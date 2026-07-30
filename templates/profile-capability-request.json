@@ -1,0 +1,51 @@
+{
+  "authority": {
+    "mayGrantEffects": false,
+    "mayMutateSubject": false,
+    "readOnly": true,
+    "runQualifiedReadOnlyTools": false
+  },
+  "context": {
+    "assignmentIds": [],
+    "assuranceTier": "material",
+    "changeClasses": [
+      "state"
+    ],
+    "hints": [],
+    "lensIds": [],
+    "paths": [],
+    "role": "architect",
+    "runTools": false,
+    "taskProfile": "implementation-structure"
+  },
+  "inputs": [
+    {
+      "canonicalSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "kind": "state-decision-effect",
+      "path": "path/to/design.json",
+      "ref": "SDE-EXAMPLE@1",
+      "schema": "bbk.state-decision-effect-design.v1",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "operation": "state-effect",
+  "profile": {
+    "id": "example",
+    "manifestSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "rootSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "version": "0.1.0"
+  },
+  "requestDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+  "requestId": "PCR-EXAMPLE",
+  "schema": "bbk.profile-capability-request.v1",
+  "source": {
+    "contentSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "root": "."
+  },
+  "subject": {
+    "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "kind": "state-decision-effect",
+    "ref": "SDE-EXAMPLE@1",
+    "revision": "1"
+  }
+}

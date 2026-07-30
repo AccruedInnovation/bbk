@@ -1,0 +1,260 @@
+{
+  "description": "Bundled OMP runtime routing profiles for BBK sub-agents. These profiles affect future OMP spawns only and do not change role authority or assurance obligations.",
+  "package_version": "0.1.0-alpha.11.7",
+  "profiles": {
+    "deepseek-economy": {
+      "description": "DeepSeek-only economy profile: V4 Pro for judgment and coordination roles, V4 Flash for mechanical roles.",
+      "roles": {
+        "bbk_architect": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        },
+        "bbk_phase_wayfinder": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        },
+        "bbk_planning_wayfinder": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        },
+        "bbk_prototyper": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        },
+        "bbk_question_guide": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        },
+        "bbk_questioning_wayfinder": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        },
+        "bbk_researcher": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        },
+        "bbk_reviewer": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        },
+        "bbk_root_orchestrator": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        },
+        "bbk_root_wayfinder": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        },
+        "bbk_synthesizer": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        },
+        "bbk_territory_orchestrator": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        },
+        "bbk_territory_wayfinder": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        },
+        "bbk_validator": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        },
+        "bbk_validator_orchestrator": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        },
+        "bbk_verification_designer": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        },
+        "bbk_worker": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        },
+        "bbk_worker_designer": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        },
+        "bbk_worker_orchestrator": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        }
+      }
+    },
+    "default": {
+      "description": "Qualified BBK default: GPT-5.6 Sol for high-judgment roles, DeepSeek V4 Pro for coordination, and DeepSeek V4 Flash for mechanical work.",
+      "roles": {
+        "bbk_architect": {
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "high"
+        },
+        "bbk_phase_wayfinder": {
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "high"
+        },
+        "bbk_planning_wayfinder": {
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "high"
+        },
+        "bbk_prototyper": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        },
+        "bbk_question_guide": {
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "high"
+        },
+        "bbk_questioning_wayfinder": {
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "high"
+        },
+        "bbk_researcher": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        },
+        "bbk_reviewer": {
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "high"
+        },
+        "bbk_root_orchestrator": {
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "high"
+        },
+        "bbk_root_wayfinder": {
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "high"
+        },
+        "bbk_synthesizer": {
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "high"
+        },
+        "bbk_territory_orchestrator": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        },
+        "bbk_territory_wayfinder": {
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "high"
+        },
+        "bbk_validator": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        },
+        "bbk_validator_orchestrator": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        },
+        "bbk_verification_designer": {
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "high"
+        },
+        "bbk_worker": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        },
+        "bbk_worker_designer": {
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "high"
+        },
+        "bbk_worker_orchestrator": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        }
+      }
+    },
+    "testing-flash": {
+      "description": "Low-cost functional test profile: every BBK sub-agent uses DeepSeek V4 Flash with high thinking.",
+      "roles": {
+        "bbk_architect": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        },
+        "bbk_phase_wayfinder": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        },
+        "bbk_planning_wayfinder": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        },
+        "bbk_prototyper": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        },
+        "bbk_question_guide": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        },
+        "bbk_questioning_wayfinder": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        },
+        "bbk_researcher": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        },
+        "bbk_reviewer": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        },
+        "bbk_root_orchestrator": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        },
+        "bbk_root_wayfinder": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        },
+        "bbk_synthesizer": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        },
+        "bbk_territory_orchestrator": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        },
+        "bbk_territory_wayfinder": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        },
+        "bbk_validator": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        },
+        "bbk_validator_orchestrator": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        },
+        "bbk_verification_designer": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        },
+        "bbk_worker": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        },
+        "bbk_worker_designer": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        },
+        "bbk_worker_orchestrator": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        }
+      }
+    }
+  },
+  "schema_version": "bbk.omp-model-routing-profiles.v1",
+  "thinking_levels": [
+    "auto",
+    "off",
+    "minimal",
+    "low",
+    "medium",
+    "high",
+    "xhigh",
+    "max"
+  ]
+}

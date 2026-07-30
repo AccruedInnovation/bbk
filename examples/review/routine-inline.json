@@ -1,0 +1,17 @@
+{
+  "applicability": "inline",
+  "assertions": [
+    {
+      "id": "A-DOC",
+      "method": "inspection",
+      "result": "PASS"
+    }
+  ],
+  "kind": "routine-inline",
+  "note": "Routine local change; deterministic check and bounded inline inspection only.",
+  "schema": "bbk.review-example.v1",
+  "subject": {
+    "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "ref": "WU-DOC-001"
+  }
+}

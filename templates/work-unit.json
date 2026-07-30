@@ -1,0 +1,72 @@
+{
+  "affectedPaths": [
+    "src/application/query_service.py"
+  ],
+  "assuranceTier": "material",
+  "authority": {
+    "filesystem": "assigned workspace only",
+    "network": false
+  },
+  "changeClasses": [
+    "application-service"
+  ],
+  "dependencies": [
+    "WU-DOMAIN-TYPES"
+  ],
+  "executionSliceIds": [
+    "ES-SOFTWARE-001"
+  ],
+  "expectedBehavior": [
+    "Return deterministic DecisionIndex values.",
+    "Propagate repository failure without partial result."
+  ],
+  "handoffSchema": "bbk.worker-result.v1",
+  "id": "WU-QUERY-SERVICE",
+  "implementationStructureContractRefs": [
+    "ISC-SOFTWARE-001@1"
+  ],
+  "keyContractRefs": [
+    "KC-QUERY",
+    "KC-RESULT"
+  ],
+  "languageProfiles": [
+    "python"
+  ],
+  "plannedArtifactRefs": [
+    "ART-APP-SERVICE",
+    "ART-TEST"
+  ],
+  "preconditions": [
+    "Domain query/result types exist."
+  ],
+  "profileHints": [
+    "public-api",
+    "type-driven"
+  ],
+  "purpose": "Implement the application query service for the first software slice.",
+  "requiredSkills": [
+    "bbk-execution",
+    "bbk-implementation-structure"
+  ],
+  "role": "worker",
+  "scaffoldingDisposition": "Retain as a contract fixture.",
+  "scope": [
+    "src/application/query_service.py",
+    "tests/test_decision_index.py"
+  ],
+  "solutionOutcomeFitRefs": [
+    "SOF-001@r1"
+  ],
+  "supportedOutcomeRefs": [
+    "OUT-001"
+  ],
+  "taskProfile": "implementation",
+  "temporaryScaffolding": [
+    "SC-FIXTURE-REPO"
+  ],
+  "touchpoint": "Run the CLI fixture through the application service.",
+  "verificationPlan": [
+    "Run focused unit tests.",
+    "Run slice assertions A-S1-ORDER and A-S1-INVALID."
+  ]
+}

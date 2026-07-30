@@ -1,0 +1,79 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-profile-lock-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "anyOf": [
+    {
+      "required": [
+        "generated_at",
+        "profiles",
+        "effective_sha256"
+      ]
+    },
+    {
+      "required": [
+        "bbkVersion",
+        "profileId",
+        "profileVersion",
+        "profileRootDigest",
+        "effectiveDigest",
+        "inputs"
+      ]
+    }
+  ],
+  "properties": {
+    "bbkVersion": {
+      "type": "string"
+    },
+    "effectiveDigest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "effective_sha256": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      ]
+    },
+    "generated_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "inputs": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "profileId": {
+      "type": "string"
+    },
+    "profileRootDigest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "profileVersion": {
+      "type": "string"
+    },
+    "profiles": {
+      "type": "array"
+    },
+    "resolution": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "schema": {
+      "const": "bbk.profile-lock.v1"
+    }
+  },
+  "required": [
+    "schema"
+  ],
+  "title": "BBK profile lock v1 (alpha.3–alpha.6 compatible)",
+  "type": "object"
+}

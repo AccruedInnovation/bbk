@@ -1,0 +1,65 @@
+{
+  "assertionRefs": [
+    "A-EFFECT-ONCE"
+  ],
+  "completedAt": "2026-07-24T00:00:10Z",
+  "completionStatus": "PASS",
+  "coverage": {
+    "complete": true,
+    "traceCount": 1
+  },
+  "dependencyFingerprint": "dbc465e978132d7119fe343b8c292afbc62bdc2b41fb0096214827ff747b16fd",
+  "environmentIdentity": {
+    "id": "fixture-order-v1"
+  },
+  "freshness": {
+    "dependencyKeys": [
+      "subject",
+      "trace",
+      "tool"
+    ],
+    "stale": false,
+    "validUntil": null
+  },
+  "kind": "freeform-log",
+  "operation": {
+    "argv": [
+      "python",
+      "run_trace.py"
+    ],
+    "externalEffects": false,
+    "network": false,
+    "sanitized": true,
+    "workingDirectory": "/fixture"
+  },
+  "outputs": {
+    "artifactRefs": [],
+    "exitCode": 0,
+    "reportRefs": [
+      "TRACE-REPORT"
+    ],
+    "stderrDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdoutDigest": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df",
+    "traceRefs": [
+      "TRACE-DUPLICATE"
+    ]
+  },
+  "producer": "legacy-log-importer",
+  "rawEvidenceRef": null,
+  "receiptId": "ER-UNSTRUCTURED-001",
+  "redaction": {
+    "classification": "none",
+    "rawDigestBeforeRedaction": null
+  },
+  "schema": "bbk.evidence-receipt.v2",
+  "startedAt": "2026-07-24T00:00:00Z",
+  "subject": {
+    "digest": "c43b10defceb4401dc11e37366e491015afb76986a0e6fd76e5022f1683197e0",
+    "ref": "CANDIDATE-ORDER-001"
+  },
+  "toolIdentity": {
+    "name": "fixture-runner",
+    "version": "1"
+  },
+  "trustClass": "UNSTRUCTURED_OBSERVATION"
+}

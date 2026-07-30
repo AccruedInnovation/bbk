@@ -1,0 +1,106 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-review-aggregate-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "advisories": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "aggregateId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "assertionResults": {
+      "type": "array"
+    },
+    "authorityDisclaimer": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "blockers": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "calculationDigest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "contextCompleteness": {
+      "enum": [
+        "COMPLETE",
+        "COMPLETE_WITH_DECLARED_EXCLUSIONS",
+        "PARTIAL_NONBLOCKING",
+        "BLOCKED_REQUIRED_CONTEXT_MISSING",
+        "STALE",
+        "INVALID"
+      ]
+    },
+    "infrastructureStates": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "nonAveraging": {
+      "const": true
+    },
+    "openFindingRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "result": {
+      "enum": [
+        "PASS",
+        "PASS_ADVISORY",
+        "NEEDS_REVISION",
+        "BLOCKED_INSUFFICIENT_CONTEXT",
+        "BLOCKED_ENVIRONMENT",
+        "INCONCLUSIVE",
+        "ERROR",
+        "ESCALATED",
+        "CANCELLED",
+        "STALE"
+      ]
+    },
+    "reviewManifestRef": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.review-aggregate.v1"
+    },
+    "subject": {
+      "additionalProperties": true,
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "aggregateId",
+    "reviewManifestRef",
+    "subject",
+    "result",
+    "assertionResults",
+    "openFindingRefs",
+    "contextCompleteness",
+    "infrastructureStates",
+    "blockers",
+    "advisories",
+    "nonAveraging",
+    "calculationDigest",
+    "authorityDisclaimer"
+  ],
+  "title": "BBK ReviewAggregate v1",
+  "type": "object"
+}

@@ -1,0 +1,338 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-review-manifest-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "aggregationPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "allowPassAdvisory": {
+          "type": "boolean"
+        },
+        "centralBlocking": {
+          "type": "boolean"
+        },
+        "nonAveraging": {
+          "const": true
+        },
+        "protectedFloors": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "nonAveraging",
+        "allowPassAdvisory",
+        "centralBlocking",
+        "protectedFloors"
+      ],
+      "type": "object"
+    },
+    "applicability": {
+      "enum": [
+        "none",
+        "inline",
+        "manifest"
+      ]
+    },
+    "assuranceContract": {
+      "additionalProperties": false,
+      "properties": {
+        "digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "ref": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "digest"
+      ],
+      "type": "object"
+    },
+    "authorityDisclaimer": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "contextPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "excludePatterns": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "includePatterns": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "maxPackBytes": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "redactionClass": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "requiredKinds": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "requiredPaths": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "requiredKinds",
+        "requiredPaths",
+        "includePatterns",
+        "excludePatterns",
+        "redactionClass",
+        "maxPackBytes"
+      ],
+      "type": "object"
+    },
+    "dependencyClosure": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "gateKind": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "independenceRequirements": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "lensAssignments": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "assignmentId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "blocking": {
+            "type": "boolean"
+          },
+          "contextSelector": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "evidenceRequirements": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "independence": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "lens": {
+            "enum": [
+              "intent-outcome",
+              "specification-acceptance",
+              "feasibility-dependency",
+              "architecture-boundary",
+              "interface-consumer-compatibility",
+              "implementation-structure",
+              "state-concurrency-effect-recovery",
+              "security-privacy-supply-chain",
+              "test-evidence",
+              "operations-performance-resource",
+              "package-install-migration-release",
+              "cross-shard-integration"
+            ]
+          },
+          "method": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "primaryAssertionRefs": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "reviewerCapabilityRequirements": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "assignmentId",
+          "lens",
+          "primaryAssertionRefs",
+          "method",
+          "evidenceRequirements",
+          "reviewerCapabilityRequirements",
+          "independence",
+          "contextSelector",
+          "blocking"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "manifestId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "priorFindingsVisibility": {
+      "enum": [
+        "HIDDEN",
+        "TARGETED",
+        "FULL",
+        "NOT_APPLICABLE"
+      ]
+    },
+    "provenance": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "purpose": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "repairPolicy": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "requiredAssertionRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "requiredDeterministicEvidence": {
+      "type": "array"
+    },
+    "revision": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.review-manifest.v1"
+    },
+    "shardPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "crossShardAssertionRefs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "grouping": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "none",
+            "semantic",
+            "path-fallback"
+          ]
+        }
+      },
+      "required": [
+        "mode",
+        "grouping",
+        "crossShardAssertionRefs"
+      ],
+      "type": "object"
+    },
+    "status": {
+      "enum": [
+        "planned",
+        "active",
+        "completed",
+        "stale",
+        "superseded"
+      ]
+    },
+    "subject": {
+      "additionalProperties": false,
+      "properties": {
+        "digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "kind": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "ref": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "revision": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "kind",
+        "revision",
+        "digest"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "manifestId",
+    "revision",
+    "status",
+    "purpose",
+    "gateKind",
+    "applicability",
+    "subject",
+    "assuranceContract",
+    "requiredAssertionRefs",
+    "lensAssignments",
+    "independenceRequirements",
+    "priorFindingsVisibility",
+    "contextPolicy",
+    "shardPlan",
+    "requiredDeterministicEvidence",
+    "aggregationPolicy",
+    "repairPolicy",
+    "dependencyClosure",
+    "provenance",
+    "authorityDisclaimer"
+  ],
+  "title": "BBK ReviewManifest v1",
+  "type": "object"
+}

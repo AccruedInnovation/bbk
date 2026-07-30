@@ -1,0 +1,194 @@
+{
+  "alternatives": [
+    {
+      "benefits": [
+        "Full control"
+      ],
+      "costs": [
+        "New service to operate"
+      ],
+      "disposition": "rejected",
+      "evidenceRefs": [],
+      "fit": "medium",
+      "id": "ALT-CUSTOM",
+      "intervention": "Build a custom reconciliation service.",
+      "kind": "requested",
+      "risks": [
+        "Duplicate matching authority"
+      ]
+    },
+    {
+      "benefits": [
+        "Uses existing authority",
+        "Low reversibility cost"
+      ],
+      "costs": [
+        "Configuration and trial effort"
+      ],
+      "disposition": "selected",
+      "evidenceRefs": [
+        "PLATFORM-MATCHING-DOC"
+      ],
+      "fit": "high",
+      "id": "ALT-CONFIGURE",
+      "intervention": "Configure and trial the existing matching rule and exception report.",
+      "kind": "no-change",
+      "risks": [
+        "May not cover every mismatch class"
+      ]
+    }
+  ],
+  "applicability": {
+    "level": "record",
+    "rationale": "A new service was requested before checking whether the existing platform can meet the outcome.",
+    "triggers": [
+      "custom-system request",
+      "existing capability not considered"
+    ]
+  },
+  "causalHypothesis": {
+    "assumptions": [
+      "The rule covers the observed mismatch classes",
+      "The exception report is available to operators"
+    ],
+    "confidence": "medium",
+    "evidenceRefs": [
+      "PLATFORM-MATCHING-DOC"
+    ],
+    "falsifiers": [
+      "A representative trial leaves more than one hour of weekly work",
+      "Mismatch reasons remain opaque"
+    ],
+    "mechanism": "The platform performs deterministic matching and emits only exceptions for operator review.",
+    "statement": "Configuring and measuring the existing matching rule may achieve the outcome with less operational burden than a new service."
+  },
+  "constraints": [
+    {
+      "evidenceRefs": [],
+      "id": "CON-EXPLAIN",
+      "kind": "hard",
+      "source": "operational requirement",
+      "statement": "Operators must be able to explain unresolved mismatches."
+    }
+  ],
+  "counterfactual": {
+    "conclusion": "A new service is premature; first test the existing platform capability against the operational outcome.",
+    "failureConditions": [
+      "Operators still investigate the same exceptions",
+      "The service creates conflicting match decisions",
+      "The new service is not adopted"
+    ],
+    "question": "If a custom service were delivered, when would the outcome remain unmet?",
+    "residualRisks": [
+      "The existing capability may prove insufficient after trial"
+    ]
+  },
+  "currentBaseline": {
+    "costsAndPain": [
+      "Several hours of manual work each week"
+    ],
+    "currentApproach": [
+      "Spreadsheet reconciliation"
+    ],
+    "description": "The existing platform has an unused matching rule and exception report, while operators reconcile records in a spreadsheet.",
+    "evidenceRefs": [
+      "PLATFORM-MATCHING-DOC"
+    ],
+    "noChangeConsequences": [
+      "Manual work continues unless the existing capability is configured"
+    ],
+    "strengths": [
+      "Existing platform already owns the source records"
+    ]
+  },
+  "desiredOutcomes": [
+    {
+      "actorRefs": [
+        "OPERATOR"
+      ],
+      "evidenceRefs": [],
+      "id": "OUT-LESS-RECONCILIATION",
+      "statement": "Operators spend less than one hour per week reconciling matching records and can explain unresolved mismatches.",
+      "successMeasures": [
+        "Weekly manual effort below one hour",
+        "Unresolved mismatches have attributable reasons"
+      ]
+    }
+  ],
+  "disposition": {
+    "approvalRefs": [
+      "DEC-TRIAL-EXISTING"
+    ],
+    "authorityMode": "user",
+    "blockers": [],
+    "investigationPlan": [
+      "Run a four-week representative trial and reopen if the threshold is not met"
+    ],
+    "rationale": "The lower-cost existing capability plausibly meets the outcome and avoids duplicate authority.",
+    "selectedDirection": "Configure and evaluate the existing platform matching rule before authorizing a custom service.",
+    "status": "NO_CHANGE_PREFERRED"
+  },
+  "fitId": "SOF-CUSTOM-RECONCILER",
+  "requestedIntervention": {
+    "evidenceRefs": [],
+    "mandatory": false,
+    "rationale": "The service was proposed to reduce manual reconciliation effort.",
+    "role": "candidate",
+    "source": "user-request",
+    "statement": "Build a custom reconciliation microservice."
+  },
+  "review": {
+    "acceptedReviewRefs": [
+      "REVIEW-EXISTING-CAPABILITY"
+    ],
+    "blockers": [],
+    "criteria": [
+      "Existing capability was evaluated",
+      "No duplicate authority is introduced",
+      "Trial evidence measures operator outcome"
+    ],
+    "required": true,
+    "reviewerKind": "fresh-reviewer"
+  },
+  "revision": "r1",
+  "risk": {
+    "confidence": "medium",
+    "consequence": 2,
+    "derivedTier": "consequential",
+    "interfaceExposure": 2,
+    "irreversibility": 2,
+    "rationale": "A new service would create a competing authority and operational boundary; the trial is low cost.",
+    "uncertainty": 1
+  },
+  "schema": "bbk.solution-outcome-fit.v1",
+  "status": "reviewed",
+  "successEvidence": [
+    {
+      "evidenceRefs": [],
+      "id": "EV-TRIAL-EFFORT",
+      "measure": "Operator time and unresolved mismatch explanations during a representative trial",
+      "method": "measurement",
+      "observationWindow": "four-week trial",
+      "outcomeRef": "OUT-LESS-RECONCILIATION",
+      "thresholdOrSignal": "Less than one hour per week and every unresolved case has an attributable reason"
+    }
+  ],
+  "title": "Reconciliation intervention selection",
+  "traceability": {
+    "architectureRefs": [],
+    "capabilityRefs": [
+      "CAP-RECONCILIATION-TRIAL"
+    ],
+    "decisionRefs": [
+      "DEC-TRIAL-EXISTING"
+    ],
+    "needRefs": [],
+    "outcomeRefs": [
+      "OUT-LESS-RECONCILIATION"
+    ],
+    "requirementRefs": [
+      "CON-EXPLAIN"
+    ],
+    "workUnitRefs": []
+  }
+}

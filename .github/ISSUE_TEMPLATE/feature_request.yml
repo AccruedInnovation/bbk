@@ -1,0 +1,25 @@
+name: Feature request
+description: Propose a BBK capability or simplification
+labels: [enhancement]
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Operational outcome
+      description: What should become possible or materially better?
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: Current workflow or limitation
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed direction
+  - type: textarea
+    id: boundaries
+    attributes:
+      label: Authority, compatibility, and assurance implications

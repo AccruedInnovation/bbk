@@ -1,0 +1,80 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-profile-capability-result-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "capability": {
+      "enum": [
+        "state_decision_effect",
+        "review_assurance"
+      ]
+    },
+    "errors": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "limitations": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "operation": {
+      "enum": [
+        "state-effect",
+        "state-effect-inventory",
+        "state-effect-review",
+        "review-context",
+        "review-lens",
+        "evidence-adapter"
+      ]
+    },
+    "payload": {},
+    "profileId": {
+      "type": "string"
+    },
+    "profileVersion": {
+      "type": "string"
+    },
+    "requestDigest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.profile-capability-result.v1"
+    },
+    "status": {
+      "enum": [
+        "PASS",
+        "PASS_ADVISORY",
+        "PARTIAL",
+        "BLOCKED",
+        "UNSUPPORTED",
+        "ERROR"
+      ]
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema",
+    "profileId",
+    "profileVersion",
+    "capability",
+    "operation",
+    "status",
+    "requestDigest",
+    "payload",
+    "warnings",
+    "errors",
+    "limitations"
+  ],
+  "title": "BBK Profile Capability Result v1",
+  "type": "object"
+}

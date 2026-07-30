@@ -1,0 +1,40 @@
+{
+  "authority": {
+    "may_add_gate_recipes": true,
+    "may_add_procedure": true,
+    "may_add_review_criteria": true,
+    "may_declare_pass": false,
+    "may_expand_work_scope": false,
+    "may_grant_tools_or_effects": false,
+    "may_reduce_assurance": false
+  },
+  "entrypoints": {
+    "gate_plan": [
+      "{python}",
+      "tools/profile.py",
+      "--json",
+      "gate-plan"
+    ],
+    "preflight": [
+      "{python}",
+      "tools/profile.py",
+      "--json",
+      "preflight"
+    ],
+    "resolve": [
+      "{python}",
+      "tools/profile.py",
+      "--json",
+      "resolve"
+    ]
+  },
+  "id": "legacy-fixture",
+  "maturity": "fixture",
+  "name": "Legacy alpha.3 fixture",
+  "package": "bbk-profile-legacy-fixture",
+  "requires": {
+    "bbk_minimum": "0.1.0-alpha.3"
+  },
+  "schema": "bbk.language-profile.v1",
+  "version": "0.1.0-alpha.1"
+}

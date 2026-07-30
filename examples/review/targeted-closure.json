@@ -1,0 +1,11 @@
+{
+  "closureCriteria": [
+    "stable idempotency key",
+    "duplicate trace passes"
+  ],
+  "findingRef": "F-ORDER-001",
+  "kind": "targeted-closure",
+  "priorFindingsVisibility": "TARGETED",
+  "requiredDisposition": "explicit successor FindingDisposition",
+  "schema": "bbk.review-example.v1"
+}

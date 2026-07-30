@@ -1,0 +1,127 @@
+{
+  "alternatives": [
+    {
+      "benefits": [],
+      "costs": [],
+      "disposition": "investigate",
+      "evidenceRefs": [],
+      "fit": "unknown",
+      "id": "ALT-REQUESTED",
+      "intervention": "The requested intervention",
+      "kind": "requested",
+      "risks": []
+    },
+    {
+      "benefits": [],
+      "costs": [],
+      "disposition": "retained",
+      "evidenceRefs": [],
+      "fit": "unknown",
+      "id": "ALT-NO-CHANGE",
+      "intervention": "Continue the current approach",
+      "kind": "no-change",
+      "risks": []
+    }
+  ],
+  "applicability": {
+    "level": "record",
+    "rationale": "The request names an intervention whose relationship to the desired operational result should be made explicit.",
+    "triggers": [
+      "solution-first request",
+      "material intervention"
+    ]
+  },
+  "causalHypothesis": {
+    "assumptions": [],
+    "confidence": "unknown",
+    "evidenceRefs": [],
+    "falsifiers": [],
+    "mechanism": "Describe the causal mechanism or operational change.",
+    "statement": "Explain why the requested intervention is expected to produce the desired outcome."
+  },
+  "constraints": [],
+  "counterfactual": {
+    "conclusion": "Not yet assessed.",
+    "failureConditions": [],
+    "question": "If the requested intervention were delivered exactly as described, under what circumstances would the underlying problem remain?",
+    "residualRisks": []
+  },
+  "currentBaseline": {
+    "costsAndPain": [],
+    "currentApproach": [],
+    "description": "Describe how the outcome is achieved today or without the proposed intervention.",
+    "evidenceRefs": [],
+    "noChangeConsequences": [],
+    "strengths": []
+  },
+  "desiredOutcomes": [
+    {
+      "actorRefs": [
+        "ACTOR-001"
+      ],
+      "evidenceRefs": [],
+      "id": "OUT-001",
+      "statement": "Describe the observable result the relevant actor needs.",
+      "successMeasures": [
+        "State how success will be observed without merely saying the artifact exists."
+      ]
+    }
+  ],
+  "disposition": {
+    "approvalRefs": [],
+    "authorityMode": "unresolved",
+    "blockers": [
+      "Complete outcome, baseline, causal, alternatives, counterfactual and evidence review."
+    ],
+    "investigationPlan": [],
+    "rationale": "The fit has not yet been reviewed.",
+    "selectedDirection": "",
+    "status": "UNRESOLVED"
+  },
+  "fitId": "SOF-001",
+  "requestedIntervention": {
+    "evidenceRefs": [],
+    "mandatory": false,
+    "rationale": "Record whether this is a candidate solution, a preference, a learning objective, or an externally mandated form.",
+    "role": "candidate",
+    "source": "user-request",
+    "statement": "Describe the requested solution or intervention."
+  },
+  "review": {
+    "acceptedReviewRefs": [],
+    "blockers": [],
+    "criteria": [
+      "Outcome is distinct from intervention",
+      "Causal hypothesis is explicit",
+      "Counterfactual failure has been considered",
+      "Success evidence measures the outcome"
+    ],
+    "required": true,
+    "reviewerKind": "same-wayfinder"
+  },
+  "revision": "r1",
+  "risk": {
+    "confidence": "low",
+    "consequence": 1,
+    "derivedTier": "routine",
+    "interfaceExposure": 1,
+    "irreversibility": 1,
+    "rationale": "Initial provisional routine assessment; raise the axes when evidence indicates materiality.",
+    "uncertainty": 1
+  },
+  "schema": "bbk.solution-outcome-fit.v1",
+  "status": "draft",
+  "successEvidence": [],
+  "title": "Requested intervention and desired outcome fit",
+  "traceability": {
+    "architectureRefs": [],
+    "capabilityRefs": [],
+    "decisionRefs": [],
+    "needRefs": [],
+    "outcomeRefs": [
+      "OUT-001"
+    ],
+    "requirementRefs": [],
+    "workUnitRefs": []
+  }
+}

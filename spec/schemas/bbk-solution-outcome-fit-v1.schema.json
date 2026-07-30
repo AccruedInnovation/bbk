@@ -1,0 +1,202 @@
+{
+  "$defs": {
+    "alternative": {
+      "additionalProperties": false,
+      "properties": {
+        "benefits": {"items": {"type": "string"}, "type": "array"},
+        "costs": {"items": {"type": "string"}, "type": "array"},
+        "disposition": {
+          "enum": ["selected", "rejected", "retained", "investigate", "not-applicable"]
+        },
+        "evidenceRefs": {"items": {"type": "string"}, "type": "array"},
+        "fit": {"enum": ["high", "medium", "low", "unknown"]},
+        "id": {"minLength": 1, "type": "string"},
+        "intervention": {"minLength": 1, "type": "string"},
+        "kind": {
+          "enum": ["requested", "alternative", "no-change", "procedural", "operational", "technical", "other"]
+        },
+        "risks": {"items": {"type": "string"}, "type": "array"}
+      },
+      "required": ["id", "intervention", "kind", "fit", "benefits", "costs", "risks", "disposition", "evidenceRefs"],
+      "type": "object"
+    },
+    "constraint": {
+      "additionalProperties": false,
+      "properties": {
+        "evidenceRefs": {"items": {"type": "string"}, "type": "array"},
+        "id": {"minLength": 1, "type": "string"},
+        "kind": {"enum": ["hard", "preference", "assumption", "unknown"]},
+        "source": {"minLength": 1, "type": "string"},
+        "statement": {"minLength": 1, "type": "string"}
+      },
+      "required": ["id", "statement", "kind", "source", "evidenceRefs"],
+      "type": "object"
+    },
+    "outcome": {
+      "additionalProperties": false,
+      "properties": {
+        "actorRefs": {"items": {"type": "string"}, "type": "array"},
+        "evidenceRefs": {"items": {"type": "string"}, "type": "array"},
+        "id": {"minLength": 1, "type": "string"},
+        "statement": {"minLength": 1, "type": "string"},
+        "successMeasures": {"items": {"minLength": 1, "type": "string"}, "type": "array"}
+      },
+      "required": ["id", "statement", "actorRefs", "successMeasures", "evidenceRefs"],
+      "type": "object"
+    },
+    "successEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "evidenceRefs": {"items": {"type": "string"}, "type": "array"},
+        "id": {"minLength": 1, "type": "string"},
+        "measure": {"minLength": 1, "type": "string"},
+        "method": {
+          "enum": ["analysis", "inspection", "demonstration", "test", "operational-observation", "review", "survey", "measurement", "other"]
+        },
+        "observationWindow": {"minLength": 1, "type": "string"},
+        "outcomeRef": {"minLength": 1, "type": "string"},
+        "thresholdOrSignal": {"minLength": 1, "type": "string"}
+      },
+      "required": ["id", "outcomeRef", "measure", "method", "thresholdOrSignal", "observationWindow", "evidenceRefs"],
+      "type": "object"
+    }
+  },
+  "$id": "https://bbk.local/schemas/bbk-solution-outcome-fit-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "alternatives": {"items": {"$ref": "#/$defs/alternative"}, "type": "array"},
+    "applicability": {
+      "additionalProperties": false,
+      "properties": {
+        "level": {"enum": ["implicit", "inline", "record"]},
+        "rationale": {"minLength": 1, "type": "string"},
+        "triggers": {"items": {"type": "string"}, "type": "array"}
+      },
+      "required": ["level", "triggers", "rationale"],
+      "type": "object"
+    },
+    "causalHypothesis": {
+      "additionalProperties": false,
+      "properties": {
+        "assumptions": {"items": {"type": "string"}, "type": "array"},
+        "confidence": {"enum": ["high", "medium", "low", "unknown"]},
+        "evidenceRefs": {"items": {"type": "string"}, "type": "array"},
+        "falsifiers": {"items": {"type": "string"}, "type": "array"},
+        "mechanism": {"minLength": 1, "type": "string"},
+        "statement": {"minLength": 1, "type": "string"}
+      },
+      "required": ["statement", "mechanism", "assumptions", "confidence", "evidenceRefs", "falsifiers"],
+      "type": "object"
+    },
+    "constraints": {"items": {"$ref": "#/$defs/constraint"}, "type": "array"},
+    "counterfactual": {
+      "additionalProperties": false,
+      "properties": {
+        "conclusion": {"minLength": 1, "type": "string"},
+        "failureConditions": {"items": {"type": "string"}, "type": "array"},
+        "question": {"minLength": 1, "type": "string"},
+        "residualRisks": {"items": {"type": "string"}, "type": "array"}
+      },
+      "required": ["question", "failureConditions", "residualRisks", "conclusion"],
+      "type": "object"
+    },
+    "currentBaseline": {
+      "additionalProperties": false,
+      "properties": {
+        "costsAndPain": {"items": {"type": "string"}, "type": "array"},
+        "currentApproach": {"items": {"type": "string"}, "type": "array"},
+        "description": {"minLength": 1, "type": "string"},
+        "evidenceRefs": {"items": {"type": "string"}, "type": "array"},
+        "noChangeConsequences": {"items": {"type": "string"}, "type": "array"},
+        "strengths": {"items": {"type": "string"}, "type": "array"}
+      },
+      "required": ["description", "currentApproach", "strengths", "costsAndPain", "noChangeConsequences", "evidenceRefs"],
+      "type": "object"
+    },
+    "desiredOutcomes": {"items": {"$ref": "#/$defs/outcome"}, "minItems": 1, "type": "array"},
+    "disposition": {
+      "additionalProperties": false,
+      "properties": {
+        "approvalRefs": {"items": {"type": "string"}, "type": "array"},
+        "authorityMode": {"enum": ["user", "delegated", "constraint-driven", "external-authority", "unresolved"]},
+        "blockers": {"items": {"type": "string"}, "type": "array"},
+        "investigationPlan": {"items": {"type": "string"}, "type": "array"},
+        "rationale": {"minLength": 1, "type": "string"},
+        "selectedDirection": {"type": "string"},
+        "status": {
+          "enum": ["CONFIRMED_FIT", "REFRAMED", "INVESTIGATE", "PREFERENCE_DRIVEN", "CONSTRAINT_REQUIRED", "NO_CHANGE_PREFERRED", "UNRESOLVED"]
+        }
+      },
+      "required": ["status", "selectedDirection", "authorityMode", "rationale", "approvalRefs", "investigationPlan", "blockers"],
+      "type": "object"
+    },
+    "fitId": {"minLength": 1, "type": "string"},
+    "metadata": {"additionalProperties": true, "type": "object"},
+    "requestedIntervention": {
+      "additionalProperties": false,
+      "properties": {
+        "evidenceRefs": {"items": {"type": "string"}, "type": "array"},
+        "mandatory": {"type": "boolean"},
+        "rationale": {"minLength": 1, "type": "string"},
+        "role": {"enum": ["candidate", "preference", "learning-objective", "mandated", "unknown"]},
+        "source": {"enum": ["user-request", "existing-plan", "external-authority", "inferred", "other"]},
+        "statement": {"minLength": 1, "type": "string"}
+      },
+      "required": ["statement", "source", "role", "mandatory", "rationale", "evidenceRefs"],
+      "type": "object"
+    },
+    "review": {
+      "additionalProperties": false,
+      "properties": {
+        "acceptedReviewRefs": {"items": {"type": "string"}, "type": "array"},
+        "blockers": {"items": {"type": "string"}, "type": "array"},
+        "criteria": {"items": {"type": "string"}, "type": "array"},
+        "required": {"type": "boolean"},
+        "reviewerKind": {"enum": ["same-wayfinder", "fresh-reviewer", "human", "not-required"]}
+      },
+      "required": ["required", "reviewerKind", "criteria", "acceptedReviewRefs", "blockers"],
+      "type": "object"
+    },
+    "revision": {"minLength": 1, "type": "string"},
+    "risk": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {"enum": ["high", "medium", "low"]},
+        "consequence": {"maximum": 4, "minimum": 0, "type": "integer"},
+        "derivedTier": {"enum": ["routine", "material", "consequential", "critical"]},
+        "interfaceExposure": {"maximum": 4, "minimum": 0, "type": "integer"},
+        "irreversibility": {"maximum": 4, "minimum": 0, "type": "integer"},
+        "rationale": {"minLength": 1, "type": "string"},
+        "uncertainty": {"maximum": 4, "minimum": 0, "type": "integer"}
+      },
+      "required": ["consequence", "irreversibility", "uncertainty", "interfaceExposure", "derivedTier", "rationale", "confidence"],
+      "type": "object"
+    },
+    "schema": {"const": "bbk.solution-outcome-fit.v1"},
+    "status": {"enum": ["draft", "in-review", "reviewed", "superseded"]},
+    "successEvidence": {"items": {"$ref": "#/$defs/successEvidence"}, "type": "array"},
+    "title": {"minLength": 1, "type": "string"},
+    "traceability": {
+      "additionalProperties": false,
+      "properties": {
+        "architectureRefs": {"items": {"type": "string"}, "type": "array"},
+        "capabilityRefs": {"items": {"type": "string"}, "type": "array"},
+        "decisionRefs": {"items": {"type": "string"}, "type": "array"},
+        "needRefs": {"items": {"type": "string"}, "type": "array"},
+        "outcomeRefs": {"items": {"type": "string"}, "type": "array"},
+        "requirementRefs": {"items": {"type": "string"}, "type": "array"},
+        "workUnitRefs": {"items": {"type": "string"}, "type": "array"}
+      },
+      "required": ["outcomeRefs", "needRefs", "requirementRefs", "decisionRefs", "architectureRefs", "capabilityRefs", "workUnitRefs"],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema", "fitId", "revision", "title", "status", "applicability", "requestedIntervention", "desiredOutcomes",
+    "currentBaseline", "causalHypothesis", "constraints", "alternatives", "counterfactual", "successEvidence", "risk",
+    "disposition", "traceability", "review"
+  ],
+  "title": "BBK SolutionOutcomeFit v1",
+  "type": "object"
+}

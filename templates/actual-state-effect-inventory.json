@@ -1,0 +1,22 @@
+{
+  "advisoryDrift": [
+    "Private helper name differs from plan."
+  ],
+  "canonicalStateOwners": [
+    "OrderApplication"
+  ],
+  "decisionBoundaryIds": [
+    "DB-AUTHORIZE"
+  ],
+  "effectExecutorIds": [
+    "EFF-PAYMENT"
+  ],
+  "hiddenDependencies": [],
+  "limitations": [],
+  "producedBy": "fixture-profile",
+  "profileDigest": null,
+  "schema": "bbk.actual-state-effect-inventory.v1",
+  "status": "COMPLETE",
+  "subjectDigest": "c15a8c3744117190a06a07e660aaa68272640af8fe8f92ab8982fdde1eba20ed",
+  "subjectRef": "SDE-ORDER-001"
+}

@@ -1,0 +1,45 @@
+{
+  "profiles": [
+    {
+      "id": "implementation",
+      "purpose": "Create or modify a bounded realization."
+    },
+    {
+      "id": "interface-schema-migration",
+      "purpose": "Change a shared boundary, schema or migration path."
+    },
+    {
+      "id": "integration",
+      "purpose": "Join components or responsibilities and close an integration obligation."
+    },
+    {
+      "id": "test-fixture",
+      "purpose": "Create or repair tests, fixtures or evidence tooling."
+    },
+    {
+      "id": "documentation-specification",
+      "purpose": "Create or update an authoritative or review artifact."
+    },
+    {
+      "id": "investigation-prototype",
+      "purpose": "Retire uncertainty through bounded investigation or prototype."
+    },
+    {
+      "id": "packaging-release",
+      "purpose": "Create package/release artifacts and evidence without granting release authority."
+    },
+    {
+      "id": "implementation-structure",
+      "purpose": "Create or review an ImplementationStructureContract."
+    },
+    {
+      "id": "execution-slicing",
+      "purpose": "Create or review the smallest coherent inspectable execution slices."
+    },
+    {
+      "id": "solution-outcome-fit",
+      "purpose": "Separate a requested intervention from the desired outcome and establish a reviewed fit disposition."
+    }
+  ],
+  "schema": "bbk.task-profiles.v1"
+}

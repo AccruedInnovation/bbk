@@ -1,0 +1,20 @@
+{
+  "authorityRef": null,
+  "closureEvidenceRefs": [
+    "ER-CLOSURE-001"
+  ],
+  "createdAt": "2026-07-24T01:00:00Z",
+  "disposition": "FIXED",
+  "dispositionId": "FDISP-ORDER-001",
+  "findingRef": "F-ORDER-001",
+  "reopeningTriggers": [
+    "idempotency key construction changes"
+  ],
+  "residualImpact": "No known residual duplicate-effect path.",
+  "reviewAttemptRef": "ATT-CLOSURE-001",
+  "schema": "bbk.finding-disposition.v1",
+  "successorSubject": {
+    "digest": "a8cec720fa44e62c7b979a3c9c9d1115e2ed1ac62f1247e88963f3b86dc1a52f",
+    "ref": "CANDIDATE-ORDER-002"
+  }
+}

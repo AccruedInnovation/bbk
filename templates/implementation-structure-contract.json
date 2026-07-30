@@ -1,0 +1,288 @@
+{
+  "applicability": {
+    "level": "contract",
+    "rationale": "Independent domain, application and adapter work needs one shared implementation shape.",
+    "triggers": [
+      "public-interface",
+      "cross-module",
+      "deterministic-ordering"
+    ]
+  },
+  "contractId": "ISC-SOFTWARE-001",
+  "decisions": {
+    "delegated": [
+      {
+        "area": "private helper layout",
+        "bounds": "May change inside a module if public types, ordering ownership and test seams remain intact."
+      },
+      {
+        "area": "internal iteration algorithm",
+        "bounds": "May choose any clear deterministic implementation meeting scale and evidence obligations."
+      }
+    ],
+    "fixed": [
+      {
+        "changeRoute": "structure-impact review plus interface verification",
+        "id": "FD-ORDER-OWNER",
+        "rationale": "One authoritative rule prevents adapter drift.",
+        "sourceRefs": [
+          "REQ-ORDER-001"
+        ],
+        "statement": "The application/domain ordering policy owns ordering; the CLI may not sort independently."
+      },
+      {
+        "changeRoute": "contract revision",
+        "id": "FD-CLOSED-ORDER",
+        "rationale": "Invalid states should not cross the adapter boundary.",
+        "sourceRefs": [
+          "IF-DECISION-QUERY"
+        ],
+        "statement": "Order selection is a closed type, not an arbitrary string after parsing."
+      }
+    ],
+    "prohibited": [
+      "Duplicating ordering rules in the CLI.",
+      "Returning partially ordered results after repository failure."
+    ]
+  },
+  "executionSliceRefs": [
+    "ES-SOFTWARE-001",
+    "ES-SOFTWARE-002"
+  ],
+  "metadata": {
+    "example": true
+  },
+  "profileProjections": {
+    "python": {
+      "runtimeBoundary": "CLI text is validated before typed construction; type hints alone are not runtime evidence.",
+      "typeStrategy": [
+        "frozen dataclass or equivalent for query/result",
+        "Enum for order",
+        "Protocol for repository port"
+      ]
+    }
+  },
+  "review": {
+    "acceptanceCriteria": [
+      "Ordering has one owner.",
+      "Public request/result shapes are explicit.",
+      "Failure and test seams are sufficient for independent work."
+    ],
+    "acceptedBy": [
+      "DEMO-AUTHORITY"
+    ],
+    "assuranceTier": "material",
+    "requiredReviewers": [
+      "bbk_reviewer"
+    ],
+    "reviewRefs": [
+      "REVIEW-DEMO-001"
+    ]
+  },
+  "revision": "1",
+  "schema": "bbk.implementation-structure-contract.v1",
+  "status": "accepted",
+  "structure": {
+    "artifactTopology": [
+      {
+        "action": "create",
+        "id": "ART-DOMAIN-TYPE",
+        "kind": "module",
+        "logicalPath": "src/domain/decision_index.py",
+        "owner": "domain",
+        "responsibility": "Own nominal query and result types plus ordering invariant.",
+        "sourceRefs": [
+          "ARCH-DOMAIN"
+        ]
+      },
+      {
+        "action": "modify",
+        "id": "ART-APP-SERVICE",
+        "kind": "module",
+        "logicalPath": "src/application/query_service.py",
+        "owner": "application",
+        "responsibility": "Coordinate repository read and deterministic projection.",
+        "sourceRefs": [
+          "IF-DECISION-QUERY"
+        ]
+      },
+      {
+        "action": "modify",
+        "id": "ART-CLI",
+        "kind": "adapter",
+        "logicalPath": "src/cli/decisions.py",
+        "owner": "cli",
+        "responsibility": "Parse CLI input and render result without owning ordering.",
+        "sourceRefs": [
+          "ARCH-CLI"
+        ]
+      },
+      {
+        "action": "create",
+        "id": "ART-TEST",
+        "kind": "test",
+        "logicalPath": "tests/test_decision_index.py",
+        "owner": "test",
+        "responsibility": "Prove ordering, invalid input and adapter/domain agreement.",
+        "sourceRefs": [
+          "REQ-ORDER-001"
+        ]
+      }
+    ],
+    "behaviorPaths": [
+      {
+        "failureAndRecovery": [
+          "invalid order fails without repository access",
+          "repository failure returns a typed diagnostic and no partial result"
+        ],
+        "id": "BP-QUERY",
+        "interfaceRefs": [
+          "IF-DECISION-QUERY"
+        ],
+        "name": "CLI decision query",
+        "steps": [
+          {
+            "contractRef": "KC-QUERY",
+            "from": "CLI adapter",
+            "interaction": "convert text to DecisionIndexQuery",
+            "to": "Query parser"
+          },
+          {
+            "contractRef": "IF-DECISION-QUERY",
+            "from": "Query service",
+            "interaction": "read current entries",
+            "to": "Decision repository"
+          },
+          {
+            "contractRef": "KC-RESULT",
+            "from": "Query service",
+            "interaction": "produce deterministic DecisionIndex",
+            "to": "Ordering policy"
+          },
+          {
+            "contractRef": "KC-RESULT",
+            "from": "CLI adapter",
+            "interaction": "render ordered result",
+            "to": "Operator"
+          }
+        ],
+        "success": "Operator sees stable ordered decisions.",
+        "trigger": "Operator invokes bbk decisions list"
+      }
+    ],
+    "effectBoundaries": [
+      {
+        "authorization": "read grant for exact project",
+        "effect": "repository read",
+        "failure": "typed unavailable or inconsistent result",
+        "idempotency": "read-only",
+        "owner": "application query service",
+        "recovery": "surface failure; retry only by caller policy"
+      }
+    ],
+    "keyContracts": [
+      {
+        "failureSemantics": [
+          "invalid external text is rejected before construction"
+        ],
+        "id": "KC-QUERY",
+        "invariants": [
+          "scope is nominal",
+          "order is a closed enumeration"
+        ],
+        "kind": "request-type",
+        "name": "DecisionIndexQuery",
+        "responsibility": "Represent a valid query without untyped order strings.",
+        "shape": "DecisionIndexQuery(scope: ScopeId, order: DecisionOrder)",
+        "sourceRefs": [
+          "IF-DECISION-QUERY"
+        ],
+        "visibility": "shared"
+      },
+      {
+        "failureSemantics": [],
+        "id": "KC-RESULT",
+        "invariants": [
+          "entries follow requested order",
+          "stable identity is preserved"
+        ],
+        "kind": "result-type",
+        "name": "DecisionIndex",
+        "responsibility": "Return immutable ordered entries.",
+        "shape": "DecisionIndex(entries: tuple[DecisionIndexEntry, ...])",
+        "sourceRefs": [
+          "REQ-ORDER-001"
+        ],
+        "visibility": "shared"
+      }
+    ],
+    "migrationTouchpoints": [],
+    "observabilityPoints": [
+      {
+        "id": "OBS-QUERY",
+        "statement": "Record query kind, scope identity and outcome without decision content."
+      }
+    ],
+    "stateOwnership": [
+      {
+        "concurrency": "read-only for this path",
+        "consistency": "query reads one repository snapshot",
+        "lifetime": "project",
+        "mutationAuthority": "separate decision commands only",
+        "owner": "DecisionRepository",
+        "recovery": "retry query against a new snapshot; never cache as authority",
+        "state": "decision records"
+      }
+    ],
+    "testSeams": [
+      {
+        "id": "TS-REPO",
+        "sourceRefs": [
+          "REQ-QUERY-001"
+        ],
+        "statement": "Inject an in-memory repository fixture at the application port."
+      },
+      {
+        "id": "TS-CLI",
+        "sourceRefs": [
+          "REQ-ORDER-001"
+        ],
+        "statement": "Exercise parser and renderer against canonical JSON snapshots."
+      }
+    ]
+  },
+  "subject": {
+    "architectureRefs": [
+      "ARCH-DOMAIN",
+      "ARCH-APPLICATION",
+      "ARCH-CLI"
+    ],
+    "assumptionRefs": [],
+    "baselineRefs": [
+      "BASELINE-DEMO-001"
+    ],
+    "capabilityRefs": [
+      "CAP-QUERY-DECISIONS"
+    ],
+    "interfaceRefs": [
+      "IF-DECISION-QUERY"
+    ],
+    "kind": "software",
+    "outcomeRefs": [
+      "OUT-001"
+    ],
+    "purpose": "Expose a deterministic decision-index query without leaking storage or transport details.",
+    "requirementRefs": [
+      "REQ-QUERY-001",
+      "REQ-ORDER-001"
+    ],
+    "scopeRefs": [
+      "SCOPE-DECISION-INDEX"
+    ],
+    "solutionOutcomeFitRefs": [
+      "SOF-001@r1"
+    ]
+  },
+  "title": "Decision-index query implementation structure",
+  "uncertainties": []
+}

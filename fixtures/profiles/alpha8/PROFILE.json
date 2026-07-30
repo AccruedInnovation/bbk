@@ -1,0 +1,64 @@
+{
+  "authority": {
+    "may_add_gate_recipes": true,
+    "may_add_procedure": true,
+    "may_add_review_criteria": true,
+    "may_declare_pass": false,
+    "may_expand_work_scope": false,
+    "may_grant_tools_or_effects": false,
+    "may_reduce_assurance": false
+  },
+  "capabilities": {
+    "implementation_structure": {
+      "artifact_kinds": ["module", "schema", "procedure", "fixture"],
+      "contract_kinds": ["type", "interface", "state-machine", "procedure-step"],
+      "status": "supported",
+      "touchpoint_kinds": ["cli", "report", "inspection", "demonstration"],
+      "trigger_hints": ["public-api", "stateful-flow", "cross-boundary", "migration"],
+      "type_concepts": ["identity", "state", "ownership", "transition", "failure"]
+    },
+    "review_assurance": {
+      "context_entrypoint": "review_context",
+      "context_selectors": ["changed-surface", "governing-contracts"],
+      "dispatch_protocol": "bbk.profile-capability.v1",
+      "evidence_adapters": ["fixture-receipt"],
+      "evidence_entrypoint": "evidence_adapter",
+      "lens_ids": ["implementation-structure", "state-concurrency-effect-recovery", "test-evidence"],
+      "limitations": ["fixture only; generic BBK aggregation remains authoritative"],
+      "review_entrypoint": "review_lens",
+      "status": "supported"
+    },
+    "state_decision_effect": {
+      "boundary_concepts": ["canonical-state", "decision-core", "effect-shell", "recovery"],
+      "dispatch_protocol": "bbk.profile-capability.v1",
+      "formal_model_tools": ["fixture-model"],
+      "inventory_entrypoint": "state_effect_inventory",
+      "limitations": ["fixture only; no language-specific runtime guarantees"],
+      "projection_entrypoint": "state_effect",
+      "representations": ["sum-type", "product-of-sums", "decision-table"],
+      "review_entrypoint": "state_effect_review",
+      "status": "supported"
+    }
+  },
+  "entrypoints": {
+    "evidence_adapter": ["{python}", "tools/profile.py", "--json", "evidence-adapter"],
+    "gate_plan": ["{python}", "tools/profile.py", "--json", "gate-plan"],
+    "preflight": ["{python}", "tools/profile.py", "--json", "preflight"],
+    "resolve": ["{python}", "tools/profile.py", "--json", "resolve"],
+    "review_context": ["{python}", "tools/profile.py", "--json", "review-context"],
+    "review_lens": ["{python}", "tools/profile.py", "--json", "review-lens"],
+    "slice": ["{python}", "tools/profile.py", "--json", "slice"],
+    "state_effect": ["{python}", "tools/profile.py", "--json", "state-effect"],
+    "state_effect_inventory": ["{python}", "tools/profile.py", "--json", "state-effect-inventory"],
+    "state_effect_review": ["{python}", "tools/profile.py", "--json", "state-effect-review"],
+    "structure": ["{python}", "tools/profile.py", "--json", "structure"],
+    "structure_review": ["{python}", "tools/profile.py", "--json", "structure-review"]
+  },
+  "id": "alpha8-fixture",
+  "maturity": "fixture",
+  "name": "Alpha.8 typed profile dispatch fixture",
+  "package": "bbk-profile-alpha8-fixture",
+  "requires": {"bbk_minimum": "0.1.0-alpha.8"},
+  "schema": "bbk.language-profile.v1",
+  "version": "0.1.0-alpha.4"
+}

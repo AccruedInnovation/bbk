@@ -1,0 +1,63 @@
+{
+  "applicability": "NONE",
+  "canonicalState": {
+    "derivedFacts": [],
+    "dimensions": [],
+    "duplicateStateProhibitions": [],
+    "observations": [],
+    "persistenceBoundary": "No persistence.",
+    "semanticOwner": "PureConverter",
+    "strategy": "STATELESS",
+    "versionFenceSemantics": "Input digest only."
+  },
+  "decisionBoundaries": [],
+  "delegatedFreedom": [
+    "Private helper decomposition and internal naming may vary."
+  ],
+  "designId": "SDE-STATELESS",
+  "effectContracts": [],
+  "fixedDecisionRefs": [
+    "FD-ORDER-STATE"
+  ],
+  "formalization": {
+    "assumptions": [],
+    "divergenceHandling": "Ordinary contract review.",
+    "exploredBounds": [],
+    "level": "NONE",
+    "limitations": [],
+    "mappingRefs": [],
+    "modelDigest": null,
+    "modelRef": null,
+    "properties": [],
+    "rationale": "Ordinary deterministic tests are sufficient.",
+    "required": false,
+    "tool": null
+  },
+  "invariants": [],
+  "rationale": "Pure deterministic conversion with no retained state or effects.",
+  "reviewPolicy": {
+    "acceptanceCriteria": [],
+    "assuranceTier": "routine",
+    "required": false,
+    "reviewerLenses": []
+  },
+  "revision": "1",
+  "schema": "bbk.state-decision-effect-design.v1",
+  "scopeRefs": [
+    "SCOPE-ORDER"
+  ],
+  "sourceDecisionRefs": [
+    "ADR-ORDER-001"
+  ],
+  "sourceInterfaceRefs": [
+    "IF-PAYMENT"
+  ],
+  "sourceRequirementRefs": [
+    "REQ-ORDER-001"
+  ],
+  "status": "accepted",
+  "title": "Order processing state and effects",
+  "traceFixtureRefs": [],
+  "transitionRules": [],
+  "triggerIndicators": []
+}

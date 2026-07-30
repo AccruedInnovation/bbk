@@ -1,0 +1,3 @@
+# Claude Code Adapter Notes
+
+Claude Code agents are generated as Markdown files in `.claude/agents/` or `~/.claude/agents/`. BBK converts underscore role IDs to lowercase hyphenated names, preloads relevant BBK skills, restricts read-only roles with `disallowedTools`, and assigns `isolation: worktree` to mutating worker/prototyper roles. Roles with children include the `Agent` tool; nested delegation additionally requires the host setting `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH`. Human-interactive roles can be run as the main session with `claude --agent <name>`; a background subagent without human tools returns a structured decision request instead of fabricating consent.

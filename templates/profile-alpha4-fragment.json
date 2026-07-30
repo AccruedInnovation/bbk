@@ -1,0 +1,44 @@
+{
+  "capabilities": {
+    "implementation_structure": {
+      "artifact_kinds": [
+        "profile-specific-artifact"
+      ],
+      "contract_kinds": [
+        "profile-specific-contract"
+      ],
+      "status": "supported",
+      "touchpoint_kinds": [
+        "profile-specific-touchpoint"
+      ],
+      "trigger_hints": [
+        "public-boundary",
+        "state-ownership",
+        "migration"
+      ],
+      "type_concepts": [
+        "profile-specific-type"
+      ]
+    }
+  },
+  "entrypoints": {
+    "slice": [
+      "{python}",
+      "tools/profile.py",
+      "--json",
+      "slice"
+    ],
+    "structure": [
+      "{python}",
+      "tools/profile.py",
+      "--json",
+      "structure"
+    ],
+    "structure_review": [
+      "{python}",
+      "tools/profile.py",
+      "--json",
+      "structure-review"
+    ]
+  }
+}

@@ -1,0 +1,304 @@
+{
+  "$id": "https://bbk.local/schemas/work-unit.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "allOf": [
+    {
+      "anyOf": [
+        {
+          "required": [
+            "schema"
+          ]
+        },
+        {
+          "not": {
+            "required": [
+              "schema"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "anyOf": [
+        {
+          "required": [
+            "task_profile",
+            "assurance_tier"
+          ]
+        },
+        {
+          "required": [
+            "taskProfile",
+            "assuranceTier",
+            "role",
+            "scope",
+            "expectedBehavior",
+            "verificationPlan"
+          ]
+        }
+      ]
+    }
+  ],
+  "properties": {
+    "affectedPaths": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "assertions": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "assuranceContractRefs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "assuranceTier": {
+      "enum": [
+        "routine",
+        "material",
+        "consequential",
+        "critical"
+      ]
+    },
+    "assurance_contract_refs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "assurance_tier": {
+      "enum": [
+        "routine",
+        "material",
+        "consequential",
+        "critical"
+      ]
+    },
+    "changeClasses": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "change_classes": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "dependencies": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "executionSliceIds": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "expectedBehavior": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "handoffSchema": {
+      "type": "string"
+    },
+    "id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "implementationStructureContractRefs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "keyContractRefs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "languageProfiles": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "language_profiles": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "paths": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "plannedArtifactRefs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "preconditions": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "profileHints": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "profile_hints": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "purpose": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "requiredSkills": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "required_gates": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "reviewManifestRefs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "review_manifest_refs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "role": {
+      "enum": [
+        "worker",
+        "validator",
+        "reviewer",
+        "prototyper",
+        "architect",
+        "wayfinder"
+      ]
+    },
+    "scaffoldingDisposition": {
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.work-unit.v1"
+    },
+    "scope": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "solutionOutcomeFitRefs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "stateDecisionEffectRefs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "stateTransitionTraceRefs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "state_decision_effect_refs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "state_transition_trace_refs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "supportedOutcomeRefs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "taskProfile": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "task_profile": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "temporaryScaffolding": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "touchpoint": {
+      "type": "string"
+    },
+    "verificationPlan": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "purpose"
+  ],
+  "title": "BBK work unit v1 (alpha.3–alpha.7 compatible)",
+  "type": "object"
+}

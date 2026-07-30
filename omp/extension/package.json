@@ -1,0 +1,7 @@
+{
+  "description": "Congruent BBK planning, state/effect, review-assurance, and Blueprint-alignment tools and commands for Oh My Pi",
+  "name": "bbk-omp-extension",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0-alpha.11.7"
+}

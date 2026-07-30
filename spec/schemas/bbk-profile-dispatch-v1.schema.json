@@ -1,0 +1,50 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-profile-dispatch-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "authorityDisclaimer": {
+      "type": "string"
+    },
+    "bbkVersion": {
+      "type": "string"
+    },
+    "executions": {
+      "type": "array"
+    },
+    "operations": {
+      "type": "array"
+    },
+    "profile": {
+      "type": "object"
+    },
+    "runTools": {
+      "type": "boolean"
+    },
+    "schema": {
+      "const": "bbk.profile-dispatch.v1"
+    },
+    "unhandledReviewAssignments": {
+      "type": "array"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema",
+    "bbkVersion",
+    "profile",
+    "runTools",
+    "operations",
+    "executions",
+    "unhandledReviewAssignments",
+    "warnings",
+    "authorityDisclaimer"
+  ],
+  "title": "BBK Profile Dispatch v1",
+  "type": "object"
+}

@@ -1,0 +1,19 @@
+{
+  "applicability": "manifest",
+  "kind": "consequential-recovery",
+  "lenses": [
+    "state-concurrency-effect-recovery",
+    "intent-outcome"
+  ],
+  "requiredEvidence": [
+    "duplicate trace",
+    "lost-acknowledgement trace",
+    "candidate-bound deterministic receipt"
+  ],
+  "reviewModes": [
+    "targeted-closure",
+    "blind-reassessment"
+  ],
+  "riskTier": "consequential",
+  "schema": "bbk.review-example.v1"
+}

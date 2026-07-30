@@ -1,0 +1,12 @@
+{
+  "contextPolicy": {
+    "exclude": [
+      "prior findings",
+      "worker self-assessment"
+    ],
+    "independentAssembly": true
+  },
+  "kind": "blind-reassessment",
+  "priorFindingsVisibility": "HIDDEN",
+  "schema": "bbk.review-example.v1"
+}

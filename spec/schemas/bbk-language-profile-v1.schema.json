@@ -1,0 +1,319 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-language-profile-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "authority": {
+      "additionalProperties": false,
+      "properties": {
+        "may_add_gate_recipes": {
+          "type": "boolean"
+        },
+        "may_add_procedure": {
+          "type": "boolean"
+        },
+        "may_add_review_criteria": {
+          "type": "boolean"
+        },
+        "may_declare_pass": {
+          "const": false
+        },
+        "may_expand_work_scope": {
+          "const": false
+        },
+        "may_grant_tools_or_effects": {
+          "const": false
+        },
+        "may_reduce_assurance": {
+          "const": false
+        }
+      },
+      "required": [
+        "may_grant_tools_or_effects",
+        "may_expand_work_scope",
+        "may_reduce_assurance",
+        "may_declare_pass"
+      ],
+      "type": "object"
+    },
+    "capabilities": {
+      "additionalProperties": true,
+      "properties": {
+        "implementation_structure": {
+          "additionalProperties": true,
+          "properties": {
+            "status": {
+              "enum": [
+                "supported",
+                "partial",
+                "unsupported"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "review_assurance": {
+          "additionalProperties": true,
+          "properties": {
+            "context_entrypoint": {
+              "type": "string"
+            },
+            "context_selectors": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "dispatch_protocol": {
+              "const": "bbk.profile-capability.v1",
+              "type": "string"
+            },
+            "evidence_adapters": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "evidence_entrypoint": {
+              "type": "string"
+            },
+            "lens_ids": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "limitations": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "review_entrypoint": {
+              "type": "string"
+            },
+            "status": {
+              "enum": [
+                "supported",
+                "partial",
+                "legacy-no-review-manifest",
+                "LEGACY_NO_REVIEW_MANIFEST",
+                "unsupported"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "state_decision_effect": {
+          "additionalProperties": true,
+          "properties": {
+            "boundary_concepts": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "dispatch_protocol": {
+              "const": "bbk.profile-capability.v1",
+              "type": "string"
+            },
+            "formal_model_tools": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "inventory_entrypoint": {
+              "type": "string"
+            },
+            "limitations": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "projection_entrypoint": {
+              "type": "string"
+            },
+            "representations": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "review_entrypoint": {
+              "type": "string"
+            },
+            "status": {
+              "enum": [
+                "supported",
+                "partial",
+                "legacy-summary",
+                "LEGACY_SUMMARY",
+                "unsupported"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "entrypoints": {
+      "additionalProperties": true,
+      "properties": {
+        "evidence_adapter": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "gate_plan": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "preflight": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "resolve": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "review_context": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "review_lens": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "slice": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "state_effect": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "state_effect_inventory": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "state_effect_review": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "structure": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "structure_review": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+      "type": "string"
+    },
+    "maturity": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "package": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "requires": {
+      "additionalProperties": true,
+      "properties": {
+        "bbk_minimum": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "schema": {
+      "const": "bbk.language-profile.v1"
+    },
+    "skills": {
+      "items": {
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "path"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "version": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "id",
+    "name",
+    "version",
+    "maturity",
+    "authority",
+    "entrypoints"
+  ],
+  "title": "BBK Language Profile v1 (alpha.8-compatible)",
+  "type": "object"
+}

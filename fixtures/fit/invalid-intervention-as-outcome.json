@@ -1,0 +1,20 @@
+{
+  "schema": "bbk.solution-outcome-fit.v1",
+  "fitId": "SOF-INVALID",
+  "revision": "r1",
+  "title": "Invalid intervention-as-outcome example",
+  "status": "reviewed",
+  "applicability": {"level": "record", "triggers": ["solution-first request"], "rationale": "Test fixture."},
+  "requestedIntervention": {"statement": "Build a dashboard", "source": "user-request", "role": "candidate", "mandatory": false, "rationale": "Requested.", "evidenceRefs": []},
+  "desiredOutcomes": [{"id": "OUT-1", "statement": "Build a dashboard", "actorRefs": [], "successMeasures": ["Dashboard exists"], "evidenceRefs": []}],
+  "currentBaseline": {"description": "Unknown", "currentApproach": [], "strengths": [], "costsAndPain": [], "noChangeConsequences": [], "evidenceRefs": []},
+  "causalHypothesis": {"statement": "A dashboard solves it", "mechanism": "Unknown", "assumptions": [], "confidence": "unknown", "evidenceRefs": [], "falsifiers": []},
+  "constraints": [],
+  "alternatives": [],
+  "counterfactual": {"question": "Could the problem remain?", "failureConditions": [], "residualRisks": [], "conclusion": "Not considered"},
+  "successEvidence": [],
+  "risk": {"consequence": 2, "irreversibility": 2, "uncertainty": 2, "interfaceExposure": 2, "derivedTier": "consequential", "rationale": "Material", "confidence": "low"},
+  "disposition": {"status": "CONFIRMED_FIT", "selectedDirection": "Build a dashboard", "authorityMode": "delegated", "rationale": "Requested", "approvalRefs": [], "investigationPlan": [], "blockers": []},
+  "traceability": {"outcomeRefs": ["OUT-1"], "needRefs": [], "requirementRefs": [], "decisionRefs": [], "architectureRefs": [], "capabilityRefs": [], "workUnitRefs": []},
+  "review": {"required": false, "reviewerKind": "not-required", "criteria": [], "acceptedReviewRefs": [], "blockers": []}
+}

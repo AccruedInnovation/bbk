@@ -1,0 +1,236 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-profile-capability-request-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "authority": {
+      "additionalProperties": false,
+      "properties": {
+        "mayGrantEffects": {
+          "const": false
+        },
+        "mayMutateSubject": {
+          "const": false
+        },
+        "readOnly": {
+          "const": true
+        },
+        "runQualifiedReadOnlyTools": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "readOnly",
+        "mayMutateSubject",
+        "mayGrantEffects"
+      ],
+      "type": "object"
+    },
+    "context": {
+      "additionalProperties": true,
+      "properties": {
+        "assignmentIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "assuranceTier": {
+          "enum": [
+            "routine",
+            "material",
+            "consequential",
+            "critical"
+          ]
+        },
+        "changeClasses": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "hints": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "lensIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "paths": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "role": {
+          "type": "string"
+        },
+        "runTools": {
+          "type": "boolean"
+        },
+        "taskProfile": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "taskProfile",
+        "assuranceTier",
+        "runTools"
+      ],
+      "type": "object"
+    },
+    "inputs": {
+      "items": {
+        "additionalProperties": true,
+        "properties": {
+          "canonicalSha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "kind": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "ref": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "schema": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "path",
+          "sha256"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "operation": {
+      "enum": [
+        "state-effect",
+        "state-effect-inventory",
+        "state-effect-review",
+        "review-context",
+        "review-lens",
+        "evidence-adapter"
+      ]
+    },
+    "profile": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "manifestSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "rootSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "rootSha256",
+        "manifestSha256"
+      ],
+      "type": "object"
+    },
+    "requestDigest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "requestId": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.profile-capability-request.v1"
+    },
+    "source": {
+      "additionalProperties": true,
+      "properties": {
+        "contentSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "root": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "root",
+        "contentSha256"
+      ],
+      "type": "object"
+    },
+    "subject": {
+      "additionalProperties": false,
+      "properties": {
+        "digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "ref": {
+          "type": "string"
+        },
+        "revision": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "kind",
+        "revision",
+        "digest"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "requestId",
+    "operation",
+    "profile",
+    "source",
+    "subject",
+    "inputs",
+    "context",
+    "authority",
+    "requestDigest"
+  ],
+  "title": "BBK Profile Capability Request v1",
+  "type": "object"
+}

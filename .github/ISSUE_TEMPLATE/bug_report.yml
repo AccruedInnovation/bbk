@@ -1,0 +1,39 @@
+name: Bug report
+description: Report incorrect BBK behavior
+labels: [bug]
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Expected outcome
+      description: What should the user or system have been able to accomplish?
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed behavior
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: BBK version or commit
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Host and environment
+      description: OS, Python, Node, OMP/Codex/Claude version, scope, and profiles.
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs or evidence
+      description: Remove credentials and sensitive project data.

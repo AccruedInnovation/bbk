@@ -1,0 +1,27 @@
+{
+  "applicabilityScope": "workflows with retryable external effects",
+  "candidateId": "LC-ORDER-001",
+  "candidateType": "method-rule",
+  "causalConfidence": "medium",
+  "contraryEvidenceRefs": [],
+  "exportClass": "restricted",
+  "privacyClass": "project-local",
+  "proposedAction": "Review for inclusion in a future profile or method successor.",
+  "proposedLesson": "Stateful external effects should bind idempotency keys to stable semantic attempt identity.",
+  "schema": "bbk.learning-candidate.v1",
+  "sourceDispositionRefs": [
+    "FDISP-ORDER-001"
+  ],
+  "sourceFindingRefs": [
+    "F-ORDER-001"
+  ],
+  "sourceRunRefs": [
+    "RR-ORDER-FAIL"
+  ],
+  "status": "PROPOSED",
+  "supportingEvidenceRefs": [
+    "ER-FAIL-001",
+    "ER-CLOSURE-001"
+  ],
+  "uncertainty": "Other providers may have different idempotency behavior."
+}

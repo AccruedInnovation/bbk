@@ -1,0 +1,66 @@
+{
+  "designRevision": "1",
+  "environmentIdentity": "fixture-order-v1",
+  "evidenceRequirements": [
+    "state trace receipt",
+    "invariant results"
+  ],
+  "faultPlan": [
+    "Deliver AuthorizeOrder twice with the same idempotency key."
+  ],
+  "initialState": {
+    "connectivity": "ONLINE",
+    "lifecycle": "READY"
+  },
+  "modelRef": "MODEL-ORDER-PROP",
+  "permittedVariation": [
+    "Provider reference may vary."
+  ],
+  "schema": "bbk.state-transition-trace.v1",
+  "steps": [
+    {
+      "expectedDecision": "authorize",
+      "expectedDomainFacts": [
+        "AuthorizationRequested"
+      ],
+      "expectedEffectIntents": [
+        "EFF-PAYMENT"
+      ],
+      "expectedInvariantResults": [
+        "INV-ONE-LIFECYCLE:PASS",
+        "INV-EFFECT-ONCE:PASS"
+      ],
+      "expectedNextState": {
+        "attemptId": "ATT-1",
+        "connectivity": "ONLINE",
+        "lifecycle": "AUTHORIZING"
+      },
+      "expectedRejection": null,
+      "input": {
+        "attemptId": "ATT-1",
+        "type": "AuthorizeOrder"
+      }
+    },
+    {
+      "expectedDecision": "deduplicate",
+      "expectedDomainFacts": [],
+      "expectedEffectIntents": [],
+      "expectedInvariantResults": [
+        "INV-EFFECT-ONCE:PASS"
+      ],
+      "expectedNextState": {
+        "attemptId": "ATT-1",
+        "connectivity": "ONLINE",
+        "lifecycle": "AUTHORIZING"
+      },
+      "expectedRejection": "Duplicate accepted as no change.",
+      "input": {
+        "attemptId": "ATT-1",
+        "type": "AuthorizeOrder"
+      }
+    }
+  ],
+  "subjectRef": "SDE-ORDER-001",
+  "traceClass": "duplicate-delivery",
+  "traceId": "TRACE-DUPLICATE"
+}

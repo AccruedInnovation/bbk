@@ -1,0 +1,138 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-review-finding-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "assertionRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "blocking": {
+      "type": "boolean"
+    },
+    "classification": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "createdAt": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "evidenceRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "expectedCondition": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "findingId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "fingerprint": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "lifecycle": {
+      "enum": [
+        "OPEN",
+        "REPAIR_PROPOSED",
+        "REVALIDATION_REQUIRED",
+        "DISPOSITIONED",
+        "SUPERSEDED"
+      ]
+    },
+    "objectRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "observedCondition": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "probableImpact": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "recommendedRoute": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "reproduction": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.review-finding.v1"
+    },
+    "scope": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "severity": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "sourceAttemptRef": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "sourceRunRef": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "subject": {
+      "additionalProperties": false,
+      "properties": {
+        "digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "ref": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "digest"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "findingId",
+    "sourceRunRef",
+    "sourceAttemptRef",
+    "subject",
+    "assertionRefs",
+    "objectRefs",
+    "classification",
+    "severity",
+    "blocking",
+    "expectedCondition",
+    "observedCondition",
+    "reproduction",
+    "evidenceRefs",
+    "scope",
+    "probableImpact",
+    "recommendedRoute",
+    "fingerprint",
+    "createdAt",
+    "lifecycle"
+  ],
+  "title": "BBK ReviewFinding v1",
+  "type": "object"
+}

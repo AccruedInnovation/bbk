@@ -1,0 +1,695 @@
+{
+  "$defs": {
+    "artifact": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "enum": [
+            "create",
+            "modify",
+            "move",
+            "remove",
+            "retain",
+            "inspect"
+          ]
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "kind": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "logicalPath": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        },
+        "owner": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "responsibility": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sourceRefs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "action",
+        "kind",
+        "logicalPath",
+        "responsibility",
+        "owner"
+      ],
+      "type": "object"
+    },
+    "behaviorPath": {
+      "additionalProperties": false,
+      "properties": {
+        "failureAndRecovery": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "interfaceRefs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "steps": {
+          "items": {
+            "$ref": "#/$defs/pathStep"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "success": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "trigger": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "trigger",
+        "steps",
+        "success",
+        "failureAndRecovery"
+      ],
+      "type": "object"
+    },
+    "delegatedDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "area": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "bounds": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "area",
+        "bounds"
+      ],
+      "type": "object"
+    },
+    "effectBoundary": {
+      "additionalProperties": false,
+      "properties": {
+        "authorization": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "effect": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "failure": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "idempotency": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "owner": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "recovery": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "effect",
+        "owner",
+        "authorization",
+        "idempotency",
+        "failure",
+        "recovery"
+      ],
+      "type": "object"
+    },
+    "fixedDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "changeRoute": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "rationale": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sourceRefs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "statement": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "statement",
+        "rationale",
+        "changeRoute"
+      ],
+      "type": "object"
+    },
+    "keyContract": {
+      "additionalProperties": false,
+      "properties": {
+        "failureSemantics": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "invariants": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "responsibility": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "shape": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sourceRefs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "visibility": {
+          "enum": [
+            "private",
+            "internal",
+            "shared",
+            "public",
+            "external"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "name",
+        "shape",
+        "responsibility",
+        "visibility",
+        "invariants"
+      ],
+      "type": "object"
+    },
+    "namedStatement": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sourceRefs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "statement": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "statement"
+      ],
+      "type": "object"
+    },
+    "pathStep": {
+      "additionalProperties": false,
+      "properties": {
+        "contractRef": {
+          "type": "string"
+        },
+        "from": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "interaction": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "to": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "from",
+        "to",
+        "interaction"
+      ],
+      "type": "object"
+    },
+    "stateOwner": {
+      "additionalProperties": false,
+      "properties": {
+        "concurrency": {
+          "type": "string"
+        },
+        "consistency": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "lifetime": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "mutationAuthority": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "owner": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "recovery": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "state": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "state",
+        "owner",
+        "lifetime",
+        "mutationAuthority",
+        "consistency",
+        "recovery"
+      ],
+      "type": "object"
+    },
+    "uncertainty": {
+      "additionalProperties": false,
+      "properties": {
+        "disposition": {
+          "enum": [
+            "resolve-before-work",
+            "prototype",
+            "monitor",
+            "accepted-residual",
+            "blocked"
+          ]
+        },
+        "impact": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "statement": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "statement",
+        "impact",
+        "disposition"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://bbk.local/schemas/bbk-implementation-structure-contract-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "applicability": {
+      "additionalProperties": false,
+      "properties": {
+        "level": {
+          "enum": [
+            "none",
+            "inline",
+            "contract"
+          ]
+        },
+        "rationale": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "triggers": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "level",
+        "triggers",
+        "rationale"
+      ],
+      "type": "object"
+    },
+    "contractId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "decisions": {
+      "additionalProperties": false,
+      "properties": {
+        "delegated": {
+          "items": {
+            "$ref": "#/$defs/delegatedDecision"
+          },
+          "type": "array"
+        },
+        "fixed": {
+          "items": {
+            "$ref": "#/$defs/fixedDecision"
+          },
+          "type": "array"
+        },
+        "prohibited": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "fixed",
+        "delegated",
+        "prohibited"
+      ],
+      "type": "object"
+    },
+    "executionSliceRefs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "profileProjections": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "review": {
+      "additionalProperties": false,
+      "properties": {
+        "acceptanceCriteria": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "acceptedBy": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "assuranceTier": {
+          "enum": [
+            "routine",
+            "material",
+            "consequential",
+            "critical"
+          ]
+        },
+        "requiredReviewers": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "reviewRefs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "assuranceTier",
+        "requiredReviewers",
+        "acceptanceCriteria"
+      ],
+      "type": "object"
+    },
+    "revision": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.implementation-structure-contract.v1"
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "in-review",
+        "accepted",
+        "superseded"
+      ]
+    },
+    "structure": {
+      "additionalProperties": false,
+      "properties": {
+        "artifactTopology": {
+          "items": {
+            "$ref": "#/$defs/artifact"
+          },
+          "type": "array"
+        },
+        "behaviorPaths": {
+          "items": {
+            "$ref": "#/$defs/behaviorPath"
+          },
+          "type": "array"
+        },
+        "effectBoundaries": {
+          "items": {
+            "$ref": "#/$defs/effectBoundary"
+          },
+          "type": "array"
+        },
+        "keyContracts": {
+          "items": {
+            "$ref": "#/$defs/keyContract"
+          },
+          "type": "array"
+        },
+        "migrationTouchpoints": {
+          "items": {
+            "$ref": "#/$defs/namedStatement"
+          },
+          "type": "array"
+        },
+        "observabilityPoints": {
+          "items": {
+            "$ref": "#/$defs/namedStatement"
+          },
+          "type": "array"
+        },
+        "stateOwnership": {
+          "items": {
+            "$ref": "#/$defs/stateOwner"
+          },
+          "type": "array"
+        },
+        "testSeams": {
+          "items": {
+            "$ref": "#/$defs/namedStatement"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "artifactTopology",
+        "keyContracts",
+        "behaviorPaths",
+        "stateOwnership",
+        "effectBoundaries",
+        "testSeams",
+        "observabilityPoints",
+        "migrationTouchpoints"
+      ],
+      "type": "object"
+    },
+    "subject": {
+      "additionalProperties": false,
+      "properties": {
+        "architectureRefs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "assumptionRefs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "baselineRefs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "capabilityRefs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "interfaceRefs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "enum": [
+            "software",
+            "automation",
+            "hardware",
+            "procedure",
+            "data",
+            "document",
+            "mixed",
+            "other"
+          ]
+        },
+        "outcomeRefs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "purpose": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "requirementRefs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "scopeRefs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "solutionOutcomeFitRefs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "purpose",
+        "kind",
+        "baselineRefs",
+        "scopeRefs"
+      ],
+      "type": "object"
+    },
+    "title": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "uncertainties": {
+      "items": {
+        "$ref": "#/$defs/uncertainty"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema",
+    "contractId",
+    "revision",
+    "title",
+    "status",
+    "subject",
+    "applicability",
+    "structure",
+    "decisions",
+    "review"
+  ],
+  "title": "BBK ImplementationStructureContract v1",
+  "type": "object"
+}

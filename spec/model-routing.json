@@ -1,0 +1,73 @@
+{
+  "description": "Canonical default model and reasoning-effort routing for generated BBK sub-agents. Edit this policy or supply an install-time override; never edit generated projections directly.",
+  "package_version": "0.1.0-alpha.11.7",
+  "profiles": {
+    "coordination": {
+      "claude": {
+        "effort": "medium",
+        "model": "sonnet"
+      },
+      "codex": {
+        "model": "gpt-5.6-terra",
+        "model_reasoning_effort": "medium"
+      },
+      "description": "Capable lower-cost routing for bounded implementation, prototyping, and execution coordination under an explicit responsibility contract.",
+      "omp": {
+        "model": "deepseek/deepseek-v4-pro",
+        "thinkingLevel": "high"
+      }
+    },
+    "judgment": {
+      "claude": {
+        "effort": "high",
+        "model": "opus"
+      },
+      "codex": {
+        "model": "gpt-5.6-sol",
+        "model_reasoning_effort": "high"
+      },
+      "description": "Premium routing for roles that make material planning, architecture, synthesis, assurance, or authority-sensitive judgments.",
+      "omp": {
+        "model": "openai-codex/gpt-5.6-sol",
+        "thinkingLevel": "high"
+      }
+    },
+    "mechanical": {
+      "claude": {
+        "effort": "low",
+        "model": "haiku"
+      },
+      "codex": {
+        "model": "gpt-5.6-luna",
+        "model_reasoning_effort": "low"
+      },
+      "description": "Fast economical routing for tightly bounded execution and exact assertion evaluation; escalate or override when broader judgment is required.",
+      "omp": {
+        "model": "deepseek/deepseek-v4-flash",
+        "thinkingLevel": "high"
+      }
+    }
+  },
+  "role_profiles": {
+    "bbk_architect": "judgment",
+    "bbk_phase_wayfinder": "judgment",
+    "bbk_planning_wayfinder": "judgment",
+    "bbk_prototyper": "coordination",
+    "bbk_question_guide": "judgment",
+    "bbk_questioning_wayfinder": "judgment",
+    "bbk_researcher": "coordination",
+    "bbk_reviewer": "judgment",
+    "bbk_root_orchestrator": "judgment",
+    "bbk_root_wayfinder": "judgment",
+    "bbk_synthesizer": "judgment",
+    "bbk_territory_orchestrator": "coordination",
+    "bbk_territory_wayfinder": "judgment",
+    "bbk_validator": "mechanical",
+    "bbk_validator_orchestrator": "coordination",
+    "bbk_verification_designer": "judgment",
+    "bbk_worker": "mechanical",
+    "bbk_worker_designer": "judgment",
+    "bbk_worker_orchestrator": "coordination"
+  },
+  "schema_version": "bbk.model-routing.v1"
+}

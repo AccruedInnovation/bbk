@@ -1,0 +1,129 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-state-transition-trace-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "designRevision": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "environmentIdentity": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "evidenceRequirements": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "faultPlan": {
+      "type": "array"
+    },
+    "initialState": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "modelRef": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "permittedVariation": {
+      "type": "array"
+    },
+    "schema": {
+      "const": "bbk.state-transition-trace.v1"
+    },
+    "steps": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "expectedDecision": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "expectedDomainFacts": {
+            "type": "array"
+          },
+          "expectedEffectIntents": {
+            "type": "array"
+          },
+          "expectedInvariantResults": {
+            "type": "array"
+          },
+          "expectedNextState": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "expectedRejection": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "input": {
+            "additionalProperties": true,
+            "type": "object"
+          }
+        },
+        "required": [
+          "input",
+          "expectedDecision",
+          "expectedNextState",
+          "expectedDomainFacts",
+          "expectedEffectIntents",
+          "expectedRejection",
+          "expectedInvariantResults"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "subjectRef": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "traceClass": {
+      "enum": [
+        "legal-path",
+        "illegal-transition",
+        "retry",
+        "duplicate-delivery",
+        "cancellation",
+        "timeout",
+        "partial-completion",
+        "ambiguous-acknowledgement",
+        "crash-before-effect",
+        "crash-after-effect-before-receipt",
+        "crash-after-semantic-commit",
+        "stale-result",
+        "replacement-fence",
+        "degraded-recovery"
+      ]
+    },
+    "traceId": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "traceId",
+    "traceClass",
+    "subjectRef",
+    "designRevision",
+    "modelRef",
+    "initialState",
+    "steps",
+    "permittedVariation",
+    "faultPlan",
+    "environmentIdentity",
+    "evidenceRequirements"
+  ],
+  "title": "BBK StateTransitionTrace v1",
+  "type": "object"
+}

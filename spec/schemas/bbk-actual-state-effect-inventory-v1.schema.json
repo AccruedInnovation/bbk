@@ -1,0 +1,95 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-actual-state-effect-inventory-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "advisoryDrift": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "canonicalStateOwners": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "decisionBoundaryIds": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "effectExecutorIds": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "hiddenDependencies": {
+      "type": "array"
+    },
+    "limitations": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "producedBy": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "profileDigest": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "schema": {
+      "const": "bbk.actual-state-effect-inventory.v1"
+    },
+    "status": {
+      "enum": [
+        "COMPLETE",
+        "PARTIAL",
+        "BLOCKED",
+        "UNKNOWN"
+      ]
+    },
+    "subjectDigest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "subjectRef": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "subjectRef",
+    "subjectDigest",
+    "canonicalStateOwners",
+    "decisionBoundaryIds",
+    "effectExecutorIds",
+    "hiddenDependencies",
+    "advisoryDrift",
+    "limitations",
+    "producedBy",
+    "profileDigest"
+  ],
+  "title": "BBK Actual State/Effect Inventory v1",
+  "type": "object"
+}

@@ -1,0 +1,140 @@
+{
+  "schema": "bbk.solution-outcome-fit.v1",
+  "fitId": "SOF-PARSER-REWRITE",
+  "revision": "r1",
+  "title": "Parser rewrite performance hypothesis",
+  "status": "in-review",
+  "applicability": {
+    "level": "record",
+    "triggers": ["expensive rewrite", "weak causal evidence", "performance claim"],
+    "rationale": "A rewrite is costly and the actual bottleneck has not been established."
+  },
+  "requestedIntervention": {
+    "statement": "Rewrite the parser in Rust.",
+    "source": "user-request",
+    "role": "candidate",
+    "mandatory": false,
+    "rationale": "The rewrite was proposed to reduce request latency.",
+    "evidenceRefs": ["REQUEST-PARSER-RUST"]
+  },
+  "desiredOutcomes": [
+    {
+      "id": "OUT-LATENCY",
+      "statement": "The service meets its p95 latency objective under the representative workload without unacceptable operational cost.",
+      "actorRefs": ["service-consumer", "operator"],
+      "successMeasures": ["p95 request latency at the declared load", "CPU and memory remain inside the resource envelope"],
+      "evidenceRefs": ["SLO-LATENCY"]
+    }
+  ],
+  "currentBaseline": {
+    "description": "The current parser is assumed to be the bottleneck, but no profile isolates parsing from storage and downstream calls.",
+    "currentApproach": ["Existing parser implementation", "End-to-end latency measurements"],
+    "strengths": ["Known behavior and compatibility"],
+    "costsAndPain": ["Latency objective is missed"],
+    "noChangeConsequences": ["Latency remains above target if the parser is in fact causal"],
+    "evidenceRefs": ["BENCH-E2E-001"]
+  },
+  "causalHypothesis": {
+    "statement": "Parser CPU and allocation behavior materially cause the latency miss, and a Rust implementation can reduce that cost without shifting the bottleneck.",
+    "mechanism": "Lower parse CPU, allocation, and copying reduce end-to-end service time.",
+    "assumptions": ["Parsing is a material fraction of the critical path", "Cross-language integration overhead is bounded", "Behavioral compatibility can be preserved"],
+    "confidence": "low",
+    "evidenceRefs": ["BENCH-E2E-001"],
+    "falsifiers": ["Profiling shows storage or network dominates", "A targeted optimization meets the objective without a rewrite"]
+  },
+  "constraints": [
+    {
+      "id": "CON-COMPAT",
+      "statement": "Existing accepted inputs and diagnostics must remain compatible.",
+      "kind": "hard",
+      "source": "public behavior contract",
+      "evidenceRefs": ["PARSER-CONTRACT"]
+    }
+  ],
+  "alternatives": [
+    {
+      "id": "ALT-RUST",
+      "intervention": "Rewrite the parser in Rust",
+      "kind": "requested",
+      "fit": "unknown",
+      "benefits": ["Potential lower CPU and allocations"],
+      "costs": ["Rewrite and integration burden"],
+      "risks": ["Compatibility drift", "Wrong bottleneck"],
+      "disposition": "investigate",
+      "evidenceRefs": []
+    },
+    {
+      "id": "ALT-PROFILE-OPT",
+      "intervention": "Profile the critical path and optimize the current implementation",
+      "kind": "technical",
+      "fit": "unknown",
+      "benefits": ["Lower change burden", "Tests the causal premise"],
+      "costs": ["May not achieve enough improvement"],
+      "risks": ["Local optimization only"],
+      "disposition": "investigate",
+      "evidenceRefs": []
+    },
+    {
+      "id": "ALT-NO-CHANGE",
+      "intervention": "Retain the current parser",
+      "kind": "no-change",
+      "fit": "low",
+      "benefits": ["No compatibility migration"],
+      "costs": ["Potential continued SLO miss"],
+      "risks": ["Operational objective remains unmet"],
+      "disposition": "retained",
+      "evidenceRefs": ["BENCH-E2E-001"]
+    }
+  ],
+  "counterfactual": {
+    "question": "If the parser were rewritten in Rust exactly as requested, when would the latency problem remain?",
+    "failureConditions": ["Parsing is not the dominant critical-path cost", "Integration or serialization overhead offsets parser gains", "Downstream saturation controls p95"],
+    "residualRisks": ["Representative workload may be wrong"],
+    "conclusion": "The intervention cannot be selected responsibly until a bounded profile and prototype discriminate among the alternatives."
+  },
+  "successEvidence": [
+    {
+      "id": "EV-PROFILE",
+      "outcomeRef": "OUT-LATENCY",
+      "measure": "Share of critical-path latency attributable to parsing",
+      "method": "measurement",
+      "thresholdOrSignal": "Enough attributable cost exists for the proposed improvement to close the SLO gap",
+      "observationWindow": "bounded investigation before architecture commitment",
+      "evidenceRefs": []
+    }
+  ],
+  "risk": {
+    "consequence": 2,
+    "irreversibility": 3,
+    "uncertainty": 3,
+    "interfaceExposure": 2,
+    "derivedTier": "consequential",
+    "rationale": "The rewrite is expensive and interface-sensitive while the causal premise is weak.",
+    "confidence": "high"
+  },
+  "disposition": {
+    "status": "INVESTIGATE",
+    "selectedDirection": "Do not commit to the rewrite yet.",
+    "authorityMode": "delegated",
+    "rationale": "A profile and bounded prototype have higher information value than choosing an implementation language now.",
+    "approvalRefs": [],
+    "investigationPlan": ["Profile the representative critical path", "Prototype the smallest parser hot path only if profiling supports the hypothesis", "Compare end-to-end latency and compatibility"],
+    "blockers": ["Causal bottleneck not established"]
+  },
+  "traceability": {
+    "outcomeRefs": ["OUT-LATENCY"],
+    "needRefs": ["NEED-LATENCY"],
+    "requirementRefs": ["SLO-LATENCY", "PARSER-CONTRACT"],
+    "decisionRefs": [],
+    "architectureRefs": [],
+    "capabilityRefs": [],
+    "workUnitRefs": []
+  },
+  "review": {
+    "required": true,
+    "reviewerKind": "same-wayfinder",
+    "criteria": ["The causal claim is testable", "Investigation is bounded", "No rewrite authority is implied"],
+    "acceptedReviewRefs": [],
+    "blockers": ["Complete the investigation before selecting a production direction"]
+  }
+}

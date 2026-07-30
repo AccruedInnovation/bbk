@@ -1,0 +1,244 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-review-attempt-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "assertionEvaluations": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "assertionRef": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "evidenceRefs": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "rationale": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "BLOCKED",
+              "INCONCLUSIVE",
+              "ERROR",
+              "NOT_RUN",
+              "NOT_APPLICABLE"
+            ]
+          }
+        },
+        "required": [
+          "assertionRef",
+          "status",
+          "rationale",
+          "evidenceRefs"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "assertionRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "assignmentRef": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "attemptId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "completedAt": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "completionState": {
+      "enum": [
+        "COMPLETED",
+        "CANCELLED",
+        "BLOCKED_ENVIRONMENT",
+        "BLOCKED_CONTEXT",
+        "ERROR",
+        "STALE"
+      ]
+    },
+    "contextPack": {
+      "additionalProperties": false,
+      "properties": {
+        "digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "ref": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "digest"
+      ],
+      "type": "object"
+    },
+    "evidenceRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "findingRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "independenceFacts": {
+      "additionalProperties": false,
+      "properties": {
+        "authorSeparation": {
+          "type": "boolean"
+        },
+        "candidateMutationProhibited": {
+          "type": "boolean"
+        },
+        "deterministicEvidenceIndependence": {
+          "type": "boolean"
+        },
+        "independentContextAssembly": {
+          "type": "boolean"
+        },
+        "modelDiversity": {
+          "type": "boolean"
+        },
+        "organizationalIndependence": {
+          "type": "boolean"
+        },
+        "providerDiversity": {
+          "type": "boolean"
+        },
+        "roleSeparation": {
+          "type": "boolean"
+        },
+        "sessionSeparation": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "authorSeparation",
+        "roleSeparation",
+        "sessionSeparation",
+        "independentContextAssembly",
+        "modelDiversity",
+        "providerDiversity",
+        "deterministicEvidenceIndependence",
+        "organizationalIndependence",
+        "candidateMutationProhibited"
+      ],
+      "type": "object"
+    },
+    "infrastructureErrors": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "invocation": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "lens": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "priorFindingsVisibility": {
+      "enum": [
+        "HIDDEN",
+        "TARGETED",
+        "FULL",
+        "NOT_APPLICABLE"
+      ]
+    },
+    "reviewer": {
+      "additionalProperties": false,
+      "properties": {
+        "effectiveDigest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "model": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "provider": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "role": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "effectiveDigest",
+        "model",
+        "provider"
+      ],
+      "type": "object"
+    },
+    "runId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.review-attempt.v1"
+    },
+    "startedAt": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "attemptId",
+    "runId",
+    "assignmentRef",
+    "lens",
+    "assertionRefs",
+    "reviewer",
+    "invocation",
+    "contextPack",
+    "priorFindingsVisibility",
+    "independenceFacts",
+    "startedAt",
+    "completedAt",
+    "completionState",
+    "assertionEvaluations",
+    "evidenceRefs",
+    "findingRefs",
+    "infrastructureErrors"
+  ],
+  "title": "BBK ReviewAttempt v1",
+  "type": "object"
+}

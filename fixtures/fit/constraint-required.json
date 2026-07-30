@@ -1,0 +1,210 @@
+{
+  "alternatives": [
+    {
+      "benefits": [
+        "Meets the mandate",
+        "Reduces manual conversion"
+      ],
+      "costs": [
+        "Requires maintained mapping"
+      ],
+      "disposition": "selected",
+      "evidenceRefs": [
+        "REG-R17"
+      ],
+      "fit": "high",
+      "id": "ALT-DIRECT-R17",
+      "intervention": "Generate and validate R-17 directly.",
+      "kind": "requested",
+      "risks": [
+        "Schema changes"
+      ]
+    },
+    {
+      "benefits": [
+        "No software change"
+      ],
+      "costs": [
+        "Continued effort"
+      ],
+      "disposition": "rejected",
+      "evidenceRefs": [],
+      "fit": "medium",
+      "id": "ALT-MANUAL",
+      "intervention": "Retain manual reformatting into R-17.",
+      "kind": "no-change",
+      "risks": [
+        "Human error",
+        "Late submission"
+      ]
+    }
+  ],
+  "applicability": {
+    "level": "record",
+    "rationale": "The requested format is externally required, but its outcome and verification still need to be explicit.",
+    "triggers": [
+      "external mandate",
+      "public interface"
+    ]
+  },
+  "causalHypothesis": {
+    "assumptions": [
+      "The published R-17 specification is current",
+      "Internal data contains every required field"
+    ],
+    "confidence": "high",
+    "evidenceRefs": [
+      "REG-R17"
+    ],
+    "falsifiers": [
+      "The regulator rejects a schema-valid sample",
+      "Required source fields are unavailable"
+    ],
+    "mechanism": "A deterministic mapping creates the mandated schema and validates it before submission.",
+    "statement": "Generating R-17 directly from validated internal records will reduce conversion errors and produce an acceptable submission."
+  },
+  "constraints": [
+    {
+      "evidenceRefs": [
+        "REG-R17"
+      ],
+      "id": "CON-R17",
+      "kind": "hard",
+      "source": "external authority",
+      "statement": "The final submission must conform to regulator schema R-17."
+    }
+  ],
+  "counterfactual": {
+    "conclusion": "The mandated format is necessary but not sufficient; semantic mapping and acknowledged submission must also be verified.",
+    "failureConditions": [
+      "The file is schema-valid but semantically wrong",
+      "The regulator specification changed",
+      "Submission acknowledgement is not obtained"
+    ],
+    "question": "If an R-17 file is produced, when would the compliance outcome still fail?",
+    "residualRisks": [
+      "External schema changes require monitored updates"
+    ]
+  },
+  "currentBaseline": {
+    "costsAndPain": [
+      "Manual conversion is slow and error-prone"
+    ],
+    "currentApproach": [
+      "Internal export",
+      "Manual reformatting",
+      "Portal submission"
+    ],
+    "description": "The team exports internal data and manually converts it into the regulator format.",
+    "evidenceRefs": [],
+    "noChangeConsequences": [
+      "Continued rework and rejection risk"
+    ],
+    "strengths": [
+      "Human review catches some anomalies"
+    ]
+  },
+  "desiredOutcomes": [
+    {
+      "actorRefs": [
+        "REPORTING-TEAM",
+        "REGULATOR"
+      ],
+      "evidenceRefs": [
+        "REG-R17"
+      ],
+      "id": "OUT-ACCEPTED-SUBMISSION",
+      "statement": "The reporting authority accepts the monthly submission without manual reformatting or schema rejection.",
+      "successMeasures": [
+        "Submission validates against R-17",
+        "Receipt is acknowledged before the deadline"
+      ]
+    }
+  ],
+  "disposition": {
+    "approvalRefs": [
+      "REG-R17"
+    ],
+    "authorityMode": "external-authority",
+    "blockers": [],
+    "investigationPlan": [],
+    "rationale": "The output form is mandated; the implementation must also prove semantic correctness and acknowledgement.",
+    "selectedDirection": "Generate, validate, and submit regulator schema R-17 with semantic mapping tests and receipt tracking.",
+    "status": "CONSTRAINT_REQUIRED"
+  },
+  "fitId": "SOF-REGULATORY-EXPORT",
+  "requestedIntervention": {
+    "evidenceRefs": [
+      "REG-R17"
+    ],
+    "mandatory": true,
+    "rationale": "The regulator accepts only the published R-17 schema for this reporting obligation.",
+    "role": "mandated",
+    "source": "external-authority",
+    "statement": "Produce the monthly submission in regulator schema R-17."
+  },
+  "review": {
+    "acceptedReviewRefs": [
+      "REVIEW-R17-FIT"
+    ],
+    "blockers": [],
+    "criteria": [
+      "External mandate is current",
+      "Semantic mapping and receipt are covered"
+    ],
+    "required": true,
+    "reviewerKind": "fresh-reviewer"
+  },
+  "revision": "r1",
+  "risk": {
+    "confidence": "high",
+    "consequence": 2,
+    "derivedTier": "consequential",
+    "interfaceExposure": 2,
+    "irreversibility": 1,
+    "rationale": "The external interface and reporting obligation make this consequential despite straightforward implementation.",
+    "uncertainty": 1
+  },
+  "schema": "bbk.solution-outcome-fit.v1",
+  "status": "reviewed",
+  "successEvidence": [
+    {
+      "evidenceRefs": [
+        "REG-R17"
+      ],
+      "id": "EV-R17-VALID",
+      "measure": "Representative and production export validation",
+      "method": "test",
+      "observationWindow": "pre-submission gate",
+      "outcomeRef": "OUT-ACCEPTED-SUBMISSION",
+      "thresholdOrSignal": "All required fields and business rules pass the qualified validator"
+    },
+    {
+      "evidenceRefs": [],
+      "id": "EV-RECEIPT",
+      "measure": "Regulator acknowledgement",
+      "method": "operational-observation",
+      "observationWindow": "each monthly submission",
+      "outcomeRef": "OUT-ACCEPTED-SUBMISSION",
+      "thresholdOrSignal": "Accepted receipt before deadline"
+    }
+  ],
+  "title": "Mandated regulatory export format",
+  "traceability": {
+    "architectureRefs": [],
+    "capabilityRefs": [
+      "CAP-R17-SUBMISSION"
+    ],
+    "decisionRefs": [
+      "REG-R17"
+    ],
+    "needRefs": [],
+    "outcomeRefs": [
+      "OUT-ACCEPTED-SUBMISSION"
+    ],
+    "requirementRefs": [
+      "REG-R17"
+    ],
+    "workUnitRefs": []
+  }
+}

@@ -1,0 +1,901 @@
+{
+  "agents": {
+    "bbk_architect": {
+      "description": "Compose territory syntheses into a responsibility and interface architecture with deep modules, explicit failure semantics, and credible evolution paths.",
+      "family": "specialist",
+      "files": {
+        "claude": "bbk-architect.md",
+        "codex": "bbk_architect.toml",
+        "generic": "bbk_architect.md",
+        "omp": "bbk_architect.md"
+      },
+      "may_mutate": false,
+      "model_profile": "judgment",
+      "model_routing": {
+        "claude": {
+          "effort": "high",
+          "model": "opus"
+        },
+        "codex": {
+          "model": "gpt-5.6-sol",
+          "model_reasoning_effort": "high"
+        },
+        "omp": {
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "high"
+        }
+      },
+      "skills": [
+        "bbk",
+        "bbk-plan",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-review-intent",
+        "bbk-context-routing",
+        "bbk-procedure-design"
+      ],
+      "spawns": []
+    },
+    "bbk_phase_wayfinder": {
+      "description": "Own one phase and decompose it into bounded work, integration obligations, validation, and handoffs.",
+      "family": "planning",
+      "files": {
+        "claude": "bbk-phase-wayfinder.md",
+        "codex": "bbk_phase_wayfinder.toml",
+        "generic": "bbk_phase_wayfinder.md",
+        "omp": "bbk_phase_wayfinder.md"
+      },
+      "may_mutate": false,
+      "model_profile": "judgment",
+      "model_routing": {
+        "claude": {
+          "effort": "high",
+          "model": "opus"
+        },
+        "codex": {
+          "model": "gpt-5.6-sol",
+          "model_reasoning_effort": "high"
+        },
+        "omp": {
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "high"
+        }
+      },
+      "skills": [
+        "bbk",
+        "bbk-plan",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-procedure-design",
+        "bbk-context-routing"
+      ],
+      "spawns": [
+        "bbk_verification_designer",
+        "bbk_worker_designer",
+        "bbk_reviewer"
+      ]
+    },
+    "bbk_planning_wayfinder": {
+      "description": "Convert an approved design direction into capability increments, phases, work units, dependencies, and assurance contracts.",
+      "family": "planning",
+      "files": {
+        "claude": "bbk-planning-wayfinder.md",
+        "codex": "bbk_planning_wayfinder.toml",
+        "generic": "bbk_planning_wayfinder.md",
+        "omp": "bbk_planning_wayfinder.md"
+      },
+      "may_mutate": false,
+      "model_profile": "judgment",
+      "model_routing": {
+        "claude": {
+          "effort": "high",
+          "model": "opus"
+        },
+        "codex": {
+          "model": "gpt-5.6-sol",
+          "model_reasoning_effort": "high"
+        },
+        "omp": {
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "high"
+        }
+      },
+      "skills": [
+        "bbk",
+        "bbk-plan",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-review-intent",
+        "bbk-procedure-design",
+        "bbk-context-routing"
+      ],
+      "spawns": [
+        "bbk_phase_wayfinder",
+        "bbk_verification_designer",
+        "bbk_worker_designer",
+        "bbk_reviewer"
+      ]
+    },
+    "bbk_prototyper": {
+      "description": "Create a bounded, disposable prototype or experiment to test one uncertainty and report observations.",
+      "family": "specialist",
+      "files": {
+        "claude": "bbk-prototyper.md",
+        "codex": "bbk_prototyper.toml",
+        "generic": "bbk_prototyper.md",
+        "omp": "bbk_prototyper.md"
+      },
+      "may_mutate": true,
+      "model_profile": "coordination",
+      "model_routing": {
+        "claude": {
+          "effort": "medium",
+          "model": "sonnet"
+        },
+        "codex": {
+          "model": "gpt-5.6-terra",
+          "model_reasoning_effort": "medium"
+        },
+        "omp": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        }
+      },
+      "skills": [
+        "bbk",
+        "bbk-execute",
+        "bbk-evidence",
+        "bbk-recover",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-context",
+        "bbk-context-routing"
+      ],
+      "spawns": []
+    },
+    "bbk_question_guide": {
+      "description": "Resolve one declared material decision through a focused one-question-at-a-time conversation with a recommendation, explicit disposition, and ADR-compatible return packet.",
+      "family": "planning",
+      "files": {
+        "claude": "bbk-question-guide.md",
+        "codex": "bbk_question_guide.toml",
+        "generic": "bbk_question_guide.md",
+        "omp": "bbk_question_guide.md"
+      },
+      "may_mutate": false,
+      "model_profile": "judgment",
+      "model_routing": {
+        "claude": {
+          "effort": "high",
+          "model": "opus"
+        },
+        "codex": {
+          "model": "gpt-5.6-sol",
+          "model_reasoning_effort": "high"
+        },
+        "omp": {
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "high"
+        }
+      },
+      "skills": [
+        "bbk",
+        "bbk-plan",
+        "bbk-solution-outcome-fit",
+        "bbk-state-decision-effect-design",
+        "bbk-procedure-design",
+        "bbk-context-routing"
+      ],
+      "spawns": []
+    },
+    "bbk_questioning_wayfinder": {
+      "description": "Own a bounded cluster of human-decision branches, prepare exact context for each Question Guide, and return durable decision packets without consuming the parent territory context.",
+      "family": "planning",
+      "files": {
+        "claude": "bbk-questioning-wayfinder.md",
+        "codex": "bbk_questioning_wayfinder.toml",
+        "generic": "bbk_questioning_wayfinder.md",
+        "omp": "bbk_questioning_wayfinder.md"
+      },
+      "may_mutate": false,
+      "model_profile": "judgment",
+      "model_routing": {
+        "claude": {
+          "effort": "high",
+          "model": "opus"
+        },
+        "codex": {
+          "model": "gpt-5.6-sol",
+          "model_reasoning_effort": "high"
+        },
+        "omp": {
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "high"
+        }
+      },
+      "skills": [
+        "bbk",
+        "bbk-plan",
+        "bbk-solution-outcome-fit",
+        "bbk-procedure-design",
+        "bbk-context-routing"
+      ],
+      "spawns": [
+        "bbk_question_guide",
+        "bbk_researcher"
+      ]
+    },
+    "bbk_researcher": {
+      "description": "Investigate a precise factual question using local evidence or current primary sources and return attributed findings.",
+      "family": "specialist",
+      "files": {
+        "claude": "bbk-researcher.md",
+        "codex": "bbk_researcher.toml",
+        "generic": "bbk_researcher.md",
+        "omp": "bbk_researcher.md"
+      },
+      "may_mutate": false,
+      "model_profile": "coordination",
+      "model_routing": {
+        "claude": {
+          "effort": "medium",
+          "model": "sonnet"
+        },
+        "codex": {
+          "model": "gpt-5.6-terra",
+          "model_reasoning_effort": "medium"
+        },
+        "omp": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        }
+      },
+      "skills": [
+        "bbk",
+        "bbk-review-context",
+        "bbk-context-routing"
+      ],
+      "spawns": []
+    },
+    "bbk_reviewer": {
+      "description": "Review a plan, architecture, work graph, evidence package, or outcome claim against an exact charter without mutating the subject.",
+      "family": "review",
+      "files": {
+        "claude": "bbk-reviewer.md",
+        "codex": "bbk_reviewer.toml",
+        "generic": "bbk_reviewer.md",
+        "omp": "bbk_reviewer.md"
+      },
+      "may_mutate": false,
+      "model_profile": "judgment",
+      "model_routing": {
+        "claude": {
+          "effort": "high",
+          "model": "opus"
+        },
+        "codex": {
+          "model": "gpt-5.6-sol",
+          "model_reasoning_effort": "high"
+        },
+        "omp": {
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "high"
+        }
+      },
+      "skills": [
+        "bbk",
+        "bbk-review",
+        "bbk-evidence",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-review-context",
+        "bbk-review-run",
+        "bbk-review-findings",
+        "bbk-review-intent",
+        "bbk-context-routing"
+      ],
+      "spawns": []
+    },
+    "bbk_root_orchestrator": {
+      "description": "Coordinate execution of an approved BBK operating baseline across territories, dependencies, integration points, evidence, and user-facing status.",
+      "family": "execution",
+      "files": {
+        "claude": "bbk-root-orchestrator.md",
+        "codex": "bbk_root_orchestrator.toml",
+        "generic": "bbk_root_orchestrator.md",
+        "omp": "bbk_root_orchestrator.md"
+      },
+      "may_mutate": false,
+      "model_profile": "judgment",
+      "model_routing": {
+        "claude": {
+          "effort": "high",
+          "model": "opus"
+        },
+        "codex": {
+          "model": "gpt-5.6-sol",
+          "model_reasoning_effort": "high"
+        },
+        "omp": {
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "high"
+        }
+      },
+      "skills": [
+        "bbk",
+        "bbk-execute",
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-review-run",
+        "bbk-review-findings",
+        "bbk-review-intent",
+        "bbk-context-routing",
+        "bbk-procedure-design"
+      ],
+      "spawns": [
+        "bbk_territory_orchestrator",
+        "bbk_reviewer"
+      ]
+    },
+    "bbk_root_wayfinder": {
+      "description": "Own the whole BBK planning conversation, establish the operational outcome, map territories, route material decisions through bounded questioning, and synthesize an executable operating baseline.",
+      "family": "planning",
+      "files": {
+        "claude": "bbk-root-wayfinder.md",
+        "codex": "bbk_root_wayfinder.toml",
+        "generic": "bbk_root_wayfinder.md",
+        "omp": "bbk_root_wayfinder.md"
+      },
+      "may_mutate": false,
+      "model_profile": "judgment",
+      "model_routing": {
+        "claude": {
+          "effort": "high",
+          "model": "opus"
+        },
+        "codex": {
+          "model": "gpt-5.6-sol",
+          "model_reasoning_effort": "high"
+        },
+        "omp": {
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "high"
+        }
+      },
+      "skills": [
+        "bbk",
+        "bbk-plan",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-review-intent",
+        "bbk-procedure-design",
+        "bbk-context-routing"
+      ],
+      "spawns": [
+        "bbk_territory_wayfinder",
+        "bbk_questioning_wayfinder",
+        "bbk_researcher",
+        "bbk_prototyper",
+        "bbk_synthesizer",
+        "bbk_architect",
+        "bbk_verification_designer",
+        "bbk_worker_designer",
+        "bbk_reviewer",
+        "bbk_root_orchestrator"
+      ]
+    },
+    "bbk_synthesizer": {
+      "description": "Compile current decisions, evidence, interfaces, work, findings, and uncertainty into a coherent bounded synthesis without inventing new commitments.",
+      "family": "specialist",
+      "files": {
+        "claude": "bbk-synthesizer.md",
+        "codex": "bbk_synthesizer.toml",
+        "generic": "bbk_synthesizer.md",
+        "omp": "bbk_synthesizer.md"
+      },
+      "may_mutate": false,
+      "model_profile": "judgment",
+      "model_routing": {
+        "claude": {
+          "effort": "high",
+          "model": "opus"
+        },
+        "codex": {
+          "model": "gpt-5.6-sol",
+          "model_reasoning_effort": "high"
+        },
+        "omp": {
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "high"
+        }
+      },
+      "skills": [
+        "bbk",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-context",
+        "bbk-review-intent",
+        "bbk-context-routing"
+      ],
+      "spawns": []
+    },
+    "bbk_territory_orchestrator": {
+      "description": "Coordinate one execution boundary, its worker cohorts, local dependencies, candidates, validators, repairs, and escalation.",
+      "family": "execution",
+      "files": {
+        "claude": "bbk-territory-orchestrator.md",
+        "codex": "bbk_territory_orchestrator.toml",
+        "generic": "bbk_territory_orchestrator.md",
+        "omp": "bbk_territory_orchestrator.md"
+      },
+      "may_mutate": false,
+      "model_profile": "coordination",
+      "model_routing": {
+        "claude": {
+          "effort": "medium",
+          "model": "sonnet"
+        },
+        "codex": {
+          "model": "gpt-5.6-terra",
+          "model_reasoning_effort": "medium"
+        },
+        "omp": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        }
+      },
+      "skills": [
+        "bbk",
+        "bbk-execute",
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-review-run",
+        "bbk-review-findings",
+        "bbk-context-routing",
+        "bbk-procedure-design"
+      ],
+      "spawns": [
+        "bbk_worker_orchestrator",
+        "bbk_validator_orchestrator",
+        "bbk_reviewer"
+      ]
+    },
+    "bbk_territory_wayfinder": {
+      "description": "Own one coherent territory, its boundary, questions, interfaces, child work, stopping assessment, and synthesis.",
+      "family": "planning",
+      "files": {
+        "claude": "bbk-territory-wayfinder.md",
+        "codex": "bbk_territory_wayfinder.toml",
+        "generic": "bbk_territory_wayfinder.md",
+        "omp": "bbk_territory_wayfinder.md"
+      },
+      "may_mutate": false,
+      "model_profile": "judgment",
+      "model_routing": {
+        "claude": {
+          "effort": "high",
+          "model": "opus"
+        },
+        "codex": {
+          "model": "gpt-5.6-sol",
+          "model_reasoning_effort": "high"
+        },
+        "omp": {
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "high"
+        }
+      },
+      "skills": [
+        "bbk",
+        "bbk-plan",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-review-intent",
+        "bbk-procedure-design",
+        "bbk-context-routing"
+      ],
+      "spawns": [
+        "bbk_territory_wayfinder",
+        "bbk_questioning_wayfinder",
+        "bbk_researcher",
+        "bbk_prototyper",
+        "bbk_synthesizer",
+        "bbk_architect",
+        "bbk_verification_designer",
+        "bbk_worker_designer",
+        "bbk_reviewer"
+      ]
+    },
+    "bbk_validator": {
+      "description": "Evaluate exact named assertions against one exact candidate and return immutable findings without repairing the subject.",
+      "family": "review",
+      "files": {
+        "claude": "bbk-validator.md",
+        "codex": "bbk_validator.toml",
+        "generic": "bbk_validator.md",
+        "omp": "bbk_validator.md"
+      },
+      "may_mutate": false,
+      "model_profile": "mechanical",
+      "model_routing": {
+        "claude": {
+          "effort": "low",
+          "model": "haiku"
+        },
+        "codex": {
+          "model": "gpt-5.6-luna",
+          "model_reasoning_effort": "low"
+        },
+        "omp": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        }
+      },
+      "skills": [
+        "bbk",
+        "bbk-review",
+        "bbk-evidence",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-run",
+        "bbk-review-findings",
+        "bbk-review-intent",
+        "bbk-context-routing"
+      ],
+      "spawns": []
+    },
+    "bbk_validator_orchestrator": {
+      "description": "Compile non-overlapping assertion charters, launch eligible validators against one exact candidate, and aggregate immutable findings.",
+      "family": "execution",
+      "files": {
+        "claude": "bbk-validator-orchestrator.md",
+        "codex": "bbk_validator_orchestrator.toml",
+        "generic": "bbk_validator_orchestrator.md",
+        "omp": "bbk_validator_orchestrator.md"
+      },
+      "may_mutate": false,
+      "model_profile": "coordination",
+      "model_routing": {
+        "claude": {
+          "effort": "medium",
+          "model": "sonnet"
+        },
+        "codex": {
+          "model": "gpt-5.6-terra",
+          "model_reasoning_effort": "medium"
+        },
+        "omp": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        }
+      },
+      "skills": [
+        "bbk",
+        "bbk-review",
+        "bbk-evidence",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-review-plan",
+        "bbk-review-context",
+        "bbk-review-run",
+        "bbk-review-findings",
+        "bbk-review-intent",
+        "bbk-context-routing"
+      ],
+      "spawns": [
+        "bbk_validator",
+        "bbk_reviewer"
+      ]
+    },
+    "bbk_verification_designer": {
+      "description": "Design proportional, assertion-scoped verification and evidence before final work decomposition or candidate validation.",
+      "family": "specialist",
+      "files": {
+        "claude": "bbk-verification-designer.md",
+        "codex": "bbk_verification_designer.toml",
+        "generic": "bbk_verification_designer.md",
+        "omp": "bbk_verification_designer.md"
+      },
+      "may_mutate": false,
+      "model_profile": "judgment",
+      "model_routing": {
+        "claude": {
+          "effort": "high",
+          "model": "opus"
+        },
+        "codex": {
+          "model": "gpt-5.6-sol",
+          "model_reasoning_effort": "high"
+        },
+        "omp": {
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "high"
+        }
+      },
+      "skills": [
+        "bbk",
+        "bbk-plan",
+        "bbk-evidence",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-review-context",
+        "bbk-review-intent",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-context-routing",
+        "bbk-procedure-design"
+      ],
+      "spawns": []
+    },
+    "bbk_worker": {
+      "description": "Perform one bounded implementation, integration, test, documentation, packaging, investigation, or other task using an invocation-supplied profile.",
+      "family": "execution",
+      "files": {
+        "claude": "bbk-worker.md",
+        "codex": "bbk_worker.toml",
+        "generic": "bbk_worker.md",
+        "omp": "bbk_worker.md"
+      },
+      "may_mutate": true,
+      "model_profile": "mechanical",
+      "model_routing": {
+        "claude": {
+          "effort": "low",
+          "model": "haiku"
+        },
+        "codex": {
+          "model": "gpt-5.6-luna",
+          "model_reasoning_effort": "low"
+        },
+        "omp": {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "high"
+        }
+      },
+      "skills": [
+        "bbk",
+        "bbk-execute",
+        "bbk-evidence",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-context-routing"
+      ],
+      "spawns": []
+    },
+    "bbk_worker_designer": {
+      "description": "Select or compose the smallest worker, task-kind profile, language profile, tools, workspace, authority, and handoff needed for a work unit.",
+      "family": "specialist",
+      "files": {
+        "claude": "bbk-worker-designer.md",
+        "codex": "bbk_worker_designer.toml",
+        "generic": "bbk_worker_designer.md",
+        "omp": "bbk_worker_designer.md"
+      },
+      "may_mutate": false,
+      "model_profile": "judgment",
+      "model_routing": {
+        "claude": {
+          "effort": "high",
+          "model": "opus"
+        },
+        "codex": {
+          "model": "gpt-5.6-sol",
+          "model_reasoning_effort": "high"
+        },
+        "omp": {
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "high"
+        }
+      },
+      "skills": [
+        "bbk",
+        "bbk-plan",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-review-context",
+        "bbk-context-routing",
+        "bbk-procedure-design"
+      ],
+      "spawns": []
+    },
+    "bbk_worker_orchestrator": {
+      "description": "Own one coherent worker cohort from entry checks through draft implementation, late freeze, deterministic gates, and handoff to validation.",
+      "family": "execution",
+      "files": {
+        "claude": "bbk-worker-orchestrator.md",
+        "codex": "bbk_worker_orchestrator.toml",
+        "generic": "bbk_worker_orchestrator.md",
+        "omp": "bbk_worker_orchestrator.md"
+      },
+      "may_mutate": false,
+      "model_profile": "coordination",
+      "model_routing": {
+        "claude": {
+          "effort": "medium",
+          "model": "sonnet"
+        },
+        "codex": {
+          "model": "gpt-5.6-terra",
+          "model_reasoning_effort": "medium"
+        },
+        "omp": {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinkingLevel": "high"
+        }
+      },
+      "skills": [
+        "bbk",
+        "bbk-execute",
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-run",
+        "bbk-review-findings",
+        "bbk-context-routing",
+        "bbk-procedure-design"
+      ],
+      "spawns": [
+        "bbk_worker"
+      ]
+    }
+  },
+  "files": {
+    "projections/claude/agents/bbk-architect.md": "8bc25c5e3a1b12ca366973bb362af85c386384a95983ffe5fcb4b97fbbd8594a",
+    "projections/claude/agents/bbk-phase-wayfinder.md": "c8a5a986df8ebb9823a99f4d1ee16dc250f6bdf0485efc9ed7f9cfe7e4caff14",
+    "projections/claude/agents/bbk-planning-wayfinder.md": "c06019074ee8415ab07877b4f4a8d32f5fcaac7553e6d83b509cc5a163ab7461",
+    "projections/claude/agents/bbk-prototyper.md": "fbfbd0f53cf49f75a750c51fd4c39f6dc18d121fc13144e5fbbcbcc16b4614c7",
+    "projections/claude/agents/bbk-question-guide.md": "8c333ee5056ca269cdf0b04a3fd1e38ef7114df1c71ca0d293b00a685bc2ee64",
+    "projections/claude/agents/bbk-questioning-wayfinder.md": "1831e343c29a587ab9486c72883cfec0dda1aa608b524e59eab5f86106b91308",
+    "projections/claude/agents/bbk-researcher.md": "2bffd716d8250c72a4748d32badd72c02131d186e9f1cafb5cabe17186b04008",
+    "projections/claude/agents/bbk-reviewer.md": "ae5d48aa610e01a9740c182ad66e3a644c8d47798e228fcca6ae4b3d6275b16f",
+    "projections/claude/agents/bbk-root-orchestrator.md": "93011657b6a1bc5c31e777709eb4ef1fa5d758b2d65a67347fbead953d19c736",
+    "projections/claude/agents/bbk-root-wayfinder.md": "b9cd3f95aaef589940bc831a0327adc457e924e5d47b7e4cfb246552ec04b845",
+    "projections/claude/agents/bbk-synthesizer.md": "180aac3f7182583c3b2487dd392d32da11d5ee8bca0a5cabd188d699387cb3b0",
+    "projections/claude/agents/bbk-territory-orchestrator.md": "1ad30ac11417c3330f88c9b58a3d2b0d0f057cd16dfbedec75c0eaef5c25ae7f",
+    "projections/claude/agents/bbk-territory-wayfinder.md": "9097eb693c8fae5f7c07c80d6e5c0630584d8ace75c44953bfdd3b26c7dbef88",
+    "projections/claude/agents/bbk-validator-orchestrator.md": "41061ff78850a602c75231fe1c986858bbaa739bd5d9965f63737d215b4d8ac7",
+    "projections/claude/agents/bbk-validator.md": "81a74429898f9bac0d3aa1edb2f231f3cc47145ccde48f2302aec6620dd0a12c",
+    "projections/claude/agents/bbk-verification-designer.md": "f5b07f2fad989a56d4402d218f5c041dc2dcb7319d64c89432cfe69c61d5c417",
+    "projections/claude/agents/bbk-worker-designer.md": "1690dca1c0cf227fe4d0590e3bd9728eb954ff244df899b388b43c8ca8d962e8",
+    "projections/claude/agents/bbk-worker-orchestrator.md": "c98f31b1caca22da36d4bae5fb8d1cc200066b9ed9153f44d7919cad196a7ed0",
+    "projections/claude/agents/bbk-worker.md": "f5e7a7232cde321b7fd03217fd9204a746a4b9a720f7849f9af0f5e10b1b7e90",
+    "projections/codex/agents/bbk_architect.toml": "05f4e0a7d663563335d7dee82ee8bc9895391945beb155b4ad42163afa6eb230",
+    "projections/codex/agents/bbk_phase_wayfinder.toml": "49c5e8e4f0bfc8b81a06d2505dec250e52b2a0a3fdfda258ef4b7c7898ac9f8e",
+    "projections/codex/agents/bbk_planning_wayfinder.toml": "2b29704cfa8d860642f6a95699a64d764c93eaf7a71dd47886955685a6d0f200",
+    "projections/codex/agents/bbk_prototyper.toml": "bacf6744e633a9b4615c1ee5ac88577db1f633b93bcee83c74d18004aaa0235f",
+    "projections/codex/agents/bbk_question_guide.toml": "5b2ec9eca3c6e9c163ebec673930812a69364a54e1335cf24bc6ebb12d97eaf5",
+    "projections/codex/agents/bbk_questioning_wayfinder.toml": "dde30122bad3507eee83aa735797ae7e8907fdc17fb92e217ad2e2bc41f4ef7d",
+    "projections/codex/agents/bbk_researcher.toml": "75105b908d52631c08515e8a3ece233c90e570fa72e873b592d297cb7577b9d1",
+    "projections/codex/agents/bbk_reviewer.toml": "f151f547bd0053794764f0ab210d46b01b3e487ba9d50c336cd4bd7a3b0f389e",
+    "projections/codex/agents/bbk_root_orchestrator.toml": "2ddaff303a4cea4d001fe0c8d3f9b13f617d7b80fcc9f77b52ef28edda84454f",
+    "projections/codex/agents/bbk_root_wayfinder.toml": "a8fc357dd89e2a5f26e33a169f7e9462919f14a27b0fefedbae0b26552ef8fc3",
+    "projections/codex/agents/bbk_synthesizer.toml": "4934876f06c47d634b7d081412f58318ee8005d78204ff19c0694647b820158e",
+    "projections/codex/agents/bbk_territory_orchestrator.toml": "ea972d04671001a681876ce55f1bcc918993b24e826fbe91a3d4bf500a01ef2b",
+    "projections/codex/agents/bbk_territory_wayfinder.toml": "d05878e5d8093d45ddf95e63eb9923b946229c45769f4fce7f6c19253819811c",
+    "projections/codex/agents/bbk_validator.toml": "9a9ab49c6903e0145292f872db9f39d511e2c5ffb7080d25b063205f4f41556a",
+    "projections/codex/agents/bbk_validator_orchestrator.toml": "516b2253cec8a45f60766491a17a69204edc6ce5444b0315636a36b43e4e0985",
+    "projections/codex/agents/bbk_verification_designer.toml": "40c72406fc4f9d0bf28201f9c4927d1e46c55e0a23066c1a703ef941d148d5b5",
+    "projections/codex/agents/bbk_worker.toml": "d46d2c9099eb845958fb6022181cfa09abab8287aa7e6de25436d4547b12e6d5",
+    "projections/codex/agents/bbk_worker_designer.toml": "976d1a6406668b0658175889ad9ef0935dafc9b4d768da4a81e2f97ba51c611a",
+    "projections/codex/agents/bbk_worker_orchestrator.toml": "fe154264f4b6e494f420ccd7d99cfa6d83f1bbbb8c8d5661449c45ed2d3e675a",
+    "projections/generic/agents/bbk_architect.md": "f69121056891fdc71ea2bbb36e99f085f4d5163eb00d1a152476931b3dbbfebe",
+    "projections/generic/agents/bbk_phase_wayfinder.md": "279f958a70c3b224aa9090d9d028c7efa6bd38e5ca64dfe280c321311f878749",
+    "projections/generic/agents/bbk_planning_wayfinder.md": "732cc60e7ae0a3226d83dbd26d91bd324bd5a7e848e7ac5014a3183cb1b190c0",
+    "projections/generic/agents/bbk_prototyper.md": "be13d9eb032b7413eb6c919dc6a299db1c9a06931d15e2147ac62a775376cc96",
+    "projections/generic/agents/bbk_question_guide.md": "2c336933ccfa1f52d5d8a2fa597ee39c0f575698cf9e7f4f05511a73a81bdd5e",
+    "projections/generic/agents/bbk_questioning_wayfinder.md": "adc6190a3507ad022b7dfe9accb9b7774fb5648a8a0decf0f8de07f859f7f842",
+    "projections/generic/agents/bbk_researcher.md": "bde8057de1361192a2cae085859b4fc26100ab2d07c7bad5d637b69f56461240",
+    "projections/generic/agents/bbk_reviewer.md": "f3c19fac8ed5af6efa6e9e43ee8ee93711461e4092e05e1a3242a354f8641f28",
+    "projections/generic/agents/bbk_root_orchestrator.md": "a61ed8196be8f13b12db0dbddf09bb195d3c0d2572aa87a6c3395347eef4edd3",
+    "projections/generic/agents/bbk_root_wayfinder.md": "07c042f1d243fc6efddad9a59b1829997618374c2e0f96d4ed8398b6ec68d973",
+    "projections/generic/agents/bbk_synthesizer.md": "06a6251c0c12aa4c076fc42ac214c888c438f522525044bfe4bca9def0a401c3",
+    "projections/generic/agents/bbk_territory_orchestrator.md": "c525e77006f4fea953c87fbb70fbc98e5c2c166a07161f32a3f0a0739c7fe794",
+    "projections/generic/agents/bbk_territory_wayfinder.md": "15d45b240ff333b26eef0b15af0cc2157a949f0105783ebaf4d3d4669c0a6b03",
+    "projections/generic/agents/bbk_validator.md": "000760f62060f0ce2ad879d6ac4f24409f76305f7178cf5b82021db407b66d76",
+    "projections/generic/agents/bbk_validator_orchestrator.md": "6a337afd3f79d9f7f3f04fe0f5fe611dd38bf4cf3e271b5f6cabd6660dfb74ab",
+    "projections/generic/agents/bbk_verification_designer.md": "62f8541f38061c3133164cb1a781bd5b0596495b3975ced9365d18d151a53ee3",
+    "projections/generic/agents/bbk_worker.md": "c3a777ed1d965e222c3b23c4736a765eb40afd02ccc84dc54f280b404a19ffd5",
+    "projections/generic/agents/bbk_worker_designer.md": "06ea5b9953381f4c41c579133690004b67af3dd5d76d14cd42f864b67fc75b79",
+    "projections/generic/agents/bbk_worker_orchestrator.md": "994c6333a59cd1399273908379f89dfc71aa401144bc2a7f8280114cb2da6e92",
+    "projections/omp/agents/bbk_architect.md": "18d76b198a1fc32d7c925fc8b8592d18748890ffbe4b5bf3e783b9be2c4e62b7",
+    "projections/omp/agents/bbk_phase_wayfinder.md": "484f551277ad8b86408bae6d5af81979d34667b122d00351c7a01a25929c8141",
+    "projections/omp/agents/bbk_planning_wayfinder.md": "89d7b806e29dfb2b130b67a369187187cb0426c9cca70b4a9bf727c161c8dfca",
+    "projections/omp/agents/bbk_prototyper.md": "6e26751e0e40e0f55208e1995c139705fef274b78b3ee0f798537e655892be5a",
+    "projections/omp/agents/bbk_question_guide.md": "e780449df8357b2ae6dda364a733f85f62975c051e6b6e820ca456bd99ad4ac4",
+    "projections/omp/agents/bbk_questioning_wayfinder.md": "f70c71d0b29d90034df8b66c0ff775f932e760e2295211b2dd6b901cb7454b92",
+    "projections/omp/agents/bbk_researcher.md": "1fcde353a8bd27895757cec8eb4e60796384ae71ff9532eb366c928865beb201",
+    "projections/omp/agents/bbk_reviewer.md": "3e27b3665facd90b56457c246b9476403ae8137806a1ea5917a62fdcbe81aaae",
+    "projections/omp/agents/bbk_root_orchestrator.md": "59801e5e57d91e1f8088e25cc6a745a6866b7315b24801d81cbb098b2befd6ec",
+    "projections/omp/agents/bbk_root_wayfinder.md": "dcf7ee40bed2cf0b250e63d4186a60f1e09f4d44815c4af5b5b36c0af77375ec",
+    "projections/omp/agents/bbk_synthesizer.md": "434607852a32fb51fa58a9abf5a785169960f463df1fd363d4b7a5845bb069c4",
+    "projections/omp/agents/bbk_territory_orchestrator.md": "b0b2bf286e5432647286ca359708bd6dd150e12a68aea88082d6ca659206bcfe",
+    "projections/omp/agents/bbk_territory_wayfinder.md": "b6df5fcd32cf9c072ec50d16d9b0d6a2fa9ac90a87df25a5cbbcc6d90245590e",
+    "projections/omp/agents/bbk_validator.md": "b054e9926d9f75695ec5d5e5022ccd641f12ce7f0e3f8b1336c837255b9eb908",
+    "projections/omp/agents/bbk_validator_orchestrator.md": "898e88abf9117d41c9b40275c2d6a3ae78068acc7d87a2002fc91f2bafe22d43",
+    "projections/omp/agents/bbk_verification_designer.md": "fa090d8d38c099fab576f9971bfe332b29e4dce53777ae0bcb745a7311aab23c",
+    "projections/omp/agents/bbk_worker.md": "adb06fe9d5b77a6dd4fb0a9489730672a7836cb090d7f10c1bda7e130ca70b38",
+    "projections/omp/agents/bbk_worker_designer.md": "da589e729a2253c9fbc78a9d5af0c45708632831242b33f11dc451e27b5ffa1d",
+    "projections/omp/agents/bbk_worker_orchestrator.md": "d279efa4ab44f15a4cf0140a262993ec18f3d35d5b24c07d56d10ec4e2321df7"
+  },
+  "model_profile_count": 3,
+  "model_routing_source": "spec/model-routing.json",
+  "model_routing_source_sha256": "e00a66078eaf94788aead80d80a229a73b2a6e6033632fe30845acbd5f1a7062",
+  "package_version": "0.1.0-alpha.11.7",
+  "projection_count": 76,
+  "role_count": 19,
+  "role_profile_counts": {
+    "coordination": 5,
+    "judgment": 12,
+    "mechanical": 2
+  },
+  "role_source_sha256": "568eb332e59db89c11cb371dbc5330f17e120c90f6df476b89d7cd53b45e0dc0",
+  "schema": "bbk.projection-manifest.v3",
+  "source": "spec/roles.json",
+  "source_sha256": "e3d49a703de60944f9e289ea780671190b3ff4e62da5434f42c5f5ab19970432",
+  "target_count": 4,
+  "targets": [
+    "claude",
+    "codex",
+    "generic",
+    "omp"
+  ]
+}

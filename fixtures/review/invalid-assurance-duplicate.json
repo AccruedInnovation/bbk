@@ -1,0 +1,167 @@
+{
+  "assertions": [
+    {
+      "assertionId": "A-STATE-ONE",
+      "blocking": true,
+      "independence": {
+        "dimensions": [
+          "author-separation",
+          "context-assembly"
+        ],
+        "reason": "State ownership is a material architectural property.",
+        "required": true
+      },
+      "lensHints": [
+        "state-concurrency-effect-recovery"
+      ],
+      "methods": [
+        "inspection",
+        "state-machine-properties"
+      ],
+      "owner": "state-review",
+      "requiredEvidence": [
+        "SDE design",
+        "trace results"
+      ],
+      "statement": "Order lifecycle has one canonical owner and one legal variant."
+    },
+    {
+      "assertionId": "A-EFFECT-ONCE",
+      "blocking": true,
+      "independence": {
+        "dimensions": [
+          "method-diversity",
+          "role-separation"
+        ],
+        "reason": "External effect duplication is a protected floor.",
+        "required": true
+      },
+      "lensHints": [
+        "state-concurrency-effect-recovery"
+      ],
+      "methods": [
+        "deterministic test",
+        "fault trace"
+      ],
+      "owner": "effect-review",
+      "requiredEvidence": [
+        "duplicate trace receipt"
+      ],
+      "statement": "Duplicate authorization cannot cause duplicate provider effects."
+    },
+    {
+      "assertionId": "A-INTENT",
+      "blocking": true,
+      "independence": {
+        "dimensions": [],
+        "reason": "",
+        "required": false
+      },
+      "lensHints": [
+        "intent-outcome"
+      ],
+      "methods": [
+        "review"
+      ],
+      "owner": "intent-review",
+      "requiredEvidence": [
+        "SolutionOutcomeFit",
+        "structure and slice chain"
+      ],
+      "statement": "The implementation remains aligned with the accepted operational outcome."
+    },
+    {
+      "assertionId": "A-STATE-ONE",
+      "blocking": true,
+      "independence": {
+        "dimensions": [
+          "author-separation",
+          "context-assembly"
+        ],
+        "reason": "State ownership is a material architectural property.",
+        "required": true
+      },
+      "lensHints": [
+        "state-concurrency-effect-recovery"
+      ],
+      "methods": [
+        "inspection",
+        "state-machine-properties"
+      ],
+      "owner": "state-review",
+      "requiredEvidence": [
+        "SDE design",
+        "trace results"
+      ],
+      "statement": "Order lifecycle has one canonical owner and one legal variant."
+    }
+  ],
+  "assuranceContractId": "AC-ORDER-001",
+  "changeClasses": [
+    "interface",
+    "state",
+    "external-effect",
+    "recovery"
+  ],
+  "consumerObligations": [
+    "Payment adapter consumes EFF-PAYMENT."
+  ],
+  "deterministicGates": [
+    {
+      "assertionRefs": [
+        "A-EFFECT-ONCE"
+      ],
+      "evidenceKind": "state-transition-trace",
+      "gateId": "G-TRACE",
+      "method": "trace replay",
+      "required": true
+    }
+  ],
+  "environmentRefs": [
+    "fixture-order-v1"
+  ],
+  "evidenceReusePolicy": {
+    "allowed": true,
+    "dependencyKeys": [
+      "subject",
+      "toolchain",
+      "traces",
+      "design"
+    ],
+    "validityWindow": "until a dependency changes"
+  },
+  "faultObligations": [
+    "Lost acknowledgement is reconciled without new effect."
+  ],
+  "independencePolicy": {
+    "dimensions": [
+      "role-separation",
+      "independent-context-assembly"
+    ],
+    "overlapPolicy": "allow-complementary-with-rationale",
+    "reason": "Consequential state/effect boundary.",
+    "required": true
+  },
+  "protectedFloors": [
+    "no-duplicate-external-effect"
+  ],
+  "repairPolicy": {
+    "earlyEscalationTriggers": [
+      "same defect recurs",
+      "interface or effect semantics change"
+    ],
+    "hardCeiling": 3,
+    "ordinaryCycles": 2
+  },
+  "reviewApplicability": "manifest",
+  "revision": "1",
+  "riskTier": "consequential",
+  "schema": "bbk.assurance-contract.v1",
+  "status": "accepted",
+  "subject": {
+    "digest": "c43b10defceb4401dc11e37366e491015afb76986a0e6fd76e5022f1683197e0",
+    "kind": "candidate",
+    "ref": "CANDIDATE-ORDER-001",
+    "revision": "1"
+  }
+}

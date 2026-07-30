@@ -1,0 +1,251 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-review-context-manifest-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "authorityDisclaimer": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "blockers": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "compiler": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "completeness": {
+      "enum": [
+        "COMPLETE",
+        "COMPLETE_WITH_DECLARED_EXCLUSIONS",
+        "PARTIAL_NONBLOCKING",
+        "BLOCKED_REQUIRED_CONTEXT_MISSING",
+        "STALE",
+        "INVALID"
+      ]
+    },
+    "contentRoot": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "contextManifestId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "contextPacks": {
+      "type": "array"
+    },
+    "crossShardAssertions": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "dependencyClosure": {
+      "type": "array"
+    },
+    "excludedItems": {
+      "type": "array"
+    },
+    "includedItems": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "generated": {
+            "type": "boolean"
+          },
+          "itemId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "kind": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "path": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "redaction": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "sourceClass": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "itemId",
+          "kind",
+          "path",
+          "bytes",
+          "sha256",
+          "sourceClass",
+          "generated",
+          "redaction"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "omissions": {
+      "type": "array"
+    },
+    "redactions": {
+      "type": "array"
+    },
+    "requiredSemanticObjects": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "retrievalOnlyItems": {
+      "type": "array"
+    },
+    "reviewManifest": {
+      "additionalProperties": false,
+      "properties": {
+        "digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "ref": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "digest"
+      ],
+      "type": "object"
+    },
+    "revision": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "root": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.review-context-manifest.v1"
+    },
+    "shards": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "contentRoot": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "primaryGroup": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "primaryItemRefs": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "shardId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "sharedItemRefs": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "shardId",
+          "primaryGroup",
+          "primaryItemRefs",
+          "sharedItemRefs",
+          "bytes",
+          "contentRoot"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "subject": {
+      "additionalProperties": false,
+      "properties": {
+        "digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "kind": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "ref": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "revision": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "kind",
+        "revision",
+        "digest"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "contextManifestId",
+    "revision",
+    "subject",
+    "reviewManifest",
+    "root",
+    "contentRoot",
+    "requiredSemanticObjects",
+    "includedItems",
+    "retrievalOnlyItems",
+    "excludedItems",
+    "omissions",
+    "redactions",
+    "compiler",
+    "contextPacks",
+    "shards",
+    "crossShardAssertions",
+    "completeness",
+    "blockers",
+    "dependencyClosure",
+    "authorityDisclaimer"
+  ],
+  "title": "BBK ReviewContextManifest v1",
+  "type": "object"
+}

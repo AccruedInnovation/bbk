@@ -1,0 +1,878 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-state-decision-effect-design-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "applicability": {
+      "enum": [
+        "NONE",
+        "INLINE",
+        "CONTRACT"
+      ]
+    },
+    "canonicalState": {
+      "additionalProperties": false,
+      "properties": {
+        "derivedFacts": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "sourceRefs": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              "statement": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "statement",
+              "sourceRefs"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "dimensions": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "dimensionId": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "independentOf": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "initialization": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "mutuallyExclusive": {
+                "type": "boolean"
+              },
+              "owner": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "persistence": {
+                "enum": [
+                  "persisted",
+                  "reconstructed",
+                  "derived",
+                  "none"
+                ]
+              },
+              "purpose": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "terminalOrReset": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "values": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "prohibitedData": {
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "requiredData": {
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "requiredData",
+                    "prohibitedData"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "dimensionId",
+              "purpose",
+              "mutuallyExclusive",
+              "independentOf",
+              "owner",
+              "values",
+              "initialization",
+              "terminalOrReset",
+              "persistence"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "duplicateStateProhibitions": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "observations": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "authority": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "freshnessPolicy": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "source": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "source",
+              "freshnessPolicy",
+              "authority"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "persistenceBoundary": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "semanticOwner": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "strategy": {
+          "enum": [
+            "STATELESS",
+            "SINGLE_SUM",
+            "PRODUCT_OF_SUMS",
+            "DECISION_TABLE",
+            "EXTERNAL_CANONICAL_CONTRACT",
+            "OTHER_WITH_RATIONALE"
+          ]
+        },
+        "versionFenceSemantics": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "strategy",
+        "semanticOwner",
+        "dimensions",
+        "derivedFacts",
+        "observations",
+        "persistenceBoundary",
+        "duplicateStateProhibitions",
+        "versionFenceSemantics"
+      ],
+      "type": "object"
+    },
+    "decisionBoundaries": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "authorityValidation": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "boundaryId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "contextHandling": {
+            "additionalProperties": false,
+            "properties": {
+              "clock": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "configuration": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "environment": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "externalData": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "randomness": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "clock",
+              "randomness",
+              "configuration",
+              "environment",
+              "externalData"
+            ],
+            "type": "object"
+          },
+          "determinism": {
+            "enum": [
+              "PURE_DETERMINISTIC",
+              "DETERMINISTIC_WITH_EXPLICIT_CONTEXT",
+              "LEGACY_EFFECTFUL_WITH_CONTAINMENT"
+            ]
+          },
+          "executionMode": {
+            "enum": [
+              "transactional",
+              "staged",
+              "compensated",
+              "none"
+            ]
+          },
+          "expectedFailures": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "freshnessValidation": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "hiddenDependencyPolicy": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "inputTypes": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "ioClaims": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "outputs": {
+            "items": {
+              "enum": [
+                "NEXT_STATE",
+                "DOMAIN_FACTS",
+                "EFFECT_INTENTS",
+                "REJECTION",
+                "NO_CHANGE"
+              ]
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "owner": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "stateInputs": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "boundaryId",
+          "owner",
+          "stateInputs",
+          "inputTypes",
+          "outputs",
+          "determinism",
+          "hiddenDependencyPolicy",
+          "contextHandling",
+          "expectedFailures",
+          "authorityValidation",
+          "freshnessValidation",
+          "executionMode",
+          "ioClaims"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "delegatedFreedom": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "designId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "effectContracts": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "ambiguousAcknowledgement": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "cancellationSemantics": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "compensationPolicy": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "duplicateBehavior": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "durableAfterInterruption": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "effectId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "executionAuthority": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "executor": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "externalRestrictions": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "idempotency": {
+            "additionalProperties": false,
+            "properties": {
+              "classification": {
+                "enum": [
+                  "idempotent",
+                  "deduplicated",
+                  "non-idempotent"
+                ]
+              },
+              "key": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "classification",
+              "key"
+            ],
+            "type": "object"
+          },
+          "intent": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "irreversibleBoundary": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "observability": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "orderingRequirements": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "partialCompletion": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "preconditions": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "recoveryOwner": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "requestAuthority": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "resultReceipt": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "retryPolicy": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "target": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "timeoutMeaning": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "effectId",
+          "intent",
+          "executor",
+          "requestAuthority",
+          "executionAuthority",
+          "target",
+          "preconditions",
+          "idempotency",
+          "duplicateBehavior",
+          "retryPolicy",
+          "timeoutMeaning",
+          "cancellationSemantics",
+          "orderingRequirements",
+          "partialCompletion",
+          "irreversibleBoundary",
+          "resultReceipt",
+          "ambiguousAcknowledgement",
+          "durableAfterInterruption",
+          "recoveryOwner",
+          "observability",
+          "compensationPolicy",
+          "externalRestrictions"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "fixedDecisionRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "formalization": {
+      "additionalProperties": false,
+      "properties": {
+        "assumptions": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "divergenceHandling": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "exploredBounds": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "level": {
+          "enum": [
+            "NONE",
+            "TRANSITION_TABLE",
+            "STATE_MACHINE_PROPERTIES",
+            "FORMAL_EXECUTABLE_MODEL"
+          ]
+        },
+        "limitations": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "mappingRefs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "modelDigest": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "modelRef": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "properties": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "rationale": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "tool": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "level",
+        "required",
+        "rationale",
+        "tool",
+        "modelRef",
+        "modelDigest",
+        "assumptions",
+        "properties",
+        "exploredBounds",
+        "mappingRefs",
+        "limitations",
+        "divergenceHandling"
+      ],
+      "type": "object"
+    },
+    "invariants": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "assertionRefs": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "class": {
+            "enum": [
+              "representation",
+              "transition",
+              "authority",
+              "effect",
+              "recovery",
+              "temporal-order",
+              "safety-feared-event",
+              "idempotency-duplicate",
+              "lifecycle-closure"
+            ]
+          },
+          "invariantId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "statement": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "verificationMethods": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "invariantId",
+          "class",
+          "statement",
+          "verificationMethods",
+          "assertionRefs"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "rationale": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "reviewPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "acceptanceCriteria": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "assuranceTier": {
+          "enum": [
+            "routine",
+            "material",
+            "consequential",
+            "critical"
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "reviewerLenses": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "required",
+        "assuranceTier",
+        "reviewerLenses",
+        "acceptanceCriteria"
+      ],
+      "type": "object"
+    },
+    "revision": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.state-decision-effect-design.v1"
+    },
+    "scopeRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "sourceDecisionRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "sourceInterfaceRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "sourceRequirementRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "in-review",
+        "accepted",
+        "superseded"
+      ]
+    },
+    "title": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "traceFixtureRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "transitionRules": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "authorityRequirements": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "dimensionRef": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "domainFacts": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "effectIntentRefs": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "fromPattern": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "guards": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "inputType": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "invariantRefs": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "rejection": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "ruleId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "toPattern": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "ruleId",
+          "dimensionRef",
+          "fromPattern",
+          "inputType",
+          "guards",
+          "authorityRequirements",
+          "toPattern",
+          "domainFacts",
+          "effectIntentRefs",
+          "rejection",
+          "invariantRefs"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "triggerIndicators": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema",
+    "designId",
+    "revision",
+    "title",
+    "status",
+    "applicability",
+    "rationale",
+    "triggerIndicators",
+    "scopeRefs",
+    "sourceRequirementRefs",
+    "sourceInterfaceRefs",
+    "sourceDecisionRefs",
+    "fixedDecisionRefs",
+    "delegatedFreedom",
+    "canonicalState",
+    "decisionBoundaries",
+    "transitionRules",
+    "effectContracts",
+    "invariants",
+    "formalization",
+    "traceFixtureRefs",
+    "reviewPolicy"
+  ],
+  "title": "BBK State–Decision–Effect Design v1",
+  "type": "object"
+}

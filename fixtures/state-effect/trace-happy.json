@@ -1,0 +1,68 @@
+{
+  "designRevision": "1",
+  "environmentIdentity": "fixture-order-v1",
+  "evidenceRequirements": [
+    "state trace receipt",
+    "invariant results"
+  ],
+  "faultPlan": [],
+  "initialState": {
+    "connectivity": "ONLINE",
+    "lifecycle": "READY"
+  },
+  "modelRef": "MODEL-ORDER-PROP",
+  "permittedVariation": [
+    "Provider reference may vary."
+  ],
+  "schema": "bbk.state-transition-trace.v1",
+  "steps": [
+    {
+      "expectedDecision": "authorize",
+      "expectedDomainFacts": [
+        "AuthorizationRequested"
+      ],
+      "expectedEffectIntents": [
+        "EFF-PAYMENT"
+      ],
+      "expectedInvariantResults": [
+        "INV-ONE-LIFECYCLE:PASS",
+        "INV-EFFECT-ONCE:PASS"
+      ],
+      "expectedNextState": {
+        "attemptId": "ATT-1",
+        "connectivity": "ONLINE",
+        "lifecycle": "AUTHORIZING"
+      },
+      "expectedRejection": null,
+      "input": {
+        "attemptId": "ATT-1",
+        "type": "AuthorizeOrder"
+      }
+    },
+    {
+      "expectedDecision": "accept-result",
+      "expectedDomainFacts": [
+        "PaymentAccepted"
+      ],
+      "expectedEffectIntents": [],
+      "expectedInvariantResults": [
+        "INV-ONE-LIFECYCLE:PASS",
+        "INV-RECEIPT:PASS"
+      ],
+      "expectedNextState": {
+        "connectivity": "ONLINE",
+        "lifecycle": "PAID",
+        "receipt": "R-1"
+      },
+      "expectedRejection": null,
+      "input": {
+        "attemptId": "ATT-1",
+        "receipt": "R-1",
+        "type": "PaymentResult.Success"
+      }
+    }
+  ],
+  "subjectRef": "SDE-ORDER-001",
+  "traceClass": "legal-path",
+  "traceId": "TRACE-HAPPY"
+}

@@ -1,0 +1,244 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-evidence-receipt-v2.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "assertionRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "completedAt": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "completionStatus": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "coverage": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "dependencyFingerprint": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "environmentIdentity": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "freshness": {
+      "additionalProperties": false,
+      "properties": {
+        "dependencyKeys": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "stale": {
+          "type": "boolean"
+        },
+        "validUntil": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "dependencyKeys",
+        "validUntil",
+        "stale"
+      ],
+      "type": "object"
+    },
+    "kind": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "operation": {
+      "additionalProperties": false,
+      "properties": {
+        "argv": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "externalEffects": {
+          "type": "boolean"
+        },
+        "network": {
+          "type": "boolean"
+        },
+        "sanitized": {
+          "type": "boolean"
+        },
+        "workingDirectory": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "argv",
+        "workingDirectory",
+        "sanitized",
+        "network",
+        "externalEffects"
+      ],
+      "type": "object"
+    },
+    "outputs": {
+      "additionalProperties": false,
+      "properties": {
+        "artifactRefs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "exitCode": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "reportRefs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "stderrDigest": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stdoutDigest": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "traceRefs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "exitCode",
+        "stdoutDigest",
+        "stderrDigest",
+        "reportRefs",
+        "artifactRefs",
+        "traceRefs"
+      ],
+      "type": "object"
+    },
+    "producer": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "rawEvidenceRef": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "receiptId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "redaction": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "schema": {
+      "const": "bbk.evidence-receipt.v2"
+    },
+    "startedAt": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "subject": {
+      "additionalProperties": false,
+      "properties": {
+        "digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "ref": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "digest"
+      ],
+      "type": "object"
+    },
+    "toolIdentity": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "trustClass": {
+      "enum": [
+        "DETERMINISTIC_LOCAL",
+        "QUALIFIED_TOOL",
+        "QUALIFIED_EXTERNAL_CHECK",
+        "SIMULATOR_OR_HARNESS",
+        "AGENT_INSPECTION",
+        "HUMAN_REVIEW",
+        "OPERATIONAL_OBSERVATION",
+        "UNSTRUCTURED_OBSERVATION",
+        "LEGACY_IMPORTED"
+      ]
+    }
+  },
+  "required": [
+    "schema",
+    "receiptId",
+    "kind",
+    "producer",
+    "subject",
+    "assertionRefs",
+    "operation",
+    "startedAt",
+    "completedAt",
+    "completionStatus",
+    "outputs",
+    "toolIdentity",
+    "environmentIdentity",
+    "dependencyFingerprint",
+    "coverage",
+    "trustClass",
+    "redaction",
+    "freshness",
+    "rawEvidenceRef"
+  ],
+  "title": "BBK EvidenceReceipt v2",
+  "type": "object"
+}

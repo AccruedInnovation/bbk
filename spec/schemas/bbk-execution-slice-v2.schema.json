@@ -1,0 +1,352 @@
+{
+  "$defs": {
+    "assertion": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "method": {
+          "enum": [
+            "analysis",
+            "inspection",
+            "demonstration",
+            "test",
+            "operational-validation",
+            "review"
+          ]
+        },
+        "statement": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "statement",
+        "method",
+        "evidence"
+      ],
+      "type": "object"
+    },
+    "scaffold": {
+      "additionalProperties": false,
+      "properties": {
+        "disposition": {
+          "enum": [
+            "remove-in-slice",
+            "remove-by-slice",
+            "retain-as-fixture",
+            "review-for-promotion",
+            "none"
+          ]
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "owner": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "purpose": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "removeBySliceRef": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "purpose",
+        "disposition",
+        "owner"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://bbk.local/schemas/bbk-execution-slice-v2.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "assertions": {
+      "items": {
+        "$ref": "#/$defs/assertion"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "atomicity": {
+      "additionalProperties": false,
+      "properties": {
+        "coherent": {
+          "type": "boolean"
+        },
+        "containedOrReversible": {
+          "type": "boolean"
+        },
+        "independentlyVerifiable": {
+          "type": "boolean"
+        },
+        "rationale": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "reviewable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "coherent",
+        "reviewable",
+        "independentlyVerifiable",
+        "containedOrReversible",
+        "rationale"
+      ],
+      "type": "object"
+    },
+    "dependencies": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "effectBoundaryTouchpoints": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "entryConditions": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "exitConditions": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "flow": {
+      "additionalProperties": false,
+      "properties": {
+        "architectureRefs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "interfaceRefs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "participants": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "steps": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "participants",
+        "steps",
+        "interfaceRefs"
+      ],
+      "type": "object"
+    },
+    "formalModelRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "integrationOwner": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "objective": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "outcomeRefs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "parentCapabilityRefs": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "profileProjections": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "scaffolding": {
+      "items": {
+        "$ref": "#/$defs/scaffold"
+      },
+      "type": "array"
+    },
+    "schema": {
+      "const": "bbk.execution-slice.v2"
+    },
+    "sliceId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "solutionOutcomeFitRefs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "stateDecisionEffectRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "stateTransitionTouchpoints": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "ready",
+        "running",
+        "validating",
+        "complete",
+        "blocked",
+        "superseded"
+      ]
+    },
+    "structureContractRefs": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "title": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "touchpoint": {
+      "additionalProperties": false,
+      "properties": {
+        "actor": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "environment": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "expectedObservation": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "interaction": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "cli",
+            "api",
+            "ui",
+            "report",
+            "procedure",
+            "simulation",
+            "physical-observation",
+            "document",
+            "package",
+            "protocol-trace",
+            "other"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "actor",
+        "interaction",
+        "expectedObservation",
+        "environment"
+      ],
+      "type": "object"
+    },
+    "traceFixtureRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "workUnitRefs": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema",
+    "sliceId",
+    "title",
+    "status",
+    "parentCapabilityRefs",
+    "structureContractRefs",
+    "objective",
+    "touchpoint",
+    "flow",
+    "workUnitRefs",
+    "integrationOwner",
+    "assertions",
+    "entryConditions",
+    "exitConditions",
+    "atomicity",
+    "scaffolding",
+    "stateDecisionEffectRefs",
+    "stateTransitionTouchpoints",
+    "effectBoundaryTouchpoints",
+    "traceFixtureRefs",
+    "formalModelRefs"
+  ],
+  "title": "BBK Execution Slice v2",
+  "type": "object"
+}

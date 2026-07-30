@@ -1,0 +1,31 @@
+{
+  "assertionRefs": [
+    "A-EFFECT-ONCE"
+  ],
+  "blocking": true,
+  "classification": "effect-idempotency",
+  "createdAt": "2026-07-24T00:00:00Z",
+  "evidenceRefs": [
+    "ER-FAIL-001"
+  ],
+  "expectedCondition": "Duplicate requests produce at most one provider effect.",
+  "findingId": "F-ORDER-001",
+  "fingerprint": "dd16edc1ec7953978031210c04c0a2537bdb9df3a417d68ab62833a31774eb1f",
+  "lifecycle": "OPEN",
+  "objectRefs": [
+    "EFF-PAYMENT"
+  ],
+  "observedCondition": "A retry path uses a new provider key.",
+  "probableImpact": "Possible duplicate charge.",
+  "recommendedRoute": "repair adapter and rerun targeted closure plus blind reassessment",
+  "reproduction": "Run duplicate trace with timeout then retry.",
+  "schema": "bbk.review-finding.v1",
+  "scope": "payment adapter",
+  "severity": "high",
+  "sourceAttemptRef": "ATT-FAIL",
+  "sourceRunRef": "RR-ORDER-FAIL",
+  "subject": {
+    "digest": "c43b10defceb4401dc11e37366e491015afb76986a0e6fd76e5022f1683197e0",
+    "ref": "CANDIDATE-ORDER-001"
+  }
+}

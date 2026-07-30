@@ -1,0 +1,15 @@
+{
+  "applicability": "manifest",
+  "assertionOwnership": {
+    "A-API-COMPAT": "interface-consumer-compatibility",
+    "A-TEST": "test-evidence"
+  },
+  "independence": "one assertion-scoped reviewer where it adds a distinct property",
+  "kind": "material-interface",
+  "lenses": [
+    "interface-consumer-compatibility",
+    "test-evidence"
+  ],
+  "riskTier": "material",
+  "schema": "bbk.review-example.v1"
+}

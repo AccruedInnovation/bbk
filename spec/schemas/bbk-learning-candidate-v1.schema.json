@@ -1,0 +1,104 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-learning-candidate-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "applicabilityScope": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "candidateId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "candidateType": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "causalConfidence": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "contraryEvidenceRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "exportClass": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "privacyClass": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "proposedAction": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "proposedLesson": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.learning-candidate.v1"
+    },
+    "sourceDispositionRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "sourceFindingRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "sourceRunRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "status": {
+      "const": "PROPOSED"
+    },
+    "supportingEvidenceRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "uncertainty": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "candidateId",
+    "candidateType",
+    "proposedLesson",
+    "applicabilityScope",
+    "supportingEvidenceRefs",
+    "contraryEvidenceRefs",
+    "sourceFindingRefs",
+    "sourceRunRefs",
+    "sourceDispositionRefs",
+    "causalConfidence",
+    "uncertainty",
+    "proposedAction",
+    "privacyClass",
+    "exportClass",
+    "status"
+  ],
+  "title": "BBK LearningCandidate v1",
+  "type": "object"
+}

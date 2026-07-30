@@ -1,0 +1,54 @@
+{
+  "assertionEvaluations": [
+    {
+      "assertionRef": "A-INTENT",
+      "evidenceRefs": [
+        "ER-INTENT-001"
+      ],
+      "rationale": "Candidate remains aligned with accepted fit and slice.",
+      "status": "PASS"
+    }
+  ],
+  "assertionRefs": [
+    "A-INTENT"
+  ],
+  "assignmentRef": "LA-A-INTENT",
+  "attemptId": "ATT-REVIEW-002",
+  "completedAt": "2026-07-24T00:01:00Z",
+  "completionState": "COMPLETED",
+  "contextPack": {
+    "digest": "49a6d96e018fd37ae343936795ae7e427de797f83c04df569d4b56cbeb679ef1",
+    "ref": "PACK-SHARD-001"
+  },
+  "evidenceRefs": [
+    "ER-INTENT-001"
+  ],
+  "findingRefs": [],
+  "independenceFacts": {
+    "authorSeparation": true,
+    "candidateMutationProhibited": true,
+    "deterministicEvidenceIndependence": true,
+    "independentContextAssembly": true,
+    "modelDiversity": false,
+    "organizationalIndependence": false,
+    "providerDiversity": false,
+    "roleSeparation": true,
+    "sessionSeparation": true
+  },
+  "infrastructureErrors": [],
+  "invocation": {
+    "id": "INV-1",
+    "session": "S-1"
+  },
+  "lens": "intent-outcome",
+  "priorFindingsVisibility": "HIDDEN",
+  "reviewer": {
+    "effectiveDigest": "1111111111111111111111111111111111111111111111111111111111111111",
+    "model": "fixture",
+    "provider": "fixture",
+    "role": "bbk_validator"
+  },
+  "runId": "RR-ORDER-001",
+  "schema": "bbk.review-attempt.v1",
+  "startedAt": "2026-07-24T00:00:00Z"
+}

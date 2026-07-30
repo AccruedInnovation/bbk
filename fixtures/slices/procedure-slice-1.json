@@ -1,0 +1,91 @@
+{
+  "assertions": [
+    {
+      "evidence": "completed walkthrough record",
+      "id": "A-P1-CUSTODY",
+      "method": "demonstration",
+      "statement": "An observer can identify the accountable custodian from the record at every step."
+    },
+    {
+      "evidence": "exception walkthrough record",
+      "id": "A-P1-BLOCK",
+      "method": "demonstration",
+      "statement": "Missing return acknowledgement leaves the scenario out of service."
+    }
+  ],
+  "atomicity": {
+    "coherent": true,
+    "containedOrReversible": true,
+    "independentlyVerifiable": true,
+    "rationale": "The complete operational path can be tested without physical effects.",
+    "reviewable": true
+  },
+  "dependencies": [],
+  "entryConditions": [
+    "Draft contract accepted for prototype.",
+    "No physical equipment is energized."
+  ],
+  "exitConditions": [
+    "Normal and failure walkthroughs completed.",
+    "Form gaps are recorded.",
+    "Digital implementation decision remains separate."
+  ],
+  "flow": {
+    "architectureRefs": [
+      "RESP-OPERATIONS",
+      "RESP-MAINTENANCE"
+    ],
+    "interfaceRefs": [
+      "IF-MAINTENANCE-HANDOFF"
+    ],
+    "participants": [
+      "Operator",
+      "Technician",
+      "Safety observer",
+      "Status board"
+    ],
+    "steps": [
+      "Request and isolate.",
+      "Accept custody.",
+      "Record work completion.",
+      "Review return.",
+      "Attempt missing-acknowledgement variant."
+    ]
+  },
+  "integrationOwner": "operations-system-owner",
+  "metadata": {
+    "example": true
+  },
+  "objective": "Exercise the complete custody transition using controlled draft forms before any digital system is built.",
+  "parentCapabilityRefs": [
+    "CAP-SAFE-MAINTENANCE-HANDOFF"
+  ],
+  "profileProjections": {},
+  "scaffolding": [
+    {
+      "disposition": "review-for-promotion",
+      "id": "SC-PAPER-BOARD",
+      "owner": "production-control",
+      "purpose": "Represent the future status projection during the tabletop."
+    }
+  ],
+  "schema": "bbk.execution-slice.v1",
+  "sliceId": "ES-PROCEDURE-001",
+  "status": "ready",
+  "structureContractRefs": [
+    "ISC-PROCEDURE-001@1"
+  ],
+  "title": "Tabletop handoff with controlled forms",
+  "touchpoint": {
+    "actor": "operator and maintenance technician",
+    "environment": "training room with representative forms and status board",
+    "expectedObservation": "Custody is visible at every step and the missing acknowledgement prevents return to service.",
+    "interaction": "Perform a tabletop normal handoff and a missing-acknowledgement scenario.",
+    "kind": "procedure"
+  },
+  "workUnitRefs": [
+    "WU-DRAFT-FORM",
+    "WU-DRAFT-CHECKLIST",
+    "WU-WALKTHROUGH"
+  ]
+}

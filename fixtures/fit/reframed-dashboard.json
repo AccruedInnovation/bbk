@@ -1,0 +1,167 @@
+{
+  "schema": "bbk.solution-outcome-fit.v1",
+  "fitId": "SOF-STALLED-JOBS",
+  "revision": "r1",
+  "title": "Stalled job detection",
+  "status": "reviewed",
+  "applicability": {
+    "level": "record",
+    "triggers": ["solution-first request", "operator workflow", "material operational outcome"],
+    "rationale": "A dashboard is a plausible intervention, but it does not by itself guarantee timely detection."
+  },
+  "requestedIntervention": {
+    "statement": "Build a dashboard showing current production job status.",
+    "source": "user-request",
+    "role": "candidate",
+    "mandatory": false,
+    "rationale": "The dashboard was proposed as a means of reducing delayed detection.",
+    "evidenceRefs": ["REQUEST-001"]
+  },
+  "desiredOutcomes": [
+    {
+      "id": "OUT-DETECT-STALLED",
+      "statement": "Operators detect stalled production jobs within five minutes and can identify the responsible job without manually searching logs.",
+      "actorRefs": ["operator"],
+      "successMeasures": ["p95 stall-detection latency is at most five minutes", "Manual log searches for initial detection fall materially", "Missed-stall rate is measured"],
+      "evidenceRefs": ["OPS-INCIDENTS-2026-H1"]
+    }
+  ],
+  "currentBaseline": {
+    "description": "Operators periodically inspect logs and also learn about stalled work from downstream complaints.",
+    "currentApproach": ["Periodic log search", "Customer or downstream escalation"],
+    "strengths": ["No additional monitoring system"],
+    "costsAndPain": ["Detection depends on attention", "Coverage is inconsistent", "Specialist knowledge is required"],
+    "noChangeConsequences": ["Stalls may remain undetected for hours", "Operators continue manual log inspection"],
+    "evidenceRefs": ["OPS-INCIDENTS-2026-H1"]
+  },
+  "causalHypothesis": {
+    "statement": "Event-driven alerts will reduce detection latency, while a small diagnostic view will accelerate triage after an alert.",
+    "mechanism": "The system detects an age/state condition automatically, notifies the responsible operator, and links to current job context.",
+    "assumptions": ["Job state and age are reliable", "An on-call or responsible operator can receive notifications", "Alert thresholds can avoid unacceptable noise"],
+    "confidence": "medium",
+    "evidenceRefs": ["OPS-INCIDENTS-2026-H1", "JOB-STATE-SCHEMA"],
+    "falsifiers": ["The authoritative job state cannot distinguish healthy long-running work from a stall", "Alert delivery is not monitored"]
+  },
+  "constraints": [
+    {
+      "id": "CON-INTERNAL",
+      "statement": "The solution must operate on the internal network and use the existing job-state source.",
+      "kind": "hard",
+      "source": "environment and security policy",
+      "evidenceRefs": ["POLICY-INTERNAL-OPS"]
+    },
+    {
+      "id": "CON-BROWSER",
+      "statement": "A browser-based diagnostic view is preferred.",
+      "kind": "preference",
+      "source": "operator preference",
+      "evidenceRefs": ["INTERVIEW-OPS-03"]
+    }
+  ],
+  "alternatives": [
+    {
+      "id": "ALT-DASHBOARD",
+      "intervention": "Continuously monitored dashboard",
+      "kind": "requested",
+      "fit": "medium",
+      "benefits": ["Shared situational view", "Useful for diagnosis"],
+      "costs": ["Requires continuous attention"],
+      "risks": ["Stalls remain unnoticed when nobody is watching"],
+      "disposition": "rejected",
+      "evidenceRefs": ["INTERVIEW-OPS-03"]
+    },
+    {
+      "id": "ALT-ALERT-DIAG",
+      "intervention": "Event-driven alerting with a small diagnostic dashboard",
+      "kind": "operational",
+      "fit": "high",
+      "benefits": ["Active detection", "Fast triage", "Lower monitoring burden"],
+      "costs": ["Alert rules and routing must be operated"],
+      "risks": ["Alert noise or delivery failure"],
+      "disposition": "selected",
+      "evidenceRefs": ["OPS-INCIDENTS-2026-H1"]
+    },
+    {
+      "id": "ALT-AUTO-RECOVERY",
+      "intervention": "Automatically restart every apparently stalled job",
+      "kind": "operational",
+      "fit": "medium",
+      "benefits": ["May shorten some incidents"],
+      "costs": ["Requires safe restart semantics"],
+      "risks": ["Duplicate effects or hidden root causes"],
+      "disposition": "retained",
+      "evidenceRefs": []
+    },
+    {
+      "id": "ALT-NO-CHANGE",
+      "intervention": "Continue periodic log inspection",
+      "kind": "no-change",
+      "fit": "low",
+      "benefits": ["No new operational component"],
+      "costs": ["Human attention remains the detector"],
+      "risks": ["Long and variable detection latency"],
+      "disposition": "rejected",
+      "evidenceRefs": ["OPS-INCIDENTS-2026-H1"]
+    }
+  ],
+  "counterfactual": {
+    "question": "If the dashboard were delivered exactly as requested, under what circumstances would delayed stall detection remain?",
+    "failureConditions": ["No operator is watching the dashboard", "The display becomes stale without an obvious health signal", "The job state cannot distinguish a stall"],
+    "residualRisks": ["Threshold tuning may produce alert noise", "Some stalls may require domain-specific detectors"],
+    "conclusion": "A passive dashboard is insufficient for the detection outcome; active alerting plus a diagnostic view is the better intervention."
+  },
+  "successEvidence": [
+    {
+      "id": "EV-DETECTION-LATENCY",
+      "outcomeRef": "OUT-DETECT-STALLED",
+      "measure": "Time from qualifying stall condition to operator acknowledgement",
+      "method": "measurement",
+      "thresholdOrSignal": "p95 at most five minutes under the agreed operational scenario",
+      "observationWindow": "initial operational assessment and first 30 days",
+      "evidenceRefs": ["METRIC-STALL-ACK"]
+    },
+    {
+      "id": "EV-MANUAL-SEARCH",
+      "outcomeRef": "OUT-DETECT-STALLED",
+      "measure": "Manual log searches used for first detection",
+      "method": "operational-observation",
+      "thresholdOrSignal": "Material reduction from the documented baseline",
+      "observationWindow": "first 30 days",
+      "evidenceRefs": ["OPS-WORK-SAMPLE"]
+    }
+  ],
+  "risk": {
+    "consequence": 3,
+    "irreversibility": 2,
+    "uncertainty": 2,
+    "interfaceExposure": 2,
+    "derivedTier": "consequential",
+    "rationale": "Delayed production detection has material operational consequences and the intervention crosses job-state, notification, and operator-workflow boundaries.",
+    "confidence": "medium"
+  },
+  "disposition": {
+    "status": "REFRAMED",
+    "selectedDirection": "Implement event-driven stall alerting with a small diagnostic dashboard and explicit alert-health observability.",
+    "authorityMode": "user",
+    "rationale": "This direction targets detection latency rather than assuming the operator will continuously watch a display.",
+    "approvalRefs": ["DEC-OPS-STALL-DIRECTION"],
+    "investigationPlan": ["Prototype stall classification and alert-noise thresholds before full implementation"],
+    "blockers": []
+  },
+  "traceability": {
+    "outcomeRefs": ["OUT-DETECT-STALLED"],
+    "needRefs": ["NEED-ACTIVE-DETECTION", "NEED-FAST-TRIAGE"],
+    "requirementRefs": ["REQ-STALL-DETECT", "REQ-ALERT-HEALTH", "REQ-DIAGNOSTIC-VIEW"],
+    "decisionRefs": ["DEC-OPS-STALL-DIRECTION"],
+    "architectureRefs": ["STALL-DETECTOR", "NOTIFICATION-ADAPTER", "DIAGNOSTIC-VIEW"],
+    "capabilityRefs": ["CAP-STALL-DETECTION"],
+    "workUnitRefs": ["WU-DETECTOR", "WU-NOTIFY", "WU-DIAG-VIEW"]
+  },
+  "review": {
+    "required": true,
+    "reviewerKind": "fresh-reviewer",
+    "criteria": ["Outcome is operational and measurable", "Requested intervention is treated as a candidate", "Alternative and no-change directions were considered", "Counterfactual failure is explicit", "Success evidence closes the causal claim"],
+    "acceptedReviewRefs": ["REVIEW-SOF-STALLED-JOBS"],
+    "blockers": []
+  }
+}

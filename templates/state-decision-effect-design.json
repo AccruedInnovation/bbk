@@ -1,0 +1,358 @@
+{
+  "applicability": "CONTRACT",
+  "canonicalState": {
+    "derivedFacts": [
+      {
+        "id": "isTerminal",
+        "sourceRefs": [
+          "lifecycle"
+        ],
+        "statement": "True when lifecycle is PAID or CANCELLED."
+      }
+    ],
+    "dimensions": [
+      {
+        "dimensionId": "lifecycle",
+        "independentOf": [
+          "connectivity"
+        ],
+        "initialization": "New valid order enters READY.",
+        "mutuallyExclusive": true,
+        "owner": "OrderApplication",
+        "persistence": "persisted",
+        "purpose": "Represent exactly one order lifecycle state.",
+        "terminalOrReset": "PAID and CANCELLED are terminal; FAILED may be retried under policy.",
+        "values": [
+          {
+            "id": "READY",
+            "prohibitedData": [
+              "receipt"
+            ],
+            "requiredData": []
+          },
+          {
+            "id": "AUTHORIZING",
+            "prohibitedData": [
+              "receipt"
+            ],
+            "requiredData": [
+              "attemptId"
+            ]
+          },
+          {
+            "id": "PAID",
+            "prohibitedData": [
+              "failureReason"
+            ],
+            "requiredData": [
+              "receipt"
+            ]
+          },
+          {
+            "id": "FAILED",
+            "prohibitedData": [
+              "receipt"
+            ],
+            "requiredData": [
+              "failureReason"
+            ]
+          },
+          {
+            "id": "CANCELLED",
+            "prohibitedData": [
+              "receipt"
+            ],
+            "requiredData": []
+          }
+        ]
+      },
+      {
+        "dimensionId": "connectivity",
+        "independentOf": [
+          "lifecycle"
+        ],
+        "initialization": "Observed from adapter health.",
+        "mutuallyExclusive": true,
+        "owner": "OrderApplication",
+        "persistence": "reconstructed",
+        "purpose": "Represent provider connectivity independently of order lifecycle.",
+        "terminalOrReset": "Changes with explicit health observations.",
+        "values": [
+          {
+            "id": "ONLINE",
+            "prohibitedData": [],
+            "requiredData": []
+          },
+          {
+            "id": "DEGRADED",
+            "prohibitedData": [],
+            "requiredData": [
+              "reason"
+            ]
+          },
+          {
+            "id": "OFFLINE",
+            "prohibitedData": [],
+            "requiredData": [
+              "since"
+            ]
+          }
+        ]
+      }
+    ],
+    "duplicateStateProhibitions": [
+      "UI and adapter caches may not become independently mutable lifecycle authorities."
+    ],
+    "observations": [
+      {
+        "authority": "Observation only; not semantic state.",
+        "freshnessPolicy": "Captured once per command and passed explicitly.",
+        "id": "currentTime",
+        "source": "Clock port"
+      }
+    ],
+    "persistenceBoundary": "Order state and pending effect intent commit atomically before provider execution.",
+    "semanticOwner": "OrderApplication",
+    "strategy": "PRODUCT_OF_SUMS",
+    "versionFenceSemantics": "Every result carries order revision and attempt fence; stale results are rejected."
+  },
+  "decisionBoundaries": [
+    {
+      "authorityValidation": "AuthorizeOrder must carry order-write authority.",
+      "boundaryId": "DB-AUTHORIZE",
+      "contextHandling": {
+        "clock": "Passed as currentTime observation.",
+        "configuration": "Validated policy value passed explicitly.",
+        "environment": "No implicit environment reads.",
+        "externalData": "Provider result passed as typed input.",
+        "randomness": "Attempt ID passed explicitly."
+      },
+      "determinism": "DETERMINISTIC_WITH_EXPLICIT_CONTEXT",
+      "executionMode": "staged",
+      "expectedFailures": [
+        "stale revision",
+        "invalid transition",
+        "provider unavailable"
+      ],
+      "freshnessValidation": "Expected revision and attempt fence must match.",
+      "hiddenDependencyPolicy": "No global clock, random source, database or network access.",
+      "inputTypes": [
+        "AuthorizeOrder",
+        "PaymentResult"
+      ],
+      "ioClaims": [],
+      "outputs": [
+        "NEXT_STATE",
+        "DOMAIN_FACTS",
+        "EFFECT_INTENTS",
+        "REJECTION"
+      ],
+      "owner": "OrderApplication",
+      "stateInputs": [
+        "lifecycle",
+        "connectivity",
+        "currentTime"
+      ]
+    }
+  ],
+  "delegatedFreedom": [
+    "Private helper decomposition and internal naming may vary."
+  ],
+  "designId": "SDE-ORDER-001",
+  "effectContracts": [
+    {
+      "ambiguousAcknowledgement": "Enter reconciliation; do not create a new attempt until provider status is known.",
+      "cancellationSemantics": "Cancellation before provider acceptance prevents execution; after acceptance it becomes a compensating workflow.",
+      "compensationPolicy": "Issue a separate refund command when authorized; never roll back history.",
+      "duplicateBehavior": "Return the existing provider result or pending status without repeating charge.",
+      "durableAfterInterruption": "Pending intent and attempt fence remain durable.",
+      "effectId": "EFF-PAYMENT",
+      "executionAuthority": [
+        "payment.execute"
+      ],
+      "executor": "PaymentProviderAdapter",
+      "externalRestrictions": [
+        "No real provider use in fixtures."
+      ],
+      "idempotency": {
+        "classification": "deduplicated",
+        "key": "orderId + attemptId"
+      },
+      "intent": "Authorize payment for one order attempt.",
+      "irreversibleBoundary": "Provider acceptance.",
+      "observability": [
+        "intent created",
+        "executor accepted",
+        "provider reference",
+        "receipt committed"
+      ],
+      "orderingRequirements": "One active payment attempt per order revision.",
+      "partialCompletion": "Provider may accept while acknowledgement is lost.",
+      "preconditions": [
+        "Order is AUTHORIZING with matching attempt."
+      ],
+      "recoveryOwner": "PaymentRecoveryWorker",
+      "requestAuthority": [
+        "order.write"
+      ],
+      "resultReceipt": "Typed PaymentResult with provider reference and attempt ID.",
+      "retryPolicy": "Retry only when the previous attempt is proven not accepted or the same key is safe.",
+      "target": "Configured payment provider",
+      "timeoutMeaning": "Unknown outcome until reconciled by idempotency key."
+    }
+  ],
+  "fixedDecisionRefs": [
+    "FD-ORDER-STATE"
+  ],
+  "formalization": {
+    "assumptions": [
+      "Provider honors idempotency key."
+    ],
+    "divergenceHandling": "Any mapping or property divergence creates a material structure finding.",
+    "exploredBounds": [
+      "up to 8 commands per generated trace"
+    ],
+    "level": "STATE_MACHINE_PROPERTIES",
+    "limitations": [
+      "Does not model provider internal failure."
+    ],
+    "mappingRefs": [
+      "MAP-ORDER-STATE"
+    ],
+    "modelDigest": null,
+    "modelRef": null,
+    "properties": [
+      "No double payment",
+      "Terminal states do not regress"
+    ],
+    "rationale": "Retries, duplicates and ambiguous acknowledgement require sequence exploration.",
+    "required": true,
+    "tool": "property-based state machine"
+  },
+  "invariants": [
+    {
+      "assertionRefs": [
+        "A-STATE-ONE"
+      ],
+      "class": "representation",
+      "invariantId": "INV-ONE-LIFECYCLE",
+      "statement": "An order has exactly one lifecycle variant.",
+      "verificationMethods": [
+        "schema validation",
+        "property test"
+      ]
+    },
+    {
+      "assertionRefs": [
+        "A-EFFECT-ONCE"
+      ],
+      "class": "idempotency-duplicate",
+      "invariantId": "INV-EFFECT-ONCE",
+      "statement": "One idempotency key cannot authorize two provider effects.",
+      "verificationMethods": [
+        "duplicate trace",
+        "adapter test"
+      ]
+    },
+    {
+      "assertionRefs": [
+        "A-RECEIPT"
+      ],
+      "class": "effect",
+      "invariantId": "INV-RECEIPT",
+      "statement": "PAID requires a validated receipt for the active attempt.",
+      "verificationMethods": [
+        "transition trace",
+        "integration test"
+      ]
+    }
+  ],
+  "rationale": "Order processing crosses a persistence and provider boundary with retries and ambiguous acknowledgement.",
+  "reviewPolicy": {
+    "acceptanceCriteria": [
+      "Canonical state has one owner.",
+      "Ambiguous acknowledgement is recoverable.",
+      "Effect intent, execution, receipt and semantic commit remain distinct."
+    ],
+    "assuranceTier": "consequential",
+    "required": true,
+    "reviewerLenses": [
+      "state-concurrency-effect-recovery"
+    ]
+  },
+  "revision": "1",
+  "schema": "bbk.state-decision-effect-design.v1",
+  "scopeRefs": [
+    "SCOPE-ORDER"
+  ],
+  "sourceDecisionRefs": [
+    "ADR-ORDER-001"
+  ],
+  "sourceInterfaceRefs": [
+    "IF-PAYMENT"
+  ],
+  "sourceRequirementRefs": [
+    "REQ-ORDER-001"
+  ],
+  "status": "accepted",
+  "title": "Order processing state and effects",
+  "traceFixtureRefs": [
+    "TRACE-HAPPY",
+    "TRACE-DUPLICATE",
+    "TRACE-ACK-LOST"
+  ],
+  "transitionRules": [
+    {
+      "authorityRequirements": [
+        "order.write"
+      ],
+      "dimensionRef": "lifecycle",
+      "domainFacts": [
+        "AuthorizationRequested"
+      ],
+      "effectIntentRefs": [
+        "EFF-PAYMENT"
+      ],
+      "fromPattern": "READY",
+      "guards": [
+        "connectivity != OFFLINE"
+      ],
+      "inputType": "AuthorizeOrder",
+      "invariantRefs": [
+        "INV-ONE-LIFECYCLE",
+        "INV-EFFECT-ONCE"
+      ],
+      "rejection": "Reject when offline, stale, unauthorized or already terminal.",
+      "ruleId": "TR-READY-AUTH",
+      "toPattern": "AUTHORIZING(attemptId)"
+    },
+    {
+      "authorityRequirements": [
+        "provider-result.accept"
+      ],
+      "dimensionRef": "lifecycle",
+      "domainFacts": [
+        "PaymentAccepted"
+      ],
+      "effectIntentRefs": [],
+      "fromPattern": "AUTHORIZING(attemptId)",
+      "guards": [
+        "result.attemptId == state.attemptId"
+      ],
+      "inputType": "PaymentResult.Success",
+      "invariantRefs": [
+        "INV-ONE-LIFECYCLE",
+        "INV-RECEIPT"
+      ],
+      "rejection": "Reject stale or duplicate result.",
+      "ruleId": "TR-AUTH-PAID",
+      "toPattern": "PAID(receipt)"
+    }
+  ],
+  "triggerIndicators": [
+    "retry",
+    "recovery",
+    "external-effect",
+    "ambiguous-acknowledgement"
+  ]
+}

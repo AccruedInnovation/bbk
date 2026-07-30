@@ -1,0 +1,285 @@
+{
+  "applicability": {
+    "level": "contract",
+    "rationale": "The work crosses authority and equipment-state boundaries and cannot rely on informal prose.",
+    "triggers": [
+      "human-handoff",
+      "safety",
+      "state-ownership",
+      "irreversible-effect"
+    ]
+  },
+  "contractId": "ISC-PROCEDURE-001",
+  "decisions": {
+    "delegated": [
+      {
+        "area": "form presentation",
+        "bounds": "May be paper or digital if fields, identities, correction history and transition semantics are preserved."
+      },
+      {
+        "area": "local wording",
+        "bounds": "May use site vocabulary without weakening stop conditions or authority."
+      }
+    ],
+    "fixed": [
+      {
+        "changeRoute": "safety and interface review",
+        "id": "FD-CUSTODY",
+        "rationale": "Silence cannot safely transfer equipment authority.",
+        "sourceRefs": [
+          "REQ-LOCKOUT"
+        ],
+        "statement": "Custody changes only through explicit acknowledgement."
+      },
+      {
+        "changeRoute": "authority and procedure revision",
+        "id": "FD-RETURN",
+        "rationale": "Maintenance completion is not production authorization.",
+        "sourceRefs": [
+          "REQ-RETURN-TO-SERVICE"
+        ],
+        "statement": "Only the authorized operator returns equipment to service after review."
+      }
+    ],
+    "prohibited": [
+      "Treating technician departure as implicit return.",
+      "Allowing status-board color alone to authorize energization."
+    ]
+  },
+  "executionSliceRefs": [
+    "ES-PROCEDURE-001"
+  ],
+  "metadata": {
+    "example": true
+  },
+  "profileProjections": {
+    "operations-procedure": {
+      "typeConcepts": [
+        "custody state",
+        "receipt",
+        "authority role",
+        "exception class"
+      ]
+    }
+  },
+  "review": {
+    "acceptanceCriteria": [
+      "Custody is unambiguous.",
+      "No missing acknowledgement can create InService.",
+      "Offline execution has a safe path."
+    ],
+    "acceptedBy": [
+      "DEMO-OPS-AUTHORITY"
+    ],
+    "assuranceTier": "consequential",
+    "requiredReviewers": [
+      "operations representative",
+      "maintenance representative",
+      "safety authority"
+    ],
+    "reviewRefs": [
+      "REVIEW-DEMO-PROCEDURE"
+    ]
+  },
+  "revision": "1",
+  "schema": "bbk.implementation-structure-contract.v1",
+  "status": "accepted",
+  "structure": {
+    "artifactTopology": [
+      {
+        "action": "create",
+        "id": "ART-FORM",
+        "kind": "controlled-form",
+        "logicalPath": "Maintenance Handoff Record",
+        "owner": "operations-system-owner",
+        "responsibility": "Capture equipment identity, state, authorization, isolation and return evidence.",
+        "sourceRefs": [
+          "IF-MAINTENANCE-HANDOFF"
+        ]
+      },
+      {
+        "action": "create",
+        "id": "ART-CHECKLIST",
+        "kind": "procedure",
+        "logicalPath": "Isolation and Return Checklist",
+        "owner": "maintenance-authority",
+        "responsibility": "Define ordered actions and stop conditions.",
+        "sourceRefs": [
+          "REQ-LOCKOUT"
+        ]
+      },
+      {
+        "action": "modify",
+        "id": "ART-BOARD",
+        "kind": "status-projection",
+        "logicalPath": "Line Status Board",
+        "owner": "production-control",
+        "responsibility": "Expose current custody and return-to-service state.",
+        "sourceRefs": [
+          "REQ-RETURN-TO-SERVICE"
+        ]
+      }
+    ],
+    "behaviorPaths": [
+      {
+        "failureAndRecovery": [
+          "Failed isolation stops before custody transfer.",
+          "Disputed return remains out of service and escalates to the equipment owner.",
+          "Lost record creates a new linked recovery record; no inferred acknowledgements."
+        ],
+        "id": "BP-HANDOFF",
+        "interfaceRefs": [
+          "IF-MAINTENANCE-HANDOFF"
+        ],
+        "name": "Normal maintenance handoff",
+        "steps": [
+          {
+            "contractRef": "REQ-LOCKOUT",
+            "from": "Operator",
+            "interaction": "bring to defined safe state",
+            "to": "Equipment"
+          },
+          {
+            "contractRef": "KC-RECORD",
+            "from": "Operator",
+            "interaction": "present equipment and completed isolation record",
+            "to": "Technician"
+          },
+          {
+            "contractRef": "KC-HANDOFF-STATE",
+            "from": "Technician",
+            "interaction": "accept custody explicitly",
+            "to": "Handoff record"
+          },
+          {
+            "contractRef": "KC-RECORD",
+            "from": "Technician",
+            "interaction": "return with work/equipment condition evidence",
+            "to": "Operator"
+          },
+          {
+            "contractRef": "KC-HANDOFF-STATE",
+            "from": "Operator",
+            "interaction": "review return and authorize in-service transition",
+            "to": "Production control"
+          }
+        ],
+        "success": "Equipment returns to service with unambiguous custody and evidence.",
+        "trigger": "Approved maintenance request"
+      }
+    ],
+    "effectBoundaries": [
+      {
+        "authorization": "return-reviewed state and site safety authority",
+        "effect": "energize or return equipment to service",
+        "failure": "remain stopped and raise an exception record",
+        "idempotency": "not assumed; verify actual state before action",
+        "owner": "authorized production operator",
+        "recovery": "site-approved safe-state and review procedure"
+      }
+    ],
+    "keyContracts": [
+      {
+        "failureSemantics": [
+          "Any missing acknowledgement leaves equipment out of service."
+        ],
+        "id": "KC-HANDOFF-STATE",
+        "invariants": [
+          "Only one accountable custodian at a time.",
+          "InService requires return review and isolation release evidence."
+        ],
+        "kind": "state-model",
+        "name": "MaintenanceCustodyState",
+        "responsibility": "Prevent ambiguous custody and illegal return.",
+        "shape": "Requested -> Isolated -> AcceptedByMaintenance -> WorkComplete -> ReturnReviewed -> InService",
+        "sourceRefs": [
+          "IF-MAINTENANCE-HANDOFF"
+        ],
+        "visibility": "shared"
+      },
+      {
+        "failureSemantics": [
+          "Incomplete record blocks state transition."
+        ],
+        "id": "KC-RECORD",
+        "invariants": [
+          "Equipment identity is immutable for the record.",
+          "Corrections are attributable."
+        ],
+        "kind": "form-schema",
+        "name": "Maintenance Handoff Record",
+        "responsibility": "Carry exact handoff meaning and evidence.",
+        "shape": "equipment ID, state, operator, technician, isolation points, timestamps, exceptions, signatures/receipts",
+        "sourceRefs": [
+          "REQ-LOCKOUT"
+        ],
+        "visibility": "shared"
+      }
+    ],
+    "migrationTouchpoints": [
+      {
+        "id": "MIG-PAPER",
+        "statement": "Pilot may begin on paper, but field identity and transition semantics must match any later digital form."
+      }
+    ],
+    "observabilityPoints": [
+      {
+        "id": "OBS-CUSTODY",
+        "statement": "Status board displays current custodian, state and age of the handoff."
+      }
+    ],
+    "stateOwnership": [
+      {
+        "concurrency": "parallel work requires named sub-scopes and one final custodian",
+        "consistency": "one state transition at a time",
+        "lifetime": "maintenance episode",
+        "mutationAuthority": "current authorized custodian plus transition receipt",
+        "owner": "production control record",
+        "recovery": "reconstruct from signed/acknowledged receipts; otherwise remain out of service",
+        "state": "equipment custody status"
+      }
+    ],
+    "testSeams": [
+      {
+        "id": "TS-WALKTHROUGH",
+        "statement": "Run a tabletop walkthrough for normal, missing-acknowledgement and disputed-return scenarios."
+      }
+    ]
+  },
+  "subject": {
+    "architectureRefs": [
+      "RESP-OPERATIONS",
+      "RESP-MAINTENANCE"
+    ],
+    "assumptionRefs": [
+      "ASM-LOCAL-COMMS"
+    ],
+    "baselineRefs": [
+      "BASELINE-OPS-001"
+    ],
+    "capabilityRefs": [
+      "CAP-SAFE-MAINTENANCE-HANDOFF"
+    ],
+    "interfaceRefs": [
+      "IF-MAINTENANCE-HANDOFF"
+    ],
+    "kind": "procedure",
+    "purpose": "Create a safe, auditable handoff from production operator to maintenance technician and back.",
+    "requirementRefs": [
+      "REQ-LOCKOUT",
+      "REQ-RETURN-TO-SERVICE"
+    ],
+    "scopeRefs": [
+      "AREA-LINE-1"
+    ]
+  },
+  "title": "Controlled maintenance handoff structure",
+  "uncertainties": [
+    {
+      "disposition": "prototype",
+      "impact": "Digital-only acknowledgement could block or encourage bypass.",
+      "owner": "operations-system-owner",
+      "statement": "Some areas have intermittent network access."
+    }
+  ]
+}

@@ -1,0 +1,225 @@
+{
+  "alternatives": [
+    {
+      "benefits": [
+        "Meets both tool and learning outcomes"
+      ],
+      "costs": [
+        "More time than using a familiar scripting language"
+      ],
+      "disposition": "selected",
+      "evidenceRefs": [],
+      "fit": "high",
+      "id": "ALT-RUST",
+      "intervention": "Build the bounded tool in Rust with guided review.",
+      "kind": "requested",
+      "risks": [
+        "Scope may become toolchain-heavy"
+      ]
+    },
+    {
+      "benefits": [
+        "Faster implementation"
+      ],
+      "costs": [
+        "Does not meet the Rust-learning outcome"
+      ],
+      "disposition": "rejected",
+      "evidenceRefs": [],
+      "fit": "medium",
+      "id": "ALT-PYTHON",
+      "intervention": "Build the tool in Python.",
+      "kind": "technical",
+      "risks": []
+    },
+    {
+      "benefits": [
+        "No implementation commitment"
+      ],
+      "costs": [
+        "Neither outcome is integrated"
+      ],
+      "disposition": "rejected",
+      "evidenceRefs": [],
+      "fit": "low",
+      "id": "ALT-NO-CHANGE",
+      "intervention": "Continue manual transformation and separate tutorials.",
+      "kind": "no-change",
+      "risks": []
+    }
+  ],
+  "applicability": {
+    "level": "record",
+    "rationale": "The requested language is not merely an implementation preference; learning Rust is part of the desired result.",
+    "triggers": [
+      "technology-specific request",
+      "learning objective"
+    ]
+  },
+  "causalHypothesis": {
+    "assumptions": [
+      "The scope remains small enough for learning rather than framework work",
+      "The user participates in reviewing key choices"
+    ],
+    "confidence": "medium",
+    "evidenceRefs": [
+      "USER-GOAL-RUST"
+    ],
+    "falsifiers": [
+      "An agent generates the implementation without exposing or explaining the relevant choices",
+      "The project expands beyond a bounded learning exercise"
+    ],
+    "mechanism": "The user implements, tests, reviews, and packages a small end-to-end Rust program with focused guidance.",
+    "statement": "Building a bounded useful tool in Rust will create relevant practice while also eliminating the manual transformation."
+  },
+  "constraints": [
+    {
+      "evidenceRefs": [
+        "USER-GOAL-RUST"
+      ],
+      "id": "CON-LEARNING",
+      "kind": "preference",
+      "source": "user preference and learning goal",
+      "statement": "Rust participation and explanation are part of the intended outcome."
+    }
+  ],
+  "counterfactual": {
+    "conclusion": "Rust is justified because it is an explicit outcome, but the delivery method must preserve learning rather than merely output code.",
+    "failureConditions": [
+      "The user cannot understand or reproduce the implementation",
+      "The tool does not handle representative inputs reliably"
+    ],
+    "question": "If a Rust tool were delivered exactly, when would the underlying outcomes remain unmet?",
+    "residualRisks": [
+      "The learning value depends on active participation"
+    ]
+  },
+  "currentBaseline": {
+    "costsAndPain": [
+      "Manual work is repetitive",
+      "Tutorial work is disconnected from a real deliverable"
+    ],
+    "currentApproach": [
+      "Manual transformation",
+      "Tutorial exercises"
+    ],
+    "description": "The transformation is currently performed manually and the user has only tutorial-level Rust experience.",
+    "evidenceRefs": [],
+    "noChangeConsequences": [
+      "The repetitive task remains manual",
+      "Rust learning remains abstract"
+    ],
+    "strengths": [
+      "No deployment dependency"
+    ]
+  },
+  "desiredOutcomes": [
+    {
+      "actorRefs": [
+        "USER"
+      ],
+      "evidenceRefs": [],
+      "id": "OUT-USEFUL-TOOL",
+      "statement": "The user can perform the target file transformation reliably from the command line.",
+      "successMeasures": [
+        "Representative files transform correctly",
+        "Errors are understandable"
+      ]
+    },
+    {
+      "actorRefs": [
+        "USER"
+      ],
+      "evidenceRefs": [
+        "USER-GOAL-RUST"
+      ],
+      "id": "OUT-RUST-LEARNING",
+      "statement": "The user gains practical experience with Rust ownership, error handling, testing, and packaging through the implementation.",
+      "successMeasures": [
+        "The user can explain the main ownership and error-handling choices",
+        "The project includes tests and a reproducible build"
+      ]
+    }
+  ],
+  "disposition": {
+    "approvalRefs": [
+      "USER-GOAL-RUST"
+    ],
+    "authorityMode": "user",
+    "blockers": [],
+    "investigationPlan": [],
+    "rationale": "The language choice is legitimate because learning Rust is itself an accepted outcome.",
+    "selectedDirection": "Implement the bounded tool in Rust with explicit learning checkpoints and user walkthroughs.",
+    "status": "PREFERENCE_DRIVEN"
+  },
+  "fitId": "SOF-RUST-LEARNING",
+  "requestedIntervention": {
+    "evidenceRefs": [
+      "USER-GOAL-RUST"
+    ],
+    "mandatory": false,
+    "rationale": "The user explicitly wants practical Rust experience in addition to a useful tool.",
+    "role": "learning-objective",
+    "source": "user-request",
+    "statement": "Implement the small command-line tool in Rust."
+  },
+  "review": {
+    "acceptedReviewRefs": [],
+    "blockers": [],
+    "criteria": [
+      "Outcome is distinct from intervention",
+      "Disposition follows the stated authority and evidence"
+    ],
+    "required": false,
+    "reviewerKind": "not-required"
+  },
+  "revision": "r1",
+  "risk": {
+    "confidence": "medium",
+    "consequence": 1,
+    "derivedTier": "material",
+    "interfaceExposure": 1,
+    "irreversibility": 1,
+    "rationale": "The intervention is reversible, but learning value is uncertain unless the work is structured appropriately.",
+    "uncertainty": 2
+  },
+  "schema": "bbk.solution-outcome-fit.v1",
+  "status": "reviewed",
+  "successEvidence": [
+    {
+      "evidenceRefs": [],
+      "id": "EV-TOOL",
+      "measure": "Representative transformation scenarios",
+      "method": "demonstration",
+      "observationWindow": "acceptance demonstration",
+      "outcomeRef": "OUT-USEFUL-TOOL",
+      "thresholdOrSignal": "All agreed examples produce correct outputs and actionable errors"
+    },
+    {
+      "evidenceRefs": [],
+      "id": "EV-LEARNING",
+      "measure": "User walkthrough of ownership, error and test choices",
+      "method": "survey",
+      "observationWindow": "project close",
+      "outcomeRef": "OUT-RUST-LEARNING",
+      "thresholdOrSignal": "User can explain and modify the key paths with bounded assistance"
+    }
+  ],
+  "title": "Rust learning as an explicit project outcome",
+  "traceability": {
+    "architectureRefs": [],
+    "capabilityRefs": [
+      "CAP-RUST-TOOL"
+    ],
+    "decisionRefs": [
+      "USER-GOAL-RUST"
+    ],
+    "needRefs": [],
+    "outcomeRefs": [
+      "OUT-USEFUL-TOOL",
+      "OUT-RUST-LEARNING"
+    ],
+    "requirementRefs": [],
+    "workUnitRefs": []
+  }
+}

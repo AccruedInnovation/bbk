@@ -1,0 +1,94 @@
+{
+  "authority": {
+    "may_add_gate_recipes": true,
+    "may_add_procedure": true,
+    "may_add_review_criteria": true,
+    "may_declare_pass": false,
+    "may_expand_work_scope": false,
+    "may_grant_tools_or_effects": false,
+    "may_reduce_assurance": false
+  },
+  "capabilities": {
+    "implementation_structure": {
+      "artifact_kinds": [
+        "module",
+        "schema",
+        "procedure",
+        "fixture"
+      ],
+      "contract_kinds": [
+        "type",
+        "interface",
+        "state-machine",
+        "procedure-step"
+      ],
+      "status": "supported",
+      "touchpoint_kinds": [
+        "cli",
+        "report",
+        "inspection",
+        "demonstration"
+      ],
+      "trigger_hints": [
+        "public-api",
+        "stateful-flow",
+        "cross-boundary",
+        "migration"
+      ],
+      "type_concepts": [
+        "identity",
+        "state",
+        "ownership",
+        "transition",
+        "failure"
+      ]
+    }
+  },
+  "entrypoints": {
+    "gate_plan": [
+      "{python}",
+      "tools/profile.py",
+      "--json",
+      "gate-plan"
+    ],
+    "preflight": [
+      "{python}",
+      "tools/profile.py",
+      "--json",
+      "preflight"
+    ],
+    "resolve": [
+      "{python}",
+      "tools/profile.py",
+      "--json",
+      "resolve"
+    ],
+    "slice": [
+      "{python}",
+      "tools/profile.py",
+      "--json",
+      "slice"
+    ],
+    "structure": [
+      "{python}",
+      "tools/profile.py",
+      "--json",
+      "structure"
+    ],
+    "structure_review": [
+      "{python}",
+      "tools/profile.py",
+      "--json",
+      "structure-review"
+    ]
+  },
+  "id": "alpha4-fixture",
+  "maturity": "fixture",
+  "name": "Alpha.4 structure fixture",
+  "package": "bbk-profile-alpha4-fixture",
+  "requires": {
+    "bbk_minimum": "0.1.0-alpha.4"
+  },
+  "schema": "bbk.language-profile.v1",
+  "version": "0.1.0-alpha.2"
+}

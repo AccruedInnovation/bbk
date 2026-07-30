@@ -1,0 +1,338 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-assurance-contract-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "assertions": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "assertionId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "blocking": {
+            "type": "boolean"
+          },
+          "independence": {
+            "additionalProperties": false,
+            "properties": {
+              "dimensions": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "required": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "required",
+              "reason",
+              "dimensions"
+            ],
+            "type": "object"
+          },
+          "lensHints": {
+            "items": {
+              "enum": [
+                "intent-outcome",
+                "specification-acceptance",
+                "feasibility-dependency",
+                "architecture-boundary",
+                "interface-consumer-compatibility",
+                "implementation-structure",
+                "state-concurrency-effect-recovery",
+                "security-privacy-supply-chain",
+                "test-evidence",
+                "operations-performance-resource",
+                "package-install-migration-release",
+                "cross-shard-integration"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "methods": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "owner": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "requiredEvidence": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "statement": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "assertionId",
+          "statement",
+          "owner",
+          "methods",
+          "requiredEvidence",
+          "blocking",
+          "lensHints",
+          "independence"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "assuranceContractId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "changeClasses": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "consumerObligations": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "deterministicGates": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "assertionRefs": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "evidenceKind": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "gateId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "method": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "gateId",
+          "assertionRefs",
+          "required",
+          "method",
+          "evidenceKind"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "environmentRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "evidenceReusePolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "allowed": {
+          "type": "boolean"
+        },
+        "dependencyKeys": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "validityWindow": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "allowed",
+        "dependencyKeys",
+        "validityWindow"
+      ],
+      "type": "object"
+    },
+    "faultObligations": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "independencePolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "dimensions": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "overlapPolicy": {
+          "enum": [
+            "reject",
+            "allow-complementary-with-rationale"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "required",
+        "reason",
+        "dimensions",
+        "overlapPolicy"
+      ],
+      "type": "object"
+    },
+    "protectedFloors": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "repairPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "earlyEscalationTriggers": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "hardCeiling": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "ordinaryCycles": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "ordinaryCycles",
+        "hardCeiling",
+        "earlyEscalationTriggers"
+      ],
+      "type": "object"
+    },
+    "reviewApplicability": {
+      "enum": [
+        "none",
+        "inline",
+        "manifest"
+      ]
+    },
+    "revision": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "riskTier": {
+      "enum": [
+        "routine",
+        "material",
+        "consequential",
+        "critical"
+      ]
+    },
+    "schema": {
+      "const": "bbk.assurance-contract.v1"
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "accepted",
+        "superseded"
+      ]
+    },
+    "subject": {
+      "additionalProperties": false,
+      "properties": {
+        "digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "kind": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "ref": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "revision": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "kind",
+        "revision",
+        "digest"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "assuranceContractId",
+    "revision",
+    "status",
+    "subject",
+    "riskTier",
+    "changeClasses",
+    "protectedFloors",
+    "assertions",
+    "deterministicGates",
+    "consumerObligations",
+    "faultObligations",
+    "independencePolicy",
+    "evidenceReusePolicy",
+    "repairPolicy",
+    "reviewApplicability",
+    "environmentRefs"
+  ],
+  "title": "BBK AssuranceContract v1",
+  "type": "object"
+}

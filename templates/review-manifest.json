@@ -1,0 +1,189 @@
+{
+  "aggregationPolicy": {
+    "allowPassAdvisory": true,
+    "centralBlocking": true,
+    "nonAveraging": true,
+    "protectedFloors": [
+      "no-duplicate-external-effect"
+    ]
+  },
+  "applicability": "manifest",
+  "assuranceContract": {
+    "digest": "d22bd8571bf163ba1a8f06f0e35b11f81c61e03ea6e695fe0830d5c8774ef781",
+    "ref": "AC-ORDER-001"
+  },
+  "authorityDisclaimer": "This BBK review plan is non-authoritative relative to Blueprint and grants no mutation, waiver, execution, or release authority.",
+  "contextPolicy": {
+    "excludePatterns": [
+      ".git/**",
+      ".bbk/**"
+    ],
+    "includePatterns": [
+      "**"
+    ],
+    "maxPackBytes": 4194304,
+    "redactionClass": "project-local",
+    "requiredKinds": [
+      "subject",
+      "assurance-contract"
+    ],
+    "requiredPaths": [
+      "README.md"
+    ]
+  },
+  "dependencyClosure": [
+    "subject.digest",
+    "assuranceContract.digest",
+    "context.contentRoot",
+    "profile.digest",
+    "environment.digest"
+  ],
+  "gateKind": "acceptance",
+  "independenceRequirements": {
+    "dimensions": [
+      "role-separation",
+      "independent-context-assembly"
+    ],
+    "overlapPolicy": "allow-complementary-with-rationale",
+    "reason": "Consequential state/effect boundary.",
+    "required": true
+  },
+  "lensAssignments": [
+    {
+      "assignmentId": "LA-A-STATE-ONE",
+      "blocking": true,
+      "contextSelector": {
+        "exclude": [
+          "prior findings"
+        ],
+        "include": [
+          "subject",
+          "design"
+        ]
+      },
+      "evidenceRequirements": [
+        "SDE design",
+        "trace results"
+      ],
+      "independence": {
+        "dimensions": [
+          "author-separation",
+          "context-assembly"
+        ],
+        "reason": "State ownership is a material architectural property.",
+        "required": true
+      },
+      "lens": "state-concurrency-effect-recovery",
+      "method": "inspection",
+      "primaryAssertionRefs": [
+        "A-STATE-ONE"
+      ],
+      "reviewerCapabilityRequirements": [
+        "state-concurrency-effect-recovery"
+      ]
+    },
+    {
+      "assignmentId": "LA-A-EFFECT-ONCE",
+      "blocking": true,
+      "contextSelector": {
+        "exclude": [],
+        "include": [
+          "subject",
+          "trace"
+        ]
+      },
+      "evidenceRequirements": [
+        "duplicate trace receipt"
+      ],
+      "independence": {
+        "dimensions": [
+          "method-diversity",
+          "role-separation"
+        ],
+        "reason": "External effect duplication is a protected floor.",
+        "required": true
+      },
+      "lens": "state-concurrency-effect-recovery",
+      "method": "fault trace",
+      "primaryAssertionRefs": [
+        "A-EFFECT-ONCE"
+      ],
+      "reviewerCapabilityRequirements": [
+        "state-concurrency-effect-recovery"
+      ]
+    },
+    {
+      "assignmentId": "LA-A-INTENT",
+      "blocking": true,
+      "contextSelector": {
+        "exclude": [],
+        "include": [
+          "fit",
+          "structure",
+          "slice"
+        ]
+      },
+      "evidenceRequirements": [
+        "fit chain"
+      ],
+      "independence": {
+        "dimensions": [],
+        "reason": "",
+        "required": false
+      },
+      "lens": "intent-outcome",
+      "method": "review",
+      "primaryAssertionRefs": [
+        "A-INTENT"
+      ],
+      "reviewerCapabilityRequirements": [
+        "intent-outcome"
+      ]
+    }
+  ],
+  "manifestId": "RM-ORDER-001",
+  "priorFindingsVisibility": "HIDDEN",
+  "provenance": {
+    "bbkVersion": "0.1.0-alpha.7",
+    "compiler": "fixture",
+    "environmentCapabilities": []
+  },
+  "purpose": "Exact candidate acceptance review",
+  "repairPolicy": {
+    "earlyEscalationTriggers": [
+      "same defect recurs",
+      "interface or effect semantics change"
+    ],
+    "hardCeiling": 3,
+    "ordinaryCycles": 2
+  },
+  "requiredAssertionRefs": [
+    "A-STATE-ONE",
+    "A-EFFECT-ONCE",
+    "A-INTENT"
+  ],
+  "requiredDeterministicEvidence": [
+    {
+      "assertionRefs": [
+        "A-EFFECT-ONCE"
+      ],
+      "evidenceKind": "state-transition-trace",
+      "gateId": "G-TRACE",
+      "required": true
+    }
+  ],
+  "revision": "1",
+  "schema": "bbk.review-manifest.v1",
+  "shardPlan": {
+    "crossShardAssertionRefs": [],
+    "grouping": "execution-slice-or-responsibility",
+    "mode": "none"
+  },
+  "status": "planned",
+  "subject": {
+    "digest": "c43b10defceb4401dc11e37366e491015afb76986a0e6fd76e5022f1683197e0",
+    "kind": "candidate",
+    "ref": "CANDIDATE-ORDER-001",
+    "revision": "1"
+  }
+}

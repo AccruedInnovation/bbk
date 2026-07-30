@@ -1,0 +1,98 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-finding-disposition-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "authorityRef": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "closureEvidenceRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "createdAt": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "disposition": {
+      "enum": [
+        "FIXED",
+        "REBUTTED",
+        "ACCEPTED_RISK",
+        "FALSE_POSITIVE",
+        "DUPLICATE_OF",
+        "SUPERSEDED",
+        "DEFERRED",
+        "OUT_OF_SCOPE",
+        "REMAINS_OPEN"
+      ]
+    },
+    "dispositionId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "findingRef": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "reopeningTriggers": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "residualImpact": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "reviewAttemptRef": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "schema": {
+      "const": "bbk.finding-disposition.v1"
+    },
+    "successorSubject": {
+      "additionalProperties": false,
+      "properties": {
+        "digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "ref": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "digest"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "dispositionId",
+    "findingRef",
+    "disposition",
+    "successorSubject",
+    "closureEvidenceRefs",
+    "reviewAttemptRef",
+    "authorityRef",
+    "residualImpact",
+    "reopeningTriggers",
+    "createdAt"
+  ],
+  "title": "BBK FindingDisposition v1",
+  "type": "object"
+}

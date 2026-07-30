@@ -1,0 +1,249 @@
+{
+  "alternatives": [
+    {
+      "benefits": [
+        "One ordering owner",
+        "Early executable feedback",
+        "Clear test seam"
+      ],
+      "costs": [
+        "Adds an application boundary"
+      ],
+      "disposition": "selected",
+      "evidenceRefs": [
+        "ISC-SOFTWARE-001"
+      ],
+      "fit": "high",
+      "id": "ALT-TYPED-SERVICE",
+      "intervention": "Create the typed query service and CLI touchpoint.",
+      "kind": "requested",
+      "risks": [
+        "Boundary could become a thin wrapper if it owns no policy"
+      ]
+    },
+    {
+      "benefits": [
+        "Fewer initial types"
+      ],
+      "costs": [
+        "Duplicated policy and tests"
+      ],
+      "disposition": "rejected",
+      "evidenceRefs": [],
+      "fit": "low",
+      "id": "ALT-DIRECT-REPOSITORY",
+      "intervention": "Let each adapter read and order repository records directly.",
+      "kind": "technical",
+      "risks": [
+        "Ordering drift",
+        "Storage coupling"
+      ]
+    },
+    {
+      "benefits": [
+        "No implementation work"
+      ],
+      "costs": [
+        "No deterministic reusable touchpoint"
+      ],
+      "disposition": "rejected",
+      "evidenceRefs": [],
+      "fit": "low",
+      "id": "ALT-NO-CHANGE",
+      "intervention": "Retain ad hoc inspection without a stable query path.",
+      "kind": "no-change",
+      "risks": [
+        "Review remains manual and inconsistent"
+      ]
+    }
+  ],
+  "applicability": {
+    "level": "inline",
+    "rationale": "The requested service and CLI boundary are reversible, bounded, and directly tied to an observable query outcome.",
+    "triggers": [
+      "explicit implementation request with a clear reviewer outcome"
+    ]
+  },
+  "causalHypothesis": {
+    "assumptions": [
+      "The repository can supply the required entries",
+      "The CLI touchpoint exercises the same application path"
+    ],
+    "confidence": "high",
+    "evidenceRefs": [
+      "KC-QUERY",
+      "KC-RESULT"
+    ],
+    "falsifiers": [
+      "The CLI or another adapter must still sort independently",
+      "Invalid order can reach the repository"
+    ],
+    "mechanism": "The adapter converts external text to a closed order type, the application service owns ordering, and the repository remains behind a port.",
+    "statement": "A typed application query service with one ordering owner will make decision-index retrieval deterministic and reject invalid order before effects."
+  },
+  "constraints": [
+    {
+      "evidenceRefs": [
+        "FD-ORDER-OWNER"
+      ],
+      "id": "CON-ORDER-OWNER",
+      "kind": "hard",
+      "source": "accepted structure decision",
+      "statement": "Ordering has one authoritative owner in the application/domain path."
+    },
+    {
+      "evidenceRefs": [
+        "ES-SOFTWARE-001"
+      ],
+      "id": "PREF-CLI-TOUCHPOINT",
+      "kind": "preference",
+      "source": "execution-slice design",
+      "statement": "Use a CLI fixture as the first inspectable touchpoint."
+    }
+  ],
+  "counterfactual": {
+    "conclusion": "The intervention fits when one ordering owner and the end-to-end touchpoint are preserved.",
+    "failureConditions": [
+      "The CLI sorts again and can diverge from the application policy",
+      "The touchpoint bypasses the application service",
+      "Invalid input reaches repository access"
+    ],
+    "question": "If the typed query service and CLI touchpoint were delivered exactly as requested, when would the outcome still remain unmet?",
+    "residualRisks": [
+      "The production repository adapter is not exercised in the first slice"
+    ]
+  },
+  "currentBaseline": {
+    "costsAndPain": [
+      "Ordering ownership can drift",
+      "Invalid input may reach the repository",
+      "Independent testing is harder"
+    ],
+    "currentApproach": [
+      "Read repository records directly",
+      "Apply local ordering or parse presentation output"
+    ],
+    "description": "Callers would otherwise inspect repository data or presentation output directly and could duplicate ordering and validation rules.",
+    "evidenceRefs": [
+      "FD-ORDER-OWNER"
+    ],
+    "noChangeConsequences": [
+      "Adapters remain coupled to storage and may implement inconsistent ordering"
+    ],
+    "strengths": [
+      "No additional application service"
+    ]
+  },
+  "desiredOutcomes": [
+    {
+      "actorRefs": [
+        "developer",
+        "reviewer"
+      ],
+      "evidenceRefs": [
+        "A-S1-ORDER",
+        "A-S1-INVALID"
+      ],
+      "id": "OUT-QUERY-DECISIONS",
+      "statement": "A developer or reviewer can retrieve decision identities in a deterministic requested order, and invalid order input fails before repository access.",
+      "successMeasures": [
+        "The same fixture and order produce identical output bytes.",
+        "Unknown order input is rejected before repository access."
+      ]
+    }
+  ],
+  "disposition": {
+    "approvalRefs": [
+      "DEC-QUERY-PATH"
+    ],
+    "authorityMode": "delegated",
+    "blockers": [],
+    "investigationPlan": [],
+    "rationale": "The requested structure directly supports the reviewer outcome and is the least-coupled viable option.",
+    "selectedDirection": "Implement the typed application query path and CLI fixture with one ordering owner.",
+    "status": "CONFIRMED_FIT"
+  },
+  "fitId": "SOF-DECISION-QUERY",
+  "requestedIntervention": {
+    "evidenceRefs": [
+      "ISC-SOFTWARE-001"
+    ],
+    "mandatory": false,
+    "rationale": "The implementation shape was proposed to give reviewers a stable deterministic query boundary.",
+    "role": "candidate",
+    "source": "existing-plan",
+    "statement": "Create a typed query service and CLI touchpoint for the decision index."
+  },
+  "review": {
+    "acceptedReviewRefs": [],
+    "blockers": [],
+    "criteria": [
+      "Outcome and intervention are distinct",
+      "The touchpoint exercises the causal path"
+    ],
+    "required": false,
+    "reviewerKind": "not-required"
+  },
+  "revision": "r1",
+  "risk": {
+    "confidence": "high",
+    "consequence": 1,
+    "derivedTier": "routine",
+    "interfaceExposure": 1,
+    "irreversibility": 1,
+    "rationale": "The change is local, reversible and covered by an executable fixture path.",
+    "uncertainty": 1
+  },
+  "schema": "bbk.solution-outcome-fit.v1",
+  "status": "reviewed",
+  "successEvidence": [
+    {
+      "evidenceRefs": [
+        "A-S1-ORDER"
+      ],
+      "id": "EV-ORDER",
+      "measure": "Deterministic output for the same fixture and requested order",
+      "method": "test",
+      "observationWindow": "Execution Slice ES-SOFTWARE-001 validation",
+      "outcomeRef": "OUT-QUERY-DECISIONS",
+      "thresholdOrSignal": "Exact expected bytes and stable digest across repeated runs"
+    },
+    {
+      "evidenceRefs": [
+        "A-S1-INVALID"
+      ],
+      "id": "EV-INVALID",
+      "measure": "Repository access count for invalid order text",
+      "method": "test",
+      "observationWindow": "Execution Slice ES-SOFTWARE-001 validation",
+      "outcomeRef": "OUT-QUERY-DECISIONS",
+      "thresholdOrSignal": "Zero repository calls and a typed diagnostic"
+    }
+  ],
+  "title": "Deterministic decision-index query path",
+  "traceability": {
+    "architectureRefs": [
+      "ARCH-DOMAIN",
+      "ARCH-APPLICATION",
+      "ARCH-CLI"
+    ],
+    "capabilityRefs": [
+      "CAP-QUERY-DECISIONS"
+    ],
+    "decisionRefs": [
+      "DEC-QUERY-PATH"
+    ],
+    "needRefs": [
+      "NEED-DETERMINISTIC-INSPECTION"
+    ],
+    "outcomeRefs": [
+      "OUT-QUERY-DECISIONS"
+    ],
+    "requirementRefs": [
+      "REQ-ORDER-001"
+    ],
+    "workUnitRefs": [
+      "WU-QUERY-SERVICE"
+    ]
+  }
+}

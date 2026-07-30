@@ -1,0 +1,654 @@
+{
+  "applicability": {
+    "level": "contract",
+    "rationale": "Independent domain, application and adapter work needs one shared implementation shape.",
+    "triggers": [
+      "public-interface",
+      "cross-module",
+      "deterministic-ordering"
+    ]
+  },
+  "contractId": "ISC-SOFTWARE-002",
+  "decisions": {
+    "delegated": [
+      {
+        "area": "private helper layout",
+        "bounds": "May change inside a module if public types, ordering ownership and test seams remain intact."
+      },
+      {
+        "area": "internal iteration algorithm",
+        "bounds": "May choose any clear deterministic implementation meeting scale and evidence obligations."
+      }
+    ],
+    "fixed": [
+      {
+        "changeRoute": "structure-impact review plus interface verification",
+        "id": "FD-ORDER-OWNER",
+        "rationale": "One authoritative rule prevents adapter drift.",
+        "sourceRefs": [
+          "REQ-ORDER-001"
+        ],
+        "statement": "The application/domain ordering policy owns ordering; the CLI may not sort independently."
+      },
+      {
+        "changeRoute": "contract revision",
+        "id": "FD-CLOSED-ORDER",
+        "rationale": "Invalid states should not cross the adapter boundary.",
+        "sourceRefs": [
+          "IF-DECISION-QUERY"
+        ],
+        "statement": "Order selection is a closed type, not an arbitrary string after parsing."
+      },
+      {
+        "changeRoute": "state/effect structure review",
+        "id": "FD-ORDER-STATE",
+        "rationale": "Prevent shadow state and hidden provider effects.",
+        "sourceRefs": [
+          "SDE-ORDER-001"
+        ],
+        "statement": "OrderApplication owns canonical order lifecycle and emits typed payment effect intents."
+      }
+    ],
+    "prohibited": [
+      "Duplicating ordering rules in the CLI.",
+      "Returning partially ordered results after repository failure."
+    ]
+  },
+  "executionSliceRefs": [
+    "ES-SOFTWARE-003"
+  ],
+  "metadata": {
+    "example": true
+  },
+  "profileProjections": {
+    "python": {
+      "runtimeBoundary": "CLI text is validated before typed construction; type hints alone are not runtime evidence.",
+      "typeStrategy": [
+        "frozen dataclass or equivalent for query/result",
+        "Enum for order",
+        "Protocol for repository port"
+      ]
+    }
+  },
+  "review": {
+    "acceptanceCriteria": [
+      "Ordering has one owner.",
+      "Public request/result shapes are explicit.",
+      "Failure and test seams are sufficient for independent work."
+    ],
+    "acceptedBy": [
+      "DEMO-AUTHORITY"
+    ],
+    "assuranceTier": "material",
+    "requiredReviewers": [
+      "bbk_reviewer"
+    ],
+    "reviewRefs": [
+      "REVIEW-DEMO-001"
+    ]
+  },
+  "revision": "2",
+  "schema": "bbk.implementation-structure-contract.v2",
+  "stateDecisionEffectDesign": {
+    "applicability": "CONTRACT",
+    "canonicalState": {
+      "derivedFacts": [
+        {
+          "id": "isTerminal",
+          "sourceRefs": [
+            "lifecycle"
+          ],
+          "statement": "True when lifecycle is PAID or CANCELLED."
+        }
+      ],
+      "dimensions": [
+        {
+          "dimensionId": "lifecycle",
+          "independentOf": [
+            "connectivity"
+          ],
+          "initialization": "New valid order enters READY.",
+          "mutuallyExclusive": true,
+          "owner": "OrderApplication",
+          "persistence": "persisted",
+          "purpose": "Represent exactly one order lifecycle state.",
+          "terminalOrReset": "PAID and CANCELLED are terminal; FAILED may be retried under policy.",
+          "values": [
+            {
+              "id": "READY",
+              "prohibitedData": [
+                "receipt"
+              ],
+              "requiredData": []
+            },
+            {
+              "id": "AUTHORIZING",
+              "prohibitedData": [
+                "receipt"
+              ],
+              "requiredData": [
+                "attemptId"
+              ]
+            },
+            {
+              "id": "PAID",
+              "prohibitedData": [
+                "failureReason"
+              ],
+              "requiredData": [
+                "receipt"
+              ]
+            },
+            {
+              "id": "FAILED",
+              "prohibitedData": [
+                "receipt"
+              ],
+              "requiredData": [
+                "failureReason"
+              ]
+            },
+            {
+              "id": "CANCELLED",
+              "prohibitedData": [
+                "receipt"
+              ],
+              "requiredData": []
+            }
+          ]
+        },
+        {
+          "dimensionId": "connectivity",
+          "independentOf": [
+            "lifecycle"
+          ],
+          "initialization": "Observed from adapter health.",
+          "mutuallyExclusive": true,
+          "owner": "OrderApplication",
+          "persistence": "reconstructed",
+          "purpose": "Represent provider connectivity independently of order lifecycle.",
+          "terminalOrReset": "Changes with explicit health observations.",
+          "values": [
+            {
+              "id": "ONLINE",
+              "prohibitedData": [],
+              "requiredData": []
+            },
+            {
+              "id": "DEGRADED",
+              "prohibitedData": [],
+              "requiredData": [
+                "reason"
+              ]
+            },
+            {
+              "id": "OFFLINE",
+              "prohibitedData": [],
+              "requiredData": [
+                "since"
+              ]
+            }
+          ]
+        }
+      ],
+      "duplicateStateProhibitions": [
+        "UI and adapter caches may not become independently mutable lifecycle authorities."
+      ],
+      "observations": [
+        {
+          "authority": "Observation only; not semantic state.",
+          "freshnessPolicy": "Captured once per command and passed explicitly.",
+          "id": "currentTime",
+          "source": "Clock port"
+        }
+      ],
+      "persistenceBoundary": "Order state and pending effect intent commit atomically before provider execution.",
+      "semanticOwner": "OrderApplication",
+      "strategy": "PRODUCT_OF_SUMS",
+      "versionFenceSemantics": "Every result carries order revision and attempt fence; stale results are rejected."
+    },
+    "decisionBoundaries": [
+      {
+        "authorityValidation": "AuthorizeOrder must carry order-write authority.",
+        "boundaryId": "DB-AUTHORIZE",
+        "contextHandling": {
+          "clock": "Passed as currentTime observation.",
+          "configuration": "Validated policy value passed explicitly.",
+          "environment": "No implicit environment reads.",
+          "externalData": "Provider result passed as typed input.",
+          "randomness": "Attempt ID passed explicitly."
+        },
+        "determinism": "DETERMINISTIC_WITH_EXPLICIT_CONTEXT",
+        "executionMode": "staged",
+        "expectedFailures": [
+          "stale revision",
+          "invalid transition",
+          "provider unavailable"
+        ],
+        "freshnessValidation": "Expected revision and attempt fence must match.",
+        "hiddenDependencyPolicy": "No global clock, random source, database or network access.",
+        "inputTypes": [
+          "AuthorizeOrder",
+          "PaymentResult"
+        ],
+        "ioClaims": [],
+        "outputs": [
+          "NEXT_STATE",
+          "DOMAIN_FACTS",
+          "EFFECT_INTENTS",
+          "REJECTION"
+        ],
+        "owner": "OrderApplication",
+        "stateInputs": [
+          "lifecycle",
+          "connectivity",
+          "currentTime"
+        ]
+      }
+    ],
+    "delegatedFreedom": [
+      "Private helper decomposition and internal naming may vary."
+    ],
+    "designId": "SDE-ORDER-001",
+    "effectContracts": [
+      {
+        "ambiguousAcknowledgement": "Enter reconciliation; do not create a new attempt until provider status is known.",
+        "cancellationSemantics": "Cancellation before provider acceptance prevents execution; after acceptance it becomes a compensating workflow.",
+        "compensationPolicy": "Issue a separate refund command when authorized; never roll back history.",
+        "duplicateBehavior": "Return the existing provider result or pending status without repeating charge.",
+        "durableAfterInterruption": "Pending intent and attempt fence remain durable.",
+        "effectId": "EFF-PAYMENT",
+        "executionAuthority": [
+          "payment.execute"
+        ],
+        "executor": "PaymentProviderAdapter",
+        "externalRestrictions": [
+          "No real provider use in fixtures."
+        ],
+        "idempotency": {
+          "classification": "deduplicated",
+          "key": "orderId + attemptId"
+        },
+        "intent": "Authorize payment for one order attempt.",
+        "irreversibleBoundary": "Provider acceptance.",
+        "observability": [
+          "intent created",
+          "executor accepted",
+          "provider reference",
+          "receipt committed"
+        ],
+        "orderingRequirements": "One active payment attempt per order revision.",
+        "partialCompletion": "Provider may accept while acknowledgement is lost.",
+        "preconditions": [
+          "Order is AUTHORIZING with matching attempt."
+        ],
+        "recoveryOwner": "PaymentRecoveryWorker",
+        "requestAuthority": [
+          "order.write"
+        ],
+        "resultReceipt": "Typed PaymentResult with provider reference and attempt ID.",
+        "retryPolicy": "Retry only when the previous attempt is proven not accepted or the same key is safe.",
+        "target": "Configured payment provider",
+        "timeoutMeaning": "Unknown outcome until reconciled by idempotency key."
+      }
+    ],
+    "fixedDecisionRefs": [
+      "FD-ORDER-STATE"
+    ],
+    "formalization": {
+      "assumptions": [
+        "Provider honors idempotency key."
+      ],
+      "divergenceHandling": "Any mapping or property divergence creates a material structure finding.",
+      "exploredBounds": [
+        "up to 8 commands per generated trace"
+      ],
+      "level": "STATE_MACHINE_PROPERTIES",
+      "limitations": [
+        "Does not model provider internal failure."
+      ],
+      "mappingRefs": [
+        "MAP-ORDER-STATE"
+      ],
+      "modelDigest": null,
+      "modelRef": null,
+      "properties": [
+        "No double payment",
+        "Terminal states do not regress"
+      ],
+      "rationale": "Retries, duplicates and ambiguous acknowledgement require sequence exploration.",
+      "required": true,
+      "tool": "property-based state machine"
+    },
+    "invariants": [
+      {
+        "assertionRefs": [
+          "A-STATE-ONE"
+        ],
+        "class": "representation",
+        "invariantId": "INV-ONE-LIFECYCLE",
+        "statement": "An order has exactly one lifecycle variant.",
+        "verificationMethods": [
+          "schema validation",
+          "property test"
+        ]
+      },
+      {
+        "assertionRefs": [
+          "A-EFFECT-ONCE"
+        ],
+        "class": "idempotency-duplicate",
+        "invariantId": "INV-EFFECT-ONCE",
+        "statement": "One idempotency key cannot authorize two provider effects.",
+        "verificationMethods": [
+          "duplicate trace",
+          "adapter test"
+        ]
+      },
+      {
+        "assertionRefs": [
+          "A-RECEIPT"
+        ],
+        "class": "effect",
+        "invariantId": "INV-RECEIPT",
+        "statement": "PAID requires a validated receipt for the active attempt.",
+        "verificationMethods": [
+          "transition trace",
+          "integration test"
+        ]
+      }
+    ],
+    "rationale": "Order processing crosses a persistence and provider boundary with retries and ambiguous acknowledgement.",
+    "reviewPolicy": {
+      "acceptanceCriteria": [
+        "Canonical state has one owner.",
+        "Ambiguous acknowledgement is recoverable.",
+        "Effect intent, execution, receipt and semantic commit remain distinct."
+      ],
+      "assuranceTier": "consequential",
+      "required": true,
+      "reviewerLenses": [
+        "state-concurrency-effect-recovery"
+      ]
+    },
+    "revision": "1",
+    "schema": "bbk.state-decision-effect-design.v1",
+    "scopeRefs": [
+      "SCOPE-DECISION-INDEX"
+    ],
+    "sourceDecisionRefs": [
+      "ADR-ORDER-001"
+    ],
+    "sourceInterfaceRefs": [
+      "IF-PAYMENT"
+    ],
+    "sourceRequirementRefs": [
+      "REQ-ORDER-001"
+    ],
+    "status": "accepted",
+    "title": "Order processing state and effects",
+    "traceFixtureRefs": [
+      "TRACE-HAPPY",
+      "TRACE-DUPLICATE",
+      "TRACE-ACK-LOST"
+    ],
+    "transitionRules": [
+      {
+        "authorityRequirements": [
+          "order.write"
+        ],
+        "dimensionRef": "lifecycle",
+        "domainFacts": [
+          "AuthorizationRequested"
+        ],
+        "effectIntentRefs": [
+          "EFF-PAYMENT"
+        ],
+        "fromPattern": "READY",
+        "guards": [
+          "connectivity != OFFLINE"
+        ],
+        "inputType": "AuthorizeOrder",
+        "invariantRefs": [
+          "INV-ONE-LIFECYCLE",
+          "INV-EFFECT-ONCE"
+        ],
+        "rejection": "Reject when offline, stale, unauthorized or already terminal.",
+        "ruleId": "TR-READY-AUTH",
+        "toPattern": "AUTHORIZING(attemptId)"
+      },
+      {
+        "authorityRequirements": [
+          "provider-result.accept"
+        ],
+        "dimensionRef": "lifecycle",
+        "domainFacts": [
+          "PaymentAccepted"
+        ],
+        "effectIntentRefs": [],
+        "fromPattern": "AUTHORIZING(attemptId)",
+        "guards": [
+          "result.attemptId == state.attemptId"
+        ],
+        "inputType": "PaymentResult.Success",
+        "invariantRefs": [
+          "INV-ONE-LIFECYCLE",
+          "INV-RECEIPT"
+        ],
+        "rejection": "Reject stale or duplicate result.",
+        "ruleId": "TR-AUTH-PAID",
+        "toPattern": "PAID(receipt)"
+      }
+    ],
+    "triggerIndicators": [
+      "retry",
+      "recovery",
+      "external-effect",
+      "ambiguous-acknowledgement"
+    ]
+  },
+  "status": "accepted",
+  "structure": {
+    "artifactTopology": [
+      {
+        "action": "create",
+        "id": "ART-DOMAIN-TYPE",
+        "kind": "module",
+        "logicalPath": "src/domain/decision_index.py",
+        "owner": "domain",
+        "responsibility": "Own nominal query and result types plus ordering invariant.",
+        "sourceRefs": [
+          "ARCH-DOMAIN"
+        ]
+      },
+      {
+        "action": "modify",
+        "id": "ART-APP-SERVICE",
+        "kind": "module",
+        "logicalPath": "src/application/query_service.py",
+        "owner": "application",
+        "responsibility": "Coordinate repository read and deterministic projection.",
+        "sourceRefs": [
+          "IF-DECISION-QUERY"
+        ]
+      },
+      {
+        "action": "modify",
+        "id": "ART-CLI",
+        "kind": "adapter",
+        "logicalPath": "src/cli/decisions.py",
+        "owner": "cli",
+        "responsibility": "Parse CLI input and render result without owning ordering.",
+        "sourceRefs": [
+          "ARCH-CLI"
+        ]
+      },
+      {
+        "action": "create",
+        "id": "ART-TEST",
+        "kind": "test",
+        "logicalPath": "tests/test_decision_index.py",
+        "owner": "test",
+        "responsibility": "Prove ordering, invalid input and adapter/domain agreement.",
+        "sourceRefs": [
+          "REQ-ORDER-001"
+        ]
+      }
+    ],
+    "behaviorPaths": [
+      {
+        "failureAndRecovery": [
+          "invalid order fails without repository access",
+          "repository failure returns a typed diagnostic and no partial result"
+        ],
+        "id": "BP-QUERY",
+        "interfaceRefs": [
+          "IF-DECISION-QUERY"
+        ],
+        "name": "CLI decision query",
+        "steps": [
+          {
+            "contractRef": "KC-QUERY",
+            "from": "CLI adapter",
+            "interaction": "convert text to DecisionIndexQuery",
+            "to": "Query parser"
+          },
+          {
+            "contractRef": "IF-DECISION-QUERY",
+            "from": "Query service",
+            "interaction": "read current entries",
+            "to": "Decision repository"
+          },
+          {
+            "contractRef": "KC-RESULT",
+            "from": "Query service",
+            "interaction": "produce deterministic DecisionIndex",
+            "to": "Ordering policy"
+          },
+          {
+            "contractRef": "KC-RESULT",
+            "from": "CLI adapter",
+            "interaction": "render ordered result",
+            "to": "Operator"
+          }
+        ],
+        "success": "Operator sees stable ordered decisions.",
+        "trigger": "Operator invokes bbk decisions list"
+      }
+    ],
+    "effectBoundaries": [
+      {
+        "authorization": "read grant for exact project",
+        "effect": "repository read",
+        "failure": "typed unavailable or inconsistent result",
+        "idempotency": "read-only",
+        "owner": "application query service",
+        "recovery": "surface failure; retry only by caller policy"
+      }
+    ],
+    "keyContracts": [
+      {
+        "failureSemantics": [
+          "invalid external text is rejected before construction"
+        ],
+        "id": "KC-QUERY",
+        "invariants": [
+          "scope is nominal",
+          "order is a closed enumeration"
+        ],
+        "kind": "request-type",
+        "name": "DecisionIndexQuery",
+        "responsibility": "Represent a valid query without untyped order strings.",
+        "shape": "DecisionIndexQuery(scope: ScopeId, order: DecisionOrder)",
+        "sourceRefs": [
+          "IF-DECISION-QUERY"
+        ],
+        "visibility": "shared"
+      },
+      {
+        "failureSemantics": [],
+        "id": "KC-RESULT",
+        "invariants": [
+          "entries follow requested order",
+          "stable identity is preserved"
+        ],
+        "kind": "result-type",
+        "name": "DecisionIndex",
+        "responsibility": "Return immutable ordered entries.",
+        "shape": "DecisionIndex(entries: tuple[DecisionIndexEntry, ...])",
+        "sourceRefs": [
+          "REQ-ORDER-001"
+        ],
+        "visibility": "shared"
+      }
+    ],
+    "migrationTouchpoints": [],
+    "observabilityPoints": [
+      {
+        "id": "OBS-QUERY",
+        "statement": "Record query kind, scope identity and outcome without decision content."
+      }
+    ],
+    "stateOwnership": [
+      {
+        "concurrency": "read-only for this path",
+        "consistency": "query reads one repository snapshot",
+        "lifetime": "project",
+        "mutationAuthority": "separate decision commands only",
+        "owner": "DecisionRepository",
+        "recovery": "retry query against a new snapshot; never cache as authority",
+        "state": "decision records"
+      }
+    ],
+    "testSeams": [
+      {
+        "id": "TS-REPO",
+        "sourceRefs": [
+          "REQ-QUERY-001"
+        ],
+        "statement": "Inject an in-memory repository fixture at the application port."
+      },
+      {
+        "id": "TS-CLI",
+        "sourceRefs": [
+          "REQ-ORDER-001"
+        ],
+        "statement": "Exercise parser and renderer against canonical JSON snapshots."
+      }
+    ]
+  },
+  "subject": {
+    "architectureRefs": [
+      "ARCH-DOMAIN",
+      "ARCH-APPLICATION",
+      "ARCH-CLI"
+    ],
+    "assumptionRefs": [],
+    "baselineRefs": [
+      "BASELINE-DEMO-001"
+    ],
+    "capabilityRefs": [
+      "CAP-QUERY-DECISIONS"
+    ],
+    "interfaceRefs": [
+      "IF-DECISION-QUERY"
+    ],
+    "kind": "software",
+    "outcomeRefs": [
+      "OUT-001"
+    ],
+    "purpose": "Expose a deterministic decision-index query without leaking storage or transport details.",
+    "requirementRefs": [
+      "REQ-QUERY-001",
+      "REQ-ORDER-001"
+    ],
+    "scopeRefs": [
+      "SCOPE-DECISION-INDEX"
+    ],
+    "solutionOutcomeFitRefs": [
+      "SOF-001@r1"
+    ]
+  },
+  "title": "Decision-index query implementation structure",
+  "uncertainties": []
+}

@@ -1,0 +1,327 @@
+{
+  "aggregate": {
+    "advisories": [],
+    "aggregateId": "RA-F168A7ADF0FB613A",
+    "assertionResults": [
+      {
+        "assertionRef": "A-EFFECT-ONCE",
+        "attemptRefs": [
+          "ATT-REVIEW-001"
+        ],
+        "status": "PASS"
+      },
+      {
+        "assertionRef": "A-INTENT",
+        "attemptRefs": [
+          "ATT-REVIEW-002"
+        ],
+        "status": "PASS"
+      },
+      {
+        "assertionRef": "A-STATE-ONE",
+        "attemptRefs": [
+          "ATT-REVIEW-001"
+        ],
+        "status": "PASS"
+      }
+    ],
+    "authorityDisclaimer": "This aggregate is a BBK workflow result only; it grants no official Blueprint authority.",
+    "blockers": [],
+    "calculationDigest": "37b4bd552556ea8d7369e63d73b768b3d42f62a632b722b728d5215147eb75f5",
+    "contextCompleteness": "COMPLETE",
+    "infrastructureStates": [],
+    "nonAveraging": true,
+    "openFindingRefs": [],
+    "result": "PASS",
+    "reviewManifestRef": "RM-ORDER-001",
+    "schema": "bbk.review-aggregate.v1",
+    "subject": {
+      "digest": "c43b10defceb4401dc11e37366e491015afb76986a0e6fd76e5022f1683197e0",
+      "kind": "candidate",
+      "ref": "CANDIDATE-ORDER-001",
+      "revision": "1"
+    }
+  },
+  "assuranceContract": {
+    "digest": "d22bd8571bf163ba1a8f06f0e35b11f81c61e03ea6e695fe0830d5c8774ef781",
+    "ref": "AC-ORDER-001"
+  },
+  "attempts": [
+    {
+      "assertionEvaluations": [
+        {
+          "assertionRef": "A-STATE-ONE",
+          "evidenceRefs": [
+            "ER-TRACE-001"
+          ],
+          "rationale": "One owner and variant model observed.",
+          "status": "PASS"
+        },
+        {
+          "assertionRef": "A-EFFECT-ONCE",
+          "evidenceRefs": [
+            "ER-TRACE-001"
+          ],
+          "rationale": "Duplicate trace produces no second effect.",
+          "status": "PASS"
+        }
+      ],
+      "assertionRefs": [
+        "A-STATE-ONE",
+        "A-EFFECT-ONCE"
+      ],
+      "assignmentRef": "LA-A-STATE-ONE",
+      "attemptId": "ATT-REVIEW-001",
+      "completedAt": "2026-07-24T00:01:00Z",
+      "completionState": "COMPLETED",
+      "contextPack": {
+        "digest": "49a6d96e018fd37ae343936795ae7e427de797f83c04df569d4b56cbeb679ef1",
+        "ref": "PACK-SHARD-001"
+      },
+      "evidenceRefs": [
+        "ER-TRACE-001"
+      ],
+      "findingRefs": [],
+      "independenceFacts": {
+        "authorSeparation": true,
+        "candidateMutationProhibited": true,
+        "deterministicEvidenceIndependence": true,
+        "independentContextAssembly": true,
+        "modelDiversity": false,
+        "organizationalIndependence": false,
+        "providerDiversity": false,
+        "roleSeparation": true,
+        "sessionSeparation": true
+      },
+      "infrastructureErrors": [],
+      "invocation": {
+        "id": "INV-1",
+        "session": "S-1"
+      },
+      "lens": "state-concurrency-effect-recovery",
+      "priorFindingsVisibility": "HIDDEN",
+      "reviewer": {
+        "effectiveDigest": "1111111111111111111111111111111111111111111111111111111111111111",
+        "model": "fixture",
+        "provider": "fixture",
+        "role": "bbk_validator"
+      },
+      "runId": "RR-ORDER-001",
+      "schema": "bbk.review-attempt.v1",
+      "startedAt": "2026-07-24T00:00:00Z"
+    },
+    {
+      "assertionEvaluations": [
+        {
+          "assertionRef": "A-INTENT",
+          "evidenceRefs": [
+            "ER-INTENT-001"
+          ],
+          "rationale": "Candidate remains aligned with accepted fit and slice.",
+          "status": "PASS"
+        }
+      ],
+      "assertionRefs": [
+        "A-INTENT"
+      ],
+      "assignmentRef": "LA-A-INTENT",
+      "attemptId": "ATT-REVIEW-002",
+      "completedAt": "2026-07-24T00:01:00Z",
+      "completionState": "COMPLETED",
+      "contextPack": {
+        "digest": "49a6d96e018fd37ae343936795ae7e427de797f83c04df569d4b56cbeb679ef1",
+        "ref": "PACK-SHARD-001"
+      },
+      "evidenceRefs": [
+        "ER-INTENT-001"
+      ],
+      "findingRefs": [],
+      "independenceFacts": {
+        "authorSeparation": true,
+        "candidateMutationProhibited": true,
+        "deterministicEvidenceIndependence": true,
+        "independentContextAssembly": true,
+        "modelDiversity": false,
+        "organizationalIndependence": false,
+        "providerDiversity": false,
+        "roleSeparation": true,
+        "sessionSeparation": true
+      },
+      "infrastructureErrors": [],
+      "invocation": {
+        "id": "INV-1",
+        "session": "S-1"
+      },
+      "lens": "intent-outcome",
+      "priorFindingsVisibility": "HIDDEN",
+      "reviewer": {
+        "effectiveDigest": "1111111111111111111111111111111111111111111111111111111111111111",
+        "model": "fixture",
+        "provider": "fixture",
+        "role": "bbk_validator"
+      },
+      "runId": "RR-ORDER-001",
+      "schema": "bbk.review-attempt.v1",
+      "startedAt": "2026-07-24T00:00:00Z"
+    }
+  ],
+  "completedAt": "2026-07-24T00:01:00Z",
+  "contentDigest": "274a77545c4b34a5a6d295725abc6331a641d61f792ac66904d23566d415d9a4",
+  "environment": {
+    "bbk": "0.1.0-alpha.7",
+    "host": "fixture-host"
+  },
+  "evidenceReceipts": [
+    {
+      "assertionRefs": [
+        "A-EFFECT-ONCE"
+      ],
+      "completedAt": "2026-07-24T00:00:10Z",
+      "completionStatus": "PASS",
+      "coverage": {
+        "complete": true,
+        "traceCount": 1
+      },
+      "dependencyFingerprint": "dbc465e978132d7119fe343b8c292afbc62bdc2b41fb0096214827ff747b16fd",
+      "environmentIdentity": {
+        "id": "fixture-order-v1"
+      },
+      "freshness": {
+        "dependencyKeys": [
+          "subject",
+          "trace",
+          "tool"
+        ],
+        "stale": false,
+        "validUntil": null
+      },
+      "kind": "trace-replay",
+      "operation": {
+        "argv": [
+          "python",
+          "run_trace.py"
+        ],
+        "externalEffects": false,
+        "network": false,
+        "sanitized": true,
+        "workingDirectory": "/fixture"
+      },
+      "outputs": {
+        "artifactRefs": [],
+        "exitCode": 0,
+        "reportRefs": [
+          "TRACE-REPORT"
+        ],
+        "stderrDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutDigest": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df",
+        "traceRefs": [
+          "TRACE-DUPLICATE"
+        ]
+      },
+      "producer": "fixture-runner",
+      "rawEvidenceRef": null,
+      "receiptId": "ER-TRACE-001",
+      "redaction": {
+        "classification": "none",
+        "rawDigestBeforeRedaction": null
+      },
+      "schema": "bbk.evidence-receipt.v2",
+      "startedAt": "2026-07-24T00:00:00Z",
+      "subject": {
+        "digest": "c43b10defceb4401dc11e37366e491015afb76986a0e6fd76e5022f1683197e0",
+        "ref": "CANDIDATE-ORDER-001"
+      },
+      "toolIdentity": {
+        "name": "fixture-runner",
+        "version": "1"
+      },
+      "trustClass": "DETERMINISTIC_LOCAL"
+    },
+    {
+      "assertionRefs": [
+        "A-INTENT"
+      ],
+      "completedAt": "2026-07-24T00:00:10Z",
+      "completionStatus": "PASS",
+      "coverage": {
+        "complete": true,
+        "traceCount": 1
+      },
+      "dependencyFingerprint": "7e768d70fbf0263b0e3589db5a7e5c5367ccfc0599390f69e839a95e0780a2ae",
+      "environmentIdentity": {
+        "id": "fixture-order-v1"
+      },
+      "freshness": {
+        "dependencyKeys": [
+          "subject",
+          "trace",
+          "tool"
+        ],
+        "stale": false,
+        "validUntil": null
+      },
+      "kind": "artifact-inspection",
+      "operation": {
+        "argv": [
+          "python",
+          "run_trace.py"
+        ],
+        "externalEffects": false,
+        "network": false,
+        "sanitized": true,
+        "workingDirectory": "/fixture"
+      },
+      "outputs": {
+        "artifactRefs": [],
+        "exitCode": 0,
+        "reportRefs": [
+          "TRACE-REPORT"
+        ],
+        "stderrDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutDigest": "2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df",
+        "traceRefs": [
+          "TRACE-DUPLICATE"
+        ]
+      },
+      "producer": "bbk-reviewer",
+      "rawEvidenceRef": null,
+      "receiptId": "ER-INTENT-001",
+      "redaction": {
+        "classification": "none",
+        "rawDigestBeforeRedaction": null
+      },
+      "schema": "bbk.evidence-receipt.v2",
+      "startedAt": "2026-07-24T00:00:00Z",
+      "subject": {
+        "digest": "c43b10defceb4401dc11e37366e491015afb76986a0e6fd76e5022f1683197e0",
+        "ref": "CANDIDATE-ORDER-001"
+      },
+      "toolIdentity": {
+        "name": "fixture-runner",
+        "version": "1"
+      },
+      "trustClass": "AGENT_INSPECTION"
+    }
+  ],
+  "findingDispositions": [],
+  "findings": [],
+  "predecessorRefs": [],
+  "reviewContextManifest": {
+    "digest": "49e7b7b24a9cb5c51f31dcdc4a9e78a7ff26978da3a209c9c7469ef40bc8d366",
+    "ref": "RCM-ORDER-001"
+  },
+  "reviewManifest": {
+    "digest": "7bc938025ed00bb52ea9ac28f80f98ca4f24dcbf595a43e2dfc97d4a929dfe02",
+    "ref": "RM-ORDER-001"
+  },
+  "runId": "RR-ORDER-001",
+  "schema": "bbk.review-run.v1",
+  "startedAt": "2026-07-24T00:00:00Z",
+  "state": "completed",
+  "subject": {
+    "digest": "c43b10defceb4401dc11e37366e491015afb76986a0e6fd76e5022f1683197e0",
+    "kind": "candidate",
+    "ref": "CANDIDATE-ORDER-001",
+    "revision": "1"
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "assertions": [
+    {
+      "evidence": "golden CLI output and digest",
+      "id": "A-S1-ORDER",
+      "method": "test",
+      "statement": "The same fixture and order produce identical output bytes."
+    },
+    {
+      "evidence": "spy repository invocation count and diagnostic",
+      "id": "A-S1-INVALID",
+      "method": "test",
+      "statement": "Unknown order text is rejected before repository access."
+    }
+  ],
+  "atomicity": {
+    "coherent": true,
+    "containedOrReversible": true,
+    "independentlyVerifiable": true,
+    "rationale": "The slice closes one end-to-end read path without durable mutation.",
+    "reviewable": true
+  },
+  "dependencies": [],
+  "effectBoundaryTouchpoints": [
+    "EFF-PAYMENT intent -> adapter result"
+  ],
+  "entryConditions": [
+    "ISC-SOFTWARE-001 revision 1 accepted."
+  ],
+  "exitConditions": [
+    "CLI touchpoint executes.",
+    "Assertions A-S1-ORDER and A-S1-INVALID pass.",
+    "No adapter-owned ordering rule exists."
+  ],
+  "flow": {
+    "architectureRefs": [
+      "ARCH-DOMAIN",
+      "ARCH-APPLICATION",
+      "ARCH-CLI"
+    ],
+    "interfaceRefs": [
+      "IF-DECISION-QUERY"
+    ],
+    "participants": [
+      "CLI adapter",
+      "Query service",
+      "Fixture repository"
+    ],
+    "steps": [
+      "Parse external text into a closed DecisionOrder.",
+      "Read fixture entries through the repository port.",
+      "Return and render a deterministic DecisionIndex."
+    ]
+  },
+  "formalModelRefs": [
+    "MODEL-ORDER-PROP"
+  ],
+  "integrationOwner": "Worker Orchestrator: decision query",
+  "metadata": {
+    "example": true
+  },
+  "objective": "Create the typed query/result path and an executable CLI touchpoint backed by a deterministic fixture repository.",
+  "outcomeRefs": [
+    "OUT-001"
+  ],
+  "parentCapabilityRefs": [
+    "CAP-QUERY-DECISIONS"
+  ],
+  "profileProjections": {
+    "python": {
+      "expectedArtifacts": [
+        "decision_index.py",
+        "query_service.py",
+        "test_decision_index.py"
+      ]
+    }
+  },
+  "scaffolding": [
+    {
+      "disposition": "retain-as-fixture",
+      "id": "SC-FIXTURE-REPO",
+      "owner": "test",
+      "purpose": "Provide deterministic entries before the production repository adapter is connected."
+    }
+  ],
+  "schema": "bbk.execution-slice.v2",
+  "sliceId": "ES-SOFTWARE-003",
+  "solutionOutcomeFitRefs": [
+    "SOF-001@r1"
+  ],
+  "stateDecisionEffectRefs": [
+    "SDE-ORDER-001@1"
+  ],
+  "stateTransitionTouchpoints": [
+    "READY + AuthorizeOrder -> AUTHORIZING"
+  ],
+  "status": "ready",
+  "structureContractRefs": [
+    "ISC-SOFTWARE-002@2"
+  ],
+  "title": "Typed query and executable CLI fixture",
+  "touchpoint": {
+    "actor": "developer/reviewer",
+    "environment": "offline fixture environment",
+    "expectedObservation": "Ordered decision identities are rendered consistently and invalid order text is rejected.",
+    "interaction": "Run bbk decisions list against the fixture repository.",
+    "kind": "cli"
+  },
+  "traceFixtureRefs": [
+    "TRACE-HAPPY",
+    "TRACE-DUPLICATE",
+    "TRACE-ACK-LOST"
+  ],
+  "workUnitRefs": [
+    "WU-DOMAIN-TYPES",
+    "WU-QUERY-SERVICE",
+    "WU-CLI-FIXTURE"
+  ]
+}

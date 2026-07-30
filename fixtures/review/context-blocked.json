@@ -1,0 +1,79 @@
+{
+  "authorityDisclaimer": "Context completeness proves what was assembled; it does not prove the subject is correct.",
+  "blockers": [
+    "required context missing: required.md"
+  ],
+  "compiler": {
+    "id": "fixture",
+    "policyDigest": "806c62df9f4da4cc93764c4364b33672fe2c748e8f0e7103ab28ccf9068b97a7",
+    "version": "1"
+  },
+  "completeness": "BLOCKED_REQUIRED_CONTEXT_MISSING",
+  "contentRoot": "49a6d96e018fd37ae343936795ae7e427de797f83c04df569d4b56cbeb679ef1",
+  "contextManifestId": "RCM-BLOCKED",
+  "contextPacks": [
+    {
+      "bytes": 4,
+      "contentRoot": "49a6d96e018fd37ae343936795ae7e427de797f83c04df569d4b56cbeb679ef1",
+      "packId": "PACK-SHARD-001",
+      "shardRef": "SHARD-001"
+    }
+  ],
+  "crossShardAssertions": [],
+  "dependencyClosure": [
+    "c43b10defceb4401dc11e37366e491015afb76986a0e6fd76e5022f1683197e0",
+    "7bc938025ed00bb52ea9ac28f80f98ca4f24dcbf595a43e2dfc97d4a929dfe02",
+    "49a6d96e018fd37ae343936795ae7e427de797f83c04df569d4b56cbeb679ef1"
+  ],
+  "excludedItems": [],
+  "includedItems": [
+    {
+      "bytes": 4,
+      "generated": false,
+      "itemId": "FILE-00001",
+      "kind": "file",
+      "path": "README.md",
+      "redaction": "none",
+      "sha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+      "sourceClass": "tracked"
+    }
+  ],
+  "omissions": [
+    {
+      "path": "required.md",
+      "reason": "required-missing",
+      "required": true
+    }
+  ],
+  "redactions": [],
+  "requiredSemanticObjects": [
+    "subject",
+    "assurance-contract"
+  ],
+  "retrievalOnlyItems": [],
+  "reviewManifest": {
+    "digest": "7bc938025ed00bb52ea9ac28f80f98ca4f24dcbf595a43e2dfc97d4a929dfe02",
+    "ref": "RM-ORDER-001"
+  },
+  "revision": "1",
+  "root": "/fixture",
+  "schema": "bbk.review-context-manifest.v1",
+  "shards": [
+    {
+      "bytes": 4,
+      "contentRoot": "49a6d96e018fd37ae343936795ae7e427de797f83c04df569d4b56cbeb679ef1",
+      "primaryGroup": "complete",
+      "primaryItemRefs": [
+        "FILE-00001"
+      ],
+      "shardId": "SHARD-001",
+      "sharedItemRefs": []
+    }
+  ],
+  "subject": {
+    "digest": "c43b10defceb4401dc11e37366e491015afb76986a0e6fd76e5022f1683197e0",
+    "kind": "candidate",
+    "ref": "CANDIDATE-ORDER-001",
+    "revision": "1"
+  }
+}

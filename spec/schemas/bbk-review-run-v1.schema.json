@@ -1,0 +1,133 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-review-run-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "aggregate": {
+      "$ref": "bbk-review-aggregate-v1.schema.json"
+    },
+    "assuranceContract": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "attempts": {
+      "items": {
+        "$ref": "bbk-review-attempt-v1.schema.json"
+      },
+      "type": "array"
+    },
+    "completedAt": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "contentDigest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "environment": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "evidenceReceipts": {
+      "items": {
+        "$ref": "bbk-evidence-receipt-v2.schema.json"
+      },
+      "type": "array"
+    },
+    "findingDispositions": {
+      "items": {
+        "$ref": "bbk-finding-disposition-v1.schema.json"
+      },
+      "type": "array"
+    },
+    "findings": {
+      "items": {
+        "$ref": "bbk-review-finding-v1.schema.json"
+      },
+      "type": "array"
+    },
+    "predecessorRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "reviewContextManifest": {
+      "additionalProperties": false,
+      "properties": {
+        "digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "ref": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "digest"
+      ],
+      "type": "object"
+    },
+    "reviewManifest": {
+      "additionalProperties": false,
+      "properties": {
+        "digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "ref": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "digest"
+      ],
+      "type": "object"
+    },
+    "runId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.review-run.v1"
+    },
+    "startedAt": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "state": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "subject": {
+      "additionalProperties": true,
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "runId",
+    "reviewManifest",
+    "reviewContextManifest",
+    "subject",
+    "assuranceContract",
+    "predecessorRefs",
+    "attempts",
+    "evidenceReceipts",
+    "findings",
+    "findingDispositions",
+    "aggregate",
+    "environment",
+    "startedAt",
+    "completedAt",
+    "state",
+    "contentDigest"
+  ],
+  "title": "BBK ReviewRun v1",
+  "type": "object"
+}

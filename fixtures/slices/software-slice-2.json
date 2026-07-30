@@ -1,0 +1,88 @@
+{
+  "assertions": [
+    {
+      "evidence": "shared contract suite",
+      "id": "A-S2-COMPAT",
+      "method": "test",
+      "statement": "Production and fixture adapters satisfy the same repository contract."
+    },
+    {
+      "evidence": "fault fixture result",
+      "id": "A-S2-FAIL",
+      "method": "test",
+      "statement": "Repository failure returns no partial DecisionIndex."
+    }
+  ],
+  "atomicity": {
+    "coherent": true,
+    "containedOrReversible": true,
+    "independentlyVerifiable": true,
+    "rationale": "Only the repository binding changes; the prior touchpoint provides a direct behavioral comparison.",
+    "reviewable": true
+  },
+  "dependencies": [
+    "ES-SOFTWARE-001"
+  ],
+  "entryConditions": [
+    "ES-SOFTWARE-001 complete.",
+    "Production repository read authorization available."
+  ],
+  "exitConditions": [
+    "Operational CLI touchpoint succeeds.",
+    "Repository fault case is evidenced.",
+    "Fixture remains as a reusable contract test."
+  ],
+  "flow": {
+    "architectureRefs": [
+      "ARCH-APPLICATION",
+      "ARCH-REPOSITORY"
+    ],
+    "interfaceRefs": [
+      "IF-DECISION-QUERY"
+    ],
+    "participants": [
+      "CLI adapter",
+      "Query service",
+      "Production repository"
+    ],
+    "steps": [
+      "Bind project repository.",
+      "Execute the unchanged typed query path.",
+      "Compare representative outputs with fixture expectations."
+    ]
+  },
+  "integrationOwner": "Worker Orchestrator: decision query",
+  "metadata": {
+    "example": true
+  },
+  "objective": "Replace the fixture repository in the operational path while preserving the exact typed query and output behavior.",
+  "outcomeRefs": [
+    "OUT-QUERY-DECISIONS"
+  ],
+  "parentCapabilityRefs": [
+    "CAP-QUERY-DECISIONS"
+  ],
+  "profileProjections": {},
+  "scaffolding": [],
+  "schema": "bbk.execution-slice.v1",
+  "sliceId": "ES-SOFTWARE-002",
+  "solutionOutcomeFitRefs": [
+    "SOF-DECISION-QUERY@r1"
+  ],
+  "status": "draft",
+  "structureContractRefs": [
+    "ISC-SOFTWARE-001@1"
+  ],
+  "title": "Production repository integration",
+  "touchpoint": {
+    "actor": "operator",
+    "environment": "local project repository",
+    "expectedObservation": "The operational result matches fixture semantics and repository failure is explicit.",
+    "interaction": "Run the same command against a project repository.",
+    "kind": "cli"
+  },
+  "workUnitRefs": [
+    "WU-PRODUCTION-REPOSITORY",
+    "WU-INTEGRATION-TEST"
+  ]
+}

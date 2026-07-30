@@ -1,0 +1,96 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-structure-review-result-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "coverage": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "disposition": {
+      "enum": [
+        "accept",
+        "accept-with-advisories",
+        "revise",
+        "blocked",
+        "inconclusive"
+      ]
+    },
+    "findings": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "class": {
+            "enum": [
+              "blocker",
+              "material",
+              "advisory",
+              "observation"
+            ]
+          },
+          "evidence": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "route": {
+            "type": "string"
+          },
+          "statement": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "class",
+          "statement",
+          "evidence",
+          "route"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "limitations": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "reviewId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "reviewer": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.structure-review-result.v1"
+    },
+    "subjectDigest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "subjectRef": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "reviewId",
+    "subjectRef",
+    "subjectDigest",
+    "reviewer",
+    "coverage",
+    "findings",
+    "disposition"
+  ],
+  "title": "BBK Structure Review Result v1",
+  "type": "object"
+}

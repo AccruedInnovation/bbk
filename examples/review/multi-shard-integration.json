@@ -1,0 +1,25 @@
+{
+  "crossShardAssertions": [
+    "A-END-TO-END"
+  ],
+  "grouping": "execution-slice-or-responsibility",
+  "kind": "multi-shard-integration",
+  "schema": "bbk.review-example.v1",
+  "shards": [
+    {
+      "id": "S-PROVIDER",
+      "primary": [
+        "provider/**"
+      ]
+    },
+    {
+      "id": "S-CONSUMER",
+      "primary": [
+        "consumer/**"
+      ]
+    }
+  ],
+  "shared": [
+    "contracts/interface.json"
+  ]
+}
