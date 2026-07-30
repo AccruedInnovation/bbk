@@ -1,9 +1,9 @@
-    ---
-    name: bbk-review-intent
-    description: Check intent and outcome conformance across requested intervention, SolutionOutcomeFit, plans, structure, slices, work, candidate, evidence, and promised capability.
-    ---
+---
+name: bbk-review-intent
+description: Check intent and outcome conformance across requested intervention, SolutionOutcomeFit, plans, structure, slices, work, candidate, evidence, and promised capability.
+---
 
-    # BBK Intent Conformance
+# BBK Intent Conformance
 
 Review the chain rather than only the leaf artifact:
 

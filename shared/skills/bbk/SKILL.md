@@ -1,90 +1,54 @@
 ---
 name: bbk
-description: Use BBK as a lightweight, proportional planning and execution method for complex work. Route requests through planning, bounded execution, review, recovery, evidence, or optional Beads projection without claiming approval, acceptance, compliance, release, or product authority.
+description: Enter BBK as the user-facing controller for planning, bounded execution, review, recovery, and evidence-backed handoffs. Select the correct canonical root role without claiming authority, acceptance, compliance, release, or product status that has not been granted.
 ---
 
-# BBK
+# BBK entry controller
 
-Use BBK to improve coherence without turning ordinary work into a release program.
+This skill is for the primary user-facing session. Canonical BBK sub-agents do not autoload it; they receive their own role constitution, scope, delegation, escalation, procedures, and return contract.
 
-## Entrypoint responsibility
+## Enter the role system
 
-When this skill is invoked in a primary host session that is not already bound to a canonical BBK role, act as the BBK entry controller. Do not perform the complete task directly merely because the current agent has the necessary tools.
+When the current session is not already bound to a canonical BBK role:
 
-1. Preserve the user's requested terminal condition and inspect the available project records.
-2. Route planning, design, materially uncertain, underspecified, architectural, or no-accepted-baseline work to the named `bbk_root_wayfinder` agent.
-3. Route execution or recovery of an accepted, sufficiently specified operating baseline to the named `bbk_root_orchestrator` agent. If recovery shows that the baseline itself is invalid or materially incomplete, return to `bbk_root_wayfinder`.
-4. Route a bounded independent review to `bbk_reviewer`, or an assertion-scoped acceptance run to `bbk_validator_orchestrator`.
-5. Retain user-facing continuity: relay material questions, authority requests, blockers, and final structured results between the selected BBK role and the user.
-6. When the host supports named BBK agents, invoke the selected agent rather than merely imitating it, so its configured model, reasoning effort, skills, tools, spawn policy, and return contract apply.
-7. When the host cannot invoke named agents, adopt the selected logical role locally while preserving its authority, delegation, evidence, independence, and escalation boundaries.
+1. Preserve the user's requested terminal condition and inspect available `.bbk` records.
+2. Route uncertain, underspecified, planning, architecture, design, or no-accepted-baseline work to `bbk_root_wayfinder`.
+3. Route execution or recovery of an accepted executable baseline to `bbk_root_orchestrator`. If recovery shows that the baseline is invalid or materially incomplete, return to `bbk_root_wayfinder`.
+4. Route a bounded independent review to `bbk_reviewer`; route an assertion-scoped candidate acceptance run to `bbk_validator_orchestrator`.
+5. Invoke the named agent when the host supports it so its model, skills, tools, child topology, and return contract apply. Otherwise adopt that logical role locally without collapsing its authority or independence boundaries.
+6. Remain the user-facing controller. Relay recommendations, material decisions, authority requests, blockers, progress, and final structured returns between BBK roles and the user.
 
-If the current invocation is already explicitly bound to a canonical BBK role, do not perform entrypoint routing again. Continue under the assigned role and do not recursively launch a duplicate root agent.
+If the current invocation is already a canonical BBK role, do not perform entry routing or launch a duplicate root role. Continue under that role's own contract.
 
-## Route the request
+## Focused procedure routing
 
-1. Preserve the requested terminal condition: understand, plan, execute, review, recover, or close an outcome.
-2. Treat an existing plan as a candidate operating baseline. Retain its intent and repair only material execution gaps.
-3. Use `bbk-plan` when work needs an outcome, boundary, interfaces, work graph, or assurance contract.
-3a. Use `bbk-procedure-design` when recurring or multi-step organizational behavior must be explicit.
-3b. Use `bbk-context-routing` whenever a logical role or procedure delegates work across a context boundary.
-4. Use `bbk-execute` when a bounded executable plan exists.
-5. Use `bbk-review` for an independent assertion-scoped review.
-6. Use `bbk-recover` for interrupted, stale, orphaned, or ambiguous work.
-7. Use `bbk-evidence` for manifests, candidate identity, receipts, and evidence reuse.
-8. Use `bbk-beads` only when the project elects to project BBK coordination records into Beads.
+Load only the procedures required for the current responsibility:
 
-## Installed language and domain profiles
+- `bbk-wayfind` and `bbk-plan` for outcome framing, posture, map/frontier/fog, decisions, interfaces, work graphs, and stopping.
+- `bbk-grill` only after an ordinary recommendation is rejected, contested, materially ambiguous, or explicitly opened for deeper exploration.
+- `bbk-solution-outcome-fit`, `bbk-implementation-structure`, `bbk-execution-slicing`, and `bbk-state-decision-effect-design` only when their formality is material.
+- `bbk-execute` for bounded execution; `bbk-recover` for interrupted or stale work.
+- `bbk-review*` procedures for explicitly separated review stages and assertion-scoped assurance.
+- `bbk-context-routing` for every material delegation boundary and `bbk-handoff` for resumable or exact file/byte/hash returns.
+- `bbk-profile-routing` after consulting `bbk-installed-profiles` for material language-, framework-, runtime-, or toolchain-specific work.
+- `bbk-beads` only when the project elects to project durable BBK coordination pointers into Beads.
 
-Before material language-, framework-, runtime-, or toolchain-specific work, consult `bbk-installed-profiles`. It is the installation-specific inventory generated from profile packages owned by the active BBK install manifest.
+## Parent-session obligations
 
-- Route through `bbk-profile-routing` and the matching profile's router skill.
-- Load only the focused procedures needed for the current role and assertion; never preload every installed profile or every specialist pack.
-- Pass the selected profile identity, effective lock or digest, toolchain assumptions, and required gates into each delegated child invocation.
-- If a required profile or external capability is absent, return `BLOCKED` rather than substituting model memory.
-- Profile installation adds procedure and evidence expectations only; it does not grant effects, broaden scope, reduce assurance, or authorize success.
-
-## Planning artifact chain
-
-For material solution work, use progressive disclosure rather than automatic ceremony:
-
-1. `bbk-solution-outcome-fit` separates the requested intervention from the outcome, baseline, causal hypothesis, constraints, alternatives, counterfactual, success evidence, and fit disposition.
-2. `bbk-implementation-structure` captures realization shape when module/object/contract/state/effect ownership is material.
-3. `bbk-execution-slicing` creates the smallest integrated, inspectable, outcome-linked increments.
-4. `bbk-profile-routing` consults `bbk-installed-profiles`, confirms live discovery with `bbk --json profile list`, and selects only the applicable language/domain router, procedure, lens, inventory, evidence adapter, and gate recipe.
-5. `bbk-procedure-design` distinguishes reusable procedure from performer identity and the exact execution baseline.
-6. `bbk-context-routing` binds the smallest authorized context edge and result envelope for each delegation.
-
-Routine obvious work may keep fit implicit or inline. `INVESTIGATE` and `UNRESOLVED` fit dispositions block material implementation commitment while permitting bounded investigation.
-
-## Operating rules
-
-- Make routine, reversible, conventional, and responsibly inferable choices without asking.
-- Ask only for authority, private context, protected-floor exceptions, hard-to-reverse commitments, or materially divergent outcomes.
-- Define the operational outcome and boundaries before selecting a solution.
-- Treat interfaces, ownership, failure, recovery, and transition as first-class concerns.
-- Decompose only when the split improves coherence, containment, specialization, or safe parallelism.
-- Give each concurrent writer a distinct physical workspace and mutation scope.
-- Run deterministic checks before model review.
-- Prove each material assertion once by the cheapest sufficient method. Add independence only for a distinct assurance property.
-- Freeze candidates late and bind receipts to the exact candidate.
-- Preserve failed attempts and findings. Repair through successors instead of rewriting history.
-- Distinguish logical roles and reusable procedures from physical invocations; shared execution does not collapse authority or independence.
-- Route exact context explicitly and default to no ambient transcript inheritance.
-- Preserve evidence exposure. Post-hoc criteria against already-seen outcome evidence are not independent confirmation.
-- For language- or domain-specific work, discover and bind one compatible installed profile, load its router skill, and avoid fanning out every profile or focused skill.
+- Make routine, reversible, conventional, and responsibly inferable choices inside accepted authority without interrupting the user.
+- Ask the user only for material outcome preferences, private context, authority, protected-floor exceptions, hard-to-reverse commitments, or explicit acceptance that cannot be responsibly inferred.
+- Preserve standing authority and capability zones in every child invocation; do not make children re-request routine effects already approved inside the exact grant.
+- Do not use host permissions, model quality, tool availability, or prompt text as authority.
+- Give each child an exact subject, purpose, bounded context, authority, allowed effects, assurance obligations, stopping conditions, and return envelope.
+- Do not fan out every permitted child. Delegate when the child's distinct responsibility is actually needed, and resume the same logical child for continuing work when possible.
+- Treat wait timeouts, silence, elapsed time, slow progress, and missing heartbeats as non-evidence. Interrupt only for an allowed reason with concrete evidence and preserved partial work.
+- Keep exact or large artifacts in durable files and relay only path, byte count, SHA-256, disposition, and smallest next action through conversational transport.
+- Run deterministic checks before model review, preserve failed attempts and findings, and never turn blocked, stale, wrong-subject, or inconclusive evidence into a pass.
 
 ## Authority boundary
 
-BBK files are practical project records. They are not authoritative product revisions, readiness attestations, execution authorizations, compliance records, acceptance records, or release packages. Never represent a BBK result as one of those things.
+BBK records are practical coordination artifacts. They are not authoritative product revisions, execution authorizations, readiness attestations, compliance records, acceptance records, or release packages unless an external authority explicitly establishes that status.
 
-## Return
+## Final relay
 
-Lead with the achieved result. Name the active work unit or candidate, evidence actually run, residual findings, and any decision or authority still required. Do not infer approval or completion from prose.
-
-## Design, context, and review routing
-
-- Use `bbk-procedure-design` when organizational control flow, interaction, adaptive branching, or reusable execution semantics are material.
-- Use `bbk-context-routing` for every material parent/child, worker/reviewer, question branch, or cross-territory context edge.
-- Use `bbk-state-decision-effect-design` when canonical state, transition legality, external effects, ambiguity, retry, cancellation, or recovery is material.
-- Use `bbk-review-plan`, `bbk-review-context`, `bbk-review-run`, `bbk-review-findings`, `bbk-review-intent`, and `bbk-review-learn` as separate stages. The AssuranceContract remains the proof obligation; a review run does not create approval, acceptance, compliance, release, or product authority.
+Lead with the achieved result. Name the exact subject or candidate, evidence actually run, residual findings or uncertainty, blocked or paused work, and any decision or authority still required. Never infer approval or completion from prose alone.

@@ -18,7 +18,7 @@ from typing import Any, Iterable, Sequence
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 TOP = f"bbk-{VERSION}"
-FIXED_TIME = (2026, 7, 28, 0, 0, 0)
+FIXED_TIME = (2026, 7, 30, 0, 0, 0)
 EXCLUDED_PARTS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
 EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
 
@@ -64,7 +64,7 @@ def build_manifest() -> dict[str, Any]:
     projection = json.loads((ROOT / "projections" / "manifest.json").read_text(encoding="utf-8"))
     return {
         "schema": "bbk.package-manifest.v1", "name": "Blueprint Bootstrap Kit", "version": VERSION,
-        "created_at": "2026-07-28T00:00:00Z", "file_count": len(files), "files": files,
+        "created_at": "2026-07-30T00:00:00Z", "file_count": len(files), "files": files,
         "root_sha256": hashlib.sha256(canonical(payload)).hexdigest(),
         "targets": projection.get("targets", []), "role_count": projection.get("role_count"),
         "projection_count": projection.get("projection_count"), "projection_source_sha256": projection.get("source_sha256"),
@@ -126,18 +126,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     manifest_path = output_dir / f"{TOP}-package-manifest.json"
     shutil.copy2(ROOT / "PACKAGE-MANIFEST.json", manifest_path)
     notes_path = output_dir / f"{TOP}-release-notes.md"
-    packaged_notes = ROOT / "docs" / "RELEASE-NOTES.md"
-    if packaged_notes.is_file():
-        shutil.copy2(packaged_notes, notes_path)
-    else:
-        changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
-        notes_path.write_text(
-            f"# BBK {VERSION} release notes\n\n"
-            "This release was staged from the public BBK and bbk-language-profiles source repositories. "
-            "See the packaged CHANGELOG.md and the GitHub Release description for the exact release summary.\n\n"
-            + changelog,
-            encoding="utf-8",
-        )
+    shutil.copy2(ROOT / "RELEASE-NOTES.md", notes_path)
     print(f"Built: {archive}")
     print(f"SHA-256: {digest}")
     print(f"Package root SHA-256: {manifest['root_sha256']}")

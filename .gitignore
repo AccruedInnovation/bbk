@@ -1,4 +1,3 @@
-# Python
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -6,43 +5,9 @@ __pycache__/
 .ruff_cache/
 .coverage
 htmlcov/
-.venv/
-venv/
-
-# Build and release outputs
 build/
 dist/
-out/
-release/
-*.zip
-*.tar
-*.tar.gz
-*.sha256
-SHA256SUMS.txt
-PACKAGE-MANIFEST.json
-
-# BBK runtime/project state
-.bbk/
-.beads/
-.jj/
-.worktrees/
-install-manifest.json
-current.json
-effective-model-routing.json
-effective-language-profiles.json
-
-# Logs, backups, temporary files
+*.egg-info/
 *.log
-*.bak
-*.backup
-*.tmp
-*.swp
-*~
-tmp/
-temp/
-
-# Editors and OS
-.vscode/
-.idea/
 .DS_Store
 Thumbs.db

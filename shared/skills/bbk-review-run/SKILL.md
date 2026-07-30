@@ -1,9 +1,9 @@
-    ---
-    name: bbk-review-run
-    description: Execute or record revision-bound review attempts, evidence, findings, and non-averaging aggregation without conflating infrastructure failure with candidate failure.
-    ---
+---
+name: bbk-review-run
+description: Execute or record revision-bound review attempts, evidence, findings, and non-averaging aggregation without conflating infrastructure failure with candidate failure.
+---
 
-    # BBK Review Run
+# BBK Review Run
 
 1. Verify exact manifest, context, subject, AssuranceContract, candidate, and prerequisite evidence digests before any attempt.
 2. Launch only the attempts named by the manifest and grant only their exact read scope, tools, effects, assertions, and result schema.

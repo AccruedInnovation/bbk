@@ -797,15 +797,23 @@ def _perform_install(
             source=f"generated:generic-agent-manifest:{routing_digest}",
             **common,
         )
+    bbk_launcher_path: Path | None = None
     if targets["binaries"] is not None:
         name, content = launcher(package_root)
+        bbk_launcher_path = targets["binaries"] / name
         install_bytes(
             content,
-            targets["binaries"] / name,
+            bbk_launcher_path,
             source="generated:launcher",
             executable=True,
             **common,
         )
+
+    bbk_cli_binding = {
+        "launcher": json_path(bbk_launcher_path) if bbk_launcher_path else None,
+        "python": json_path(Path(sys.executable).resolve()),
+        "script": json_path(package_root / "tools" / "bbk.py"),
+    }
 
     installed_profiles = [
         install_language_profile(
@@ -821,8 +829,12 @@ def _perform_install(
         for item in prepared_profiles
     ]
 
-    registry_json = registry_json_bytes(prepared_profiles, bbk_version=VERSION)
-    registry_skill = registry_skill_bytes(prepared_profiles, bbk_version=VERSION)
+    registry_json = registry_json_bytes(
+        prepared_profiles, bbk_version=VERSION, bbk_cli=bbk_cli_binding
+    )
+    registry_skill = registry_skill_bytes(
+        prepared_profiles, bbk_version=VERSION, bbk_cli=bbk_cli_binding
+    )
     registry_digest = hashlib.sha256(registry_skill).hexdigest()
     effective_profiles = root / "effective-language-profiles.json"
     install_bytes(
@@ -908,6 +920,7 @@ def _perform_install(
             "skill_sha256": registry_digest,
             "skill_paths": registry_paths,
             "profile_count": len(installed_profiles),
+            "bbk_cli": bbk_cli_binding,
         },
         "created_at": dt.datetime.now(dt.timezone.utc)
         .replace(microsecond=0)
@@ -972,19 +985,13 @@ def install(args: argparse.Namespace) -> dict[str, Any]:
         sources = explicit_sources
         source_mode = "explicit"
     else:
-        sibling_profiles = ROOT.parent / "bbk-language-profiles"
-        if BUNDLED_PROFILES_PATH.is_dir():
-            sources = [str(BUNDLED_PROFILES_PATH)]
-            source_mode = "bundled-default"
-        elif (sibling_profiles / "REPOSITORY-MANIFEST.json").is_file() or (sibling_profiles / "packages").is_dir():
-            sources = [str(sibling_profiles)]
-            source_mode = "sibling-default"
-        else:
+        if not BUNDLED_PROFILES_PATH.is_dir():
             raise InstallError(
-                "No default language-profile source is available. "
-                f"Expected bundled profiles at {BUNDLED_PROFILES_PATH} or a sibling repository at {sibling_profiles}; "
-                "use --language-profiles PATH or --no-language-profiles."
+                f"Bundled language profiles are missing: {BUNDLED_PROFILES_PATH}; "
+                "use --no-language-profiles for a core-only install"
             )
+        sources = [str(BUNDLED_PROFILES_PATH)]
+        source_mode = "bundled-default"
     args.language_profile_source_mode = source_mode
     progress_note(
         progress_enabled,
@@ -1323,12 +1330,12 @@ def add_install_selection_flags(parser: argparse.ArgumentParser) -> None:
         "--profile-id",
         action="append",
         metavar="ID",
-        help="install only this profile id; repeat as needed; defaults to every profile in the selected, bundled, or sibling source",
+        help="install only this profile id; repeat as needed; defaults to every bundled profile",
     )
     parser.add_argument(
         "--no-language-profiles",
         action="store_true",
-        help="install BBK core only instead of the selected, bundled, or sibling language profiles",
+        help="install BBK core only instead of the five bundled language profiles",
     )
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--dry-run", action="store_true")

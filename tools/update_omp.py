@@ -199,18 +199,9 @@ def validated_routes(
 
 
 def prepared_bundled_profiles(installed_ids: list[str], temp_root: Path) -> tuple[list[PreparedProfile], list[str]]:
-    if not installed_ids:
-        return [], []
-    bundled = install_tool.BUNDLED_PROFILES_PATH
-    if not bundled.is_dir():
-        # Public source checkouts intentionally omit bundled profile ZIPs.
-        # Preserve installed profile packages/extensions at their current
-        # versions rather than blocking a core OMP update or silently dropping
-        # private/sibling profiles.
-        return [], list(installed_ids)
     try:
         all_profiles = prepare_profile_sources(
-            [str(bundled)], temp_root=temp_root, selected_ids=None
+            [str(install_tool.BUNDLED_PROFILES_PATH)], temp_root=temp_root, selected_ids=None
         )
     except ProfileInstallError as exc:
         raise OmpUpdateError(f"Cannot prepare bundled language profiles: {exc}") from exc
@@ -247,15 +238,22 @@ def make_desired_files(
         ),
         source="generated:current-install",
     )
+    bbk_launcher_path: Path | None = None
     if targets["binaries"] is not None:
         launcher_name, launcher_bytes = install_tool.launcher(package_root)
+        bbk_launcher_path = targets["binaries"] / launcher_name
         add_desired(
             desired,
-            targets["binaries"] / launcher_name,
+            bbk_launcher_path,
             launcher_bytes,
             source="generated:launcher",
             is_executable=True,
         )
+    bbk_cli_binding = {
+        "launcher": install_tool.json_path(bbk_launcher_path) if bbk_launcher_path else None,
+        "python": install_tool.json_path(Path(sys.executable).resolve()),
+        "script": install_tool.json_path(package_root / "tools" / "bbk.py"),
+    }
 
     routing_state_meta = old_manifest.get("omp_runtime_routing")
     if not isinstance(routing_state_meta, Mapping) or not isinstance(routing_state_meta.get("state_path"), str):
@@ -401,7 +399,9 @@ def make_desired_files(
         add_desired(
             desired,
             profile_json,
-            registry_json_bytes(prepared_profiles, bbk_version=VERSION),
+            registry_json_bytes(
+                prepared_profiles, bbk_version=VERSION, bbk_cli=bbk_cli_binding
+            ),
             source="generated:effective-language-profiles:update",
         )
         agent_skills = targets.get("agent_skills")
@@ -409,7 +409,9 @@ def make_desired_files(
             add_desired(
                 desired,
                 agent_skills.joinpath(*REGISTRY_RELATIVE_PATH.parts),
-                registry_skill_bytes(prepared_profiles, bbk_version=VERSION),
+                registry_skill_bytes(
+                    prepared_profiles, bbk_version=VERSION, bbk_cli=bbk_cli_binding
+                ),
                 source="generated:installed-profile-registry-skill:update-omp",
             )
 

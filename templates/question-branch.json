@@ -1,0 +1,32 @@
+{
+  "schema": "bbk.question-branch.v1",
+  "bbk_version": "0.1.0-alpha.11.11",
+  "id": "Q-DECISION-001",
+  "root_decision": "Replace with the exact decision that must be resolved.",
+  "status": "ACTIVE",
+  "owner_role": "bbk_questioning_wayfinder",
+  "parent_scope": null,
+  "authority": {
+    "mode": "WAYFINDER_RECOMMENDS",
+    "holder": "user"
+  },
+  "context_digest": null,
+  "current_recommendation": null,
+  "proposal_response": null,
+  "root_disposition": null,
+  "accepted_decision": null,
+  "accepted_related_decisions": [],
+  "independent_questions": [],
+  "dependencies": [],
+  "invalidated_by": [],
+  "exposure_history": [],
+  "unresolved_point": null,
+  "stopping_assessment": {
+    "decision_ready": false,
+    "reason": "Recommendation has not yet been accepted or escalated for deeper exploration.",
+    "remaining_information_value": null,
+    "attention_state": null
+  },
+  "next_action": "Prepare and present a decision-ready recommendation.",
+  "updated_at": "1970-01-01T00:00:00Z"
+}

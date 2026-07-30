@@ -24,10 +24,14 @@ Use evidence to establish a specific assertion, not to accumulate ceremony.
 
 Record what actually ran or was observed, its exact subject, operation, environment, inputs, outputs, trust class, completeness, redaction, and reuse dependencies. Keep EvidenceReceipt, assertion evaluation, and review aggregate separate. Freeform “tests passed” prose is an unstructured observation, not required-gate evidence.
 
+## Durable handoff evidence
+
+Use `bbk-handoff` when exact paths, hashes, commands, or large evidence must cross an agent boundary. The authoritative carrier is the file on disk; the agent response should provide only its path, byte count, SHA-256, disposition, and smallest next action. Verify the carrier and referenced artifacts before reuse.
+
 ## Profile-bound evidence
 
-When a language or domain profile contributes evidence, bind the profile identity, package/effective digest, capability operation, adapter, toolchain, and exact input/output subject. An installed skill name alone is not evidence that the profile or adapter was selected or qualified.
+When a language or domain profile contributes evidence, bind the exact profile id, version, package/root or effective digest, selected router and focused procedure, capability operation, adapter identity, toolchain context, request digest, and input/output subject. An installed skill name establishes neither selection nor qualification, and `bbk-installed-profiles` does not make stale, incomplete, or externally unqualified evidence reusable.
 
-## Profile-bound evidence
+## Lossless command evidence
 
-Bind profile-derived evidence to the exact profile id, version, package/root digest, selected router and focused procedure, effective toolchain context, request digest, and adapter identity. `bbk-installed-profiles` establishes managed availability only; it does not make a stale, incomplete, or externally unqualified receipt reusable.
+When a BBK-configured gate executes, its JSON receipt contains only bounded UTF-8 previews. The authoritative stdout and stderr streams are stored beside the receipt and bound by project-relative path, byte count, and SHA-256. A reusable PASS receipt is eligible only while both stream files still match those bindings.

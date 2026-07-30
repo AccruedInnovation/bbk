@@ -25,6 +25,7 @@ import sys
 import tempfile
 import time
 import uuid
+from importlib import metadata as importlib_metadata
 from pathlib import Path, PurePath
 from typing import Any, Iterable, Iterator, Sequence
 
@@ -2020,6 +2021,15 @@ def initial_files(title: str, project_id: str) -> dict[str, bytes]:
         "schema": "bbk.config.v1", "bbk_version": VERSION, "project_id": project_id,
         "title": title, "created_at": created,
         "method": {"default_depth": "standard", "default_assurance_tier": "material", "ordinary_repair_cycles": 2, "hard_repair_review_cycle": 3},
+        "execution": {
+            "worker_window": "extended",
+            "checkpoint_interval_seconds": 600,
+            "checkpoint_before_host_boundary": True,
+            "resume_same_thread": True,
+            "infrastructure_continuations": 6,
+            "durable_handoffs": True,
+            "large_result_transport": "file-bytes-sha256"
+        },
         "manifest": {"excludes": DEFAULT_EXCLUDES},
         "workspaces": {"root": "../.bbk-worktrees", "default_lease_hours": 24},
         "prevalidation": {"allow_empty": False},
@@ -2035,7 +2045,20 @@ def initial_files(title: str, project_id: str) -> dict[str, bytes]:
     }
     values: dict[str, Any] = {
         "config.json": config,
-        "map.json": {"schema": "bbk.map.v1", "project_id": project_id, "destination": {"outcome": "", "success_evidence": [], "in_scope": [], "out_of_scope": [], "constraints": []}, "territories": [], "questions": [], "capability_increments": [], "phases": [], "fog": []},
+        "map.json": {
+            "schema": "bbk.map.v1",
+            "project_id": project_id,
+            "destination": {"outcome": "", "success_evidence": [], "in_scope": [], "out_of_scope": [], "constraints": []},
+            "posture": {"user_decides": [], "wayfinder_recommends": [], "delegated": [], "constraint_driven": [], "interrupt_for": []},
+            "territories": [],
+            "questions": [],
+            "frontier": [],
+            "blockers": [],
+            "capability_increments": [],
+            "phases": [],
+            "fog": [],
+            "stopping_assessment": {"last_assessed_at": None, "remaining_positive_information_value": None, "residual_uncertainty": []}
+        },
         "interfaces.json": {"schema": "bbk.interfaces.v1", "project_id": project_id, "interfaces": []},
         "work.json": {"schema": "bbk.work.v1", "project_id": project_id, "work_units": [], "integration_obligations": []},
         "assurance.json": {"schema": "bbk.assurance.v1", "project_id": project_id, "default_tier": "material", "contracts": [], "policy": {"one_assertion_one_sufficient_proof": True, "deterministic_before_model_review": True, "independence_requires_distinct_property": True, "ordinary_repair_cycles": 2, "review_by_cycle": 3}},
@@ -2068,7 +2091,7 @@ def cmd_init(args: argparse.Namespace) -> dict[str, Any]:
         atomic_write(path, data)
         created.append(portable_relative_path(path, root))
     for name in [
-        "candidates", "attestations", "receipts/gates", "handoffs", "runtime/candidate-state",
+        "candidates", "attestations", "receipts/gates", "questions", "handoffs", "runtime/candidate-state",
         "runtime", "workspaces", "logs", "fit", "structures", "state-effects", "traces", "slices", "reviews", "reviews/manifests", "reviews/contexts", "reviews/runs", "reviews/findings", "reviews/dispositions", "reviews/learning", "work-units", "profiles",
     ]:
         (target / name).mkdir(parents=True, exist_ok=True)
@@ -2089,6 +2112,8 @@ def cmd_init(args: argparse.Namespace) -> dict[str, Any]:
         "reviews/EXAMPLE-finding-disposition.json": "finding-disposition.json",
         "reviews/EXAMPLE-learning-candidate.json": "learning-candidate.json",
         "work-units/EXAMPLE-work-unit.json": "work-unit.json",
+        "questions/EXAMPLE-question-branch.json": "question-branch.json",
+        "handoffs/EXAMPLE-handoff.json": "handoff.json",
     }
     for rel, template in examples.items():
         destination = target / rel
@@ -2345,11 +2370,108 @@ def gate_applicability(root: Path, gate: dict[str, Any], phase: str) -> tuple[st
     return "APPLICABLE", None
 
 
-def truncate(text: str) -> tuple[str, int, bool]:
-    raw = text.encode("utf-8", "replace")
-    if len(raw) <= MAX_CAPTURE:
-        return text, len(raw), False
-    return raw[:MAX_CAPTURE].decode("utf-8", "replace") + "\n[BBK output truncated]\n", len(raw), True
+def capture_preview(path: Path) -> tuple[str, int, bool]:
+    """Return a bounded UTF-8 preview while preserving the authoritative file."""
+    size = path.stat().st_size
+    with path.open("rb") as handle:
+        raw = handle.read(MAX_CAPTURE)
+    truncated = size > len(raw)
+    preview = raw.decode("utf-8", "replace")
+    if truncated:
+        preview += "\n[BBK preview truncated; verify the bound output file for complete bytes]\n"
+    return preview, size, truncated
+
+
+def gate_stream_record(root: Path, path: Path) -> dict[str, Any]:
+    return {
+        "path": path.relative_to(root).as_posix(),
+        "bytes": path.stat().st_size,
+        "sha256": sha256_file(path),
+    }
+
+
+def gate_streams_current(root: Path, receipt: dict[str, Any]) -> bool:
+    """A reusable gate receipt must still bind both complete output streams."""
+    for field in ("stdout_file", "stderr_file"):
+        record = receipt.get(field)
+        if not isinstance(record, dict):
+            return False
+        rel = record.get("path")
+        expected_bytes = record.get("bytes")
+        expected_sha = record.get("sha256")
+        if not isinstance(rel, str) or not isinstance(expected_bytes, int) or not isinstance(expected_sha, str):
+            return False
+        candidate = Path(rel)
+        if candidate.is_absolute() or "\\" in rel:
+            return False
+        path = (root / candidate).resolve()
+        try:
+            path.relative_to(root.resolve())
+        except ValueError:
+            return False
+        if not path.is_file() or path.stat().st_size != expected_bytes or sha256_file(path) != expected_sha:
+            return False
+    return True
+
+
+def run_to_bound_files(
+    argv: Sequence[str],
+    cwd: Path,
+    stdout_path: Path,
+    stderr_path: Path,
+    *,
+    timeout: float | None,
+    env: dict[str, str] | None,
+) -> dict[str, Any]:
+    """Run without an in-memory output ceiling and atomically bind both streams."""
+    command = [str(item) for item in argv]
+    if not command:
+        raise BbkError("Command argv must not be empty")
+    stdout_path.parent.mkdir(parents=True, exist_ok=True)
+    stderr_path.parent.mkdir(parents=True, exist_ok=True)
+    token = uuid.uuid4().hex
+    stdout_temp = stdout_path.with_name(f".{stdout_path.name}.{token}.tmp")
+    stderr_temp = stderr_path.with_name(f".{stderr_path.name}.{token}.tmp")
+    started = time.monotonic()
+    executable = shutil.which(command[0], path=(env or os.environ).get("PATH"))
+    returncode = 127
+    timed_out = False
+    try:
+        with stdout_temp.open("wb") as stdout_handle, stderr_temp.open("wb") as stderr_handle:
+            try:
+                result = subprocess.run(
+                    command,
+                    cwd=str(cwd),
+                    env=env,
+                    timeout=timeout,
+                    check=False,
+                    stdout=stdout_handle,
+                    stderr=stderr_handle,
+                )
+                returncode = result.returncode
+            except subprocess.TimeoutExpired:
+                returncode = 124
+                timed_out = True
+            except FileNotFoundError as exc:
+                stderr_handle.write(str(exc).encode("utf-8", "replace"))
+                returncode = 127
+            stdout_handle.flush()
+            stderr_handle.flush()
+            os.fsync(stdout_handle.fileno())
+            os.fsync(stderr_handle.fileno())
+        os.replace(stdout_temp, stdout_path)
+        os.replace(stderr_temp, stderr_path)
+    finally:
+        stdout_temp.unlink(missing_ok=True)
+        stderr_temp.unlink(missing_ok=True)
+    return {
+        "argv": command,
+        "cwd": str(cwd),
+        "returncode": returncode,
+        "duration_seconds": round(time.monotonic() - started, 6),
+        "timed_out": timed_out,
+        "executable": executable,
+    }
 
 
 def run_gate(root: Path, gate: dict[str, Any], phase: str, candidate_id: str | None, no_reuse: bool) -> dict[str, Any]:
@@ -2375,17 +2497,32 @@ def run_gate(root: Path, gate: dict[str, Any], phase: str, candidate_id: str | N
     }
     fingerprint = sha256_bytes(canonical_bytes(resolved))
     receipt_path = root / ".bbk" / "receipts" / "gates" / gate["id"] / f"{fingerprint}.json"
+    stdout_path = receipt_path.with_suffix(".stdout.bin")
+    stderr_path = receipt_path.with_suffix(".stderr.bin")
     if receipt_path.exists() and not no_reuse:
         existing = read_json(receipt_path)
-        if existing.get("status") == "PASS" and existing.get("fingerprint") == fingerprint:
+        if (
+            existing.get("status") == "PASS"
+            and existing.get("fingerprint") == fingerprint
+            and gate_streams_current(root, existing)
+        ):
             existing["reused"] = True
             existing["receipt_path"] = str(receipt_path)
             return existing
     env = os.environ.copy()
     env.update({str(k): str(v) for k, v in gate.get("env", {}).items()})
-    outcome = run(resolved["command"], cwd, timeout=float(gate.get("timeout_seconds", 600)), env=env)
-    stdout, stdout_bytes, stdout_truncated = truncate(outcome["stdout"])
-    stderr, stderr_bytes, stderr_truncated = truncate(outcome["stderr"])
+    outcome = run_to_bound_files(
+        resolved["command"],
+        cwd,
+        stdout_path,
+        stderr_path,
+        timeout=float(gate.get("timeout_seconds", 600)),
+        env=env,
+    )
+    stdout, stdout_bytes, stdout_truncated = capture_preview(stdout_path)
+    stderr, stderr_bytes, stderr_truncated = capture_preview(stderr_path)
+    stdout_file = gate_stream_record(root, stdout_path)
+    stderr_file = gate_stream_record(root, stderr_path)
     status = "PASS" if outcome["returncode"] == 0 else ("BLOCKED" if outcome["returncode"] == 127 else ("ERROR" if outcome["timed_out"] else "FAIL"))
     receipt = {
         "schema": "bbk.gate-receipt.v1", "bbk_version": VERSION, "gate_id": gate["id"],
@@ -2396,6 +2533,8 @@ def run_gate(root: Path, gate: dict[str, Any], phase: str, candidate_id: str | N
         "duration_seconds": outcome["duration_seconds"], "stdout": stdout, "stderr": stderr,
         "stdout_bytes": stdout_bytes, "stderr_bytes": stderr_bytes,
         "stdout_truncated": stdout_truncated, "stderr_truncated": stderr_truncated,
+        "stdout_file": stdout_file, "stderr_file": stderr_file,
+        "output_transport": "file-bytes-sha256",
         "completed_at": utc_now(), "reused": False,
     }
     write_json(receipt_path, receipt)
@@ -2600,6 +2739,704 @@ def cmd_workspace_cleanup(args: argparse.Namespace) -> dict[str, Any]:
     return {"status": "REMOVED", "workspace": item, "prior_inspection": inspection, "candidate_references": refs}
 
 
+
+def _relative_file_reference(root: Path, raw: str, *, kind: str) -> dict[str, Any]:
+    candidate = Path(raw).expanduser()
+    if not candidate.is_absolute():
+        candidate = root / candidate
+    try:
+        path = candidate.resolve(strict=True)
+    except FileNotFoundError as exc:
+        raise BbkError(f"{kind} file does not exist: {candidate}") from exc
+    try:
+        relative = path.relative_to(root.resolve()).as_posix()
+    except ValueError as exc:
+        raise BbkError(f"{kind} file must be inside the BBK project root: {path}") from exc
+    if not path.is_file():
+        raise BbkError(f"{kind} reference must identify a regular file: {path}")
+    return {
+        "path": relative,
+        "bytes": path.stat().st_size,
+        "sha256": sha256_file(path),
+        "kind": kind,
+    }
+
+
+def _normalize_project_relative(root: Path, raw: str, *, label: str, require_exists: bool = False) -> str:
+    candidate = Path(raw).expanduser()
+    if not candidate.is_absolute():
+        candidate = root / candidate
+    resolved = candidate.resolve(strict=require_exists)
+    try:
+        return resolved.relative_to(root.resolve()).as_posix()
+    except ValueError as exc:
+        raise BbkError(f"{label} must remain inside the BBK project root: {candidate}") from exc
+
+
+def _question_branch_errors(value: Any) -> list[str]:
+    errors: list[str] = []
+    if not isinstance(value, dict):
+        return ["question branch must be a JSON object"]
+    required = {
+        "schema", "bbk_version", "id", "root_decision", "status", "owner_role",
+        "authority", "current_recommendation", "proposal_response", "root_disposition",
+        "dependencies", "accepted_related_decisions", "independent_questions",
+        "exposure_history", "unresolved_point", "stopping_assessment", "next_action",
+        "updated_at",
+    }
+    missing = sorted(required - set(value))
+    if missing:
+        errors.append(f"missing required fields: {missing}")
+    if value.get("schema") != "bbk.question-branch.v1":
+        errors.append("schema must equal bbk.question-branch.v1")
+    if not isinstance(value.get("id"), str) or not SAFE_ID.fullmatch(value.get("id", "")):
+        errors.append("id must be a safe BBK identifier")
+    for field in ("root_decision", "owner_role", "next_action", "updated_at"):
+        if not isinstance(value.get(field), str) or not value.get(field):
+            errors.append(f"{field} must be non-empty")
+    statuses = {
+        "ACTIVE", "WAITING_FOR_USER", "RESEARCH_BLOCKED", "PARKED", "INVALIDATED",
+        "ORPHANED", "RESOLVED", "DEFERRED", "BLOCKED", "CANCELLED", "SUPERSEDED",
+    }
+    if value.get("status") not in statuses:
+        errors.append("status is not recognized")
+    responses = {None, "APPROVE", "REJECT", "REVISE"}
+    if value.get("proposal_response") not in responses:
+        errors.append("proposal_response is not recognized")
+    dispositions = {
+        None, "RESOLVED", "DEFERRED", "PARKED", "BLOCKED", "INSUFFICIENT_EVIDENCE",
+        "OUT_OF_SCOPE", "CANCELLED", "SUPERSEDED",
+    }
+    if value.get("root_disposition") not in dispositions:
+        errors.append("root_disposition is not recognized")
+    authority = value.get("authority")
+    if not isinstance(authority, dict) or authority.get("mode") not in {
+        "USER_DECIDES", "WAYFINDER_RECOMMENDS", "DELEGATED", "CONSTRAINT_DRIVEN",
+    } or not isinstance(authority.get("holder"), str) or not authority.get("holder"):
+        errors.append("authority requires a recognized mode and non-empty holder")
+    for field in ("dependencies", "accepted_related_decisions", "independent_questions", "exposure_history"):
+        if not isinstance(value.get(field), list) or not all(isinstance(item, str) for item in value.get(field, [])):
+            errors.append(f"{field} must be an array of strings")
+    stopping = value.get("stopping_assessment")
+    if not isinstance(stopping, dict) or not isinstance(stopping.get("decision_ready"), bool) or not isinstance(stopping.get("reason"), str):
+        errors.append("stopping_assessment requires decision_ready and reason")
+    if value.get("root_disposition") == "RESOLVED":
+        if value.get("status") != "RESOLVED":
+            errors.append("a RESOLVED root disposition requires status RESOLVED")
+        if value.get("proposal_response") != "APPROVE":
+            errors.append("a RESOLVED root disposition requires proposal_response APPROVE")
+        if not isinstance(value.get("accepted_decision"), str) or not value.get("accepted_decision"):
+            errors.append("a RESOLVED root disposition requires accepted_decision")
+    if value.get("proposal_response") in {"REJECT", "REVISE"} and value.get("root_disposition") == "RESOLVED":
+        errors.append("REJECT or REVISE keeps the root question open")
+    return errors
+
+
+def cmd_question_validate(args: argparse.Namespace) -> dict[str, Any]:
+    path = Path(args.path).expanduser().resolve()
+    value = read_json(path)
+    errors = _question_branch_errors(value)
+    return {
+        "schema": "bbk.question-branch-validation.v1",
+        "status": "PASS" if not errors else "FAIL",
+        "valid": not errors,
+        "path": str(path),
+        "id": value.get("id") if isinstance(value, dict) else None,
+        "root_disposition": value.get("root_disposition") if isinstance(value, dict) else None,
+        "errors": errors,
+    }
+
+
+def cmd_question_new(args: argparse.Namespace) -> dict[str, Any]:
+    root = resolve_root(args.root, required=True)
+    assert root is not None
+    question_id = validate_id(args.id, "question id")
+    output = Path(args.output).expanduser() if args.output else root / ".bbk" / "questions" / f"{question_id}.json"
+    if not output.is_absolute():
+        output = root / output
+    output = output.resolve()
+    _normalize_project_relative(root, str(output), label="question output")
+    if output.exists() and not args.force:
+        raise BbkError(f"Refusing to overwrite existing question branch without --force: {output}")
+    value = read_json(TEMPLATE_DIR / "question-branch.json")
+    value.update({
+        "bbk_version": VERSION,
+        "id": question_id,
+        "root_decision": args.root_decision,
+        "owner_role": args.owner_role,
+        "parent_scope": args.parent_scope,
+        "authority": {"mode": args.authority_mode, "holder": args.authority_holder},
+        "next_action": args.next_action,
+        "updated_at": utc_now(),
+    })
+    errors = _question_branch_errors(value)
+    if errors:
+        raise BbkError("Invalid generated question branch: " + "; ".join(errors))
+    write_json(output, value)
+    return {
+        "schema": "bbk.question-branch-created.v1",
+        "status": "PASS",
+        "created": True,
+        "path": _normalize_project_relative(root, str(output), label="question", require_exists=True),
+        "bytes": output.stat().st_size,
+        "sha256": sha256_file(output),
+        "question": value,
+    }
+
+
+def cmd_question_list(args: argparse.Namespace) -> dict[str, Any]:
+    root = resolve_root(args.root, required=True)
+    assert root is not None
+    base = root / ".bbk" / "questions"
+    items: list[dict[str, Any]] = []
+    if base.is_dir():
+        for path in sorted(base.glob("*.json")):
+            value = read_json(path)
+            errors = _question_branch_errors(value)
+            if args.status and value.get("status") != args.status:
+                continue
+            items.append({
+                "id": value.get("id"),
+                "root_decision": value.get("root_decision"),
+                "status": value.get("status"),
+                "proposal_response": value.get("proposal_response"),
+                "root_disposition": value.get("root_disposition"),
+                "next_action": value.get("next_action"),
+                "updated_at": value.get("updated_at"),
+                "path": _normalize_project_relative(root, str(path), label="question", require_exists=True),
+                "valid": not errors,
+                "errors": errors,
+            })
+    items.sort(key=lambda item: (str(item.get("updated_at") or ""), str(item.get("id") or "")), reverse=True)
+    return {"schema": "bbk.question-branch-list.v1", "status": "PASS", "count": len(items), "questions": items}
+
+
+def _handoff_shape_errors(value: Any) -> list[str]:
+    errors: list[str] = []
+    if not isinstance(value, dict):
+        return ["handoff must be a JSON object"]
+    required = {
+        "schema", "bbk_version", "id", "work_unit_id", "attempt", "producer",
+        "subject", "disposition", "summary", "artifacts", "evidence",
+        "smallest_next_action", "created_at",
+    }
+    missing = sorted(required - set(value))
+    if missing:
+        errors.append(f"missing required fields: {missing}")
+    if value.get("schema") != "bbk.handoff.v1":
+        errors.append("schema must equal bbk.handoff.v1")
+    for field in ("id", "work_unit_id"):
+        raw = value.get(field)
+        if not isinstance(raw, str) or not SAFE_ID.fullmatch(raw):
+            errors.append(f"{field} must be a safe BBK identifier")
+    if not isinstance(value.get("attempt"), int) or isinstance(value.get("attempt"), bool) or value.get("attempt", 0) < 1:
+        errors.append("attempt must be an integer >= 1")
+    if value.get("disposition") not in {
+        "COMPLETE", "READY_FOR_VALIDATION", "PARTIAL", "BLOCKED",
+        "PAUSED", "BLOCKED_TECHNICAL", "BLOCKED_AUTHORITY",
+        "BLOCKED_DECISION", "PAUSED_CAPACITY", "PAUSED_HOST_WINDOW",
+        "CANCELLED", "INCONCLUSIVE",
+    }:
+        errors.append("disposition is not recognized")
+    producer = value.get("producer")
+    if not isinstance(producer, dict) or not isinstance(producer.get("role"), str) or not producer.get("role"):
+        errors.append("producer.role must be non-empty")
+    subject = value.get("subject")
+    if not isinstance(subject, dict) or not all(isinstance(subject.get(name), str) and subject.get(name) for name in ("kind", "id")):
+        errors.append("subject.kind and subject.id must be non-empty strings")
+    authority = value.get("authority")
+    if authority is not None:
+        if not isinstance(authority, dict):
+            errors.append("authority must be an object or null")
+        else:
+            if authority.get("source") is not None and not isinstance(authority.get("source"), str):
+                errors.append("authority.source must be a string or null")
+            if not isinstance(authority.get("scope", []), list) or not all(isinstance(item, str) and item for item in authority.get("scope", [])):
+                errors.append("authority.scope must be a string array")
+    zones = value.get("capability_zones_used", [])
+    if not isinstance(zones, list):
+        errors.append("capability_zones_used must be an array")
+    else:
+        for index, zone in enumerate(zones):
+            if not isinstance(zone, dict):
+                errors.append(f"capability_zones_used[{index}] must be an object")
+                continue
+            if zone.get("kind") not in {"disposable-candidate-root", "protected-worktree", "sealed-evidence"}:
+                errors.append(f"capability_zones_used[{index}].kind is not recognized")
+            if not isinstance(zone.get("path"), str) or not zone.get("path"):
+                errors.append(f"capability_zones_used[{index}].path must be non-empty")
+    interrupt = value.get("interrupt")
+    if interrupt is not None:
+        allowed_interrupts = {
+            "USER_CANCELLED", "CHILD_REQUESTED_STOP", "UNAUTHORIZED_EFFECT",
+            "OWNERSHIP_COLLISION", "CONFIRMED_HANG", "OBSOLETE_WORK",
+        }
+        if not isinstance(interrupt, dict):
+            errors.append("interrupt must be an object or null")
+        else:
+            if interrupt.get("reason") not in allowed_interrupts:
+                errors.append("interrupt.reason is not recognized")
+            evidence_items = interrupt.get("evidence")
+            if not isinstance(evidence_items, list) or not evidence_items or not all(isinstance(item, str) and item for item in evidence_items):
+                errors.append("interrupt.evidence must be a non-empty string array")
+    for field in ("summary", "smallest_next_action", "created_at"):
+        if not isinstance(value.get(field), str) or not value.get(field):
+            errors.append(f"{field} must be non-empty")
+    for field in ("artifacts", "evidence"):
+        refs = value.get(field)
+        if not isinstance(refs, list):
+            errors.append(f"{field} must be an array")
+            continue
+        for index, ref in enumerate(refs):
+            where = f"{field}[{index}]"
+            if not isinstance(ref, dict):
+                errors.append(f"{where} must be an object")
+                continue
+            if not isinstance(ref.get("path"), str) or not ref.get("path"):
+                errors.append(f"{where}.path must be non-empty")
+            if not isinstance(ref.get("bytes"), int) or isinstance(ref.get("bytes"), bool) or ref.get("bytes", -1) < 0:
+                errors.append(f"{where}.bytes must be an integer >= 0")
+            if not isinstance(ref.get("sha256"), str) or not re.fullmatch(r"[0-9a-f]{64}", ref.get("sha256", "")):
+                errors.append(f"{where}.sha256 must be a lowercase SHA-256 digest")
+    return errors
+
+
+def verify_handoff(path: Path, *, root: Path) -> dict[str, Any]:
+    value = read_json(path)
+    errors = _handoff_shape_errors(value)
+    observations: list[dict[str, Any]] = []
+    for field in ("artifacts", "evidence"):
+        refs = value.get(field) if isinstance(value, dict) else []
+        if not isinstance(refs, list):
+            continue
+        for index, ref in enumerate(refs):
+            if not isinstance(ref, dict) or not isinstance(ref.get("path"), str):
+                continue
+            raw = ref["path"]
+            candidate = Path(raw)
+            if candidate.is_absolute() or candidate.drive or ".." in candidate.parts:
+                errors.append(f"{field}[{index}].path must be a safe project-relative path: {raw}")
+                continue
+            actual = (root / candidate).resolve()
+            try:
+                actual.relative_to(root.resolve())
+            except ValueError:
+                errors.append(f"{field}[{index}].path escapes the project root: {raw}")
+                continue
+            observed: dict[str, Any] = {"field": field, "index": index, "path": raw}
+            if not actual.is_file():
+                errors.append(f"{field}[{index}] is missing: {raw}")
+                observed["status"] = "MISSING"
+            else:
+                observed.update({
+                    "status": "PASS",
+                    "bytes": actual.stat().st_size,
+                    "sha256": sha256_file(actual),
+                })
+                if observed["bytes"] != ref.get("bytes"):
+                    errors.append(f"{field}[{index}] byte count mismatch for {raw}: expected {ref.get('bytes')}, observed {observed['bytes']}")
+                    observed["status"] = "FAIL"
+                if observed["sha256"] != ref.get("sha256"):
+                    errors.append(f"{field}[{index}] SHA-256 mismatch for {raw}")
+                    observed["status"] = "FAIL"
+            observations.append(observed)
+    return {
+        "schema": "bbk.handoff-verification.v1",
+        "status": "PASS" if not errors else "FAIL",
+        "valid": not errors,
+        "handoff": {
+            "path": _normalize_project_relative(root, str(path), label="handoff", require_exists=True),
+            "bytes": path.stat().st_size,
+            "sha256": sha256_file(path),
+            "id": value.get("id") if isinstance(value, dict) else None,
+            "work_unit_id": value.get("work_unit_id") if isinstance(value, dict) else None,
+            "disposition": value.get("disposition") if isinstance(value, dict) else None,
+            "smallest_next_action": value.get("smallest_next_action") if isinstance(value, dict) else None,
+        },
+        "references": observations,
+        "errors": errors,
+    }
+
+
+def cmd_handoff_create(args: argparse.Namespace) -> dict[str, Any]:
+    root = resolve_root(args.root, required=True)
+    assert root is not None
+    config = load_config(root)
+    work_unit = validate_id(args.work_unit, "work-unit id")
+    attempt = int(args.attempt)
+    handoff_id = validate_id(args.id or f"HO-{work_unit}-{attempt}", "handoff id")
+    output = Path(args.output).expanduser() if args.output else root / ".bbk" / "handoffs" / work_unit / f"{handoff_id}.json"
+    if not output.is_absolute():
+        output = root / output
+    output = output.resolve()
+    _normalize_project_relative(root, str(output), label="handoff output")
+    if output.exists() and not args.force:
+        raise BbkError(f"Refusing to overwrite existing handoff without --force: {output}")
+    artifacts = [_relative_file_reference(root, raw, kind="artifact") for raw in (args.artifact or [])]
+    evidence = [_relative_file_reference(root, raw, kind="evidence") for raw in (args.evidence or [])]
+    changed = [_normalize_project_relative(root, raw, label="changed path") for raw in (args.changed_path or [])]
+    checkpoint = None
+    if args.checkpoint:
+        checkpoint = _normalize_project_relative(root, args.checkpoint, label="checkpoint", require_exists=True)
+    zones: list[dict[str, Any]] = []
+    for raw in args.capability_zone or []:
+        if "=" not in raw:
+            raise BbkError("--capability-zone must use KIND=PATH")
+        kind, raw_path = raw.split("=", 1)
+        if kind not in {"disposable-candidate-root", "protected-worktree", "sealed-evidence"}:
+            raise BbkError(f"unrecognized capability-zone kind: {kind}")
+        zone_path = _normalize_project_relative(root, raw_path, label="capability zone")
+        zones.append({"kind": kind, "path": zone_path, "operations": []})
+    if args.interrupt_reason and not args.interrupt_evidence:
+        raise BbkError("--interrupt-reason requires at least one --interrupt-evidence")
+    if args.interrupt_evidence and not args.interrupt_reason:
+        raise BbkError("--interrupt-evidence requires --interrupt-reason")
+    partial_work_location = None
+    if args.partial_work_location:
+        partial_work_location = _normalize_project_relative(
+            root, args.partial_work_location, label="partial work location"
+        )
+    authority = None
+    if args.authority_source or args.authority_scope:
+        authority = {
+            "source": args.authority_source,
+            "scope": list(args.authority_scope or []),
+            "standing": not args.authority_not_standing,
+        }
+    interrupt = None
+    if args.interrupt_reason:
+        interrupt = {
+            "reason": args.interrupt_reason,
+            "evidence": list(args.interrupt_evidence or []),
+            "partial_work_location": partial_work_location,
+        }
+    value = {
+        "schema": "bbk.handoff.v1",
+        "bbk_version": VERSION,
+        "id": handoff_id,
+        "project_id": config.get("project_id"),
+        "work_unit_id": work_unit,
+        "attempt": attempt,
+        "producer": {
+            "role": args.role,
+            "invocation_id": args.invocation_id,
+            "thread_id": args.thread_id,
+        },
+        "subject": {
+            "kind": args.subject_kind,
+            "id": args.subject_id or work_unit,
+            "revision": args.subject_revision,
+        },
+        "authority": authority,
+        "capability_zones_used": zones,
+        "interrupt": interrupt,
+        "disposition": args.disposition,
+        "summary": args.summary,
+        "work_performed": list(args.work_performed or []),
+        "changed_paths": changed,
+        "commands": list(args.command_run or []),
+        "checks": list(args.check or []),
+        "findings": list(args.finding or []),
+        "discoveries": list(args.discovery or []),
+        "residual_uncertainty": list(args.residual or []),
+        "blockers": list(args.blocker or []),
+        "artifacts": artifacts,
+        "evidence": evidence,
+        "continuation": {
+            "state": args.continuation_state,
+            "checkpoint_path": checkpoint,
+            "resume_same_thread": not args.no_resume_same_thread,
+            "completed_step": args.completed_step,
+            "next_step": args.next_step,
+        },
+        "smallest_next_action": args.next_action,
+        "created_at": utc_now(),
+    }
+    errors = _handoff_shape_errors(value)
+    if errors:
+        raise BbkError("Invalid handoff: " + "; ".join(errors))
+    write_json(output, value)
+    result = verify_handoff(output, root=root)
+    result["created"] = True
+    return result
+
+
+def cmd_handoff_verify(args: argparse.Namespace) -> dict[str, Any]:
+    path = Path(args.path).expanduser().resolve()
+    root = resolve_root(args.root, required=False)
+    if root is None:
+        root = project_root(path.parent, required=True)
+    assert root is not None
+    return verify_handoff(path, root=root)
+
+
+def cmd_handoff_list(args: argparse.Namespace) -> dict[str, Any]:
+    root = resolve_root(args.root, required=True)
+    assert root is not None
+    base = root / ".bbk" / "handoffs"
+    items: list[dict[str, Any]] = []
+    if base.is_dir():
+        for path in sorted(base.rglob("*.json")):
+            try:
+                value = read_json(path)
+                if args.work_unit and value.get("work_unit_id") != args.work_unit:
+                    continue
+                verification = verify_handoff(path, root=root)
+                item = {
+                    **verification["handoff"],
+                    "attempt": value.get("attempt"),
+                    "created_at": value.get("created_at"),
+                    "producer_role": (value.get("producer") or {}).get("role"),
+                    "continuation": value.get("continuation"),
+                    "valid": verification["valid"],
+                    "errors": verification["errors"],
+                }
+            except (BbkError, OSError, json.JSONDecodeError) as exc:
+                item = {
+                    "path": _normalize_project_relative(root, str(path), label="handoff", require_exists=True),
+                    "valid": False,
+                    "errors": [str(exc)],
+                    "created_at": None,
+                    "attempt": None,
+                }
+            items.append(item)
+    items.sort(
+        key=lambda item: (
+            str(item.get("created_at") or ""),
+            int(item.get("attempt") or 0),
+            str(item.get("path") or ""),
+        ),
+        reverse=True,
+    )
+    latest = items[0] if items else None
+    if args.latest and latest is not None:
+        items = [latest]
+    return {
+        "schema": "bbk.handoff-list.v1",
+        "status": "PASS",
+        "root": str(root),
+        "work_unit_id": args.work_unit,
+        "count": len(items),
+        "latest": latest,
+        "handoffs": items,
+    }
+
+
+def _schema_tool_root(root: Path | None, explicit: str | None) -> Path:
+    if explicit:
+        return Path(explicit).expanduser().resolve()
+    if value := os.environ.get("BBK_TOOL_ROOT"):
+        return Path(value).expanduser().resolve() / "jsonschema-4.25.1"
+    if root is not None:
+        return root / ".bbk" / "tooling" / "jsonschema-4.25.1"
+    return Path.home() / ".cache" / "bbk" / "tooling" / "jsonschema-4.25.1"
+
+
+def _venv_python(root: Path) -> Path:
+    return root / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+
+
+def _jsonschema_runtime() -> tuple[Any | None, str | None]:
+    try:
+        import jsonschema  # type: ignore
+        try:
+            version = importlib_metadata.version("jsonschema")
+        except importlib_metadata.PackageNotFoundError:
+            version = None
+        return jsonschema, version
+    except ModuleNotFoundError:
+        return None, None
+
+
+def cmd_schema_status(args: argparse.Namespace) -> dict[str, Any]:
+    root = resolve_root(args.root, required=False)
+    package, version = _jsonschema_runtime()
+    tool_root = _schema_tool_root(root, args.tool_dir)
+    tool_python = _venv_python(tool_root)
+    return {
+        "schema": "bbk.schema-validator-status.v1",
+        "status": "PASS" if package is not None or tool_python.is_file() else "BLOCKED",
+        "draft": "2020-12",
+        "current_interpreter": {
+            "python": sys.executable,
+            "jsonschema_available": package is not None,
+            "jsonschema_version": version,
+        },
+        "managed_environment": {
+            "root": str(tool_root),
+            "python": str(tool_python),
+            "available": tool_python.is_file(),
+        },
+        "ensure_command": f'bbk schema validate --ensure --schema <schema.json> --instance <instance.json>',
+    }
+
+
+def _ensure_jsonschema_environment(tool_root: Path, wheelhouse: str | None) -> dict[str, Any]:
+    python = _venv_python(tool_root)
+    operations: list[dict[str, Any]] = []
+    if not python.is_file():
+        tool_root.parent.mkdir(parents=True, exist_ok=True)
+        result = run([sys.executable, "-m", "venv", str(tool_root)], Path.cwd(), timeout=300)
+        operations.append({"operation": "create-venv", **result})
+        if result["returncode"] != 0:
+            raise BbkError(f"Could not create schema-validator environment: {result['stderr'] or result['stdout']}")
+    argv = [str(python), "-m", "pip", "install", "--disable-pip-version-check", "jsonschema==4.25.1"]
+    if wheelhouse:
+        argv[4:4] = ["--no-index", "--find-links", str(Path(wheelhouse).expanduser().resolve())]
+    result = run(argv, Path.cwd(), timeout=600)
+    operations.append({"operation": "install-jsonschema", **result})
+    if result["returncode"] != 0:
+        raise BbkError(f"Could not install jsonschema 4.25.1: {result['stderr'] or result['stdout']}")
+    return {"python": str(python), "operations": operations}
+
+
+def cmd_schema_validate(args: argparse.Namespace) -> dict[str, Any]:
+    root = resolve_root(args.root, required=False)
+    package, version = _jsonschema_runtime()
+    tool_root = _schema_tool_root(root, args.tool_dir)
+    if package is None:
+        tool_python = _venv_python(tool_root)
+        if not tool_python.is_file() and args.ensure:
+            ensured = _ensure_jsonschema_environment(tool_root, args.wheelhouse)
+            tool_python = Path(ensured["python"])
+        if tool_python.is_file() and Path(sys.executable).resolve() != tool_python.resolve():
+            argv = [str(tool_python), str(Path(__file__).resolve()), "--json", "schema", "validate", "--schema", args.schema]
+            for instance in args.instance:
+                argv += ["--instance", instance]
+            if args.root:
+                argv += ["--root", args.root]
+            result = run(argv, Path.cwd(), timeout=args.timeout)
+            if result["returncode"] not in {0, 1}:
+                raise BbkError(f"Managed schema validator failed: {result['stderr'] or result['stdout']}")
+            try:
+                value = json.loads(result["stdout"])
+            except json.JSONDecodeError as exc:
+                raise BbkError(f"Managed schema validator returned invalid JSON: {result['stdout']}") from exc
+            value["managed_environment"] = str(tool_root)
+            return value
+        return {
+            "schema": "bbk.schema-validation.v1",
+            "status": "BLOCKED",
+            "valid": False,
+            "draft": "2020-12",
+            "error": "The Python jsonschema package is not available.",
+            "remediation": "Re-run with --ensure to create an isolated jsonschema 4.25.1 environment, or provide that package in the active interpreter.",
+            "managed_environment": str(tool_root),
+        }
+    schema_path = Path(args.schema).expanduser().resolve()
+    schema_value = read_json(schema_path)
+    try:
+        package.Draft202012Validator.check_schema(schema_value)
+    except Exception as exc:  # jsonschema exposes several validation exception types
+        return {
+            "schema": "bbk.schema-validation.v1",
+            "status": "FAIL",
+            "valid": False,
+            "draft": "2020-12",
+            "validator_version": version,
+            "schema_path": str(schema_path),
+            "schema_errors": [str(exc)],
+            "instances": [],
+        }
+    validator = package.Draft202012Validator(schema_value)
+    instances: list[dict[str, Any]] = []
+    valid = True
+    for raw in args.instance:
+        path = Path(raw).expanduser().resolve()
+        instance = read_json(path)
+        errors = sorted(validator.iter_errors(instance), key=lambda item: list(item.absolute_path))
+        rendered = []
+        for error in errors:
+            pointer = "/" + "/".join(str(part).replace("~", "~0").replace("/", "~1") for part in error.absolute_path) if error.absolute_path else ""
+            rendered.append({"pointer": pointer, "message": error.message, "validator": error.validator})
+        if rendered:
+            valid = False
+        instances.append({"path": str(path), "valid": not rendered, "errors": rendered})
+    return {
+        "schema": "bbk.schema-validation.v1",
+        "status": "PASS" if valid else "FAIL",
+        "valid": valid,
+        "draft": "2020-12",
+        "validator": "python-jsonschema",
+        "validator_version": version,
+        "schema_path": str(schema_path),
+        "schema_sha256": sha256_file(schema_path),
+        "instances": instances,
+    }
+
+
+def cmd_beads_handoff_plan(args: argparse.Namespace) -> dict[str, Any]:
+    path = Path(args.handoff).expanduser().resolve()
+    root = resolve_root(args.root, required=False)
+    if root is None:
+        root = project_root(path.parent, required=True)
+    assert root is not None
+    verification = verify_handoff(path, root=root)
+    if not verification["valid"]:
+        raise BbkError("Cannot project an invalid handoff into Beads: " + "; ".join(verification["errors"]))
+    item = read_json(path)
+    handoff = verification["handoff"]
+    note = "\n".join([
+        f"BBK handoff {item['work_unit_id']} attempt {item['attempt']}: {item['disposition']}",
+        f"handoff={handoff['path']}",
+        f"bytes={handoff['bytes']}",
+        f"sha256={handoff['sha256']}",
+        f"next={item['smallest_next_action']}",
+    ])
+    if len(note.encode("utf-8")) > 4096:
+        raise BbkError("Compact Beads handoff pointer exceeds 4096 UTF-8 bytes")
+    argv = ["bd", "comments", "add", args.bead, note]
+    value: dict[str, Any] = {
+        "schema": "bbk.beads-handoff-plan.v1",
+        "status": "PASS",
+        "dry_run": not bool(args.apply),
+        "bead_id": args.bead,
+        "handoff": handoff,
+        "note": note,
+        "argv": argv,
+        "warnings": [
+            "The Beads comment is an append-only coordination pointer; the verified BBK handoff file remains authoritative.",
+            "Do not paste large artifacts or evidence into the Beads comment.",
+            "A Beads update does not prove validation, acceptance, completion, or release.",
+        ],
+    }
+    if args.apply:
+        mapping_path = root / ".bbk" / "mappings" / "beads.json"
+        mapping = read_json(mapping_path)
+        if not mapping.get("enabled") or not mapping.get("write_enabled"):
+            raise BbkError(
+                "Beads handoff writes require .bbk/mappings/beads.json with enabled=true and write_enabled=true"
+            )
+        executable = shutil.which("bd")
+        if not executable:
+            raise BbkError("Cannot apply Beads handoff: bd is not available on PATH")
+        workspace_raw = mapping.get("workspace")
+        workspace = root
+        if isinstance(workspace_raw, str) and workspace_raw.strip():
+            candidate = Path(workspace_raw).expanduser()
+            workspace = (root / candidate).resolve() if not candidate.is_absolute() else candidate.resolve()
+        if not workspace.is_dir():
+            raise BbkError(f"Configured Beads workspace is not a directory: {workspace}")
+        executed = run([executable, "comments", "add", args.bead, note], workspace, timeout=args.timeout)
+        value["execution"] = {
+            "cwd": str(workspace),
+            "returncode": executed["returncode"],
+            "duration_seconds": executed["duration_seconds"],
+            "stdout_sha256": sha256_bytes(str(executed.get("stdout") or "").encode("utf-8")),
+            "stderr_sha256": sha256_bytes(str(executed.get("stderr") or "").encode("utf-8")),
+        }
+        if executed["returncode"] != 0:
+            value["status"] = "ERROR"
+            value["error"] = (executed.get("stderr") or executed.get("stdout") or "bd comments add failed").strip()
+        else:
+            value["applied"] = True
+    if args.output:
+        output = Path(args.output).expanduser().resolve()
+        write_json(output, value)
+        value["output"] = str(output)
+    return value
+
+
 def cmd_beads_plan(args: argparse.Namespace) -> dict[str, Any]:
     root = resolve_root(args.root, required=False)
     if args.work_unit:
@@ -2668,6 +3505,10 @@ def cmd_status(args: argparse.Namespace) -> dict[str, Any]:
             "executable_gates": True,
             "workspace_leases": True,
             "language_profiles": True,
+            "recursive_wayfinding": True,
+            "durable_question_branches": True,
+            "durable_handoffs": True,
+            "draft_2020_12_schema_adapter": True,
         },
     }
     if root is None:
@@ -2705,6 +3546,18 @@ def cmd_doctor(args: argparse.Namespace) -> dict[str, Any]:
     def add(name: str, status: str, detail: Any) -> None:
         checks.append({"name": name, "status": status, "detail": detail})
     add("python", "PASS" if sys.version_info >= (3, 10) else "FAIL", sys.version.split()[0])
+    jsonschema_package, jsonschema_version = _jsonschema_runtime()
+    managed_schema_python = _venv_python(_schema_tool_root(root, None))
+    schema_available = jsonschema_package is not None or managed_schema_python.is_file()
+    add(
+        "draft-2020-12-schema-validator",
+        "PASS" if schema_available else "BLOCKED",
+        {
+            "current_interpreter": jsonschema_version,
+            "managed_python": str(managed_schema_python) if managed_schema_python.is_file() else None,
+            "remediation": None if schema_available else "run bbk schema validate --ensure --schema <schema> --instance <instance>",
+        },
+    )
     for command, label in [("git", "git"), ("codex", "codex-runtime"), ("omp", "omp-runtime"), ("claude", "claude-code-runtime")]:
         found = shutil.which(command)
         add(label, "PASS" if found else ("BLOCKED" if command == "git" else "NOT_INSTALLED"), found or "not found")
@@ -2772,6 +3625,21 @@ def human(value: Any) -> str:
         return f"Profile resolution: {value.get('profile', {}).get('id')}\nSelected components: {len(selected)}\nCapability operations: {len(dispatch.get('operations', []))}\nEffective digest: {value.get('effective_sha256') or resolution.get('effective_sha256')}\nLock: {value.get('lock_path', 'not written')}"
     if value.get("schema") == "bbk.profile-dispatch-result.v1":
         return f"Profile dispatch: {value.get('operation')}\nStatus: {value.get('status')}\nRequest digest: {value.get('requestDigest')}"
+    if value.get("schema") == "bbk.question-branch-list.v1":
+        lines = [f"Question branches: {value.get('count', 0)}"]
+        lines += [
+            f"- {item.get('id')}: {item.get('status')} / {item.get('root_disposition')} — {item.get('root_decision')}"
+            for item in value.get("questions", [])
+        ]
+        return "\n".join(lines)
+    if value.get("schema") == "bbk.handoff-list.v1":
+        lines = [f"Handoffs: {value.get('count', 0)}"]
+        lines += [
+            f"- {item.get('work_unit_id')} attempt {item.get('attempt')}: {item.get('disposition')} "
+            f"[{('valid' if item.get('valid') else 'invalid')}] {item.get('path')} sha256={item.get('sha256')}"
+            for item in value.get("handoffs", [])
+        ]
+        return "\n".join(lines)
     if value.get("schema") == "bbk.doctor.v1":
         return "\n".join([f"BBK doctor: {value['status']}", *[f"[{item['status']}] {item['name']}: {item['detail']}" for item in value["checks"]]])
     return json.dumps(value, indent=2, ensure_ascii=False, sort_keys=True)
@@ -2876,8 +3744,68 @@ def parser() -> argparse.ArgumentParser:
     x = pr.add_parser("resolve"); x.add_argument("--root"); x.add_argument("--source"); x.add_argument("--id", required=True); x.add_argument("--version"); x.add_argument("--profile-dir", "--profile-root", dest="profile_dir", action="append"); x.add_argument("--work-unit"); x.add_argument("--task-profile"); x.add_argument("--assurance-tier", choices=["routine", "material", "consequential", "critical"]); x.add_argument("--role"); x.add_argument("--change-class", action="append"); x.add_argument("--hint", action="append"); x.add_argument("--path", action="append"); x.add_argument("--solution-outcome-fit", action="append"); x.add_argument("--structure-contract", action="append"); x.add_argument("--execution-slice", action="append"); x.add_argument("--state-decision-effect", action="append"); x.add_argument("--assurance-contract", action="append"); x.add_argument("--review-manifest", action="append"); x.add_argument("--evidence-input", action="append"); x.add_argument("--run-tools", action="store_true"); x.add_argument("--write-lock", action="store_true"); x.add_argument("--lock-path"); x.add_argument("--allow-unverified", action="store_true"); x.add_argument("--timeout", type=float, default=120.0); x.set_defaults(func=cmd_profile_resolve)
     x = pr.add_parser("dispatch"); x.add_argument("--operation", required=True, choices=sorted(PROFILE_CAPABILITY_OPERATION_SPEC)); x.add_argument("--root"); x.add_argument("--source"); x.add_argument("--id", required=True); x.add_argument("--version"); x.add_argument("--profile-dir", "--profile-root", dest="profile_dir", action="append"); x.add_argument("--role"); x.add_argument("--task-profile"); x.add_argument("--assurance-tier", choices=["routine", "material", "consequential", "critical"]); x.add_argument("--change-class", action="append"); x.add_argument("--hint", action="append"); x.add_argument("--path", action="append"); x.add_argument("--lens-id", action="append"); x.add_argument("--assignment-id", action="append"); x.add_argument("--state-decision-effect"); x.add_argument("--state-effect-inventory"); x.add_argument("--assurance-contract"); x.add_argument("--review-manifest"); x.add_argument("--review-context"); x.add_argument("--evidence-input"); x.add_argument("--run-tools", action="store_true"); x.add_argument("--allow-unverified", action="store_true"); x.add_argument("--timeout", type=float, default=120.0); x.add_argument("--output"); x.set_defaults(func=cmd_profile_dispatch)
 
+    question = sub.add_parser("question").add_subparsers(dest="question_command", required=True)
+    x = question.add_parser("validate"); x.add_argument("path"); x.set_defaults(func=cmd_question_validate)
+    x = question.add_parser("new"); x.add_argument("--root"); x.add_argument("--id", required=True); x.add_argument("--root-decision", required=True); x.add_argument("--owner-role", default="bbk_questioning_wayfinder"); x.add_argument("--parent-scope"); x.add_argument("--authority-mode", choices=["USER_DECIDES", "WAYFINDER_RECOMMENDS", "DELEGATED", "CONSTRAINT_DRIVEN"], default="WAYFINDER_RECOMMENDS"); x.add_argument("--authority-holder", default="user"); x.add_argument("--next-action", default="Prepare and present a decision-ready recommendation."); x.add_argument("--output"); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_question_new)
+    x = question.add_parser("list"); x.add_argument("--root"); x.add_argument("--status"); x.set_defaults(func=cmd_question_list)
+
+    handoff = sub.add_parser("handoff").add_subparsers(dest="handoff_command", required=True)
+    x = handoff.add_parser("create")
+    x.add_argument("--root")
+    x.add_argument("--id")
+    x.add_argument("--work-unit", required=True)
+    x.add_argument("--attempt", type=int, default=1)
+    x.add_argument("--role", default="bbk_worker")
+    x.add_argument("--invocation-id")
+    x.add_argument("--thread-id")
+    x.add_argument("--subject-kind", default="work-unit")
+    x.add_argument("--subject-id")
+    x.add_argument("--subject-revision")
+    x.add_argument("--authority-source")
+    x.add_argument("--authority-scope", action="append")
+    x.add_argument("--authority-not-standing", action="store_true")
+    x.add_argument("--capability-zone", action="append", metavar="KIND=PATH")
+    x.add_argument("--interrupt-reason", choices=[
+        "USER_CANCELLED", "CHILD_REQUESTED_STOP", "UNAUTHORIZED_EFFECT",
+        "OWNERSHIP_COLLISION", "CONFIRMED_HANG", "OBSOLETE_WORK",
+    ])
+    x.add_argument("--interrupt-evidence", action="append")
+    x.add_argument("--partial-work-location")
+    x.add_argument("--disposition", choices=[
+        "COMPLETE", "READY_FOR_VALIDATION", "PARTIAL", "BLOCKED", "PAUSED",
+        "BLOCKED_TECHNICAL", "BLOCKED_AUTHORITY", "BLOCKED_DECISION",
+        "PAUSED_CAPACITY", "PAUSED_HOST_WINDOW", "CANCELLED", "INCONCLUSIVE",
+    ], required=True)
+    x.add_argument("--summary", required=True)
+    x.add_argument("--work-performed", action="append")
+    x.add_argument("--changed-path", action="append")
+    x.add_argument("--command-run", action="append")
+    x.add_argument("--check", action="append")
+    x.add_argument("--finding", action="append")
+    x.add_argument("--discovery", action="append")
+    x.add_argument("--residual", action="append")
+    x.add_argument("--blocker", action="append")
+    x.add_argument("--artifact", action="append")
+    x.add_argument("--evidence", action="append")
+    x.add_argument("--continuation-state", choices=["NOT_REQUIRED", "READY", "WAITING", "BLOCKED"], default="NOT_REQUIRED")
+    x.add_argument("--checkpoint")
+    x.add_argument("--no-resume-same-thread", action="store_true")
+    x.add_argument("--completed-step")
+    x.add_argument("--next-step")
+    x.add_argument("--next-action", required=True)
+    x.add_argument("--output")
+    x.add_argument("--force", action="store_true")
+    x.set_defaults(func=cmd_handoff_create)
+    x = handoff.add_parser("verify"); x.add_argument("path"); x.add_argument("--root"); x.set_defaults(func=cmd_handoff_verify)
+    x = handoff.add_parser("list"); x.add_argument("--root"); x.add_argument("--work-unit"); x.add_argument("--latest", action="store_true"); x.set_defaults(func=cmd_handoff_list)
+
+    schema = sub.add_parser("schema").add_subparsers(dest="schema_command", required=True)
+    x = schema.add_parser("status"); x.add_argument("--root"); x.add_argument("--tool-dir"); x.set_defaults(func=cmd_schema_status)
+    x = schema.add_parser("validate"); x.add_argument("--schema", required=True); x.add_argument("--instance", action="append", required=True); x.add_argument("--root"); x.add_argument("--ensure", action="store_true"); x.add_argument("--tool-dir"); x.add_argument("--wheelhouse"); x.add_argument("--timeout", type=float, default=900.0); x.set_defaults(func=cmd_schema_validate)
+
     b = sub.add_parser("beads").add_subparsers(dest="beads_command", required=True)
     x = b.add_parser("plan"); x.add_argument("--root"); x.add_argument("--work-unit"); x.add_argument("--output"); x.set_defaults(func=cmd_beads_plan)
+    x = b.add_parser("handoff-plan"); x.add_argument("--root"); x.add_argument("--handoff", required=True); x.add_argument("--bead", required=True); x.add_argument("--output"); x.add_argument("--apply", action="store_true"); x.add_argument("--timeout", type=float, default=60.0); x.set_defaults(func=cmd_beads_handoff_plan)
 
     package = sub.add_parser("package").add_subparsers(dest="package_command", required=True)
     x = package.add_parser("verify"); x.add_argument("package_root", nargs="?", default=str(PACKAGE_ROOT)); x.set_defaults(func=cmd_package_verify)

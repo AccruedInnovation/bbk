@@ -1,9 +1,9 @@
-    ---
-    name: bbk-review-plan
-    description: Compile the smallest sufficient ReviewManifest from an exact AssuranceContract, subject, risk, profiles, environment capabilities, and review purpose.
-    ---
+---
+name: bbk-review-plan
+description: Compile the smallest sufficient ReviewManifest from an exact AssuranceContract, subject, risk, profiles, environment capabilities, and review purpose.
+---
 
-    # BBK Review Plan
+# BBK Review Plan
 
 The `AssuranceContract` says what must be proven. The `ReviewManifest` says how this review will cover it.
 

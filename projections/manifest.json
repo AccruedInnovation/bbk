@@ -1,7 +1,22 @@
 {
   "agents": {
     "bbk_architect": {
+      "autoload_skills": [
+        "bbk-plan",
+        "bbk-context-routing",
+        "bbk-handoff"
+      ],
+      "constitution_modules": [
+        "core",
+        "planning"
+      ],
+      "delegation": {},
       "description": "Compose territory syntheses into a responsibility and interface architecture with deep modules, explicit failure semantics, and credible evolution paths.",
+      "escalations": [
+        "Return user-reserved trade-offs, stale or conflicting source decisions, and approval needs to the responsible Wayfinder.",
+        "Return factual or empirical gaps as requests for bounded research or prototyping through the parent; do not silently assume them.",
+        "Do not contact the user directly, implement the proposal, or represent it as accepted."
+      ],
       "family": "specialist",
       "files": {
         "claude": "bbk-architect.md",
@@ -25,8 +40,11 @@
           "thinkingLevel": "high"
         }
       },
+      "scope": [
+        "Own a versioned architecture proposal bound to accepted outcomes, constraints, decisions, and source revisions.",
+        "Does not approve the proposal, implement it, or silently settle reserved trade-offs."
+      ],
       "skills": [
-        "bbk",
         "bbk-plan",
         "bbk-solution-outcome-fit",
         "bbk-implementation-structure",
@@ -36,12 +54,33 @@
         "bbk-review-plan",
         "bbk-review-intent",
         "bbk-context-routing",
-        "bbk-procedure-design"
+        "bbk-procedure-design",
+        "bbk-handoff"
       ],
-      "spawns": []
+      "spawns": [],
+      "user_interaction": []
     },
     "bbk_phase_wayfinder": {
+      "autoload_skills": [
+        "bbk-plan",
+        "bbk-context-routing"
+      ],
+      "constitution_modules": [
+        "core",
+        "planning",
+        "coordination"
+      ],
+      "delegation": {
+        "bbk_reviewer": "an independent phase-plan review can retire a material execution or assurance risk",
+        "bbk_verification_designer": "phase exit claims or integration obligations need explicit assertions and evidence methods",
+        "bbk_worker_designer": "a phase work unit needs an exact worker invocation, profile, tool, authority, and handoff contract"
+      },
       "description": "Own one phase and decompose it into bounded work, integration obligations, validation, and handoffs.",
+      "escalations": [
+        "Return newly exposed governing decisions or cross-phase/shared-interface conflicts to the responsible Planning, Territory, or Root Wayfinder as `BLOCKED_DECISION`.",
+        "Return missing authority, ownership, tool, containment, or evidence feasibility to the parent with the corresponding blocker and affected work units.",
+        "Return the completed phase plan to the parent; do not contact the user or launch execution."
+      ],
       "family": "planning",
       "files": {
         "claude": "bbk-phase-wayfinder.md",
@@ -65,8 +104,11 @@
           "thinkingLevel": "high"
         }
       },
+      "scope": [
+        "Own the decomposition, ownership, integration, checks, and handoffs for one accepted phase outcome.",
+        "Does not redefine the phase purpose, shared interfaces, governing authority, or acceptance policy."
+      ],
       "skills": [
-        "bbk",
         "bbk-plan",
         "bbk-execution-slicing",
         "bbk-profile-routing",
@@ -74,16 +116,38 @@
         "bbk-state-decision-effect-design",
         "bbk-review-plan",
         "bbk-procedure-design",
-        "bbk-context-routing"
+        "bbk-context-routing",
+        "bbk-wayfind"
       ],
       "spawns": [
         "bbk_verification_designer",
         "bbk_worker_designer",
         "bbk_reviewer"
-      ]
+      ],
+      "user_interaction": []
     },
     "bbk_planning_wayfinder": {
+      "autoload_skills": [
+        "bbk-plan",
+        "bbk-context-routing"
+      ],
+      "constitution_modules": [
+        "core",
+        "planning",
+        "coordination"
+      ],
+      "delegation": {
+        "bbk_phase_wayfinder": "one coherent capability increment needs detailed phase-level ownership, ordering, integration, and handoffs",
+        "bbk_reviewer": "an independent bounded review can expose planning gaps before authorization",
+        "bbk_verification_designer": "the work graph contains material claims whose assertions or evidence methods are not yet explicit",
+        "bbk_worker_designer": "a work-unit class needs a concrete least-privilege worker invocation and continuation contract"
+      },
       "description": "Convert an approved design direction into capability increments, phases, work units, dependencies, and assurance contracts.",
+      "escalations": [
+        "Return missing outcome, interface, architecture, authority, risk-acceptance, or verification decisions to the responsible Root or Territory Wayfinder as `BLOCKED_DECISION`.",
+        "Return insufficient authority or unsafe effect assumptions as `BLOCKED_AUTHORITY`, and stale or contradictory accepted inputs as an exact resynthesis request.",
+        "Return the executable work graph to the invoking Wayfinder; do not contact the user or authorize execution."
+      ],
       "family": "planning",
       "files": {
         "claude": "bbk-planning-wayfinder.md",
@@ -107,8 +171,11 @@
           "thinkingLevel": "high"
         }
       },
+      "scope": [
+        "Own the executable work graph derived from accepted outcome, architecture, interface, authority, and assurance decisions.",
+        "May elaborate accepted decisions into phases and work units; does not invent missing decisions or authorize execution."
+      ],
       "skills": [
-        "bbk",
         "bbk-plan",
         "bbk-solution-outcome-fit",
         "bbk-implementation-structure",
@@ -119,17 +186,35 @@
         "bbk-review-plan",
         "bbk-review-intent",
         "bbk-procedure-design",
-        "bbk-context-routing"
+        "bbk-context-routing",
+        "bbk-wayfind"
       ],
       "spawns": [
         "bbk_phase_wayfinder",
         "bbk_verification_designer",
         "bbk_worker_designer",
         "bbk_reviewer"
-      ]
+      ],
+      "user_interaction": []
     },
     "bbk_prototyper": {
+      "autoload_skills": [
+        "bbk-execute",
+        "bbk-context-routing",
+        "bbk-handoff"
+      ],
+      "constitution_modules": [
+        "core",
+        "execution",
+        "assurance"
+      ],
+      "delegation": {},
       "description": "Create a bounded, disposable prototype or experiment to test one uncertainty and report observations.",
+      "escalations": [
+        "Return production-data, external-effect, credential, budget, scope, architecture, or promotion decisions to the invoking parent before crossing the prototype boundary.",
+        "Return falsification, discrimination, cleanup failure, or unexpected system effects with exact evidence and the smallest decision or repair request.",
+        "Do not contact the user directly; use `BLOCKED_AUTHORITY`, `BLOCKED_DECISION`, or `BLOCKED_TECHNICAL` as applicable."
+      ],
       "family": "specialist",
       "files": {
         "claude": "bbk-prototyper.md",
@@ -153,8 +238,11 @@
           "thinkingLevel": "high"
         }
       },
+      "scope": [
+        "Own one bounded prototype hypothesis and its disposable or explicitly protected experiment scope.",
+        "Does not own production promotion, general implementation, irreversible external effects, or acceptance."
+      ],
       "skills": [
-        "bbk",
         "bbk-execute",
         "bbk-evidence",
         "bbk-recover",
@@ -164,12 +252,28 @@
         "bbk-installed-profiles",
         "bbk-state-decision-effect-design",
         "bbk-review-context",
-        "bbk-context-routing"
+        "bbk-context-routing",
+        "bbk-handoff"
       ],
-      "spawns": []
+      "spawns": [],
+      "user_interaction": []
     },
     "bbk_question_guide": {
-      "description": "Resolve one declared material decision through a focused one-question-at-a-time conversation with a recommendation, explicit disposition, and ADR-compatible return packet.",
+      "autoload_skills": [
+        "bbk-grill",
+        "bbk-context-routing"
+      ],
+      "constitution_modules": [
+        "core",
+        "planning"
+      ],
+      "delegation": {},
+      "description": "Conduct the deeper collaborative Grill for one rejected, contested, materially ambiguous, or explicitly escalated root decision and return an ADR-compatible result.",
+      "escalations": [
+        "Ask the user directly only when this invocation is the active user-facing Grill, one material question at a time, with the current recommendation, alternatives, consequences, and uncertainty.",
+        "Return discoverable factual gaps to `bbk_questioning_wayfinder` for research rather than consuming user attention.",
+        "Return sibling decisions, implementation consequences, authority changes, and unresolved branch state to `bbk_questioning_wayfinder`; do not expand the Grill."
+      ],
       "family": "planning",
       "files": {
         "claude": "bbk-question-guide.md",
@@ -193,18 +297,43 @@
           "thinkingLevel": "high"
         }
       },
+      "scope": [
+        "Own one escalated root-decision conversation until it is resolved or receives an explicit non-resolution disposition.",
+        "Does not own sibling decisions, discoverable factual research, implementation, or approval beyond the user's explicit decision."
+      ],
       "skills": [
-        "bbk",
         "bbk-plan",
         "bbk-solution-outcome-fit",
         "bbk-state-decision-effect-design",
         "bbk-procedure-design",
-        "bbk-context-routing"
+        "bbk-context-routing",
+        "bbk-grill"
       ],
-      "spawns": []
+      "spawns": [],
+      "user_interaction": [
+        "one material question at a time within the active root decision, after discoverable facts have been retired and with a concrete recommendation attached"
+      ]
     },
     "bbk_questioning_wayfinder": {
-      "description": "Own a bounded cluster of human-decision branches, prepare exact context for each Question Guide, and return durable decision packets without consuming the parent territory context.",
+      "autoload_skills": [
+        "bbk-wayfind",
+        "bbk-context-routing"
+      ],
+      "constitution_modules": [
+        "core",
+        "planning",
+        "coordination"
+      ],
+      "delegation": {
+        "bbk_question_guide": "the recommendation is rejected, contested, materially ambiguous, assumption-conflicted, or explicitly opened for deeper exploration",
+        "bbk_researcher": "discoverable facts are needed before presenting or revising the recommendation"
+      },
+      "description": "Own a bounded cluster of human decisions, investigate discoverable facts, prepare decision-ready recommendations, and create a focused Question Guide only when deeper exploration is necessary.",
+      "escalations": [
+        "Return each recommendation, revised recommendation, accepted decision packet, or explicit non-resolution disposition to the user-facing parent; do not contact the user directly.",
+        "Return decisions outside the bounded cluster and any outcome, scope, interface, or authority change to the parent Wayfinder.",
+        "When a deep branch is needed, keep this logical role as branch owner, invoke one `bbk_question_guide`, and reconcile its return before closing or resuming the branch."
+      ],
       "family": "planning",
       "files": {
         "claude": "bbk-questioning-wayfinder.md",
@@ -228,20 +357,39 @@
           "thinkingLevel": "high"
         }
       },
+      "scope": [
+        "Own one bounded cluster of human decisions across recommendation, response, optional deep branch, and final decision packet.",
+        "Does not execute consequences, approve its own recommendation, or contact the user directly; the user-facing parent relays responses and resumes this logical role."
+      ],
       "skills": [
-        "bbk",
         "bbk-plan",
         "bbk-solution-outcome-fit",
         "bbk-procedure-design",
-        "bbk-context-routing"
+        "bbk-context-routing",
+        "bbk-wayfind"
       ],
       "spawns": [
         "bbk_question_guide",
         "bbk_researcher"
-      ]
+      ],
+      "user_interaction": []
     },
     "bbk_researcher": {
+      "autoload_skills": [
+        "bbk-context-routing",
+        "bbk-handoff"
+      ],
+      "constitution_modules": [
+        "core",
+        "assurance"
+      ],
+      "delegation": {},
       "description": "Investigate a precise factual question using local evidence or current primary sources and return attributed findings.",
+      "escalations": [
+        "Return source-access, private-context, legal-use, credential, or scope authority needs to the invoking parent; do not ask the user directly.",
+        "Return any governing choice or broadened research question to the parent instead of deciding it.",
+        "When evidence is absent, contradictory, inaccessible, stale, or insufficient, return `INCONCLUSIVE` or `BLOCKED_TECHNICAL` with the exact gap rather than a fabricated conclusion."
+      ],
       "family": "specialist",
       "files": {
         "claude": "bbk-researcher.md",
@@ -265,15 +413,35 @@
           "thinkingLevel": "high"
         }
       },
-      "skills": [
-        "bbk",
-        "bbk-review-context",
-        "bbk-context-routing"
+      "scope": [
+        "Own one exact factual question, source boundary, freshness horizon, and evidence return.",
+        "Does not own product, architecture, authority, acceptance, or implementation decisions."
       ],
-      "spawns": []
+      "skills": [
+        "bbk-review-context",
+        "bbk-context-routing",
+        "bbk-handoff"
+      ],
+      "spawns": [],
+      "user_interaction": []
     },
     "bbk_reviewer": {
+      "autoload_skills": [
+        "bbk-review",
+        "bbk-review-context",
+        "bbk-handoff"
+      ],
+      "constitution_modules": [
+        "core",
+        "assurance"
+      ],
+      "delegation": {},
       "description": "Review a plan, architecture, work graph, evidence package, or outcome claim against an exact charter without mutating the subject.",
+      "escalations": [
+        "Return findings, coverage gaps, stale or wrong-subject evidence, and the smallest responsible disposition to the invoking parent.",
+        "Request a new charter through the parent when material concerns fall outside the assigned assertions; do not broaden silently.",
+        "Return unavailable tools as `BLOCKED_TECHNICAL`, missing authority as `BLOCKED_AUTHORITY`, and unresolved governing choices as `BLOCKED_DECISION`; do not contact the user directly."
+      ],
       "family": "review",
       "files": {
         "claude": "bbk-reviewer.md",
@@ -297,8 +465,11 @@
           "thinkingLevel": "high"
         }
       },
+      "scope": [
+        "Own one exact review charter, subject, context, assertion set, and independence reason.",
+        "Does not edit the subject, broaden the charter silently, waive findings, or create approval."
+      ],
       "skills": [
-        "bbk",
         "bbk-review",
         "bbk-evidence",
         "bbk-solution-outcome-fit",
@@ -312,12 +483,34 @@
         "bbk-review-run",
         "bbk-review-findings",
         "bbk-review-intent",
-        "bbk-context-routing"
+        "bbk-context-routing",
+        "bbk-handoff"
       ],
-      "spawns": []
+      "spawns": [],
+      "user_interaction": []
     },
     "bbk_root_orchestrator": {
+      "autoload_skills": [
+        "bbk-execute",
+        "bbk-context-routing",
+        "bbk-handoff"
+      ],
+      "constitution_modules": [
+        "core",
+        "coordination",
+        "execution",
+        "assurance"
+      ],
+      "delegation": {
+        "bbk_reviewer": "a global, cross-territory, recovery, intent-conformance, or completion claim needs an independent bounded review",
+        "bbk_territory_orchestrator": "an admitted territory has satisfied its entry contract and can execute within a bounded dependency and authority envelope"
+      },
       "description": "Coordinate execution of an approved BBK operating baseline across territories, dependencies, integration points, evidence, and user-facing status.",
+      "escalations": [
+        "Stop affected execution and return material outcome, fit, architecture, shared-interface, scope, or baseline changes to the responsible Wayfinder through the user-facing parent.",
+        "Return new or broadened authority needs as `BLOCKED_AUTHORITY` and governing choices as `BLOCKED_DECISION`; do not ask the user directly.",
+        "Return outcome-level completion, residual findings, blocked work, pauses, and exact evidence to the user-facing parent; only that parent communicates final status or decisions to the user."
+      ],
       "family": "execution",
       "files": {
         "claude": "bbk-root-orchestrator.md",
@@ -341,8 +534,11 @@
           "thinkingLevel": "high"
         }
       },
+      "scope": [
+        "Own global coordination, dependency state, integration, evidence readiness, and completion reporting for one accepted operating baseline.",
+        "Does not perform leaf implementation, change the governing plan, or create acceptance from child prose."
+      ],
       "skills": [
-        "bbk",
         "bbk-execute",
         "bbk-recover",
         "bbk-evidence",
@@ -353,15 +549,44 @@
         "bbk-review-findings",
         "bbk-review-intent",
         "bbk-context-routing",
-        "bbk-procedure-design"
+        "bbk-procedure-design",
+        "bbk-handoff"
       ],
       "spawns": [
         "bbk_territory_orchestrator",
         "bbk_reviewer"
-      ]
+      ],
+      "user_interaction": []
     },
     "bbk_root_wayfinder": {
-      "description": "Own the whole BBK planning conversation, establish the operational outcome, map territories, route material decisions through bounded questioning, and synthesize an executable operating baseline.",
+      "autoload_skills": [
+        "bbk-wayfind",
+        "bbk-context-routing"
+      ],
+      "constitution_modules": [
+        "core",
+        "planning",
+        "coordination"
+      ],
+      "delegation": {
+        "bbk_architect": "system responsibilities, interfaces, failure, recovery, migration, or consequential trade-offs need a versioned proposal",
+        "bbk_planning_wayfinder": "accepted design direction is ready to become a phased executable work graph",
+        "bbk_prototyper": "an interaction, performance, integration, or migration uncertainty is cheaper to test than debate",
+        "bbk_questioning_wayfinder": "a material human decision needs factual retirement, a recommendation, and controlled response handling",
+        "bbk_researcher": "discoverable factual uncertainty materially affects planning or a decision",
+        "bbk_reviewer": "an independent bounded review can retire a planning, architecture, assurance, or readiness risk",
+        "bbk_root_orchestrator": "the operating baseline is accepted, sufficiently specified, authorized, and ready for execution",
+        "bbk_synthesizer": "multiple authoritative returns need reconciliation without losing dissent, provenance, or uncertainty",
+        "bbk_territory_wayfinder": "a coherent responsibility area needs bounded mapping, decision work, interfaces, and synthesis",
+        "bbk_verification_designer": "material claims need explicit assertions, evidence methods, stages, and independence rationale",
+        "bbk_worker_designer": "accepted work needs a least-privilege worker invocation, profile, tool, continuation, and handoff contract"
+      },
+      "description": "Own the whole BBK planning conversation, establish the operational destination and decision posture, recursively map and reduce uncertainty, and synthesize an executable operating baseline.",
+      "escalations": [
+        "Route ordinary material choices through `bbk_questioning_wayfinder`; ask the user directly only when this invocation is user-facing and a material outcome preference, authority grant, private context, protected-floor exception, hard-to-reverse commitment, or baseline acceptance cannot be responsibly inferred.",
+        "Return unresolved cross-territory conflicts, stale governing decisions, or insufficient planning evidence to the user-facing parent as an exact decision or blocker packet rather than synthesizing around them.",
+        "Invoke `bbk_root_orchestrator` only after the baseline is accepted and authorized; if execution reveals a material baseline defect, reopen Wayfinding."
+      ],
       "family": "planning",
       "files": {
         "claude": "bbk-root-wayfinder.md",
@@ -385,8 +610,11 @@
           "thinkingLevel": "high"
         }
       },
+      "scope": [
+        "Own the complete planning state from uncertain intent through an accepted, executable operating baseline.",
+        "May create or update planning and coordination records; does not own production effects, candidate acceptance, or release authority."
+      ],
       "skills": [
-        "bbk",
         "bbk-plan",
         "bbk-solution-outcome-fit",
         "bbk-implementation-structure",
@@ -397,7 +625,8 @@
         "bbk-review-plan",
         "bbk-review-intent",
         "bbk-procedure-design",
-        "bbk-context-routing"
+        "bbk-context-routing",
+        "bbk-wayfind"
       ],
       "spawns": [
         "bbk_territory_wayfinder",
@@ -409,11 +638,32 @@
         "bbk_verification_designer",
         "bbk_worker_designer",
         "bbk_reviewer",
-        "bbk_root_orchestrator"
+        "bbk_root_orchestrator",
+        "bbk_planning_wayfinder"
+      ],
+      "user_interaction": [
+        "initial outcome, boundary, posture, and authority facts that are not discoverable or responsibly inferable",
+        "material outcome preferences, protected-floor exceptions, hard-to-reverse commitments, or explicit acceptance of the proposed operating baseline",
+        "private context or accountable authority that only the user can supply"
       ]
     },
     "bbk_synthesizer": {
+      "autoload_skills": [
+        "bbk-context-routing",
+        "bbk-handoff"
+      ],
+      "constitution_modules": [
+        "core",
+        "planning",
+        "assurance"
+      ],
+      "delegation": {},
       "description": "Compile current decisions, evidence, interfaces, work, findings, and uncertainty into a coherent bounded synthesis without inventing new commitments.",
+      "escalations": [
+        "Return missing, stale, unauthorized, contradictory, or wrong-subject inputs to the invoking parent as `INCONCLUSIVE` or a cannot-synthesize-yet result.",
+        "Return any new governing decision, cross-boundary ownership conflict, or unresolved dissent to the responsible Wayfinder.",
+        "Do not contact the user directly or turn a summary into acceptance."
+      ],
       "family": "specialist",
       "files": {
         "claude": "bbk-synthesizer.md",
@@ -437,8 +687,11 @@
           "thinkingLevel": "high"
         }
       },
+      "scope": [
+        "Own reconciliation and compression of one exact declared source set.",
+        "Does not create decisions, evidence, consensus, authority, or completion absent from those sources."
+      ],
       "skills": [
-        "bbk",
         "bbk-solution-outcome-fit",
         "bbk-implementation-structure",
         "bbk-execution-slicing",
@@ -447,12 +700,35 @@
         "bbk-state-decision-effect-design",
         "bbk-review-context",
         "bbk-review-intent",
-        "bbk-context-routing"
+        "bbk-context-routing",
+        "bbk-handoff"
       ],
-      "spawns": []
+      "spawns": [],
+      "user_interaction": []
     },
     "bbk_territory_orchestrator": {
+      "autoload_skills": [
+        "bbk-execute",
+        "bbk-context-routing",
+        "bbk-handoff"
+      ],
+      "constitution_modules": [
+        "core",
+        "coordination",
+        "execution",
+        "assurance"
+      ],
+      "delegation": {
+        "bbk_reviewer": "a territory, integration, recovery, or readiness question needs an independent bounded review outside validator repair authority",
+        "bbk_validator_orchestrator": "an exact frozen candidate is eligible for its required assertion-scoped acceptance run",
+        "bbk_worker_orchestrator": "one candidate-producing cohort has admitted work units, non-overlapping ownership, tools, authority, and entry conditions"
+      },
       "description": "Coordinate one execution boundary, its worker cohorts, local dependencies, candidates, validators, repairs, and escalation.",
+      "escalations": [
+        "Return cross-territory, shared-interface, scope, standing-authority, or repeated-repair problems to `bbk_root_orchestrator` with preserved candidate and attempt state.",
+        "Return governing design or outcome decisions through the Root Orchestrator to the responsible Wayfinder; do not ask the user directly.",
+        "Return territory completion, candidate readiness, blockers, pauses, and residuals to the Root Orchestrator."
+      ],
       "family": "execution",
       "files": {
         "claude": "bbk-territory-orchestrator.md",
@@ -476,8 +752,11 @@
           "thinkingLevel": "high"
         }
       },
+      "scope": [
+        "Own execution, candidate flow, validation routing, and local recovery for one bounded territory.",
+        "Does not absorb cross-territory work, mutate candidates directly, or act as an independent validator."
+      ],
       "skills": [
-        "bbk",
         "bbk-execute",
         "bbk-recover",
         "bbk-evidence",
@@ -487,16 +766,44 @@
         "bbk-review-run",
         "bbk-review-findings",
         "bbk-context-routing",
-        "bbk-procedure-design"
+        "bbk-procedure-design",
+        "bbk-handoff"
       ],
       "spawns": [
         "bbk_worker_orchestrator",
         "bbk_validator_orchestrator",
         "bbk_reviewer"
-      ]
+      ],
+      "user_interaction": []
     },
     "bbk_territory_wayfinder": {
-      "description": "Own one coherent territory, its boundary, questions, interfaces, child work, stopping assessment, and synthesis.",
+      "autoload_skills": [
+        "bbk-wayfind",
+        "bbk-context-routing"
+      ],
+      "constitution_modules": [
+        "core",
+        "planning",
+        "coordination"
+      ],
+      "delegation": {
+        "bbk_architect": "territory responsibilities, interfaces, failure, recovery, or trade-offs need a proposal",
+        "bbk_planning_wayfinder": "accepted territory design is ready for executable phase and work-unit decomposition",
+        "bbk_prototyper": "a territory uncertainty is cheaper and safer to discriminate with a bounded experiment",
+        "bbk_questioning_wayfinder": "a territory decision needs a recommendation and controlled user-response path",
+        "bbk_researcher": "a bounded factual uncertainty blocks or changes the territory decision frontier",
+        "bbk_reviewer": "an independent bounded review can retire a territory-specific risk",
+        "bbk_synthesizer": "territory returns or evidence need reconciliation before synthesis",
+        "bbk_territory_wayfinder": "a child responsibility has a real ownership, specialization, containment, or safe-parallelism boundary",
+        "bbk_verification_designer": "territory claims need explicit proof obligations and evidence design",
+        "bbk_worker_designer": "accepted territory work needs a bounded worker invocation contract"
+      },
+      "description": "Own one coherent territory, recursively map its boundary, interfaces, frontier, blockers, fog, decisions, child work, stopping assessment, and synthesis.",
+      "escalations": [
+        "Return outcome, scope, shared-interface, cross-territory ownership, or standing-authority conflicts to `bbk_root_wayfinder`.",
+        "Route material human decisions through `bbk_questioning_wayfinder` and the user-facing parent; never question the user directly.",
+        "Return stale source context, unresolved blockers, or negative information-value stopping results to the parent with the smallest valid next action."
+      ],
       "family": "planning",
       "files": {
         "claude": "bbk-territory-wayfinder.md",
@@ -520,8 +827,11 @@
           "thinkingLevel": "high"
         }
       },
+      "scope": [
+        "Own the planning state, interfaces, frontier, blockers, fog, and synthesis for one bounded territory.",
+        "Does not own the parent outcome, cross-territory interface decisions, production effects, or direct material user questioning."
+      ],
       "skills": [
-        "bbk",
         "bbk-plan",
         "bbk-solution-outcome-fit",
         "bbk-implementation-structure",
@@ -531,7 +841,8 @@
         "bbk-review-plan",
         "bbk-review-intent",
         "bbk-procedure-design",
-        "bbk-context-routing"
+        "bbk-context-routing",
+        "bbk-wayfind"
       ],
       "spawns": [
         "bbk_territory_wayfinder",
@@ -542,11 +853,28 @@
         "bbk_architect",
         "bbk_verification_designer",
         "bbk_worker_designer",
-        "bbk_reviewer"
-      ]
+        "bbk_reviewer",
+        "bbk_planning_wayfinder"
+      ],
+      "user_interaction": []
     },
     "bbk_validator": {
+      "autoload_skills": [
+        "bbk-review",
+        "bbk-context-routing",
+        "bbk-handoff"
+      ],
+      "constitution_modules": [
+        "core",
+        "assurance"
+      ],
+      "delegation": {},
       "description": "Evaluate exact named assertions against one exact candidate and return immutable findings without repairing the subject.",
+      "escalations": [
+        "Return candidate-identity mismatch, charter ambiguity, unavailable tools, missing authority, or unresolved governing choices to `bbk_validator_orchestrator`; do not ask the user directly.",
+        "Return every assertion result, evidence reference, finding, coverage gap, and smallest disposition to the Validator Orchestrator.",
+        "Request a new charter through the parent when an important issue is outside scope; do not repair, waive, or broaden the current attempt."
+      ],
       "family": "review",
       "files": {
         "claude": "bbk-validator.md",
@@ -570,8 +898,11 @@
           "thinkingLevel": "high"
         }
       },
+      "scope": [
+        "Own only the named assertions against one exact candidate and review context.",
+        "Has no child-agent authority and does not repair the candidate, change the charter, waive findings, or decide acceptance outside the assigned assertions."
+      ],
       "skills": [
-        "bbk",
         "bbk-review",
         "bbk-evidence",
         "bbk-solution-outcome-fit",
@@ -583,12 +914,33 @@
         "bbk-review-run",
         "bbk-review-findings",
         "bbk-review-intent",
-        "bbk-context-routing"
+        "bbk-context-routing",
+        "bbk-handoff"
       ],
-      "spawns": []
+      "spawns": [],
+      "user_interaction": []
     },
     "bbk_validator_orchestrator": {
+      "autoload_skills": [
+        "bbk-review",
+        "bbk-context-routing",
+        "bbk-handoff"
+      ],
+      "constitution_modules": [
+        "core",
+        "coordination",
+        "assurance"
+      ],
+      "delegation": {
+        "bbk_reviewer": "a qualitative, cross-cutting, or independently reasoned charter is required in addition to exact validator assertions",
+        "bbk_validator": "one non-overlapping assertion charter needs exact candidate-bound evaluation and immutable evidence"
+      },
       "description": "Compile non-overlapping assertion charters, launch eligible validators against one exact candidate, and aggregate immutable findings.",
+      "escalations": [
+        "Return candidate defects and exact repair scope to `bbk_territory_orchestrator`; repair remains with the worker path.",
+        "Return design, assertion-authority, waiver, or governing-decision questions through the parent to the responsible Wayfinder; do not ask the user directly.",
+        "Return the non-averaged assurance disposition, findings, pauses, infrastructure blockers, and revalidation scope to the Territory Orchestrator."
+      ],
       "family": "execution",
       "files": {
         "claude": "bbk-validator-orchestrator.md",
@@ -612,8 +964,11 @@
           "thinkingLevel": "high"
         }
       },
+      "scope": [
+        "Own one candidate-bound assurance run, assertion partition, attempt lineage, evidence aggregation, and finding routing.",
+        "Does not mutate or repair the candidate, average findings, change assertions to pass, or create approval."
+      ],
       "skills": [
-        "bbk",
         "bbk-review",
         "bbk-evidence",
         "bbk-solution-outcome-fit",
@@ -626,15 +981,33 @@
         "bbk-review-run",
         "bbk-review-findings",
         "bbk-review-intent",
-        "bbk-context-routing"
+        "bbk-context-routing",
+        "bbk-handoff"
       ],
       "spawns": [
         "bbk_validator",
         "bbk_reviewer"
-      ]
+      ],
+      "user_interaction": []
     },
     "bbk_verification_designer": {
+      "autoload_skills": [
+        "bbk-review-plan",
+        "bbk-context-routing",
+        "bbk-handoff"
+      ],
+      "constitution_modules": [
+        "core",
+        "planning",
+        "assurance"
+      ],
+      "delegation": {},
       "description": "Design proportional, assertion-scoped verification and evidence before final work decomposition or candidate validation.",
+      "escalations": [
+        "Return ambiguous claims, acceptance authority, duplicated ownership, or outcome-evidence gaps to the invoking Wayfinder or planning parent.",
+        "Return unavailable required tools, environments, profiles, or evidence adapters as `BLOCKED_TECHNICAL` with an exact remediation or alternative method.",
+        "Do not contact the user directly or waive an assertion to make the plan executable."
+      ],
       "family": "specialist",
       "files": {
         "claude": "bbk-verification-designer.md",
@@ -658,8 +1031,11 @@
           "thinkingLevel": "high"
         }
       },
+      "scope": [
+        "Own the assertion, method, evidence, applicability, environment, and gate design for material claims.",
+        "Does not execute acceptance, waive evidence, repair the subject, or turn reviewer language into objective criteria."
+      ],
       "skills": [
-        "bbk",
         "bbk-plan",
         "bbk-evidence",
         "bbk-solution-outcome-fit",
@@ -672,12 +1048,28 @@
         "bbk-profile-routing",
         "bbk-installed-profiles",
         "bbk-context-routing",
-        "bbk-procedure-design"
+        "bbk-procedure-design",
+        "bbk-handoff"
       ],
-      "spawns": []
+      "spawns": [],
+      "user_interaction": []
     },
     "bbk_worker": {
+      "autoload_skills": [
+        "bbk-execute",
+        "bbk-handoff"
+      ],
+      "constitution_modules": [
+        "core",
+        "execution"
+      ],
+      "delegation": {},
       "description": "Perform one bounded implementation, integration, test, documentation, packaging, investigation, or other task using an invocation-supplied profile.",
+      "escalations": [
+        "Stop and return outcome, scope, shared-interface, authority, external-effect, protected-floor, ownership, or recovery-semantics changes to `bbk_worker_orchestrator`; do not ask the user directly.",
+        "Record adjacent or newly discovered work in the structured handoff instead of implementing it without a new work unit.",
+        "Return tool or implementation failure as `BLOCKED_TECHNICAL`, missing permission as `BLOCKED_AUTHORITY`, unresolved governing choice as `BLOCKED_DECISION`, and valid interruption checkpoints as a pause."
+      ],
       "family": "execution",
       "files": {
         "claude": "bbk-worker.md",
@@ -701,8 +1093,11 @@
           "thinkingLevel": "high"
         }
       },
+      "scope": [
+        "Own one exact work unit and only its assigned mutation scope, capability zones, checks, and handoff.",
+        "Has no child-agent authority and does not own integration, publication, independent validation, acceptance, or adjacent work."
+      ],
       "skills": [
-        "bbk",
         "bbk-execute",
         "bbk-evidence",
         "bbk-implementation-structure",
@@ -710,12 +1105,30 @@
         "bbk-profile-routing",
         "bbk-installed-profiles",
         "bbk-state-decision-effect-design",
-        "bbk-context-routing"
+        "bbk-context-routing",
+        "bbk-handoff"
       ],
-      "spawns": []
+      "spawns": [],
+      "user_interaction": []
     },
     "bbk_worker_designer": {
+      "autoload_skills": [
+        "bbk-procedure-design",
+        "bbk-context-routing",
+        "bbk-handoff"
+      ],
+      "constitution_modules": [
+        "core",
+        "planning",
+        "execution"
+      ],
+      "delegation": {},
       "description": "Select or compose the smallest worker, task-kind profile, language profile, tools, workspace, authority, and handoff needed for a work unit.",
+      "escalations": [
+        "Return missing work-unit scope, authority, capability zones, tool environment, payload limits, assurance, or handoff requirements to the planning parent before compiling the invocation.",
+        "Return any need for a new permanent role, broader effects, cross-territory integration authority, or independent validation ownership to the responsible Wayfinder.",
+        "Do not contact the user directly or encode an authority grant that was not accepted upstream."
+      ],
       "family": "specialist",
       "files": {
         "claude": "bbk-worker-designer.md",
@@ -739,8 +1152,11 @@
           "thinkingLevel": "high"
         }
       },
+      "scope": [
+        "Own compilation of one least-privilege worker invocation contract from accepted plans and work units.",
+        "Does not grant authority, perform the work, validate the result, or create a permanent role for each language/task combination."
+      ],
       "skills": [
-        "bbk",
         "bbk-plan",
         "bbk-implementation-structure",
         "bbk-execution-slicing",
@@ -750,12 +1166,33 @@
         "bbk-review-plan",
         "bbk-review-context",
         "bbk-context-routing",
-        "bbk-procedure-design"
+        "bbk-procedure-design",
+        "bbk-handoff"
       ],
-      "spawns": []
+      "spawns": [],
+      "user_interaction": []
     },
     "bbk_worker_orchestrator": {
+      "autoload_skills": [
+        "bbk-execute",
+        "bbk-context-routing",
+        "bbk-handoff"
+      ],
+      "constitution_modules": [
+        "core",
+        "coordination",
+        "execution",
+        "assurance"
+      ],
+      "delegation": {
+        "bbk_worker": "one bounded work unit has exact subject, workspace, ownership, profiles, tools, authority, checks, continuation policy, and handoff"
+      },
       "description": "Own one coherent worker cohort from entry checks through draft implementation, late freeze, deterministic gates, and handoff to validation.",
+      "escalations": [
+        "Return material baseline, interface, scope, authority, ownership, or governing-decision changes to `bbk_territory_orchestrator` before allowing affected mutation to continue.",
+        "Return repeated non-progress, unavailable required tools, unsafe containment, or invalid handoffs with the exact blocker classification and preserved work.",
+        "Return one exact frozen candidate or a continuation-ready cohort state to the Territory Orchestrator; do not contact the user or launch acceptance independently."
+      ],
       "family": "execution",
       "files": {
         "claude": "bbk-worker-orchestrator.md",
@@ -779,8 +1216,11 @@
           "thinkingLevel": "high"
         }
       },
+      "scope": [
+        "Own one worker cohort, its workspaces, candidate lifecycle, pre-freeze checks, retries, and exact handoffs.",
+        "Does not perform leaf implementation, own independent validation, waive findings, or grow scope for convenience."
+      ],
       "skills": [
-        "bbk",
         "bbk-execute",
         "bbk-recover",
         "bbk-evidence",
@@ -791,95 +1231,97 @@
         "bbk-review-run",
         "bbk-review-findings",
         "bbk-context-routing",
-        "bbk-procedure-design"
+        "bbk-procedure-design",
+        "bbk-handoff"
       ],
       "spawns": [
         "bbk_worker"
-      ]
+      ],
+      "user_interaction": []
     }
   },
   "files": {
-    "projections/claude/agents/bbk-architect.md": "8bc25c5e3a1b12ca366973bb362af85c386384a95983ffe5fcb4b97fbbd8594a",
-    "projections/claude/agents/bbk-phase-wayfinder.md": "c8a5a986df8ebb9823a99f4d1ee16dc250f6bdf0485efc9ed7f9cfe7e4caff14",
-    "projections/claude/agents/bbk-planning-wayfinder.md": "c06019074ee8415ab07877b4f4a8d32f5fcaac7553e6d83b509cc5a163ab7461",
-    "projections/claude/agents/bbk-prototyper.md": "fbfbd0f53cf49f75a750c51fd4c39f6dc18d121fc13144e5fbbcbcc16b4614c7",
-    "projections/claude/agents/bbk-question-guide.md": "8c333ee5056ca269cdf0b04a3fd1e38ef7114df1c71ca0d293b00a685bc2ee64",
-    "projections/claude/agents/bbk-questioning-wayfinder.md": "1831e343c29a587ab9486c72883cfec0dda1aa608b524e59eab5f86106b91308",
-    "projections/claude/agents/bbk-researcher.md": "2bffd716d8250c72a4748d32badd72c02131d186e9f1cafb5cabe17186b04008",
-    "projections/claude/agents/bbk-reviewer.md": "ae5d48aa610e01a9740c182ad66e3a644c8d47798e228fcca6ae4b3d6275b16f",
-    "projections/claude/agents/bbk-root-orchestrator.md": "93011657b6a1bc5c31e777709eb4ef1fa5d758b2d65a67347fbead953d19c736",
-    "projections/claude/agents/bbk-root-wayfinder.md": "b9cd3f95aaef589940bc831a0327adc457e924e5d47b7e4cfb246552ec04b845",
-    "projections/claude/agents/bbk-synthesizer.md": "180aac3f7182583c3b2487dd392d32da11d5ee8bca0a5cabd188d699387cb3b0",
-    "projections/claude/agents/bbk-territory-orchestrator.md": "1ad30ac11417c3330f88c9b58a3d2b0d0f057cd16dfbedec75c0eaef5c25ae7f",
-    "projections/claude/agents/bbk-territory-wayfinder.md": "9097eb693c8fae5f7c07c80d6e5c0630584d8ace75c44953bfdd3b26c7dbef88",
-    "projections/claude/agents/bbk-validator-orchestrator.md": "41061ff78850a602c75231fe1c986858bbaa739bd5d9965f63737d215b4d8ac7",
-    "projections/claude/agents/bbk-validator.md": "81a74429898f9bac0d3aa1edb2f231f3cc47145ccde48f2302aec6620dd0a12c",
-    "projections/claude/agents/bbk-verification-designer.md": "f5b07f2fad989a56d4402d218f5c041dc2dcb7319d64c89432cfe69c61d5c417",
-    "projections/claude/agents/bbk-worker-designer.md": "1690dca1c0cf227fe4d0590e3bd9728eb954ff244df899b388b43c8ca8d962e8",
-    "projections/claude/agents/bbk-worker-orchestrator.md": "c98f31b1caca22da36d4bae5fb8d1cc200066b9ed9153f44d7919cad196a7ed0",
-    "projections/claude/agents/bbk-worker.md": "f5e7a7232cde321b7fd03217fd9204a746a4b9a720f7849f9af0f5e10b1b7e90",
-    "projections/codex/agents/bbk_architect.toml": "05f4e0a7d663563335d7dee82ee8bc9895391945beb155b4ad42163afa6eb230",
-    "projections/codex/agents/bbk_phase_wayfinder.toml": "49c5e8e4f0bfc8b81a06d2505dec250e52b2a0a3fdfda258ef4b7c7898ac9f8e",
-    "projections/codex/agents/bbk_planning_wayfinder.toml": "2b29704cfa8d860642f6a95699a64d764c93eaf7a71dd47886955685a6d0f200",
-    "projections/codex/agents/bbk_prototyper.toml": "bacf6744e633a9b4615c1ee5ac88577db1f633b93bcee83c74d18004aaa0235f",
-    "projections/codex/agents/bbk_question_guide.toml": "5b2ec9eca3c6e9c163ebec673930812a69364a54e1335cf24bc6ebb12d97eaf5",
-    "projections/codex/agents/bbk_questioning_wayfinder.toml": "dde30122bad3507eee83aa735797ae7e8907fdc17fb92e217ad2e2bc41f4ef7d",
-    "projections/codex/agents/bbk_researcher.toml": "75105b908d52631c08515e8a3ece233c90e570fa72e873b592d297cb7577b9d1",
-    "projections/codex/agents/bbk_reviewer.toml": "f151f547bd0053794764f0ab210d46b01b3e487ba9d50c336cd4bd7a3b0f389e",
-    "projections/codex/agents/bbk_root_orchestrator.toml": "2ddaff303a4cea4d001fe0c8d3f9b13f617d7b80fcc9f77b52ef28edda84454f",
-    "projections/codex/agents/bbk_root_wayfinder.toml": "a8fc357dd89e2a5f26e33a169f7e9462919f14a27b0fefedbae0b26552ef8fc3",
-    "projections/codex/agents/bbk_synthesizer.toml": "4934876f06c47d634b7d081412f58318ee8005d78204ff19c0694647b820158e",
-    "projections/codex/agents/bbk_territory_orchestrator.toml": "ea972d04671001a681876ce55f1bcc918993b24e826fbe91a3d4bf500a01ef2b",
-    "projections/codex/agents/bbk_territory_wayfinder.toml": "d05878e5d8093d45ddf95e63eb9923b946229c45769f4fce7f6c19253819811c",
-    "projections/codex/agents/bbk_validator.toml": "9a9ab49c6903e0145292f872db9f39d511e2c5ffb7080d25b063205f4f41556a",
-    "projections/codex/agents/bbk_validator_orchestrator.toml": "516b2253cec8a45f60766491a17a69204edc6ce5444b0315636a36b43e4e0985",
-    "projections/codex/agents/bbk_verification_designer.toml": "40c72406fc4f9d0bf28201f9c4927d1e46c55e0a23066c1a703ef941d148d5b5",
-    "projections/codex/agents/bbk_worker.toml": "d46d2c9099eb845958fb6022181cfa09abab8287aa7e6de25436d4547b12e6d5",
-    "projections/codex/agents/bbk_worker_designer.toml": "976d1a6406668b0658175889ad9ef0935dafc9b4d768da4a81e2f97ba51c611a",
-    "projections/codex/agents/bbk_worker_orchestrator.toml": "fe154264f4b6e494f420ccd7d99cfa6d83f1bbbb8c8d5661449c45ed2d3e675a",
-    "projections/generic/agents/bbk_architect.md": "f69121056891fdc71ea2bbb36e99f085f4d5163eb00d1a152476931b3dbbfebe",
-    "projections/generic/agents/bbk_phase_wayfinder.md": "279f958a70c3b224aa9090d9d028c7efa6bd38e5ca64dfe280c321311f878749",
-    "projections/generic/agents/bbk_planning_wayfinder.md": "732cc60e7ae0a3226d83dbd26d91bd324bd5a7e848e7ac5014a3183cb1b190c0",
-    "projections/generic/agents/bbk_prototyper.md": "be13d9eb032b7413eb6c919dc6a299db1c9a06931d15e2147ac62a775376cc96",
-    "projections/generic/agents/bbk_question_guide.md": "2c336933ccfa1f52d5d8a2fa597ee39c0f575698cf9e7f4f05511a73a81bdd5e",
-    "projections/generic/agents/bbk_questioning_wayfinder.md": "adc6190a3507ad022b7dfe9accb9b7774fb5648a8a0decf0f8de07f859f7f842",
-    "projections/generic/agents/bbk_researcher.md": "bde8057de1361192a2cae085859b4fc26100ab2d07c7bad5d637b69f56461240",
-    "projections/generic/agents/bbk_reviewer.md": "f3c19fac8ed5af6efa6e9e43ee8ee93711461e4092e05e1a3242a354f8641f28",
-    "projections/generic/agents/bbk_root_orchestrator.md": "a61ed8196be8f13b12db0dbddf09bb195d3c0d2572aa87a6c3395347eef4edd3",
-    "projections/generic/agents/bbk_root_wayfinder.md": "07c042f1d243fc6efddad9a59b1829997618374c2e0f96d4ed8398b6ec68d973",
-    "projections/generic/agents/bbk_synthesizer.md": "06a6251c0c12aa4c076fc42ac214c888c438f522525044bfe4bca9def0a401c3",
-    "projections/generic/agents/bbk_territory_orchestrator.md": "c525e77006f4fea953c87fbb70fbc98e5c2c166a07161f32a3f0a0739c7fe794",
-    "projections/generic/agents/bbk_territory_wayfinder.md": "15d45b240ff333b26eef0b15af0cc2157a949f0105783ebaf4d3d4669c0a6b03",
-    "projections/generic/agents/bbk_validator.md": "000760f62060f0ce2ad879d6ac4f24409f76305f7178cf5b82021db407b66d76",
-    "projections/generic/agents/bbk_validator_orchestrator.md": "6a337afd3f79d9f7f3f04fe0f5fe611dd38bf4cf3e271b5f6cabd6660dfb74ab",
-    "projections/generic/agents/bbk_verification_designer.md": "62f8541f38061c3133164cb1a781bd5b0596495b3975ced9365d18d151a53ee3",
-    "projections/generic/agents/bbk_worker.md": "c3a777ed1d965e222c3b23c4736a765eb40afd02ccc84dc54f280b404a19ffd5",
-    "projections/generic/agents/bbk_worker_designer.md": "06ea5b9953381f4c41c579133690004b67af3dd5d76d14cd42f864b67fc75b79",
-    "projections/generic/agents/bbk_worker_orchestrator.md": "994c6333a59cd1399273908379f89dfc71aa401144bc2a7f8280114cb2da6e92",
-    "projections/omp/agents/bbk_architect.md": "18d76b198a1fc32d7c925fc8b8592d18748890ffbe4b5bf3e783b9be2c4e62b7",
-    "projections/omp/agents/bbk_phase_wayfinder.md": "484f551277ad8b86408bae6d5af81979d34667b122d00351c7a01a25929c8141",
-    "projections/omp/agents/bbk_planning_wayfinder.md": "89d7b806e29dfb2b130b67a369187187cb0426c9cca70b4a9bf727c161c8dfca",
-    "projections/omp/agents/bbk_prototyper.md": "6e26751e0e40e0f55208e1995c139705fef274b78b3ee0f798537e655892be5a",
-    "projections/omp/agents/bbk_question_guide.md": "e780449df8357b2ae6dda364a733f85f62975c051e6b6e820ca456bd99ad4ac4",
-    "projections/omp/agents/bbk_questioning_wayfinder.md": "f70c71d0b29d90034df8b66c0ff775f932e760e2295211b2dd6b901cb7454b92",
-    "projections/omp/agents/bbk_researcher.md": "1fcde353a8bd27895757cec8eb4e60796384ae71ff9532eb366c928865beb201",
-    "projections/omp/agents/bbk_reviewer.md": "3e27b3665facd90b56457c246b9476403ae8137806a1ea5917a62fdcbe81aaae",
-    "projections/omp/agents/bbk_root_orchestrator.md": "59801e5e57d91e1f8088e25cc6a745a6866b7315b24801d81cbb098b2befd6ec",
-    "projections/omp/agents/bbk_root_wayfinder.md": "dcf7ee40bed2cf0b250e63d4186a60f1e09f4d44815c4af5b5b36c0af77375ec",
-    "projections/omp/agents/bbk_synthesizer.md": "434607852a32fb51fa58a9abf5a785169960f463df1fd363d4b7a5845bb069c4",
-    "projections/omp/agents/bbk_territory_orchestrator.md": "b0b2bf286e5432647286ca359708bd6dd150e12a68aea88082d6ca659206bcfe",
-    "projections/omp/agents/bbk_territory_wayfinder.md": "b6df5fcd32cf9c072ec50d16d9b0d6a2fa9ac90a87df25a5cbbcc6d90245590e",
-    "projections/omp/agents/bbk_validator.md": "b054e9926d9f75695ec5d5e5022ccd641f12ce7f0e3f8b1336c837255b9eb908",
-    "projections/omp/agents/bbk_validator_orchestrator.md": "898e88abf9117d41c9b40275c2d6a3ae78068acc7d87a2002fc91f2bafe22d43",
-    "projections/omp/agents/bbk_verification_designer.md": "fa090d8d38c099fab576f9971bfe332b29e4dce53777ae0bcb745a7311aab23c",
-    "projections/omp/agents/bbk_worker.md": "adb06fe9d5b77a6dd4fb0a9489730672a7836cb090d7f10c1bda7e130ca70b38",
-    "projections/omp/agents/bbk_worker_designer.md": "da589e729a2253c9fbc78a9d5af0c45708632831242b33f11dc451e27b5ffa1d",
-    "projections/omp/agents/bbk_worker_orchestrator.md": "d279efa4ab44f15a4cf0140a262993ec18f3d35d5b24c07d56d10ec4e2321df7"
+    "projections/claude/agents/bbk-architect.md": "64eb1de6a898dfeb76cc4b8fbeced221c091895600053e8479982c9ca9d6c93f",
+    "projections/claude/agents/bbk-phase-wayfinder.md": "853cd28e4d600c333bf69fe6680802283c3ab84646355ce5daa874729c4f4075",
+    "projections/claude/agents/bbk-planning-wayfinder.md": "e1e7496157892f7936f8a00cd4863d7c59627dc0f378a200356a0a02eb18fae3",
+    "projections/claude/agents/bbk-prototyper.md": "82a5a2f4b673043df0d4ae6e09d8e149675e35e5f3c5ff05a8974e0dea393a47",
+    "projections/claude/agents/bbk-question-guide.md": "7feed1a519e74bb0a04d99560532eb65339ea38a06534d7933db157d4c0c999b",
+    "projections/claude/agents/bbk-questioning-wayfinder.md": "5ec218839aea659605a58ce1d0d5b815e9bb201d4ae92176af781a2de7699c95",
+    "projections/claude/agents/bbk-researcher.md": "7c4b3ab22078848c9b47268e0d57c555ca01c73c04efc7284389dd9e045d7300",
+    "projections/claude/agents/bbk-reviewer.md": "e4bb4a18610fb8c7b66495abd9be45153cd0656056f28e7f0efbbed66d6447b6",
+    "projections/claude/agents/bbk-root-orchestrator.md": "b2f2751c57dd4a1d2618a9d95ae8340bf5e35a61fc068b5d7a8bd2170280507d",
+    "projections/claude/agents/bbk-root-wayfinder.md": "06cec221b9a4acb0d350747fd2ab558d10da807ac3707b3bfaf39b3d8c08b4e9",
+    "projections/claude/agents/bbk-synthesizer.md": "ec4440c18c5bb326149ac1478945e44898cac9fe264950c3658b12e66ca80272",
+    "projections/claude/agents/bbk-territory-orchestrator.md": "eb0ad581d5879e43fb937b8c28c3f0a957948d83e0b9b7320e1d209f3adeafaa",
+    "projections/claude/agents/bbk-territory-wayfinder.md": "26d4944f6a8b53344abf172e1d50c8c079580cef5b9986e26440b53471cd8c5b",
+    "projections/claude/agents/bbk-validator-orchestrator.md": "6d7203ae6adaf05f21a2add623917c5562164c0cd9dc4e6fa354629885281d37",
+    "projections/claude/agents/bbk-validator.md": "70655a64439a90b9730d4677248b2a2d061e4f6ac3e7d585e5b679b1c6926cf0",
+    "projections/claude/agents/bbk-verification-designer.md": "4ff538e33f0d5ae901302cdfff0de7789ccbe5cce64cac0c26b06e20cfda6bce",
+    "projections/claude/agents/bbk-worker-designer.md": "9233ef0310148a6e79f99f50c71a54a012ba49e09bee1bf963d042d4f15ee4dc",
+    "projections/claude/agents/bbk-worker-orchestrator.md": "3586b0fb3e9be55735027458db6b82f6412e70b167ffa1b326434dd93f6c9961",
+    "projections/claude/agents/bbk-worker.md": "9abd06297c358ed8f3dda476053f2cad3a5e89c79441914624e8c24d0e9bbb53",
+    "projections/codex/agents/bbk_architect.toml": "428379e28c1858505373a4f15f0735131682fb0d95aa7587e418207fbf167bf6",
+    "projections/codex/agents/bbk_phase_wayfinder.toml": "59712bd9aa0cd73a610726a464145e7d6600ad2b87d788e95523317766f6363e",
+    "projections/codex/agents/bbk_planning_wayfinder.toml": "719db2959b039b8ec283eea2207fedfec808a644eafda3ceac5a247b9f961810",
+    "projections/codex/agents/bbk_prototyper.toml": "60ce00d6b7dc15bc6fb300b7428134e9094203fd39a866c3aede75b9bc8b7320",
+    "projections/codex/agents/bbk_question_guide.toml": "b252fd7766bf63dfbeced3fe05c5720900ff82eb6d9916123958f825943f55cc",
+    "projections/codex/agents/bbk_questioning_wayfinder.toml": "b6967f95f40546f4e54f2bbcd88d13fc1f5edc6a12f170e6845733498c7698aa",
+    "projections/codex/agents/bbk_researcher.toml": "75c3fa284183f5f4d478764f5280c8670093d9f7a165b5d5d54f707bbd068ad4",
+    "projections/codex/agents/bbk_reviewer.toml": "d23e4293bca2bf5c982fe3b6003eddfdbcfe316b97e9b644b613414cc9c996ba",
+    "projections/codex/agents/bbk_root_orchestrator.toml": "7d818d02c8fdd84b934820c6781891dcc4fde135d373a92a61025a6f91fac82c",
+    "projections/codex/agents/bbk_root_wayfinder.toml": "1106943eb6b2bdb669bc51b0ed47416cf05533265540fed0e6c8696334dafab7",
+    "projections/codex/agents/bbk_synthesizer.toml": "cdc051386c71f710990c1173e03dfe521da3dde34838fa46d4d126242a3b7420",
+    "projections/codex/agents/bbk_territory_orchestrator.toml": "ce4ec47f43ad68557c2e0c99fa2cdc48e56f65e00d33599d97a67869ec593c42",
+    "projections/codex/agents/bbk_territory_wayfinder.toml": "2041b8142d9bf90a018763f7f4b4d2ead82f075429f99048f8b94bcbff399065",
+    "projections/codex/agents/bbk_validator.toml": "b94ec8894a1e49e70a85ff0502161bba80a35ab360dde180d753201624186212",
+    "projections/codex/agents/bbk_validator_orchestrator.toml": "bfb94b74a53e2e724902b786badaa89aeda9d7a482ff38bd1820bbe26d6b53f4",
+    "projections/codex/agents/bbk_verification_designer.toml": "8906a4cd91bcd159c22743bee9bcfdcb0ecc7425a9976c8c99bf25006769a48b",
+    "projections/codex/agents/bbk_worker.toml": "e0f5ef16008b4b32d8b221e600a96308cf43ebbd4b6708ac842c132fdb840e35",
+    "projections/codex/agents/bbk_worker_designer.toml": "24d10869c5260a0751c9e6282fa71795c747214cded6445b190897422995660e",
+    "projections/codex/agents/bbk_worker_orchestrator.toml": "78749311858aee93e447a78d09effaa40dd6bec6da7492852c097389a74894cb",
+    "projections/generic/agents/bbk_architect.md": "9a7f991d0c54ec30f22cff79bed631643d3c16d84e94c09ca3f4c5de029f8791",
+    "projections/generic/agents/bbk_phase_wayfinder.md": "b7d9298ba844fd920fe23d0a5f54c71c3d7e2f2fd7ba8f8323a9d861fe221000",
+    "projections/generic/agents/bbk_planning_wayfinder.md": "fd37b5045fa38e6cd21eaa81d7992df51edc5baa8b68e1247ff1fdede1bee724",
+    "projections/generic/agents/bbk_prototyper.md": "c1902d40d6449ab2bc39584936c2d292fb3405fb66c6607f7ec03bee7c34dd4d",
+    "projections/generic/agents/bbk_question_guide.md": "2475d3aa2422db2611eeed373004fb062dbe090d32b2a8ff468f312831600fd2",
+    "projections/generic/agents/bbk_questioning_wayfinder.md": "023b1edeb86f7f453221a027a0cd6049bfa9d5a3395c000d6de326c219bc803d",
+    "projections/generic/agents/bbk_researcher.md": "6df88580bdf5bb90076a6618f963729cc50ffe2a2845a4bf07ceb2a4fc3e6dcb",
+    "projections/generic/agents/bbk_reviewer.md": "88a4f6f967bb7691b122bdfa524d09ae3e697f85901f4704277cc677bbb9bded",
+    "projections/generic/agents/bbk_root_orchestrator.md": "37f610cd62f2ee4da366081b4efc1ab46fd248caa41df9561655433fc5d87729",
+    "projections/generic/agents/bbk_root_wayfinder.md": "ee08dd59ca5320276399206da19ed88176efea84859a0425f180b11ae98f553c",
+    "projections/generic/agents/bbk_synthesizer.md": "e22b0ee36cded4552f5c923e25d27b4d2e4e21e4e50379a4e6b3662490005813",
+    "projections/generic/agents/bbk_territory_orchestrator.md": "b6c2bfde41fc33d0df81061b178ae5bd2e5a57b4ff33cea2d6b0aec8779e447f",
+    "projections/generic/agents/bbk_territory_wayfinder.md": "6d7a6ddf9c9e92d8e3a4f87206fc03f22228ec1a0db86deb5bf36487ca57f030",
+    "projections/generic/agents/bbk_validator.md": "e3c289c3f8ee0989b0eb33967dd12d5ec03012f914619cca9b0749d57138bc06",
+    "projections/generic/agents/bbk_validator_orchestrator.md": "081768f3b5306e8f54e8cfed772cb32458a377d5f7de955b626821faf2257453",
+    "projections/generic/agents/bbk_verification_designer.md": "c7532d9c5a2f388a035816463e4263c1e4cb1a938c685ae23a393b7c4cf3fe6f",
+    "projections/generic/agents/bbk_worker.md": "bc3394c70f879c299545143fd9adc4b98533b4fcf467d0e0003d3c0c58a2b645",
+    "projections/generic/agents/bbk_worker_designer.md": "fb33351146e7178dbfa9e9f0bd13c8659964d5216f5cd627a8d0af46b1c27e31",
+    "projections/generic/agents/bbk_worker_orchestrator.md": "a196c7888b84e986c747d8e30838b2cf965b37058c6c020b208ff0415054adcd",
+    "projections/omp/agents/bbk_architect.md": "703e5389334e90f75d4ab38843223692565d1de98f255dcc309ce38f57480d6c",
+    "projections/omp/agents/bbk_phase_wayfinder.md": "b86da5fcc18359a36efb161dbe37f0ae8a18edbb1eb7f30289fef47a03112536",
+    "projections/omp/agents/bbk_planning_wayfinder.md": "4970d7307900aa98b678b73a6aaea4e80e2b7c7ffd4eb9b9166e51e83715d9c1",
+    "projections/omp/agents/bbk_prototyper.md": "2283501ad979773c8890af6b841479ea4342e97a00316dec603bb9fb0f579942",
+    "projections/omp/agents/bbk_question_guide.md": "614ed37267066cdf1e09e921a1b64b814cba2182227a818627231ee1f3c4f301",
+    "projections/omp/agents/bbk_questioning_wayfinder.md": "3907738c2a844c6273d98c9a3443126d67fe9a5e40141f0219aaf8b3fc9a8de2",
+    "projections/omp/agents/bbk_researcher.md": "9715230f2e1983cdcdcfe8752956c9c093c0705dfe96f6116680065e692712e7",
+    "projections/omp/agents/bbk_reviewer.md": "75959d87221c93adc464603b4d8738d2ecdab5f004557275f8fcadd0b0717a8d",
+    "projections/omp/agents/bbk_root_orchestrator.md": "d616790543cecba1f989078828ea81a9ae5381f21ce37dedf70f98145b273e84",
+    "projections/omp/agents/bbk_root_wayfinder.md": "82d95d0eebbd3bc0b7c271951962650c84cf15dc294136af89e15aea6a359dac",
+    "projections/omp/agents/bbk_synthesizer.md": "8b73dcd32c2ea14406e66c7a4438d7673b5a0a99e613bef82d72f0250e795c9a",
+    "projections/omp/agents/bbk_territory_orchestrator.md": "23c7053c5946e804936f5db239738252fc0185e58e04b3aa88240c2757c23018",
+    "projections/omp/agents/bbk_territory_wayfinder.md": "6da34629beaa0d0a8e4ce102c9648fcd569eda7229020f72f936bf9fb0ad9b21",
+    "projections/omp/agents/bbk_validator.md": "f46b6e4c5050cb635c761c012ccecf4ff0fe7841dc9ab839974e832a12533596",
+    "projections/omp/agents/bbk_validator_orchestrator.md": "077dfa5f4645b8e2c9ee5dcfba71176fb404e172bf609b4d7ae3b8ada6681dec",
+    "projections/omp/agents/bbk_verification_designer.md": "de0090724bc049f561cfda5ba26a1c3e31fdb1e88ea145da7682393cf12ca3a6",
+    "projections/omp/agents/bbk_worker.md": "ca48e8547815e1057ff2a4b058acbdeedf4e80ea001c6d02bf15e42747983402",
+    "projections/omp/agents/bbk_worker_designer.md": "d4e76630998b50b43b00e22ab879643ec098cfb79e0395c8024115f0ad3fb603",
+    "projections/omp/agents/bbk_worker_orchestrator.md": "5f8474a36b5b3bd28ed53fcb512e1dc8fb5c677598f04745cda66e2fedfbd761"
   },
   "model_profile_count": 3,
   "model_routing_source": "spec/model-routing.json",
-  "model_routing_source_sha256": "e00a66078eaf94788aead80d80a229a73b2a6e6033632fe30845acbd5f1a7062",
-  "package_version": "0.1.0-alpha.11.7",
+  "model_routing_source_sha256": "357bdfcbfbac42b3f0accfd5b94bb156601354a20eef8fbff9ac233e40dccbae",
+  "package_version": "0.1.0-alpha.11.11",
   "projection_count": 76,
   "role_count": 19,
   "role_profile_counts": {
@@ -887,10 +1329,10 @@
     "judgment": 12,
     "mechanical": 2
   },
-  "role_source_sha256": "568eb332e59db89c11cb371dbc5330f17e120c90f6df476b89d7cd53b45e0dc0",
-  "schema": "bbk.projection-manifest.v3",
+  "role_source_sha256": "04cece7a3eb552f5635812723240fc56ad8099afd85e49acce4bda877df7a698",
+  "schema": "bbk.projection-manifest.v4",
   "source": "spec/roles.json",
-  "source_sha256": "e3d49a703de60944f9e289ea780671190b3ff4e62da5434f42c5f5ab19970432",
+  "source_sha256": "40686eca4e766119062ae4ad471617eb28aff5d4151724bac3323c380e4a5ecb",
   "target_count": 4,
   "targets": [
     "claude",

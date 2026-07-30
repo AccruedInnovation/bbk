@@ -1,9 +1,9 @@
-    ---
-    name: bbk-state-decision-effect-design
-    description: Design or review canonical state, deterministic decisions, controlled effects, recovery semantics, and proportionate transition evidence inside an ImplementationStructureContract.
-    ---
+---
+name: bbk-state-decision-effect-design
+description: Design or review canonical state, deterministic decisions, controlled effects, recovery semantics, and proportionate transition evidence inside an ImplementationStructureContract.
+---
 
-    # BBK State–Decision–Effect Design
+# BBK State–Decision–Effect Design
 
 Use this concern only where state or effects are material. Keep it nested under the governing `ImplementationStructureContract`.
 
@@ -21,8 +21,6 @@ Use this concern only where state or effects are material. Keep it nested under 
 12. Return applicability, canonical owner, state algebra, decisions, effects, invariants, formalization, traces, uncertainties, and review obligations.
 
 
-When a compatible language/domain profile is selected, use `bbk-profile-routing` to invoke only its typed State–Decision–Effect projection, inventory, or review capability. Keep the generic design authoritative and treat a missing required capability as `BLOCKED`.
-
 ## Language-profile projection
 
-When a managed profile applies, use `bbk-installed-profiles` and `bbk-profile-routing` to select its state/effect representation, inventory, review, and evidence procedures. Bind the projection to the generic design and exact profile digest; unsupported or unavailable mandatory capability is `BLOCKED`.
+When a managed profile applies, use `bbk-installed-profiles` and `bbk-profile-routing` to invoke only its typed state/effect representation, projection, inventory, review, or evidence capability. Bind the result to the authoritative generic design and exact profile digest; an unsupported or unavailable mandatory capability is `BLOCKED`.

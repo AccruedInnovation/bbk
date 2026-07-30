@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-question-branch-v1.schema.json",
+  "title": "BBK durable question branch",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "bbk_version", "id", "root_decision", "status", "owner_role",
+    "authority", "current_recommendation", "proposal_response", "root_disposition",
+    "dependencies", "accepted_related_decisions", "independent_questions",
+    "exposure_history", "unresolved_point", "stopping_assessment", "next_action",
+    "updated_at"
+  ],
+  "properties": {
+    "schema": {"const": "bbk.question-branch.v1"},
+    "bbk_version": {"type": "string", "minLength": 1},
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "root_decision": {"type": "string", "minLength": 1},
+    "status": {
+      "enum": [
+        "ACTIVE", "WAITING_FOR_USER", "RESEARCH_BLOCKED", "PARKED", "INVALIDATED",
+        "ORPHANED", "RESOLVED", "DEFERRED", "BLOCKED", "CANCELLED", "SUPERSEDED"
+      ]
+    },
+    "owner_role": {"type": "string", "minLength": 1},
+    "parent_scope": {"type": ["string", "null"]},
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "holder"],
+      "properties": {
+        "mode": {"enum": ["USER_DECIDES", "WAYFINDER_RECOMMENDS", "DELEGATED", "CONSTRAINT_DRIVEN"]},
+        "holder": {"type": "string", "minLength": 1}
+      }
+    },
+    "context_digest": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "current_recommendation": {"type": ["string", "null"]},
+    "proposal_response": {"enum": [null, "APPROVE", "REJECT", "REVISE"]},
+    "root_disposition": {
+      "enum": [null, "RESOLVED", "DEFERRED", "PARKED", "BLOCKED", "INSUFFICIENT_EVIDENCE", "OUT_OF_SCOPE", "CANCELLED", "SUPERSEDED"]
+    },
+    "accepted_decision": {"type": ["string", "null"]},
+    "accepted_related_decisions": {"type": "array", "items": {"type": "string"}},
+    "independent_questions": {"type": "array", "items": {"type": "string"}},
+    "dependencies": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "invalidated_by": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "exposure_history": {"type": "array", "items": {"type": "string"}},
+    "unresolved_point": {"type": ["string", "null"]},
+    "stopping_assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision_ready", "reason"],
+      "properties": {
+        "decision_ready": {"type": "boolean"},
+        "reason": {"type": "string"},
+        "remaining_information_value": {"type": ["string", "null"]},
+        "attention_state": {"type": ["string", "null"]}
+      }
+    },
+    "next_action": {"type": "string", "minLength": 1},
+    "updated_at": {"type": "string", "format": "date-time"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"root_disposition": {"const": "RESOLVED"}}, "required": ["root_disposition"]},
+      "then": {
+        "properties": {
+          "status": {"const": "RESOLVED"},
+          "proposal_response": {"const": "APPROVE"},
+          "accepted_decision": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"proposal_response": {"enum": ["REJECT", "REVISE"]}}, "required": ["proposal_response"]},
+      "then": {"not": {"properties": {"root_disposition": {"const": "RESOLVED"}}, "required": ["root_disposition"]}}
+    }
+  ]
+}

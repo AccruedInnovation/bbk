@@ -1,5 +1,54 @@
 # Changelog
 
+## 0.1.0-alpha.11.11 — 2026-07-30
+
+- Make the extracted BBK package root the canonical Git repository source; remove the repository-extractor and generated staging-tree workflow.
+- Reduce `docs/` to 14 indexed, current-facing documents and consolidate agent, execution-design, assurance, profile, upgrade, and repository guidance.
+- Move historical PRDs, per-alpha migration notes, decision notes, internal alignment material, old qualification reports, and release transcripts outside the public source tree while preserving them in a separate pre-public history artifact.
+- Remove pre-public-only Blueprint alignment/dogfood material and the one-off alpha.9.1 Windows leak-recovery utility from the current package.
+- Replace history-presence regressions with direct public-repository-shape, documentation-inventory, and product-neutrality checks while retaining the five consolidated test modules.
+- Update the deterministic release builder and current documentation for direct repository maintenance without changing role, runtime, installer, project-record, model-routing, or bundled-profile behavior.
+- Preserve the independently versioned alpha.3 CODESYS, Go, Python, Rust, and TypeScript/JavaScript profile packages byte-for-byte.
+
+## 0.1.0-alpha.11.10 — 2026-07-30
+
+- Replace the single cross-role constitution with selectively loaded `core`, `planning`, `coordination`, `execution`, and `assurance` modules.
+- Upgrade the canonical role catalogue to `bbk.roles.v2` with explicit scope, per-child delegation triggers, escalation routes, and user-interaction boundaries for all 19 roles.
+- Add model-facing child-selection triggers to OMP while retaining native `spawns` as the enforceable allowlist; align Codex, Claude Code, and generic projections to the same contract.
+- Restrict direct user questioning to an active Root Wayfinder or active Question Guide; require all other roles to return structured requests to their parent.
+- Stop canonical sub-agents from autoloading the top-level `bbk` entry-controller skill and reduce that skill to user-facing entry and relay responsibilities.
+- Upgrade the projection manifest to `bbk.projection-manifest.v4` and bind constitution modules, scope, delegation triggers, escalations, and user boundaries.
+- Normalize shared-skill frontmatter, merge duplicate profile sections, regenerate all 76 projections, and extend the five consolidated regression modules.
+- Preserve alpha.11.9's corrected independently versioned alpha.3 language profiles and all existing `.bbk` project-record formats.
+
+## 0.1.0-alpha.11.9 — 2026-07-29
+
+- Rebuilt all five bundled language profiles at their existing independently versioned `0.1.0-alpha.3` identities before the first public tag.
+- Normalized current profile metadata to require BBK `0.1.0-alpha.8` or a compatible successor while preserving predecessor provenance and the structure/slice contract dialect introduced in alpha.4.
+- Corrected Python structure-contract validator compatibility so alpha.8, alpha.11.x, stable, and compatible future cores are accepted while genuinely older cores remain unavailable.
+- Consolidated profile tests into responsibility-oriented suites, enforced explicit UTF-8 text I/O, and made OMP `.py` command overrides interpreter-safe across Windows and POSIX.
+- Rebound the default bundled profile set, release manifest, install tests, Git-ready profile repository, and qualification evidence to the corrected packages.
+
+## 0.1.0-alpha.11.8 — 2026-07-29
+
+- Restore recursive Wayfinding through dedicated `bbk-wayfind` procedure, active map/frontier/blocker/fog maintenance, dependency invalidation, proportionate pressure tests, and information-value stopping.
+- Make the Questioning Wayfinder recommendation-first and reserve the Question Guide/`bbk-grill` path for rejected, contested, materially ambiguous, or explicitly deeper decisions.
+- Complete Root/Territory → Planning → Phase reachability, prohibit Territory Wayfinders from directly asking material user questions, and add Planning/Phase route-back for missing decisions.
+- Add durable `bbk.question-branch.v1` records plus `bbk question new|validate|list`.
+- Add extended logical worker execution, same-thread continuation, bounded checkpoints, and six infrastructure continuations without inventing unsupported Codex timeout metadata.
+- Add `bbk.handoff.v1`, `bbk handoff create|verify|list`, exact file byte/hash binding, and large-result direct-file transport.
+- Add compact Beads handoff pointers with explicit `enabled`/`write_enabled` gating for `--apply`.
+- Add discoverable Draft 2020-12 schema validation and optional isolated `jsonschema==4.25.1` bootstrap.
+- Add exact installed-profile CLI fallback for shells that cannot resolve `bbk`.
+- Consolidate 20 release-numbered test modules into five thematic modules while retaining behavioral coverage and detailed final summaries.
+- Keep all bundled alpha.3 language-profile packages unchanged pending the separate profile-focused follow-up.
+- Propagate standing user authority through Wayfinder, Planning, and Orchestrator contracts with exact scope, safeguards, exclusions, expiry, and no redundant re-approval inside the grant.
+- Add disposable-candidate-root, protected-worktree, and sealed-evidence capability zones to work-unit, worker, and execution contracts.
+- Add precise technical/authority/decision blocker and capacity/host-window pause states plus strict interruption reasons; make heartbeat absence, silence, elapsed time, and polling timeout non-evidence.
+- Add exact tool-environment, payload-limit, fail-before-mutation, structured-return, same-thread continuation, and completed-child slot-hygiene duties.
+- Direct workers to use built-in manifest/candidate operations for exact inventories and add the requested YAGNI/one-liner implementation instruction.
+- Document the tested Codex `[features.multi_agent_v2]` configuration and custom-agent lifecycle contract in `docs/USAGE.md`.
+
 ## 0.1.0-alpha.11.7 — 2026-07-29
 
 - Accept expanded language-profile package trees, conventional `packages/` layouts, and manifested Git repositories through `--language-profiles`.

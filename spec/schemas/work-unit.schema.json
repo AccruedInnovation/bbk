@@ -83,6 +83,112 @@
         "critical"
       ]
     },
+    "authorityGrant": {
+      "additionalProperties": false,
+      "properties": {
+        "allowedEffects": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "expiresWhen": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "prohibitedEffects": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "safeguards": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "scope": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "source": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "standing": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "source",
+        "standing",
+        "scope",
+        "allowedEffects",
+        "prohibitedEffects",
+        "safeguards",
+        "expiresWhen"
+      ],
+      "type": "object"
+    },
+    "capabilityZones": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "guards": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "kind": {
+            "enum": [
+              "disposable-candidate-root",
+              "protected-worktree",
+              "sealed-evidence"
+            ]
+          },
+          "operations": {
+            "items": {
+              "enum": [
+                "read",
+                "create",
+                "replace",
+                "rename",
+                "delete"
+              ]
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "path": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "path",
+          "operations",
+          "guards"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
     "changeClasses": {
       "items": {
         "type": "string"
@@ -101,6 +207,46 @@
         "type": "string"
       },
       "type": "array"
+    },
+    "executionBudget": {
+      "additionalProperties": false,
+      "properties": {
+        "checkpointIntervalSeconds": {
+          "minimum": 60,
+          "type": "integer"
+        },
+        "durableHandoff": {
+          "type": "boolean"
+        },
+        "infrastructureContinuations": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "largeResultTransport": {
+          "enum": [
+            "conversation-only",
+            "file-bytes-sha256"
+          ]
+        },
+        "mode": {
+          "enum": [
+            "bounded",
+            "extended-resumable"
+          ]
+        },
+        "resumeSameThread": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "mode",
+        "checkpointIntervalSeconds",
+        "infrastructureContinuations",
+        "resumeSameThread",
+        "durableHandoff",
+        "largeResultTransport"
+      ],
+      "type": "object"
     },
     "executionSliceIds": {
       "items": {
@@ -128,6 +274,47 @@
       },
       "type": "array"
     },
+    "interruptPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "allowedReasons": {
+          "items": {
+            "enum": [
+              "USER_CANCELLED",
+              "CHILD_REQUESTED_STOP",
+              "UNAUTHORIZED_EFFECT",
+              "OWNERSHIP_COLLISION",
+              "CONFIRMED_HANG",
+              "OBSOLETE_WORK"
+            ]
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "heartbeatSemantics": {
+          "const": "informational"
+        },
+        "rejectedReasons": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "waitTimeoutSemantics": {
+          "const": "polling-only"
+        }
+      },
+      "required": [
+        "allowedReasons",
+        "rejectedReasons",
+        "heartbeatSemantics",
+        "waitTimeoutSemantics"
+      ],
+      "type": "object"
+    },
     "keyContractRefs": {
       "items": {
         "type": "string"
@@ -153,6 +340,37 @@
       },
       "type": "array",
       "uniqueItems": true
+    },
+    "payloadLimits": {
+      "additionalProperties": false,
+      "properties": {
+        "maxInlineBytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "maxToolResultBytes": {
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "onExceed": {
+          "enum": [
+            "fail-before-mutation",
+            "file-bytes-sha256"
+          ]
+        },
+        "silentTruncationAllowed": {
+          "const": false
+        }
+      },
+      "required": [
+        "maxInlineBytes",
+        "onExceed",
+        "silentTruncationAllowed"
+      ],
+      "type": "object"
     },
     "plannedArtifactRefs": {
       "items": {
@@ -195,6 +413,48 @@
       },
       "type": "array",
       "uniqueItems": true
+    },
+    "returnContract": {
+      "additionalProperties": false,
+      "properties": {
+        "operationalDispositions": {
+          "items": {
+            "enum": [
+              "COMPLETE",
+              "PARTIAL",
+              "READY_FOR_VALIDATION",
+              "BLOCKED_TECHNICAL",
+              "BLOCKED_AUTHORITY",
+              "BLOCKED_DECISION",
+              "PAUSED_CAPACITY",
+              "PAUSED_HOST_WINDOW",
+              "CANCELLED",
+              "INCONCLUSIVE"
+            ]
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "requiredFields": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "schema": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema",
+        "requiredFields",
+        "operationalDispositions"
+      ],
+      "type": "object"
     },
     "reviewManifestRefs": {
       "items": {
@@ -283,6 +543,59 @@
         "type": "string"
       },
       "type": "array"
+    },
+    "toolEnvironment": {
+      "additionalProperties": false,
+      "properties": {
+        "activation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "tools": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "command": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "expectedVersion": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "fallbackCommand": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "versionCommand": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "command",
+              "versionCommand"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "tools"
+      ],
+      "type": "object"
     },
     "touchpoint": {
       "type": "string"

@@ -1,9 +1,9 @@
-    ---
-    name: bbk-review-learn
-    description: Create governed LearningCandidate records from recurring review evidence without automatically changing BBK methods, agents, profiles, gates, or policy.
-    ---
+---
+name: bbk-review-learn
+description: Create governed LearningCandidate records from recurring review evidence without automatically changing BBK methods, agents, profiles, gates, or policy.
+---
 
-    # BBK Review Learning
+# BBK Review Learning
 
 1. Select exact runs, findings, dispositions, escaped defects, repairs, context failures, or evidence gaps.
 2. State the proposed reusable lesson, applicability, supporting and contrary evidence, causal confidence, uncertainty, privacy/export class, and proposed action.

@@ -1,61 +1,55 @@
 # Upgrading BBK
 
-This page describes supported upgrade patterns. Exact release-specific corrections remain attached to the relevant GitHub Release.
+Use a clean extraction for each BBK version. Do not overlay a new release onto an
+older extracted package.
 
-## General rule
+## Full managed upgrade
 
-Do not overlay one immutable release extraction onto another. Extract the new release into a new directory.
-
-## Full user installation upgrade
-
-From the currently installed release, uninstall through its manifest-aware tool:
+From the previous extraction:
 
 ```bash
-python /path/to/old/tools/install.py uninstall --scope user
+python tools/install.py uninstall --scope user
 ```
 
-Then install the new release or source checkout:
+From the new extraction:
 
 ```bash
-python tools/setup.py --test-and-install --scope user --omp --codex
+python tools/setup.py --test-and-install --scope user --omp --codex --claude
 ```
 
-For sibling source repositories:
+All bundled language profiles install by default. Add `--no-language-profiles`
+for an intentional core-only installation or repeated `--profile-id` options for
+a subset.
+
+## Selective host updates
+
+Update OMP without modifying the installed Codex agents:
 
 ```bash
-python tools/repo_setup.py --test-and-install --scope user --omp --codex
+python tools/setup.py --test-and-update-omp --scope user
 ```
 
-## Selective host update
-
-When supported by both versions:
+Update Codex agents without modifying OMP:
 
 ```bash
-python tools/setup.py --update-omp --scope user --dry-run
-python tools/setup.py --update-omp --scope user
+python tools/setup.py --test-and-update-codex --scope user
 ```
 
-or:
-
-```bash
-python tools/setup.py --update-codex --scope user --dry-run
-python tools/setup.py --update-codex --scope user
-```
-
-Selective updates preserve the other host definitions and record mixed harness versions in the unified install manifest.
+Use the corresponding non-test form only after the exact extraction has already
+passed verification. Start a fresh Codex session after a Codex-agent update; use
+`/reload-plugins` in an existing OMP session after an OMP extension update.
 
 ## Project records
 
-Do not rewrite `.bbk` records merely because the package version changed. Apply a migration only when a release explicitly changes an artifact schema or semantic contract.
+A release note will state explicitly when `.bbk/` project-record migration is
+required. In the absence of such a statement, preserve the records and validate
+them with the new CLI before continuing consequential work.
 
-Never silently upgrade a legacy record to a stronger evidence, authority, independence, closure, or readiness state.
+## External routing policies
 
-## Model-routing files
+External model-routing files are package-version-bound. Update their
+`package_version` to the installed BBK version and validate them before use:
 
-External install-time routing policies are version-bound. Update their declared package version and revalidate them before use.
-
-OMP runtime routing profiles may also be version-bound; validate or export them again after an upgrade.
-
-## Historical upgrade instructions
-
-Older alpha-to-alpha migration documents are retained in release archives and tags rather than the current source documentation tree.
+```bash
+python tools/model_routing.py --path /path/to/model-routing.json --check
+```

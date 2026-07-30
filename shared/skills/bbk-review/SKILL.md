@@ -28,8 +28,4 @@ For a separately persisted review, require an AssuranceContract, ReviewManifest,
 
 ## Language and domain profiles
 
-When the review charter includes language- or toolchain-specific assertions, confirm the exact locked profile, load its router skill, and use only the applicable profile review lenses, context selectors, and evidence adapters. Profile output informs the declared assertion; it does not create approval or a pass by itself.
-
-## Language-profile review
-
-Use `bbk-installed-profiles` and the effective profile lock to select only profile-owned lenses, context selectors, gates, or evidence adapters that prove named assertions. Do not treat profile installation as proof of applicability, tool availability, independent execution, or candidate acceptance.
+When the charter includes language- or toolchain-specific assertions, use `bbk-installed-profiles` and the effective lock to confirm the exact profile and toolchain, load its router, and select only the lenses, context selectors, gates, or evidence adapters that prove named assertions. Profile installation or output is not proof of applicability, tool availability, independent execution, candidate acceptance, approval, or a pass.

@@ -1,9 +1,9 @@
-    ---
-    name: bbk-review-context
-    description: Compile and inspect deterministic review context packs with full content roots, omission accounting, redaction, semantic shards, and cross-shard coverage.
-    ---
+---
+name: bbk-review-context
+description: Compile and inspect deterministic review context packs with full content roots, omission accounting, redaction, semantic shards, and cross-shard coverage.
+---
 
-    # BBK Review Context
+# BBK Review Context
 
 1. Bind the exact ReviewManifest, subject, source revision, and content root.
 2. Inventory required semantic objects and tracked, untracked, ignored, generated, deleted, external, and retrieval-only artifacts.

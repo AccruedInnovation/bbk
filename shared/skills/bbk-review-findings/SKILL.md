@@ -1,9 +1,9 @@
-    ---
-    name: bbk-review-findings
-    description: Preserve, correlate, disposition, and close immutable BBK review findings using exact successor evidence rather than rediscovery or voting.
-    ---
+---
+name: bbk-review-findings
+description: Preserve, correlate, disposition, and close immutable BBK review findings using exact successor evidence rather than rediscovery or voting.
+---
 
-    # BBK Review Findings
+# BBK Review Findings
 
 1. Create an immutable finding bound to one run, attempt, subject/candidate digest, assertion, observation, expected condition, evidence, scope, impact, and route.
 2. Use fingerprints only for correlation. A collision cannot merge records, and absence from a later run cannot close a finding.

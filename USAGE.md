@@ -1,437 +1,397 @@
-# BBK — Blueprint Bootstrap Kit
+# Blueprint Bootstrap Kit
 
-### A practical control layer for agentic engineering
+**Version:** `0.1.0-alpha.11.11`  
+**Status:** package-qualified temporary method harness; live host, model, profile-toolchain, and target-project behavior remain separately qualified
 
-> Most agentic-development systems improve **how the agent behaves**.
->
-> BBK helps preserve **what the project means**.
+BBK is a lightweight, Blueprint-inspired planning, execution, evidence, and review kit for Codex, Oh My Pi (OMP), Claude Code, and generic agent harnesses. It is external to the real Blueprint product and carries no official Blueprint lifecycle, capability, authorization, readiness, execution, verification, completion, qualification, or release authority.
 
-Coding agents are already capable actors. They can inspect a repository, plan work, edit files, run tests, use tools, and delegate to sub-agents. What they do not automatically provide is durable project meaning: a persistent account of the outcome being pursued, what is known, what was decided, who had authority, which implementation was reviewed, what evidence supports acceptance, what later changed, and where work can safely resume.
+Alpha.11.11 is the current canonical successor. It preserves the complete role, Wayfinding, execution, assurance, model-routing, and language-profile contracts while making the extracted package root the direct Git repository source. The public documentation set is consolidated and current-facing; historical PRDs, per-alpha migration notes, internal alignment audits, and release-specific qualification evidence are distributed separately instead of cluttering `docs/`.
 
-**BBK—the Blueprint Bootstrap Kit—is an early, host-neutral harness for adding that control discipline to existing agent environments.** It projects planning, orchestration, implementation, validation, and review roles into OMP, Codex, Claude Code, and generic agent hosts; adds structured project records and language profiles; and supplies deterministic tooling for validation, packaging, installation, candidate binding, evidence, review, and recovery.
+## BBK entrypoint
 
-BBK is not “a bigger prompt.” It is a working bridge between capable coding agents and the broader Blueprint method.
+Invoking BBK enters the role system rather than merely exposing method text to an otherwise unbound parent agent.
 
-> [!IMPORTANT]
-> BBK is pre-1.0 software. Package qualification establishes the integrity and tested behavior of the package itself. It does **not** prove that a selected model is competent, that a host provides perfect isolation, that two logical roles are physically independent, that an external language toolchain is available, that a target project is correct, or that organizational approval or release authority exists.
+When the baseline `bbk` skill is loaded in a primary non-OMP session, the current agent acts as the **BBK entry controller** and routes planning, accepted execution, bounded review, or assertion-scoped acceptance to the corresponding named BBK role. Where named agents are supported, the entry controller invokes the selected agent instead of imitating it, so the configured model, effort, skills, tools, spawn policy, and return contract apply.
 
----
+### Persistent OMP mode
 
-## The problem BBK is trying to solve
-
-A conventional agent workflow often looks like this:
+OMP provides a persistent BBK mode:
 
 ```text
-request → plan → code → tests → “done”
+/bbk                 enter BBK mode without starting an agent turn
+/bbk <request>       enter BBK mode and submit the first directive
+/bbk:exit            exit BBK mode and return to normal OMP prompting
+/bbk exit            non-colon exit alias
+/bbk status          deterministic BBK project status; does not enter the mode
+/bbk:status          deterministic BBK project status; does not enter the mode
 ```
 
-That is enough for a great deal of useful work. It becomes fragile when the work is long-running, consequential, uncertain, distributed across several agents, difficult to reverse, or expected to survive beyond the conversation that started it.
+`/bbk` records a small `bbk-mode-state` entry with `appendEntry`; that state is not sent to the model. The extension restores the latest state from the active session branch on session start, resume/switch, branch, and tree navigation. A `BBK` footer indicator is shown while the mode is active.
 
-BBK applies more structure only where the work justifies it:
+Before every ordinary agent turn in the active session, the extension's `before_agent_start` handler appends a concise `<bbk-session-mode>` system-prompt overlay. The overlay tells the parent to interpret the message as part of the ongoing BBK-governed workflow, preserve current project state, and route work through the appropriate named BBK role:
+
+```text
+planning, design, material uncertainty, or no accepted executable baseline
+  → bbk_root_wayfinder
+
+execution or recovery of an accepted, sufficiently specified baseline
+  → bbk_root_orchestrator
+
+bounded independent review
+  → bbk_reviewer
+
+assertion-scoped acceptance run
+  → bbk_validator_orchestrator
+```
+
+The full baseline skill and routing JSON are not copied into the conversation transcript. `/bbk <request>` forwards only the user's request with `sendUserMessage`; the system-prompt overlay supplies the mode context for that and subsequent ordinary messages. `/bbk` with no arguments and `/bbk:exit` are UI/state operations and do not trigger a model turn.
+
+BBK mode is session-local. It does not change the parent model, thinking level, active tools, or installed sub-agent routes, and it does not replace OMP's native plan or vibe modes. Exit a conflicting native mode separately when its tool or prompt restrictions are not appropriate for BBK work.
+
+In Codex, Claude Code, and generic harnesses, invoke the installed baseline `bbk` skill. The non-OMP entry-controller contract remains turn-scoped unless the host provides its own persistent-mode mechanism.
+
+## Wayfinding, recommendations, and Grill
+
+Ordinary material decisions do not automatically create a Question Guide:
+
+```text
+Root or Territory Wayfinder
+  → Questioning Wayfinder
+      → investigate discoverable facts
+      → prepare a decision-ready recommendation
+  → user-facing parent presents it
+      ├─ accepted → record the decision; no Question Guide
+      ├─ bounded correction → revise the recommendation
+      └─ rejected, contested, materially ambiguous, or deeper exploration requested
+           → one Question Guide conducts the deep Grill
+```
+
+`bbk-wayfind` restores the recursive map → frontier → dispatch → receive → invalidate → reassess → synthesize loop, including posture, blockers, fog, interface obligations, proportional pressure tests, and economic stopping. `bbk-grill` supplies the escalation-only probe → reflect → challenge → update → converge loop. Rejecting one recommendation keeps the root question active; it does not disposition the underlying decision. See `docs/WAYFINDING-AND-GRILL.md`.
+
+The canonical topology now reaches all 19 roles from `bbk_root_wayfinder`, including:
+
+```text
+Root/Territory Wayfinder → Planning Wayfinder → Phase Wayfinder
+```
+
+Territory Wayfinders do not ask material user questions directly. Planning and Phase Wayfinders return missing outcome, interface, architecture, authority, risk-acceptance, or verification decisions to the responsible Wayfinder instead of inventing them.
+
+## Durable material decisions
+
+Ordinary recommendations do not require a Question Guide or a branch file. When a material decision spans turns, research, parking, or deeper Grill work, persist it explicitly:
+
+```powershell
+python tools\bbk.py question new --root D:\Project `
+  --id Q-PROVIDER-CONTRACT `
+  --root-decision "Which provider contract should the Stage 1 harness adopt?"
+
+python tools\bbk.py question validate `
+  D:\Project\.bbk\questions\Q-PROVIDER-CONTRACT.json
+```
+
+`REJECT` and `REVISE` keep the root question open. `RESOLVED` requires an approved decision. See `docs/WAYFINDING-AND-GRILL.md`.
+
+## Resumable workers and lossless handoffs
+
+BBK treats a host sub-agent turn as one segment of a logical worker lifecycle, not necessarily the entire work unit. New project configuration gives workers an extended logical window, bounded checkpoints, same-thread continuation after infrastructure interruption, and a durable handoff requirement. BBK does not emit an undocumented Codex timeout key.
+
+Exact or large results use an authoritative UTF-8 handoff file with project-relative paths, byte counts, and SHA-256 digests:
+
+```powershell
+python tools\bbk.py handoff create --root D:\Project `
+  --work-unit WU-EXAMPLE --disposition PARTIAL `
+  --summary "Implementation complete; focused validation remains." `
+  --artifact out\candidate.json --continuation-state READY `
+  --checkpoint .bbk\runtime\checkpoint.json `
+  --next-action "Resume the same worker thread and run focused validation."
+
+python tools\bbk.py handoff verify `
+  .bbk\handoffs\WU-EXAMPLE\HO-WU-EXAMPLE-1.json --root D:\Project
+
+python tools\bbk.py handoff list --root D:\Project `
+  --work-unit WU-EXAMPLE --latest
+```
+
+Beads can carry a compact append-only pointer rather than the full payload:
+
+```powershell
+python tools\bbk.py beads handoff-plan `
+  --root D:\Project --handoff .bbk\handoffs\WU-EXAMPLE\HO-WU-EXAMPLE-1.json `
+  --bead bd-123
+```
+
+Add `--apply` only after `.bbk/mappings/beads.json` explicitly enables projection and writes. BBK appends a compact pointer with `bd comments add`; it never treats the bead text as the authoritative payload.
+
+The BBK file remains authoritative. Configured gate runs follow the same lossless boundary: JSON receipts expose bounded previews, while complete stdout and stderr are stored beside the receipt and bound by project-relative path, byte count, and SHA-256. A PASS receipt is not reusable if either bound stream is missing or changed. See `docs/DURABLE-HANDOFFS.md`.
+
+
+## Execution authority and child lifecycle
+
+Execution planning now carries standing user authority as a scoped grant rather than forcing each worker to ask again for effects that were already approved. The grant records its source, exact scope, approved effects, safeguards, exclusions, and expiry. Filesystem access is classified into disposable candidate roots, protected worktrees, and sealed evidence.
+
+Worker and orchestrator returns distinguish technical, authority, and decision blockers from capacity and host-window pauses. A polling timeout, silence, elapsed time, or missing heartbeat is non-evidence. Running children may be interrupted only for an enumerated reason with concrete evidence; completed children are consumed or continued through the host follow-up mechanism rather than interrupted to reclaim capacity.
+
+The existing `bbk manifest` and `bbk candidate` commands are the first-class exact-inventory and candidate-identity operations. See `docs/USAGE.md` for the tested Codex `multi_agent_v2` configuration and the complete interruption policy.
+
+
+## Discoverable schema validation and profile CLI
+
+```powershell
+python tools\bbk.py schema status
+python tools\bbk.py schema validate --schema schema.json --instance candidate.json
+```
+
+When `python-jsonschema` is missing, the validator reports `BLOCKED` with an exact `--ensure` remediation; it does not silently access the network. The installation-specific `bbk-installed-profiles` skill now records both the preferred launcher path and the exact Python/script fallback, so a missing `bbk` entry in `PATH` or a mise shell does not by itself make profile discovery unavailable. The familiar discovery form remains `bbk --json profile list`.
+
+## Model routing
+
+Model selection is separate from stable role responsibility:
+
+```text
+spec/roles.json            role responsibility, authority, skills, and direct children
+spec/model-routing.json    model/effort profiles and role-to-profile allocation
+```
+
+The packaged defaults are:
+
+| Profile | OMP | Codex | Claude Code |
+|---|---|---|---|
+| `judgment` | `openai-codex/gpt-5.6-sol`, `thinkingLevel: high` | `gpt-5.6-sol`, `model_reasoning_effort: high` | `opus`, `effort: high` |
+| `coordination` | `deepseek/deepseek-v4-pro`, `thinkingLevel: high` | `gpt-5.6-terra`, `model_reasoning_effort: medium` | `sonnet`, `effort: medium` |
+| `mechanical` | `deepseek/deepseek-v4-flash`, `thinkingLevel: high` | `gpt-5.6-luna`, `model_reasoning_effort: low` | `haiku`, `effort: low` |
+
+High-judgment planning, architecture, synthesis, assurance, review, and root orchestration use `judgment`; research, prototyping, and bounded execution coordination use `coordination`; tightly bounded leaf workers and exact validators use `mechanical`. A parent or user should override or escalate an assignment whose uncertainty, consequence, or breadth exceeds its default tier.
+
+Validate the packaged policy and projections:
+
+```bash
+python tools/model_routing.py --check
+python tools/generate_agents.py --check
+```
+
+To customize without modifying the qualified package, copy `spec/model-routing.json` outside the extracted release and pass it at installation:
+
+```powershell
+Copy-Item .\spec\model-routing.json D:\Projects\BBK\my-model-routing.json
+python tools/model_routing.py --path D:\Projects\BBK\my-model-routing.json --check
+python tools/install.py install --scope user --omp --codex --claude `
+  --model-routing D:\Projects\BBK\my-model-routing.json --dry-run
+python tools/install.py install --scope user --omp --codex --claude `
+  --model-routing D:\Projects\BBK\my-model-routing.json
+```
+
+The installer validates the complete policy before writing, renders selected projections in memory, copies the active policy to `effective-model-routing.json`, and binds its digest into the installation manifest. See `docs/MODEL-ROUTING.md`.
+
+### OMP runtime routing menu
+
+After installing the OMP target, run:
+
+```text
+/bbk:models
+```
+
+Use `testing-flash` to send all 19 BBK sub-agents through DeepSeek V4 Flash for inexpensive functional testing, `deepseek-economy` for a DeepSeek-only cost-conscious route, `default` for the packaged tiered route, or `installation-default` to restore the exact install-time policy. The menu can also edit any one sub-agent's `model` and `thinkingLevel`, apply a reusable profile file based on `templates/omp-model-routing-profile.json`, and export the BBK-managed route. Changes affect future OMP sub-agent spawns and remain manifest-aware for status and uninstall.
+
+```text
+/bbk:models status
+/bbk:models profile testing-flash
+/bbk:models profile deepseek-economy
+/bbk:models set bbk_worker @task medium
+/bbk:models apply D:\Profiles\bbk-routing.json
+/bbk:models export D:\Profiles\bbk-current.json current-bbk
+```
+
+OMP rediscovers agent definitions when it spawns a task agent, so already-running sub-agents are not changed. BBK writes its managed route into the installed BBK agent frontmatter and updates the BBK install manifest. An OMP `task.agentModelOverrides` entry or a higher-precedence project agent definition with the same role name can still supersede that frontmatter; `/bbk:models status` reports this precedence boundary.
+
+
+### OMP command/context boundary
+
+OMP slash commands such as `/bbk:models`, `/bbk:status`, `/bbk:doctor`, `/bbk:exit`, and every bundled language-profile command are **UI-only**. They show concise results through `ctx.ui.notify`, return no structured command payload, and do not call `sendMessage` or `sendUserMessage`; deterministic JSON therefore does not enter model context. Explicit LLM-callable tools still return structured results because the model deliberately invoked them.
+
+The mode state is persisted with `appendEntry`, which OMP does not send to the LLM. When BBK mode is active, `before_agent_start` adds only the concise system-prompt overlay for the current turn. `/bbk <request>` is the sole slash-command path that deliberately calls `sendUserMessage`, and it forwards only the user's directive. `/bbk` with no arguments, `/bbk:exit`, `/bbk status`, and all other deterministic commands remain non-agent-facing.
+
+### Update only OMP
+
+A running Codex session does not need to be stopped to update BBK's OMP surface:
+
+```powershell
+python tools/setup.py --test-and-update-omp --scope user
+```
+
+For a faster update after independently verifying the package:
+
+```powershell
+python tools/setup.py --update-omp --scope user
+```
+
+The updater preserves the active `/bbk:models` route, updates future OMP agents and bundled profile extensions, reconciles the unified install manifest, and does not modify `.codex` agent files. Afterward, run `/reload-plugins` in OMP.
+
+To apply a BBK Codex-agent successor without modifying an existing OMP installation:
+
+```powershell
+python tools/setup.py --test-and-update-codex --scope user
+```
+
+Or, after independently verifying the extracted release:
+
+```powershell
+python tools/setup.py --update-codex --scope user
+```
+
+The selective updater preserves the installed package copy, current pointer, launcher, effective model-routing file, OMP runtime state, and other harnesses. It replaces only BBK's 19 Codex custom-agent definitions and reconciles their ownership records in the unified manifest. Start a fresh Codex turn or session if the running host has cached custom-agent definitions.
+
+## Product-neutral roles, modular constitutions, and explicit delegation
+
+Reusable role instructions do not inject Blueprint, Tenex, Otobotto, Autospec, capability-partition, host-projection, routing-digest, or build-provenance text into unrelated project work.
+
+Every canonical role now declares its own scope, focused constitution modules, exact direct-child triggers, escalation routes, user-interaction boundary, procedures, prohibitions, and return contract. Only six universal `core` rules are repeated. Planning, coordination, execution, and assurance clauses are included only where that responsibility applies.
+
+The top-level `bbk` skill is an entry controller for the primary user-facing session and is no longer autoloaded by canonical sub-agents. Children receive their own complete role contract instead of entry-routing text. Each role also separates its full allowed procedures from a two- or three-skill always-loaded core; conditional procedures remain available on demand.
+
+OMP keeps native `spawns` as the exact child allowlist **and** now tells the model when each allowed child is appropriate. Codex, Claude Code, and generic projections carry the same trigger map; Claude's `Agent(...)` allowlist matches it. Leaf roles explicitly return adjacent work to their parent rather than spawning, impersonating, or silently absorbing another responsibility.
+
+Only `bbk_root_wayfinder` and an active `bbk_question_guide` may question the user directly. All other roles return structured decision, authority, private-context, blocker, or scope requests to the invoking parent. See `docs/AGENTS.md`.
+
+Generated prompt bodies begin with operational content. Role identity, host filenames, model profile, host routes, constitution selection, scope, delegation topology and triggers, escalations, user boundary, skills, mutability, and source digests remain available in native host metadata and `projections/manifest.json` (`bbk.projection-manifest.v4`) instead of consuming build-provenance tokens. Generic installations also write `.agents/bbk/agent-manifest.json`.
+
+### Host workspace permissions versus BBK authority
+
+Codex projections deliberately omit a role-level `sandbox_mode`, and Claude Code projections no longer deny Edit/Write to non-mutating roles. Every role can therefore persist bounded coordination artifacts such as notes, handoffs, plans, ADRs, manifests, evidence records, findings, dispositions, and result packets when the host workspace permits it.
+
+Inherited workspace write access is not subject-mutation authority. Only `bbk_worker` and `bbk_prototyper` may change subject or product artifacts, and only inside their explicit invocation scope and allowed effects. Other roles may write coordination artifacts but must return implementation work to the parent or an explicitly permitted mutating role. A user- or organization-selected read-only parent session still remains read-only.
+
+## Bundled language profiles
+
+BBK includes the independently manifested `0.1.0-alpha.3` CODESYS, Go, Python, Rust, and TypeScript/JavaScript profile packages. All five install by default; use `--no-language-profiles` for core-only installation or repeated `--profile-id` options for a subset.
+
+An explicit `--language-profiles PATH` replaces the bundled source for that invocation. It may identify a profile ZIP, an extracted profile package, a flat set of extracted profiles, a `packages/` repository tree, or a verified aggregate bundle. The separate `bbk-language-profiles` repository is already expanded and can be passed directly:
+
+```powershell
+python tools\setup.py --test-and-install `
+  --scope user --omp --codex `
+  --language-profiles ..\bbk-language-profiles
+```
+
+During installation BBK replaces the package placeholder `bbk-installed-profiles` skill with a compact registry generated from the exact verified profile set. The complete machine-readable inventory is written to `effective-language-profiles.json` and bound into `install-manifest.json`.
+
+See `docs/LANGUAGE-PROFILES.md`.
+
+## Repository-native source
+
+The extracted package root is the BBK Git repository tree. No Git-repository extractor or staging script is required. Preserve `.git/` and any intentionally maintained repository-only README, replace the repository contents with the verified package tree, review the diff, and commit.
+
+Release qualification reports, archive audits, test transcripts, and pre-public history are separate release artifacts rather than source-tree documentation. The BBK repository intentionally retains the small bundled profile archives so a clone remains self-contained and the default installer continues to install all profiles.
+
+See `docs/DEVELOPMENT.md` and `docs/UPGRADING.md`.
+
+## Lineage and scope
+
+BBK is Blueprint-inspired but product-neutral. It carries forward explicit authority, bounded context, recommendation-first Wayfinding, escalation-only Grill, durable evidence, non-averaging assurance, and logical-role boundaries without claiming official Blueprint, Tenex, target-project, qualification, or release authority.
+
+Pre-public Blueprint alignment reviews, roadmap mappings, source PRDs, and dogfood fixtures are preserved outside the public source tree. The executable source of truth for current BBK behavior is the canonical specification under `spec/`, generated projections, schemas, tests, and the durable documentation indexed by `docs/README.md`.
+
+## Core method chain
 
 ```text
 requested intervention
-  → desired operational outcome
-    → facts, assumptions, and open questions
-      → decisions, authority, architecture, and interfaces
-        → accepted execution baseline
-          → bounded work units
-            → exact implementation candidate
-              → assertion-specific validation and review
-                → evidence-bound acceptance
-                  → operational outcome check
+  → desired operational outcome and baseline
+  → SolutionOutcomeFit when applicable
+  → architecture and ImplementationStructureContract
+    → reusable procedure and explicit context edges when applicable
+      → StateDecisionEffectDesign when applicable
+        → ExecutionSlices and WorkUnits
+          → AssuranceContract
+            → deterministic gates and exact candidate
+              → ReviewManifest and ReviewContextManifest
+                → typed profile projections and evidence adapters
+                  → ReviewRun, receipts, findings, and dispositions
+                    → outcome evidence and learning candidates
 ```
 
-The central idea is simple:
+Routine work may keep most of this inline. Material, consequential, uncertain, stateful, effectful, interface-heavy, recurrent, delegated, or hard-to-reverse work records only the applicable objects and boundaries.
 
-> Agentic engineering needs more than a capable actor and a good prompt. It needs a persistent model of outcomes, decisions, authority, interfaces, execution state, evidence, invalidation, and recovery.
+## Language/domain profile protocol
 
-A useful design shorthand is:
-
-> **Models propose; deterministic code commits.**
-
-Models remain responsible for judgment, investigation, design, implementation, and interpretation. Deterministic tooling is used where exactness matters: schema validation, authority and state checks, candidate identity, gate dependencies, manifest comparison, installation ownership, evidence binding, and invalidation.
-
----
-
-## BBK and Blueprint
-
-**Blueprint** is the broader planned local-first semantic planning and execution control plane. Its goal is to represent important project concepts as identity-bearing, related objects rather than leaving them as loose prose across chats and documents.
-
-**BBK** is the practical bootstrap harness available now. It applies much of that philosophy through current agent hosts while the full Blueprint product is still being developed.
+`bbk.profile-capability.v1` remains the core-owned, typed, content-addressed boundary for read-only language/domain procedures:
 
 ```text
-Vanilla coding agent
-  A powerful actor that can reason and act.
-
-Skills-first methodology
-  Instructions and procedures that improve how that actor works.
-
-Spec-first methodology
-  Structured documents that make intent drive implementation.
-
-Blueprint
-  A project-local semantic and authority system that governs what the work
-  means, what is known, who may decide, what may change, what counts as
-  evidence, when execution is authorized, and how reality changes the plan.
-
-BBK
-  A practical bootstrap harness for applying much of that control discipline
-  before the full Blueprint product exists.
+verified profile package
+  → exact content-bound request package
+    → read-only profile operation
+      → typed result bound to the request digest
+        → generic BBK validation, assurance, evidence, and locking
 ```
 
-BBK is deliberately external to the eventual Blueprint product. It does not claim official Blueprint lifecycle, capability, readiness, release, organizational, Tenex, or other institutional authority.
+Supported operations remain `state-effect`, `state-effect-inventory`, `state-effect-review`, `review-context`, `review-lens`, and `evidence-adapter`. Alpha.7 declarations without the typed protocol remain `legacy-declared` and are not invoked automatically. Alpha.8-aware alpha.3 profiles remain compatible when their exact package and runtime compatibility checks pass.
 
----
-
-## What changes when you use BBK
-
-### Outcome before intervention
-
-“Build a dashboard” is an intervention. “Help an operator recognize and respond to a developing fault within two minutes” is an outcome. BBK encourages agents to test whether the requested solution is actually fit for the result that matters.
-
-### Facts, assumptions, proposals, and decisions stay distinct
-
-A plausible statement from a model is not automatically a fact. A recommendation is not automatically a decision. A decision is not automatically authorized. BBK keeps those distinctions visible so downstream work does not inherit accidental certainty or authority.
-
-### Planning and execution are separate responsibilities
-
-Planning roles discover, frame, decide, and structure. Execution roles implement an accepted baseline. Material discoveries return to planning rather than being silently absorbed as implementation drift.
-
-### Interfaces matter more than file lists
-
-Parallel agents help only when ownership, contracts, failure behavior, compatibility, and integration obligations are explicit. BBK treats interfaces and responsibility boundaries as first-class architecture.
-
-### Evidence belongs to an exact subject
-
-A green test, review, benchmark, or inspection is meaningful only when it is bound to the exact candidate, environment, context, method, and claim it supports. Change the candidate materially and affected evidence becomes stale.
-
-### Review is claim-specific
-
-“Looks good” is not an assurance strategy. Important assertions receive explicit methods, evidence requirements, applicability rules, and independence expectations. Protected floors such as safety, security, privacy, or reliability cannot be averaged away by strong performance elsewhere.
-
-### Recovery is a state problem, not a memory problem
-
-Interrupted work should resume from durable decisions, active branches, candidates, blockers, deviations, findings, and evidence—not from whichever summary the last model happened to write.
-
-### Process is proportional
-
-A one-line bug does not need a miniature safety case. BBK’s rule is to use the lightest structure that protects the important claims and boundaries. Routine work can remain mostly inline; consequential or uncertain work earns more explicit artifacts and assurance.
-
----
-
-## What BBK provides today
-
-BBK currently provides:
-
-- a canonical role system covering recursive planning, focused investigation, architecture, orchestration, bounded implementation, validation, synthesis, and independent review;
-- generated host projections for **OMP, Codex, Claude Code, and generic agent environments**;
-- explicit direct-child delegation contracts and structured return expectations;
-- durable `.bbk` project records for decisions, structures, work, assurance, gates, reviews, profile locks, status, and related state;
-- `SolutionOutcomeFit` for detecting when the requested intervention is not well matched to the desired outcome;
-- implementation-structure, execution-slice, work-unit, and State–Decision–Effect methods;
-- exact candidates, deterministic gate execution, evidence receipts, review contexts, findings, and dispositions;
-- install-time and OMP runtime model-routing profiles, including economical test and all-DeepSeek routes;
-- a persistent OMP BBK mode with `/bbk`, `/bbk:exit`, and `/bbk:models`;
-- independently verified language and domain profiles;
-- cautious installation, selective host updates, ownership manifests, backups, status, and conservative uninstall;
-- deterministic package verification, ordered test execution, reproducible release building, and Git-repository extraction.
-
-The companion **`bbk-language-profiles`** repository contains the editable source form of the current specialist profiles:
-
-- CODESYS;
-- Go;
-- Python;
-- Rust;
-- TypeScript/JavaScript.
-
-Profiles add language- or domain-specific procedures, checks, tool guidance, and evidence adapters. They do not redefine the canonical BBK role topology or grant additional authority.
-
----
-
-## Supported agent hosts
-
-| Host | BBK integration |
-|---|---|
-| **OMP / Oh My Pi** | Extension, persistent BBK mode, model-routing menu, commands, tools, skills, and native task-agent `spawns` metadata |
-| **Codex** | Generated custom agents, model and reasoning-effort routing, skills, and explicit delegation contracts |
-| **Claude Code** | Generated sub-agents, model and effort routing, skills, and child-agent allowlists |
-| **Generic** | Portable Markdown agent definitions and shared skills for other harnesses |
-
-Host support is an adapter layer. BBK does not require one particular model provider, version-control system, issue tracker, or hosted project service to be the semantic authority.
-
----
-
-## Quick start
-
-### Requirements
-
-At minimum:
-
-- Python 3.10 or newer for BBK core;
-- Git for worktree and repository workflows;
-- Node.js when installing or qualifying the OMP extension;
-- the selected agent host for live use.
-
-Individual language profiles may require newer Python versions and their own compilers, runtimes, IDEs, simulators, or test tools.
-
-### Verify the source checkout
-
-```bash
-python tools/verify_source_repository.py --require-node
-```
-
-A source checkout intentionally has no release `PACKAGE-MANIFEST.json`. This command verifies canonical/generated drift, model routing, Python and JSON sanity, semantic fixtures, the ordered unittest corpus, and OMP JavaScript syntax without pretending the mutable Git working tree is an immutable release archive.
-
-### Install from sibling source repositories
-
-The normal source layout is:
+## Package layout
 
 ```text
-workspace/
-├── bbk/
-└── bbk-language-profiles/
+bundled-language-profiles/          verified five-profile release bundle
+spec/roles.json                     canonical role catalogue and direct-child topology
+spec/model-routing.json             default model/effort policy
+spec/method-content.json            canonical skills and references
+spec/schemas/                       30 BBK schemas
+shared/skills/                      harness-neutral skills
+shared/references/                  method modules
+projections/*/agents/               generated Codex, OMP, Claude, and generic agents
+projections/manifest.json           externalized role/routing/projection metadata
+omp/extension/                      OMP tools, commands, and /bbk entrypoint
+tools/bootstrap.py                  preferred test/install front door
+tools/setup.py                      bootstrap modes and aliases
+tools/update_omp.py                 selective OMP-only updater
+tools/update_codex.py               selective Codex-agent-only updater
+tools/verify_all.py                 ordered full verification pipeline
+tools/run_tests.py                  PowerShell-safe tests and final summaries
+tools/profile_install.py            ZIP and expanded-repository profile validation
+tools/profile_registry.py           install-bound compact profile registry
+tools/install_profiles.py           bundled/alternate profile convenience wrapper
+tools/install.py                    unified preflight/install/status/uninstall
+tools/bbk.py                        deterministic BBK CLI
+fixtures/                           semantic, schema, profile, and compatibility fixtures
+templates/                          BBK artifact templates
+tests/                              consolidated responsibility-oriented suites
 ```
 
-Verify BBK and install it for OMP and Codex with all profiles from the sibling repository:
+## Verify and install
+
+Run every package check in canonical order:
 
 ```bash
-python tools/repo_setup.py --test-and-install \
-  --scope user \
-  --omp --codex
+python tools/run_tests.py --all --require-node
 ```
 
-`repo_setup.py` auto-detects `../bbk-language-profiles`. An explicit profile source is also supported:
+Run only unittest modules, with `[current/total]` suite status, completion timing, a `still running` heartbeat after 15 quiet seconds, and the final aggregate failure/error summary:
 
 ```bash
-python tools/repo_setup.py --test-and-install \
-  --scope user \
-  --omp --codex \
-  --language-profiles /path/to/bbk-language-profiles
+python tools/run_tests.py -v
 ```
 
-Install only selected profiles:
+Preferred test-then-install command; all five bundled profiles are included automatically:
 
 ```bash
-python tools/repo_setup.py --test-and-install \
-  --scope user \
-  --omp --codex \
-  --profile-id rust \
-  --profile-id python
+python tools/bootstrap.py --test-and-install --scope user --omp --codex --claude
 ```
 
-Install core BBK without language profiles:
+Equivalent explicit setup spelling:
 
 ```bash
-python tools/repo_setup.py --test-and-install \
-  --scope user \
-  --omp --codex \
-  --no-language-profiles
+python tools/setup.py --test-and-install --scope user --omp --codex --claude
 ```
 
-Preview installation without writing:
+Inspect the complete core-plus-profile plan without creating the installation root or manifest:
 
 ```bash
-python tools/repo_setup.py --test-and-install \
-  --scope user \
-  --omp --codex \
-  --dry-run
+python tools/install.py install --scope user --omp --codex --claude --dry-run
 ```
 
-Published release archives may bundle exact qualified profile snapshots for self-contained installation. The Git `main` branch does not duplicate those ZIP payloads. See [`docs/INSTALL.md`](docs/INSTALL.md) for release installation, user/project scopes, selective host updates, external model-routing policies, status, and uninstall behavior.
+The installer verifies every selected profile package, validates a bundled release or expanded repository manifest when present, checks compatibility, generates one complete destination plan, rejects unsafe archives and cross-package collisions, and preflights divergence and backup behavior before the first write. Human-mode runs stream verification as it happens and report profile preparation, preflight file counts, write progress, and manifest completion. Core and profile files share one install manifest, status surface, and conservative uninstall path.
 
-### Begin using BBK in OMP
 
-```text
-/bbk          enter persistent BBK mode
-/bbk:models   inspect or change sub-agent model routing
-/bbk:exit     leave BBK mode
-```
+See `docs/README.md`, `docs/INSTALL.md`, `docs/USAGE.md`, `docs/LANGUAGE-PROFILES.md`, and `docs/DEVELOPMENT.md`.
 
-Inside BBK mode, ordinary messages are interpreted as part of the continuing governed workflow. The parent session remains user-facing and routes planning, execution, review, and acceptance work to the appropriate named BBK agents.
+## Boundaries
 
-### Initialize project records
+BBK package qualification proves deterministic package content and the tested method and installer mechanics. It does not prove live model availability or competence, acceptance of a model/effort value by a particular host release, physical role separation, context isolation, external profile toolchains, target-project correctness, or official Blueprint/Tenex authority. Model routing and installed profiles add procedures and execution defaults; they do not grant effects, approval, evidence sufficiency, or release authority.
 
-```bash
-bbk init --title "Project name"
-bbk status
-```
-
-The method is designed to scale from mostly inline use to explicit structured records as the consequence, uncertainty, duration, and coordination burden increase.
-
----
-
-## When BBK is worth using
-
-BBK becomes compelling when several of these are true:
-
-- the requested solution may be the wrong intervention;
-- the work is long-running, consequential, uncertain, or difficult to reverse;
-- implementation crosses software, equipment, operations, data, people, or policy;
-- several agents, teams, or authorities must share decisions and interfaces;
-- interface behavior and failure modes matter more than individual files;
-- review must establish specific claims rather than produce general confidence;
-- safety, security, privacy, legal, reliability, or regulatory floors matter;
-- later changes must invalidate earlier conclusions correctly;
-- execution may be interrupted and resumed by a different agent or person;
-- implementation can be complete while the real operational outcome still fails.
-
-A good first BBK pilot is consequential enough to expose real decisions, interfaces, evidence, and resumption—but bounded enough that the team can compare it honestly with its normal workflow.
-
-## When a lighter approach is better
-
-BBK is not automatically the right choice for every task.
-
-A vanilla coding agent, Superpowers, Spec Kit, Compound Engineering, or a focused language skill may be faster when:
-
-- the cause of a small defect is already known;
-- the change is local, reversible, and well covered by existing tests;
-- the feature is well specified and has few material interfaces;
-- the work is a disposable prototype;
-- durable authority, evidence, recovery, and operational closure do not justify additional structure.
-
-That is not a failure of BBK. **Proportionality is part of the method.**
-
----
-
-## Relationship to other agentic-development systems
-
-BBK is best understood as a composable layer, not a demand to replace every useful workflow.
-
-| Layer | Primary responsibility |
-|---|---|
-| **Claude Code, OMP, Codex, Cursor, and similar hosts** | Models, sessions, tools, editing, permissions, hooks, and sub-agent execution |
-| **Superpowers and other skills-first methods** | Strong development procedures such as brainstorming, TDD, debugging, worktrees, review, and verification |
-| **Spec Kit and other spec-first systems** | Structured specification and intent-to-implementation workflows |
-| **Compound Engineering** | Pragmatic plan-build-review-learn loops and repository-local knowledge compounding |
-| **Language/domain profiles** | Specialist procedures, checks, tools, and evidence adapters |
-| **BBK / Blueprint** | Outcome, meaning, authority, interfaces, execution baseline, candidate identity, evidence, invalidation, recovery, and operational closure |
-
-A mature workflow may use all of these. A Superpowers procedure, Spec Kit artifact, Compound Engineering practice, or language-profile operation can act as a capability provider inside a larger BBK-governed effort.
-
-The distinction is not “more features.” It is center of gravity:
-
-```text
-What outcome are we pursuing?
-What is known versus assumed?
-What was proposed versus actually decided?
-Who had authority to decide or authorize it?
-What exact baseline was accepted for execution?
-What exact candidate was tested or reviewed?
-What evidence supports each acceptance claim?
-What changed afterward?
-Which conclusions are now stale?
-Where can execution safely resume?
-Did the delivered capability improve the real-world outcome?
-```
-
----
-
-## Repository layout
-
-```text
-spec/                 canonical roles, method content, routing, and schemas
-shared/skills/        host-neutral BBK skills
-shared/references/    reusable method modules
-projections/          generated Codex, OMP, Claude, and generic agents
-omp/extension/        OMP extension, mode, commands, tools, and model UI
-templates/            project and artifact templates
-fixtures/             positive, negative, and compatibility fixtures
-examples/             curated public examples
-tools/                CLI, validators, installers, generators, and release tools
-tests/                behavioral, semantic, portability, and integration tests
-docs/                 current usage, method, contributor, and boundary documentation
-```
-
-The source repository deliberately excludes bundled language-profile ZIPs, release manifests, checksums, archive audits, full test logs, and version-specific qualification reports. Those are staged for GitHub Releases. The editable profiles live in the companion `bbk-language-profiles` repository.
-
-Generated files should normally be changed through their canonical inputs rather than edited directly:
-
-```text
-spec/roles.json
-spec/method-content.json
-spec/model-routing.json
-```
-
-Run the relevant generator and drift checks after canonical changes.
-
----
-
-## Project state and qualification boundaries
-
-BBK uses deterministic checks to protect exact properties, but determinism does not remove engineering judgment.
-
-BBK can verify that:
-
-- an artifact conforms to a schema;
-- a decision records an authority;
-- a candidate digest matches the reviewed subject;
-- required gates ran in the correct dependency order;
-- a package or installation matches its manifest;
-- a finding remains open until explicitly dispositioned;
-- evidence is stale after a material subject change.
-
-BBK cannot prove that:
-
-- the architecture is wise;
-- the selected model is capable enough for the assignment;
-- weak evidence is strong;
-- a claimed independent review was physically independent;
-- an external compiler, simulator, provider, or service behaved correctly;
-- a target system is safe, secure, compliant, or fit for operation;
-- a human or organization actually granted the authority recorded in an artifact.
-
-See [`docs/QUALIFICATION.md`](docs/QUALIFICATION.md) and [`docs/BOUNDARIES.md`](docs/BOUNDARIES.md) before relying on BBK for consequential work.
-
----
-
-## Documentation
-
-Start with:
-
-- [`docs/USAGE.md`](docs/USAGE.md) — day-to-day BBK workflows;
-- [`docs/INSTALL.md`](docs/INSTALL.md) — source and release installation, updates, profiles, and removal;
-- [`docs/AGENT-COMPOSITION.md`](docs/AGENT-COMPOSITION.md) — role, delegation, and host-projection architecture;
-- [`docs/MODEL-ROUTING.md`](docs/MODEL-ROUTING.md) — install-time tiers and OMP runtime profiles;
-- [`docs/LANGUAGE-PROFILES.md`](docs/LANGUAGE-PROFILES.md) — profile discovery, locking, routing, and repository use;
-- [`docs/SOLUTION-OUTCOME-FIT.md`](docs/SOLUTION-OUTCOME-FIT.md) — outcome and intervention fitness;
-- [`docs/IMPLEMENTATION-STRUCTURE.md`](docs/IMPLEMENTATION-STRUCTURE.md) — responsibilities, interfaces, slices, and work units;
-- [`docs/STATE-DECISION-EFFECT.md`](docs/STATE-DECISION-EFFECT.md) — stateful and effectful system design;
-- [`docs/REVIEW-ASSURANCE.md`](docs/REVIEW-ASSURANCE.md) — assurance contracts, context, evidence, findings, independence, and intent;
-- [`docs/BOUNDARIES.md`](docs/BOUNDARIES.md) — authority and non-claims;
-- [`docs/QUALIFICATION.md`](docs/QUALIFICATION.md) — evergreen source/release verification model;
-- [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) — canonical files, generation, tests, and release staging;
-- [`docs/UPGRADING.md`](docs/UPGRADING.md) — supported upgrade patterns.
-
----
-
-## Contributing
-
-BBK is still evolving quickly. Issues and pull requests are most useful when they identify:
-
-- the operational outcome or failure mode being addressed;
-- the current and expected behavior;
-- the affected canonical source rather than only a generated projection;
-- compatibility and migration consequences;
-- evidence that the change works across the relevant hosts or platforms;
-- whether the change belongs in core BBK, a host adapter, or a language/domain profile.
-
-Changes to generated agents should normally begin in the canonical role, method, or routing specifications and include regenerated projections plus drift tests.
-
-A useful contribution does not need to make BBK larger. Removing unnecessary ceremony, duplicated context, brittle assumptions, or unprotected complexity is equally aligned with the project.
-
----
-
-## Influences and lineage
-
-The Blueprint Method and BBK were developed independently as a broader planning, systems-engineering, execution, and assurance system. Several foundational interaction concepts and names were materially inspired by Matt Pocock’s open-source `grill-me`, `grilling`, and `wayfinder` skills, particularly one-question-at-a-time decision exploration, destination-defined scope, decision maps, actionable frontiers, and fog of war.
-
-Blueprint extends those ideas into recursive responsibility territories, operational framing, interface architecture, implementation-structure contracts, execution slices, proportional assurance, isolated workers, candidate-bound validation, and lifecycle feedback.
-
-Matt Pocock is not affiliated with and has not endorsed this project unless explicitly stated otherwise.
-
----
-
-## License
-
-BBK is released under the [MIT License](LICENSE).
+See `docs/BOUNDARIES.md` and `docs/MODEL-ROUTING.md`.

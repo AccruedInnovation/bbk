@@ -1,0 +1,22 @@
+{
+  "file_count": 2,
+  "files": [
+    {
+      "bytes": 3806,
+      "executable": false,
+      "path": "PROFILE.json",
+      "sha256": "a496ca8e6a9d2113976022453f429bdae7c105c6cded70062d3e5d38942d8b63"
+    },
+    {
+      "bytes": 475,
+      "executable": false,
+      "path": "tools/profile.py",
+      "sha256": "46d496f632e27678a412b7fd2955fc3717725e42905f02109e5b68c84e6aad87"
+    }
+  ],
+  "name": "BBK alpha.7 fixture profile",
+  "root_schema": "bbk.profile-package-root.v1",
+  "root_sha256": "d65cdd7120bc733f21c775a9ccd91e4159373cc158066907ca67bffb14c8a262",
+  "schema": "bbk.profile-package-manifest.v1",
+  "version": "0.1.0-alpha.3"
+}

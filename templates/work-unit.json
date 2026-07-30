@@ -13,6 +13,14 @@
   "dependencies": [
     "WU-DOMAIN-TYPES"
   ],
+  "executionBudget": {
+    "checkpointIntervalSeconds": 600,
+    "durableHandoff": true,
+    "infrastructureContinuations": 6,
+    "largeResultTransport": "file-bytes-sha256",
+    "mode": "extended-resumable",
+    "resumeSameThread": true
+  },
   "executionSliceIds": [
     "ES-SOFTWARE-001"
   ],
@@ -68,5 +76,137 @@
   "verificationPlan": [
     "Run focused unit tests.",
     "Run slice assertions A-S1-ORDER and A-S1-INVALID."
-  ]
+  ],
+  "authorityGrant": {
+    "source": "standing user authorization recorded by the parent Wayfinder",
+    "standing": true,
+    "scope": [
+      "assigned workspace and declared work-unit paths"
+    ],
+    "allowedEffects": [
+      "write explicitly owned source paths",
+      "install temporary packages inside the disposable candidate root"
+    ],
+    "prohibitedEffects": [
+      "modify unrelated protected paths",
+      "mutate sealed or historical evidence",
+      "cause undeclared external effects"
+    ],
+    "safeguards": [
+      "expected prior hash for replacement or deletion of pre-existing disposable artifacts",
+      "preserve durable handoff and evidence records"
+    ],
+    "expiresWhen": [
+      "the work unit is completed, cancelled, superseded, or its scope or authority changes"
+    ]
+  },
+  "capabilityZones": [
+    {
+      "kind": "disposable-candidate-root",
+      "path": ".bbk/workspaces/WU-QUERY-SERVICE",
+      "operations": [
+        "read",
+        "create",
+        "replace",
+        "rename",
+        "delete"
+      ],
+      "guards": [
+        "stay inside the exact root",
+        "use expected prior hash for pre-existing artifacts"
+      ]
+    },
+    {
+      "kind": "protected-worktree",
+      "path": ".",
+      "operations": [
+        "read",
+        "replace"
+      ],
+      "guards": [
+        "mutate only affectedPaths owned by this work unit"
+      ]
+    },
+    {
+      "kind": "sealed-evidence",
+      "path": ".bbk/candidates",
+      "operations": [
+        "read"
+      ],
+      "guards": [
+        "never mutate; create successor records outside the sealed subject"
+      ]
+    }
+  ],
+  "toolEnvironment": {
+    "activation": null,
+    "tools": [
+      {
+        "id": "bbk",
+        "command": "bbk",
+        "versionCommand": "bbk version",
+        "expectedVersion": "0.1.0-alpha.11.11",
+        "fallbackCommand": "<python> <installed-bbk-root>/tools/bbk.py version"
+      },
+      {
+        "id": "language-toolchain",
+        "command": "<resolved profile command>",
+        "versionCommand": "<resolved profile version command>",
+        "expectedVersion": null,
+        "fallbackCommand": null
+      }
+    ]
+  },
+  "payloadLimits": {
+    "maxInlineBytes": 32768,
+    "maxToolResultBytes": null,
+    "onExceed": "file-bytes-sha256",
+    "silentTruncationAllowed": false
+  },
+  "returnContract": {
+    "schema": "bbk.handoff.v1",
+    "requiredFields": [
+      "disposition",
+      "subject",
+      "authority",
+      "capability_zones_used",
+      "changed_paths",
+      "artifacts",
+      "evidence",
+      "checks",
+      "residual_uncertainty",
+      "continuation",
+      "smallest_next_action"
+    ],
+    "operationalDispositions": [
+      "COMPLETE",
+      "PARTIAL",
+      "READY_FOR_VALIDATION",
+      "BLOCKED_TECHNICAL",
+      "BLOCKED_AUTHORITY",
+      "BLOCKED_DECISION",
+      "PAUSED_CAPACITY",
+      "PAUSED_HOST_WINDOW",
+      "CANCELLED",
+      "INCONCLUSIVE"
+    ]
+  },
+  "interruptPolicy": {
+    "allowedReasons": [
+      "USER_CANCELLED",
+      "CHILD_REQUESTED_STOP",
+      "UNAUTHORIZED_EFFECT",
+      "OWNERSHIP_COLLISION",
+      "CONFIRMED_HANG",
+      "OBSOLETE_WORK"
+    ],
+    "rejectedReasons": [
+      "timed out",
+      "silent",
+      "taking too long",
+      "slot needed"
+    ],
+    "heartbeatSemantics": "informational",
+    "waitTimeoutSemantics": "polling-only"
+  }
 }
