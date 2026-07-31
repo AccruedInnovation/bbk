@@ -1,6 +1,6 @@
 {
   "description": "Canonical default model and reasoning-effort routing for generated BBK sub-agents. Edit this policy or supply an install-time override; never edit generated projections directly.",
-  "package_version": "0.1.0-alpha.11.11",
+  "package_version": "0.1.0-alpha.11.12",
   "profiles": {
     "coordination": {
       "claude": {

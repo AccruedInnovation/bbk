@@ -5,7 +5,7 @@
   },
   "description": "Start from one model and override only the roles that need a different route.",
   "id": "my-custom-profile",
-  "package_version": "0.1.0-alpha.11.11",
+  "package_version": "0.1.0-alpha.11.12",
   "roles": {
     "bbk_architect": {
       "model": "deepseek/deepseek-v4-pro",

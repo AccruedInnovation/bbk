@@ -1,6 +1,6 @@
 {
   "schema_version": "bbk.roles.v2",
-  "package_version": "0.1.0-alpha.11.11",
+  "package_version": "0.1.0-alpha.11.12",
   "constitution_modules": {
     "core": [
       "BBK is a method harness. Host capability does not create authority; installation, invocation, model choice, tool availability, and permissions only define what is physically possible.",

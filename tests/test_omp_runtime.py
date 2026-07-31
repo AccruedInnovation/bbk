@@ -18,6 +18,10 @@ import textwrap
 import unittest
 from pathlib import Path
 m1_ROOT = Path(__file__).resolve().parents[1]
+m1_TOOLS = m1_ROOT / 'tools'
+if str(m1_TOOLS) not in sys.path:
+    sys.path.insert(0, str(m1_TOOLS))
+from path_compat import path_key as m_path_key
 m1_INSTALL = m1_ROOT / 'tools' / 'install.py'
 m1_ROUTING = m1_ROOT / 'tools' / 'omp_model_routing.py'
 m1_PROFILES = m1_ROOT / 'spec' / 'omp-model-routing-profiles.json'
@@ -51,7 +55,7 @@ class Alpha113OmpModelMenuTests(unittest.TestCase):
         value = json.loads(m1_PROFILES.read_text(encoding='utf-8'))
         roles = {item['name'] for item in json.loads((m1_ROOT / 'spec' / 'roles.json').read_text(encoding='utf-8'))['roles']}
         self.assertEqual(value['schema_version'], 'bbk.omp-model-routing-profiles.v1')
-        self.assertEqual(value['package_version'], '0.1.0-alpha.11.11')
+        self.assertEqual(value['package_version'], '0.1.0-alpha.11.12')
         self.assertEqual(set(value['profiles']), {'default', 'testing-flash', 'deepseek-economy'})
         for profile in value['profiles'].values():
             self.assertEqual(set(profile['roles']), roles)
@@ -65,7 +69,7 @@ class Alpha113OmpModelMenuTests(unittest.TestCase):
     def test_template_is_compact_and_valid_for_runtime_application(self):
         value = json.loads(m1_TEMPLATE.read_text(encoding='utf-8'))
         self.assertEqual(value['schema_version'], 'bbk.omp-model-routing-profile.v1')
-        self.assertEqual(value['package_version'], '0.1.0-alpha.11.11')
+        self.assertEqual(value['package_version'], '0.1.0-alpha.11.12')
         self.assertEqual(set(value['default']), {'model', 'thinkingLevel'})
         canonical = {item['name'] for item in json.loads((m1_ROOT / 'spec' / 'roles.json').read_text(encoding='utf-8'))['roles']}
         self.assertLessEqual(set(value['roles']), canonical)
@@ -82,6 +86,7 @@ class Alpha113OmpModelMenuTests(unittest.TestCase):
             binding = json.loads((extension / 'bbk-package-root.json').read_text(encoding='utf-8'))
             self.assertEqual(binding['schema'], 'bbk.omp-package-binding.v2')
             self.assertTrue((extension / 'omp_model_routing.py').is_file())
+            self.assertTrue((extension / 'path_compat.py').is_file())
             self.assertTrue(Path(binding['state_path']).is_file())
             status, _ = m1_run_json([sys.executable, extension / 'omp_model_routing.py', '--json', 'status'], env=env)
             self.assertEqual(status['active_profile'], 'installation-default')
@@ -150,7 +155,7 @@ class Alpha113OmpModelMenuTests(unittest.TestCase):
 
     def test_version_and_extension_metadata_agree(self):
         version = (m1_ROOT / 'VERSION').read_text(encoding='utf-8').strip()
-        self.assertEqual(version, '0.1.0-alpha.11.11')
+        self.assertEqual(version, '0.1.0-alpha.11.12')
         self.assertEqual(json.loads((m1_ROOT / 'omp' / 'extension' / 'package.json').read_text(encoding='utf-8'))['version'], version)
         self.assertEqual(json.loads(m1_PROFILES.read_text(encoding='utf-8'))['package_version'], version)
 
@@ -273,6 +278,21 @@ class Alpha114OmpContextAndUpdateTests(unittest.TestCase):
             installed, _ = m2_run_json([sys.executable, m2_INSTALL, '--json', 'install', '--scope', 'user', '--omp', '--codex', '--no-language-profiles'], env=env)
             extension = home / '.omp' / 'agent' / 'extensions' / 'bbk'
             m2_run_json([sys.executable, extension / 'omp_model_routing.py', '--json', 'apply-profile', 'testing-flash'], env=env)
+            # Simulate an alpha.11.11 predecessor installation that did not yet
+            # carry the shared path helper beside the routing command. The OMP-
+            # only successor update must make its new import self-contained.
+            helper = extension / 'path_compat.py'
+            helper.unlink()
+            manifest_path = Path(installed['manifest_path'])
+            predecessor_manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+            predecessor_manifest['files'] = [
+                record for record in predecessor_manifest['files']
+                if m_path_key(record['path']) != m_path_key(helper)
+            ]
+            manifest_path.write_text(
+                json.dumps(predecessor_manifest, indent=2, ensure_ascii=False, sort_keys=True) + '\n',
+                encoding='utf-8',
+            )
             codex_root = home / '.codex' / 'agents'
             before = m2_file_snapshot(codex_root)
             updated, _ = m2_run_json([sys.executable, m2_UPDATE_OMP, '--json', '--scope', 'user'], env=env)
@@ -283,6 +303,7 @@ class Alpha114OmpContextAndUpdateTests(unittest.TestCase):
             self.assertIn('codex', updated['untouched_harnesses'])
             self.assertEqual(updated['reload_command'], '/reload-plugins')
             self.assertEqual(before, m2_file_snapshot(codex_root))
+            self.assertTrue(helper.is_file())
             routed, _ = m2_run_json([sys.executable, extension / 'omp_model_routing.py', '--json', 'status'], env=env)
             self.assertEqual(routed['active_profile'], 'testing-flash')
             self.assertEqual({route['model'] for route in routed['roles'].values()}, {'deepseek/deepseek-v4-flash'})

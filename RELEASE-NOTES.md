@@ -1,102 +1,98 @@
-# BBK 0.1.0-alpha.11.11 release notes
+# BBK 0.1.0-alpha.11.12 release notes
 
-Alpha.11.11 is a repository-shape and documentation-maintenance successor to
-alpha.11.10. It does not change the 19-role method, generated agent behavior,
-model-routing policy, language-profile packages, installer destination
-contracts, or `.bbk/` project-record formats.
+Alpha.11.12 is the immutable Windows-portability and qualification successor to
+alpha.11.11. It carries forward alpha.11.11's repository-native source tree,
+consolidated documentation, 19-role method, model-routing policy, installer
+contracts, `.bbk/` record formats, and mixed-version bundled profile set. The
+revision changes the BBK package identity so the corrected archive is no longer
+published by replacing an earlier artifact under the same version.
 
-## Repository-native source
+## Repository-native source and documentation boundary
 
-The extracted BBK package root is now the canonical Git source tree. A separate
-repository extractor, generated staging tree, or post-release projection step is
-no longer required.
+The alpha.11.11 **Repository-native source** contract is unchanged: the
+extracted BBK package root remains the canonical Git source tree and contains
+everything required to develop, verify, install, and rebuild the release.
 
-A normal repository update is:
+The public documentation inventory remains **14 current** durable documents.
+Historical PRDs, per-alpha migration notes, internal alignment material, and
+release-specific qualification transcripts remain outside the source tree in
+the separate **pre-public history** artifact. No repository extractor or
+post-release staging-tree workflow is reintroduced.
 
-1. extract and verify the new release;
-2. replace the tracked repository contents while preserving `.git/` and any
-   intentionally repository-only root README;
-3. review the diff;
-4. commit and tag through the normal Git workflow.
+## Windows verification-console correction
 
-The source tree retains everything required to verify, develop, install, and
-build BBK, including generated host projections and the five small bundled
-language-profile archives. Keeping the bundled archives makes a standalone BBK
-clone self-contained and preserves default profile installation.
+The unittest runner, ordered verifier, and installation verification gate now
+transport child output safely on native Windows consoles:
 
-## Documentation boundary
+- Python verification children use deterministic UTF-8 standard streams;
+- undecodable child bytes remain visible as ASCII escape sequences rather than
+  becoming an unprintable replacement character;
+- characters unsupported by the active console code page are escaped without
+  forcing a global console-encoding change;
+- a still-running suite is terminated before capture-file cleanup; and
+- transiently locked capture logs are removed with bounded retries, while
+  exhausted cleanup remains best-effort and cannot mask the actual test result.
 
-`docs/` is reduced from the accumulated pre-public history to 14 current,
-durable documents:
+Regression coverage includes strict CP1252 output, valid Unicode, invalid UTF-8
+bytes, a running child, and both transient and persistent simulated Windows
+sharing violations.
 
-```text
-README.md
-INSTALL.md
-USAGE.md
-UPGRADING.md
-DEVELOPMENT.md
-AGENTS.md
-WAYFINDING-AND-GRILL.md
-SOLUTION-OUTCOME-FIT.md
-EXECUTION-DESIGN.md
-DURABLE-HANDOFFS.md
-ASSURANCE.md
-LANGUAGE-PROFILES.md
-MODEL-ROUTING.md
-BOUNDARIES.md
+## Windows filesystem identity and optional tooling
+
+BBK now centralizes two deliberate path identities in `tools/path_compat.py`:
+
+- **native physical identity** follows host filesystem semantics and collapses
+  long/8.3 Windows aliases, case aliases, junctions, and symlinks for live
+  installation and selective-update ownership checks;
+- **portable install-plan identity** additionally normalizes slash spelling and
+  case on every host, preventing a plan created on Linux or macOS from carrying
+  destinations that would collide when installed on Windows.
+
+The Codex-only and OMP-only update paths, installed OMP model routing, and core
+installer use the appropriate shared identity. Tests cover not-yet-created
+leaves beneath an existing short-name parent and case-only portable collisions.
+
+Schema-validator tests now recognize both supported states: `PASS` when the
+optional `jsonschema` runtime is available, and structured `BLOCKED` with exit
+code 1 when it is absent. An isolated `python -S` regression verifies that the
+blocked-state contract does not depend on user-site packages or `PYTHONPATH`.
+
+## Native Windows release gate
+
+The source tree includes `tools/windows_compat.py` and
+`.github/workflows/windows-verification.yml`. The native probe exercises:
+
+- case-insensitive aliases;
+- 8.3 aliases when enabled on the volume;
+- directory-junction identity; and
+- real Win32 sharing-violation cleanup after an exclusive handle is released.
+
+The Windows CI matrix runs Python 3.11 and 3.13, the native probe, all ordered
+verification stages, the complete unittest suite, and a second unittest pass
+under strict CP1252 output. Unsupported 8.3 generation or junction creation is
+reported as `NOT_APPLICABLE`; available behavior must pass.
+
+## Bundled profiles and compatibility
+
+The bundled profile inventory is unchanged:
+
+- CODESYS `0.1.0-alpha.4`;
+- Go `0.1.0-alpha.3`;
+- Python `0.1.0-alpha.3`;
+- Rust `0.1.0-alpha.3`; and
+- TypeScript/JavaScript `0.1.0-alpha.3`.
+
+All five inner archives remain independently manifested and byte-identical to
+the alpha.11.11 bundle. No `.bbk/` project-record migration is required.
+External model-routing overrides must bind `package_version` to
+`0.1.0-alpha.11.12` when used with this release.
+
+Use a new empty extraction directory. For a normal verified user installation:
+
+```powershell
+python tools\windows_compat.py
+python tools\bootstrap.py --test-and-install --scope user --omp --codex --claude
 ```
 
-Related material was consolidated rather than discarded:
-
-- role composition and role-contract guidance are combined in `AGENTS.md`;
-- state/effect and implementation-structure guidance are combined in
-  `EXECUTION-DESIGN.md`;
-- review context, evidence, findings, independence, and intent conformance are
-  combined in `ASSURANCE.md`;
-- profile dispatch is part of `LANGUAGE-PROFILES.md`;
-- one durable `UPGRADING.md` replaces a chain of per-alpha migration files;
-- `docs/README.md` is the documentation index.
-
-Historical PRDs, decision notes, migration notes, internal alignment material,
-old qualification reports, and release-specific test/audit transcripts are not
-part of the public source tree. The human-readable public history remains in
-`CHANGELOG.md`; the complete pre-public material is preserved in a separate
-archive artifact.
-
-## Removed pre-public utilities and fixtures
-
-The public tree no longer carries:
-
-- the repository-extraction utility and its documentation;
-- the alpha.9.1 one-off Windows test-leak recovery utility;
-- the internal Blueprint alignment data and dogfood fixture;
-- historical source-PRD and decision-note directories.
-
-None is required to build, verify, install, update, or use current BBK. They are
-retained in the separate pre-public history archive for provenance.
-
-## Test and build alignment
-
-The five consolidated responsibility-oriented test modules now verify the
-repository boundary directly:
-
-- the public documentation inventory is exact and current-facing;
-- historical directories and one-off utilities remain absent;
-- the package root remains self-contained;
-- expanded language-profile repositories remain directly installable;
-- release building copies the root release notes without relying on a deleted
-  documentation path.
-
-`tools/build_release.py` continues to produce a deterministic release ZIP,
-SHA-256 companion, package-manifest copy, and release-notes copy.
-
-## Compatibility
-
-No `.bbk/` project-record migration is required. Existing alpha.11.10 model
-routing overrides need only update their package-version binding when used with
-alpha.11.11. The independently versioned CODESYS, Go, Python, Rust, and
-TypeScript/JavaScript `0.1.0-alpha.3` packages are byte-identical to the set in
-alpha.11.10 and continue to install by default.
-
-See `docs/DEVELOPMENT.md` for the direct Git workflow, `docs/README.md` for the
-current documentation map, and `docs/UPGRADING.md` for managed-install updates.
+See `docs/INSTALL.md`, `docs/UPGRADING.md`, and `docs/DEVELOPMENT.md` for the
+managed-install, selective-update, and repository workflows.

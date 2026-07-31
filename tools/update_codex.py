@@ -26,6 +26,7 @@ if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
 import install as install_tool
+from path_compat import path_key
 from generate_agents import rendered_projections
 from model_routing import ModelRoutingError
 
@@ -60,7 +61,7 @@ def utc_now() -> str:
 
 
 def normalized(path: Path) -> str:
-    return os.path.normcase(os.path.abspath(os.fspath(path))).replace("\\", "/")
+    return path_key(path)
 
 
 def digest_bytes(data: bytes) -> str:

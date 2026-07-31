@@ -12,6 +12,8 @@ import sys
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from path_compat import path_key
+
 SCRIPT_DIR = Path(__file__).resolve().parent
 DEFAULT_BINDING = SCRIPT_DIR / "bbk-package-root.json"
 THINKING_LEVELS = {"auto", "off", "minimal", "low", "medium", "high", "xhigh", "max"}
@@ -71,7 +73,7 @@ def atomic_write(path: Path, data: bytes, mode: int | None = None) -> None:
 
 
 def normalized_path(path: Path) -> str:
-    return os.path.normcase(os.path.abspath(os.fspath(path))).replace("\\", "/")
+    return path_key(path)
 
 
 def validate_route(value: Any, where: str) -> dict[str, str]:

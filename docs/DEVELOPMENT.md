@@ -44,6 +44,36 @@ method and role projections, model routing, generated agents, Python and JSON
 sanity, semantic/schema fixtures, typed profile fixtures, all tests, OMP syntax,
 and package integrity after testing.
 
+## Windows-native compatibility
+
+Linux and macOS runs cannot faithfully reproduce Windows console code pages,
+8.3 aliases, case-insensitive path identity, directory junctions, or Win32 file
+sharing. Before publishing a release, run the native probe and the full suite
+on Windows:
+
+```powershell
+python tools/windows_compat.py
+python tools/run_tests.py --all --require-node
+
+$env:PYTHONIOENCODING = "cp1252:strict"
+python tools/run_tests.py -v
+```
+
+`tools/windows_compat.py` treats unavailable 8.3 generation or junction
+creation as `NOT_APPLICABLE`, but fails any native behavior that is available
+and produces inconsistent physical-path identity or leaves a capture file
+behind after its exclusive Win32 handle is released.
+
+The repository workflow `.github/workflows/windows-verification.yml` performs
+these checks on `windows-latest` with Python 3.11 and 3.13. Keep that workflow
+blocking for pull requests that change installation, update, subprocess,
+console, temporary-file, path, or manifest code.
+
+Cross-platform regressions still simulate a `TOMBST~1` to `Tombstone`
+short-name expansion and use a directory alias to verify collision detection.
+This keeps the algorithm covered even when a particular Windows CI volume has
+8.3 name generation disabled.
+
 ## Generated files
 
 Do not edit generated agent projections directly. Update the canonical sources

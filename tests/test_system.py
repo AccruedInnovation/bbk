@@ -664,12 +664,12 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
             (root / 'skills' / 'bbk-rust' / 'SKILL.md').write_text('---\nname: bbk-rust\ndescription: Rust profile router.\n---\n\n# Router\n', encoding='utf-8')
             (root / 'skills' / 'rust-review' / 'SKILL.md').write_text('---\nname: rust-review\ndescription: Focused Rust review.\n---\n\n# Review\n', encoding='utf-8')
             item = _DummyProfile(root=root, profile={'id': 'rust', 'version': '0.1.0-alpha.3', 'name': 'Rust', 'description': 'Qualified Rust procedures.', 'package': 'bbk-profile-rust', 'installation': {'skill_root': 'skills', 'cli': 'tools/rust_profile.py'}, 'capabilities': {'test': {'status': 'supported'}, 'mutation': {'status': 'conditional'}}})
-            data = profile_registry.registry_data([item], bbk_version='0.1.0-alpha.11.11')
+            data = profile_registry.registry_data([item], bbk_version='0.1.0-alpha.11.12')
             profile = data['profiles'][0]
             self.assertEqual(profile['router_skill'], 'bbk-rust')
             self.assertEqual(profile['cli_command'], 'rust-profile')
             self.assertEqual(profile['skill_count'], 2)
-            text = profile_registry.registry_skill_text([item], bbk_version='0.1.0-alpha.11.11')
+            text = profile_registry.registry_skill_text([item], bbk_version='0.1.0-alpha.11.12')
             self.assertIn('### `rust@0.1.0-alpha.3` — Rust', text)
             self.assertIn('Router skill: `bbk-rust`', text)
             self.assertIn('test=supported', text)
@@ -917,7 +917,8 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
             self.assertEqual(third["results"][0]["stdout_file"]["sha256"], a118_hashlib.sha256(restored).hexdigest())
 
     def test_schema_validator_is_discoverable_and_uses_draft_2020_12(self) -> None:
-        status = self.run_cli("schema", "status")
+        status = self.run_cli("schema", "status", check=False)
+        self.assertIn(status["status"], {"PASS", "BLOCKED"})
         self.assertEqual(status["draft"], "2020-12")
         self.assertIn("ensure_command", status)
         schema = A118_ROOT / "spec" / "schemas" / "bbk-handoff-v1.schema.json"
@@ -928,6 +929,33 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
         else:
             self.assertTrue(result["valid"], result)
             self.assertEqual(result["draft"], "2020-12")
+
+        with a118_tempfile.TemporaryDirectory() as raw_tool_root:
+            isolated_environment = a118_os.environ.copy()
+            isolated_environment.pop("PYTHONPATH", None)
+            isolated_environment.update({
+                "PYTHONDONTWRITEBYTECODE": "1",
+                "PYTHONNOUSERSITE": "1",
+            })
+            blocked = a118_subprocess.run(
+                [
+                    a118_sys.executable, "-S", str(A118_BBK), "--json", "schema", "status",
+                    "--tool-dir", raw_tool_root,
+                ],
+                cwd=str(A118_ROOT),
+                env=isolated_environment,
+                stdout=a118_subprocess.PIPE,
+                stderr=a118_subprocess.PIPE,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                check=False,
+            )
+            blocked_value = a118_json.loads(blocked.stdout)
+            self.assertEqual(blocked.returncode, 1, blocked.stderr + blocked.stdout)
+            self.assertEqual(blocked_value["status"], "BLOCKED")
+            self.assertFalse(blocked_value["current_interpreter"]["jsonschema_available"])
+            self.assertFalse(blocked_value["managed_environment"]["available"])
 
     def test_worker_execution_window_is_logical_resumable_and_not_fake_host_metadata(self) -> None:
         with a118_tempfile.TemporaryDirectory() as raw:

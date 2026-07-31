@@ -1,6 +1,6 @@
 # Sub-agent model routing
 
-BBK `0.1.0-alpha.11.11` separates a role's responsibility from the model used to perform it.
+BBK `0.1.0-alpha.11.12` separates a role's responsibility from the model used to perform it.
 
 The canonical default policy is:
 

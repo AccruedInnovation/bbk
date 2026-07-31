@@ -16,7 +16,7 @@ The canonical source is `spec/roles.json`. Generated Codex, OMP, Claude Code, an
 
 ## Modular constitution
 
-Alpha.11.11 replaces one shared constitution copied into every role with five modules:
+Alpha.11.12 replaces one shared constitution copied into every role with five modules:
 
 | Module | Loaded by | Purpose |
 |---|---|---|

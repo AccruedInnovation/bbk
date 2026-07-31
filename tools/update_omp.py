@@ -26,6 +26,7 @@ if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
 import install as install_tool
+from path_compat import path_key
 from generate_agents import MODEL_ROUTING_PATH, rendered_projections
 from model_routing import ModelRoutingError
 from omp_model_routing import RoutingError, patch_agent_route, validate_route
@@ -68,7 +69,7 @@ def utc_now() -> str:
 
 
 def normalized(path: Path) -> str:
-    return os.path.normcase(os.path.abspath(os.fspath(path))).replace("\\", "/")
+    return path_key(path)
 
 
 def digest_bytes(data: bytes) -> str:
@@ -313,6 +314,7 @@ def make_desired_files(
         "state_effect.py",
         "review_assurance.py",
         "verify_package.py",
+        "path_compat.py",
         "omp_model_routing.py",
     ]:
         add_file(desired, ROOT / "tools" / name, extension / name)

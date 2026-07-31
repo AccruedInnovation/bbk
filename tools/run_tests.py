@@ -37,6 +37,8 @@ RUN_COUNT_RE = re.compile(r"^Ran (\d+) tests? in ", re.MULTILINE)
 DEFAULT_SUITE_TIMEOUT = 900.0
 DEFAULT_HEARTBEAT_SECONDS = 15.0
 ISSUE_HEADING_RE = re.compile(r"^(ERROR|FAIL): (.+)$")
+SUBPROCESS_OUTPUT_ENCODING = "utf-8"
+SUBPROCESS_OUTPUT_ERRORS = "backslashreplace"
 
 
 class TestIssue(NamedTuple):
@@ -59,6 +61,57 @@ class SuiteResult(NamedTuple):
     @property
     def passed(self) -> bool:
         return self.returncode == 0
+
+
+def _stream_text(stream: TextIO, value: str) -> str:
+    """Return *value* in a form the destination stream can always encode.
+
+    PowerShell 5.1 and redirected Windows consoles commonly expose a strict
+    CP1252 ``sys.stdout``.  Test output can contain Unicode that CP1252 cannot
+    represent, including escaped undecodable bytes.  Preserve that information
+    as explicit ``\\u``/``\\U``/``\\x`` sequences rather than allowing a
+    ``UnicodeEncodeError`` to abort verification.
+    """
+    encoding = getattr(stream, "encoding", None)
+    if not encoding:
+        return value
+    try:
+        value.encode(encoding)
+    except (LookupError, UnicodeEncodeError):
+        try:
+            return value.encode(encoding, errors="backslashreplace").decode(encoding)
+        except LookupError:
+            return value.encode("ascii", errors="backslashreplace").decode("ascii")
+    return value
+
+
+def _write_text(stream: TextIO, value: str, *, flush: bool = False) -> None:
+    """Write without allowing console encoding limitations to abort a run."""
+    stream.write(_stream_text(stream, value))
+    if flush:
+        stream.flush()
+
+
+def _configure_standard_stream(stream: TextIO) -> None:
+    """Make direct console writes non-fatal without changing its encoding."""
+    reconfigure = getattr(stream, "reconfigure", None)
+    if not callable(reconfigure):
+        return
+    try:
+        reconfigure(errors=SUBPROCESS_OUTPUT_ERRORS)
+    except (AttributeError, OSError, TypeError, ValueError):
+        # A host may provide a non-reconfigurable wrapper. _write_text remains
+        # the final defensive layer for those streams.
+        pass
+
+
+def _subprocess_environment() -> dict[str, str]:
+    """Return an environment that makes Python child output deterministic."""
+    environment = os.environ.copy()
+    environment["PYTHONIOENCODING"] = (
+        f"{SUBPROCESS_OUTPUT_ENCODING}:{SUBPROCESS_OUTPUT_ERRORS}"
+    )
+    return environment
 
 
 def discover_suite(pattern: str = "test*.py") -> unittest.TestSuite:
@@ -209,6 +262,26 @@ def _terminate_process_tree(process: subprocess.Popen[bytes]) -> None:
         process.wait()
 
 
+def _remove_capture_file(path: Path, *, attempts: int = 20, delay: float = 0.05) -> None:
+    """Best-effort removal resilient to delayed Windows handle release.
+
+    Cleanup must never replace the real test-runner failure with ``WinError
+    32``.  A terminated Windows process can retain its redirected file handle
+    for a short interval, so retry before giving up silently on the temporary
+    diagnostic file.
+    """
+    for attempt in range(max(attempts, 1)):
+        try:
+            path.unlink(missing_ok=True)
+            return
+        except PermissionError:
+            if attempt + 1 >= max(attempts, 1):
+                return
+            time.sleep(max(delay, 0.0))
+        except OSError:
+            return
+
+
 def execute_discovered(
     pattern: str = "test*.py",
     *,
@@ -241,6 +314,7 @@ def execute_discovered(
         creation["start_new_session"] = True
 
     capture_path: Path | None = None
+    process: subprocess.Popen[bytes] | None = None
     try:
         fd, raw_capture = tempfile.mkstemp(prefix="bbk-test-suite-", suffix=".log")
         os.close(fd)
@@ -251,10 +325,13 @@ def execute_discovered(
                 cwd=ROOT,
                 stdout=writer,
                 stderr=subprocess.STDOUT,
+                env=_subprocess_environment(),
                 **creation,
             )
 
-        decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
+        decoder = codecs.getincrementaldecoder(SUBPROCESS_OUTPUT_ENCODING)(
+            errors=SUBPROCESS_OUTPUT_ERRORS
+        )
         chunks: list[str] = []
         started = time.monotonic()
         last_visible_activity = started
@@ -271,17 +348,17 @@ def execute_discovered(
                     if data:
                         value = decoder.decode(data, final=False)
                         chunks.append(value)
-                        stream.write(value)
-                        stream.flush()
+                        _write_text(stream, value, flush=True)
                         last_visible_activity = now
                     elif heartbeat_seconds > 0 and now - last_visible_activity >= heartbeat_seconds:
                         elapsed = now - started
                         timeout_text = f" of {timeout:g}s timeout" if timeout > 0 else ""
-                        stream.write(
+                        _write_text(
+                            stream,
                             f"    ... {pattern} is still running "
-                            f"({elapsed:.0f}s elapsed{timeout_text})\n"
+                            f"({elapsed:.0f}s elapsed{timeout_text})\n",
+                            flush=True,
                         )
-                        stream.flush()
                         last_visible_activity = now
                 time.sleep(0.05)
 
@@ -290,14 +367,16 @@ def execute_discovered(
             returncode = process.wait()
             if stream is None:
                 reader.seek(0)
-                output = reader.read().decode("utf-8", errors="replace")
+                output = reader.read().decode(
+                    SUBPROCESS_OUTPUT_ENCODING,
+                    errors=SUBPROCESS_OUTPUT_ERRORS,
+                )
             else:
                 data = reader.read()
                 tail = decoder.decode(data, final=True)
                 if tail:
                     chunks.append(tail)
-                    stream.write(tail)
-                    stream.flush()
+                    _write_text(stream, tail, flush=True)
                 output = "".join(chunks)
 
         if timed_out:
@@ -307,16 +386,23 @@ def execute_discovered(
             )
             output += diagnostic
             if stream is not None:
-                stream.write(diagnostic)
-                stream.flush()
+                _write_text(stream, diagnostic, flush=True)
             issue = TestIssue("PROCESS ERROR", pattern, diagnostic.strip())
             return SuiteResult(pattern, 2, output, parse_test_count(output), (issue,))
     except OSError as exc:
         issue = TestIssue("PROCESS ERROR", pattern, f"{type(exc).__name__}: {exc}")
         return SuiteResult(pattern, 2, "", None, (issue,))
     finally:
+        if process is not None and process.poll() is None:
+            try:
+                _terminate_process_tree(process)
+            except OSError:
+                # Do not mask the original output/process failure. The capture
+                # deletion below is independently best-effort for the same
+                # reason.
+                pass
         if capture_path is not None:
-            capture_path.unlink(missing_ok=True)
+            _remove_capture_file(capture_path)
 
     return SuiteResult(
         name=pattern,
@@ -330,9 +416,9 @@ def execute_discovered(
 def _write_output(output: str, stream: TextIO) -> None:
     if not output:
         return
-    stream.write(output)
+    _write_text(stream, output)
     if not output.endswith("\n"):
-        stream.write("\n")
+        _write_text(stream, "\n")
     stream.flush()
 
 
@@ -399,41 +485,42 @@ def print_final_summary(
     unknown_count_suites = sum(result.tests_run is None for result in results)
     issues = summary_issues(results)
 
-    target.write("\n" + "=" * 70 + "\n")
-    target.write("BBK FINAL TEST SUMMARY\n")
-    target.write("=" * 70 + "\n")
-    target.write(f"Result: {'PASS' if exit_code == 0 else 'FAILED'}\n")
-    target.write(
+    _write_text(target, "\n" + "=" * 70 + "\n")
+    _write_text(target, "BBK FINAL TEST SUMMARY\n")
+    _write_text(target, "=" * 70 + "\n")
+    _write_text(target, f"Result: {'PASS' if exit_code == 0 else 'FAILED'}\n")
+    _write_text(
+        target,
         f"Suites: {len(results)}/{expected_suites} run; "
         f"{passed} passed; {failed} failed; {not_run} not run\n"
     )
     test_suffix = f"; {unknown_count_suites} suite(s) did not report a count" if unknown_count_suites else ""
-    target.write(f"Tests reported: {known_test_count}{test_suffix}\n")
+    _write_text(target, f"Tests reported: {known_test_count}{test_suffix}\n")
     failure_count = sum(issue.kind == "FAIL" for _, issue in issues)
     error_count = sum(issue.kind == "ERROR" for _, issue in issues)
     runner_error_count = len(issues) - failure_count - error_count
-    target.write(f"Failures: {failure_count}\n")
-    target.write(f"Errors: {error_count}\n")
-    target.write(f"Runner/configuration errors: {runner_error_count}\n")
+    _write_text(target, f"Failures: {failure_count}\n")
+    _write_text(target, f"Errors: {error_count}\n")
+    _write_text(target, f"Runner/configuration errors: {runner_error_count}\n")
 
     failed_results = [result for result in results if not result.passed]
     if failed_results:
-        target.write("\nFailed suites:\n")
+        _write_text(target, "\nFailed suites:\n")
         for result in failed_results:
-            target.write(f"- {result.name}: exit code {result.returncode}\n")
+            _write_text(target, f"- {result.name}: exit code {result.returncode}\n")
 
     if issues:
-        target.write("\nFailure/error list:\n")
+        _write_text(target, "\nFailure/error list:\n")
         for number, (suite_name, issue) in enumerate(issues, start=1):
-            target.write(f"{number}. [{issue.kind}] {issue.label}\n")
-            target.write(f"   Suite: {suite_name}\n")
-            target.write(f"   Cause: {issue.cause}\n")
+            _write_text(target, f"{number}. [{issue.kind}] {issue.label}\n")
+            _write_text(target, f"   Suite: {suite_name}\n")
+            _write_text(target, f"   Cause: {issue.cause}\n")
 
     else:
-        target.write("No failures or errors.\n")
+        _write_text(target, "No failures or errors.\n")
 
-    target.write(f"Exit code: {exit_code}\n")
-    target.write("=" * 70 + "\n")
+    _write_text(target, f"Exit code: {exit_code}\n")
+    _write_text(target, "=" * 70 + "\n")
     target.flush()
 
 
@@ -454,8 +541,7 @@ def run_test_files(
     total_started = time.monotonic()
     for index, path in enumerate(files, start=1):
         suite_started = time.monotonic()
-        target.write(f"==> [{index}/{len(files)}] {path.name}\n")
-        target.flush()
+        _write_text(target, f"==> [{index}/{len(files)}] {path.name}\n", flush=True)
         result = execute_discovered(
             path.name,
             quiet=quiet,
@@ -469,19 +555,21 @@ def run_test_files(
         results.append(result)
         elapsed = time.monotonic() - suite_started
         count_text = f", {result.tests_run} tests" if result.tests_run is not None else ""
-        target.write(
+        _write_text(
+            target,
             f"<== [{index}/{len(files)}] {path.name}: "
-            f"{'PASS' if result.passed else 'FAIL'} ({elapsed:.1f}s{count_text})\n"
+            f"{'PASS' if result.passed else 'FAIL'} ({elapsed:.1f}s{count_text})\n",
+            flush=True,
         )
-        target.flush()
         if not result.passed and failfast:
             break
 
     total_elapsed = time.monotonic() - total_started
-    target.write(
-        f"Completed {len(results)}/{len(files)} unittest suites in {total_elapsed:.1f}s.\n"
+    _write_text(
+        target,
+        f"Completed {len(results)}/{len(files)} unittest suites in {total_elapsed:.1f}s.\n",
+        flush=True,
     )
-    target.flush()
     exit_code = 1 if any(not result.passed for result in results) else 0
     print_final_summary(
         results,
@@ -493,6 +581,8 @@ def run_test_files(
 
 
 def main(argv: Sequence[str] | None = None) -> int:
+    _configure_standard_stream(sys.stdout)
+    _configure_standard_stream(sys.stderr)
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--all",

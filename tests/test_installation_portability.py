@@ -300,7 +300,7 @@ class Alpha101EntrySetupTests(unittest.TestCase):
 
     def test_version_and_canonical_inputs_agree(self):
         version = (m4_ROOT / 'VERSION').read_text(encoding='utf-8').strip()
-        self.assertEqual(version, '0.1.0-alpha.11.11')
+        self.assertEqual(version, '0.1.0-alpha.11.12')
         self.assertEqual(json.loads((m4_ROOT / 'spec' / 'roles.json').read_text(encoding='utf-8'))['package_version'], version)
         self.assertEqual(json.loads((m4_ROOT / 'spec' / 'model-routing.json').read_text(encoding='utf-8'))['package_version'], version)
         self.assertEqual(json.loads((m4_ROOT / 'spec' / 'method-content.json').read_text(encoding='utf-8'))['version'], version)
@@ -565,6 +565,13 @@ import profile_install
 import setup as setup_tool
 m5_BUNDLE = m5_ROOT / 'bundled-language-profiles'
 m5_EXPECTED_PROFILES = ['codesys', 'go', 'python', 'rust', 'typescript-javascript']
+m5_EXPECTED_PROFILE_VERSIONS = {
+    'codesys': '0.1.0-alpha.4',
+    'go': '0.1.0-alpha.3',
+    'python': '0.1.0-alpha.3',
+    'rust': '0.1.0-alpha.3',
+    'typescript-javascript': '0.1.0-alpha.3',
+}
 
 class Alpha111BundledReleaseTests(unittest.TestCase):
 
@@ -579,7 +586,7 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
         cls._prepared_temp.cleanup()
 
     def test_current_successor_is_repository_native_and_self_contained(self):
-        self.assertEqual((m5_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.11.11')
+        self.assertEqual((m5_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.11.12')
         self.assertTrue((m5_ROOT / 'docs' / 'README.md').is_file())
         self.assertTrue((m5_ROOT / 'docs' / 'DEVELOPMENT.md').is_file())
         self.assertTrue((m5_ROOT / 'bundled-language-profiles' / 'packages').is_dir())
@@ -591,16 +598,19 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
         report = profile_install.verify_bundle_manifest(m5_BUNDLE)
         self.assertEqual(report['status'], 'PASS')
         self.assertEqual([item.profile_id for item in self.prepared], m5_EXPECTED_PROFILES)
-        self.assertTrue(all((item.version == '0.1.0-alpha.3' for item in self.prepared)))
+        self.assertEqual({item.profile_id: item.version for item in self.prepared}, m5_EXPECTED_PROFILE_VERSIONS)
+        release = json.loads((m5_BUNDLE / 'RELEASE-MANIFEST.json').read_text(encoding='utf-8'))
+        self.assertEqual(release.get('profileVersions'), m5_EXPECTED_PROFILE_VERSIONS)
         self.assertTrue(all((item.package_verification.get('status') == 'PASS' for item in self.prepared)))
         self.assertTrue(all((item.compatibility.get('status') == 'PASS' for item in self.prepared)))
 
-    def test_all_bundled_alpha3_current_metadata_is_consistent(self):
+    def test_all_bundled_current_metadata_is_consistent(self):
         for profile_id, item in sorted(self.by_id.items()):
             with self.subTest(profile=profile_id):
-                self.assertEqual(item.profile['version'], '0.1.0-alpha.3')
+                expected_version = m5_EXPECTED_PROFILE_VERSIONS[profile_id]
+                self.assertEqual(item.profile['version'], expected_version)
                 self.assertEqual(item.profile['requires']['bbk_minimum'], '0.1.0-alpha.8')
-                self.assertEqual((item.root / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.3')
+                self.assertEqual((item.root / 'VERSION').read_text(encoding='utf-8').strip(), expected_version)
                 dialects = item.profile.get('contract_dialects', {})
                 self.assertEqual(dialects['implementation_structure']['legacy_output_value'], '0.1.0-alpha.4')
                 self.assertEqual(dialects['execution_slice']['legacy_output_value'], '0.1.0-alpha.4')
@@ -609,12 +619,35 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
                 install_doc = (item.root / 'docs' / 'INSTALL.md').read_text(encoding='utf-8')
                 metadata_doc = (item.root / 'docs' / 'METADATA-CONTRACT.md').read_text(encoding='utf-8')
                 omp_package = json.loads((item.root / 'omp' / 'extension' / 'package.json').read_text(encoding='utf-8'))
-                self.assertIn('0.1.0-alpha.3', readme)
+                self.assertIn(expected_version, readme)
                 self.assertIn('0.1.0-alpha.8', readme)
                 self.assertIn('0.1.0-alpha.8', install_doc)
                 self.assertIn('contract dialect', metadata_doc.lower())
-                self.assertEqual(omp_package['version'], '0.1.0-alpha.3')
-                self.assertEqual(item.profile.get('predecessor', {}).get('version'), '0.1.0-alpha.2')
+                self.assertEqual(omp_package['version'], expected_version)
+                expected_predecessor = '0.1.0-alpha.3' if profile_id == 'codesys' else '0.1.0-alpha.2'
+                self.assertEqual(item.profile.get('predecessor', {}).get('version'), expected_predecessor)
+
+    def test_current_docs_describe_the_mixed_profile_versions(self):
+        combined = "\n".join(
+            (m5_ROOT / relative).read_text(encoding="utf-8")
+            for relative in (
+                "README.md",
+                "RELEASE-NOTES.md",
+                "docs/INSTALL.md",
+                "docs/LANGUAGE-PROFILES.md",
+                "bundled-language-profiles/README.md",
+            )
+        )
+        self.assertIn("CODESYS `0.1.0-alpha.4`", combined)
+        self.assertIn("Go, Python, Rust, and TypeScript/JavaScript", combined)
+        self.assertIn("`0.1.0-alpha.3`", combined)
+        for stale_claim in (
+            "All five packages remain `0.1.0-alpha.3`",
+            "five independently manifested alpha.3 language profiles",
+            "five bundled alpha.3 profiles",
+            "The five package identities remain `0.1.0-alpha.3`",
+        ):
+            self.assertNotIn(stale_claim, combined)
 
     def test_profile_omp_python_overrides_are_interpreter_safe(self):
         for profile_id, item in sorted(self.by_id.items()):
@@ -633,7 +666,7 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         self.assertFalse(module.version_supports_structure_contract('0.1.0-alpha.3'))
-        for version in ('0.1.0-alpha.4', '0.1.0-alpha.8', '0.1.0-alpha.11.11', '0.1.0', '0.2.0-alpha.1'):
+        for version in ('0.1.0-alpha.4', '0.1.0-alpha.8', '0.1.0-alpha.11.11', '0.1.0-alpha.11.12', '0.1.0', '0.2.0-alpha.1'):
             with self.subTest(version=version):
                 self.assertTrue(module.version_supports_structure_contract(version))
         gates = json.loads((item.root / 'gates' / 'python-gates.json').read_text(encoding='utf-8'))
@@ -726,7 +759,7 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
 
     def test_current_documentation_states_the_default_and_single_archive_contract(self):
         combined = '\n'.join(((m5_ROOT / relative).read_text(encoding='utf-8') for relative in ('README.md', 'docs/INSTALL.md', 'docs/LANGUAGE-PROFILES.md', 'RELEASE-NOTES.md')))
-        for expected in ('0.1.0-alpha.11.11', 'installed by default', '--no-language-profiles', '--profile-id', 'bundled-language-profiles', 'TypeScript/JavaScript'):
+        for expected in ('0.1.0-alpha.11.12', 'installed by default', '--no-language-profiles', '--profile-id', 'bundled-language-profiles', 'TypeScript/JavaScript'):
             self.assertIn(expected, combined)
 
 # ---------------------------------------------------------------------------
@@ -749,7 +782,7 @@ class Alpha112WindowsUtf8Tests(unittest.TestCase):
 
     def test_current_version_and_utf8_canonical_input_are_read_explicitly(self):
         version = (m6_ROOT / 'VERSION').read_text(encoding='utf-8').strip()
-        self.assertEqual(version, '0.1.0-alpha.11.11')
+        self.assertEqual(version, '0.1.0-alpha.11.12')
         method_content = json.loads((m6_ROOT / 'spec' / 'method-content.json').read_text(encoding='utf-8'))
         self.assertEqual(method_content['version'], version)
 
@@ -788,11 +821,15 @@ import tomllib
 import unittest
 from pathlib import Path
 m7_ROOT = Path(__file__).resolve().parents[1]
+m7_TOOLS = m7_ROOT / 'tools'
+if str(m7_TOOLS) not in sys.path:
+    sys.path.insert(0, str(m7_TOOLS))
 m7_CODEX_AGENTS = m7_ROOT / 'projections' / 'codex' / 'agents'
 m7_INSTALL = m7_ROOT / 'tools' / 'install.py'
 m7_SETUP = m7_ROOT / 'tools' / 'setup.py'
 m7_UPDATE_CODEX = m7_ROOT / 'tools' / 'update_codex.py'
 m7_VERSION = (m7_ROOT / 'VERSION').read_text(encoding='utf-8').strip()
+from path_compat import path_key as m7_path_key
 
 def m7_run(command, *, env=None, check=True):
     return subprocess.run([str(value) for value in command], cwd=m7_ROOT, env=env, check=check, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8', errors='replace', timeout=180)
@@ -811,8 +848,8 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
         cls.roles = json.loads((m7_ROOT / 'spec' / 'roles.json').read_text(encoding='utf-8'))['roles']
         cls.by_name = {item['name']: item for item in cls.roles}
 
-    def test_current_version_is_alpha116(self) -> None:
-        self.assertEqual(m7_VERSION, '0.1.0-alpha.11.11')
+    def test_current_version_matches_release(self) -> None:
+        self.assertEqual(m7_VERSION, '0.1.0-alpha.11.12')
 
     def test_all_codex_agents_inherit_parent_sandbox(self) -> None:
         files = sorted(m7_CODEX_AGENTS.glob('*.toml'))
@@ -864,14 +901,14 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
             manifest_path = Path(installed['manifest_path'])
             manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
             initial_version = manifest['version']
-            records = {Path(item['path']): item for item in manifest['files']}
+            records = {m7_path_key(item['path']): item for item in manifest['files']}
             codex_root = home / '.codex' / 'agents'
             for path in sorted(codex_root.glob('bbk_*.toml')):
                 text = path.read_text(encoding='utf-8')
                 self.assertNotIn('\nsandbox_mode = "read-only"\n', text)
                 text = text.replace('\ndeveloper_instructions = ', '\nsandbox_mode = "read-only"\ndeveloper_instructions = ', 1)
                 path.write_text(text, encoding='utf-8')
-                records[path]['sha256'] = hashlib.sha256(path.read_bytes()).hexdigest()
+                records[m7_path_key(path)]['sha256'] = hashlib.sha256(path.read_bytes()).hexdigest()
             manifest.setdefault('harness_versions', {})['codex'] = '0.1.0-alpha.11.5'
             manifest['harness_versions']['omp'] = initial_version
             manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
@@ -940,8 +977,10 @@ m8_TOOLS = m8_ROOT / 'tools'
 if str(m8_TOOLS) not in sys.path:
     sys.path.insert(0, str(m8_TOOLS))
 import install
+import path_compat
 import profile_install
 import run_tests
+import windows_compat
 
 class Alpha117GitRepositoryTests(unittest.TestCase):
 
@@ -986,6 +1025,75 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
                 profile_install.prepare_profile_sources([repo], temp_root=Path(raw_work))
 
 
+    def test_windows_short_name_expansion_is_deterministic_for_missing_leaf_paths(self):
+        short_parent = r'C:\Users\TOMBST~1\AppData\Local\Temp'
+        long_parent = r'C:\Users\Tombstone\AppData\Local\Temp'
+        pending = short_parent + r'\bbk-pending\agent.toml'
+        expanded = path_compat._expand_existing_windows_prefix(
+            pending,
+            exists=lambda value: value == short_parent,
+            long_name=lambda value: long_parent if value == short_parent else value,
+        )
+        self.assertEqual(expanded, long_parent + r'\bbk-pending\agent.toml')
+
+    def test_portable_path_keys_reject_windows_case_and_separator_aliases_on_every_host(self):
+        forward = 'C:/tmp/shared.md'
+        backward = r'c:\tmp\shared.md'
+        self.assertEqual(
+            path_compat.portable_path_key(forward),
+            path_compat.portable_path_key(backward),
+        )
+        with self.assertRaises(install.InstallError):
+            install.validate_install_plan({
+                'files': [
+                    {'path': forward, 'sha256': 'a', 'source': 'one'},
+                    {'path': backward, 'sha256': 'b', 'source': 'two'},
+                ]
+            })
+
+    def test_physical_path_keys_collapse_directory_aliases_before_install_preflight(self):
+        with tempfile.TemporaryDirectory() as raw_root:
+            root = Path(raw_root)
+            target = root / 'physical-target'
+            target.mkdir()
+            alias = root / 'alias-target'
+            try:
+                alias.symlink_to(target, target_is_directory=True)
+            except (NotImplementedError, OSError) as exc:
+                self.skipTest(f'directory symlinks unavailable on this host: {exc}')
+            target_file = target / 'same-file.txt'
+            alias_file = alias / 'same-file.txt'
+            self.assertEqual(path_compat.path_key(target_file), path_compat.path_key(alias_file))
+            records = []
+            planned = {}
+            backups = root / 'backups'
+            install.install_bytes(
+                b'first', target_file, source='first', force=False, dry_run=True,
+                backup_root=backups, records=records, planned=planned,
+            )
+            with self.assertRaisesRegex(install.InstallError, 'collision'):
+                install.install_bytes(
+                    b'second', alias_file, source='second', force=False, dry_run=True,
+                    backup_root=backups, records=records, planned=planned,
+                )
+
+    def test_native_windows_probe_and_ci_workflow_are_release_surfaces(self):
+        workflow = m8_ROOT / '.github' / 'workflows' / 'windows-verification.yml'
+        probe = m8_ROOT / 'tools' / 'windows_compat.py'
+        helper = m8_ROOT / 'tools' / 'path_compat.py'
+        self.assertTrue(workflow.is_file())
+        self.assertTrue(probe.is_file())
+        self.assertTrue(helper.is_file())
+        workflow_text = workflow.read_text(encoding='utf-8')
+        for expected in ('windows-latest', '3.11', '3.13', 'cp1252:strict', 'windows_compat.py', '--all --require-node'):
+            self.assertIn(expected, workflow_text)
+        development = (m8_ROOT / 'docs' / 'DEVELOPMENT.md').read_text(encoding='utf-8')
+        for expected in ('Windows-native compatibility', 'TOMBST~1', 'NOT_APPLICABLE', 'windows-verification.yml'):
+            self.assertIn(expected, development)
+        report = windows_compat.probe()
+        expected = 'PASS' if os.name == 'nt' else 'NOT_APPLICABLE'
+        self.assertEqual(report['status'], expected, report)
+
     def test_test_runner_emits_suite_progress_and_quiet_heartbeat(self):
         with tempfile.TemporaryDirectory() as raw_root:
             root = Path(raw_root)
@@ -1002,6 +1110,168 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
         self.assertIn('test_slow.py is still running', output)
         self.assertIn('<== [1/1] test_slow.py: PASS', output)
         self.assertIn('Completed 1/1 unittest suites', output)
+
+    def test_test_runner_survives_cp1252_console_and_non_utf8_child_bytes(self):
+        with tempfile.TemporaryDirectory() as raw_root:
+            root = Path(raw_root)
+            tests = root / 'tests'
+            tests.mkdir()
+            test_file = tests / 'test_unicode_output.py'
+            test_file.write_text(textwrap.dedent('''
+                    import sys
+                    import unittest
+
+                    class UnicodeOutputTests(unittest.TestCase):
+                        def test_output(self):
+                            print("Résumé → 🚀", flush=True)
+                            sys.stdout.buffer.write(b"raw-invalid:\\x81\\n")
+                            sys.stdout.buffer.flush()
+                            self.assertTrue(True)
+                    '''), encoding='utf-8')
+            raw_output = io.BytesIO()
+            stream = io.TextIOWrapper(
+                raw_output,
+                encoding='cp1252',
+                errors='strict',
+                write_through=True,
+            )
+            with mock.patch.object(run_tests, 'ROOT', root), mock.patch.object(run_tests, 'TESTS', tests):
+                code = run_tests.run_test_files([test_file], verbose=True, stream=stream)
+            stream.flush()
+            output = raw_output.getvalue().decode('cp1252')
+            stream.detach()
+        self.assertEqual(code, 0)
+        self.assertIn('Résumé', output)
+        self.assertIn('\\u2192', output)
+        self.assertIn('\\U0001f680', output)
+        self.assertIn('raw-invalid:\\x81', output)
+        self.assertNotIn('\ufffd', output)
+
+    def test_output_stream_failure_terminates_child_before_capture_cleanup(self):
+
+        class BrokenStream(io.StringIO):
+
+            def write(self, value):
+                if value:
+                    raise RuntimeError('deliberate output-stream failure')
+                return 0
+
+        with tempfile.TemporaryDirectory() as raw_root:
+            root = Path(raw_root)
+            tests = root / 'tests'
+            tests.mkdir()
+            test_file = tests / 'test_blocking.py'
+            test_file.write_text(textwrap.dedent('''
+                    import time
+                    import unittest
+
+                    class BlockingTests(unittest.TestCase):
+                        def test_waits(self):
+                            print("child ready", flush=True)
+                            time.sleep(30)
+                    '''), encoding='utf-8')
+            capture = root / 'known-capture.log'
+
+            def fixed_mkstemp(*args, **kwargs):
+                fd = os.open(capture, os.O_CREAT | os.O_EXCL | os.O_RDWR, 0o600)
+                return fd, str(capture)
+
+            with mock.patch.object(run_tests, 'ROOT', root), mock.patch.object(run_tests, 'TESTS', tests), mock.patch.object(run_tests.tempfile, 'mkstemp', side_effect=fixed_mkstemp):
+                with self.assertRaisesRegex(RuntimeError, 'deliberate output-stream failure'):
+                    run_tests.execute_discovered(
+                        test_file.name,
+                        verbose=True,
+                        stream=BrokenStream(),
+                        timeout=10,
+                        heartbeat_seconds=0,
+                    )
+            self.assertFalse(capture.exists())
+
+    def test_capture_cleanup_retries_and_suppresses_windows_sharing_violation(self):
+        capture = Path('bbk-test-suite-locked.log')
+        locked = PermissionError(32, 'file is being used by another process')
+        with mock.patch.object(
+            Path,
+            'unlink',
+            side_effect=[locked, locked, None],
+        ) as unlink, mock.patch.object(run_tests.time, 'sleep') as sleep:
+            run_tests._remove_capture_file(capture, attempts=3, delay=0.01)
+        self.assertEqual(unlink.call_count, 3)
+        self.assertEqual(sleep.call_count, 2)
+
+        with mock.patch.object(
+            Path,
+            'unlink',
+            side_effect=locked,
+        ) as unlink, mock.patch.object(run_tests.time, 'sleep') as sleep:
+            run_tests._remove_capture_file(capture, attempts=2, delay=0.01)
+        self.assertEqual(unlink.call_count, 2)
+        self.assertEqual(sleep.call_count, 1)
+
+    def test_ordered_verifier_survives_cp1252_console_with_unicode_child_output(self):
+        raw_output = io.BytesIO()
+        stream = io.TextIOWrapper(
+            raw_output,
+            encoding='cp1252',
+            errors='strict',
+            write_through=True,
+        )
+        spec = verify_all.CheckSpec(
+            'Unicode output probe',
+            (sys.executable, '-c', 'print("Résumé → 🚀")'),
+        )
+        result = verify_all.execute_step(spec, stream=stream)
+        stream.flush()
+        output = raw_output.getvalue().decode('cp1252')
+        stream.detach()
+        self.assertTrue(result.passed)
+        self.assertIn('Résumé → 🚀', result.output)
+        self.assertIn('Résumé', output)
+        self.assertIn('\\u2192', output)
+        self.assertIn('\\U0001f680', output)
+
+    def test_install_verification_gate_survives_cp1252_console_mirroring(self):
+        observed = {}
+
+        def fake_popen(command, **kwargs):
+            observed.update(kwargs)
+            report_path = Path(command[command.index('--report-file') + 1])
+            report_path.write_text(json.dumps({
+                'schema': 'bbk.verification-report.v1',
+                'status': 'PASS',
+                'checks': [],
+                'checks_run': 0,
+                'checks_expected': 0,
+                'exit_code': 0,
+            }), encoding='utf-8')
+            return types.SimpleNamespace(
+                stdout=io.StringIO('Résumé → 🚀\n'),
+                wait=lambda: 0,
+            )
+
+        raw_output = io.BytesIO()
+        stream = io.TextIOWrapper(
+            raw_output,
+            encoding='cp1252',
+            errors='strict',
+            write_through=True,
+        )
+        with mock.patch.object(install_tool.subprocess, 'Popen', side_effect=fake_popen), contextlib.redirect_stdout(stream):
+            report = install_tool.run_verification_gate(
+                failfast=False,
+                require_node=False,
+                echo=True,
+            )
+        stream.flush()
+        output = raw_output.getvalue().decode('cp1252')
+        stream.detach()
+        self.assertEqual(report['status'], 'PASS')
+        self.assertEqual(observed['encoding'], 'utf-8')
+        self.assertEqual(observed['errors'], 'backslashreplace')
+        self.assertEqual(observed['env']['PYTHONIOENCODING'], 'utf-8:backslashreplace')
+        self.assertIn('Résumé', output)
+        self.assertIn('\\u2192', output)
+        self.assertIn('\\U0001f680', output)
 
     def test_install_progress_reports_phase_file_counts_and_completion(self):
         stream = io.StringIO()

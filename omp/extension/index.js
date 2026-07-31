@@ -20,7 +20,7 @@ const versionPath = (() => {
   try { readFileSync(path.join(extensionDir, "VERSION")); return path.join(extensionDir, "VERSION"); }
   catch { return path.join(sourceRoot, "VERSION"); }
 })();
-let version = "0.1.0-alpha.11.11";
+let version = "0.1.0-alpha.11.12";
 try { version = readFileSync(versionPath, "utf8").trim() || version; } catch {}
 let packageRoot = sourceRoot;
 try {

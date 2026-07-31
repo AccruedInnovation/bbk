@@ -1,6 +1,6 @@
-# BBK alpha.11.11 usage
+# BBK alpha.11.12 usage
 
-Alpha.11.11 is the current canonical successor. It adds complete per-role scope, delegation-trigger, escalation, and user-interaction contracts; modular role constitutions; and lean canonical sub-agents that no longer autoload the top-level entry controller. It retains persistent session-local BBK mode, bundled profiles, ordered verification, installation safeguards, model routing, selective host updates, recommendation-first Wayfinding, escalation-only Grill, durable handoffs, resumable workers, and explicit execution control.
+Alpha.11.12 is the current canonical successor. It adds complete per-role scope, delegation-trigger, escalation, and user-interaction contracts; modular role constitutions; and lean canonical sub-agents that no longer autoload the top-level entry controller. It retains persistent session-local BBK mode, bundled profiles, ordered verification, installation safeguards, model routing, selective host updates, recommendation-first Wayfinding, escalation-only Grill, durable handoffs, resumable workers, and explicit execution control.
 
 ## Enter BBK
 

@@ -1,6 +1,6 @@
-# Install and qualify BBK alpha.11.11
+# Install and qualify BBK alpha.11.12
 
-Alpha.11.11 is distributed as one archive containing the BBK core and five independently manifested alpha.3 language profiles. The normal installation installs all five profiles by default. Use a clean extraction for each release; a complete managed reinstall is the default upgrade path, while selective OMP-only and Codex-only updates remain available.
+Alpha.11.12 is distributed as one archive containing the BBK core and five independently manifested language profiles: CODESYS `0.1.0-alpha.4`, plus Go, Python, Rust, and TypeScript/JavaScript `0.1.0-alpha.3`. The normal installation installs all five profiles by default. Use a clean extraction for each release; a complete managed reinstall is the default upgrade path, while selective OMP-only and Codex-only updates remain available.
 
 ## Prerequisites
 
@@ -78,7 +78,7 @@ The ordered sequence is:
 10. OMP JavaScript syntax validation;
 11. strict post-test package-manifest check.
 
-`tools/run_tests.py` merges unittest stderr into stdout for PowerShell 5.1 compatibility and always ends with a consolidated summary. Each suite is labelled `[current/total]`, reports elapsed time on completion, and emits a `still running` heartbeat after 15 quiet seconds. On failure, test labels and terminal causes are repeated at the end.
+`tools/run_tests.py` merges unittest stderr into stdout for PowerShell 5.1 compatibility and always ends with a consolidated summary. Each suite is labelled `[current/total]`, reports elapsed time on completion, and emits a `still running` heartbeat after 15 quiet seconds. On failure, test labels and terminal causes are repeated at the end. Native release qualification additionally uses `python tools/windows_compat.py`; see `docs/DEVELOPMENT.md`.
 
 To run only the unittest modules:
 
@@ -196,7 +196,7 @@ Profile package, compatibility, archive-safety, collision, and destination prefl
 
 ## Fail-closed preparation and installation boundary
 
-Before the first destination write, alpha.11.11:
+Before the first destination write, alpha.11.12:
 
 1. validates raw ZIP paths before normalization;
 2. rejects traversal, absolute/drive-qualified paths, backslashes, alternate-data-stream names, NUL/control characters, trailing dots/spaces, reserved Windows device names, duplicate entries, portable case collisions, file/directory conflicts, symlinks, special files, encrypted entries, and excessive expansion;
@@ -243,7 +243,7 @@ python tools\bbk.py schema status
 python tools\bbk.py schema validate --schema schema.json --instance candidate.json
 ```
 
-`--ensure` is explicit and creates an isolated `jsonschema==4.25.1` environment only when requested. Use `--wheelhouse PATH` for an offline source.
+`schema status` returns structured `BLOCKED` and process exit code 1 when neither the active interpreter nor the managed environment provides `jsonschema`; that is an expected optional-capability state, not malformed output. `--ensure` is explicit and creates an isolated `jsonschema==4.25.1` environment only when requested. Use `--wheelhouse PATH` for an offline source.
 
 ## Installed layout
 
@@ -257,7 +257,7 @@ User scope uses the platform data root. On Windows the default is:
   effective-language-profiles.json
   install-manifest.json
   bin\
-  versions\0.1.0-alpha.11.11\
+  versions\0.1.0-alpha.11.12\
   profiles\<profile-id>\0.1.0-alpha.3\
   profiles\<profile-id>\current.json
 ```
@@ -276,7 +276,7 @@ python tools/install.py install --scope user --omp --codex --claude \
   --model-routing /path/to/model-routing.json --dry-run
 ```
 
-The external file's `package_version` must be `0.1.0-alpha.11.11`. The installer validates exact coverage of all 19 roles before writing and records the effective policy and digest.
+The external file's `package_version` must be `0.1.0-alpha.11.12`. The installer validates exact coverage of all 19 roles before writing and records the effective policy and digest.
 
 An OMP installation also writes `effective-omp-model-routing.json` and exposes an interactive runtime menu:
 
@@ -298,11 +298,11 @@ python tools/install.py uninstall --scope user
 
 Status compares content digests and, on POSIX, expected executable modes. Uninstall removes only manifest-owned files that remain unchanged. Locally modified bytes or executable modes are preserved and reported unless `--force` is explicit.
 
-## Upgrade to alpha.11.11
+## Upgrade to alpha.11.12
 
-Do not overlay one extracted release onto another. For a full managed reinstall, uninstall from the previous clean extraction, extract alpha.11.11 into a new directory, and run the preferred test-and-install command.
+Do not overlay one extracted release onto another. For a full managed reinstall, uninstall from the previous clean extraction, extract alpha.11.12 into a new directory, and run the preferred test-and-install command.
 
-No `.bbk` project-record migration is required for alpha.11.11. A full install refreshes the five bundled alpha.3 profiles by default; use `--no-language-profiles` only for an intentional core-only installation.
+No `.bbk` project-record migration is required for alpha.11.12. A full install refreshes the mixed-version bundled profile set by default; use `--no-language-profiles` only for an intentional core-only installation.
 
 Selective OMP-only and Codex-only update commands remain available when only one host surface changes. See `UPGRADING.md`.
 

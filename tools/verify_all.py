@@ -24,6 +24,8 @@ from pathlib import Path
 from typing import Callable, Sequence, TextIO
 
 ROOT = Path(__file__).resolve().parents[1]
+SUBPROCESS_OUTPUT_ENCODING = "utf-8"
+SUBPROCESS_OUTPUT_ERRORS = "backslashreplace"
 
 
 @dataclass(frozen=True)
@@ -50,6 +52,48 @@ class CheckResult:
     @property
     def skipped(self) -> bool:
         return self.status == "SKIP"
+
+
+def _stream_text(stream: TextIO, value: str) -> str:
+    """Return text that a strict legacy Windows stream can encode safely."""
+    encoding = getattr(stream, "encoding", None)
+    if not encoding:
+        return value
+    try:
+        value.encode(encoding)
+    except (LookupError, UnicodeEncodeError):
+        try:
+            return value.encode(encoding, errors="backslashreplace").decode(encoding)
+        except LookupError:
+            return value.encode("ascii", errors="backslashreplace").decode("ascii")
+    return value
+
+
+def _write_text(stream: TextIO, value: str, *, flush: bool = False) -> None:
+    """Write verification output without propagating encoding limitations."""
+    stream.write(_stream_text(stream, value))
+    if flush:
+        stream.flush()
+
+
+def _configure_standard_stream(stream: TextIO) -> None:
+    """Make direct console writes non-fatal without changing its encoding."""
+    reconfigure = getattr(stream, "reconfigure", None)
+    if not callable(reconfigure):
+        return
+    try:
+        reconfigure(errors=SUBPROCESS_OUTPUT_ERRORS)
+    except (AttributeError, OSError, TypeError, ValueError):
+        pass
+
+
+def _subprocess_environment() -> dict[str, str]:
+    """Force Python verification children to emit the encoding we decode."""
+    environment = os.environ.copy()
+    environment["PYTHONIOENCODING"] = (
+        f"{SUBPROCESS_OUTPUT_ENCODING}:{SUBPROCESS_OUTPUT_ERRORS}"
+    )
+    return environment
 
 
 def verification_steps(*, require_node: bool = False, skip_package_manifest: bool = False) -> list[CheckSpec]:
@@ -117,8 +161,7 @@ def terminal_cause(output: str, returncode: int) -> str:
 
 def execute_step(spec: CheckSpec, *, stream: TextIO) -> CheckResult:
     if spec.optional_reason is not None:
-        stream.write(f"SKIP: {spec.optional_reason}\n")
-        stream.flush()
+        _write_text(stream, f"SKIP: {spec.optional_reason}\n", flush=True)
         return CheckResult(spec.name, spec.command, "SKIP", None, "", spec.optional_reason)
     try:
         process = subprocess.Popen(
@@ -127,21 +170,21 @@ def execute_step(spec: CheckSpec, *, stream: TextIO) -> CheckResult:
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
-            encoding="utf-8",
-            errors="replace",
+            encoding=SUBPROCESS_OUTPUT_ENCODING,
+            errors=SUBPROCESS_OUTPUT_ERRORS,
+            env=_subprocess_environment(),
         )
     except OSError as exc:
         cause = f"{type(exc).__name__}: {exc}"
-        stream.write(cause + "\n")
-        stream.flush()
+        _write_text(stream, cause + "\n", flush=True)
         return CheckResult(spec.name, spec.command, "FAIL", 2, "", cause)
 
     chunks: list[str] = []
     assert process.stdout is not None
-    for line in process.stdout:
-        chunks.append(line)
-        stream.write(line)
-        stream.flush()
+    with process.stdout:
+        for line in process.stdout:
+            chunks.append(line)
+            _write_text(stream, line, flush=True)
     returncode = process.wait()
     output = "".join(chunks)
     return CheckResult(
@@ -183,33 +226,34 @@ def report_dict(results: Sequence[CheckResult], *, expected: int, exit_code: int
 
 def print_final_summary(results: Sequence[CheckResult], *, expected: int, exit_code: int, stream: TextIO) -> None:
     report = report_dict(results, expected=expected, exit_code=exit_code)
-    stream.write("\n" + "=" * 70 + "\n")
-    stream.write("BBK FINAL VERIFICATION SUMMARY\n")
-    stream.write("=" * 70 + "\n")
+    _write_text(stream, "\n" + "=" * 70 + "\n")
+    _write_text(stream, "BBK FINAL VERIFICATION SUMMARY\n")
+    _write_text(stream, "=" * 70 + "\n")
     disposition = "FAILED" if exit_code else ("PASS WITH SKIPS" if report["skipped"] else "PASS")
-    stream.write(f"Result: {disposition}\n")
-    stream.write(
+    _write_text(stream, f"Result: {disposition}\n")
+    _write_text(
+        stream,
         f"Checks: {report['checks_run']}/{report['checks_expected']} run; "
         f"{report['passed']} passed; {report['failed']} failed; "
         f"{report['skipped']} skipped; {report['not_run']} not run\n"
     )
     failures = [result for result in results if result.status == "FAIL"]
     if failures:
-        stream.write("\nFailure list:\n")
+        _write_text(stream, "\nFailure list:\n")
         for number, result in enumerate(failures, start=1):
-            stream.write(f"{number}. {result.name}\n")
-            stream.write(f"   Command: {command_text(result.command)}\n")
-            stream.write(f"   Exit code: {result.returncode}\n")
-            stream.write(f"   Cause: {result.cause}\n")
+            _write_text(stream, f"{number}. {result.name}\n")
+            _write_text(stream, f"   Command: {command_text(result.command)}\n")
+            _write_text(stream, f"   Exit code: {result.returncode}\n")
+            _write_text(stream, f"   Cause: {result.cause}\n")
     skips = [result for result in results if result.skipped]
     if skips:
-        stream.write("\nSkipped checks:\n")
+        _write_text(stream, "\nSkipped checks:\n")
         for result in skips:
-            stream.write(f"- {result.name}: {result.cause}\n")
+            _write_text(stream, f"- {result.name}: {result.cause}\n")
     if not failures and not skips:
-        stream.write("All verification checks passed.\n")
-    stream.write(f"Exit code: {exit_code}\n")
-    stream.write("=" * 70 + "\n")
+        _write_text(stream, "All verification checks passed.\n")
+    _write_text(stream, f"Exit code: {exit_code}\n")
+    _write_text(stream, "=" * 70 + "\n")
     stream.flush()
 
 
@@ -225,27 +269,26 @@ def run_all_report(
     steps = verification_steps(require_node=require_node, skip_package_manifest=skip_package_manifest)
     results: list[CheckResult] = []
     total_started = time.monotonic()
-    target.write(f"BBK ordered verification starting: {len(steps)} checks.\n")
-    target.flush()
+    _write_text(target, f"BBK ordered verification starting: {len(steps)} checks.\n", flush=True)
     for index, spec in enumerate(steps, start=1):
         step_started = time.monotonic()
-        target.write(f"\n==> [{index}/{len(steps)}] {spec.name}\n")
+        _write_text(target, f"\n==> [{index}/{len(steps)}] {spec.name}\n")
         if spec.command:
-            target.write(f"    {command_text(spec.command)}\n")
+            _write_text(target, f"    {command_text(spec.command)}\n")
         target.flush()
         result = executor(spec) if executor is not None else execute_step(spec, stream=target)
         results.append(result)
         elapsed = time.monotonic() - step_started
-        target.write(f"<== {spec.name}: {result.status} ({elapsed:.1f}s)\n")
-        target.flush()
+        _write_text(target, f"<== {spec.name}: {result.status} ({elapsed:.1f}s)\n", flush=True)
         # A failed package trust gate stops before any package code executes.
         if result.status == "FAIL" and (failfast or spec.trust_gate):
             break
     exit_code = 1 if any(result.status == "FAIL" for result in results) else 0
-    target.write(
-        f"Verification checks completed in {time.monotonic() - total_started:.1f}s.\n"
+    _write_text(
+        target,
+        f"Verification checks completed in {time.monotonic() - total_started:.1f}s.\n",
+        flush=True,
     )
-    target.flush()
     print_final_summary(results, expected=len(steps), exit_code=exit_code, stream=target)
     return exit_code, results
 
@@ -256,6 +299,8 @@ def run_all(**kwargs: object) -> int:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
+    _configure_standard_stream(sys.stdout)
+    _configure_standard_stream(sys.stderr)
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--failfast", action="store_true", help="stop after the first failed verification check")
     parser.add_argument("--require-node", action="store_true", help="fail if Node.js is unavailable for OMP syntax validation")

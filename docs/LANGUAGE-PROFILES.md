@@ -1,6 +1,6 @@
-# Language and domain profiles in BBK alpha.11.11
+# Language and domain profiles in BBK alpha.11.12
 
-BBK installs the five independently manifested `0.1.0-alpha.3` profile packages by default. Strict manifests bind their metadata, compatibility, OMP launch behavior, structure-validator detection, and consolidated test surfaces. The typed capability protocol is `bbk.profile-capability.v1`.
+BBK installs five independently manifested profile packages by default: CODESYS `0.1.0-alpha.4`, and Go, Python, Rust, and TypeScript/JavaScript `0.1.0-alpha.3`. Strict manifests bind their metadata, compatibility, OMP launch behavior, structure-validator detection, and consolidated test surfaces. The typed capability protocol is `bbk.profile-capability.v1`.
 
 ## Bundled inventory
 
@@ -8,7 +8,7 @@ The verified inner archives live at `bundled-language-profiles/packages/`:
 
 | ID | Package | Version | Router skill | CLI |
 |---|---|---|---|---|
-| `codesys` | `bbk-profile-codesys` | `0.1.0-alpha.3` | `bbk-codesys` | `bbk-codesys` |
+| `codesys` | `bbk-profile-codesys` | `0.1.0-alpha.4` | `bbk-codesys` | `bbk-codesys` |
 | `go` | `bbk-profile-go` | `0.1.0-alpha.3` | `bbk-go` | `bbk-go` |
 | `python` | `bbk-profile-python` | `0.1.0-alpha.3` | `bbk-python` | `bbk-python` |
 | `rust` | `bbk-profile-rust` | `0.1.0-alpha.3` | `bbk-rust` | `bbk-rust` |
@@ -124,19 +124,20 @@ bbk --json profile list
 
 Project-local profile roots and `BBK_PROFILE_PATH` may change runtime precedence beyond the managed installation.
 
-## Pre-public alpha.3 metadata corrections
+## Pre-public metadata corrections and CODESYS alpha.4 promotion
 
-All five packages remain `0.1.0-alpha.3`. Current-facing metadata now agrees across `VERSION`, `PROFILE.json`, README, installation guidance, OMP extension metadata, and each strict package manifest. CODESYS, Go, Python, and Rust stale alpha.2/alpha.4-facing display text is corrected, and the earlier TypeScript/JavaScript correction is retained. Historical alpha.1/alpha.2 predecessor, migration, source-binding, and source-change records remain unchanged because they describe actual lineage.
+Go, Python, Rust, and TypeScript/JavaScript retain their independently versioned `0.1.0-alpha.3` packages. CODESYS is now `0.1.0-alpha.4`, an immutable successor to the reviewed alpha.3 CI-script and documentation correction. Current-facing metadata agrees across `VERSION`, `PROFILE.json`, README, installation guidance, OMP extension metadata, and each strict package manifest. Historical predecessor, migration, source-binding, and source-change records remain unchanged where they describe actual lineage.
 
-Every profile now documents three separate identities:
+The bundle therefore carries four distinct identities that must not be conflated:
 
 ```text
-profile package version:       0.1.0-alpha.3
-minimum compatible BBK core:   0.1.0-alpha.8
-structure/slice dialect:       introduced in 0.1.0-alpha.4
+CODESYS profile package version:       0.1.0-alpha.4
+other bundled profile versions:        0.1.0-alpha.3
+minimum compatible BBK core:           0.1.0-alpha.8
+structure/slice contract dialect:      introduced in 0.1.0-alpha.4
 ```
 
-The packages were rebuilt with new package manifests, root digests, deterministic ZIP digests, and qualification records without changing their semantic versions, as requested before the first public tag.
+The four alpha.3 packages remain byte-identical to the corrected `verified-r3` set. The CODESYS package has a new semantic version, package root, archive digest, predecessor binding, and migration record while retaining the reviewed alpha.3 operational behavior and authority boundary.
 
 ## Fail-closed preparation
 
@@ -176,7 +177,7 @@ Uninstall is conservative: content or executable-mode divergence is preserved an
 - Earlier packages may be `legacy-unprojected`, `legacy-summary`, or `legacy-no-review-manifest`.
 - Alpha.7 could declare capability names but had no central typed invocation protocol; those declarations remain `legacy-declared` and are not auto-dispatched.
 - Alpha.8-aware profiles opt into `bbk.profile-capability.v1` and typed request/result handling.
-- The bundled alpha.3 profiles declare minimum BBK alpha.8 and remain compatible with alpha.11.11 and compatible successors when their exact package and runtime checks pass.
+- All bundled profiles declare minimum BBK alpha.8 and remain compatible with alpha.11.12 and compatible successors when their exact package and runtime checks pass.
 
 No profile file, skill, compiler, linter, simulator, IDE, or native tool is invoked merely because the package is installed.
 
@@ -201,7 +202,7 @@ See `INSTALL.md`, `ASSURANCE.md`, and the schemas under `../spec/schemas/`.
 
 ## Current bundled-profile contract
 
-The five package identities remain `0.1.0-alpha.3`. The bundled packages share the following contract:
+The bundled package identities are CODESYS `0.1.0-alpha.4` plus Go, Python, Rust, and TypeScript/JavaScript `0.1.0-alpha.3`. All five share the following contract:
 
 - current package metadata agrees across `VERSION`, `PROFILE.json`, README, installation guidance, OMP package metadata, and `PACKAGE-MANIFEST.json`;
 - `PROFILE.json.requires.bbk_minimum` is `0.1.0-alpha.8`;

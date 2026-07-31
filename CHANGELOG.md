@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.0-alpha.11.12 — 2026-07-30
+
+- Reissue the corrected alpha.11.11 line as an immutable alpha.11.12 successor instead of continuing to replace archives under the same version identity.
+- Make unittest, ordered-verification, and install-gate streaming safe on legacy Windows console code pages by forcing Python child stdio to UTF-8, preserving undecodable bytes as escapes, and escaping unsupported console characters.
+- Terminate an unfinished suite before capture cleanup and make locked temporary-log removal bounded and best-effort, preventing a secondary `WinError 32` from masking the original result.
+- Add strict-CP1252, mixed-byte, Unicode, and locked-capture regressions for the native Windows verification path.
+- Correct the Codex-only update regression to compare manifest ownership through physical path identity rather than raw `WindowsPath` spelling, covering long-name/8.3 aliases.
+- Correct schema-validator coverage to treat optional-dependency `BLOCKED` plus exit code 1 as the documented machine-readable status contract.
+- Centralize install/update path identity across core installation, Codex-only update, OMP-only update, and installed OMP routing; use native physical identity for live files and a stricter case/slash-normalized portable key for cross-platform install-plan collision checks.
+- Add a native Windows compatibility probe and GitHub Actions matrix for Python 3.11/3.13, full verification, strict CP1252 output, path aliases, and Win32 sharing violations.
+- Preserve the 19-role method, project-record formats, installer destinations, model-routing defaults, and all five bundled language-profile archives; beyond the Windows portability corrections, changes are limited to release identity, generated integrity metadata, documentation, and version-bound fixtures.
+
 ## 0.1.0-alpha.11.11 — 2026-07-30
 
 - Make the extracted BBK package root the canonical Git repository source; remove the repository-extractor and generated staging-tree workflow.
@@ -7,8 +19,8 @@
 - Move historical PRDs, per-alpha migration notes, decision notes, internal alignment material, old qualification reports, and release transcripts outside the public source tree while preserving them in a separate pre-public history artifact.
 - Remove pre-public-only Blueprint alignment/dogfood material and the one-off alpha.9.1 Windows leak-recovery utility from the current package.
 - Replace history-presence regressions with direct public-repository-shape, documentation-inventory, and product-neutrality checks while retaining the five consolidated test modules.
-- Update the deterministic release builder and current documentation for direct repository maintenance without changing role, runtime, installer, project-record, model-routing, or bundled-profile behavior.
-- Preserve the independently versioned alpha.3 CODESYS, Go, Python, Rust, and TypeScript/JavaScript profile packages byte-for-byte.
+- Update the deterministic release builder and current documentation for direct repository maintenance without changing role, runtime, installer, project-record, model-routing, or bundled-profile operational behavior.
+- Promote the bundled CODESYS profile to its independently versioned `0.1.0-alpha.4` successor after CI-script/documentation review; preserve the Go, Python, Rust, and TypeScript/JavaScript `0.1.0-alpha.3` packages byte-for-byte.
 
 ## 0.1.0-alpha.11.10 — 2026-07-30
 

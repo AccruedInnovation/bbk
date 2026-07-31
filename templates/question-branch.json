@@ -1,6 +1,6 @@
 {
   "schema": "bbk.question-branch.v1",
-  "bbk_version": "0.1.0-alpha.11.11",
+  "bbk_version": "0.1.0-alpha.11.12",
   "id": "Q-DECISION-001",
   "root_decision": "Replace with the exact decision that must be resolved.",
   "status": "ACTIVE",

@@ -15,7 +15,7 @@ import tempfile
 import time
 from copy import copy
 from pathlib import Path, PurePath, PurePosixPath
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any, Iterable, Mapping, Sequence, TextIO
 
 TOOLS_DIR = Path(__file__).resolve().parent
 if str(TOOLS_DIR) not in sys.path:
@@ -23,6 +23,7 @@ if str(TOOLS_DIR) not in sys.path:
 
 from generate_agents import MODEL_ROUTING_PATH, rendered_projections
 from model_routing import ModelRoutingError
+from path_compat import portable_path_key
 from profile_install import (
     PreparedProfile,
     ProfileInstallError,
@@ -40,10 +41,54 @@ from profile_registry import (
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 BUNDLED_PROFILES_PATH = ROOT / "bundled-language-profiles"
+SUBPROCESS_OUTPUT_ENCODING = "utf-8"
+SUBPROCESS_OUTPUT_ERRORS = "backslashreplace"
 
 
 class InstallError(RuntimeError):
     pass
+
+
+def _stream_text(stream: TextIO, value: str) -> str:
+    """Return text safe for strict CP1252 and other legacy host streams."""
+    encoding = getattr(stream, "encoding", None)
+    if not encoding:
+        return value
+    try:
+        value.encode(encoding)
+    except (LookupError, UnicodeEncodeError):
+        try:
+            return value.encode(encoding, errors="backslashreplace").decode(encoding)
+        except LookupError:
+            return value.encode("ascii", errors="backslashreplace").decode("ascii")
+    return value
+
+
+def _write_text(stream: TextIO, value: str, *, flush: bool = False) -> None:
+    """Write without allowing console encoding to abort installation."""
+    stream.write(_stream_text(stream, value))
+    if flush:
+        stream.flush()
+
+
+def _configure_standard_stream(stream: TextIO) -> None:
+    """Make direct console writes non-fatal without changing its encoding."""
+    reconfigure = getattr(stream, "reconfigure", None)
+    if not callable(reconfigure):
+        return
+    try:
+        reconfigure(errors=SUBPROCESS_OUTPUT_ERRORS)
+    except (AttributeError, OSError, TypeError, ValueError):
+        pass
+
+
+def _subprocess_environment() -> dict[str, str]:
+    """Force Python verification children to emit the encoding we decode."""
+    environment = os.environ.copy()
+    environment["PYTHONIOENCODING"] = (
+        f"{SUBPROCESS_OUTPUT_ENCODING}:{SUBPROCESS_OUTPUT_ERRORS}"
+    )
+    return environment
 
 
 class InstallProgress:
@@ -206,7 +251,7 @@ def install_bytes(
     # before an actual installation writes any files. Identical co-owned bytes
     # are safe and retain all source provenance on the first record.
     if planned is not None:
-        key = os.path.normcase(os.path.abspath(os.fspath(destination))).replace("\\", "/")
+        key = portable_path_key(destination)
         prior_index = planned.get(key)
         if prior_index is not None:
             prior = records[prior_index]
@@ -603,19 +648,20 @@ def run_verification_gate(
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
-                encoding="utf-8",
-                errors="replace",
+                encoding=SUBPROCESS_OUTPUT_ENCODING,
+                errors=SUBPROCESS_OUTPUT_ERRORS,
+                env=_subprocess_environment(),
             )
         except OSError as exc:
             raise InstallError(f"Verification runner could not start: {exc}") from exc
 
         chunks: list[str] = []
         assert process.stdout is not None
-        for line in process.stdout:
-            chunks.append(line)
-            if echo:
-                sys.stdout.write(line)
-                sys.stdout.flush()
+        with process.stdout:
+            for line in process.stdout:
+                chunks.append(line)
+                if echo:
+                    _write_text(sys.stdout, line, flush=True)
         returncode = process.wait()
         output = "".join(chunks)
         if not report_path.is_file():
@@ -741,6 +787,7 @@ def _perform_install(
             "state_effect.py",
             "review_assurance.py",
             "verify_package.py",
+            "path_compat.py",
             "omp_model_routing.py",
         ]:
             install_file(ROOT / "tools" / name, omp_extension / name, **common)
@@ -942,7 +989,7 @@ def validate_install_plan(manifest: Mapping[str, Any]) -> None:
     for record in manifest.get("files", []):
         if not isinstance(record, dict) or not isinstance(record.get("path"), str):
             raise InstallError("installer preflight produced an invalid file record")
-        key = record["path"].replace("\\", "/").casefold()
+        key = portable_path_key(Path(record["path"]))
         previous = seen.get(key)
         if previous is None:
             seen[key] = record
@@ -1385,6 +1432,8 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
+    _configure_standard_stream(sys.stdout)
+    _configure_standard_stream(sys.stderr)
     normalized = list(sys.argv[1:] if argv is None else argv)
     if "--json" in normalized and normalized and normalized[0] != "--json":
         normalized.remove("--json")

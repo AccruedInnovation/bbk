@@ -209,7 +209,7 @@ m2_BBK = m2_ROOT / 'tools' / 'bbk.py'
 class Alpha7CongruenceTests(unittest.TestCase):
 
     def test_release_is_additive_over_alpha6(self):
-        self.assertEqual((m2_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.11.11')
+        self.assertEqual((m2_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.11.12')
         help_text = subprocess.run([sys.executable, m2_BBK, '--help'], cwd=m2_ROOT, check=True, text=True, stdout=subprocess.PIPE).stdout
         for command in ('fit', 'structure', 'slice', 'profile', 'manifest', 'candidate', 'gate', 'workspace', 'worktree', 'package'):
             self.assertIn(command, help_text)
@@ -364,7 +364,7 @@ class Alpha8ProfileDispatchTests(unittest.TestCase):
             self.assertEqual(lock['effective_sha256'], value['effective_sha256'])
 
     def test_alpha8_package_surface_is_present(self):
-        self.assertEqual((m3_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.11.11')
+        self.assertEqual((m3_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.11.12')
         for rel in ['docs/LANGUAGE-PROFILES.md', 'spec/schemas/bbk-profile-capability-request-v1.schema.json', 'spec/schemas/bbk-profile-capability-result-v1.schema.json', 'spec/schemas/bbk-profile-dispatch-v1.schema.json', 'templates/profile-capability-request.json']:
             self.assertTrue((m3_ROOT / rel).is_file(), rel)
 
@@ -417,7 +417,7 @@ class PublicRepositoryBoundaryTests(unittest.TestCase):
 
     def test_context_and_procedure_methods_are_canonical_and_projected(self):
         method = m4_load('spec/method-content.json')
-        self.assertEqual(method['version'], '0.1.0-alpha.11.11')
+        self.assertEqual(method['version'], '0.1.0-alpha.11.12')
         self.assertIn('bbk-context-routing', method['skills'])
         self.assertIn('bbk-procedure-design', method['skills'])
         self.assertIn('context-routing.md', method['references'])

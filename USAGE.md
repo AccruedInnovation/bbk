@@ -1,11 +1,11 @@
 # Blueprint Bootstrap Kit
 
-**Version:** `0.1.0-alpha.11.11`  
+**Version:** `0.1.0-alpha.11.12`  
 **Status:** package-qualified temporary method harness; live host, model, profile-toolchain, and target-project behavior remain separately qualified
 
 BBK is a lightweight, Blueprint-inspired planning, execution, evidence, and review kit for Codex, Oh My Pi (OMP), Claude Code, and generic agent harnesses. It is external to the real Blueprint product and carries no official Blueprint lifecycle, capability, authorization, readiness, execution, verification, completion, qualification, or release authority.
 
-Alpha.11.11 is the current canonical successor. It preserves the complete role, Wayfinding, execution, assurance, model-routing, and language-profile contracts while making the extracted package root the direct Git repository source. The public documentation set is consolidated and current-facing; historical PRDs, per-alpha migration notes, internal alignment audits, and release-specific qualification evidence are distributed separately instead of cluttering `docs/`.
+Alpha.11.12 is the current canonical successor. It preserves alpha.11.11's complete role, Wayfinding, execution, assurance, model-routing, repository, documentation, and bundled-profile contracts while correcting Windows verification-console transport, filesystem identity, and optional schema-validator test handling. It also adds a native Windows compatibility probe and blocking Windows CI coverage so path aliases, console code pages, and sharing violations are exercised before future releases.
 
 ## BBK entrypoint
 
@@ -141,7 +141,7 @@ python tools\bbk.py schema status
 python tools\bbk.py schema validate --schema schema.json --instance candidate.json
 ```
 
-When `python-jsonschema` is missing, the validator reports `BLOCKED` with an exact `--ensure` remediation; it does not silently access the network. The installation-specific `bbk-installed-profiles` skill now records both the preferred launcher path and the exact Python/script fallback, so a missing `bbk` entry in `PATH` or a mise shell does not by itself make profile discovery unavailable. The familiar discovery form remains `bbk --json profile list`.
+When `python-jsonschema` is missing, the validator reports `BLOCKED` with process exit code 1 and an exact `--ensure` remediation; this is an expected optional-capability status, and it does not silently access the network. The installation-specific `bbk-installed-profiles` skill now records both the preferred launcher path and the exact Python/script fallback, so a missing `bbk` entry in `PATH` or a mise shell does not by itself make profile discovery unavailable. The familiar discovery form remains `bbk --json profile list`.
 
 ## Model routing
 
@@ -262,7 +262,7 @@ Inherited workspace write access is not subject-mutation authority. Only `bbk_wo
 
 ## Bundled language profiles
 
-BBK includes the independently manifested `0.1.0-alpha.3` CODESYS, Go, Python, Rust, and TypeScript/JavaScript profile packages. All five install by default; use `--no-language-profiles` for core-only installation or repeated `--profile-id` options for a subset.
+BBK includes independently manifested language profiles: CODESYS `0.1.0-alpha.4`, plus Go, Python, Rust, and TypeScript/JavaScript `0.1.0-alpha.3`. All five install by default; use `--no-language-profiles` for core-only installation or repeated `--profile-id` options for a subset.
 
 An explicit `--language-profiles PATH` replaces the bundled source for that invocation. It may identify a profile ZIP, an extracted profile package, a flat set of extracted profiles, a `packages/` repository tree, or a verified aggregate bundle. The separate `bbk-language-profiles` repository is already expanded and can be passed directly:
 
@@ -322,7 +322,7 @@ verified profile package
         → generic BBK validation, assurance, evidence, and locking
 ```
 
-Supported operations remain `state-effect`, `state-effect-inventory`, `state-effect-review`, `review-context`, `review-lens`, and `evidence-adapter`. Alpha.7 declarations without the typed protocol remain `legacy-declared` and are not invoked automatically. Alpha.8-aware alpha.3 profiles remain compatible when their exact package and runtime compatibility checks pass.
+Supported operations remain `state-effect`, `state-effect-inventory`, `state-effect-review`, `review-context`, `review-lens`, and `evidence-adapter`. Alpha.7 declarations without the typed protocol remain `legacy-declared` and are not invoked automatically. Alpha.8-aware independently versioned profiles remain compatible when their exact package and runtime compatibility checks pass.
 
 ## Package layout
 

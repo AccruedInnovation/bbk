@@ -1320,8 +1320,8 @@
   },
   "model_profile_count": 3,
   "model_routing_source": "spec/model-routing.json",
-  "model_routing_source_sha256": "357bdfcbfbac42b3f0accfd5b94bb156601354a20eef8fbff9ac233e40dccbae",
-  "package_version": "0.1.0-alpha.11.11",
+  "model_routing_source_sha256": "ed9831b453c759f92c9062349d2c63d3125b45426cb33c9c4b8ea95ea3a07945",
+  "package_version": "0.1.0-alpha.11.12",
   "projection_count": 76,
   "role_count": 19,
   "role_profile_counts": {
@@ -1329,10 +1329,10 @@
     "judgment": 12,
     "mechanical": 2
   },
-  "role_source_sha256": "04cece7a3eb552f5635812723240fc56ad8099afd85e49acce4bda877df7a698",
+  "role_source_sha256": "e1de5b517639aed1b1147fb6aede3292149aa76c9cf24175c69a86e5e4dab2d9",
   "schema": "bbk.projection-manifest.v4",
   "source": "spec/roles.json",
-  "source_sha256": "40686eca4e766119062ae4ad471617eb28aff5d4151724bac3323c380e4a5ecb",
+  "source_sha256": "8789683f113ed556e7f1480c2dc248c6fc74bbcac687cf2db3664e6920f8a759",
   "target_count": 4,
   "targets": [
     "claude",

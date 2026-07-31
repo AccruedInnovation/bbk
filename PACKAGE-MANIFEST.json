@@ -1,7 +1,7 @@
 {
   "authority_disclaimer": "BBK is a temporary method harness and is not an official Blueprint release or authority-bearing package.",
   "created_at": "2026-07-30T00:00:00Z",
-  "file_count": 303,
+  "file_count": 306,
   "files": [
     {
       "bytes": 139,
@@ -10,16 +10,22 @@
       "sha256": "68621095cc05ceaaf0c7568ca0d7ad42b24dff6299d87426254ea5eac9ca25fe"
     },
     {
+      "bytes": 893,
+      "executable": false,
+      "path": ".github/workflows/windows-verification.yml",
+      "sha256": "dee8ba3cb9370596548e0bc650a8ff44b4457cf68899d14c3b22f98d63300510"
+    },
+    {
       "bytes": 134,
       "executable": false,
       "path": ".gitignore",
       "sha256": "3c760b50b5bb0af8dc659b5a1941f4f7f5a8d9fa0eaa116218eec715e6377aa9"
     },
     {
-      "bytes": 26534,
+      "bytes": 28454,
       "executable": false,
       "path": "CHANGELOG.md",
-      "sha256": "b47683ae8fbcdfe58927108e647e178c945bdcc1d9bcb116003a2b43c2ee46c4"
+      "sha256": "1135fe993465cf7b16ba97b455d0d3357c6d408b3ea1057f5839f241a6d57a9c"
     },
     {
       "bytes": 1093,
@@ -28,52 +34,52 @@
       "sha256": "d1278607a64065a2485edb5700a36a7050e57e450df28be8f703f62a87c92355"
     },
     {
-      "bytes": 26271,
+      "bytes": 26410,
       "executable": false,
       "path": "README.md",
-      "sha256": "10bdbb9268378e3595a6f3968712d23c58a516a9f47ebe8dbaa3a36a2c4aac97"
+      "sha256": "12bf31ad252389e43b7f239a03447d9dc4d617c1346465895f62aec089b77739"
     },
     {
-      "bytes": 3905,
+      "bytes": 4639,
       "executable": false,
       "path": "RELEASE-NOTES.md",
-      "sha256": "32c0af7fe298c5b432f41bac8ef19c5cae3a2ab8d40612e5b4d170407adf5196"
+      "sha256": "2447cce9a3d5f057e8f92a5961eb3442df61fd5f7e13891a3f65671febe12b6c"
     },
     {
       "bytes": 18,
       "executable": false,
       "path": "VERSION",
-      "sha256": "aa932c58a3d74bceec30722db8ec32969d8263f795b4ba389772020c7d6fe3ce"
+      "sha256": "a8a5288383b3a847e41ae57920946c7179dbba25b774540774f871e2293cac0f"
     },
     {
-      "bytes": 750,
+      "bytes": 1122,
       "executable": false,
       "path": "bundled-language-profiles/README.md",
-      "sha256": "41780bdf54c0af02f546ed28cebad865b7acc0d89eb7ed219fa77683c27a00b1"
+      "sha256": "657e548320514f7a4e829c9b8535d6470a99b2838ec92e2988a2a823ed07021b"
     },
     {
-      "bytes": 2434,
+      "bytes": 2651,
       "executable": false,
       "path": "bundled-language-profiles/RELEASE-MANIFEST.json",
-      "sha256": "9b31092eda33966cf9c3530b557f1f1f9298fdcfd8580f53feb32886391bb8ab"
+      "sha256": "8883bcbbb7426ebb13a66af70b27777567dbe91c6c37745c92923460d54480a8"
     },
     {
       "bytes": 570,
       "executable": false,
       "path": "bundled-language-profiles/SHA256SUMS.txt",
-      "sha256": "ce74bd35713ae947aa5361d33dc9547545206fc8d009a9224c15835d6c6c32b5"
+      "sha256": "3f86713b5091e303838a04ff149727e44ce59faef3d82895a2959b59c14244aa"
     },
     {
-      "bytes": 510008,
+      "bytes": 549905,
       "executable": false,
-      "path": "bundled-language-profiles/packages/bbk-profile-codesys-0.1.0-alpha.3.zip",
-      "sha256": "d3220198a0708e76c2d9ddccfcc42b0a5be631fa35cc93f8ec1e911a641aaa0a"
+      "path": "bundled-language-profiles/packages/bbk-profile-codesys-0.1.0-alpha.4.zip",
+      "sha256": "201d07b8491fd3a25e29a0d0e96ac7065a053492586ae82efd6eeef8371fe97c"
     },
     {
       "bytes": 104,
       "executable": false,
-      "path": "bundled-language-profiles/packages/bbk-profile-codesys-0.1.0-alpha.3.zip.sha256",
-      "sha256": "baa72e5a5f81d2450292705d28ee0f66af6d5ff28cf6637e923343eb0025a624"
+      "path": "bundled-language-profiles/packages/bbk-profile-codesys-0.1.0-alpha.4.zip.sha256",
+      "sha256": "a83d84daeea22792db4f153a0069164975873537a2bb72093ddc9c4455a89621"
     },
     {
       "bytes": 250022,
@@ -127,7 +133,7 @@
       "bytes": 17924,
       "executable": false,
       "path": "docs/AGENTS.md",
-      "sha256": "93287903ebdf8b453c8e5fd41300864fe0265e38b1df7fe0768332b4d5313f82"
+      "sha256": "efdaa8aa735d7b99dabfad648af79c50554797985d2796d3b898575632756055"
     },
     {
       "bytes": 12807,
@@ -142,10 +148,10 @@
       "sha256": "eaaaa4db2719c678bdd2d06a664868b7ff14c5201917d8060e13db7878e83140"
     },
     {
-      "bytes": 2964,
+      "bytes": 4227,
       "executable": false,
       "path": "docs/DEVELOPMENT.md",
-      "sha256": "354cb23761296b65cdd68c6cd0353c742b37dae1122cab46aeac2d1ead360c6b"
+      "sha256": "8bee561ce01758e3c76ea7d1106f1b268986180bc3dcc1e6d60e0a179083123a"
     },
     {
       "bytes": 4176,
@@ -160,22 +166,22 @@
       "sha256": "cad5abc93f46ef4e457cb263285895a159d0cd52664905669d360e21542d9cb1"
     },
     {
-      "bytes": 15935,
+      "bytes": 16355,
       "executable": false,
       "path": "docs/INSTALL.md",
-      "sha256": "57424101b4c599278593926c106f5672ee67ef0007f86a42f121e99f2b40977b"
+      "sha256": "bdde869f2e47df6b2915491c2f06d0d1a68b6e30b4c15d8614408dc692e2eb1f"
     },
     {
-      "bytes": 17315,
+      "bytes": 17659,
       "executable": false,
       "path": "docs/LANGUAGE-PROFILES.md",
-      "sha256": "1ee2c02d772c0e8c1f9723f62e4d32378cae4d0e5f1984aabd136dbfc7e74230"
+      "sha256": "a0a87e1cd19c52f5b95c913d716fe90a774515b8d06c8a2ed8cb7369129be27f"
     },
     {
       "bytes": 14625,
       "executable": false,
       "path": "docs/MODEL-ROUTING.md",
-      "sha256": "7a967685a8f19d76ce5005c704166cb9481be17a1ef8dd797f2d21bf8b7b8c02"
+      "sha256": "608821726a14674454093b60f144a899a47c263a639832d8d2961173c20f051a"
     },
     {
       "bytes": 1270,
@@ -199,7 +205,7 @@
       "bytes": 23975,
       "executable": false,
       "path": "docs/USAGE.md",
-      "sha256": "b5f8bb3f37601347200ae9228cb6b7c94cb13d6663004a6b31364f93b9b36b5b"
+      "sha256": "a15de11633d2d1800438b7281db92b40230cde5edfa0f3cb4d31c6f20e05a36b"
     },
     {
       "bytes": 4643,
@@ -541,25 +547,25 @@
       "bytes": 5020,
       "executable": false,
       "path": "fixtures/work-units/query-service.json",
-      "sha256": "b6f60659002b4c34d8e338e4ee77a7e8f8443adbfd39279314b49aaa3a74db8f"
+      "sha256": "a61a297886dac42c7f76f6593e3029dfc55647f5ae64c2476a98b37200cc1b91"
     },
     {
       "bytes": 7637,
       "executable": false,
       "path": "omp/extension/README.md",
-      "sha256": "bcb6c1ead00ab9c9da2775839af808fabe7623d479e372c23076baaf30ba4539"
+      "sha256": "8c130d72a9299a85cd2ef06d83a9598519e0a080ba33558ef2af40af631f593f"
     },
     {
       "bytes": 41564,
       "executable": false,
       "path": "omp/extension/index.js",
-      "sha256": "42fe8aec1c790266cbe0a40562978aebb60e3b28a322709ca540d45c1f34e1c3"
+      "sha256": "e70a451a9afa561de315bb0a36c7f7c8e966e714fe164cdf868de6d8d9a66656"
     },
     {
       "bytes": 239,
       "executable": false,
       "path": "omp/extension/package.json",
-      "sha256": "ef9ea5644eb01c569567b167143f9912e0dac621341604a183e07633629eb835"
+      "sha256": "9021844657cbd3313fa1d53b5d22109e8b031f3a6e7c8cc5cd99f9ec32d8d955"
     },
     {
       "bytes": 8249,
@@ -907,7 +913,7 @@
       "bytes": 58994,
       "executable": false,
       "path": "projections/manifest.json",
-      "sha256": "d4ed3118320c2030a613d04840e6a38a4f6cab41db09a78aef69d8d007535067"
+      "sha256": "a3187f378e58b131254fcdb0a0fe50cc44d2e22edfc9bb2d6d1d791eb6018362"
     },
     {
       "bytes": 7387,
@@ -1303,25 +1309,25 @@
       "bytes": 98526,
       "executable": false,
       "path": "spec/method-content.json",
-      "sha256": "dac9b78426210eab0653de3e60663ac1752b79347191765e7e5c71ee131b3091"
+      "sha256": "db323e258a05ad0d7dc038e0d578dab8a19a5f8618ad93035a8df6d15a85da93"
     },
     {
       "bytes": 2489,
       "executable": false,
       "path": "spec/model-routing.json",
-      "sha256": "bac86885b60849605aded42a026bf3eecbff57e2a3c225c021efd22335417eac"
+      "sha256": "c3c40f870899665126896e02786bee03f40dbcae72ddb54936500a905d2ea215"
     },
     {
       "bytes": 8156,
       "executable": false,
       "path": "spec/omp-model-routing-profiles.json",
-      "sha256": "20a67d334d72d38a5aea40561239fbd4daa92849f350e582204d5205e14ca044"
+      "sha256": "63c33f4b5910ce9e3995fb7006ed068078663d01bf880e089163477039a2e236"
     },
     {
       "bytes": 94091,
       "executable": false,
       "path": "spec/roles.json",
-      "sha256": "512f89001d349bfb7612f41da8afe2e3d8fbd828081243b964af8f6377463314"
+      "sha256": "f3607ad1d444d1a6cddb079c0d1f80ae4946313653379e54f5464c5ace75c93b"
     },
     {
       "bytes": 1875,
@@ -1549,7 +1555,7 @@
       "bytes": 1374,
       "executable": false,
       "path": "templates/handoff.json",
-      "sha256": "456b643f5f89e5dbcddd047804de981bf0bbf17600a175ef8f44e330697abdf6"
+      "sha256": "84792cf3decd747c3571fe2247a10b592d63237dafef1ceb6e05308ece269d0f"
     },
     {
       "bytes": 19989,
@@ -1573,7 +1579,7 @@
       "bytes": 649,
       "executable": false,
       "path": "templates/omp-model-routing-profile.json",
-      "sha256": "489e2fdf6de54e901bb930ca797588b3535d205c19cf3b4ca9f32fecdb84fce5"
+      "sha256": "a6476fafc7bc0e5e4c2878aa5a9c305c467ef919028968eff1bd072f28850d48"
     },
     {
       "bytes": 828,
@@ -1591,7 +1597,7 @@
       "bytes": 1003,
       "executable": false,
       "path": "templates/question-branch.json",
-      "sha256": "11e8f87388947dbe02c1f33e7d8c02da7e2fb0fa3a087778f1fae3f1cb910396"
+      "sha256": "f0ea978dece1d9d6a0f17e49e8e1fedbf9d58d008c03c2d56b3c1e197581d288"
     },
     {
       "bytes": 1650,
@@ -1645,37 +1651,37 @@
       "bytes": 5241,
       "executable": false,
       "path": "templates/work-unit.json",
-      "sha256": "f430d8c196892431d82caea2d48e0df836c34b4bf93aac6175a8904ffd1289a4"
+      "sha256": "f852f5c757c57511028d41273bdad792d1dd529ca21f52ffc9e4bd3e102bc122"
     },
     {
       "bytes": 18244,
       "executable": false,
       "path": "tests/test_assurance_state.py",
-      "sha256": "34a2baff01516a7abb8bea3ad7a1405208eb7bce06455390019b0e9537c0ce87"
+      "sha256": "2e2f1b7dfe46372c02420544402e8d1285426d1a12642a4d8c3025fb50975a47"
     },
     {
       "bytes": 44558,
       "executable": false,
       "path": "tests/test_core_contracts.py",
-      "sha256": "2c56c355e9f31b835071b6de2bf951761e942bb698962ee8675acfb887d081ea"
+      "sha256": "c30c7e0a87161ef7e1834a7c0585bbe071805648b56c72cd6dd17741ae844e55"
     },
     {
-      "bytes": 69548,
+      "bytes": 81605,
       "executable": false,
       "path": "tests/test_installation_portability.py",
-      "sha256": "a47f45de66a8d29b77c30951eb315a9d025022c83a906b44ea1bf952b2a896f1"
+      "sha256": "e6ac70e179b555161c4e5fefada07cf8bfac90964b245b837696d5c844350313"
     },
     {
-      "bytes": 36364,
+      "bytes": 37477,
       "executable": false,
       "path": "tests/test_omp_runtime.py",
-      "sha256": "cd7ae2380a7e33e68024cdfe49519418dc1727e8861b7567b8ec8eb95d4fece5"
+      "sha256": "718b9630f6d414c6cf39cd2529cc9e7fd44114e8b991be691a2837fcb8d48d83"
     },
     {
-      "bytes": 74282,
+      "bytes": 75592,
       "executable": false,
       "path": "tests/test_system.py",
-      "sha256": "5f92aea7cd02aaac6525d2069cc74c02716203152f47da2e8e87a8523bdb9f4e"
+      "sha256": "308f8fcd2f7f9f61b25912a2d39362b33439494052f35d238e3280edb0b49472"
     },
     {
       "bytes": 207532,
@@ -1720,10 +1726,10 @@
       "sha256": "46bf353d33de06b190c6872e7d48d52f68df9a7d22450ffe50a0d682d53b17c5"
     },
     {
-      "bytes": 53906,
+      "bytes": 55661,
       "executable": false,
       "path": "tools/install.py",
-      "sha256": "292cc8566df1dfaecce5991cae9aec835170f32e3af00dcc0fc319ae94e41697"
+      "sha256": "0af5b670633c2736c470a6a18e87a7ed5eda1228b9894fbc260f33f6896c3713"
     },
     {
       "bytes": 2413,
@@ -1738,10 +1744,16 @@
       "sha256": "81bf549dd154d487cb13edc9746a1133b944198caffd6c6bff5ec66816611a11"
     },
     {
-      "bytes": 28068,
+      "bytes": 28047,
       "executable": false,
       "path": "tools/omp_model_routing.py",
-      "sha256": "3cd4efd4056943099ee7d0c0f94ba1b40898872d1b710b289c9bdf9ace784620"
+      "sha256": "e2c8efb6cb8e5ba27241484158872358e045bacb4d346597d845ac9afc9989f8"
+    },
+    {
+      "bytes": 4634,
+      "executable": true,
+      "path": "tools/path_compat.py",
+      "sha256": "dc5f5c4ca4cec3f301e068142417478da295be176740c3edc3e17c735a3dd987"
     },
     {
       "bytes": 30574,
@@ -1762,10 +1774,10 @@
       "sha256": "0371f9cca97487887e8f3b2961323bf80a15d860cfed4c1318707a5f5da4d4d1"
     },
     {
-      "bytes": 19845,
+      "bytes": 23464,
       "executable": false,
       "path": "tools/run_tests.py",
-      "sha256": "3856c8c7aa9b4521ea2dfffcaa5dac69b3a5ddf68a4aacd1ed26dc1d3247b685"
+      "sha256": "02a42c84c654677b87881997f5cc1be1c37fb7e1310c02f17706f4ea22f1754f"
     },
     {
       "bytes": 8257,
@@ -1786,16 +1798,16 @@
       "sha256": "be782f11d395fcd561fb87de6359a50889a35070b9c1706944f849cb627c9eb2"
     },
     {
-      "bytes": 18991,
+      "bytes": 18969,
       "executable": false,
       "path": "tools/update_codex.py",
-      "sha256": "f76054d074f4340a306b218ee1545922fdd35d5bbb8bf92a4c147f49eb042bca"
+      "sha256": "2438eff025a1a17985c2f5fe06b1e8bbed5fa912f38010a736a92d38bf3ccdeb"
     },
     {
-      "bytes": 28507,
+      "bytes": 28511,
       "executable": false,
       "path": "tools/update_omp.py",
-      "sha256": "1922ed52352e734950aca37591fbe077512ecc7ab6cfddf361863d87a6d8811f"
+      "sha256": "6c1d7115e4e1bbc6bd924690d80d06f9961ef82063a1481d852e1df23d90be30"
     },
     {
       "bytes": 12074,
@@ -1810,30 +1822,36 @@
       "sha256": "60a29d0f80af9321a5747c58f21d05ca785f5606636656b1745396ea44ff23c8"
     },
     {
-      "bytes": 12671,
+      "bytes": 14535,
       "executable": false,
       "path": "tools/verify_all.py",
-      "sha256": "81bf18cef9281ecb13125e227322e2069b2ae1ffcc1a3773f4894f18bdba4226"
+      "sha256": "4e0bddc7f723c86afad5cace7851da33de2480be935bb2c167750387391d246c"
     },
     {
       "bytes": 4594,
       "executable": false,
       "path": "tools/verify_package.py",
       "sha256": "0dd5df724092fdadb5c658b9cc0e02d2a645e7a9d9d237f6ddae7a6e3854e5b3"
+    },
+    {
+      "bytes": 7571,
+      "executable": true,
+      "path": "tools/windows_compat.py",
+      "sha256": "c7917ef405b143b25fac45f784e4497ea8a3415adf54e511e1eec817774dee8b"
     }
   ],
   "model_profile_count": 3,
-  "model_routing_source_sha256": "357bdfcbfbac42b3f0accfd5b94bb156601354a20eef8fbff9ac233e40dccbae",
+  "model_routing_source_sha256": "ed9831b453c759f92c9062349d2c63d3125b45426cb33c9c4b8ea95ea3a07945",
   "name": "Blueprint Bootstrap Kit",
   "projection_count": 76,
-  "projection_source_sha256": "40686eca4e766119062ae4ad471617eb28aff5d4151724bac3323c380e4a5ecb",
+  "projection_source_sha256": "8789683f113ed556e7f1480c2dc248c6fc74bbcac687cf2db3664e6920f8a759",
   "role_count": 19,
   "role_profile_counts": {
     "coordination": 5,
     "judgment": 12,
     "mechanical": 2
   },
-  "root_sha256": "820600cc056a91839936d731657c07ee6c960fb2b21474e4eccd15ae23f57582",
+  "root_sha256": "9dd7a759308d913ac029f33e1c433cdc73f9e0ab2f46f60d926b9c8af5ef98fb",
   "schema": "bbk.package-manifest.v1",
   "targets": [
     "claude",
@@ -1841,5 +1859,5 @@
     "generic",
     "omp"
   ],
-  "version": "0.1.0-alpha.11.11"
+  "version": "0.1.0-alpha.11.12"
 }

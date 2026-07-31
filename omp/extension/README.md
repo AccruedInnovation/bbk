@@ -1,4 +1,4 @@
-# BBK alpha.11.11 OMP extension
+# BBK alpha.11.12 OMP extension
 
 This thin adapter exposes the BBK project, fit, structure, State–Decision–Effect, slicing, assurance, candidate, gate, review, finding, evidence, package, profile, leased-workspace, and orchestration-entrypoint surfaces.
 
