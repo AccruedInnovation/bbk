@@ -1,5 +1,85 @@
 # Changelog
 
+## 0.1.0-alpha.13.1 — 2026-08-02
+
+- Remove the accidental hard test dependency on `jsonschema`; add a standard-library role-return validator and run the complete contract suite successfully under `python -S`.
+- Retain optional Draft 2020-12 validation through `jsonschema`/`referencing` when installed, while making the standalone full validator report a precise dependency blocker when absent.
+- Restore cached in-process execution for canonical BBK CLI behavior tests and trusted package-local profile fixtures, retaining real subprocesses for operating-system, isolation, timeout, and tamper boundaries.
+- Reduce the default eight-suite wall time from 42.48 seconds to 25.21 seconds on the qualification host while increasing contract coverage.
+- Preserve alpha.13 role, contract, prompt, installer, language-profile, and reviewed per-role model-routing behavior unchanged apart from the package-version binding.
+
+
+## 0.1.0-alpha.13 — 2026-08-01
+
+- Make the 19 split role files canonical under `spec/roles/`, with a v4 catalogue, explicit controller roots and parent modes, deterministic assembly, and generated `spec/roles.json` compatibility projection.
+- Resolve Prototyper delegation, Planning/Phase specialist ownership, and operational-versus-semantic readiness contradictions.
+- Add exact normalized role-return/result schemas, registry generation, formal TerritoryExecutionBoundary and local-discovery contracts, capability-status inventory, and retire the ambiguous WorkerValidationBatch object.
+- Compile shared role behavior through 21 reusable prompt modules, remove the arbitrary three-mandatory-procedure ceiling, and preserve role-specific protocol behavior through source-bound regression tests.
+- Advance generated projection metadata to `bbk.projection-manifest.v8` and integrate exact return contracts into Codex, OMP, Claude, and generic projections.
+- Set alpha.13 default model routing to the exact reviewed `roles-update.zip` per-role selections and bind them through a complete fixture and generated-host regression.
+- Regenerate skills, schemas, projections, manifests, templates, documentation, installers, and release metadata; retain alpha.12.4 project-record and installer compatibility boundaries.
+- Make source-archive executable modes an explicit empty allowlist so Python, Windows, and POSIX extractors produce the same strictly verifiable alpha.13 package tree.
+
+
+## 0.1.0-alpha.12.4 — 2026-08-01
+
+- Replace canonical install-time profile buckets with `bbk.model-routing.v2`, giving all 19 roles independent OMP, Codex, and Claude Code routes while retaining validated v1 compatibility and arbitrary valid v1 profile names.
+- Advance generated routing metadata to `bbk.projection-manifest.v6` and add the v2 JSON Schema, direct-route qualification, install-time override, and migration regressions.
+- Make `--uninstall-existing` harness-scoped when exactly one already-installed OMP or Codex harness is selected, preserving unselected harness files and ownership records instead of uninstalling the entire managed installation.
+- Add manifest-aware stale-file removal, backup/force handling, rollback, interactive scope-specific prompts, and OMP/Codex preservation regressions for selective clean replacement.
+- Remove `<bbk-role-contract>` and `<bbk-inlined-skill>` metadata envelopes from Codex `developer_instructions`; retain mandatory procedure bodies as plain Markdown and keep provenance in native metadata and manifests.
+- Preserve OMP's authenticated child markers, alpha.12.3.1's PowerShell-visible prompt, alpha.12.3's bounded test runner, alpha.12.2's activity/`ask` behavior, and all existing project-record schemas.
+
+## 0.1.0-alpha.12.3.1 — 2026-08-01
+
+- Make the interactive existing-install question line-terminated before reading stdin so Windows PowerShell and other line-oriented native-command hosts display the `[Y/n]` prompt instead of buffering it invisibly.
+- Add a regression that simulates a line-mediated host and proves the prompt is visible before the installer reads the user's response.
+- Preserve alpha.12.3 test-runner bounds, diagnostics, OMP behavior, installer replacement semantics, and all package/project schemas unchanged.
+
+## 0.1.0-alpha.12.3 — 2026-08-01
+
+- Close stdin for unittest-module processes and real behavior-test subprocesses so an unexpected prompt cannot consume the developer console or block verification indefinitely.
+- Reduce the default per-module hard timeout from 900 to 300 seconds while preserving the `--suite-timeout` override.
+- Add explicit 30/120/180-second bounds to Node, installer, nested unittest, and Codex-update subprocesses used by portability tests.
+- Bound Windows `taskkill` to ten seconds and retain bounded direct-kill/reap fallbacks so cleanup cannot become the new hang.
+- Show each running suite's latest visible unittest line in parallel heartbeats, including the current test and the hard timeout.
+- Add regressions for console-input isolation and current-test heartbeat visibility; retain all alpha.12.2 product behavior unchanged.
+
+## 0.1.0-alpha.12.2 — 2026-08-01
+
+- Add a single above-editor OMP BBK line, showing `BBK · ready` while idle and live canonical-child activity while work is running.
+- Show the latest named worker's public intent/tool/output and current context-window use, with compact context gauges for up to three additional workers.
+- Remove the old `setStatus` row; document that OMP's current interactive extension API cannot replace the built-in `pi` footer brand, and consolidate mode/activity state into the one widget.
+- Accept harmless OMP child-wrapper presentation normalization (line endings, blank lines, trailing horizontal whitespace) while continuing to fail closed on any changed, missing, injected, or reordered non-empty role instruction.
+- Require Main to use OMP `ask` for every BBK user-facing question or decision request; ordinary prose questions are informational and cannot be treated as answered.
+- Bind ADR-compatible accepted decisions to matching `BBK_USER_RESPONSE` packets marked `source: omp.ask`; keep ADR authorship in the responsible canonical role rather than Main.
+- Detect a pre-existing managed BBK installation before an ordinary install and offer a default-Yes clean replacement.
+- Add `--uninstall-existing` and `--keep-existing` for explicit automation policy; preflight before removal, preserve unowned files, back up forced modified regular files, and reject non-regular manifest-path conflicts.
+- Add regressions for live worker/context rendering, lifecycle clearing, ask provenance, interactive replacement defaults, and preservation of a user-owned OMP extension file.
+- Retain all alpha.12.1 verification-profile, hermetic-test, and performance improvements.
+
+## 0.1.0-alpha.12.1 — 2026-07-31
+
+- Make the profile-discovery regression hermetic instead of assuming an explicit `--profile-dir` suppresses the intentionally additive installed-profile search path.
+- Verify explicit profile precedence against a deliberate isolated ambient profile and retain unexpected-file package-drift coverage.
+- Add `full`, `quick`, `omp`, and `codex` ordered-verification profiles while preserving the complete release/CI path.
+- Use OMP-focused qualification for `--test-and-update-omp` and Codex-focused qualification for `--test-and-update-codex`; keep full qualification for `--test`, test-and-install, and release builds.
+- Run independent unittest modules concurrently by default, with `--jobs 1` available for serial diagnosis.
+- Replace repeated Python interpreter startup in behavior-level CLI tests with calls to the same public `main(argv)` entry points, while retaining real subprocess coverage for operating-system and isolation boundaries.
+- Keep the standalone Alpha.8 typed-profile validator for profile maintainers but stop running its external-process matrix immediately before the equivalent Alpha8ProfileDispatchTests release coverage.
+- Preserve alpha.12's prompt replacement, mandatory-skill injection, controller topology, role/project schemas, model routing, and bundled profile packages.
+
+## 0.1.0-alpha.12 — 2026-07-31
+
+- Made the harness-root session the sole user-facing BBK controller; every canonical `bbk_*` role is now a non-user-facing child.
+- Added explicit controller-mediated human-decision triggers and OMP `hub`/IRC request/reply routing.
+- Replaced OMP's Main and canonical-child system prompts through `before_agent_start`, excluding conflicting generic and client-specific compatibility instructions.
+- Preserved only explicit task-call data from OMP's marker-bearing child wrapper, verified the embedded role against the installed canonical projection, and discarded all other host workflow or compatibility policy.
+- Made the OMP batch task contract explicit: `agent` selects the canonical role, `name` is a stable IRC/job identity, and even one child uses the `tasks` array.
+- Inlined mandatory procedure bodies into all generated role prompts and removed reliance on OMP/Claude autoload metadata.
+- Advanced the role catalogue to `bbk.roles.v3`, projection metadata to `bbk.projection-manifest.v5`, and OMP mode state to `bbk.omp-mode-state.v2`.
+- Preserved all alpha.11.12 Windows verification and portability corrections.
+
 ## 0.1.0-alpha.11.12 — 2026-07-30
 
 - Reissue the corrected alpha.11.11 line as an immutable alpha.11.12 successor instead of continuing to replace archives under the same version identity.

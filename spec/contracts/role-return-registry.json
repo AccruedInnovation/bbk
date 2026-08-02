@@ -1,0 +1,401 @@
+{
+  "schema": "bbk.role-return-registry.v1",
+  "package_version": "0.1.0-alpha.13.1",
+  "source_role_catalog": "spec/roles/catalog.json",
+  "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+  "generator": "tools/return_contracts.py",
+  "role_count": 19,
+  "operational_dispositions": [
+    "COMPLETE",
+    "PARTIAL",
+    "BLOCKED_TECHNICAL",
+    "BLOCKED_AUTHORITY",
+    "BLOCKED_DECISION",
+    "PAUSED_CAPACITY",
+    "PAUSED_HOST_WINDOW",
+    "CANCELLED",
+    "INCONCLUSIVE"
+  ],
+  "entries": [
+    {
+      "role": "bbk_root_wayfinder",
+      "contract_id": "bbk.root-wayfinder-return.v1",
+      "semantic_state_name": "planning_readiness",
+      "return_schema": {
+        "path": "spec/schemas/role-returns/bbk-root-wayfinder-return-v1.schema.json",
+        "bytes": 5752,
+        "sha256": "b1144117d60c8b6ce05bf8a07177c6d7cde8029ac92a8b98c185d6c86e7344a0"
+      },
+      "result_schema": {
+        "path": "spec/schemas/role-results/bbk-root-wayfinder-result-v1.schema.json",
+        "bytes": 5188,
+        "sha256": "52f3000af5cede3893434d06b12166d129904a8e207009106cc6c820b3b7e654"
+      },
+      "source": {
+        "path": "spec/roles/bbk_root_wayfinder-role.json",
+        "bytes": 17603,
+        "sha256": "bf75f4f5a3759bbdd9b39eb70c8cb0e21673937d8c392a32e4f581e2b7132675"
+      }
+    },
+    {
+      "role": "bbk_territory_wayfinder",
+      "contract_id": "bbk.territory-wayfinder-return.v1",
+      "semantic_state_name": "territory_readiness",
+      "return_schema": {
+        "path": "spec/schemas/role-returns/bbk-territory-wayfinder-return-v1.schema.json",
+        "bytes": 8434,
+        "sha256": "1b34298923b19c0698f8b968e01b9fad2597f60881a3cf942c70ebe8e43268b9"
+      },
+      "result_schema": {
+        "path": "spec/schemas/role-results/bbk-territory-wayfinder-result-v1.schema.json",
+        "bytes": 5723,
+        "sha256": "bd566fb21f626ccd4589421d2e7264d5754cfec30efcc3f1524501feac03a4a5"
+      },
+      "source": {
+        "path": "spec/roles/bbk_territory_wayfinder-role.json",
+        "bytes": 23245,
+        "sha256": "6fe85435ac7d4368d7bc87e91ddc32404d4640f524d5588a0a1b2f8ddd7c3022"
+      }
+    },
+    {
+      "role": "bbk_questioning_wayfinder",
+      "contract_id": "bbk.questioning-wayfinder-return.v1",
+      "semantic_state_name": "decision_cluster_state",
+      "return_schema": {
+        "path": "spec/schemas/role-returns/bbk-questioning-wayfinder-return-v1.schema.json",
+        "bytes": 8865,
+        "sha256": "ac2e195c4998bac94ed6e13933a663ef9d510afdc115b83ebf6f6a3597d7ade5"
+      },
+      "result_schema": {
+        "path": "spec/schemas/role-results/bbk-questioning-wayfinder-result-v1.schema.json",
+        "bytes": 6785,
+        "sha256": "9423043d1d52ba56731ca342ec894a6522234b0e1d7ba09fca6760d51f662638"
+      },
+      "source": {
+        "path": "spec/roles/bbk_questioning_wayfinder-role.json",
+        "bytes": 26530,
+        "sha256": "324b2cb77a9c9f2b0f258f45f6c2339df7b470209edf6c56368936b8fb774824"
+      }
+    },
+    {
+      "role": "bbk_planning_wayfinder",
+      "contract_id": "bbk.planning-wayfinder-return.v1",
+      "semantic_state_name": "work_graph_state",
+      "return_schema": {
+        "path": "spec/schemas/role-returns/bbk-planning-wayfinder-return-v1.schema.json",
+        "bytes": 8568,
+        "sha256": "b3d310b82c5a11fdfbc6caf427c336b0102dabcb3258242974e512845be8511a"
+      },
+      "result_schema": {
+        "path": "spec/schemas/role-results/bbk-planning-wayfinder-result-v1.schema.json",
+        "bytes": 7671,
+        "sha256": "d271e21920b8fb0bc8e820823e59c6651fce58e97b9e419a95cb8e00fef41e0f"
+      },
+      "source": {
+        "path": "spec/roles/bbk_planning_wayfinder-role.json",
+        "bytes": 28633,
+        "sha256": "2b8009ec0d851f975720b2ba9a02a87b3c25befc51a38d102bcafe70d8bf401c"
+      }
+    },
+    {
+      "role": "bbk_phase_wayfinder",
+      "contract_id": "bbk.phase-wayfinder-return.v1",
+      "semantic_state_name": "phase_plan_state",
+      "return_schema": {
+        "path": "spec/schemas/role-returns/bbk-phase-wayfinder-return-v1.schema.json",
+        "bytes": 9980,
+        "sha256": "721e4bc85c6f5b30f98d64a413a8b6ff62ab0fe3ef5a141d482a5f9d78b11718"
+      },
+      "result_schema": {
+        "path": "spec/schemas/role-results/bbk-phase-wayfinder-result-v1.schema.json",
+        "bytes": 9929,
+        "sha256": "c3e6a6cad3a688ff6114f1d6c92a51d063c7e0fb457f16d3767b4f2ee3a2f4fb"
+      },
+      "source": {
+        "path": "spec/roles/bbk_phase_wayfinder-role.json",
+        "bytes": 34963,
+        "sha256": "b9bdca137f93c18215d351f601c4b4fcac70b396a5bcac310ed24679974f44e0"
+      }
+    },
+    {
+      "role": "bbk_question_guide",
+      "contract_id": "bbk.question-guide-return.v1",
+      "semantic_state_name": "guide_branch_state",
+      "return_schema": {
+        "path": "spec/schemas/role-returns/bbk-question-guide-return-v1.schema.json",
+        "bytes": 9155,
+        "sha256": "01d4bd5e1c3bf5ac231242ccfab0b2c4e862f521a4d9c9d772c6da7be6ff871b"
+      },
+      "result_schema": {
+        "path": "spec/schemas/role-results/bbk-question-guide-result-v1.schema.json",
+        "bytes": 9625,
+        "sha256": "2c3b4cfb26c53d6ff4a04fdf519d5fa52708a8d06477e667e24ab2b1ecc5513c"
+      },
+      "source": {
+        "path": "spec/roles/bbk_question_guide-role.json",
+        "bytes": 29293,
+        "sha256": "955ae77637a897cc4ccd6c7dddda97dc94cfc10947d65138e37d7c87f6307b1c"
+      }
+    },
+    {
+      "role": "bbk_researcher",
+      "contract_id": "bbk.researcher-return.v1",
+      "semantic_state_name": "research_state",
+      "return_schema": {
+        "path": "spec/schemas/role-returns/bbk-researcher-return-v1.schema.json",
+        "bytes": 7093,
+        "sha256": "44f01e4f0ed6bfc6c4d59745c0f0f064bea8461ada1646e0e8bc09a3917afd52"
+      },
+      "result_schema": {
+        "path": "spec/schemas/role-results/bbk-researcher-result-v1.schema.json",
+        "bytes": 6178,
+        "sha256": "0ac122810939483cf93f0e5c7bdeaa7d4ea52e36948e47120157808d3737aa4c"
+      },
+      "source": {
+        "path": "spec/roles/bbk_researcher-role.json",
+        "bytes": 23497,
+        "sha256": "59fd69df170af2864881437df6d2f025f3305c873f37438c7a63c5d7f574b1cb"
+      }
+    },
+    {
+      "role": "bbk_prototyper",
+      "contract_id": "bbk.prototyper-return.v1",
+      "semantic_state_name": "experiment_state",
+      "return_schema": {
+        "path": "spec/schemas/role-returns/bbk-prototyper-return-v1.schema.json",
+        "bytes": 8825,
+        "sha256": "32a068d8183a852b75eb611f8d0ce7a1bb13a629d1bd490b390c7c616791d2d4"
+      },
+      "result_schema": {
+        "path": "spec/schemas/role-results/bbk-prototyper-result-v1.schema.json",
+        "bytes": 9977,
+        "sha256": "66d7b99ad7a8e587e0c645ca83d65c3ea9f24136ef83da66f6e1ba2e303691a0"
+      },
+      "source": {
+        "path": "spec/roles/bbk_prototyper-role.json",
+        "bytes": 36256,
+        "sha256": "68cc5930f2b5f4cf94b626ad010f81a6ac96dccf9a0d8b38da785800039c02e6"
+      }
+    },
+    {
+      "role": "bbk_synthesizer",
+      "contract_id": "bbk.synthesizer-return.v1",
+      "semantic_state_name": "synthesis_state",
+      "return_schema": {
+        "path": "spec/schemas/role-returns/bbk-synthesizer-return-v1.schema.json",
+        "bytes": 6852,
+        "sha256": "6839e7812fa8c0c7c388bfefea61f66b5508ba938ea189d0cb5fc756828f91fd"
+      },
+      "result_schema": {
+        "path": "spec/schemas/role-results/bbk-synthesizer-result-v1.schema.json",
+        "bytes": 6548,
+        "sha256": "12c09c2d5150c0346a9f9c8b249b257266d3ecf5ce0ff16af95a31422bbf40f6"
+      },
+      "source": {
+        "path": "spec/roles/bbk_synthesizer-role.json",
+        "bytes": 23588,
+        "sha256": "b03687f08f9a69aa3cf90ba8d987835d6d0351636eb6d0159bbf9e6de3c2085e"
+      }
+    },
+    {
+      "role": "bbk_architect",
+      "contract_id": "bbk.architect-return.v1",
+      "semantic_state_name": "architecture_state",
+      "return_schema": {
+        "path": "spec/schemas/role-returns/bbk-architect-return-v1.schema.json",
+        "bytes": 8888,
+        "sha256": "98717ed27cad2d304612b3a2b646755783d96e6babdb005e73f69d92c8bfea0c"
+      },
+      "result_schema": {
+        "path": "spec/schemas/role-results/bbk-architect-result-v1.schema.json",
+        "bytes": 12964,
+        "sha256": "a18348859148ad1b40e0541ddebdd3daa5bb6dde650f4fae83359c588f6deadd"
+      },
+      "source": {
+        "path": "spec/roles/bbk_architect-role.json",
+        "bytes": 40646,
+        "sha256": "4975975bdad1380557b7329a347cdee054be5612b58b99d947b409ce9b58b285"
+      }
+    },
+    {
+      "role": "bbk_verification_designer",
+      "contract_id": "bbk.verification-designer-return.v1",
+      "semantic_state_name": "assurance_design_state",
+      "return_schema": {
+        "path": "spec/schemas/role-returns/bbk-verification-designer-return-v1.schema.json",
+        "bytes": 9506,
+        "sha256": "0cbfa3887f8ae92db79c63deaa293695f7df0200a72c0f48e8be20d868c42c12"
+      },
+      "result_schema": {
+        "path": "spec/schemas/role-results/bbk-verification-designer-result-v1.schema.json",
+        "bytes": 11917,
+        "sha256": "2fe1b0920423f64faf495a29e2ec74e79ed4553dacc90562c0688fed9817adb7"
+      },
+      "source": {
+        "path": "spec/roles/bbk_verification_designer-role.json",
+        "bytes": 34252,
+        "sha256": "021b2cbaa082efb965eccfd6c100e0ed5c8cdd2ec9501021f43eed5c9630ec9d"
+      }
+    },
+    {
+      "role": "bbk_worker_designer",
+      "contract_id": "bbk.worker-designer-return.v1",
+      "semantic_state_name": "invocation_design_state",
+      "return_schema": {
+        "path": "spec/schemas/role-returns/bbk-worker-designer-return-v1.schema.json",
+        "bytes": 8542,
+        "sha256": "c760a0d8701b50e630197930971f6f404cbb6683a1110f45e2d2bb1f07f2c00f"
+      },
+      "result_schema": {
+        "path": "spec/schemas/role-results/bbk-worker-designer-result-v1.schema.json",
+        "bytes": 14249,
+        "sha256": "617f8c3dce28aacedcca6d0eb01b78693598bac561e63469b14d412346c2ac4b"
+      },
+      "source": {
+        "path": "spec/roles/bbk_worker_designer-role.json",
+        "bytes": 40350,
+        "sha256": "ba782b9442b97d095df470d1a08af882d9f1b4ade1f9ab8fd364a617812f8c0a"
+      }
+    },
+    {
+      "role": "bbk_reviewer",
+      "contract_id": "bbk.reviewer-return.v1",
+      "semantic_state_name": "review_state",
+      "return_schema": {
+        "path": "spec/schemas/role-returns/bbk-reviewer-return-v1.schema.json",
+        "bytes": 12583,
+        "sha256": "771f1ff0876a1b96e8c42b11c71db5c79086caca5be5c946dcba8510f713e45e"
+      },
+      "result_schema": {
+        "path": "spec/schemas/role-results/bbk-reviewer-result-v1.schema.json",
+        "bytes": 8434,
+        "sha256": "e5985fe86eef9bab5e0a355e28987f7bdf25a727e198a10d7ff964bbaac58f80"
+      },
+      "source": {
+        "path": "spec/roles/bbk_reviewer-role.json",
+        "bytes": 36690,
+        "sha256": "81d1a10d9c3de782ec963716be6444364f66f52d1225b36d046bd6ef3abafeb8"
+      }
+    },
+    {
+      "role": "bbk_root_orchestrator",
+      "contract_id": "bbk.root-orchestrator-return.v1",
+      "semantic_state_name": "root_execution_state",
+      "return_schema": {
+        "path": "spec/schemas/role-returns/bbk-root-orchestrator-return-v1.schema.json",
+        "bytes": 10563,
+        "sha256": "ddc66bb5974eadb3b72c348ec7f9e57689a47b2b8f5bdf7e577867287b78eaaa"
+      },
+      "result_schema": {
+        "path": "spec/schemas/role-results/bbk-root-orchestrator-result-v1.schema.json",
+        "bytes": 11954,
+        "sha256": "8c44a346365be29aed318f9bfd5d43a54dac0148cd12539e6ffadd8f7e42ce4d"
+      },
+      "source": {
+        "path": "spec/roles/bbk_root_orchestrator-role.json",
+        "bytes": 39136,
+        "sha256": "70535944e44edb7f4e07d4d4db08805433fb643c2ac7df6dbd009958fb164bc9"
+      }
+    },
+    {
+      "role": "bbk_territory_orchestrator",
+      "contract_id": "bbk.territory-orchestrator-return.v1",
+      "semantic_state_name": "territory_execution_state",
+      "return_schema": {
+        "path": "spec/schemas/role-returns/bbk-territory-orchestrator-return-v1.schema.json",
+        "bytes": 10814,
+        "sha256": "70c56026251b2a76d5d6c7d718cb79696d489f7d650760c644e3898d980d06bd"
+      },
+      "result_schema": {
+        "path": "spec/schemas/role-results/bbk-territory-orchestrator-result-v1.schema.json",
+        "bytes": 10348,
+        "sha256": "b18a7b068e7cd6415aefb671d19f0f8a4a7d4f7cec6a71eb66eb1a6d8ed26802"
+      },
+      "source": {
+        "path": "spec/roles/bbk_territory_orchestrator-role.json",
+        "bytes": 41789,
+        "sha256": "dde61f7264c40c3a38982b13baa819000da71485de081561625a2c09e0ac8f8e"
+      }
+    },
+    {
+      "role": "bbk_worker_orchestrator",
+      "contract_id": "bbk.worker-orchestrator-return.v1",
+      "semantic_state_name": "worker_cohort_state",
+      "return_schema": {
+        "path": "spec/schemas/role-returns/bbk-worker-orchestrator-return-v1.schema.json",
+        "bytes": 11927,
+        "sha256": "da83564911f608f0014ec0f15ee0ebaf5782515dfea44ae20cf2d19070702ea7"
+      },
+      "result_schema": {
+        "path": "spec/schemas/role-results/bbk-worker-orchestrator-result-v1.schema.json",
+        "bytes": 9624,
+        "sha256": "3a69d0335b6eaca6b9f32a0f3c0943d08d8eefcfac0f4699c38286d83d6a7b45"
+      },
+      "source": {
+        "path": "spec/roles/bbk_worker_orchestrator-role.json",
+        "bytes": 40487,
+        "sha256": "3282792a0f1802195ed97b75a12ad865a7a578c8095f9e8a0b5acc51f77c6423"
+      }
+    },
+    {
+      "role": "bbk_validator_orchestrator",
+      "contract_id": "bbk.validator-orchestrator-return.v1",
+      "semantic_state_name": "validation_run_state",
+      "return_schema": {
+        "path": "spec/schemas/role-returns/bbk-validator-orchestrator-return-v1.schema.json",
+        "bytes": 13082,
+        "sha256": "d07a385eb8c8aa020b4d738152cc2f27bffe522c816f8f26ecf2b87a42b872fa"
+      },
+      "result_schema": {
+        "path": "spec/schemas/role-results/bbk-validator-orchestrator-result-v1.schema.json",
+        "bytes": 10571,
+        "sha256": "ae7e7f3c0e8b2b9a7c1951b1be7e420fa6a0bb51db7309d1cf9eea50f5221b61"
+      },
+      "source": {
+        "path": "spec/roles/bbk_validator_orchestrator-role.json",
+        "bytes": 44389,
+        "sha256": "b2bf5f3d564e4c75b9b0ce879495482afb5e56836a0043d93d32b6c3624a18a0"
+      }
+    },
+    {
+      "role": "bbk_worker",
+      "contract_id": "bbk.worker-return.v1",
+      "semantic_state_name": "work_unit_execution_state",
+      "return_schema": {
+        "path": "spec/schemas/role-returns/bbk-worker-return-v1.schema.json",
+        "bytes": 7754,
+        "sha256": "96c9ea02d58e26845d81c77b70b9240e3c94d7ca0bb7347d0d85e20fd03e26fc"
+      },
+      "result_schema": {
+        "path": "spec/schemas/role-results/bbk-worker-result-v1.schema.json",
+        "bytes": 8748,
+        "sha256": "9918ce4c46fe8d958b8815cad9df4381df4778df7b8ae1e7234a7bba7dd72e63"
+      },
+      "source": {
+        "path": "spec/roles/bbk_worker-role.json",
+        "bytes": 32449,
+        "sha256": "e8ef1e1e3d7152d363de3b544176bd6345cc54d63c66ef2df9e9dc554bb2d0d3"
+      }
+    },
+    {
+      "role": "bbk_validator",
+      "contract_id": "bbk.validator-return.v1",
+      "semantic_state_name": "validator_attempt_state",
+      "return_schema": {
+        "path": "spec/schemas/role-returns/bbk-validator-return-v1.schema.json",
+        "bytes": 7089,
+        "sha256": "227498355e53267c99073c06107122e428f00aaf2f532b3983038d21c855ec23"
+      },
+      "result_schema": {
+        "path": "spec/schemas/role-results/bbk-validator-result-v1.schema.json",
+        "bytes": 10631,
+        "sha256": "5879825945611a6fd38879e2c3fc5ccba77236ff487ed3adf127177d43adec8e"
+      },
+      "source": {
+        "path": "spec/roles/bbk_validator-role.json",
+        "bytes": 35087,
+        "sha256": "557853ac0f18be2b8d5be5c086da6b9afc7193e7cc22b74ab96dbbf3a404af8a"
+      }
+    }
+  ]
+}

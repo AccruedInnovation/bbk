@@ -4,6 +4,27 @@ The extracted BBK package root is the canonical BBK source tree and is intended
 to be committed directly to the BBK Git repository. No repository-extraction script
 or generated `bbk/` staging directory is required.
 
+
+## Canonical generation graph
+
+Alpha.13 uses a one-way generation graph:
+
+```text
+spec/roles/catalog.json + spec/roles/bbk_*-role.json
+  → tools/assemble_roles.py
+  → spec/roles.json
+
+canonical role return metadata
+  → tools/return_contracts.py
+  → role result/return schemas + role-return registry
+
+spec/method-content.json + spec/prompt-modules/ + spec/model-routing.json + generated roles.json
+  → tools/generate_agents.py
+  → shared skills + Codex/OMP/Claude/generic projections + projections/manifest.json
+```
+
+Edit only canonical inputs. Every generator has a drift-check mode and the release gate runs all of them before packaging.
+
 ## Normal update workflow
 
 1. Extract the new BBK release into a clean directory.
@@ -33,11 +54,19 @@ Run the complete ordered trust-gated sequence:
 python tools/run_tests.py --all --require-node
 ```
 
-Run only the consolidated unittest modules:
+Run all consolidated unittest modules (independent modules run concurrently by default):
 
 ```bash
 python tools/run_tests.py -v
 ```
+
+Run the cross-cutting developer smoke profile when full release qualification is not required:
+
+```bash
+python tools/verify_all.py --profile quick --require-node
+```
+
+Use `python tools/run_tests.py -v --jobs 1` to reproduce ordering-sensitive failures serially. To isolate the Windows portability module, use `python tools/run_tests.py -v --jobs 1 -p test_installation_portability.py --suite-timeout 300`. Test children cannot read the developer console, and every module is bounded by the displayed hard timeout. OMP-only and Codex-only tested updates use their corresponding targeted verification profiles; the complete ordered sequence remains mandatory for release publication and CI qualification.
 
 The ordered sequence verifies package integrity before execution, canonical
 method and role projections, model routing, generated agents, Python and JSON
@@ -56,7 +85,7 @@ python tools/windows_compat.py
 python tools/run_tests.py --all --require-node
 
 $env:PYTHONIOENCODING = "cp1252:strict"
-python tools/run_tests.py -v
+python tools/run_tests.py -v --jobs 1
 ```
 
 `tools/windows_compat.py` treats unavailable 8.3 generation or junction

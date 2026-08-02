@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-validator-orchestrator-result-v1.schema.json",
+  "title": "BBK BBK Validator Orchestrator result payload v1",
+  "description": "Closed role-specific `result` payload for `bbk_validator_orchestrator` returns.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "subject_candidate_and_eligibility",
+    "baseline_campaign_boundary_and_authority",
+    "assurance_contract_and_assertion_inventory",
+    "review_manifest_and_assignment_partition",
+    "review_context_and_completeness",
+    "attempt_purpose_independence_and_exposure",
+    "direct_evaluators_and_attempts",
+    "evidence_and_assertion_evaluation_state",
+    "findings_and_dispositions_state",
+    "aggregate_calculation_state",
+    "failure_classification_and_routing",
+    "repair_and_revalidation_scope",
+    "capability_environment_and_profile_state",
+    "recovery_liveness_pause_and_cleanup",
+    "invalidated_or_superseded_refs",
+    "parent_actions_and_recommended_route",
+    "aggregate_result"
+  ],
+  "properties": {
+    "subject_candidate_and_eligibility": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Exact governed subject, candidate identity, revision and digest, manifest, freeze or immutability receipt, prerequisite worker-quality attestation or explicitly valid alternative or non-applicability record, currentness, identity checks, post-freeze mutation check and eligibility blockers."
+    },
+    "baseline_campaign_boundary_and_authority": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Accepted operating and execution baselines, execution or assurance-run authorization, root campaign, TerritoryExecutionBoundary, Worker cohort, WorkUnits, authority holder, effects, safeguards, expiry, revocation and cancellation when applicable; exact not-applicable rationale otherwise."
+    },
+    "assurance_contract_and_assertion_inventory": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Current AssuranceContract identity and digest, protected floors, every required and optional assertion, source trace, criteria, applicability, acceptable methods, evidence, environment, blocking consequence, independence, reuse, repair and revalidation rules, plus unresolved design gaps."
+    },
+    "review_manifest_and_assignment_partition": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Exact ReviewManifest identity, revision and digest, purpose, applicability, gate kind, required assertions, primary evaluation owner per required assertion, complementary overlap rationale, lens or method assignments, deterministic prerequisites, aggregation and repair policy, dependency closure and manifest qualification result."
+    },
+    "review_context_and_completeness": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "ReviewContextManifest identity and digest, subject content root, required semantic objects, included and retrieval-only items, exclusions, omissions, redactions, context packs, shards, cross-shard assertions, compiler, completeness, blockers and invalidation dependencies."
+    },
+    "attempt_purpose_independence_and_exposure": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Per-assignment purpose, criteria-timing state, prior-findings visibility, outcome-bearing evidence exposure, append-only exposure history, producer, role, physical invocation, context assembly, model, provider, tool, environment, data and organizational independence facts, plus limitations on blindness, replication and confirmation."
+    },
+    "direct_evaluators_and_attempts": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every Validator and candidate-bound Reviewer logical assignment, semantic attempt, physical invocation, model and provider, profile and tool route, environment, context, authority, liveness, useful progress, checkpoint, completion state, replacement, interruption and verified handoff."
+    },
+    "evidence_and_assertion_evaluation_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every deterministic or interpretive EvidenceReceipt, raw carrier, trust class, tool and environment identity, currentness, reuse decision, AssertionEvaluation, rationale, coverage, limitation, unsupported claim and distinction between observation and inference."
+    },
+    "findings_and_dispositions_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every immutable ReviewFinding with exact subject, attempt, assertions, evidence, severity, blocking state, reproduction, impact, fingerprint and route; duplicate or contradiction correlation; current externally supplied FindingDisposition and authority when any; findings that remain open; and prohibited self-dispositions."
+    },
+    "aggregate_calculation_state": {
+      "anyOf": [
+        {
+          "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+          "description": "Central non-averaging calculation inputs and digest, required assertion results, protected floors, context completeness, infrastructure states, blockers, advisories, open findings, unhandled capability register, output aggregate or null before derivation, and claims explicitly not established by the aggregate."
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Central non-averaging calculation inputs and digest, required assertion results, protected floors, context completeness, infrastructure states, blockers, advisories, open findings, unhandled capability register, output aggregate or null before derivation, and claims explicitly not established by the aggregate."
+    },
+    "failure_classification_and_routing": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Candidate defects, assertion failures, evidence defects, evaluator or reasoning errors, malformed results, tool, context, environment or infrastructure failures, authority and decision blockers, capacity and host-window pauses, identity and integrity failures, and the smallest responsible route for each."
+    },
+    "repair_and_revalidation_scope": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Exact candidate and findings requiring repair, proposed smallest repair owner and scope, invalidated evidence, changed-subject and dependency impact, targeted-closure assertions, blind-reassessment needs, reusable unaffected evidence, required successor candidate and prerequisite attestation, and parent action needed. This is a route proposal, not repair authorization."
+    },
+    "capability_environment_and_profile_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Required and actual profiles, routers, tools, evidence adapters, environments, consumers, devices, fixtures, credentials and facilities; qualification and versions; capability gaps; unhandled assignments; substitutions explicitly prohibited or approved; and whether each gap blocks, narrows or makes the run inconclusive."
+    },
+    "recovery_liveness_pause_and_cleanup": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Validation-run and direct-child lifecycle, liveness, useful progress, expected silence, capacity or host-window pause, probes, checkpoints, same-thread continuation, replacement, fencing, stale state, unresolved recovery ambiguity, temporary effects, redaction, cleanup, quarantine and residual owners."
+    },
+    "invalidated_or_superseded_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Prior candidates, manifests, attestations, ReviewManifests, context packs, attempts, evidence, findings, dispositions, aggregates, revalidation scopes, handoffs or reports invalidated, replaced, reopened or superseded, with exact cause and unaffected material retained."
+    },
+    "parent_actions_and_recommended_route": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Exact invoking-parent action requested: accept the report for its own assessment, route candidate repair, admit a successor candidate for revalidation, retry or replace an evaluator, rebuild context, qualify a method, profile, tool or environment, obtain assurance redesign or governing decision, apply an authorized finding disposition, recover, pause, cancel, replan or correctly stop. In controller-root mode, include the conditions for Main to choose the next canonical root without making that transition itself."
+    },
+    "aggregate_result": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "PASS",
+            "PASS_ADVISORY",
+            "NEEDS_REVISION",
+            "BLOCKED_INSUFFICIENT_CONTEXT",
+            "BLOCKED_ENVIRONMENT",
+            "INCONCLUSIVE",
+            "ERROR",
+            "ESCALATED",
+            "CANCELLED",
+            "STALE"
+          ],
+          "description": "One centrally derived non-averaging aggregate result, or null before aggregation is valid. This discriminator is distinct from operational disposition and validation-run state."
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "One centrally derived non-averaging aggregate result, or null before aggregation is valid. This discriminator is distinct from operational disposition and validation-run state."
+    }
+  },
+  "x-bbk-role": "bbk_validator_orchestrator",
+  "x-bbk-contract": "bbk.validator-orchestrator-return.v1",
+  "x-bbk-supplemental-enums": {
+    "aggregate_results": [
+      "PASS",
+      "PASS_ADVISORY",
+      "NEEDS_REVISION",
+      "BLOCKED_INSUFFICIENT_CONTEXT",
+      "BLOCKED_ENVIRONMENT",
+      "INCONCLUSIVE",
+      "ERROR",
+      "ESCALATED",
+      "CANCELLED",
+      "STALE"
+    ]
+  }
+}

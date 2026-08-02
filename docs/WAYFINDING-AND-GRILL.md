@@ -2,6 +2,11 @@
 
 BBK separates ordinary decision preparation from deep interactive exploration.
 
+
+## Root and specialist ownership
+
+Planning starts at `bbk_root_wayfinder`; execution, direct bounded review, and candidate assurance start at separate controller-selected roots. Planning Wayfinder owns work-graph topology, cross-phase dependencies, global coverage, and readiness. Phase Wayfinder owns phase-local decomposition, sequencing, mutation ownership, specialist commissioning, and integration. Verification Designer owns exact assertion and evidence-method design; Worker Designer owns exact executable Worker invocation-contract design. A Wayfinder commissions, validates, and integrates those specialist returns but does not silently author or approve the specialist contract it requested.
+
 ## Recommendation-first path
 
 ```text
@@ -10,7 +15,7 @@ Root or Territory Wayfinder
       → investigate discoverable facts
       → prepare one decision-ready recommendation
       → state alternatives, consequences, affected scope, and uncertainty
-  → user-facing parent presents the recommendation
+  → harness-root controller presents the recommendation
       ├─ accepted
       │    → record and return the ADR-compatible decision packet
       │    → no Question Guide

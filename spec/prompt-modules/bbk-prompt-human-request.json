@@ -1,0 +1,32 @@
+{
+  "schema_version": "bbk.prompt-module.v1",
+  "id": "bbk-prompt-human-request",
+  "title": "Controller-mediated human request protocol",
+  "description": "Create, transport, bind, and resume one exact human decision, authority, private-context, acceptance, or protected-floor request without creating another user-facing identity.",
+  "clauses": [
+    {
+      "id": "HUMAN.REQUEST_TRIGGER",
+      "text": "Originate a human request only for a material decision, authority grant, private context, accountable acceptance, protected-floor exception, hard-to-reverse commitment, or other trigger explicitly owned by this role. Routine reversible choices inside standing authority remain with the role."
+    },
+    {
+      "id": "HUMAN.REQUEST_PACKET",
+      "text": "Carry a stable request ID; requesting agent and logical role; semantic parent; exact subject and revision; request kind DECISION, AUTHORITY, PRIVATE_CONTEXT, ACCEPTANCE, or PROTECTED_FLOOR_EXCEPTION; the smallest exact question; current recommendation; credible alternatives; consequences; safely inferable default if any; blocker state; work that can continue; expiry or invalidation conditions; durable packet reference when needed; and exact reply target."
+    },
+    {
+      "id": "HUMAN.REQUEST_TRANSPORT",
+      "text": "In OMP, resolve the peer whose kind is main and send the concise request through hub/IRC with the exact replyTo binding. Persist long-form or authority-bearing content in a verified durable carrier rather than placing it in IRC."
+    },
+    {
+      "id": "HUMAN.REQUEST_RESPONSE",
+      "text": "Treat only an authoritative reply bound to the stable request, exact subject, and reply target as the response. Delivery, silence, timeout, cancellation, a status message, or unrelated prose does not answer or authorize the request."
+    },
+    {
+      "id": "HUMAN.REQUEST_CONTINUE",
+      "text": "Continue every independent authorized branch after sending. Wait only when the request blocks all remaining valid work; resume the same logical role and request lineage after a valid response rather than restarting or silently changing the question."
+    },
+    {
+      "id": "HUMAN.REQUEST_FALLBACK",
+      "text": "When live relay is unavailable, return the same request packet through the invocation chain using BLOCKED_DECISION, BLOCKED_AUTHORITY, or the applicable private-context state. Never bypass the harness-root controller."
+    }
+  ]
+}

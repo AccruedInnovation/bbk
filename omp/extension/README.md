@@ -1,6 +1,6 @@
-# BBK alpha.11.12 OMP extension
+# BBK alpha.12 OMP extension
 
-This thin adapter exposes the BBK project, fit, structure, State–Decision–Effect, slicing, assurance, candidate, gate, review, finding, evidence, package, profile, leased-workspace, and orchestration-entrypoint surfaces.
+This adapter exposes BBK's deterministic project, fit, structure, State–Decision–Effect, slicing, assurance, candidate, gate, review, evidence, profile, workspace, model-routing, and orchestration-entrypoint surfaces.
 
 ## `/bbk` enters persistent BBK mode
 
@@ -8,58 +8,93 @@ This thin adapter exposes the BBK project, fit, structure, State–Decision–Ef
 /bbk                 enter BBK mode without starting an agent turn
 /bbk <request>       enter BBK mode and submit the first directive
 /bbk:exit            exit BBK mode
-/bbk exit            exit alias
-/bbk status          run deterministic BBK status without changing the mode
-/bbk:status          run deterministic BBK status without changing the mode
+/bbk exit            non-colon exit alias
+/bbk status          deterministic project status without changing mode
+/bbk:status          deterministic project status without changing mode
 ```
 
-The mode is session-local. `/bbk` stores a compact `bbk-mode-state` custom entry with `pi.appendEntry`; OMP does not send that entry to the LLM. The extension restores the latest state from `ctx.sessionManager.getBranch()` on `session_start`, `session_switch`, `session_branch`, and `session_tree`, and shows a `BBK` footer/status indicator while active.
+The mode is **session-local**. `/bbk` stores a compact `bbk-mode-state` v2 custom entry with `pi.appendEntry`; OMP does not send that entry to the model. The extension restores the latest branch state on `session_start`, `session_switch`, `session_branch`, and `session_tree`.
 
-For each ordinary user turn in an active session, `before_agent_start` appends a concise `<bbk-session-mode>` system-prompt overlay. The overlay tells the parent to preserve the current BBK workflow and route the request through the named task-agent system:
+## Live child activity widget
+
+The extension subscribes to OMP's shared `task:subagent:lifecycle` and `task:subagent:progress` events. While BBK mode is active it owns one line through `ctx.ui.setWidget(..., { placement: "aboveEditor" })`. The idle form is:
 
 ```text
-planning/uncertainty/no executable baseline → bbk_root_wayfinder
-accepted execution or recovery baseline     → bbk_root_orchestrator
-bounded independent review                  → bbk_reviewer
-assertion-scoped acceptance                 → bbk_validator_orchestrator
+BBK · ready
 ```
 
-`/bbk <request>` forwards only the raw directive through `sendUserMessage`; it no longer copies the full baseline skill or a large entry-controller prompt into the transcript. `/bbk` with no arguments and `/bbk:exit` perform only local state/UI work and do not trigger a model turn.
+While canonical `bbk_*` jobs are pending or running, the same line becomes:
 
-The named invocation remains important: it is where the selected OMP agent's `model`, `thinkingLevel`, autoloaded skills, tool policy, native `spawns` restrictions, and return contract take effect. The parent remains user-facing and relays material questions, authority requests, blockers, and final results.
+```text
+BBK · RelayWayfinder [ctx 264k/1M 26%]: Incorporating the user's answers into the operating baseline | RelayOrchestrator 44.7k/1M 4.5%
+```
 
-BBK mode does not change the parent model, thinking level, active tools, or sub-agent routes. It also does not replace OMP's native plan or vibe modes; exit a conflicting native mode separately when its restrictions are inappropriate.
+The most recently active BBK job supplies the name and latest public intent, tool/action, or recent public output. When OMP publishes `contextTokens` and `contextWindow`, BBK shows current context use and percentage; up to three other active jobs receive compact gauges. ANSI/control characters and embedded newlines are removed and non-BBK task events are ignored. Completion returns the line to `BBK · ready`; session navigation rebuilds it from restored mode state; mode exit and shutdown clear it.
 
-## Installed projection surface
+The old separate `setStatus`-based `BBK` row is no longer emitted. OMP's public `setFooter` extension method is currently not effective in interactive mode, so an extension cannot replace the built-in `pi` footer brand. BBK leaves that native footer intact and consolidates mode plus worker state into the single widget above it.
 
-- 19 agents, including `bbk_questioning_wayfinder`;
-- 21 skills, including `bbk-context-routing`, `bbk-procedure-design`, and the install-bound `bbk-installed-profiles` registry;
-- product-neutral reusable role instructions;
-- native `spawns` allowlists on every role that may delegate, without duplicating the list in the model-facing prompt;
-- profile-aware roles that autoload `bbk-installed-profiles` and `bbk-profile-routing`;
-- explicit `model` and `thinkingLevel` on every generated OMP agent;
-- 26 tools and 27 commands, including the active `/bbk`, deterministic `/bbk:status`, and interactive `/bbk:models`;
-- common constraints for logical-versus-physical topology, explicit context edges, proportional assurance, and append-only evidence exposure.
+## Complete Main system-prompt replacement
 
-The packaged model-routing defaults are:
+For each ordinary Main turn in an active session, `before_agent_start` returns one `<bbk-controller-system>` block. This is a **system-prompt replacement**, not an append or overlay. It excludes OMP's generic planning/delegation workflow and compatibility-discovered `.codex`, `.claude`, `.gemini`, and other client-specific instructions. The replacement injects the complete `bbk` and `bbk-context-routing` mandatory skills directly.
 
-- `judgment`: `openai-codex/gpt-5.6-sol`, high thinking;
-- `coordination`: `deepseek/deepseek-v4-pro`, high thinking;
-- `mechanical`: `deepseek/deepseek-v4-flash`, high thinking.
+The peer whose `kind` is `main`, normally `Main`, is the sole user-facing controller. It does not imitate canonical roles. It routes exactly one root through OMP `task`. With the advertised batch form, even one root uses `{ context, tasks: [{ name, agent, task, ... }] }`: `agent` is the exact canonical role, `name` is a stable IRC/job ID, and `task` is the complete assignment. A flat-form host uses its exact schema and a durable `local://` file for reusable shared context.
 
-A validated external policy can be supplied at install time with `--model-routing PATH`. Model selection is an execution preference. It does not broaden role authority, weaken assurance, prove model availability, or establish that a lower-cost route is adequate for a concrete invocation.
+```text
+planning, design, uncertainty, or no accepted executable baseline
+  → bbk_root_wayfinder
+accepted-baseline execution or recovery
+  → bbk_root_orchestrator
+bounded independent review
+  → bbk_reviewer
+assertion-scoped candidate acceptance
+  → bbk_validator_orchestrator
+```
 
-## Interactive sub-agent model menu
+Prefer background/non-blocking root jobs so Main remains available to relay user decisions and steering. `/bbk <request>` forwards only the raw directive through `sendUserMessage`; `/bbk` with no arguments and `/bbk:exit` perform only local state/UI work. `/bbk:exit` restores ordinary OMP prompting for later Main turns.
+
+Prompt replacement does not change the parent model, thinking level, active tools, child model routes, filesystem containment, or native host capabilities. It also does not itself exit another OMP mode; leave a conflicting native mode separately when its tool restrictions are inappropriate.
+
+## Closed role-specific child replacement
+
+All 19 generated OMP roles carry a deterministic `<bbk-agent-system role="...">` marker. Every named `bbk_*` role is a non-user-facing child, including Root Wayfinder, Root Orchestrator, Question Guide, Reviewer, and Validator Orchestrator.
+
+When a marked role starts, `before_agent_start` replaces the complete incoming subagent system prompt with one `<bbk-agent-replacement>` block containing:
+
+- the canonical role contract;
+- complete inlined bodies and digests for the role's one-to-three `mandatory_skills`;
+- compact BBK runtime facts;
+- explicit task-call context parsed only from OMP's marker-bearing native child wrapper;
+- an approved `<plan>` and its path when present;
+- isolated worktree information;
+- hub peer identity and initial roster;
+- the caller's yield schema when present; and
+- the BBK completion, blocker, evidence, and durable-handoff rules.
+
+The replacement discards conflicting generic OMP workflow rules and Codex/Claude/Gemini compatibility context. It authenticates every non-empty line of the embedded role contract against the installed projection while allowing only host presentation normalization: line-ending conversion, blank-line insertion/removal, and trailing spaces or tabs. A changed, missing, injected, or reordered non-empty instruction still fails closed. A caller schema may refine result-field shape but cannot broaden authority, erase findings, or convert missing evidence into success. Children finish through OMP's hidden `yield` tool with the BBK result in `result.data`; genuine terminal failures use `result.error`. Prompt assembly fails closed when the marker, role catalogue, installed projection, or mandatory procedure set is invalid.
+
+OMP frontmatter intentionally has no `autoloadSkills`. Mandatory procedures are already in the system prompt, so the model does not waste a skill-read call and correctness does not depend on host autoload behavior. Optional procedures and language/domain profiles remain available on demand.
+
+## Main-mediated `hub`/IRC communication
+
+Named BBK agents use OMP `hub`/IRC for live communication. They discover exact peer IDs with the roster, send ordinary coordination to their invoking parent, and send a compact `BBK_USER_REQUEST` to Main when they need a material decision, authority grant, private context, protected-floor exception, hard-to-reverse commitment, or explicit acceptance. The request carries a stable ID, the smallest material question, recommendation, alternatives, consequences, residual uncertainty, blocking state, and any durable packet reference.
+
+Main presents the question only through OMP's native `ask` tool and relays the structured result to the exact waiting peer as a matching `BBK_USER_RESPONSE` marked `source: omp.ask`, preserving `replyTo` where available and notifying the semantic parent when needed. A question written only in assistant prose is informational; it is not pending and cannot be treated as answered. Only an ask-backed response is eligible for ADR-compatible accepted-decision recording, and the responsible canonical role—not Main—authors the ADR. A send receipt, timeout, silence, or missing heartbeat is not a user answer or proof of failure. Large or authority-bearing material remains in durable files; IRC carries path, bytes, SHA-256, disposition, and smallest next action.
+
+## Installed projection and model-routing surface
+
+The OMP target installs:
+
+- 19 role agents with native direct-child `spawns` allowlists;
+- 21 core BBK skills plus an install-bound profile registry;
+- complete mandatory-skill injection for every role;
+- explicit `model` and `thinkingLevel` fields;
+- 26 model-facing tools and 27 UI commands; and
+- the persistent `/bbk`, deterministic `/bbk:status`, and interactive `/bbk:models` surfaces.
+
+The canonical install-time v2 policy gives every role its own OMP route. Packaged starting values currently use `openai-codex/gpt-5.6-sol` for broader judgment-heavy roles, `deepseek/deepseek-v4-pro` for several coordination roles, and `deepseek/deepseek-v4-flash` for bounded leaf roles, all with high OMP thinking; these are duplicated per-role values rather than shared categories. Model choice is an execution preference, not authority or assurance.
 
 ```text
 /bbk:models
-```
-
-The menu lets you view current routes, apply `installation-default`, `default`, `testing-flash`, or `deepseek-economy`, set the model and thinking level for one sub-agent, apply an `omp-model-routing-profile.json` file, or export the effective routing. Only future sub-agent spawns use a changed route; already-running sub-agents continue unchanged.
-
-Headless equivalents are available:
-
-```text
 /bbk:models status
 /bbk:models profile testing-flash
 /bbk:models profile deepseek-economy
@@ -68,42 +103,20 @@ Headless equivalents are available:
 /bbk:models export /path/to/profile.json profile-id
 ```
 
-The installer owns a mutable `effective-omp-model-routing.json` beside the immutable package copy. Applying a route updates only the `model` and `thinkingLevel` frontmatter of installed BBK OMP agents, reconciles their digests and routing metadata into the BBK install manifest, and refuses any locally divergent or unowned agent. Uninstalling and reinstalling restores the installation-time route.
-
-The menu manages BBK-owned frontmatter. OMP `task.agentModelOverrides` has higher model precedence, and a project agent definition has discovery precedence over the same user agent name. Either can supersede the BBK-managed route. `/bbk:models status` reports this boundary. See `docs/MODEL-ROUTING.md` and `templates/omp-model-routing-profile.json`.
-
-## Profile surface
-
-The typed profile-capability surface remains:
-
-```text
-bbk_profile_dispatch
-/bbk:profile:dispatch
-```
-
-Language-profile bundles can now be installed with the core in one verified operation:
-
-```bash
-python tools/bootstrap.py --test-and-install --scope user --omp \
-  --language-profiles /path/to/bbk-language-profiles.zip
-```
-
-The core and declared profile OMP extensions are preflighted together and recorded in one installation manifest. The installer also generates a compact `bbk-installed-profiles` skill from the exact selected packages and writes the complete machine inventory to `effective-language-profiles.json`. OMP agents use that registry to select a profile router before loading focused profile procedures.
-
-## Qualification boundary
-
-Package qualification validates 26 tool registrations and 27 command registrations, including `/bbk:exit`; JavaScript syntax; persistent session-state restoration; footer state; per-turn `before_agent_start` system-prompt overlays; verbatim first-directive forwarding; UI-only deterministic commands; installed-adjacent-CLI behavior; deterministic agent projection; and model-routing bindings. It does not establish live provider/model availability, native OMP mode interoperability, task-agent competence, physical review independence, profile toolchains, or target-project correctness.
+Changes apply to future child spawns. `task.agentModelOverrides` and higher-precedence project agent definitions may supersede BBK-managed frontmatter; `/bbk:models status` reports that boundary.
 
 ## Slash-command and model-context boundary
 
-The extension treats deterministic slash commands as **UI-only** operations. `/bbk:models`, `/bbk:status`, `/bbk:doctor`, `/bbk:exit`, and the other deterministic `/bbk:*` commands show concise notifications and return no structured payload. They do not call `sendMessage` or `sendUserMessage`, so command-result JSON does not enter model context.
+Deterministic slash commands are **UI-only**. They notify through `ctx.ui.notify`, return no structured command payload, and do not call `sendMessage` or `sendUserMessage`, so their JSON does not enter model context. `/bbk <request>` is the only slash-command path that calls `sendUserMessage`, and it forwards only the user's text. Registered model-facing tools still return structured content because the model explicitly invoked them.
 
-Mode state is persisted by `appendEntry`, which is explicitly not model-facing. When the mode is active, `before_agent_start` adds a concise system-prompt overlay for that agent turn; it does not add a transcript message. `/bbk <request>` is the only slash-command path that calls `sendUserMessage`, and it forwards only the request text. Registered BBK tools continue to return structured content because those calls are explicitly initiated by the model.
-
-Update only this OMP surface from a successor package with:
+## OMP-only update
 
 ```powershell
 python tools/setup.py --test-and-update-omp --scope user
 ```
 
-The updater preserves the current BBK OMP route and does not modify `.codex` agent files. Run `/reload-plugins` after it completes.
+The updater preserves the active BBK OMP model route, updates future role definitions and the extension, reconciles the install manifest, and **does not modify `.codex`** agent files. Run `/reload-plugins` in an existing OMP session afterward.
+
+## Qualification boundary
+
+Package qualification checks JavaScript syntax, exact registration counts, persistent state restoration, live activity/context rendering, lifecycle clearing, full Main and child system-prompt replacement, exclusion of compatibility context, mandatory skill injection, ask-backed ADR provenance, preservation of sanitized invocation data, hub/Main communication contracts, fail-closed behavior, UI-only commands, deterministic projections, installation ownership, and model-routing bindings. It does not prove live provider/model availability, model competence, physical review independence, target-project correctness, external profile toolchains, exact optional progress fields in every OMP build, interactive footer replacement, or compliance with an institution's network policy.

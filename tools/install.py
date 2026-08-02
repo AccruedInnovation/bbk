@@ -392,14 +392,18 @@ def generic_agent_manifest_bytes(metadata: Mapping[str, Any]) -> bytes:
             "skills": list(value.get("skills") or []),
             "spawns": list(value.get("spawns") or []),
             "may_mutate": bool(value.get("may_mutate")),
-            "model_profile": value.get("model_profile"),
+            "model_route": value.get("model_route"),
+            "model_routing_mode": value.get("model_routing_mode"),
             "model_routing": value.get("model_routing"),
+            "return_contract": value.get("return_contract"),
             "file": files.get("generic") if isinstance(files, Mapping) else None,
         }
     return json_bytes(
         {
-            "schema": "bbk.installed-generic-agent-manifest.v1",
+            "schema": "bbk.installed-generic-agent-manifest.v3",
             "package_version": metadata.get("package_version"),
+            "contract_package": metadata.get("contract_package"),
+            "role_return_registry": metadata.get("role_return_registry"),
             "projection_source_sha256": metadata.get("source_sha256"),
             "role_source_sha256": metadata.get("role_source_sha256"),
             "model_routing_source_sha256": metadata.get("model_routing_source_sha256"),
@@ -489,11 +493,161 @@ def manifest_path(scope: str, project: Path | None, root: Path) -> Path:
     return root / "install-manifest.json" if scope == "user" else project / ".bbk-kit-install.json"  # type: ignore[operator]
 
 
+def install_scope_paths(args: argparse.Namespace) -> tuple[Path | None, Path, Path]:
+    project = (
+        Path(args.root).expanduser().resolve()
+        if args.root
+        else (Path.cwd().resolve() if args.scope == "project" else None)
+    )
+    root = data_root() if args.scope == "user" else project / ".bbk-kit"  # type: ignore[operator]
+    return project, root, manifest_path(args.scope, project, root)
+
+
+def load_existing_install(args: argparse.Namespace) -> dict[str, Any] | None:
+    project, root, mpath = install_scope_paths(args)
+    if not mpath.exists():
+        return None
+    try:
+        manifest = json.loads(mpath.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise InstallError(f"Cannot read existing BBK install manifest {mpath}: {exc}") from exc
+    if not isinstance(manifest, dict) or manifest.get("schema") != "bbk.install-manifest.v1":
+        raise InstallError(f"Unsupported existing BBK install manifest: {mpath}")
+    harnesses = [name for name in ("codex", "omp", "claude", "generic") if manifest.get(name)]
+    return {
+        "project": project,
+        "root": root,
+        "manifest_path": mpath,
+        "manifest": manifest,
+        "version": str(manifest.get("version") or "unknown"),
+        "harnesses": harnesses,
+        "file_count": len(manifest.get("files", [])),
+    }
+
+
+def choose_existing_install_action(args: argparse.Namespace, existing: Mapping[str, Any] | None) -> str:
+    """Return ``replace`` or ``keep`` without making noninteractive runs hang.
+
+    Human installs prompt with a default-Yes replacement. JSON, dry-run, and
+    noninteractive invocations preserve the existing install unless the caller
+    explicitly passes ``--uninstall-existing``. This keeps automation
+    deterministic and prevents an implicit destructive action hidden behind a
+    machine-readable command.
+    """
+    if existing is None:
+        return "none"
+    if bool(getattr(args, "uninstall_existing", False)):
+        return "replace"
+    if bool(getattr(args, "keep_existing", False)):
+        return "keep"
+    if bool(getattr(args, "json", False)) or bool(getattr(args, "dry_run", False)):
+        return "keep"
+    is_interactive = False
+    try:
+        is_interactive = bool(sys.stdin.isatty())
+    except (AttributeError, OSError):
+        pass
+    if not is_interactive:
+        progress_note(
+            True,
+            "Existing BBK installation detected; noninteractive install will preserve it. "
+            "Use --uninstall-existing for an explicit clean replacement.",
+        )
+        return "keep"
+
+    harnesses = ", ".join(existing.get("harnesses", [])) or "none recorded"
+    scope = replacement_scope(args, existing)
+    validate_replacement_scope(scope)
+    selected_text = ", ".join(name for name in HARNESS_ORDER if name in scope["selected"])
+    preserved_text = ", ".join(name for name in HARNESS_ORDER if name in scope["preserved"])
+    if scope["kind"] == "harness":
+        replacement_text = (
+            f"A harness-scoped clean replacement refreshes only: {selected_text}. "
+            f"It preserves the existing {preserved_text} installation and shared ownership records.\n"
+        )
+        question_text = f"Clean-replace the selected {selected_text} harness now? [Y/n]\n"
+    else:
+        replacement_text = (
+            "A full clean replacement removes every manifest-owned BBK file before "
+            "installing only the harnesses and profiles selected by this command.\n"
+        )
+        question_text = "Uninstall the existing BBK installation first? [Y/n]\n"
+    prompt_text = (
+        "\nExisting BBK installation detected:\n"
+        f"  version: {existing.get('version')}\n"
+        f"  harnesses: {harnesses}\n"
+        f"  files: {existing.get('file_count')}\n"
+        f"  manifest: {existing.get('manifest_path')}\n"
+        f"{replacement_text}"
+        # Terminate the prompt line. Windows PowerShell can mediate native
+        # stdout through a line-oriented pipe even while stdin remains an
+        # interactive console. A prompt without a trailing newline may stay
+        # buffered and invisible while the installer waits for input.
+        f"{question_text}"
+    )
+    _write_text(sys.stdout, prompt_text, flush=True)
+    try:
+        answer = sys.stdin.readline()
+    except (OSError, UnicodeError):
+        answer = "n"
+    if answer == "":
+        # EOF is not an affirmative user decision, even though a blank entered
+        # response is. Avoid destructive behavior in a detached shell.
+        return "keep"
+    return "keep" if answer.strip().lower() in {"n", "no"} else "replace"
+
+
 def selected_harnesses(args: argparse.Namespace) -> tuple[bool, bool, bool, bool]:
     codex, omp, claude, generic = bool(args.codex), bool(args.omp), bool(args.claude), bool(args.generic)
     if not (codex or omp or claude or generic):
         codex = omp = claude = generic = True
     return codex, omp, claude, generic
+
+
+HARNESS_ORDER = ("codex", "omp", "claude", "generic")
+
+
+def selected_harness_names(args: argparse.Namespace) -> set[str]:
+    codex, omp, claude, generic = selected_harnesses(args)
+    values = {"codex": codex, "omp": omp, "claude": claude, "generic": generic}
+    return {name for name in HARNESS_ORDER if values[name]}
+
+
+def existing_harness_names(existing: Mapping[str, Any]) -> set[str]:
+    return {str(name) for name in existing.get("harnesses", []) if name in HARNESS_ORDER}
+
+
+def replacement_scope(args: argparse.Namespace, existing: Mapping[str, Any]) -> dict[str, Any]:
+    selected = selected_harness_names(args)
+    installed = existing_harness_names(existing)
+    preserved = installed - selected
+    if not preserved:
+        kind = "full"
+    elif len(selected) == 1 and selected <= {"omp", "codex"} and selected <= installed:
+        kind = "harness"
+    else:
+        kind = "unsupported-partial"
+    return {
+        "selected": selected,
+        "installed": installed,
+        "preserved": preserved,
+        "kind": kind,
+    }
+
+
+def validate_replacement_scope(scope: Mapping[str, Any]) -> None:
+    if scope.get("kind") != "unsupported-partial":
+        return
+    selected_values = set(scope.get("selected") or [])
+    preserved_values = set(scope.get("preserved") or [])
+    selected = ", ".join(name for name in HARNESS_ORDER if name in selected_values) or "none"
+    preserved = ", ".join(name for name in HARNESS_ORDER if name in preserved_values) or "none"
+    raise InstallError(
+        "A partial clean replacement currently supports exactly one already-installed --omp or --codex "
+        f"harness. Selected: {selected}; would preserve: {preserved}. No files were removed. "
+        "Run separate OMP/Codex selective replacements, use --keep-existing for additive reconciliation, "
+        "or select every installed harness for a full clean replacement."
+    )
 
 
 def installation_targets(
@@ -627,6 +781,8 @@ def run_verification_gate(
     failfast: bool,
     require_node: bool,
     echo: bool,
+    profile: str = "full",
+    jobs: int = 0,
 ) -> dict[str, Any]:
     """Run verification in a child process while streaming human progress."""
     with tempfile.TemporaryDirectory(prefix="bbk-verification-report-") as raw_temp:
@@ -636,6 +792,10 @@ def run_verification_gate(
             str(ROOT / "tools" / "verify_all.py"),
             "--report-file",
             str(report_path),
+            "--profile",
+            profile,
+            "--jobs",
+            str(jobs),
         ]
         if failfast:
             command.append("--failfast")
@@ -697,6 +857,8 @@ def verify_command(args: argparse.Namespace) -> dict[str, Any]:
         failfast=bool(args.failfast),
         require_node=bool(args.require_node),
         echo=not args.json,
+        profile="full",
+        jobs=0,
     )
 
 
@@ -931,8 +1093,11 @@ def _perform_install(
             "effective_copy": json_path(effective_routing),
             "sha256": routing_meta["model_routing_source_sha256"],
             "projection_source_sha256": routing_meta["source_sha256"],
-            "profile_count": routing_meta["model_profile_count"],
-            "role_profile_counts": routing_meta["role_profile_counts"],
+            "schema_version": routing_meta["model_routing_schema"],
+            "mode": routing_meta["model_routing_mode"],
+            "route_count": routing_meta["model_route_count"],
+            "legacy_profile_count": routing_meta["legacy_model_profile_count"],
+            "legacy_role_profile_counts": routing_meta["legacy_role_profile_counts"],
         },
         "omp_runtime_routing": (
             {
@@ -1005,8 +1170,276 @@ def validate_install_plan(manifest: Mapping[str, Any]) -> None:
         )
 
 
+def _uninstall_args(args: argparse.Namespace, *, force: bool, dry_run: bool) -> argparse.Namespace:
+    return argparse.Namespace(
+        scope=args.scope,
+        root=args.root,
+        force=force,
+        dry_run=dry_run,
+        json=bool(getattr(args, "json", False)),
+    )
+
+
+def _backup_preserved_install_files(
+    preserved: Sequence[Mapping[str, Any]],
+    *,
+    backup_root: Path,
+) -> list[dict[str, str]]:
+    backups: list[dict[str, str]] = []
+    for index, item in enumerate(preserved, 1):
+        raw_path = item.get("path")
+        if not isinstance(raw_path, str):
+            continue
+        source = Path(raw_path)
+        if not source.is_file():
+            continue
+        identity = hashlib.sha256(str(source).encode("utf-8")).hexdigest()[:12]
+        destination = backup_root / f"{index:04d}-{identity}-{source.name}"
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, destination)
+        backups.append(
+            {
+                "source": json_path(source),
+                "backup": json_path(destination),
+                "sha256": sha256_file(destination),
+            }
+        )
+    return backups
+
+
+def clean_replace_existing_install(
+    args: argparse.Namespace,
+    *,
+    existing: Mapping[str, Any],
+    prepared_profiles: Sequence[PreparedProfile],
+    verification: dict[str, Any] | None,
+    progress_enabled: bool,
+) -> dict[str, Any]:
+    """Preflight the successor, then conservatively remove the old install."""
+    progress_note(progress_enabled, "==> Preflighting clean replacement against the existing installation...")
+    replacement_args = copy(args)
+    replacement_args.dry_run = True
+    replacement_args.force = True
+    replacement_plan = _perform_install(
+        replacement_args,
+        prepared_profiles=prepared_profiles,
+        verification=verification,
+        progress=InstallProgress(enabled=False),
+    )
+    validate_install_plan(replacement_plan)
+
+    old_manifest = existing.get("manifest") if isinstance(existing.get("manifest"), Mapping) else {}
+    old_owned = {
+        portable_path_key(Path(item["path"]))
+        for item in old_manifest.get("files", [])
+        if isinstance(item, Mapping) and isinstance(item.get("path"), str)
+    }
+    unowned_conflicts = []
+    for item in replacement_plan.get("files", []):
+        if not isinstance(item, Mapping) or item.get("action") != "replace":
+            continue
+        raw_path = item.get("path")
+        if not isinstance(raw_path, str):
+            continue
+        destination = Path(raw_path)
+        if destination.exists() and portable_path_key(destination) not in old_owned:
+            unowned_conflicts.append(raw_path)
+    if unowned_conflicts and not args.force:
+        raise InstallError(
+            "clean replacement found locally owned files at successor destinations; "
+            "nothing was uninstalled. Re-run with --force to back up and replace them, "
+            "or use --keep-existing and reconcile manually:\n- "
+            + "\n- ".join(unowned_conflicts[:20])
+        )
+
+    preview = uninstall(_uninstall_args(args, force=False, dry_run=True))
+    preserved = list(preview.get("preserved", []))
+    non_regular = [
+        item
+        for item in preserved
+        if isinstance(item.get("path"), str)
+        and Path(str(item["path"])).exists()
+        and not Path(str(item["path"])).is_file()
+    ]
+    if non_regular:
+        paths = [str(item.get("path")) for item in non_regular[:20]]
+        raise InstallError(
+            "the existing installation contains a non-regular object at a manifest-owned path; "
+            "nothing was uninstalled. Move or remove it manually before a clean replacement:\n- "
+            + "\n- ".join(paths)
+        )
+    if preserved and not args.force:
+        paths = [str(item.get("path")) for item in preserved[:20]]
+        raise InstallError(
+            "the existing installation has locally modified manifest-owned files; "
+            "nothing was uninstalled. Re-run with --force to back them up before removal, "
+            "or use --keep-existing:\n- "
+            + "\n- ".join(paths)
+        )
+
+    backups: list[dict[str, str]] = []
+    backup_root: Path | None = None
+    if preserved:
+        root = Path(existing["root"])
+        backup_root = root / "backups" / f"{stamp()}-preinstall"
+        backups = _backup_preserved_install_files(preserved, backup_root=backup_root)
+        if len(backups) != len(preserved):
+            raise InstallError("could not back up every modified manifest-owned file; nothing was uninstalled")
+
+    removed = uninstall(_uninstall_args(args, force=bool(args.force), dry_run=False))
+    progress_note(
+        progress_enabled,
+        f"<== Existing BBK {existing.get('version')} removed: "
+        f"{len(removed.get('removed', [])):,} files; {len(backups):,} modified files backed up.",
+    )
+    return {
+        "detected": True,
+        "decision": "replace",
+        "previous_version": existing.get("version"),
+        "previous_manifest_path": json_path(Path(existing["manifest_path"])),
+        "previous_harnesses": list(existing.get("harnesses", [])),
+        "previous_file_count": existing.get("file_count"),
+        "uninstalled": True,
+        "removed_count": len(removed.get("removed", [])),
+        "modified_backup_count": len(backups),
+        "modified_backup_root": json_path(backup_root) if backup_root else None,
+        "modified_backups": backups,
+    }
+
+
+def selective_clean_replace_existing_install(
+    args: argparse.Namespace,
+    *,
+    existing: Mapping[str, Any],
+    verification: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Clean-replace one installed OMP or Codex surface without touching peers."""
+    scope = replacement_scope(args, existing)
+    selected = set(scope["selected"])
+    preserved = set(scope["preserved"])
+    if not preserved:
+        raise InstallError("internal error: selective replacement requested without preserved harnesses")
+    if len(selected) != 1 or not selected <= {"omp", "codex"}:
+        raise InstallError(
+            "A harness-scoped clean replacement currently supports exactly one of --omp or --codex. "
+            "No files were removed. Select every installed harness for a full clean replacement, "
+            "or run separate selective updates."
+        )
+    if not selected <= set(scope["installed"]):
+        missing = sorted(selected - set(scope["installed"]))
+        raise InstallError(
+            f"Cannot clean-replace harnesses not owned by the existing installation: {missing}. "
+            "Use --keep-existing for an additive reconciliation or perform a full replacement."
+        )
+    incompatible: list[str] = []
+    if getattr(args, "model_routing", None):
+        incompatible.append("--model-routing")
+    if list(getattr(args, "language_profiles", None) or []):
+        incompatible.append("--language-profiles")
+    if list(getattr(args, "profile_id", None) or []):
+        incompatible.append("--profile-id")
+    if bool(getattr(args, "no_language_profiles", False)):
+        incompatible.append("--no-language-profiles")
+    if incompatible:
+        raise InstallError(
+            "Harness-scoped clean replacement preserves the installed shared routing and profile set; "
+            f"these options require a full replacement: {', '.join(incompatible)}. No files were removed."
+        )
+
+    common = argparse.Namespace(
+        scope=args.scope,
+        root=args.root,
+        verify=False,
+        verification_failfast=False,
+        force=bool(args.force),
+        dry_run=bool(args.dry_run),
+        json=bool(args.json),
+        clean=True,
+    )
+    selected_name = next(iter(selected))
+    try:
+        if selected_name == "omp":
+            import update_omp as selective_tool
+
+            update_result = selective_tool.update_omp(common)
+        else:
+            import update_codex as selective_tool
+
+            update_result = selective_tool.update_codex(common)
+    except Exception as exc:
+        # Import locally to avoid a top-level install/update import cycle. Both
+        # selective tools expose user-facing typed errors, but a stable install
+        # error is preferable to coupling this boundary to their class names.
+        raise InstallError(f"{selected_name.upper()} harness-scoped clean replacement failed: {exc}") from exc
+
+    selected_ordered = [name for name in HARNESS_ORDER if name in selected]
+    preserved_ordered = [name for name in HARNESS_ORDER if name in preserved]
+    preexisting = {
+        "detected": True,
+        "decision": "replace-selected",
+        "previous_version": existing.get("version"),
+        "previous_manifest_path": json_path(Path(existing["manifest_path"])),
+        "previous_harnesses": list(existing.get("harnesses", [])),
+        "previous_file_count": existing.get("file_count"),
+        "selected_harnesses": selected_ordered,
+        "preserved_harnesses": preserved_ordered,
+        "selected_harnesses_replaced": not bool(args.dry_run),
+        "full_install_uninstalled": False,
+        "removed_stale_count": int(update_result.get("removed_stale_count") or 0),
+        "verification": dict(verification) if verification else None,
+    }
+    if args.dry_run:
+        return {
+            "schema": "bbk.selective-clean-replacement-plan.v1",
+            "status": "DRY-RUN",
+            "scope": args.scope,
+            "selected_harnesses": selected_ordered,
+            "preserved_harnesses": preserved_ordered,
+            "preexisting_install": preexisting,
+            "update": update_result,
+            "manifest_path": json_path(Path(existing["manifest_path"])),
+        }
+
+    mpath = Path(existing["manifest_path"])
+    try:
+        manifest = json.loads(mpath.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise InstallError(
+            f"Selective replacement completed but the unified manifest cannot be read: {mpath}: {exc}"
+        ) from exc
+    if not isinstance(manifest, dict) or manifest.get("schema") != "bbk.install-manifest.v1":
+        raise InstallError(f"Selective replacement produced an unsupported manifest: {mpath}")
+    manifest["preexisting_install"] = preexisting
+    manifest["last_selective_clean_replacement"] = {
+        "harness": selected_name,
+        "from_version": existing.get("version"),
+        "to_version": VERSION,
+        "preserved_harnesses": preserved_ordered,
+        "removed_stale_count": preexisting["removed_stale_count"],
+    }
+    if verification is not None:
+        manifest["last_install_verification"] = dict(verification)
+    atomic_write(mpath, json_bytes(manifest), 0o600)
+    manifest["manifest_path"] = json_path(mpath)
+    return manifest
+
+
 def install(args: argparse.Namespace) -> dict[str, Any]:
     progress_enabled = not bool(args.json)
+    existing = load_existing_install(args)
+    existing_action = choose_existing_install_action(args, existing)
+    replacement = replacement_scope(args, existing) if existing is not None else None
+    if existing is not None and existing_action == "replace":
+        validate_replacement_scope(replacement or {})
+    existing_result: dict[str, Any] = {
+        "detected": existing is not None,
+        "decision": existing_action,
+        "previous_version": existing.get("version") if existing else None,
+        "previous_manifest_path": json_path(Path(existing["manifest_path"])) if existing else None,
+        "previous_harnesses": list(existing.get("harnesses", [])) if existing else [],
+        "previous_file_count": existing.get("file_count") if existing else 0,
+        "uninstalled": False,
+    }
     verification = None
     if args.verify:
         progress_note(progress_enabled, "==> Running complete BBK verification before installation...")
@@ -1015,8 +1448,23 @@ def install(args: argparse.Namespace) -> dict[str, Any]:
             failfast=bool(args.verification_failfast),
             require_node=bool(args.require_node or omp_selected),
             echo=not args.json,
+            profile="full",
+            jobs=0,
         )
         progress_note(progress_enabled, "<== Verification: PASS; installation preparation may proceed.")
+
+    if existing is not None and existing_action == "replace" and replacement and replacement["kind"] == "harness":
+        progress_note(
+            progress_enabled,
+            "==> Performing harness-scoped clean replacement; unselected harnesses will be preserved...",
+        )
+        result = selective_clean_replace_existing_install(
+            args,
+            existing=existing,
+            verification=verification,
+        )
+        progress_note(progress_enabled, "<== Harness-scoped clean replacement complete.")
+        return result
 
     explicit_sources = list(args.language_profiles or [])
     selected_ids = list(args.profile_id or [])
@@ -1065,11 +1513,16 @@ def install(args: argparse.Namespace) -> dict[str, Any]:
             f"<== Language profiles verified: {len(prepared)} ({profile_names})",
         )
         if args.dry_run:
+            planning_args = copy(args)
+            if existing_action == "replace":
+                # Model the successor after the selected clean removal without
+                # mutating the existing installation during a dry run.
+                planning_args.force = True
             dry_progress = InstallProgress(enabled=progress_enabled)
             dry_progress.start("Building dry-run installation plan")
             try:
                 plan = _perform_install(
-                    args,
+                    planning_args,
                     prepared_profiles=prepared,
                     verification=verification,
                     progress=dry_progress,
@@ -1079,7 +1532,22 @@ def install(args: argparse.Namespace) -> dict[str, Any]:
                 dry_progress.finish(status="FAIL")
                 raise
             dry_progress.finish()
+            plan["preexisting_install"] = existing_result
             return plan
+
+        if existing is not None and existing_action == "replace":
+            existing_result = clean_replace_existing_install(
+                args,
+                existing=existing,
+                prepared_profiles=prepared,
+                verification=verification,
+                progress_enabled=progress_enabled,
+            )
+        elif existing is not None:
+            progress_note(
+                progress_enabled,
+                f"Existing BBK {existing.get('version')} retained; installing in reconciliation mode.",
+            )
 
         # Perform a complete no-write preflight before the first destination is
         # created. This catches divergence, invalid destinations, mode conflicts,
@@ -1129,14 +1597,10 @@ def install(args: argparse.Namespace) -> dict[str, Any]:
             "language_profile_count": len(plan.get("language_profiles", [])),
             "language_profile_source_mode": source_mode,
         }
-        project = (
-            Path(args.root).expanduser().resolve()
-            if args.root
-            else (Path.cwd().resolve() if args.scope == "project" else None)
-        )
-        root = data_root() if args.scope == "user" else project / ".bbk-kit"  # type: ignore[operator]
+        result["preexisting_install"] = existing_result
+        project, root, final_manifest_path = install_scope_paths(args)
         progress_note(progress_enabled, "==> Finalizing the unified installation manifest...")
-        atomic_write(manifest_path(args.scope, project, root), json_bytes({
+        atomic_write(final_manifest_path, json_bytes({
             key: value for key, value in result.items() if key != "manifest_path"
         }), 0o600)
         progress_note(
@@ -1305,6 +1769,15 @@ def human(value: dict[str, Any]) -> str:
             f"Checks: {value.get('checks_run')}/{value.get('checks_expected')}\n"
             f"Exit code: {value.get('exit_code')}"
         )
+    if schema == "bbk.selective-clean-replacement-plan.v1":
+        update = value.get("update") or {}
+        return (
+            "BBK harness-scoped clean replacement: DRY-RUN\n"
+            f"Selected: {', '.join(value.get('selected_harnesses') or []) or 'none'}\n"
+            f"Preserved: {', '.join(value.get('preserved_harnesses') or []) or 'none'}\n"
+            f"Stale files to remove: {update.get('removed_stale_count', 0)}\n"
+            f"Manifest: {value.get('manifest_path')}"
+        )
     if schema == "bbk.install-manifest.v1":
         actions: dict[str, int] = {}
         for item in value["files"]:
@@ -1363,7 +1836,7 @@ def add_install_selection_flags(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--generic", action="store_true")
     parser.add_argument(
         "--model-routing",
-        help="external bbk.model-routing.v1 JSON used to render installed agents without modifying the package",
+        help="external bbk.model-routing.v2 JSON (legacy v1 accepted) used to render installed agents without modifying the package",
     )
     parser.add_argument(
         "--language-profiles",
@@ -1383,6 +1856,17 @@ def add_install_selection_flags(parser: argparse.ArgumentParser) -> None:
         "--no-language-profiles",
         action="store_true",
         help="install BBK core only instead of the five bundled language profiles",
+    )
+    existing = parser.add_mutually_exclusive_group()
+    existing.add_argument(
+        "--uninstall-existing",
+        action="store_true",
+        help="clean-replace selected installed OMP/Codex harnesses while preserving unselected harnesses; selecting every installed harness performs a full replacement",
+    )
+    existing.add_argument(
+        "--keep-existing",
+        action="store_true",
+        help="do not offer clean replacement; reconcile the new install against the existing files",
     )
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--dry-run", action="store_true")

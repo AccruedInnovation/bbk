@@ -15,6 +15,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from tests._cli_support import run_cli as test_run_cli
 m1_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(m1_ROOT / 'tools'))
 from contracts import canonical_digest
@@ -47,7 +48,7 @@ class Alpha7ReviewAssuranceTests(unittest.TestCase):
         self.assertIn('intent-outcome', lenses)
         self.assertIn('state-concurrency-effect-recovery', lenses)
         self.assertEqual(len(first['lensAssignments']), 3)
-        self.assertEqual(first['provenance']['bbkVersion'], '0.1.0-alpha.11.12')
+        self.assertEqual(first['provenance']['bbkVersion'], '0.1.0-alpha.13.1')
 
     def test_manifest_rejects_unjustified_assertion_overlap(self):
         value = copy.deepcopy(self.manifest)
@@ -194,7 +195,7 @@ def m2_load(rel: str):
     return json.loads((m2_ROOT / rel).read_text(encoding='utf-8'))
 
 def m2_run_json(argv, *, cwd=m2_ROOT, env=None, check=True):
-    completed = subprocess.run([str(x) for x in argv], cwd=str(cwd), env=env, text=True, encoding='utf-8', errors='replace', stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=check)
+    completed = test_run_cli([str(x) for x in argv], cwd=cwd, env=env, check=check)
     return (json.loads(completed.stdout), completed)
 
 class Alpha7StateEffectTests(unittest.TestCase):

@@ -14,6 +14,8 @@ Preferred entry points::
 
 Ordinary installs include every profile bundled with BBK. An explicit
 ``--language-profiles`` source replaces that bundled source for the invocation.
+Full test/install modes retain release qualification; selective test-and-update
+modes use the matching trust-gated OMP or Codex regression profile.
 
 The older ``--verify`` and ``--verify-and-install`` spellings remain aliases.
 All ordinary diagnostics are kept on stdout for PowerShell 5.1 compatibility.
@@ -53,7 +55,7 @@ def build_parser() -> argparse.ArgumentParser:
     action.add_argument(
         "--test-and-update-omp", "--verify-and-update-omp",
         dest="test_and_update_omp", action="store_true",
-        help="run all tests/checks and update only OMP if every blocking check passes",
+        help="run package trust/drift checks plus OMP-focused regressions, then update only OMP on PASS",
     )
     action.add_argument(
         "--update-codex", action="store_true",
@@ -62,7 +64,7 @@ def build_parser() -> argparse.ArgumentParser:
     action.add_argument(
         "--test-and-update-codex", "--verify-and-update-codex",
         dest="test_and_update_codex", action="store_true",
-        help="run all tests/checks and update only Codex if every blocking check passes",
+        help="run package trust/drift checks plus Codex-focused regressions, then update only Codex on PASS",
     )
     parser.add_argument("--scope", choices=["user", "project"], default="user")
     parser.add_argument("--root", help="project root for project-scoped installation")
@@ -83,6 +85,15 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--no-language-profiles", action="store_true",
         help="install BBK core only instead of the bundled language profiles",
+    )
+    existing = parser.add_mutually_exclusive_group()
+    existing.add_argument(
+        "--uninstall-existing", action="store_true",
+        help="clean-replace one selected installed OMP/Codex harness while preserving peers; selecting every installed harness performs a full replacement",
+    )
+    existing.add_argument(
+        "--keep-existing", action="store_true",
+        help="retain a pre-existing BBK install and reconcile files in place",
     )
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
@@ -107,6 +118,10 @@ def install_arguments(args: argparse.Namespace) -> list[str]:
         values.extend(["--profile-id", profile_id])
     if args.no_language_profiles:
         values.append("--no-language-profiles")
+    if args.uninstall_existing:
+        values.append("--uninstall-existing")
+    if args.keep_existing:
+        values.append("--keep-existing")
     if args.force:
         values.append("--force")
     if args.dry_run:
@@ -162,6 +177,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     selective_update = bool(omp_update or codex_update)
     if args.test and (
         args.language_profiles or args.profile_id or args.no_language_profiles or args.dry_run or args.force
+        or args.uninstall_existing or args.keep_existing
         or args.model_routing or args.root or any(getattr(args, name) for name in ("codex", "omp", "claude", "generic"))
     ):
         parser.error("installation/profile selection options cannot be combined with --test")
@@ -169,6 +185,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.error("--no-language-profiles cannot be combined with profile sources or --profile-id")
     if selective_update and (
         args.language_profiles or args.profile_id or args.no_language_profiles or args.model_routing
+        or args.uninstall_existing or args.keep_existing
         or any(getattr(args, name) for name in ("codex", "omp", "claude", "generic"))
     ):
         target_name = "OMP-only" if omp_update else "Codex-only"

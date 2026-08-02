@@ -1,0 +1,44 @@
+{
+  "schema_version": "bbk.prompt-module.v1",
+  "id": "bbk-prompt-evidence-receipts",
+  "title": "Evidence representation and receipt protocol",
+  "description": "Represent byte, semantic, command, profile, and observation evidence with the exact identity, carrier, trust, completeness, and reuse information needed by assurance roles.",
+  "clauses": [
+    {
+      "id": "EVIDENCE.PLANNING_BINDING",
+      "text": "Bind evidence to the exact planning subject as well as the candidate where applicable: fit revision, outcome references, structure-contract digest, slice IDs, WorkUnit revision, profile digest, assertion, and dependency closure."
+    },
+    {
+      "id": "EVIDENCE.BYTE_IDENTITY",
+      "text": "Use exact SHA-256 bytes for immutable source, manifests, candidates, generated definitions, and artifacts whose byte identity is meaningful."
+    },
+    {
+      "id": "EVIDENCE.SEMANTIC_IDENTITY",
+      "text": "Use canonical structured comparison when semantic equivalence is the claim. Do not treat formatting-only JSON changes as semantic drift, and classify drift as added, removed, byte-changed, semantic-changed, semantic-equivalent, or unavailable rather than merely hash mismatch."
+    },
+    {
+      "id": "EVIDENCE.NONDETERMINISTIC",
+      "text": "Treat compiler output, timestamps, platform metadata, nondeterministic archives, and similar values as semantic or fresh-run receipts unless deterministic byte identity is explicitly required."
+    },
+    {
+      "id": "EVIDENCE.RECEIPT",
+      "text": "An EvidenceReceipt records what actually ran or was observed; exact subject, candidate and assertion; operation or method; command; environment; toolchain and profile; inputs and configuration; outputs and raw carriers; coverage; trust and completeness class; redaction; freshness; exposure; and reuse dependencies. Freeform tests-passed prose or model confidence is not required-gate evidence."
+    },
+    {
+      "id": "EVIDENCE.SEAL",
+      "text": "Seal an evidence object only after collection is complete. Put later annotations outside the sealed object and link them; preserve failed attempts, conflicting evidence, and superseded state."
+    },
+    {
+      "id": "EVIDENCE.NO_SELF_HASH",
+      "text": "Do not hash mutable indexes into themselves or copy one current digest into many hand-maintained authorities. Generate projections from one canonical mapping source."
+    },
+    {
+      "id": "EVIDENCE.PROFILE_BINDING",
+      "text": "For profile-derived evidence, bind exact profile ID and version, source or effective digest, router and focused procedure, capability operation, adapter identity, toolchain context, request digest, and input/output subject. An installed skill name alone establishes neither selection nor qualification."
+    },
+    {
+      "id": "EVIDENCE.COMMAND_STREAMS",
+      "text": "When a configured gate stores only bounded UTF-8 previews in its JSON receipt, preserve authoritative stdout and stderr beside the receipt and bind each by safe project-relative path, byte count, and SHA-256. A reusable PASS remains eligible only while both raw streams match."
+    }
+  ]
+}

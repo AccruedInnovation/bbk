@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-prototyper-return-v1.schema.json",
+  "title": "BBK BBK Prototyper return v1",
+  "description": "Role-specific `bbk.role-return.v1` contract for `bbk_prototyper`.",
+  "allOf": [
+    {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "contract": {
+          "const": "bbk.prototyper-return.v1"
+        },
+        "role": {
+          "const": "bbk_prototyper"
+        },
+        "invocation_mode": {
+          "enum": [
+            "EXPERIMENT_CHILD"
+          ]
+        },
+        "return_kind": {
+          "enum": [
+            "CHECKPOINT",
+            "EXPERIMENT_REPORT"
+          ]
+        },
+        "operational_disposition": {
+          "enum": [
+            "COMPLETE",
+            "PARTIAL",
+            "BLOCKED_TECHNICAL",
+            "BLOCKED_AUTHORITY",
+            "BLOCKED_DECISION",
+            "PAUSED_CAPACITY",
+            "PAUSED_HOST_WINDOW",
+            "CANCELLED",
+            "INCONCLUSIVE"
+          ]
+        },
+        "semantic_state": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "value"
+          ],
+          "properties": {
+            "name": {
+              "const": "experiment_state"
+            },
+            "value": {
+              "enum": [
+                "SUPPORTED_WITHIN_BOUNDARY",
+                "FALSIFIED_WITHIN_BOUNDARY",
+                "ALTERNATIVES_DISCRIMINATED",
+                "NO_MATERIAL_DISCRIMINATION",
+                "INCONCLUSIVE",
+                "INVALID_EXPERIMENT",
+                "NEEDS_PARENT_RECHARTER",
+                "BLOCKED"
+              ]
+            }
+          }
+        },
+        "result": {
+          "$ref": "https://bbk.local/schemas/bbk-prototyper-result-v1.schema.json"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "invocation_mode": {
+                "const": "EXPERIMENT_CHILD"
+              }
+            },
+            "required": [
+              "invocation_mode"
+            ]
+          },
+          "then": {
+            "properties": {
+              "parent_ref": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "const": "canonical_role"
+                      },
+                      "id": {
+                        "enum": [
+                          "bbk_root_wayfinder",
+                          "bbk_territory_wayfinder"
+                        ]
+                      },
+                      "invocation_mode": {
+                        "const": "EXPERIMENT_CHILD"
+                      },
+                      "role": {
+                        "enum": [
+                          "bbk_root_wayfinder",
+                          "bbk_territory_wayfinder"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "id",
+                      "invocation_mode",
+                      "role"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "x-bbk-role": "bbk_prototyper",
+  "x-bbk-contract": "bbk.prototyper-return.v1",
+  "x-bbk-envelope": "bbk.role-return.v1",
+  "x-bbk-semantic-state-name": "experiment_state",
+  "x-bbk-requirements": [
+    "Return one `bbk.role-return.v1` object with `contract` = `bbk.prototyper-return.v1`, `role` = `bbk_prototyper`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `experiment_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
+    "The Prototyper may invoke only `bbk_worker_designer` and `bbk_worker` under the current charter's fixed logical-child, concurrent-attempt, and retry or continuation limits. Worker Designer owns every new or materially changed child invocation contract; each Worker receives one exact experimental WorkUnit, may not delegate, and returns only to the Prototyper. The Prototyper remains the sole logical experiment owner. Exceeding or changing those limits, adding a child-role type, or requiring nested coordination yields `NEEDS_PARENT_RECHARTER`. Every other logical role need returns to the invoking semantic parent.",
+    "The evaluation commitment must be fixed before outcome-bearing evidence is observed. A changed criterion or method becomes a recorded deviation or successor attempt; it does not silently replace the original charter.",
+    "Use `SUPPORTED_WITHIN_BOUNDARY`, `FALSIFIED_WITHIN_BOUNDARY`, or `ALTERNATIVES_DISCRIMINATED` only when the relevant run is valid, the declared criteria are met, and the evidence is bound to the exact subject, method, and environment. These states remain bounded experimental evidence and do not establish production readiness or acceptance.",
+    "Use `NO_MATERIAL_DISCRIMINATION` when a valid experiment ran but did not distinguish the declared hypotheses or alternatives. Use `INVALID_EXPERIMENT` when apparatus, setup, method, environment, contamination, or evidence defects prevent interpretation. Use `INCONCLUSIVE` when a reliable substantive state cannot be established for another reason.",
+    "Operational `COMPLETE` means the authorized experiment procedure and required cleanup or quarantine workflow reached a valid return point. It may accompany a falsified, non-discriminating, or invalid result; it never means that a parent decision is made, architecture is accepted, implementation is production-ready, an assertion passed, or release is authorized.",
+    "Every declared and materially exploratory run is represented in the run inventory. Unfavorable, negative, invalid, interrupted, superseded, and failed attempts are not omitted or overwritten.",
+    "Every retained or discarded prototype artifact receives exactly one allowed disposition. `REVIEW_FOR_PRODUCTION_PROMOTION` starts a separate review and production-planning path and cannot be interpreted as merge, deployment, publication, candidate, validation, acceptance, or release authority.",
+    "Cleanup success requires evidence against the charter's cleanup obligations. Unresolved external state, ambiguous ownership, leaked credentials, active processes, unlabeled artifacts, or uncertain rollback yields `QUARANTINED`, `RESIDUALS_RECORDED`, or `CLEANUP_BLOCKED`, not a clean result.",
+    "A prototype observation may inform a parent decision or later verification design, but the Prototyper does not author the parent ADR, perform independent review, issue a validation pass, waive a finding, approve its own promotion, or execute production work.",
+    "Host interruption, timeout, missing heartbeat, silence, or physical invocation replacement does not determine experiment state. Recover or return from the last verified checkpoint and preserve the same logical attempt or create an explicit successor attempt.",
+    "The result returns to the invoking semantic parent. The Prototyper and its children do not contact the user, call `ask`, bypass the parent for Main, or invoke any canonical role outside the Prototyper's exact permitted child set.",
+    "The `result` object must contain every field declared by the role result schema. Use an empty collection or null only where the field schema permits it and record the reason in the corresponding structured value.",
+    "This return is governed by `spec/contracts/catalog.json`, the common `bbk.role-return.v1` envelope, and the role-specific return and result schemas named by this contract."
+  ],
+  "x-bbk-readiness-rule": "Use `SUPPORTED_WITHIN_BOUNDARY`, `FALSIFIED_WITHIN_BOUNDARY`, or `ALTERNATIVES_DISCRIMINATED` only when the relevant run is valid, the declared criteria are met, and the evidence is bound to the exact subject, method, and environment. These states remain bounded experimental evidence and do not establish production readiness or acceptance.",
+  "x-bbk-authority-boundary": "A valid `bbk.prototyper-return.v1` return establishes only the `bbk_prototyper`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect."
+}

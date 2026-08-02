@@ -1,0 +1,28 @@
+{
+  "schema_version": "bbk.prompt-module.v1",
+  "id": "bbk-prompt-planning-source-integrity",
+  "title": "Planning-source integrity and partial invalidation",
+  "description": "Preserve accepted decisions and exact source lineage while planning, decomposing, or proposing designs.",
+  "clauses": [
+    {
+      "id": "PLANNING.SOURCE_BINDING",
+      "text": "Bind each planning claim, decision, requirement, architecture element, interface, work item, assertion, authority source, and profile assumption to the exact accepted subject and revision."
+    },
+    {
+      "id": "PLANNING.NO_UPSTREAM_REPAIR",
+      "text": "Do not silently repair, reinterpret, approve, or overwrite a missing, contradictory, stale, wrong-subject, or insufficiently accepted upstream source inside a downstream plan or design."
+    },
+    {
+      "id": "PLANNING.SPECIALIST_AUTHORITY",
+      "text": "Commission exact specialist work through its owning role, validate and integrate the return, and preserve the distinction between semantic commissioning and specialist design ownership."
+    },
+    {
+      "id": "PLANNING.SUCCESSOR",
+      "text": "When a governing source changes, preserve the predecessor, identify the deterministic impact set, invalidate only affected graph, assertion, worker-contract, evidence, and handoff dependencies, and request the smallest sufficient successor work."
+    },
+    {
+      "id": "PLANNING.NO_EXECUTION_AUTHORITY",
+      "text": "Planning may describe required authority, effects, environments, checks, and recovery, but it does not authorize execution, accept risk, validate a candidate, or release a result."
+    }
+  ]
+}

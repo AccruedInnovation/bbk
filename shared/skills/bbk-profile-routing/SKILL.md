@@ -3,34 +3,45 @@ name: bbk-profile-routing
 description: Discover installed language and domain profiles, then resolve and dispatch only applicable procedures, lenses, inventories, evidence adapters, and gates.
 ---
 
+
 # BBK Profile Routing
 
 ## Installed-profile registry
 
-Read `bbk-installed-profiles` before resolving profile work. Treat that generated skill—and the machine-readable `effective-language-profiles.json` beside the installation manifest—as the inventory of profiles managed by this BBK installation.
+<!-- BBK prompt module bbk-prompt-profile-qualification: expanded from canonical source -->
 
-1. Match the exact changed surface and runtime/toolchain context to the smallest applicable installed profile.
-2. Load the profile router skill first; let it select focused worker, reviewer, gate, and evidence modules rather than loading the entire profile corpus.
-3. Preserve the profile identity, version, router skill, capability status, effective digest or lock, and unavailable-tool dispositions in downstream context edges.
-4. An unlisted profile is unavailable to this installation. A stray similarly named skill or executable elsewhere on the host is not proof of managed profile availability.
-5. A profile adds procedure and evidence expectations only. It cannot grant tools or effects, broaden scope, waive generic BBK rules, reduce assurance, declare a pass, or authorize release.
+### Language, domain, toolchain, and model qualification
 
-Repository-declared policy wins within its legitimate scope. Select procedures by role, task, assurance, changed surface, fit, structure, slice, State–Decision–Effect, and review inputs. Ordinary work must not fan out every specialist. Required unavailable capability blocks; optional unavailable capability advises.
+Select only applicable installed profiles and focused procedures without allowing them to broaden authority.
+
+- `PROFILE.EXPLICIT` — Use only a profile explicitly supplied or selected from the current installed-profile registry for the exact language, domain, framework, runtime, or toolchain responsibility.
+- `PROFILE.FOCUSED` — Load the router and only the focused procedures and gates material to this role and assertion; do not fan out every profile or specialist pack.
+- `PROFILE.BIND` — Carry profile identity, version or digest, toolchain assumptions, required gates, qualified operations, unavailable-capability policy, and evidence bindings into child and return contracts.
+- `PROFILE.NO_AUTHORITY` — A profile, skill, tool, model route, or host capability adds method and evidence requirements only. It cannot broaden scope, effects, authority, or acceptance.
+- `PROFILE.UNAVAILABLE` — When a required profile, toolchain, model, environment, or qualified operation is unavailable, return the exact technical or eligibility blocker instead of improvising qualification.
+
+<!-- End BBK prompt module bbk-prompt-profile-qualification -->
 
 ## Discover the active profiles
 
-1. Consult `bbk-installed-profiles` for the installation-bound catalogue, then confirm current discovery with `bbk --json profile list`. Project profile paths and `BBK_PROFILE_PATH` may change the live set or precedence.
-2. Consider only packages whose verification and compatibility status are `PASS`, unless bounded investigation explicitly permits otherwise.
-3. Match the repository language or domain, exact task, changed surface, and assurance need. Select one profile per applicable language/domain concern rather than loading every installed profile.
-4. Load the selected profile's router skill from the `router` entry in `PROFILE.json.skills`. The router chooses the smallest focused skill set; do not infer procedure applicability from a skill name alone.
-5. Resolve and lock the exact profile identity, version, source digest, selected components, and effective digest before relying on its outputs.
+<!-- BBK prompt module bbk-prompt-profile-dispatch: expanded from canonical source -->
+
+### Installed-profile discovery and capability dispatch
+
+Resolve the exact managed language or domain profile, focused router procedures, and typed capability entrypoints without treating ambient files or tool access as qualification.
+
+- `PROFILE.REGISTRY` — Read bbk-installed-profiles as the installation-bound catalogue and confirm live discovery with bbk --json profile list when required. Project profile paths and BBK_PROFILE_PATH may alter the live set or precedence; a stray similarly named skill or executable is not proof of managed availability.
+- `PROFILE.ELIGIBILITY` — Use only profile packages whose verification and compatibility status are PASS unless a bounded investigation explicitly permits otherwise.
+- `PROFILE.MATCH` — Match the exact language or domain, task, changed surface, runtime or toolchain context, and assurance need. Select the smallest applicable profile set rather than loading every installed specialist pack.
+- `PROFILE.ROUTER` — Load the selected profile router from the router entry in PROFILE.json.skills. Let that router select focused Worker, Reviewer, gate, evidence, lens, inventory, or projection procedures; do not infer applicability from a skill name alone.
+- `PROFILE.LOCK` — Resolve and bind profile identity, version, source digest, selected components, effective digest or lock, capability status, unavailable-tool policy, and known qualification limits before relying on profile outputs.
+- `PROFILE.DISPATCH_PROTOCOL` — Treat capability declarations and executable entrypoints separately. Only capabilities declaring dispatch_protocol bbk.profile-capability.v1 may be centrally dispatched; capability fields name entrypoints, and entrypoints supply argv arrays. Never execute a path copied from a capability field.
+- `PROFILE.REQUEST_RESULT` — Use the core-owned typed request/result protocol, bind exact content digests, use request-package-relative inputs, keep the subject read-only, and return a typed result. Do not reinterpret runTools as mutation or network authority.
+- `PROFILE.AUTHORITY_SPLIT` — Profiles may contribute structure or slice projections, State–Decision–Effect inventories, review lenses and context, gate recipes, or EvidenceReceipt adapters. Generic BBK remains authoritative for schemas, assertion ownership, context completeness, evidence eligibility, aggregation, findings, dispositions, locks, candidate identity, and authority.
+- `PROFILE.UNAVAILABLE_PROTOCOL` — When a required profile or capability is missing, incompatible, unverifiable, or unavailable, return the exact typed capability blocker. Do not silently substitute generic guidance while claiming profile-qualified evidence; legacy declarations without the typed protocol remain manually usable but are not centrally dispatched.
+
+<!-- End BBK prompt module bbk-prompt-profile-dispatch -->
 
 ## Capability dispatch
 
-Treat capability declarations and entrypoints separately. Only capabilities declaring `dispatch_protocol: bbk.profile-capability.v1` may be centrally dispatched. Capability fields reference entrypoint **names**; `entrypoints` supplies the argv arrays. Never execute a path copied from a capability field.
-
-Use the core-owned request/result protocol. Bind exact content digests, use request-package-relative inputs, keep the subject read-only, and return a typed result. Do not reinterpret `runTools` as mutation or network authority.
-
-Profiles may contribute ImplementationStructure and ExecutionSlice projections, State–Decision–Effect projections and inventories, logical review-lens procedures, review context, gate recipes, or EvidenceReceipt v2 adapters. Generic BBK remains authoritative for schemas, assertion ownership, context completeness, evidence eligibility, aggregation, findings, dispositions, locks, and candidate identity. Unsupported lenses remain visible and must be handled by another qualified method or explicitly dispositioned.
-
-If a required profile or capability is missing, incompatible, unverifiable, or unavailable, return `BLOCKED`; do not silently fall back to generic guidance while claiming profile-qualified evidence. Alpha.7 declarations without the typed protocol and earlier profiles remain usable but are not automatically dispatched.
+> Apply the `PROFILE.DISPATCH_PROTOCOL`, `PROFILE.REQUEST_RESULT`, `PROFILE.AUTHORITY_SPLIT`, and `PROFILE.UNAVAILABLE_PROTOCOL` clauses above.

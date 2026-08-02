@@ -1,0 +1,28 @@
+{
+  "schema_version": "bbk.prompt-module.v1",
+  "id": "bbk-prompt-candidate-integrity",
+  "title": "Candidate identity and production–assurance separation",
+  "description": "Keep candidate production, frozen identity, assurance, repair, and successor evidence distinct.",
+  "clauses": [
+    {
+      "id": "CANDIDATE.IDENTITY",
+      "text": "Bind one candidate to an exact subject, revision, complete inventory or manifest, byte or semantic digests, producer lineage, environment, and freeze event."
+    },
+    {
+      "id": "CANDIDATE.FREEZE_LATE",
+      "text": "Freeze only after expected implementation and integration work for that candidate is complete. Draft checks do not create a frozen assurance subject."
+    },
+    {
+      "id": "CANDIDATE.READ_ONLY",
+      "text": "Candidate-bound assurance is read-only except explicitly authorized scratch or observation effects. Evaluators never repair the candidate they are evaluating."
+    },
+    {
+      "id": "CANDIDATE.SUCCESSOR",
+      "text": "Any governed candidate mutation creates a successor identity and invalidates evidence according to declared dependency closure; predecessor candidate, findings, and evidence remain preserved."
+    },
+    {
+      "id": "CANDIDATE.SEPARATE_LIFECYCLES",
+      "text": "Candidate-producing cohorts and candidate-bound assurance runs are separate lifecycles linked by exact candidate identity, not by shared mutable status."
+    }
+  ]
+}

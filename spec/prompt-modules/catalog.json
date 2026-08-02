@@ -1,0 +1,103 @@
+{
+  "schema_version": "bbk.prompt-modules.v1",
+  "package_version": "0.1.0-alpha.13.1",
+  "module_schema": "spec/schemas/bbk-prompt-module-v1.schema.json",
+  "catalog_schema": "spec/schemas/bbk-prompt-module-catalog-v1.schema.json",
+  "module_entries": [
+    {
+      "id": "bbk-prompt-role-boundary",
+      "file": "spec/prompt-modules/bbk-prompt-role-boundary.json"
+    },
+    {
+      "id": "bbk-prompt-invocation-binding",
+      "file": "spec/prompt-modules/bbk-prompt-invocation-binding.json"
+    },
+    {
+      "id": "bbk-prompt-context-human-relay",
+      "file": "spec/prompt-modules/bbk-prompt-context-human-relay.json"
+    },
+    {
+      "id": "bbk-prompt-human-request",
+      "file": "spec/prompt-modules/bbk-prompt-human-request.json"
+    },
+    {
+      "id": "bbk-prompt-delegation-return",
+      "file": "spec/prompt-modules/bbk-prompt-delegation-return.json"
+    },
+    {
+      "id": "bbk-prompt-durable-handoff",
+      "file": "spec/prompt-modules/bbk-prompt-durable-handoff.json"
+    },
+    {
+      "id": "bbk-prompt-handoff-protocol",
+      "file": "spec/prompt-modules/bbk-prompt-handoff-protocol.json"
+    },
+    {
+      "id": "bbk-prompt-state-claim-truth",
+      "file": "spec/prompt-modules/bbk-prompt-state-claim-truth.json"
+    },
+    {
+      "id": "bbk-prompt-profile-qualification",
+      "file": "spec/prompt-modules/bbk-prompt-profile-qualification.json"
+    },
+    {
+      "id": "bbk-prompt-profile-dispatch",
+      "file": "spec/prompt-modules/bbk-prompt-profile-dispatch.json"
+    },
+    {
+      "id": "bbk-prompt-execution-slicing",
+      "file": "spec/prompt-modules/bbk-prompt-execution-slicing.json"
+    },
+    {
+      "id": "bbk-prompt-proportional-stop",
+      "file": "spec/prompt-modules/bbk-prompt-proportional-stop.json"
+    },
+    {
+      "id": "bbk-prompt-liveness-recovery",
+      "file": "spec/prompt-modules/bbk-prompt-liveness-recovery.json"
+    },
+    {
+      "id": "bbk-prompt-effects-cleanup",
+      "file": "spec/prompt-modules/bbk-prompt-effects-cleanup.json"
+    },
+    {
+      "id": "bbk-prompt-evidence-lineage",
+      "file": "spec/prompt-modules/bbk-prompt-evidence-lineage.json"
+    },
+    {
+      "id": "bbk-prompt-evidence-receipts",
+      "file": "spec/prompt-modules/bbk-prompt-evidence-receipts.json"
+    },
+    {
+      "id": "bbk-prompt-assurance-integrity",
+      "file": "spec/prompt-modules/bbk-prompt-assurance-integrity.json"
+    },
+    {
+      "id": "bbk-prompt-finding-lifecycle",
+      "file": "spec/prompt-modules/bbk-prompt-finding-lifecycle.json"
+    },
+    {
+      "id": "bbk-prompt-candidate-integrity",
+      "file": "spec/prompt-modules/bbk-prompt-candidate-integrity.json"
+    },
+    {
+      "id": "bbk-prompt-planning-source-integrity",
+      "file": "spec/prompt-modules/bbk-prompt-planning-source-integrity.json"
+    },
+    {
+      "id": "bbk-prompt-host-capability-truth",
+      "file": "spec/prompt-modules/bbk-prompt-host-capability-truth.json"
+    }
+  ],
+  "compilation_policy": {
+    "role_field": "prompt_modules",
+    "skill_directive_syntax": "{{bbk-module:<module-id>}}",
+    "embed_each_module_once": true,
+    "standalone_skill_expands_modules": true,
+    "role_prompt_uses_compact_skill_references": true,
+    "mandatory_procedure_default": 1,
+    "mandatory_procedure_maximum": null,
+    "additional_mandatory_procedure_rule": "Allowed only when the role catalogue records a specific measured exception and the procedure adds behavior not already present in the primary procedure or prompt modules.",
+    "additional_mandatory_procedure_exceptions": {}
+  }
+}

@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-"""Run the complete BBK verification sequence in deterministic order.
+"""Run BBK verification profiles in deterministic order.
 
-This is the one-command package verification entry point. It verifies package
-integrity before executing package code, checks every generated surface,
-compiles Python, parses JSON, validates semantic fixtures, runs every unittest
-module in filename order, validates the OMP extension when Node.js is present,
-and re-verifies package integrity after the run. Child stderr is merged into
-stdout for PowerShell-safe reporting, and a final summary repeats every failed
-check and its terminal cause.
+The ``full`` profile is the release-author/CI qualification path. Targeted
+``omp`` and ``codex`` profiles retain package trust gates and generated-source
+checks but run only the regressions relevant to a selective harness update.
+``quick`` is a cross-cutting developer smoke profile. Child stderr is merged
+into stdout for PowerShell-safe reporting, and a final summary repeats every
+failed check and its terminal cause.
 """
 from __future__ import annotations
 
@@ -34,6 +33,7 @@ class CheckSpec:
     command: tuple[str, ...]
     optional_reason: str | None = None
     trust_gate: bool = False
+    cwd: Path = ROOT
 
 
 @dataclass(frozen=True)
@@ -96,7 +96,18 @@ def _subprocess_environment() -> dict[str, str]:
     return environment
 
 
-def verification_steps(*, require_node: bool = False, skip_package_manifest: bool = False) -> list[CheckSpec]:
+VERIFICATION_PROFILES = ("full", "quick", "omp", "codex")
+
+
+def verification_steps(
+    *,
+    profile: str = "full",
+    require_node: bool = False,
+    skip_package_manifest: bool = False,
+    jobs: int = 0,
+) -> list[CheckSpec]:
+    if profile not in VERIFICATION_PROFILES:
+        raise ValueError(f"unknown verification profile: {profile}")
     python = sys.executable
     steps: list[CheckSpec] = []
     if not skip_package_manifest:
@@ -114,24 +125,92 @@ def verification_steps(*, require_node: bool = False, skip_package_manifest: boo
             CheckSpec("Model-routing policy", (python, "tools/model_routing.py", "--check")),
             CheckSpec("Agent projection drift", (python, "tools/generate_agents.py", "--check")),
             CheckSpec("Python compilation and JSON parsing", (python, "tools/source_sanity.py")),
-            CheckSpec("Alpha.7 semantic fixtures", (python, "tools/validate_alpha7_fixtures.py")),
-            CheckSpec("Alpha.8 typed-profile fixtures", (python, "tools/validate_alpha8_fixtures.py")),
-            CheckSpec("All unittest suites", (python, "tools/run_tests.py", "-v")),
         ]
     )
-    node = shutil.which("node")
-    if node:
-        steps.append(CheckSpec("OMP extension JavaScript syntax", (node, "--check", "omp/extension/index.js")))
-    elif require_node:
-        steps.append(CheckSpec("OMP extension JavaScript syntax", ("node", "--check", "omp/extension/index.js")))
-    else:
+
+    if profile == "full":
+        steps.extend(
+            [
+                CheckSpec("Alpha.7 semantic fixtures", (python, "tools/validate_alpha7_fixtures.py")),
+                CheckSpec(
+                    "All unittest suites",
+                    (python, "tools/run_tests.py", "-v", "--jobs", str(jobs)),
+                ),
+            ]
+        )
+    elif profile == "omp":
         steps.append(
             CheckSpec(
-                "OMP extension JavaScript syntax",
-                (),
-                "Node.js is unavailable; use --require-node to make this a blocking check.",
+                "OMP-focused unittest suite",
+                (
+                    python,
+                    "tools/run_tests.py",
+                    "-v",
+                    "--pattern",
+                    "test_omp_runtime.py",
+                    "--jobs",
+                    "1",
+                ),
             )
         )
+    elif profile == "codex":
+        steps.append(
+            CheckSpec(
+                "Codex-focused unittest selection",
+                (
+                    python,
+                    "-m",
+                    "unittest",
+                    "-v",
+                    "tests.test_core_contracts.Alpha10ModelRoutingTests",
+                    "tests.test_installation_portability.Alpha116CodexWorkspaceTests",
+                ),
+                cwd=ROOT,
+            )
+        )
+    else:  # quick
+        steps.extend(
+            [
+                CheckSpec(
+                    "Core assurance smoke suite",
+                    (
+                        python,
+                        "tools/run_tests.py",
+                        "-v",
+                        "--pattern",
+                        "test_assurance_state.py",
+                        "--jobs",
+                        "1",
+                    ),
+                ),
+                CheckSpec(
+                    "OMP smoke suite",
+                    (
+                        python,
+                        "tools/run_tests.py",
+                        "-v",
+                        "--pattern",
+                        "test_omp_runtime.py",
+                        "--jobs",
+                        "1",
+                    ),
+                ),
+            ]
+        )
+    if profile in {"full", "quick", "omp"}:
+        node = shutil.which("node")
+        if node:
+            steps.append(CheckSpec("OMP extension JavaScript syntax", (node, "--check", "omp/extension/index.js")))
+        elif require_node:
+            steps.append(CheckSpec("OMP extension JavaScript syntax", ("node", "--check", "omp/extension/index.js")))
+        else:
+            steps.append(
+                CheckSpec(
+                    "OMP extension JavaScript syntax",
+                    (),
+                    "Node.js is unavailable; use --require-node to make this a blocking check.",
+                )
+            )
     if not skip_package_manifest:
         steps.append(
             CheckSpec(
@@ -166,7 +245,7 @@ def execute_step(spec: CheckSpec, *, stream: TextIO) -> CheckResult:
     try:
         process = subprocess.Popen(
             list(spec.command),
-            cwd=ROOT,
+            cwd=spec.cwd,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
@@ -197,12 +276,19 @@ def execute_step(spec: CheckSpec, *, stream: TextIO) -> CheckResult:
     )
 
 
-def report_dict(results: Sequence[CheckResult], *, expected: int, exit_code: int) -> dict[str, object]:
+def report_dict(
+    results: Sequence[CheckResult],
+    *,
+    expected: int,
+    exit_code: int,
+    profile: str = "full",
+) -> dict[str, object]:
     passed = sum(result.passed for result in results)
     skipped = sum(result.skipped for result in results)
     failed = len(results) - passed - skipped
     return {
         "schema": "bbk.verification-report.v1",
+        "profile": profile,
         "status": "PASS" if exit_code == 0 else "FAIL",
         "exit_code": exit_code,
         "checks_expected": expected,
@@ -224,11 +310,19 @@ def report_dict(results: Sequence[CheckResult], *, expected: int, exit_code: int
     }
 
 
-def print_final_summary(results: Sequence[CheckResult], *, expected: int, exit_code: int, stream: TextIO) -> None:
-    report = report_dict(results, expected=expected, exit_code=exit_code)
+def print_final_summary(
+    results: Sequence[CheckResult],
+    *,
+    expected: int,
+    exit_code: int,
+    stream: TextIO,
+    profile: str = "full",
+) -> None:
+    report = report_dict(results, expected=expected, exit_code=exit_code, profile=profile)
     _write_text(stream, "\n" + "=" * 70 + "\n")
     _write_text(stream, "BBK FINAL VERIFICATION SUMMARY\n")
     _write_text(stream, "=" * 70 + "\n")
+    _write_text(stream, f"Profile: {profile}\n")
     disposition = "FAILED" if exit_code else ("PASS WITH SKIPS" if report["skipped"] else "PASS")
     _write_text(stream, f"Result: {disposition}\n")
     _write_text(
@@ -259,17 +353,28 @@ def print_final_summary(results: Sequence[CheckResult], *, expected: int, exit_c
 
 def run_all_report(
     *,
+    profile: str = "full",
     failfast: bool = False,
     require_node: bool = False,
     skip_package_manifest: bool = False,
+    jobs: int = 0,
     stream: TextIO | None = None,
     executor: Callable[[CheckSpec], CheckResult] | None = None,
 ) -> tuple[int, list[CheckResult]]:
     target = stream if stream is not None else sys.stdout
-    steps = verification_steps(require_node=require_node, skip_package_manifest=skip_package_manifest)
+    steps = verification_steps(
+        profile=profile,
+        require_node=require_node,
+        skip_package_manifest=skip_package_manifest,
+        jobs=jobs,
+    )
     results: list[CheckResult] = []
     total_started = time.monotonic()
-    _write_text(target, f"BBK ordered verification starting: {len(steps)} checks.\n", flush=True)
+    _write_text(
+        target,
+        f"BBK ordered verification starting: profile={profile}; {len(steps)} checks.\n",
+        flush=True,
+    )
     for index, spec in enumerate(steps, start=1):
         step_started = time.monotonic()
         _write_text(target, f"\n==> [{index}/{len(steps)}] {spec.name}\n")
@@ -289,7 +394,13 @@ def run_all_report(
         f"Verification checks completed in {time.monotonic() - total_started:.1f}s.\n",
         flush=True,
     )
-    print_final_summary(results, expected=len(steps), exit_code=exit_code, stream=target)
+    print_final_summary(
+        results,
+        expected=len(steps),
+        exit_code=exit_code,
+        stream=target,
+        profile=profile,
+    )
     return exit_code, results
 
 
@@ -303,6 +414,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     _configure_standard_stream(sys.stderr)
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--failfast", action="store_true", help="stop after the first failed verification check")
+    parser.add_argument(
+        "--profile",
+        choices=VERIFICATION_PROFILES,
+        default="full",
+        help="verification scope: full release/CI, quick smoke, or harness-focused omp/codex",
+    )
+    parser.add_argument(
+        "--jobs",
+        type=int,
+        default=0,
+        help="parallel unittest modules for the full profile; 0 selects up to four automatically",
+    )
     parser.add_argument("--require-node", action="store_true", help="fail if Node.js is unavailable for OMP syntax validation")
     parser.add_argument("--skip-package-manifest", action="store_true", help="source-build mode: skip pre/post immutable package checks")
     parser.add_argument("--list", action="store_true", help="list ordered checks without running them")
@@ -312,11 +435,18 @@ def main(argv: Sequence[str] | None = None) -> int:
         help="write the machine-readable report to this file while streaming normal human output",
     )
     args = parser.parse_args(argv)
+    if args.jobs < 0:
+        parser.error("--jobs must be zero or positive")
     if args.json and args.report_file:
         parser.error("--json and --report-file are mutually exclusive")
     if args.list:
         for index, spec in enumerate(
-            verification_steps(require_node=args.require_node, skip_package_manifest=args.skip_package_manifest), start=1
+            verification_steps(
+                profile=args.profile,
+                require_node=args.require_node,
+                skip_package_manifest=args.skip_package_manifest,
+                jobs=args.jobs,
+            ), start=1
         ):
             suffix = command_text(spec.command) if spec.command else f"SKIP — {spec.optional_reason}"
             print(f"{index}. {spec.name}: {suffix}")
@@ -324,23 +454,35 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.json:
         stream = io.StringIO()
         exit_code, results = run_all_report(
+            profile=args.profile,
             failfast=args.failfast,
             require_node=args.require_node,
             skip_package_manifest=args.skip_package_manifest,
+            jobs=args.jobs,
             stream=stream,
         )
         value = report_dict(
             results,
-            expected=len(verification_steps(require_node=args.require_node, skip_package_manifest=args.skip_package_manifest)),
+            expected=len(
+                verification_steps(
+                    profile=args.profile,
+                    require_node=args.require_node,
+                    skip_package_manifest=args.skip_package_manifest,
+                    jobs=args.jobs,
+                )
+            ),
             exit_code=exit_code,
+            profile=args.profile,
         )
         value["output"] = stream.getvalue()
         print(json.dumps(value, indent=2, ensure_ascii=False, sort_keys=True))
         return exit_code
     exit_code, results = run_all_report(
+        profile=args.profile,
         failfast=args.failfast,
         require_node=args.require_node,
         skip_package_manifest=args.skip_package_manifest,
+        jobs=args.jobs,
     )
     if args.report_file:
         destination = Path(args.report_file).expanduser().resolve()
@@ -349,11 +491,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             results,
             expected=len(
                 verification_steps(
+                    profile=args.profile,
                     require_node=args.require_node,
                     skip_package_manifest=args.skip_package_manifest,
+                    jobs=args.jobs,
                 )
             ),
             exit_code=exit_code,
+            profile=args.profile,
         )
         temp = destination.with_name(f".{destination.name}.bbk-{os.getpid()}.tmp")
         temp.write_text(

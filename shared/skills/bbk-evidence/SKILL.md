@@ -3,35 +3,77 @@ name: bbk-evidence
 description: Create, compare, interpret, and reuse BBK manifests, candidate identities, gate receipts, validation evidence, and handoffs. Use when exact file identity, semantic JSON equivalence, stale evidence, or repeated validation is material.
 ---
 
+
 # BBK Evidence
 
-Use evidence to establish a specific assertion, not to accumulate ceremony.
+<!-- BBK prompt module bbk-prompt-evidence-lineage: expanded from canonical source -->
 
-0. Bind evidence to the exact planning subject as well as the candidate: fit revision, outcome references, structure-contract digest, slice IDs, work-unit revision, profile digest, and assertion where applicable.
+### Evidence identity, reuse, and invalidation
 
-1. State the assertion and subject before collecting evidence.
-2. Use exact SHA-256 bytes for immutable source, manifests, candidates, generated definitions, and artifacts whose byte identity is meaningful.
-3. Use canonical JSON comparison when structured semantic equivalence is the claim. Do not treat formatting-only JSON changes as semantic drift.
-4. Treat compiler output, timestamps, platform metadata, nondeterministic archives, and similar outputs as semantic or fresh-run receipts unless deterministic bytes are explicitly required.
-5. Bind every receipt to the full fingerprint needed for reuse: subject, candidate, gate definition, command, environment, toolchain, inputs, and configuration.
-6. Reuse a prior `PASS` only when the entire fingerprint is unchanged and the receipt has not been invalidated.
-7. Explain drift as added, removed, byte-changed, semantic-changed, semantic-equivalent, or unavailable—not merely “hash mismatch.”
-8. Seal evidence only after collection is complete. Later annotations go outside the sealed object and link to it.
-9. Preserve failed attempts and conflicting evidence.
-10. Do not hash mutable indexes into themselves or copy one current digest into many hand-maintained authorities. Generate projections from one canonical mapping source.
+Bind every observation and receipt to the exact assertion, subject, environment, method, and dependency closure it can establish.
+
+- `EVIDENCE.ASSERTION_FIRST` — State the exact assertion and subject before collecting, reusing, or interpreting evidence.
+- `EVIDENCE.FINGERPRINT` — Bind each receipt to candidate or planning subject, operation or method, command, inputs, configuration, environment, toolchain, profile, context and exposure policy, and produced artifacts.
+- `EVIDENCE.REUSE` — Reuse a prior PASS only when the complete fingerprint and dependency closure remain unchanged and no invalidation condition has fired.
+- `EVIDENCE.OBSERVATION_INFERENCE` — Separate direct observation, source report, inference, evaluation, recommendation, and authority-bearing decision.
+- `EVIDENCE.APPEND_ONLY` — Preserve failed attempts, conflicting evidence, exposure history, and superseded state. Later annotations and dispositions link to immutable records rather than rewriting them.
+- `EVIDENCE.INVALIDATE` — A material subject, source, assertion, criterion, method, environment, context, independence, or exposure change invalidates only the affected evidence and conclusions; create a successor and preserve unaffected valid reuse.
+
+<!-- End BBK prompt module bbk-prompt-evidence-lineage -->
 
 ## EvidenceReceipt v2
 
-Record what actually ran or was observed, its exact subject, operation, environment, inputs, outputs, trust class, completeness, redaction, and reuse dependencies. Keep EvidenceReceipt, assertion evaluation, and review aggregate separate. Freeform “tests passed” prose is an unstructured observation, not required-gate evidence.
+<!-- BBK prompt module bbk-prompt-evidence-receipts: expanded from canonical source -->
+
+### Evidence representation and receipt protocol
+
+Represent byte, semantic, command, profile, and observation evidence with the exact identity, carrier, trust, completeness, and reuse information needed by assurance roles.
+
+- `EVIDENCE.PLANNING_BINDING` — Bind evidence to the exact planning subject as well as the candidate where applicable: fit revision, outcome references, structure-contract digest, slice IDs, WorkUnit revision, profile digest, assertion, and dependency closure.
+- `EVIDENCE.BYTE_IDENTITY` — Use exact SHA-256 bytes for immutable source, manifests, candidates, generated definitions, and artifacts whose byte identity is meaningful.
+- `EVIDENCE.SEMANTIC_IDENTITY` — Use canonical structured comparison when semantic equivalence is the claim. Do not treat formatting-only JSON changes as semantic drift, and classify drift as added, removed, byte-changed, semantic-changed, semantic-equivalent, or unavailable rather than merely hash mismatch.
+- `EVIDENCE.NONDETERMINISTIC` — Treat compiler output, timestamps, platform metadata, nondeterministic archives, and similar values as semantic or fresh-run receipts unless deterministic byte identity is explicitly required.
+- `EVIDENCE.RECEIPT` — An EvidenceReceipt records what actually ran or was observed; exact subject, candidate and assertion; operation or method; command; environment; toolchain and profile; inputs and configuration; outputs and raw carriers; coverage; trust and completeness class; redaction; freshness; exposure; and reuse dependencies. Freeform tests-passed prose or model confidence is not required-gate evidence.
+- `EVIDENCE.SEAL` — Seal an evidence object only after collection is complete. Put later annotations outside the sealed object and link them; preserve failed attempts, conflicting evidence, and superseded state.
+- `EVIDENCE.NO_SELF_HASH` — Do not hash mutable indexes into themselves or copy one current digest into many hand-maintained authorities. Generate projections from one canonical mapping source.
+- `EVIDENCE.PROFILE_BINDING` — For profile-derived evidence, bind exact profile ID and version, source or effective digest, router and focused procedure, capability operation, adapter identity, toolchain context, request digest, and input/output subject. An installed skill name alone establishes neither selection nor qualification.
+- `EVIDENCE.COMMAND_STREAMS` — When a configured gate stores only bounded UTF-8 previews in its JSON receipt, preserve authoritative stdout and stderr beside the receipt and bind each by safe project-relative path, byte count, and SHA-256. A reusable PASS remains eligible only while both raw streams match.
+
+<!-- End BBK prompt module bbk-prompt-evidence-receipts -->
 
 ## Durable handoff evidence
 
-Use `bbk-handoff` when exact paths, hashes, commands, or large evidence must cross an agent boundary. The authoritative carrier is the file on disk; the agent response should provide only its path, byte count, SHA-256, disposition, and smallest next action. Verify the carrier and referenced artifacts before reuse.
+<!-- BBK prompt module bbk-prompt-durable-handoff: expanded from canonical source -->
+
+### Durable handoff and exact return
+
+Preserve exact or consequential state across role, invocation, host-window, and recovery boundaries without treating a chat channel as the authoritative carrier.
+
+- `HANDOFF.CARRIER` — Store exact, consequential, generated, evidence-heavy, binary, large, or truncation-sensitive material in an authorized durable carrier. A small inline result is acceptable only when no exact state could be lost.
+- `HANDOFF.BIND` — Bind every carrier and material referenced artifact by safe project-relative path, byte count, lowercase SHA-256 computed from disk, exact subject and revision, producer attempt, and declared disposition.
+- `HANDOFF.VERIFY` — Verify the carrier and every referenced artifact before creation is announced, before consumption or reuse, and after transfer. A locator without matching bytes, digest, subject, and schema is not an exact handoff.
+- `HANDOFF.SEPARATE_STATE` — Keep physical-attempt disposition, role-specific semantic readiness, accountable acceptance, finding closure, completion, and release as separate fields and authorities.
+- `HANDOFF.HISTORY` — Preserve partial, failed, blocked, cancelled, stale, superseded, and predecessor state. Never overwrite a published record to make a successor appear originally successful.
+- `HANDOFF.CHANNEL_LIMIT` — Use live inter-agent messages only for concise coordination and verified references. Chat, task results, tracker comments, patches, and IRC do not replace the governed final return channel or durable domain object.
+
+<!-- End BBK prompt module bbk-prompt-durable-handoff -->
 
 ## Profile-bound evidence
 
-When a language or domain profile contributes evidence, bind the exact profile id, version, package/root or effective digest, selected router and focused procedure, capability operation, adapter identity, toolchain context, request digest, and input/output subject. An installed skill name establishes neither selection nor qualification, and `bbk-installed-profiles` does not make stale, incomplete, or externally unqualified evidence reusable.
+<!-- BBK prompt module bbk-prompt-profile-qualification: expanded from canonical source -->
+
+### Language, domain, toolchain, and model qualification
+
+Select only applicable installed profiles and focused procedures without allowing them to broaden authority.
+
+- `PROFILE.EXPLICIT` — Use only a profile explicitly supplied or selected from the current installed-profile registry for the exact language, domain, framework, runtime, or toolchain responsibility.
+- `PROFILE.FOCUSED` — Load the router and only the focused procedures and gates material to this role and assertion; do not fan out every profile or specialist pack.
+- `PROFILE.BIND` — Carry profile identity, version or digest, toolchain assumptions, required gates, qualified operations, unavailable-capability policy, and evidence bindings into child and return contracts.
+- `PROFILE.NO_AUTHORITY` — A profile, skill, tool, model route, or host capability adds method and evidence requirements only. It cannot broaden scope, effects, authority, or acceptance.
+- `PROFILE.UNAVAILABLE` — When a required profile, toolchain, model, environment, or qualified operation is unavailable, return the exact technical or eligibility blocker instead of improvising qualification.
+
+<!-- End BBK prompt module bbk-prompt-profile-qualification -->
 
 ## Lossless command evidence
 
-When a BBK-configured gate executes, its JSON receipt contains only bounded UTF-8 previews. The authoritative stdout and stderr streams are stored beside the receipt and bound by project-relative path, byte count, and SHA-256. A reusable PASS receipt is eligible only while both stream files still match those bindings.
+> Apply the `EVIDENCE.COMMAND_STREAMS` clause above.

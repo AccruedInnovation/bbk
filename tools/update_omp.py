@@ -64,6 +64,15 @@ class PlannedFile:
     original_mode: int | None = None
 
 
+@dataclass
+class StaleFile:
+    path: Path
+    record: dict[str, Any]
+    backup: Path | None = None
+    original: bytes | None = None
+    original_mode: int | None = None
+
+
 def utc_now() -> str:
     return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
@@ -473,6 +482,114 @@ def plan_files(
     return planned
 
 
+def path_is_within(path: Path, directory: Path) -> bool:
+    path_key_value = normalized(path)
+    root_key = normalized(directory).rstrip("/")
+    return path_key_value == root_key or path_key_value.startswith(root_key + "/")
+
+
+def plan_stale_files(
+    old_records: Mapping[str, Mapping[str, Any]],
+    desired: Mapping[str, DesiredFile],
+    *,
+    omp_agents: Path,
+    omp_extensions: Path,
+    state_path: Path,
+    preserve_roots: Sequence[Path] = (),
+    force: bool,
+    backup_root: Path,
+) -> list[StaleFile]:
+    stale: list[StaleFile] = []
+    problems: list[str] = []
+    state_key = normalized(state_path)
+    for key, raw in sorted(old_records.items()):
+        path = Path(str(raw["path"]))
+        targeted = (
+            path_is_within(path, omp_agents)
+            or path_is_within(path, omp_extensions)
+            or key == state_key
+        )
+        preserved_private_profile = any(path_is_within(path, root) for root in preserve_roots)
+        if key in desired or not targeted or preserved_private_profile:
+            continue
+        record = dict(raw)
+        if not path.exists():
+            stale.append(StaleFile(path=path, record=record))
+            continue
+        if not path.is_file():
+            problems.append(f"stale manifest-owned path is not a regular file: {path}")
+            continue
+        current_digest = install_tool.sha256_file(path)
+        mode_matches = (
+            os.name == "nt"
+            or "executable" not in record
+            or executable(path) == bool(record.get("executable"))
+        )
+        owned_current = current_digest == record.get("sha256") and mode_matches
+        if not owned_current and not force:
+            problems.append(
+                f"stale OMP file is locally modified: {path}; rerun with --force to back it up before removal"
+            )
+            continue
+        backup = install_tool.backup_path(backup_root, path) if not owned_current else None
+        stale.append(
+            StaleFile(
+                path=path,
+                record=record,
+                backup=backup,
+                original=path.read_bytes(),
+                original_mode=path.stat().st_mode,
+            )
+        )
+    if problems:
+        raise OmpUpdateError("OMP clean-replacement preflight failed:\n- " + "\n- ".join(problems))
+    return stale
+
+
+def stale_record(item: StaleFile) -> dict[str, Any]:
+    return {
+        "path": install_tool.json_path(item.path),
+        "action": "remove-stale",
+        "source": item.record.get("source"),
+        "expected": item.record.get("sha256"),
+        "backup": install_tool.json_path(item.backup) if item.backup else None,
+    }
+
+
+def apply_stale_files(plan: Sequence[StaleFile], *, dry_run: bool) -> list[dict[str, Any]]:
+    if dry_run:
+        return [stale_record(item) for item in plan]
+    completed: list[StaleFile] = []
+    try:
+        for item in plan:
+            if item.path.exists():
+                if item.backup is not None:
+                    item.backup.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(item.path, item.backup)
+                item.path.unlink()
+            completed.append(item)
+    except Exception as exc:
+        restore_stale_files(completed)
+        raise OmpUpdateError(
+            f"OMP stale-file removal failed and rollback was attempted: {exc}"
+        ) from exc
+    return [stale_record(item) for item in plan]
+
+
+def restore_stale_files(plan: Sequence[StaleFile]) -> None:
+    for item in reversed(plan):
+        if item.original is None:
+            continue
+        try:
+            install_tool.atomic_write(
+                item.path,
+                item.original,
+                (item.original_mode or 0o644) & 0o777,
+            )
+        except Exception:
+            pass
+
+
 def apply_plan(plan: Sequence[PlannedFile], *, dry_run: bool) -> list[dict[str, Any]]:
     records: list[dict[str, Any]] = []
     if dry_run:
@@ -543,8 +660,12 @@ def merge_manifest(
     skipped_profiles: Sequence[str],
     verification: Mapping[str, Any] | None,
     backup_root: Path,
+    removed_stale: Sequence[StaleFile] = (),
+    clean: bool = False,
 ) -> dict[str, Any]:
     merged_records = record_map(old)
+    for item in removed_stale:
+        merged_records.pop(normalized(item.path), None)
     for record in updated_records:
         merged_records[normalized(Path(str(record["path"])))] = dict(record)
     result = dict(old)
@@ -586,6 +707,8 @@ def merge_manifest(
             "untouched_harnesses": [name for name in ("codex", "claude", "generic") if old.get(name)],
             "skipped_profile_extensions": list(skipped_profiles),
             "verification": dict(verification) if verification else None,
+            "clean_replacement": bool(clean),
+            "removed_stale_count": len(removed_stale),
         }
     )
     result["update_history"] = history
@@ -603,6 +726,8 @@ def update_omp(args: argparse.Namespace) -> dict[str, Any]:
                 failfast=bool(args.verification_failfast),
                 require_node=True,
                 echo=not args.json,
+                profile="omp",
+                jobs=1,
             )
         except install_tool.InstallError as exc:
             raise OmpUpdateError(str(exc)) from exc
@@ -630,7 +755,41 @@ def update_omp(args: argparse.Namespace) -> dict[str, Any]:
             prepared_profiles=prepared,
         )
         plan = plan_files(desired, old_records, force=bool(args.force), backup_root=backup_root)
-        update_records = apply_plan(plan, dry_run=bool(args.dry_run))
+        targets = install_tool.installation_targets(scope=args.scope, project=project)
+        omp_agents = targets.get("omp_agents")
+        omp_extensions = targets.get("omp_extensions")
+        state_meta = old_manifest.get("omp_runtime_routing")
+        state_path_raw = state_meta.get("state_path") if isinstance(state_meta, Mapping) else None
+        if omp_agents is None or omp_extensions is None or not isinstance(state_path_raw, str):
+            raise OmpUpdateError("Cannot resolve OMP clean-replacement targets")
+        skipped_roots = [
+            Path(str(item["omp_extension"]))
+            for item in old_manifest.get("language_profiles", [])
+            if isinstance(item, Mapping)
+            and str(item.get("id") or "") in set(skipped)
+            and isinstance(item.get("omp_extension"), str)
+        ]
+        stale_plan = (
+            plan_stale_files(
+                old_records,
+                desired,
+                omp_agents=omp_agents,
+                omp_extensions=omp_extensions,
+                state_path=Path(state_path_raw),
+                preserve_roots=skipped_roots,
+                force=bool(args.force),
+                backup_root=backup_root,
+            )
+            if bool(getattr(args, "clean", False))
+            else []
+        )
+        stale_records = apply_stale_files(stale_plan, dry_run=bool(args.dry_run))
+        try:
+            update_records = apply_plan(plan, dry_run=bool(args.dry_run))
+        except Exception:
+            if not args.dry_run:
+                restore_stale_files(stale_plan)
+            raise
         package_root = root / "versions" / VERSION
         merged = merge_manifest(
             old_manifest,
@@ -641,6 +800,8 @@ def update_omp(args: argparse.Namespace) -> dict[str, Any]:
             skipped_profiles=skipped,
             verification=verification,
             backup_root=backup_root,
+            removed_stale=stale_plan,
+            clean=bool(getattr(args, "clean", False)),
         )
         if not args.dry_run:
             install_tool.atomic_write(mpath, install_tool.json_bytes(merged), 0o600)
@@ -660,6 +821,9 @@ def update_omp(args: argparse.Namespace) -> dict[str, Any]:
         "manifest_path": install_tool.json_path(mpath),
         "package_root": install_tool.json_path(root / "versions" / VERSION),
         "files": update_records,
+        "removed_stale_files": stale_records,
+        "removed_stale_count": len(stale_records),
+        "clean_replacement": bool(getattr(args, "clean", False)),
         "actions": actions,
         "preserved_profile": state.get("active_profile"),
         "preserved_routes_sha256": state.get("routes_sha256"),
@@ -680,6 +844,7 @@ def human(value: Mapping[str, Any]) -> str:
         f"Files: {value.get('actions')}\n"
         f"Preserved OMP routing: {value.get('preserved_profile')}\n"
         f"Updated profile extensions: {', '.join(value.get('updated_profile_extensions') or []) or 'none'}\n"
+        f"Stale OMP files removed: {value.get('removed_stale_count', 0)}\n"
         f"Untouched harnesses: {', '.join(value.get('untouched_harnesses') or []) or 'none'}\n"
         f"Codex files touched: {value.get('codex_files_touched')}\n"
         f"Manifest: {value.get('manifest_path')}\n"
@@ -691,9 +856,18 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--scope", choices=["user", "project"], default="user")
     parser.add_argument("--root", help="project root for project-scoped installation")
-    parser.add_argument("--verify", action="store_true", help="run complete package verification before updating")
+    parser.add_argument(
+        "--verify",
+        action="store_true",
+        help="run package trust/drift checks and the OMP-focused regression suite before updating",
+    )
     parser.add_argument("--verification-failfast", action="store_true")
     parser.add_argument("--force", action="store_true", help="back up and replace locally modified targeted OMP files")
+    parser.add_argument(
+        "--clean",
+        action="store_true",
+        help="remove manifest-owned OMP files that are no longer part of the successor projection",
+    )
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--json", action="store_true")
     return parser

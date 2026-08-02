@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-root-wayfinder-return-v1.schema.json",
+  "title": "BBK BBK Root Wayfinder return v1",
+  "description": "Role-specific `bbk.role-return.v1` contract for `bbk_root_wayfinder`.",
+  "allOf": [
+    {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "contract": {
+          "const": "bbk.root-wayfinder-return.v1"
+        },
+        "role": {
+          "const": "bbk_root_wayfinder"
+        },
+        "invocation_mode": {
+          "enum": [
+            "CONTROLLER_ROOT"
+          ]
+        },
+        "return_kind": {
+          "enum": [
+            "CHECKPOINT",
+            "PLANNING_BASELINE_REPORT"
+          ]
+        },
+        "operational_disposition": {
+          "enum": [
+            "COMPLETE",
+            "PARTIAL",
+            "BLOCKED_TECHNICAL",
+            "BLOCKED_AUTHORITY",
+            "BLOCKED_DECISION",
+            "PAUSED_CAPACITY",
+            "PAUSED_HOST_WINDOW",
+            "CANCELLED",
+            "INCONCLUSIVE"
+          ]
+        },
+        "semantic_state": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "value"
+          ],
+          "properties": {
+            "name": {
+              "const": "planning_readiness"
+            },
+            "value": {
+              "enum": [
+                "READY_TO_PLAN",
+                "READY_TO_EXECUTE",
+                "NEEDS_DECISION",
+                "NEEDS_INVESTIGATION",
+                "BLOCKED"
+              ]
+            }
+          }
+        },
+        "result": {
+          "$ref": "https://bbk.local/schemas/bbk-root-wayfinder-result-v1.schema.json"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "invocation_mode": {
+                "const": "CONTROLLER_ROOT"
+              }
+            },
+            "required": [
+              "invocation_mode"
+            ]
+          },
+          "then": {
+            "properties": {
+              "parent_ref": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "const": "controller"
+                      },
+                      "id": {
+                        "enum": [
+                          "harness_root_controller"
+                        ]
+                      },
+                      "invocation_mode": {
+                        "const": "CONTROLLER_ROOT"
+                      },
+                      "role": {
+                        "type": "null"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "id",
+                      "invocation_mode"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "x-bbk-role": "bbk_root_wayfinder",
+  "x-bbk-contract": "bbk.root-wayfinder-return.v1",
+  "x-bbk-envelope": "bbk.role-return.v1",
+  "x-bbk-semantic-state-name": "planning_readiness",
+  "x-bbk-requirements": [
+    "Return one `bbk.role-return.v1` object with `contract` = `bbk.root-wayfinder-return.v1`, `role` = `bbk_root_wayfinder`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `planning_readiness` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
+    "Keep every required field present. Use null or an empty collection only with an explicit reason where the contract permits absence.",
+    "Bind the baseline and all authority-bearing artifacts by exact ID, revision, durable path, byte count, and SHA-256 when they are too large or consequential to transport inline.",
+    "Do not return `READY_TO_EXECUTE` unless the exact baseline is accepted, execution authority covers the proposed effects, material planning dependencies are current, and no blocking frontier item remains.",
+    "Do not name `bbk_root_orchestrator` as the next root unless `planning_readiness` is `READY_TO_EXECUTE`; the harness-root controller, not this role, performs that invocation.",
+    "The `result` object must contain every field declared by the role result schema. Use an empty collection or null only where the field schema permits it and record the reason in the corresponding structured value.",
+    "This return is governed by `spec/contracts/catalog.json`, the common `bbk.role-return.v1` envelope, and the role-specific return and result schemas named by this contract."
+  ],
+  "x-bbk-readiness-rule": "`READY_TO_EXECUTE` may be returned only when every current input, required role-owned output, blocking dependency, evidence carrier, cleanup obligation, invalidation condition, and durable handoff required by this contract has been reconciled. The state authorizes only the next parent integration or assessment step named by the role contract.",
+  "x-bbk-authority-boundary": "A valid `bbk.root-wayfinder-return.v1` return establishes only the `bbk_root_wayfinder`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect."
+}

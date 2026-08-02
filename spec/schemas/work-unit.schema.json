@@ -422,7 +422,6 @@
             "enum": [
               "COMPLETE",
               "PARTIAL",
-              "READY_FOR_VALIDATION",
               "BLOCKED_TECHNICAL",
               "BLOCKED_AUTHORITY",
               "BLOCKED_DECISION",

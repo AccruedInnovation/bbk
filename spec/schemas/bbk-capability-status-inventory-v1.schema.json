@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-capability-status-inventory-v1.schema.json",
+  "title": "BBK capability status inventory v1",
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+    },
+    "stringList": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "roleList": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^bbk_[a-z][a-z0-9_]*$"
+      },
+      "uniqueItems": true
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "package_version",
+    "status_vocabulary",
+    "entries"
+  ],
+  "properties": {
+    "schema": {
+      "const": "bbk.capability-status-inventory.v1"
+    },
+    "package_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status_vocabulary": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "IMPLEMENTED_DETERMINISTIC",
+          "IMPLEMENTED_BOOTSTRAP",
+          "SCHEMA_DEFINED_COMPANION",
+          "HOST_PROVIDED_OPTIONAL",
+          "TARGET_ONLY",
+          "RETIRED_NOT_IMPLEMENTED"
+        ]
+      }
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "capability_id",
+          "category",
+          "status",
+          "source_refs",
+          "owner_roles",
+          "consumer_roles",
+          "enforcement",
+          "limitations"
+        ],
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
+          },
+          "category": {
+            "enum": [
+              "RETURN_CONTRACT",
+              "EXECUTION_BOUNDARY",
+              "DISCOVERY_CONTROL",
+              "CANDIDATE_AND_GATE",
+              "AUTHORITY_AND_RUNTIME",
+              "REPAIR_AND_CLOSURE"
+            ]
+          },
+          "status": {
+            "enum": [
+              "IMPLEMENTED_DETERMINISTIC",
+              "IMPLEMENTED_BOOTSTRAP",
+              "SCHEMA_DEFINED_COMPANION",
+              "HOST_PROVIDED_OPTIONAL",
+              "TARGET_ONLY",
+              "RETIRED_NOT_IMPLEMENTED"
+            ]
+          },
+          "source_refs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/relativePath"
+            },
+            "uniqueItems": true
+          },
+          "owner_roles": {
+            "$ref": "#/$defs/roleList"
+          },
+          "consumer_roles": {
+            "$ref": "#/$defs/roleList"
+          },
+          "enforcement": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limitations": {
+            "$ref": "#/$defs/stringList"
+          },
+          "replacement_refs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          }
+        }
+      }
+    }
+  }
+}

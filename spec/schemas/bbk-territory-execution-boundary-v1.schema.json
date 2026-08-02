@@ -1,0 +1,613 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-territory-execution-boundary-v1.schema.json",
+  "title": "BBK TerritoryExecutionBoundary v1",
+  "description": "Immutable-after-admission execution-containment contract compiled and admitted by the Root Orchestrator and operated by one Territory Orchestrator. Structural mutation requires a successor boundary.",
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": true,
+      "minProperties": 1,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "id"
+          ]
+        },
+        {
+          "required": [
+            "path"
+          ]
+        }
+      ]
+    },
+    "referenceList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/reference"
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": true,
+      "minProperties": 1
+    },
+    "recordList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/record"
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "boundary_id",
+    "revision",
+    "lifecycle_state",
+    "subject_ref",
+    "operating_baseline_ref",
+    "execution_baseline_ref",
+    "execution_authorization_ref",
+    "root_campaign_ref",
+    "root_orchestrator_ref",
+    "territory_orchestrator_ref",
+    "parent_boundary_ref",
+    "predecessor_boundary_ref",
+    "admission",
+    "membership",
+    "ownership",
+    "interfaces",
+    "authority_and_effects",
+    "resources_and_budgets",
+    "assurance",
+    "local_discovery",
+    "recovery_and_invalidation",
+    "completion_contract",
+    "immutability",
+    "created_at",
+    "expires_at"
+  ],
+  "properties": {
+    "schema": {
+      "const": "bbk.territory-execution-boundary.v1"
+    },
+    "boundary_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "lifecycle_state": {
+      "enum": [
+        "DRAFT",
+        "PROPOSED",
+        "ADMITTED",
+        "ACTIVE",
+        "SUSPENDED",
+        "COMPLETION_REPORTED",
+        "COMPLETED",
+        "CANCELLED",
+        "INVALIDATED",
+        "SUPERSEDED"
+      ]
+    },
+    "subject_ref": {
+      "$ref": "#/$defs/reference"
+    },
+    "operating_baseline_ref": {
+      "$ref": "#/$defs/reference"
+    },
+    "execution_baseline_ref": {
+      "$ref": "#/$defs/reference"
+    },
+    "execution_authorization_ref": {
+      "$ref": "#/$defs/reference"
+    },
+    "root_campaign_ref": {
+      "$ref": "#/$defs/reference"
+    },
+    "root_orchestrator_ref": {
+      "$ref": "#/$defs/reference"
+    },
+    "territory_orchestrator_ref": {
+      "$ref": "#/$defs/reference"
+    },
+    "parent_boundary_ref": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/reference"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "predecessor_boundary_ref": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/reference"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "admission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "compiled_by_role",
+        "admitted_by_role",
+        "source_manifest_refs",
+        "admitted_at"
+      ],
+      "properties": {
+        "compiled_by_role": {
+          "const": "bbk_root_orchestrator"
+        },
+        "admitted_by_role": {
+          "const": "bbk_root_orchestrator"
+        },
+        "source_manifest_refs": {
+          "$ref": "#/$defs/referenceList"
+        },
+        "admitted_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/timestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "membership": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capability_refs",
+        "phase_refs",
+        "work_unit_refs",
+        "dependency_refs",
+        "integration_obligation_refs"
+      ],
+      "properties": {
+        "capability_refs": {
+          "$ref": "#/$defs/referenceList"
+        },
+        "phase_refs": {
+          "$ref": "#/$defs/referenceList"
+        },
+        "work_unit_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/reference"
+          },
+          "uniqueItems": true
+        },
+        "dependency_refs": {
+          "$ref": "#/$defs/referenceList"
+        },
+        "integration_obligation_refs": {
+          "$ref": "#/$defs/referenceList"
+        }
+      }
+    },
+    "ownership": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "integration_owner_ref",
+        "mutation_owners",
+        "shared_resources"
+      ],
+      "properties": {
+        "integration_owner_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "mutation_owners": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "surface_ref",
+              "owner_work_unit_ref",
+              "workspace_ref",
+              "serialization_policy"
+            ],
+            "properties": {
+              "surface_ref": {
+                "$ref": "#/$defs/reference"
+              },
+              "owner_work_unit_ref": {
+                "$ref": "#/$defs/reference"
+              },
+              "workspace_ref": {
+                "$ref": "#/$defs/reference"
+              },
+              "serialization_policy": {
+                "enum": [
+                  "EXCLUSIVE",
+                  "SERIALIZED_SHARED",
+                  "READ_ONLY_SHARED"
+                ]
+              }
+            }
+          }
+        },
+        "shared_resources": {
+          "$ref": "#/$defs/recordList"
+        }
+      }
+    },
+    "interfaces": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "interface_ref",
+          "direction",
+          "owner_ref",
+          "consumer_refs",
+          "required_state"
+        ],
+        "properties": {
+          "interface_ref": {
+            "$ref": "#/$defs/reference"
+          },
+          "direction": {
+            "enum": [
+              "INBOUND",
+              "OUTBOUND",
+              "BIDIRECTIONAL"
+            ]
+          },
+          "owner_ref": {
+            "$ref": "#/$defs/reference"
+          },
+          "consumer_refs": {
+            "$ref": "#/$defs/referenceList"
+          },
+          "required_state": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "authority_and_effects": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authority_holder_ref",
+        "allowed_effect_classes",
+        "prohibited_effect_classes",
+        "safeguards",
+        "revocation_conditions"
+      ],
+      "properties": {
+        "authority_holder_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "allowed_effect_classes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "prohibited_effect_classes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "safeguards": {
+          "$ref": "#/$defs/recordList"
+        },
+        "revocation_conditions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "resources_and_budgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "planned_effort_unit_name",
+        "planned_effort_units",
+        "concurrency_limit",
+        "resource_allocations",
+        "stopping_conditions"
+      ],
+      "properties": {
+        "planned_effort_unit_name": {
+          "const": "PLANNED_EFFORT_UNIT"
+        },
+        "planned_effort_units": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "concurrency_limit": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "resource_allocations": {
+          "$ref": "#/$defs/recordList"
+        },
+        "stopping_conditions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "assurance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "assurance_contract_refs",
+        "protected_floor_refs",
+        "completion_assertion_refs",
+        "worker_quality_gate_refs",
+        "independent_evaluation_refs",
+        "candidate_lineage_policy"
+      ],
+      "properties": {
+        "assurance_contract_refs": {
+          "$ref": "#/$defs/referenceList"
+        },
+        "protected_floor_refs": {
+          "$ref": "#/$defs/referenceList"
+        },
+        "completion_assertion_refs": {
+          "$ref": "#/$defs/referenceList"
+        },
+        "worker_quality_gate_refs": {
+          "$ref": "#/$defs/referenceList"
+        },
+        "independent_evaluation_refs": {
+          "$ref": "#/$defs/referenceList"
+        },
+        "candidate_lineage_policy": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "local_discovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policy_ref",
+        "default_allowance",
+        "issuer_role",
+        "active_envelope_ref"
+      ],
+      "properties": {
+        "policy_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "default_allowance": {
+          "const": "ZERO_WITHOUT_ACTIVE_ENVELOPE_AND_PERMIT"
+        },
+        "issuer_role": {
+          "const": "bbk_territory_orchestrator"
+        },
+        "active_envelope_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/reference"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "recovery_and_invalidation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recovery_owner_role",
+        "checkpoint_requirements",
+        "invalidation_triggers",
+        "successor_boundary_triggers"
+      ],
+      "properties": {
+        "recovery_owner_role": {
+          "const": "bbk_territory_orchestrator"
+        },
+        "checkpoint_requirements": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "invalidation_triggers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "successor_boundary_triggers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "completion_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "completion_owner_role",
+        "required_work_unit_states",
+        "integration_obligation_refs",
+        "assurance_obligation_refs",
+        "cleanup_requirements",
+        "claims_not_established"
+      ],
+      "properties": {
+        "completion_owner_role": {
+          "const": "bbk_territory_orchestrator"
+        },
+        "required_work_unit_states": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "integration_obligation_refs": {
+          "$ref": "#/$defs/referenceList"
+        },
+        "assurance_obligation_refs": {
+          "$ref": "#/$defs/referenceList"
+        },
+        "cleanup_requirements": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "claims_not_established": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "immutability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "immutable_after",
+        "immutable_fields",
+        "successor_required_for_change"
+      ],
+      "properties": {
+        "immutable_after": {
+          "const": "ADMITTED"
+        },
+        "immutable_fields": {
+          "type": "array",
+          "minItems": 8,
+          "items": {
+            "enum": [
+              "subject_ref",
+              "operating_baseline_ref",
+              "execution_baseline_ref",
+              "execution_authorization_ref",
+              "root_campaign_ref",
+              "membership",
+              "ownership",
+              "interfaces",
+              "authority_and_effects",
+              "resources_and_budgets",
+              "assurance",
+              "local_discovery.policy_ref",
+              "recovery_and_invalidation",
+              "completion_contract"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "successor_required_for_change": {
+          "const": true
+        }
+      }
+    },
+    "created_at": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "expires_at": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/timestamp"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  }
+}

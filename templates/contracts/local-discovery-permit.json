@@ -1,0 +1,86 @@
+{
+  "schema": "bbk.local-discovery-permit.v1",
+  "permit_id": "LDP-EXAMPLE-001",
+  "revision": 1,
+  "lifecycle_state": "ISSUED",
+  "policy_ref": {
+    "id": "bbk.local-discovery-policy.v1",
+    "path": "spec/policies/local-discovery-v1.json"
+  },
+  "envelope_ref": {
+    "id": "LDE-EXAMPLE-001",
+    "revision": 1
+  },
+  "boundary_ref": {
+    "id": "TEB-EXAMPLE-001",
+    "revision": 1
+  },
+  "cohort_ref": {
+    "id": "COHORT-EXAMPLE-001",
+    "revision": 1,
+    "digest": "7777777777777777777777777777777777777777777777777777777777777777"
+  },
+  "work_unit_ref": {
+    "id": "WU-EXAMPLE",
+    "revision": "1",
+    "digest": "6666666666666666666666666666666666666666666666666666666666666666"
+  },
+  "proposal_ref": {
+    "id": "DISCOVERY-PROPOSAL-EXAMPLE-001"
+  },
+  "issued_by": {
+    "role": "bbk_territory_orchestrator",
+    "id": "TERRITORY-RUN-EXAMPLE"
+  },
+  "proposed_by": {
+    "role": "bbk_worker_orchestrator",
+    "id": "WORKER-ORCHESTRATOR-RUN-EXAMPLE"
+  },
+  "discovery_item": {
+    "description": "Add one bounded diagnostic fixture required to complete the admitted WorkUnit.",
+    "why_not_ordinary_implied_work": "The fixture was not named or semantically implied by the compiled WorkUnit and therefore requires explicit local-discovery authority.",
+    "affected_refs": [
+      {
+        "id": "SURFACE-EXAMPLE"
+      }
+    ],
+    "allowed_operations": [
+      "CREATE_DIAGNOSTIC_FIXTURE",
+      "RUN_FOCUSED_CHECK"
+    ],
+    "completion_condition": "The fixture and focused check are recorded, reconciled, and included in candidate and validation lineage."
+  },
+  "budget_charge": {
+    "item_unit": "DISCOVERY_ITEM",
+    "item_units": 1,
+    "effort_unit": "PLANNED_EFFORT_UNIT",
+    "planned_effort_units": 1
+  },
+  "governance_impact": {
+    "changes_outcome": false,
+    "changes_scope": false,
+    "changes_requirement": false,
+    "changes_adr_or_architecture": false,
+    "changes_canonical_interface": false,
+    "changes_assertion_meaning_or_ownership": false,
+    "changes_protected_floor": false,
+    "changes_authority": false,
+    "changes_territory_boundary": false,
+    "changes_cohort_meaning": false,
+    "changes_toolchain_policy": false,
+    "changes_validation_meaning": false,
+    "changes_external_effect_envelope": false
+  },
+  "candidate_and_validation_impact": {
+    "candidate_state": "DRAFT_CANDIDATE",
+    "requires_successor_candidate": false,
+    "requires_successor_cohort_or_parent_recharter": false,
+    "validation_scope_impact": "Include the fixture, permit, and focused-check evidence in the candidate manifest and applicable validation context."
+  },
+  "issued_at": "2026-08-01T01:00:00Z",
+  "activates_at": "2026-08-01T01:00:00Z",
+  "expires_at": "2026-08-01T12:00:00Z",
+  "revoked_at": null,
+  "consumption": null,
+  "superseded_by_ref": null
+}

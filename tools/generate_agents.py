@@ -7,6 +7,7 @@ import hashlib
 import json
 import re
 import sys
+from functools import lru_cache
 from pathlib import Path, PurePath
 from typing import Any, Callable, Mapping
 
@@ -14,11 +15,23 @@ TOOLS_DIR = Path(__file__).resolve().parent
 if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
-from model_routing import load_model_routing, route_for_role
+from model_routing import load_model_routing, route_for_role, routing_statistics
+from prompt_modules import (
+    PromptModuleError,
+    compact_skill_template,
+    load_prompt_modules,
+    module_directives,
+    ordered_modules,
+    source_manifest as prompt_module_source_manifest,
+    strip_frontmatter,
+    validate_skill_templates,
+)
+from return_contracts import render_return_contract_prompt
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC_PATH = ROOT / "spec" / "roles.json"
 MODEL_ROUTING_PATH = ROOT / "spec" / "model-routing.json"
+METHOD_CONTENT_PATH = ROOT / "spec" / "method-content.json"
 TARGETS = {
     "codex": ROOT / "projections" / "codex" / "agents",
     "omp": ROOT / "projections" / "omp" / "agents",
@@ -26,6 +39,49 @@ TARGETS = {
     "generic": ROOT / "projections" / "generic" / "agents",
 }
 MANIFEST = ROOT / "projections" / "manifest.json"
+
+
+
+@lru_cache(maxsize=1)
+def prompt_module_package():
+    try:
+        return load_prompt_modules(ROOT)
+    except PromptModuleError as exc:
+        raise ValueError("invalid prompt-module package: " + "; ".join(exc.errors)) from exc
+
+
+@lru_cache(maxsize=1)
+def canonical_method_content() -> dict[str, Any]:
+    try:
+        value = json.loads(METHOD_CONTENT_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f"cannot load canonical method content: {exc}") from exc
+    package = prompt_module_package()
+    errors = validate_skill_templates(value, package)
+    if value.get("version") != package.catalog.get("package_version"):
+        errors.append("method-content and prompt-module package versions differ")
+    if errors:
+        raise ValueError("invalid canonical method content: " + "; ".join(errors))
+    return value
+
+
+def mandatory_skill_body(name: str) -> str:
+    template = canonical_method_content().get("skills", {}).get(name)
+    if not isinstance(template, str) or not template.strip():
+        raise ValueError(f"mandatory skill {name!r} is absent from canonical method content")
+    body = strip_frontmatter(compact_skill_template(template, prompt_module_package())).strip()
+    if not body:
+        raise ValueError(f"mandatory skill {name!r} has an empty compact body")
+    return body
+
+
+def mandatory_skill_sources(spec: dict[str, Any]) -> dict[str, str]:
+    names = sorted({
+        name
+        for role in spec.get("roles", [])
+        for name in role.get("mandatory_skills", [])
+    })
+    return {name: mandatory_skill_body(name) for name in names}
 
 
 def sha256(data: bytes) -> str:
@@ -60,26 +116,86 @@ def claude_name(role: dict[str, Any]) -> str:
     return value
 
 
+@lru_cache(maxsize=None)
+def load_skill(name: str) -> dict[str, Any]:
+    template = canonical_method_content().get("skills", {}).get(name)
+    if not isinstance(template, str) or not template.strip():
+        raise ValueError(f"unknown canonical skill {name!r}")
+    body = mandatory_skill_body(name)
+    encoded = body.encode("utf-8")
+    template_encoded = template.encode("utf-8")
+    return {
+        "name": name,
+        "path": f"shared/skills/{name}/SKILL.md",
+        "source": f"spec/method-content.json#skills/{name}",
+        "bytes": len(encoded),
+        "sha256": sha256(encoded),
+        "template_bytes": len(template_encoded),
+        "template_sha256": sha256(template_encoded),
+        "prompt_modules": list(module_directives(template)),
+    }
+
+
+def mandatory_skill_metadata(role: dict[str, Any]) -> list[dict[str, Any]]:
+    return [load_skill(name) for name in role.get("mandatory_skills", [])]
+
+def render_role_prompt_module(module: Mapping[str, Any], *, tagged: bool) -> str:
+    """Render one behavior-bearing module exactly once.
+
+    OMP retains authenticated markers. Codex keeps the model-facing body free of
+    BBK XML-like metadata while preserving the module identity in Markdown.
+    """
+    heading = f'### Shared module: `{module["id"]}` — {module["title"]}'
+    body = "\n".join([heading, "", *[f'- {clause["text"]}' for clause in module["clauses"]]])
+    if not tagged:
+        return body
+    return (
+        f'<bbk-prompt-module id="{module["id"]}">\n'
+        f'{body}\n'
+        '</bbk-prompt-module>'
+    )
+
 def instruction_text(
     spec: dict[str, Any],
     role: dict[str, Any],
     *,
     host: str,
 ) -> str:
-    """Render only operational instructions intended for the model context.
+    """Render one self-contained role prompt from canonical contracts.
 
-    Build provenance, canonical digests, host identity, and model-routing metadata
-    belong in ``projections/manifest.json`` or native host configuration, not in
-    the prompt body consumed on every invocation. The constitution is modular:
-    each role receives only the invariant groups named by its canonical contract.
+    Role-specific purpose, scope, responsibility, topology, and return contracts
+    remain explicit. Shared cross-role behavior is embedded once per assigned
+    prompt module. Mandatory procedure templates retain only compact references
+    to those already embedded modules.
     """
-    modules = spec["constitution_modules"]
-    selected_modules = role["constitution"]
+    constitution = spec["constitution_modules"]
     constitution_clauses: list[str] = []
-    for module in selected_modules:
-        constitution_clauses.extend(modules[module])
+    for module_name in role["constitution"]:
+        constitution_clauses.extend(constitution[module_name])
 
-    lines = [
+    package = prompt_module_package()
+    mandatory_skills = role.get("mandatory_skills", [])
+    skills = role.get("skills", [])
+    on_demand = [name for name in skills if name not in mandatory_skills]
+    assigned_modules = ordered_modules(package, role.get("prompt_modules", []))
+    human_request_originators = set(spec["interaction_topology"]["human_request_originators"])
+    may_originate_human_request = role["name"] in human_request_originators
+
+    lines: list[str] = []
+    tagged_contract = host != "codex"
+    if tagged_contract:
+        lines += [
+            f'<bbk-role-contract role="{role["name"]}" package-version="{spec["package_version"]}">',
+            "",
+        ]
+
+    lines += [
+        "## Runtime identity and interaction topology",
+        "",
+        f"You are the canonical `{role['name']}` BBK child role.",
+        "",
+        "Apply the role contract, embedded modules, and mandatory procedures as one instruction set.",
+        "",
         "## Purpose",
         "",
         role["purpose"],
@@ -95,156 +211,168 @@ def instruction_text(
     lines += ["", "## Responsibilities", ""]
     lines.extend(f"- {item}" for item in role["responsibilities"])
 
+    lines += [
+        "",
+        "## Shared behavior modules — embedded once",
+        "",
+        "Each module is active once for the whole invocation.",
+    ]
+    for module in assigned_modules:
+        lines += ["", render_role_prompt_module(module, tagged=host != "codex")]
+
     lines += ["", "## Delegation", ""]
     delegation = role.get("delegation", {})
     if delegation:
         if host == "omp":
-            lines.append(
-                "The native `spawns` allowlist constrains the direct children. Use a child only for the corresponding trigger:"
-            )
+            lines.append("The native `spawns` allowlist constrains direct children. Use a child only for its declared trigger:")
         else:
-            lines.append(
-                "Use only these direct child agents, and only for the corresponding trigger:"
-            )
+            lines.append("Use only these direct child agents, and only for their declared trigger:")
         lines.append("")
         role_index = {item["name"]: item for item in spec["roles"]}
         for child_name, trigger in delegation.items():
             child = role_index[child_name]
             if host == "claude":
-                invocation = claude_name(child)
-                label = f"`{invocation}` (canonical `{child_name}`)"
+                label = f"`{claude_name(child)}` (canonical `{child_name}`)"
             else:
                 label = f"`{child_name}`"
             lines.append(f"- {label} — when {trigger}.")
-        lines += [
-            "",
-            "Delegate only inside this list and the invocation's authority. Give each child an exact subject, purpose, context package, allowed effects, assurance obligations, stopping conditions, and return schema. Do not spawn every permitted child, and do not absorb a child's responsibility merely because the current model could perform it directly.",
-        ]
+        if host == "omp":
+            lines += [
+                "",
+                "For the OMP batch `task` form, set each task's `agent` to the exact permitted canonical `bbk_*` role, use a stable logical `name`, and provide a complete self-contained `task`. For the flat form, follow the advertised schema and use a durable `local://` context file for reusable shared background.",
+            ]
     else:
         lines.append(
-            "This role has no child-agent authority. Return work requiring another BBK responsibility to the invoking parent instead of spawning, impersonating, or silently absorbing an unlisted role."
+            "This role has no child-agent authority. Return work requiring another responsibility to the invoking parent rather than spawning, impersonating, or silently absorbing an unlisted role."
         )
 
-    lines += ["", "## Escalation and user interaction", ""]
+    lines += ["", "## Escalation and human relay", ""]
     lines.extend(f"- {item}" for item in role["escalations"])
-    user_interaction = role.get("user_interaction", [])
-    if user_interaction:
+    human_triggers = role.get("human_decision_triggers", [])
+    if human_triggers:
         lines += [
             "",
-            "When this invocation is the current user-facing role, direct user questions are limited to:",
+            "These conditions trigger a controller-mediated human request, never direct user interaction:",
             "",
         ]
-        lines.extend(f"- {item}" for item in user_interaction)
-        lines += [
-            "",
-            "If this role is running as a child rather than the user-facing invocation, return the same need as a structured decision or authority request to the parent instead of opening a separate user conversation.",
-        ]
+        lines.extend(f"- {item}" for item in human_triggers)
     else:
         lines += [
             "",
-            "This role is not user-facing. Do not ask the user directly or infer consent. Return a structured decision, authority, or private-context request to the invoking parent.",
+            "This role has no ordinary user-gateway branch. Report typed blockers or findings through its parent/controller route.",
         ]
 
     lines += ["", "## Prohibitions", ""]
     lines.extend(f"- {item}" for item in role["prohibitions"])
 
-    # Keep the full allowed procedure surface separate from the small set that
-    # OMP and Claude preload. Conditional procedures stay discoverable through
-    # the host Skill mechanism instead of consuming every invocation's context.
-    # The top-level ``bbk`` skill is an entry controller and is intentionally
-    # absent from both sets for canonical roles.
-    skills = role.get("skills", [])
-    autoload_skills = role.get("autoload_skills", [])
-    if skills:
-        on_demand = [name for name in skills if name not in autoload_skills]
-        lines += ["", "## Procedure skills", ""]
-        if autoload_skills:
-            lines.append(
-                "Always-loaded procedure core where the host supports skill preloading: "
-                + ", ".join(f"`{name}`" for name in autoload_skills)
-                + "."
-            )
-        if on_demand:
-            lines.append(
-                "Additional procedures available on demand: "
-                + ", ".join(f"`{name}`" for name in on_demand)
-                + "."
-            )
+    lines += ["", "## Procedure skills", ""]
+    lines.append(f"Primary procedure: `{role['primary_skill']}`.")
+    if mandatory_skills:
         lines.append(
-            "Load an additional procedure only when its method is material to the current responsibility; availability does not make it mandatory."
+            "Mandatory procedures embedded below: "
+            + ", ".join(f"`{name}`" for name in mandatory_skills)
+            + "."
+        )
+    if on_demand:
+        lines.append(
+            "Additional procedures available on demand: "
+            + ", ".join(f"`{name}`" for name in on_demand)
+            + ". Load one only when its method is material to the assigned responsibility."
         )
 
-    profile_aware = (
-        "bbk-profile-routing" in skills or "bbk-installed-profiles" in skills
-    )
+    profile_aware = "bbk-profile-routing" in skills or "bbk-installed-profiles" in skills
+    lines += ["", "## Language, domain, toolchain, and model qualification", ""]
     if profile_aware:
-        lines += [
-            "",
-            "## Language and domain profiles",
-            "",
-            "- Consult `bbk-installed-profiles` before material language-, framework-, runtime-, or toolchain-specific planning, execution, or review.",
-            "- When a matching installed profile applies, use `bbk-profile-routing`, load its router skill, and select only the focused procedures needed for this role and the exact assertion; never fan out every profile or specialist pack.",
-            "- Carry the selected profile identity, effective lock or digest, toolchain assumptions, required gates, and unavailable-capability dispositions into child invocations and the return envelope.",
-            "- An installed profile adds procedure and evidence expectations only. It does not broaden scope, grant tools or effects, reduce assurance, or authorize a pass.",
-        ]
+        lines.append(
+            "Use the embedded `bbk-prompt-profile-qualification` module and the current installed-profile registry to select only the applicable focused procedures and gates."
+        )
     else:
+        lines.append(
+            "Use only a profile or focused procedure supplied by the invocation. Return a profile-resolution blocker when a material specialized method is required but absent."
+        )
+
+    if host == "omp":
         lines += [
             "",
-            "## Language and domain profile boundary",
+            "## OMP hub/IRC communication contract",
             "",
-            "- Do not discover or activate the installed profile inventory by default for this lean role. Use only a profile and focused procedure explicitly supplied in the invocation.",
-            "- When a material language-, framework-, runtime-, or toolchain-specific method is needed but absent, return a profile-resolution request to the parent instead of inferring availability or improvising the procedure.",
+            "- Run as an OMP task subagent. Use `hub`/IRC for live inter-agent communication and the task/yield channel for the final governed result.",
+            "- Resolve the harness-root controller with `hub` `op: \"list\"` and the peer whose `kind` is `main`; never infer or invent a peer ID.",
+        ]
+        if may_originate_human_request:
+            lines.append("- This role is a declared human-request originator. Send only its exact controller-mediated request packet to the `main` peer and bind the reply to the stable request; send ordinary coordination to the invoking parent.")
+        else:
+            lines.append("- This role is not a human-request originator. Send decision, authority, private-context, or acceptance needs as typed blockers to the invoking parent; do not send a direct user request to `main`.")
+        lines += [
+            "- Wait only when no other authorized work remains, and resume the same logical role after a valid bound response or parent continuation.",
+            "- When spawning, carry the main peer, invoking-parent peer, logical parent, branch identity, and exact reply target in the child context edge.",
+            "- This replacement prompt excludes OMP generic workflow policy and compatibility-discovered cross-harness instructions unless supplied as governed project data.",
         ]
 
     if host == "codex":
         lines += [
             "",
-            "## Codex workspace behavior",
+            "## Codex workspace and parent-channel behavior",
             "",
-            "- This role deliberately omits a role-level `sandbox_mode` override and inherits the parent turn's active Codex sandbox and approval settings.",
-            "- It may create or update bounded BBK coordination artifacts—notes, handoffs, plans, ADRs, manifests, evidence records, findings, dispositions, and result packets—when required by this invocation and stored inside the permitted workspace.",
+            ("- This Codex child cannot converse with the user. Use the declared controller route for exact human requests." if may_originate_human_request else "- This Codex child cannot converse with the user and is not a human-request originator. Return material human needs to the invoking parent through the inter-agent channel or typed terminal result."),
+            "- Inherit the parent turn's active sandbox and approval settings. Persist bounded BBK coordination artifacts inside the permitted workspace.",
         ]
         if role.get("mutates"):
-            lines.append(
-                "- It may also modify subject or product artifacts only within the invocation's explicit scope, allowed effects, and stopping conditions."
-            )
+            lines.append("- Modify subject or product artifacts only within the exact invocation scope, effects, safeguards, and stopping conditions.")
         else:
-            lines.append(
-                "- Inherited host write access does not authorize changes to subject or product artifacts. Return implementation work to the parent or an explicitly permitted mutating role."
-            )
+            lines.append("- Writable host tools do not authorize subject or product mutation for this non-mutating role.")
         if role.get("spawns"):
             lines += [
-                "",
-                "## Codex child lifecycle",
-                "",
-                "- Treat a child wait timeout as a parent polling deadline only. Elapsed time, silence, repeated polling timeouts, apparent slow progress, or absence of a heartbeat are not evidence that a running child is unhealthy.",
-                "- Continue related work in the same logical child thread through the host continuation or follow-up operation (`followup_task` on compatible Codex builds) when possible. Consume completed results, remove them from BBK active-slot accounting while retaining immutable history, and never interrupt a completed, failed, or already-interrupted child merely to reclaim capacity. Logical closure does not guarantee host-level physical thread reclamation.",
-                "- Interrupt a running child only for `USER_CANCELLED`, `CHILD_REQUESTED_STOP`, `UNAUTHORIZED_EFFECT`, `OWNERSHIP_COLLISION`, `CONFIRMED_HANG`, or `OBSOLETE_WORK`, with concrete evidence and preservation of partial work.",
+                "- Use host continuation/follow-up for the same logical child when possible. The embedded liveness module controls polling, interruption, replacement, and preservation of partial work.",
             ]
+
     if host == "claude":
         lines += [
             "",
             "## Claude Code operating notes",
             "",
-            "- When this definition runs as a subagent, unavailable human-interaction tools must be replaced by a structured `needs-human-decision` return; never infer consent.",
-            "- A role with the Agent tool may delegate only to the role types named above and exposed by its tool allowlist. Host support for nested subagents does not broaden semantic authority.",
-            "- Edit and Write are available so every role can persist bounded coordination artifacts. Only a canonical mutating role may change the governed subject, and only within its exact invocation authority.",
-            "- Worktree isolation is a host containment mechanism, not permission to change unrelated files, branches, repositories, or external systems.",
+            ("- This Claude Code child has no `AskUserQuestion` authority. Use the declared controller route for exact human requests." if may_originate_human_request else "- This Claude Code child has no `AskUserQuestion` authority and is not a human-request originator. Return material human needs through the parent channel or typed result."),
+            "- Agent, Edit, Write, and worktree affordances do not broaden the role's declared delegation or mutation authority.",
         ]
+
     lines += [
         "",
         "## Invocation contract",
         "",
-        "Before acting, bind the exact subject, desired result, scope, authority, allowed effects, capability zones, inputs, interfaces, assurance contract, and return format supplied by the parent or user. The authority record must identify its source, standing approvals, exclusions, safeguards, and revocation or expiry conditions. Honor routine effects already approved inside that exact boundary without re-requesting permission; ambiguity narrows the grant rather than broadening it. Fill safely inferable gaps with explicit assumptions and follow the role-specific escalation and user-interaction contract for every material gap.",
-        "",
-        "Use the invocation-supplied task-kind and language/toolchain profiles where applicable. Runtime permissions and workspace controls override prose; this role never gains authority merely because an instruction requests it.",
-        "",
-        "The generated model and reasoning-effort settings are defaults, not evidence of fitness. Obey a valid host-, organization-, session-, or invocation-level override and report when the requested model is unavailable or materially downgraded.",
-        "",
-        "## Return contract",
-        "",
-        "Return: operational disposition; exact subject; concise summary; authority and capability-zone use; work performed or findings; evidence and commands; changed artifacts with byte counts and hashes when material; validation; residual uncertainty; blocker or pause classification; continuation state; discoveries; and the smallest valid next action. Use `COMPLETE`, `PARTIAL`, `READY_FOR_VALIDATION`, `BLOCKED_TECHNICAL`, `BLOCKED_AUTHORITY`, `BLOCKED_DECISION`, `PAUSED_CAPACITY`, `PAUSED_HOST_WINDOW`, `CANCELLED`, or `INCONCLUSIVE` for operational state. Use `PASS`, `FAIL`, `BLOCKED`, or `INCONCLUSIVE` only when evaluating a declared assertion.",
+        "Apply the embedded `bbk-prompt-invocation-binding` module before substantive work. Invocation-, organization-, session-, sandbox-, and runtime-level controls take precedence over a generated default; unavailable or materially downgraded capabilities must be reported truthfully.",
     ]
+
+    if host == "omp":
+        lines += [
+            "",
+            "## Return contract",
+            "",
+            "The BBK OMP adapter injects the exact role-specific return contract from the installed v4 role catalogue. Treat it as controlling and fail closed if it is absent or inconsistent.",
+        ]
+    else:
+        lines += ["", render_return_contract_prompt(role)]
+
+    if mandatory_skills:
+        lines += [
+            "",
+            "## Mandatory procedures — injected",
+            "",
+            "Apply these compact canonical procedure templates directly. Their shared module references point to the single embedded copies above.",
+        ]
+        for name in mandatory_skills:
+            body = mandatory_skill_body(name)
+            lines.append("")
+            if host == "codex":
+                lines += [f"### Mandatory procedure: `{name}`", "", body]
+            else:
+                lines += [
+                    f'<bbk-inlined-skill name="{name}" source="spec/method-content.json#skills/{name}">',
+                    body,
+                    "</bbk-inlined-skill>",
+                ]
+
+    if tagged_contract:
+        lines += ["", "</bbk-role-contract>"]
     return "\n".join(lines).strip() + "\n"
 
 
@@ -280,14 +408,16 @@ def render_omp(
         f"model: {yaml_scalar(omp['model'])}",
         f"thinkingLevel: {yaml_scalar(omp['thinkingLevel'])}",
     ]
-    if role.get("autoload_skills"):
-        lines.append("autoloadSkills: " + ", ".join(role["autoload_skills"]))
     if role.get("spawns"):
         lines.append("spawns: " + ", ".join(role["spawns"]))
     lines.extend([
         "---",
         "",
+        f'<bbk-agent-system role="{role["name"]}" package-version="{spec["package_version"]}">',
+        "",
         instruction_text(spec, role, host="omp").rstrip(),
+        "",
+        "</bbk-agent-system>",
     ])
     return "\n".join(lines) + "\n"
 
@@ -302,8 +432,6 @@ def claude_tools(role: dict[str, Any]) -> tuple[list[str], list[str]]:
     denied: list[str] = []
     if role.get("web"):
         tools += ["WebFetch", "WebSearch"]
-    if role.get("interactive"):
-        tools.append("AskUserQuestion")
     if role.get("spawns"):
         allowed = ", ".join(name.replace("_", "-") for name in role["spawns"])
         tools.insert(0, f"Agent({allowed})")
@@ -337,7 +465,6 @@ def render_claude(
     ]
     render_yaml_list(lines, "tools", tools)
     render_yaml_list(lines, "disallowedTools", denied)
-    render_yaml_list(lines, "skills", role.get("autoload_skills", []))
     if role.get("mutates"):
         lines.append("isolation: worktree")
     lines.extend([
@@ -369,9 +496,22 @@ def rendered_projections(
     """
     spec = json.loads(SPEC_PATH.read_text(encoding="utf-8"))
     routing = load_model_routing(model_routing_path, root=ROOT, role_spec=spec)
+    method_content = canonical_method_content()
+    module_package = prompt_module_package()
+    module_manifest = prompt_module_source_manifest(module_package)
+    skill_sources = mandatory_skill_sources(spec)
     role_digest = sha256(canonical_json_bytes(spec))
     routing_digest = sha256(canonical_json_bytes(routing))
-    source_digest = sha256(canonical_json_bytes({"roles": spec, "model_routing": routing}))
+    method_content_digest = sha256(METHOD_CONTENT_PATH.read_bytes())
+    prompt_module_digest = sha256(canonical_json_bytes(module_manifest))
+    mandatory_skill_digest = sha256(canonical_json_bytes(skill_sources))
+    source_digest = sha256(canonical_json_bytes({
+        "roles": spec,
+        "model_routing": routing,
+        "method_content": method_content,
+        "prompt_module_sources": module_manifest,
+        "mandatory_skill_sources": skill_sources,
+    }))
     outputs: dict[str, dict[str, bytes]] = {target: {} for target in TARGETS}
     renderers: dict[
         str,
@@ -400,13 +540,19 @@ def rendered_projections(
             "constitution_modules": role.get("constitution", []),
             "scope": role.get("scope", []),
             "skills": role.get("skills", []),
-            "autoload_skills": role.get("autoload_skills", []),
+            "primary_skill": role.get("primary_skill"),
+            "mandatory_skills": role.get("mandatory_skills", []),
+            "prompt_modules": role.get("prompt_modules", []),
+            "inlined_skills": mandatory_skill_metadata(role),
             "spawns": role.get("spawns", []),
             "delegation": role.get("delegation", {}),
+            "return_contract": role.get("return_contract", {}),
             "escalations": role.get("escalations", []),
-            "user_interaction": role.get("user_interaction", []),
+            "human_decision_triggers": role.get("human_decision_triggers", []),
+            "user_facing": False,
             "may_mutate": bool(role.get("mutates")),
-            "model_profile": route["profile"],
+            "model_route": route["route_id"],
+            "model_routing_mode": route["mode"],
             "model_routing": {
                 "omp": route["omp"],
                 "codex": route["codex"],
@@ -414,17 +560,29 @@ def rendered_projections(
             },
             "files": filenames,
         }
+    routing_stats = routing_statistics(routing)
     metadata = {
         "package_version": spec["package_version"],
+        "contract_package": spec.get("contract_package"),
+        "role_return_registry": "spec/contracts/role-return-registry.json",
+        "method_content_source": portable_relative_path(METHOD_CONTENT_PATH, ROOT),
+        "prompt_module_package": spec.get("prompt_module_package"),
         "source_sha256": source_digest,
         "role_source_sha256": role_digest,
         "model_routing_source_sha256": routing_digest,
+        "method_content_source_sha256": method_content_digest,
+        "prompt_module_source_sha256": prompt_module_digest,
+        "prompt_module_sources": module_manifest["sources"],
+        "mandatory_skill_source_sha256": mandatory_skill_digest,
+        "mandatory_skill_sources": sorted(skill_sources),
         "role_count": len(spec["roles"]),
-        "model_profile_count": len(routing["profiles"]),
-        "role_profile_counts": {
-            profile: sum(1 for selected in routing["role_profiles"].values() if selected == profile)
-            for profile in sorted(routing["profiles"])
-        },
+        "model_routing_schema": routing["schema_version"],
+        "model_routing_mode": routing_stats["mode"],
+        "model_route_count": routing_stats["route_count"],
+        # Retained internally so install-time v1 compatibility can report legacy
+        # profile statistics without exposing profile tiers in the v2 projection manifest.
+        "legacy_model_profile_count": routing_stats["profile_count"],
+        "legacy_role_profile_counts": routing_stats["role_profile_counts"],
         "target_count": len(TARGETS),
         "projection_count": sum(len(files) for files in outputs.values()),
         "targets": sorted(TARGETS),
@@ -445,16 +603,26 @@ def expected_files() -> tuple[dict[Path, bytes], dict[str, Any]]:
         for path, content in sorted(outputs.items(), key=lambda item: str(item[0]))
     }
     manifest = {
-        "schema": "bbk.projection-manifest.v4",
+        "schema": "bbk.projection-manifest.v8",
         "package_version": metadata["package_version"],
+        "contract_package": metadata["contract_package"],
+        "role_return_registry": metadata["role_return_registry"],
         "source": portable_relative_path(SPEC_PATH, ROOT),
         "model_routing_source": portable_relative_path(MODEL_ROUTING_PATH, ROOT),
+        "method_content_source": metadata["method_content_source"],
+        "prompt_module_package": metadata["prompt_module_package"],
         "source_sha256": metadata["source_sha256"],
         "role_source_sha256": metadata["role_source_sha256"],
         "model_routing_source_sha256": metadata["model_routing_source_sha256"],
+        "method_content_source_sha256": metadata["method_content_source_sha256"],
+        "prompt_module_source_sha256": metadata["prompt_module_source_sha256"],
+        "prompt_module_sources": metadata["prompt_module_sources"],
+        "model_routing_schema": metadata["model_routing_schema"],
+        "model_routing_mode": metadata["model_routing_mode"],
+        "model_route_count": metadata["model_route_count"],
+        "mandatory_skill_source_sha256": metadata["mandatory_skill_source_sha256"],
+        "mandatory_skill_sources": metadata["mandatory_skill_sources"],
         "role_count": metadata["role_count"],
-        "model_profile_count": metadata["model_profile_count"],
-        "role_profile_counts": metadata["role_profile_counts"],
         "target_count": metadata["target_count"],
         "projection_count": metadata["projection_count"],
         "targets": metadata["targets"],
@@ -507,7 +675,7 @@ def main() -> int:
                 print(f"- {error}", file=sys.stderr)
             return 1
         print(
-            f"OK: {manifest['role_count']} roles, {manifest['model_profile_count']} model profiles, "
+            f"OK: {manifest['role_count']} roles, {manifest['model_route_count']} direct model routes, "
             f"{manifest['target_count']} targets, and {manifest['projection_count']} projections "
             f"match {manifest['source_sha256']}"
         )
@@ -515,7 +683,7 @@ def main() -> int:
     write(outputs)
     print(
         f"Generated {manifest['role_count']} roles into {manifest['projection_count']} projections "
-        f"across {manifest['target_count']} targets using {manifest['model_profile_count']} model profiles"
+        f"across {manifest['target_count']} targets using {manifest['model_route_count']} direct model routes"
     )
     print(f"Projection input SHA-256: {manifest['source_sha256']}")
     return 0

@@ -1,6 +1,6 @@
-# Install and qualify BBK alpha.11.12
+# Install and qualify BBK alpha.13
 
-Alpha.11.12 is distributed as one archive containing the BBK core and five independently manifested language profiles: CODESYS `0.1.0-alpha.4`, plus Go, Python, Rust, and TypeScript/JavaScript `0.1.0-alpha.3`. The normal installation installs all five profiles by default. Use a clean extraction for each release; a complete managed reinstall is the default upgrade path, while selective OMP-only and Codex-only updates remain available.
+Alpha.13 is distributed as one archive containing the BBK core and five independently manifested language profiles: CODESYS `0.1.0-alpha.4`, plus Go, Python, Rust, and TypeScript/JavaScript `0.1.0-alpha.3`. It integrates the canonical split-role v4 package, exact role-return/execution contracts, reusable prompt modules, projection manifest v8, and the reviewed per-role model-routing defaults. It preserves bounded verification, harness-scoped updates, the PowerShell-visible default-Yes prompt, OMP controller/activity/`ask` behavior, and installs all five profiles by default. Use a clean extraction for each release.
 
 ## Prerequisites
 
@@ -74,17 +74,25 @@ The ordered sequence is:
 6. non-mutating Python compilation and JSON parsing;
 7. alpha.7 semantic and schema fixtures;
 8. alpha.8 typed-profile fixtures;
-9. every `test*.py` module in deterministic filename order;
+9. every `test*.py` module, scheduled concurrently by default and summarized in deterministic filename order;
 10. OMP JavaScript syntax validation;
 11. strict post-test package-manifest check.
 
-`tools/run_tests.py` merges unittest stderr into stdout for PowerShell 5.1 compatibility and always ends with a consolidated summary. Each suite is labelled `[current/total]`, reports elapsed time on completion, and emits a `still running` heartbeat after 15 quiet seconds. On failure, test labels and terminal causes are repeated at the end. Native release qualification additionally uses `python tools/windows_compat.py`; see `docs/DEVELOPMENT.md`.
+`tools/run_tests.py` merges unittest stderr into stdout for PowerShell 5.1 compatibility and always ends with a consolidated summary. Each suite is labelled `[current/total]`, reports elapsed time on completion, and emits a `still running` heartbeat after 15 quiet seconds. Parallel heartbeats include the latest visible unittest line so a stalled run identifies the current test. Suite children have closed stdin, nested behavior-test subprocesses are bounded, and each module has a 300-second hard timeout by default (`--suite-timeout 0` disables it). On failure, test labels and terminal causes are repeated at the end. Native release qualification additionally uses `python tools/windows_compat.py`; see `docs/DEVELOPMENT.md`.
 
-To run only the unittest modules:
+To run all unittest modules (up to four independent module processes concurrently by default):
 
 ```bash
 python tools/run_tests.py -v
 ```
+
+For a developer smoke check, use:
+
+```bash
+python tools/verify_all.py --profile quick --require-node
+```
+
+For ordinary selective successor updates, prefer `python tools/setup.py --test-and-update-omp --scope user` or `--test-and-update-codex`; those commands retain package trust and generated-source checks but do not rerun unrelated harness suites. Full verification remains the release/CI path.
 
 ## Inspect the full plan
 
@@ -194,9 +202,60 @@ python tools/install.py install --scope user --omp --codex --claude
 
 Profile package, compatibility, archive-safety, collision, and destination preflight checks are never skipped.
 
+## Existing installation and clean replacement
+
+Before an ordinary interactive install begins verification or profile preparation, BBK checks the selected scope for an existing `bbk.install-manifest.v1`. It reports the installed version, harnesses, file count, and manifest path.
+
+The replacement question now follows the selected harness scope.
+
+When every installed harness is selected—or the existing installation contains only the selected harness—the installer offers a full replacement:
+
+```text
+Uninstall the existing BBK installation first? [Y/n]
+```
+
+A full replacement preflights the successor before removal, removes every unchanged manifest-owned file from the previous install, then installs only the harnesses and profiles selected by the current command.
+
+When an existing multi-harness installation contains OMP and/or Codex and the command selects exactly one already-installed `--omp` or `--codex` harness, the installer offers a harness-scoped replacement instead:
+
+```text
+Clean-replace the selected omp harness now? [Y/n]
+```
+
+or:
+
+```text
+Clean-replace the selected codex harness now? [Y/n]
+```
+
+That path refreshes only the selected harness and removes only stale manifest-owned files inside that harness's target roots. It preserves every unselected harness, its files, its per-harness version record, shared install ownership, and unowned/private files. In particular, `--omp --uninstall-existing` no longer uninstalls Codex, and `--codex --uninstall-existing` no longer removes OMP.
+
+Harness-scoped clean replacement currently supports exactly one already-installed OMP or Codex harness. Unsupported partial combinations fail before any removal. Selecting all installed harnesses uses full replacement. Use the dedicated selective update commands for normal successor updates.
+
+Press Enter to accept the displayed default **Yes**. Locally modified manifest-owned files stop either replacement before removal unless `--force` is explicit; forced replacement backs up modified regular files first. Non-regular objects at manifest-owned file paths fail closed. Unowned material is never removed merely because it lives under a BBK directory.
+
+Machine-readable and detached automation never answers a destructive prompt implicitly. JSON, dry-run, and other noninteractive installs retain/reconcile the existing installation unless an explicit policy is supplied:
+
+```bash
+# Clean-replace only OMP and preserve installed Codex.
+python tools/setup.py --install --scope user --omp --uninstall-existing
+
+# Clean-replace only Codex and preserve installed OMP.
+python tools/setup.py --install --scope user --codex --uninstall-existing
+
+# Reconcile without clean stale-file removal.
+python tools/setup.py --install --scope user --omp --keep-existing
+```
+
+The same flags are available on `tools/install.py install`; `--uninstall-existing` and `--keep-existing` are mutually exclusive.
+
+A harness-scoped replacement preserves the installed shared model-routing policy and language-profile set. Supplying `--model-routing`, `--language-profiles`, `--profile-id`, or `--no-language-profiles` with that path fails before removal; use a full replacement when changing shared installation state.
+
+Selective `--test-and-update-omp` and `--test-and-update-codex` commands use the same manifest-aware host boundaries without the install prompt and remain the preferred way to apply a successor to only one harness.
+
 ## Fail-closed preparation and installation boundary
 
-Before the first destination write, alpha.11.12:
+Before the first destination write, alpha.13:
 
 1. validates raw ZIP paths before normalization;
 2. rejects traversal, absolute/drive-qualified paths, backslashes, alternate-data-stream names, NUL/control characters, trailing dots/spaces, reserved Windows device names, duplicate entries, portable case collisions, file/directory conflicts, symlinks, special files, encrypted entries, and excessive expansion;
@@ -220,7 +279,7 @@ Human-readable setup and installation commands stream progress instead of buffer
 
 - each ordered verification gate and elapsed time;
 - each unittest suite as `[current/total]`;
-- a `still running` heartbeat after 15 seconds without test output;
+- a `still running` heartbeat after 15 seconds without completion, including the latest visible test line and the module hard timeout;
 - verified profile IDs before planning;
 - no-write preflight file counts;
 - actual file-write progress at bounded intervals;
@@ -257,7 +316,7 @@ User scope uses the platform data root. On Windows the default is:
   effective-language-profiles.json
   install-manifest.json
   bin\
-  versions\0.1.0-alpha.11.12\
+  versions\0.1.0-alpha.13.1\
   profiles\<profile-id>\0.1.0-alpha.3\
   profiles\<profile-id>\current.json
 ```
@@ -268,7 +327,7 @@ All core files, profile package copies, profile skills, OMP extensions, launcher
 
 ## Model routing
 
-Use the packaged defaults or pass an external `bbk.model-routing.v1` policy:
+Use the packaged defaults or pass an external `bbk.model-routing.v2` policy (legacy v1 remains accepted):
 
 ```bash
 python tools/model_routing.py --path /path/to/model-routing.json --check
@@ -276,7 +335,7 @@ python tools/install.py install --scope user --omp --codex --claude \
   --model-routing /path/to/model-routing.json --dry-run
 ```
 
-The external file's `package_version` must be `0.1.0-alpha.11.12`. The installer validates exact coverage of all 19 roles before writing and records the effective policy and digest.
+The external file's `package_version` must be `0.1.0-alpha.13.1`. The installer validates exact coverage of all 19 roles before writing and records the effective policy and digest.
 
 An OMP installation also writes `effective-omp-model-routing.json` and exposes an interactive runtime menu:
 
@@ -298,13 +357,27 @@ python tools/install.py uninstall --scope user
 
 Status compares content digests and, on POSIX, expected executable modes. Uninstall removes only manifest-owned files that remain unchanged. Locally modified bytes or executable modes are preserved and reported unless `--force` is explicit.
 
-## Upgrade to alpha.11.12
+## Upgrade to alpha.13
 
-Do not overlay one extracted release onto another. For a full managed reinstall, uninstall from the previous clean extraction, extract alpha.11.12 into a new directory, and run the preferred test-and-install command.
+Do not overlay one extracted release package directory onto another. Extract alpha.13 into a new directory and choose the narrowest appropriate update.
 
-No `.bbk` project-record migration is required for alpha.11.12. A full install refreshes the mixed-version bundled profile set by default; use `--no-language-profiles` only for an intentional core-only installation.
+To refresh only OMP while preserving Codex:
 
-Selective OMP-only and Codex-only update commands remain available when only one host surface changes. See `UPGRADING.md`.
+```bash
+python tools/setup.py --test-and-update-omp --scope user
+```
+
+To refresh only Codex while preserving OMP:
+
+```bash
+python tools/setup.py --test-and-update-codex --scope user
+```
+
+For a full managed upgrade, select every installed harness and accept the full clean-replacement prompt, or pass `--uninstall-existing` explicitly in automation. A command selecting only `--omp` or only `--codex` now performs a harness-scoped clean replacement and preserves the other installed harness rather than removing it.
+
+Alpha.13 advances the canonical role package to split `bbk.roles.v4`, the generated projection manifest to v8, and the default `bbk.model-routing.v2` policy to the exact reviewed per-role selections. It adds generated role-return/result schemas and contract registries while preserving the existing install destinations. Start a fresh Codex session after updating its agents. Reload OMP plugins with `/reload-plugins` after an OMP update.
+
+No `.bbk` project-record migration is required solely for alpha.13.
 
 ## Live qualification
 
@@ -326,7 +399,11 @@ Then enter persistent BBK mode:
 /bbk:exit            exit mode
 ```
 
-The mode state is session-local and persisted with `appendEntry`, which is not sent to the model. A `before_agent_start` system-prompt overlay applies BBK context to ordinary messages while active, and a `BBK` footer indicator shows the current state. BBK mode does not change the parent model, thinking level, toolset, or sub-agent routing, and it does not replace OMP's native plan or vibe modes.
+Mode state is session-local and persisted with `appendEntry`; it is not sent to the model. While active, `before_agent_start` performs a complete Main **system-prompt replacement** that excludes OMP's generic workflow and compatibility-discovered `.codex`, `.claude`, `.gemini`, or other client-specific instructions. The replacement injects the mandatory `bbk` and `bbk-context-routing` procedures and makes Main the sole user-facing controller.
+
+Every generated named BBK role is a non-user-facing child with mandatory procedures already inlined. The hook also replaces each marked child's generic OMP subagent prompt while preserving sanitized assignment context, approved plan/path, worktree, hub identity/roster, and caller yield schema. Children coordinate through `hub`/IRC and send material human requests to Main; they do not focus the terminal or question the user directly.
+
+Prompt replacement does not change the parent model, thinking level, toolset, child routing, or filesystem containment. `/bbk:exit` restores normal OMP prompting for later Main turns. Named BBK children continue to receive their role-specific replacement when invoked.
 
 ## Codex-only update without modifying OMP
 
@@ -369,4 +446,3 @@ python tools/setup.py --update-omp --scope user
 The operation updates the installed BBK package copy and launcher, OMP agents, the core OMP extension, installed bundled-profile OMP extensions, the mutable OMP routing state, and installation metadata. It preserves the active `/bbk:models` profile and per-role routes. It does not modify `.codex` agent files, Claude agent files, or generic agent files, so a running Codex process need not be shut down. The compact shared installed-profile registry may be refreshed only when every installed profile is present in the bundled release; already-loaded Codex context is not changed.
 
 Use `--dry-run` to inspect the exact plan and `--force` only after reviewing a locally divergent targeted OMP file. After a successful update, run `/reload-plugins` in OMP so the process reloads the changed extensions and agent definitions.
-

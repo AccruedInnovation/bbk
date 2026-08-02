@@ -1,0 +1,514 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-local-discovery-permit-v1.schema.json",
+  "title": "BBK LocalDiscoveryPermit v1",
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": true,
+      "minProperties": 1,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "id"
+          ]
+        },
+        {
+          "required": [
+            "path"
+          ]
+        }
+      ]
+    },
+    "referenceList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/reference"
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": true,
+      "minProperties": 1
+    },
+    "recordList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/record"
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "permit_id",
+    "revision",
+    "lifecycle_state",
+    "policy_ref",
+    "envelope_ref",
+    "boundary_ref",
+    "cohort_ref",
+    "work_unit_ref",
+    "proposal_ref",
+    "issued_by",
+    "proposed_by",
+    "discovery_item",
+    "budget_charge",
+    "governance_impact",
+    "candidate_and_validation_impact",
+    "issued_at",
+    "activates_at",
+    "expires_at",
+    "revoked_at",
+    "consumption",
+    "superseded_by_ref"
+  ],
+  "properties": {
+    "schema": {
+      "const": "bbk.local-discovery-permit.v1"
+    },
+    "permit_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "lifecycle_state": {
+      "enum": [
+        "PROPOSED",
+        "ISSUED",
+        "ACTIVE",
+        "CONSUMED",
+        "EXPIRED",
+        "REVOKED",
+        "SUPERSEDED",
+        "CANCELLED"
+      ]
+    },
+    "policy_ref": {
+      "$ref": "#/$defs/reference"
+    },
+    "envelope_ref": {
+      "$ref": "#/$defs/reference"
+    },
+    "boundary_ref": {
+      "$ref": "#/$defs/reference"
+    },
+    "cohort_ref": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/reference"
+        },
+        {
+          "type": "object",
+          "required": [
+            "id",
+            "revision",
+            "digest"
+          ]
+        }
+      ]
+    },
+    "work_unit_ref": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/reference"
+        },
+        {
+          "type": "object",
+          "required": [
+            "id",
+            "revision",
+            "digest"
+          ]
+        }
+      ]
+    },
+    "proposal_ref": {
+      "$ref": "#/$defs/reference"
+    },
+    "issued_by": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "id"
+      ],
+      "properties": {
+        "role": {
+          "const": "bbk_territory_orchestrator"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "proposed_by": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "id"
+      ],
+      "properties": {
+        "role": {
+          "enum": [
+            "bbk_worker_orchestrator",
+            "bbk_worker"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "discovery_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "description",
+        "why_not_ordinary_implied_work",
+        "affected_refs",
+        "allowed_operations",
+        "completion_condition"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "why_not_ordinary_implied_work": {
+          "type": "string",
+          "minLength": 1
+        },
+        "affected_refs": {
+          "$ref": "#/$defs/referenceList"
+        },
+        "allowed_operations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "completion_condition": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "budget_charge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "item_unit",
+        "item_units",
+        "effort_unit",
+        "planned_effort_units"
+      ],
+      "properties": {
+        "item_unit": {
+          "const": "DISCOVERY_ITEM"
+        },
+        "item_units": {
+          "const": 1
+        },
+        "effort_unit": {
+          "const": "PLANNED_EFFORT_UNIT"
+        },
+        "planned_effort_units": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "governance_impact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "changes_outcome",
+        "changes_scope",
+        "changes_requirement",
+        "changes_adr_or_architecture",
+        "changes_canonical_interface",
+        "changes_assertion_meaning_or_ownership",
+        "changes_protected_floor",
+        "changes_authority",
+        "changes_territory_boundary",
+        "changes_cohort_meaning",
+        "changes_toolchain_policy",
+        "changes_validation_meaning",
+        "changes_external_effect_envelope"
+      ],
+      "properties": {
+        "changes_outcome": {
+          "const": false
+        },
+        "changes_scope": {
+          "const": false
+        },
+        "changes_requirement": {
+          "const": false
+        },
+        "changes_adr_or_architecture": {
+          "const": false
+        },
+        "changes_canonical_interface": {
+          "const": false
+        },
+        "changes_assertion_meaning_or_ownership": {
+          "const": false
+        },
+        "changes_protected_floor": {
+          "const": false
+        },
+        "changes_authority": {
+          "const": false
+        },
+        "changes_territory_boundary": {
+          "const": false
+        },
+        "changes_cohort_meaning": {
+          "const": false
+        },
+        "changes_toolchain_policy": {
+          "const": false
+        },
+        "changes_validation_meaning": {
+          "const": false
+        },
+        "changes_external_effect_envelope": {
+          "const": false
+        }
+      }
+    },
+    "candidate_and_validation_impact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_state",
+        "requires_successor_candidate",
+        "requires_successor_cohort_or_parent_recharter",
+        "validation_scope_impact"
+      ],
+      "properties": {
+        "candidate_state": {
+          "enum": [
+            "NO_CANDIDATE",
+            "DRAFT_CANDIDATE",
+            "FROZEN_CANDIDATE",
+            "SUCCESSOR_COHORT_PENDING"
+          ]
+        },
+        "requires_successor_candidate": {
+          "type": "boolean"
+        },
+        "requires_successor_cohort_or_parent_recharter": {
+          "type": "boolean"
+        },
+        "validation_scope_impact": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "issued_at": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "activates_at": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "expires_at": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "revoked_at": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/timestamp"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "consumption": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "consumed_at",
+            "result_ref",
+            "actual_effort_units"
+          ],
+          "properties": {
+            "consumed_at": {
+              "$ref": "#/$defs/timestamp"
+            },
+            "result_ref": {
+              "$ref": "#/$defs/reference"
+            },
+            "actual_effort_units": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "superseded_by_ref": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/reference"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "lifecycle_state": {
+            "const": "CONSUMED"
+          }
+        },
+        "required": [
+          "lifecycle_state"
+        ]
+      },
+      "then": {
+        "properties": {
+          "consumption": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_and_validation_impact": {
+            "properties": {
+              "candidate_state": {
+                "const": "FROZEN_CANDIDATE"
+              }
+            },
+            "required": [
+              "candidate_state"
+            ]
+          }
+        },
+        "required": [
+          "candidate_and_validation_impact"
+        ]
+      },
+      "then": {
+        "properties": {
+          "candidate_and_validation_impact": {
+            "properties": {
+              "requires_successor_candidate": {
+                "const": true
+              },
+              "requires_successor_cohort_or_parent_recharter": {
+                "const": true
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "lifecycle_state": {
+            "const": "REVOKED"
+          }
+        },
+        "required": [
+          "lifecycle_state"
+        ]
+      },
+      "then": {
+        "properties": {
+          "revoked_at": {
+            "$ref": "#/$defs/timestamp"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "lifecycle_state": {
+            "const": "SUPERSEDED"
+          }
+        },
+        "required": [
+          "lifecycle_state"
+        ]
+      },
+      "then": {
+        "properties": {
+          "superseded_by_ref": {
+            "$ref": "#/$defs/reference"
+          }
+        }
+      }
+    }
+  ]
+}

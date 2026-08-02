@@ -1,4 +1,4 @@
-# Language and domain profiles in BBK alpha.11.12
+# Language and domain profiles in BBK alpha.12
 
 BBK installs five independently manifested profile packages by default: CODESYS `0.1.0-alpha.4`, and Go, Python, Rust, and TypeScript/JavaScript `0.1.0-alpha.3`. Strict manifests bind their metadata, compatibility, OMP launch behavior, structure-validator detection, and consolidated test surfaces. The typed capability protocol is `bbk.profile-capability.v1`.
 
@@ -77,7 +77,7 @@ A material language/toolchain invocation combines:
 
 ```text
 canonical BBK role and authority
-+ model-routing profile
++ direct per-role model route
 + BBK method skill
 + installed-profile registry
 + selected profile router
@@ -177,7 +177,7 @@ Uninstall is conservative: content or executable-mode divergence is preserved an
 - Earlier packages may be `legacy-unprojected`, `legacy-summary`, or `legacy-no-review-manifest`.
 - Alpha.7 could declare capability names but had no central typed invocation protocol; those declarations remain `legacy-declared` and are not auto-dispatched.
 - Alpha.8-aware profiles opt into `bbk.profile-capability.v1` and typed request/result handling.
-- All bundled profiles declare minimum BBK alpha.8 and remain compatible with alpha.11.12 and compatible successors when their exact package and runtime checks pass.
+- All bundled profiles declare minimum BBK alpha.8 and remain compatible with alpha.12 and compatible successors when their exact package and runtime checks pass.
 
 No profile file, skill, compiler, linter, simulator, IDE, or native tool is invoked merely because the package is installed.
 

@@ -17,14 +17,12 @@ import textwrap
 import tomllib
 import unittest
 from pathlib import Path
+from tests._cli_support import run_cli as m1_run
 m1_ROOT = Path(__file__).resolve().parents[1]
 m1_BBK = m1_ROOT / 'tools' / 'bbk.py'
 m1_INSTALL = m1_ROOT / 'tools' / 'install.py'
 m1_GENERATOR = m1_ROOT / 'tools' / 'generate_agents.py'
 m1_ROUTING = m1_ROOT / 'spec' / 'model-routing.json'
-
-def m1_run(command, *, cwd=None, env=None, check=True):
-    return subprocess.run([str(x) for x in command], cwd=str(cwd or m1_ROOT), env=env, check=check, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8', errors='replace')
 
 def m1_run_json(command, *, cwd=None, env=None, check=True):
     result = m1_run(command, cwd=cwd, env=env, check=check)
@@ -95,8 +93,11 @@ class BbkTests(unittest.TestCase):
         self.assertEqual(manifest['role_count'], 19)
         self.assertEqual(manifest['target_count'], 4)
         self.assertEqual(manifest['projection_count'], 76)
-        self.assertEqual(manifest['model_profile_count'], 3)
-        self.assertEqual(manifest['role_profile_counts'], {'coordination': 5, 'judgment': 12, 'mechanical': 2})
+        self.assertEqual(manifest['model_routing_schema'], 'bbk.model-routing.v2')
+        self.assertEqual(manifest['model_routing_mode'], 'per-role')
+        self.assertEqual(manifest['model_route_count'], 19)
+        self.assertNotIn('model_profile_count', manifest)
+        self.assertNotIn('role_profile_counts', manifest)
         self.assertEqual(manifest['targets'], ['claude', 'codex', 'generic', 'omp'])
         for target in manifest['targets']:
             self.assertEqual(len(list((m1_ROOT / 'projections' / target / 'agents').glob('*'))), 19)
@@ -109,8 +110,7 @@ class BbkTests(unittest.TestCase):
             self.assertTrue(value['model'])
             self.assertIn(value['model_reasoning_effort'], {'minimal', 'low', 'medium', 'high', 'xhigh', 'max', 'ultra'})
             self.assertIn('developer_instructions', value)
-            profile = routing['role_profiles'][value['name']]
-            expected = routing['profiles'][profile]['codex']
+            expected = routing['roles'][value['name']]['codex']
             self.assertEqual(value['model'], expected['model'])
             self.assertEqual(value['model_reasoning_effort'], expected['model_reasoning_effort'])
 
@@ -126,15 +126,14 @@ class BbkTests(unittest.TestCase):
             self.assertNotIn(name, names)
             names.add(name)
             canonical_name = name.replace('-', '_')
-            profile = routing['role_profiles'][canonical_name]
-            expected = routing['profiles'][profile]['claude']
+            expected = routing['roles'][canonical_name]['claude']
             self.assertEqual(value['model'], expected['model'])
             self.assertEqual(value['effort'], expected['effort'])
             self.assertEqual(value['permissionMode'], 'default')
             self.assertTrue(value['description'])
             self.assertIn('Read', value['tools'])
             self.assertIn('Skill', value['tools'])
-            self.assertTrue(value['skills'])
+            self.assertNotIn('skills', value)
             self.assertIn('Edit', value['tools'])
             self.assertIn('Write', value['tools'])
             self.assertIn('NotebookEdit', value['tools'])
@@ -145,7 +144,7 @@ class BbkTests(unittest.TestCase):
                 self.assertNotIn('isolation', value)
         root = m1_parse_simple_yaml_frontmatter(m1_ROOT / 'projections' / 'claude' / 'agents' / 'bbk-root-wayfinder.md')
         self.assertTrue(any((tool.startswith('Agent(') for tool in root['tools'])))
-        self.assertIn('AskUserQuestion', root['tools'])
+        self.assertNotIn('AskUserQuestion', root['tools'])
 
     def test_omp_extension_parses_and_registers(self):
         m1_run(['node', '--check', m1_ROOT / 'omp' / 'extension' / 'index.js'])
@@ -318,20 +317,34 @@ class BbkTests(unittest.TestCase):
             temp_root = Path(temp)
             project = temp_root / 'project'
             project.mkdir()
-            m1_run([sys.executable, m1_BBK, 'init', '--root', project, '--project-id', 'TEST-PROFILE'])
+            # Profile discovery is intentionally additive: explicit paths are
+            # followed by BBK_PROFILE_PATH, project roots, the installed user
+            # profile store, and bundled roots. Keep this regression hermetic
+            # while also proving that an explicit profile wins over an ambient
+            # installed profile with the same id/version.
+            ambient_data = temp_root / 'ambient-bbk-data'
+            ambient_profile = m1_make_test_profile(ambient_data / 'profiles')
             profile_base = temp_root / 'profiles'
             profile_root = m1_make_test_profile(profile_base)
-            listed, _ = m1_run_json([sys.executable, m1_BBK, '--json', 'profile', 'list', '--root', project, '--profile-dir', profile_base])
-            self.assertEqual(len(listed['profiles']), 1)
-            self.assertEqual(listed['profiles'][0]['package_verification']['status'], 'PASS')
-            inspected, _ = m1_run_json([sys.executable, m1_BBK, '--json', 'profile', 'inspect', '--root', project, '--profile-dir', profile_base, '--id', 'rust'])
+            env = os.environ.copy()
+            env.pop('BBK_PROFILE_PATH', None)
+            env['BBK_INSTALL_ROOT'] = str(ambient_data)
+
+            m1_run([sys.executable, m1_BBK, 'init', '--root', project, '--project-id', 'TEST-PROFILE'], env=env)
+            listed, _ = m1_run_json([sys.executable, m1_BBK, '--json', 'profile', 'list', '--root', project, '--profile-dir', profile_base], env=env)
+            self.assertEqual(len(listed['profiles']), 2)
+            self.assertEqual(Path(listed['profiles'][0]['root']), profile_root.resolve())
+            self.assertEqual(Path(listed['profiles'][1]['root']), ambient_profile.resolve())
+            self.assertTrue(all(item['package_verification']['status'] == 'PASS' for item in listed['profiles']))
+            inspected, _ = m1_run_json([sys.executable, m1_BBK, '--json', 'profile', 'inspect', '--root', project, '--profile-dir', profile_base, '--id', 'rust'], env=env)
             self.assertEqual(inspected['version'], '0.0.0-test')
-            resolved, _ = m1_run_json([sys.executable, m1_BBK, '--json', 'profile', 'resolve', '--root', project, '--source', project, '--profile-dir', profile_base, '--id', 'rust', '--role', 'worker', '--task-profile', 'implementation', '--assurance-tier', 'routine', '--hint', 'public-api', '--path', 'src/lib.rs', '--write-lock'])
+            self.assertEqual(Path(inspected['root']), profile_root.resolve())
+            resolved, _ = m1_run_json([sys.executable, m1_BBK, '--json', 'profile', 'resolve', '--root', project, '--source', project, '--profile-dir', profile_base, '--id', 'rust', '--role', 'worker', '--task-profile', 'implementation', '--assurance-tier', 'routine', '--hint', 'public-api', '--path', 'src/lib.rs', '--write-lock'], env=env)
             self.assertEqual(resolved['resolution']['selected_components'][0]['id'], 'test-rust')
             lock = json.loads((project / '.bbk' / 'profile-lock.json').read_text(encoding='utf-8'))
             self.assertRegex(lock['effective_sha256'], '^[0-9a-f]{64}$')
             (profile_root / 'unexpected.txt').write_text('drift\n', encoding='utf-8')
-            drifted, _ = m1_run_json([sys.executable, m1_BBK, '--json', 'profile', 'inspect', '--root', project, '--profile-dir', profile_base, '--id', 'rust'])
+            drifted, _ = m1_run_json([sys.executable, m1_BBK, '--json', 'profile', 'inspect', '--root', project, '--profile-dir', profile_base, '--id', 'rust'], env=env)
             self.assertEqual(drifted['package_verification']['status'], 'FAIL')
             self.assertTrue(any(('unexpected' in error for error in drifted['package_verification']['errors'])))
 
@@ -464,7 +477,7 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
                         else:
                             expected_line = f"- `{child_name}` — when {trigger}."
                         self.assertIn(expected_line, body, f'{host}:{role_name}')
-                    self.assertIn('Delegate only inside this list', body, f'{host}:{role_name}')
+                    self.assertIn('Use only these direct child agents', body, f'{host}:{role_name}')
                 else:
                     self.assertIn('has no child-agent authority', body, f'{host}:{role_name}')
 
@@ -505,54 +518,100 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
                 bodies.append((host, body))
             bodies.append(('generic', (m2_ROOT / 'projections' / 'generic' / 'agents' / f'{role_name}.md').read_text(encoding='utf-8')))
             for host, body in bodies:
-                self.assertTrue(body.startswith('## Purpose\n'), f'{host}:{role_name}')
+                expected_prefix = (
+                    '<bbk-agent-system '
+                    if host == 'omp'
+                    else '## Runtime identity and interaction topology'
+                    if host == 'codex'
+                    else '<bbk-role-contract '
+                )
+                self.assertTrue(body.startswith(expected_prefix), f'{host}:{role_name}')
+                self.assertIn('## Purpose\n', body, f'{host}:{role_name}')
+                if host != 'codex':
+                    self.assertIn(f'role="{role_name}"', body, f'{host}:{role_name}')
+                else:
+                    self.assertNotIn('<bbk-role-contract', body, role_name)
+                    self.assertNotIn('</bbk-role-contract>', body, role_name)
                 for forbidden in m2_FORBIDDEN_PROMPT_PROVENANCE:
                     self.assertNotIn(forbidden, body, f'{host}:{role_name}')
                 self.assertNotIn('```json', body, f'{host}:{role_name}')
 
-    def test_projection_manifest_v4_carries_role_contract_metadata(self):
-        self.assertEqual(self.manifest['schema'], 'bbk.projection-manifest.v4')
+    def test_projection_manifest_v8_carries_role_module_return_and_inlined_procedure_metadata(self):
+        self.assertEqual(self.manifest['schema'], 'bbk.projection-manifest.v8')
         self.assertEqual(set(self.manifest['agents']), set(self.roles))
-        self.assertRegex(self.manifest['role_source_sha256'], '^[0-9a-f]{64}$')
-        self.assertRegex(self.manifest['model_routing_source_sha256'], '^[0-9a-f]{64}$')
+        for digest_field in (
+            'role_source_sha256', 'model_routing_source_sha256',
+            'mandatory_skill_source_sha256', 'method_content_source_sha256',
+            'prompt_module_source_sha256',
+        ):
+            self.assertRegex(self.manifest[digest_field], '^[0-9a-f]{64}$')
+        self.assertTrue(self.manifest['mandatory_skill_sources'])
+        self.assertTrue(self.manifest['prompt_module_sources'])
+        self.assertEqual(self.manifest['contract_package'], 'spec/contracts/catalog.json')
+        self.assertEqual(self.manifest['role_return_registry'], 'spec/contracts/role-return-registry.json')
         for role_name, role in self.roles.items():
             value = self.manifest['agents'][role_name]
             self.assertEqual(value['description'], role['description'])
             self.assertEqual(value['constitution_modules'], role['constitution'])
             self.assertEqual(value['scope'], role['scope'])
             self.assertEqual(value['skills'], role.get('skills', []))
-            self.assertEqual(value['autoload_skills'], role.get('autoload_skills', []))
+            self.assertEqual(value['primary_skill'], role['primary_skill'])
+            self.assertEqual(value['mandatory_skills'], role.get('mandatory_skills', []))
+            self.assertEqual(value['prompt_modules'], role.get('prompt_modules', []))
+            self.assertEqual(value['return_contract'], role['return_contract'])
             self.assertEqual(value['spawns'], role.get('spawns', []))
             self.assertEqual(value['delegation'], role['delegation'])
             self.assertEqual(value['escalations'], role['escalations'])
-            self.assertEqual(value['user_interaction'], role['user_interaction'])
-            self.assertIn(value['model_profile'], {'judgment', 'coordination', 'mechanical'})
+            self.assertEqual(value['human_decision_triggers'], role['human_decision_triggers'])
+            self.assertFalse(value['user_facing'])
+            self.assertEqual([item['name'] for item in value['inlined_skills']], role['mandatory_skills'])
+            for item in value['inlined_skills']:
+                self.assertRegex(item['sha256'], '^[0-9a-f]{64}$')
+                self.assertGreater(item['bytes'], 0)
+                self.assertEqual(item['source'], f"spec/method-content.json#skills/{item['name']}")
+            self.assertEqual(value['model_route'], role_name)
+            self.assertEqual(value['model_routing_mode'], 'per-role')
             self.assertEqual(set(value['files']), {'codex', 'omp', 'claude', 'generic'})
 
-    def test_profile_procedures_remain_available_while_native_autoload_stays_focused(self):
+    def test_profile_procedures_remain_available_while_mandatory_skills_are_inlined(self):
+        policy = json.loads((m2_ROOT / 'spec' / 'prompt-modules' / 'catalog.json').read_text(encoding='utf-8'))['compilation_policy']
+        self.assertIsNone(policy['mandatory_procedure_maximum'])
         for role_name, role in self.roles.items():
             skills = role.get('skills', [])
-            autoload_expected = role.get('autoload_skills', [])
-            self.assertTrue(set(autoload_expected) <= set(skills), role_name)
-            self.assertLessEqual(len(autoload_expected), 3, role_name)
-            if role_name in m2_PROFILE_AWARE_ROLES:
-                self.assertIn('bbk-installed-profiles', skills, role_name)
-                self.assertIn('bbk-profile-routing', skills, role_name)
-            else:
-                self.assertNotIn('bbk-installed-profiles', skills, role_name)
-            omp, _ = m2__frontmatter_and_body(m2_ROOT / 'projections' / 'omp' / 'agents' / f'{role_name}.md')
-            autoload = omp.get('autoloadSkills', [])
-            if isinstance(autoload, str):
-                autoload = [value.strip() for value in autoload.split(',') if value.strip()]
-            self.assertEqual(autoload, autoload_expected, role_name)
-            claude, _ = m2__frontmatter_and_body(m2_ROOT / 'projections' / 'claude' / 'agents' / f"{role_name.replace('_', '-')}.md")
-            claude_skills = claude.get('skills', [])
-            if isinstance(claude_skills, str):
-                claude_skills = [value.strip() for value in claude_skills.split(',') if value.strip()]
-            self.assertEqual(claude_skills, autoload_expected, role_name)
+            mandatory = role.get('mandatory_skills', [])
+            self.assertTrue(set(mandatory) <= set(skills), role_name)
+            self.assertGreaterEqual(len(mandatory), 1, role_name)
+            self.assertEqual(mandatory[0], role['primary_skill'], role_name)
+            if len(mandatory) > 1:
+                self.assertIn(role_name, policy['additional_mandatory_procedure_exceptions'])
+            omp, omp_body = m2__frontmatter_and_body(m2_ROOT / 'projections' / 'omp' / 'agents' / f'{role_name}.md')
+            self.assertNotIn('autoloadSkills', omp, role_name)
+            claude, claude_body = m2__frontmatter_and_body(m2_ROOT / 'projections' / 'claude' / 'agents' / f"{role_name.replace('_', '-')}.md")
+            self.assertNotIn('skills', claude, role_name)
+            self.assertNotIn('AskUserQuestion', claude.get('tools', []), role_name)
+            _, codex_body = m2__codex(m2_ROOT / 'projections' / 'codex' / 'agents' / f'{role_name}.toml')
+            generic_body = (m2_ROOT / 'projections' / 'generic' / 'agents' / f'{role_name}.md').read_text(encoding='utf-8')
+            for name in mandatory:
+                marker = f'<bbk-inlined-skill name="{name}" source="spec/method-content.json#skills/{name}"'
+                for body in (omp_body, claude_body, generic_body):
+                    self.assertIn(marker, body, role_name)
+                self.assertIn(f'### Mandatory procedure: `{name}`', codex_body, role_name)
+                self.assertNotIn(marker, codex_body, role_name)
+
+    def test_codex_developer_instructions_contain_no_bbk_metadata_tags(self):
+        for role_name in self.roles:
+            data, body = m2__codex(
+                m2_ROOT / 'projections' / 'codex' / 'agents' / f'{role_name}.toml'
+            )
+            self.assertEqual(data['name'], role_name)
+            self.assertNotIn('<bbk-', body, role_name)
+            self.assertNotIn('</bbk-', body, role_name)
+            self.assertNotIn('package-version=', body, role_name)
+            self.assertNotIn('source="shared/skills/', body, role_name)
+            self.assertIn('## Mandatory procedures — injected', body, role_name)
 
     def test_every_generated_role_prompt_explains_profile_selection_and_propagation(self):
-        for role_name in self.roles:
+        for role_name, role in self.roles.items():
             bodies = []
             _, codex_body = m2__codex(m2_ROOT / 'projections' / 'codex' / 'agents' / f'{role_name}.toml')
             bodies.append(codex_body)
@@ -560,18 +619,20 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
                 _, body = m2__frontmatter_and_body(m2_ROOT / 'projections' / host / 'agents' / filename)
                 bodies.append(body)
             bodies.append((m2_ROOT / 'projections' / 'generic' / 'agents' / f'{role_name}.md').read_text(encoding='utf-8'))
+            qualified = 'bbk-prompt-profile-qualification' in role.get('prompt_modules', [])
             for body in bodies:
-                if role_name in m2_PROFILE_AWARE_ROLES:
-                    self.assertIn('## Language and domain profiles', body, role_name)
-                    self.assertIn('`bbk-installed-profiles`', body, role_name)
-                    self.assertIn('`bbk-profile-routing`', body, role_name)
-                    self.assertIn('Carry the selected profile identity', body, role_name)
+                self.assertIn('## Language, domain, toolchain, and model qualification', body, role_name)
+                if qualified:
+                    self.assertIn('bbk-prompt-profile-qualification', body, role_name)
+                    self.assertIn('Use only a profile explicitly supplied or selected', body, role_name)
+                    self.assertIn('Carry profile identity, version or digest', body, role_name)
+                    self.assertIn('cannot broaden scope, effects, authority, or acceptance', body, role_name)
                 else:
-                    self.assertIn('## Language and domain profile boundary', body, role_name)
-                    self.assertIn('return a profile-resolution request to the parent', body, role_name)
-                    self.assertNotIn('Consult `bbk-installed-profiles`', body, role_name)
+                    self.assertNotIn('bbk-prompt-profile-qualification', body, role_name)
+                    self.assertIn('Use only a profile or focused procedure supplied by the invocation', body, role_name)
+                    self.assertIn('profile-resolution blocker', body, role_name)
 
-    def test_every_projection_contains_scope_delegation_escalation_and_correct_user_boundary(self):
+    def test_every_projection_contains_scope_delegation_escalation_and_controller_relay_boundary(self):
         for role_name, role in self.roles.items():
             bodies = []
             _, codex_body = m2__codex(m2_ROOT / 'projections' / 'codex' / 'agents' / f'{role_name}.toml')
@@ -581,30 +642,64 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
                 bodies.append((host, body))
             bodies.append(('generic', (m2_ROOT / 'projections' / 'generic' / 'agents' / f'{role_name}.md').read_text(encoding='utf-8')))
             for host, body in bodies:
-                for heading in ('## Constitution', '## Scope', '## Responsibilities', '## Delegation', '## Escalation and user interaction', '## Prohibitions', '## Invocation contract', '## Return contract'):
+                common_headings = (
+                    '## Runtime identity and interaction topology',
+                    '## Constitution',
+                    '## Scope',
+                    '## Responsibilities',
+                    '## Delegation',
+                    '## Escalation and human relay',
+                    '## Prohibitions',
+                    '## Invocation contract',
+                    '## Mandatory procedures — injected',
+                )
+                for heading in common_headings:
                     self.assertIn(heading, body, f'{host}:{role_name}')
-                for item in role['scope'] + role['escalations']:
-                    self.assertIn(item, body, f'{host}:{role_name}')
-                if role['interactive']:
-                    self.assertIn('direct user questions are limited to', body, f'{host}:{role_name}')
-                    for item in role['user_interaction']:
-                        self.assertIn(item, body, f'{host}:{role_name}')
+                if host == 'omp':
+                    self.assertIn('## Return contract', body, f'{host}:{role_name}')
+                    self.assertIn('injects the exact role-specific return contract', body, f'{host}:{role_name}')
                 else:
-                    self.assertIn('This role is not user-facing', body, f'{host}:{role_name}')
+                    self.assertIn('## Exact role-return contract', body, f'{host}:{role_name}')
+                    self.assertIn(role['return_contract']['contract_id'], body, f'{host}:{role_name}')
+                    self.assertIn(role['return_contract']['return_schema'], body, f'{host}:{role_name}')
+                for item in role['scope'] + role['escalations'] + role['human_decision_triggers']:
+                    self.assertIn(item, body, f'{host}:{role_name}')
+                self.assertIn('Every canonical BBK role is non-user-facing', body, f'{host}:{role_name}')
+                self.assertIn('sole user-facing controller', body, f'{host}:{role_name}')
+                self.assertIn('Never ask the user directly', body, f'{host}:{role_name}')
+                if role['human_decision_triggers']:
+                    self.assertIn('controller-mediated human request', body, f'{host}:{role_name}')
+                else:
+                    self.assertIn('no ordinary user-gateway branch', body, f'{host}:{role_name}')
+                if host == 'omp':
+                    self.assertIn('## OMP hub/IRC communication contract', body, role_name)
+                    self.assertIn('whose `kind` is `main`', body, role_name)
+                    if role['spawns']:
+                        self.assertIn("set each task's `agent` to the exact permitted canonical `bbk_*` role", body, role_name)
+                        self.assertIn('use a stable logical `name`', body, role_name)
+                        self.assertIn('provide a complete self-contained `task`', body, role_name)
+                        self.assertIn('When spawning, carry the main peer', body, role_name)
 
-    def test_constitution_is_modular_and_top_level_entry_skill_is_not_autoloaded(self):
-        self.assertEqual(self.spec['schema_version'], 'bbk.roles.v2')
+    def test_constitution_is_modular_and_top_level_controller_skill_is_not_a_child_skill(self):
+        self.assertEqual(self.spec['schema_version'], 'bbk.roles.v4')
+        self.assertEqual(self.spec['interaction_topology']['user_facing_identity'], 'harness_root_controller')
+        self.assertFalse(self.spec['interaction_topology']['canonical_roles_user_facing'])
+        self.assertEqual(self.spec['interaction_topology']['omp_transport'], 'hub/IRC to the peer whose kind is main')
         modules = self.spec['constitution_modules']
         self.assertEqual(set(modules), {'core', 'planning', 'coordination', 'execution', 'assurance'})
         entry = (m2_ROOT / 'shared' / 'skills' / 'bbk' / 'SKILL.md').read_text(encoding='utf-8')
-        self.assertIn('This skill is for the primary user-facing session', entry)
-        self.assertLess(len(entry.split()), 750)
+        self.assertIn('# BBK harness-root controller', entry)
+        self.assertIn('only BBK participant that may interact with the user', entry)
+        self.assertIn('hub`/IRC', entry)
+        self.assertIn('{ context, tasks: [{ name, agent, task, ... }] }', entry)
+        self.assertIn('Do not put the role name only in `name` while omitting `agent`', entry)
+        self.assertLess(len(entry.split()), 1400)
         for role_name, role in self.roles.items():
             self.assertEqual(role['constitution'][0], 'core', role_name)
             self.assertNotIn('bbk', role['skills'], role_name)
-            self.assertNotIn('bbk', role['autoload_skills'], role_name)
-            self.assertTrue(set(role['autoload_skills']) <= set(role['skills']), role_name)
-            self.assertLessEqual(len(role['autoload_skills']), 3, role_name)
+            self.assertNotIn('bbk', role['mandatory_skills'], role_name)
+            self.assertTrue(set(role['mandatory_skills']) <= set(role['skills']), role_name)
+            self.assertEqual(role['mandatory_skills'][0], role['primary_skill'], role_name)
             if role['spawns']:
                 self.assertIn('coordination', role['constitution'], role_name)
             if role['mutates']:
@@ -614,22 +709,23 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
             if role['family'] == 'review':
                 self.assertIn('assurance', role['constitution'], role_name)
 
-    def test_native_skill_preload_budget_is_bounded_and_role_specific(self):
-        word_counts = {
-            path.parent.name: len(path.read_text(encoding='utf-8').split())
-            for path in (m2_ROOT / 'shared' / 'skills').glob('*/SKILL.md')
-        }
+    def test_mandatory_procedure_composition_is_role_specific_and_module_backed(self):
+        module_catalog = json.loads((m2_ROOT / 'spec' / 'prompt-modules' / 'catalog.json').read_text(encoding='utf-8'))
+        policy = module_catalog['compilation_policy']
+        self.assertIsNone(policy['mandatory_procedure_maximum'])
+        self.assertEqual(policy['additional_mandatory_procedure_exceptions'], {})
         for role_name, role in self.roles.items():
-            autoload = role['autoload_skills']
-            self.assertGreaterEqual(len(autoload), 1, role_name)
-            self.assertLessEqual(len(autoload), 3, role_name)
-            self.assertLessEqual(sum(word_counts[name] for name in autoload), 2300, role_name)
+            mandatory = role['mandatory_skills']
+            self.assertEqual(mandatory, [role['primary_skill']], role_name)
+            self.assertEqual(len(mandatory), len(set(mandatory)), role_name)
+            self.assertTrue(set(mandatory) <= set(role['skills']), role_name)
+            self.assertTrue(role['prompt_modules'], role_name)
             if role['spawns']:
-                self.assertIn('bbk-context-routing', autoload, role_name)
-        self.assertIn('bbk-wayfind', self.roles['bbk_root_wayfinder']['autoload_skills'])
-        self.assertIn('bbk-grill', self.roles['bbk_question_guide']['autoload_skills'])
-        self.assertIn('bbk-execute', self.roles['bbk_worker']['autoload_skills'])
-        self.assertIn('bbk-review', self.roles['bbk_validator']['autoload_skills'])
+                self.assertIn('bbk-prompt-delegation-return', role['prompt_modules'], role_name)
+        self.assertEqual(self.roles['bbk_root_wayfinder']['mandatory_skills'], ['bbk-wayfind'])
+        self.assertEqual(self.roles['bbk_question_guide']['mandatory_skills'], ['bbk-grill'])
+        self.assertEqual(self.roles['bbk_worker']['mandatory_skills'], ['bbk-work-unit-execution'])
+        self.assertEqual(self.roles['bbk_validator']['mandatory_skills'], ['bbk-assertion-validation'])
 
     def test_every_shared_skill_has_valid_unindented_frontmatter(self):
         for path in sorted((m2_ROOT / 'shared' / 'skills').glob('*/SKILL.md')):
@@ -639,11 +735,13 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
             self.assertIn(f"name: {path.parent.name}", text.split('---', 2)[1], str(path.relative_to(m2_ROOT)))
 
     def test_all_shared_skills_define_profile_interaction_without_embedding_inventory(self):
+        method = json.loads((m2_ROOT / 'spec' / 'method-content.json').read_text(encoding='utf-8'))
         paths = sorted((m2_ROOT / 'shared' / 'skills').glob('*/SKILL.md'))
-        self.assertEqual(len(paths), 24)
+        self.assertEqual({path.parent.name for path in paths}, set(method['skills']))
+        self.assertEqual(len(paths), 39)
         for path in paths:
             text = path.read_text(encoding='utf-8')
-            self.assertRegex(text.lower(), '\\bprofiles?\\b', str(path.relative_to(m2_ROOT)))
+            self.assertRegex(text.lower(), r'\bprofiles?\b', str(path.relative_to(m2_ROOT)))
         placeholder = (m2_ROOT / 'shared' / 'skills' / 'bbk-installed-profiles' / 'SKILL.md').read_text(encoding='utf-8')
         self.assertIn('package-source placeholder', placeholder)
         self.assertIn('No language or domain profile is managed', placeholder)
@@ -664,12 +762,12 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
             (root / 'skills' / 'bbk-rust' / 'SKILL.md').write_text('---\nname: bbk-rust\ndescription: Rust profile router.\n---\n\n# Router\n', encoding='utf-8')
             (root / 'skills' / 'rust-review' / 'SKILL.md').write_text('---\nname: rust-review\ndescription: Focused Rust review.\n---\n\n# Review\n', encoding='utf-8')
             item = _DummyProfile(root=root, profile={'id': 'rust', 'version': '0.1.0-alpha.3', 'name': 'Rust', 'description': 'Qualified Rust procedures.', 'package': 'bbk-profile-rust', 'installation': {'skill_root': 'skills', 'cli': 'tools/rust_profile.py'}, 'capabilities': {'test': {'status': 'supported'}, 'mutation': {'status': 'conditional'}}})
-            data = profile_registry.registry_data([item], bbk_version='0.1.0-alpha.11.12')
+            data = profile_registry.registry_data([item], bbk_version='0.1.0-alpha.12.4')
             profile = data['profiles'][0]
             self.assertEqual(profile['router_skill'], 'bbk-rust')
             self.assertEqual(profile['cli_command'], 'rust-profile')
             self.assertEqual(profile['skill_count'], 2)
-            text = profile_registry.registry_skill_text([item], bbk_version='0.1.0-alpha.11.12')
+            text = profile_registry.registry_skill_text([item], bbk_version='0.1.0-alpha.12.4')
             self.assertIn('### `rust@0.1.0-alpha.3` — Rust', text)
             self.assertIn('Router skill: `bbk-rust`', text)
             self.assertIn('test=supported', text)
@@ -698,15 +796,10 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
         child_env["PYTHONDONTWRITEBYTECODE"] = "1"
         if env:
             child_env.update(env)
-        result = a118_subprocess.run(
+        result = m1_run(
             [a118_sys.executable, str(A118_BBK), "--json", *args],
-            cwd=str(cwd or A118_ROOT),
+            cwd=cwd or A118_ROOT,
             env=child_env,
-            stdout=a118_subprocess.PIPE,
-            stderr=a118_subprocess.PIPE,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
             check=False,
         )
         if check and result.returncode != 0:
@@ -715,26 +808,40 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
 
     def test_wayfinding_topology_is_complete_and_question_guide_is_escalation_only(self) -> None:
         catalogue = a118_json.loads((A118_ROOT / "spec" / "roles.json").read_text(encoding="utf-8"))
+        role_catalog = a118_json.loads((A118_ROOT / "spec" / "roles" / "catalog.json").read_text(encoding="utf-8"))
         by_id = {role["id"]: role for role in catalogue["roles"]}
         by_name = {role["name"]: role for role in catalogue["roles"]}
-        for role_id in (
-            "root_wayfinder", "territory_wayfinder", "questioning_wayfinder",
-            "planning_wayfinder", "phase_wayfinder",
-        ):
-            self.assertIn("bbk-wayfind", by_id[role_id]["skills"])
-        self.assertIn("bbk-grill", by_id["question_guide"]["skills"])
-        self.assertFalse(by_id["territory_wayfinder"]["interactive"])
+        self.assertEqual(by_id["root_wayfinder"]["primary_skill"], "bbk-wayfind")
+        self.assertEqual(by_id["territory_wayfinder"]["primary_skill"], "bbk-wayfind")
+        self.assertEqual(by_id["questioning_wayfinder"]["primary_skill"], "bbk-question-branch")
+        self.assertEqual(by_id["planning_wayfinder"]["primary_skill"], "bbk-work-graph")
+        self.assertEqual(by_id["phase_wayfinder"]["primary_skill"], "bbk-phase-plan")
+        self.assertEqual(by_id["question_guide"]["primary_skill"], "bbk-grill")
+        guide_entry = next(entry for entry in role_catalog["role_entries"] if entry["name"] == "bbk_question_guide")
+        guide_parent_modes = guide_entry["allowed_parent_modes"]
+        self.assertEqual(len(guide_parent_modes), 1)
+        self.assertEqual(guide_parent_modes[0]["parents"], ["bbk_questioning_wayfinder"])
+        self.assertEqual(by_id["question_guide"]["spawns"], [])
+        self.assertEqual(by_id["territory_wayfinder"]["human_decision_triggers"], [])
         for parent in ("root_wayfinder", "territory_wayfinder"):
             self.assertIn("bbk_questioning_wayfinder", by_id[parent]["spawns"])
             self.assertIn("bbk_planning_wayfinder", by_id[parent]["spawns"])
             self.assertNotIn("bbk_question_guide", by_id[parent]["spawns"])
         questioning = "\n".join(by_id["questioning_wayfinder"]["responsibilities"] + by_id["questioning_wayfinder"]["prohibitions"])
-        self.assertIn("accepted recommendation becomes the decision packet without spawning a Question Guide", questioning)
-        self.assertIn("Do not create a Question Guide for every", questioning)
+        self.assertIn("rejection or revision keeps the root decision active", questioning)
+        self.assertIn("Invoke exactly one foreground `bbk_question_guide` only when", questioning)
         guide = "\n".join(by_id["question_guide"]["responsibilities"] + by_id["question_guide"]["prohibitions"])
-        self.assertIn("rejection keeps the question active", guide)
+        self.assertIn("rejection keeps the root decision active", guide)
+        self.assertIn("Do not begin or continue a Grill for routine acceptance", guide)
+        roots = [entry["role"] for entry in role_catalog["controller_entrypoints"]]
+        self.assertEqual(roots, [
+            "bbk_root_wayfinder",
+            "bbk_root_orchestrator",
+            "bbk_reviewer",
+            "bbk_validator_orchestrator",
+        ])
         reachable: set[str] = set()
-        stack = ["bbk_root_wayfinder"]
+        stack = list(roots)
         while stack:
             current = stack.pop()
             if current in reachable:
@@ -742,15 +849,42 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
             reachable.add(current)
             stack.extend(by_name[current]["spawns"])
         self.assertEqual(reachable, set(by_name))
+        planning_reachable: set[str] = set()
+        stack = ["bbk_root_wayfinder"]
+        while stack:
+            current = stack.pop()
+            if current in planning_reachable:
+                continue
+            planning_reachable.add(current)
+            stack.extend(by_name[current]["spawns"])
+        self.assertLess(planning_reachable, set(by_name))
+        self.assertNotIn("bbk_root_orchestrator", planning_reachable)
+        self.assertNotIn("bbk_validator_orchestrator", planning_reachable)
 
     def test_wayfinding_and_grill_procedures_preserve_dynamic_method(self) -> None:
-        wayfind = (A118_ROOT / "shared" / "skills" / "bbk-wayfind" / "SKILL.md").read_text(encoding="utf-8")
-        grill = (A118_ROOT / "shared" / "skills" / "bbk-grill" / "SKILL.md").read_text(encoding="utf-8")
-        for phrase in ("frontier", "blocker", "fog", "information value", "invalidation", "synthesize"):
-            self.assertIn(phrase, wayfind.lower())
-        for phrase in ("one material question at a time", "reflect", "challenge", "reject", "root question"):
-            self.assertIn(phrase, grill.lower())
-        self.assertIn("escalation path, not ceremony for every decision", grill.lower())
+        wayfind = (A118_ROOT / "shared" / "skills" / "bbk-wayfind" / "SKILL.md").read_text(encoding="utf-8").lower()
+        grill = (A118_ROOT / "shared" / "skills" / "bbk-grill" / "SKILL.md").read_text(encoding="utf-8").lower()
+        for phrase in (
+            "frontier",
+            "blockers",
+            "fog",
+            "integration value",
+            "invalidation",
+            "return a synthesis",
+            "stop economically",
+            "materially improve outcome fit",
+        ):
+            self.assertIn(phrase, wayfind)
+        for phrase in (
+            "one material question at a time",
+            "reflect",
+            "challenge",
+            "reject",
+            "root decision",
+            "deep exception path",
+            "not ceremony around every decision",
+        ):
+            self.assertIn(phrase, grill)
 
     def test_durable_question_branch_preserves_rejection_and_resolution_semantics(self) -> None:
         with a118_tempfile.TemporaryDirectory() as raw:
@@ -974,12 +1108,12 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
             mapping = a118_json.loads((root / ".bbk" / "map.json").read_text(encoding="utf-8"))
             for field in ("posture", "frontier", "blockers", "fog", "stopping_assessment"):
                 self.assertIn(field, mapping)
-        roles = a118_json.loads((A118_ROOT / "spec" / "roles.json").read_text(encoding="utf-8"))["roles"]
-        by_id = {role["id"]: role for role in roles}
-        worker_text = "\n".join(by_id["worker"]["responsibilities"])
-        orchestrator_text = "\n".join(by_id["worker_orchestrator"]["responsibilities"])
-        self.assertIn("continue beyond preflight", worker_text)
-        self.assertIn("same-thread", orchestrator_text)
+        worker_procedure = (A118_ROOT / "shared" / "skills" / "bbk-work-unit-execution" / "SKILL.md").read_text(encoding="utf-8")
+        orchestrator_procedure = (A118_ROOT / "shared" / "skills" / "bbk-worker-execution" / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("Do not consume the useful execution window", worker_procedure)
+        self.assertIn("Resume the same logical WorkUnit", worker_procedure)
+        self.assertIn("same semantic run", orchestrator_procedure)
+        self.assertIn("recovery-capable checkpoint", orchestrator_procedure)
         for path in (A118_ROOT / "projections" / "codex" / "agents").glob("*.toml"):
             text = path.read_text(encoding="utf-8")
             self.assertNotIn("timeout =", text)
@@ -997,63 +1131,84 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
         paths = sorted((A118_ROOT / "tests").glob("test*.py"))
         self.assertEqual([path.name for path in paths], [
             "test_assurance_state.py",
+            "test_contract_package_v1.py",
             "test_core_contracts.py",
             "test_installation_portability.py",
             "test_omp_runtime.py",
+            "test_prompt_module_package_v1.py",
+            "test_role_package_v4.py",
             "test_system.py",
         ])
         self.assertFalse(any("alpha" in path.name for path in paths))
 
     def test_method_and_schema_surfaces_include_new_contracts(self) -> None:
         methods = a118_json.loads((A118_ROOT / "spec" / "method-content.json").read_text(encoding="utf-8"))
-        self.assertEqual(len(methods["skills"]), 24)
-        self.assertEqual(len(methods["references"]), 22)
-        for name in ("bbk-wayfind", "bbk-grill", "bbk-handoff"):
+        self.assertEqual(len(methods["skills"]), 39)
+        self.assertEqual(len(methods["references"]), 23)
+        prompt_catalog = a118_json.loads((A118_ROOT / "spec" / "prompt-modules" / "catalog.json").read_text(encoding="utf-8"))
+        self.assertEqual(len(prompt_catalog["module_entries"]), 21)
+        for name in ("bbk-wayfind", "bbk-grill", "bbk-handoff", "bbk-work-unit-execution", "bbk-assertion-validation"):
             self.assertIn(name, methods["skills"])
         self.assertIn("handoff.md", methods["references"])
         self.assertIn("question-branch.md", methods["references"])
-        self.assertTrue((A118_ROOT / "spec" / "schemas" / "bbk-handoff-v1.schema.json").is_file())
-        self.assertTrue((A118_ROOT / "spec" / "schemas" / "bbk-question-branch-v1.schema.json").is_file())
-        self.assertTrue((A118_ROOT / "templates" / "handoff.json").is_file())
-        self.assertTrue((A118_ROOT / "templates" / "question-branch.json").is_file())
+        for relative in (
+            "spec/schemas/bbk-handoff-v1.schema.json",
+            "spec/schemas/bbk-question-branch-v1.schema.json",
+            "spec/schemas/bbk-role-return-v1.schema.json",
+            "spec/schemas/bbk-territory-execution-boundary-v1.schema.json",
+            "spec/schemas/bbk-local-discovery-policy-v1.schema.json",
+            "spec/schemas/bbk-local-discovery-envelope-v1.schema.json",
+            "spec/schemas/bbk-local-discovery-permit-v1.schema.json",
+            "spec/contracts/catalog.json",
+            "spec/contracts/role-return-registry.json",
+            "templates/handoff.json",
+            "templates/question-branch.json",
+        ):
+            self.assertTrue((A118_ROOT / relative).is_file(), relative)
+        self.assertEqual(len(list((A118_ROOT / "spec" / "schemas" / "role-returns").glob("*.schema.json"))), 19)
+        self.assertEqual(len(list((A118_ROOT / "spec" / "schemas" / "role-results").glob("*.schema.json"))), 19)
 
     def test_standing_authority_capability_zones_and_worker_contract_are_projected(self) -> None:
         catalogue = a118_json.loads((A118_ROOT / "spec" / "roles.json").read_text(encoding="utf-8"))
+        role_catalog = a118_json.loads((A118_ROOT / "spec" / "roles" / "catalog.json").read_text(encoding="utf-8"))
         by_id = {role["id"]: role for role in catalogue["roles"]}
+        execution_constitution = "\n".join(role_catalog["constitution_modules"]["execution"]).lower()
+        self.assertIn("standing approvals", execution_constitution)
+        self.assertIn("authority grant and capability zone", execution_constitution)
         for role_id in (
             "root_wayfinder", "planning_wayfinder", "phase_wayfinder",
             "worker_designer", "root_orchestrator", "territory_orchestrator",
             "worker_orchestrator", "worker",
         ):
             text = "\n".join(by_id[role_id]["responsibilities"] + by_id[role_id]["prohibitions"]).lower()
-            self.assertIn("standing", text, role_id)
             self.assertIn("authority", text, role_id)
-        worker = "\n".join(by_id["worker"]["responsibilities"] + by_id["worker"]["prohibitions"])
-        self.assertIn("When writing code, follow YAGNI principles, and one-liner solutions.", worker)
+        worker_role = by_id["worker"]
+        worker = "\n".join(worker_role["responsibilities"] + worker_role["prohibitions"])
+        self.assertNotIn("When writing code, follow YAGNI principles, and one-liner solutions.", worker)
         for phrase in (
-            "disposable candidate root", "protected worktree", "sealed or historical evidence",
-            "BLOCKED_TECHNICAL", "PAUSED_CAPACITY", "PAUSED_HOST_WINDOW",
-            "silent truncation", "structured result",
+            "sealed or historical evidence", "silent truncation", "capability zone",
+            "bbk.worker-result.v1", "durable artifact and handoff",
         ):
             self.assertIn(phrase.lower(), worker.lower())
+        dispositions = worker_role["return_contract"]["allowed_operational_dispositions"]
+        for state in ("BLOCKED_TECHNICAL", "PAUSED_CAPACITY", "PAUSED_HOST_WINDOW"):
+            self.assertIn(state, dispositions)
         orchestration = "\n".join(
             item
             for role_id in ("root_orchestrator", "territory_orchestrator", "worker_orchestrator", "validator_orchestrator")
             for item in by_id[role_id]["responsibilities"] + by_id[role_id]["prohibitions"]
         )
-        for phrase in (
-            "USER_CANCELLED", "CONFIRMED_HANG", "OBSOLETE_WORK",
-            "polling", "heartbeat", "completed", "active-slot accounting",
-            "host-level physical thread reclamation",
-        ):
+        for phrase in ("USER_CANCELLED", "CONFIRMED_HANG", "OBSOLETE_WORK", "polling", "heartbeat", "completed"):
             self.assertIn(phrase, orchestration)
         self.assertNotIn("Use heartbeat/deadline checks", orchestration)
-        codex_worker = (A118_ROOT / "projections" / "codex" / "agents" / "bbk_worker.toml").read_text(encoding="utf-8")
-        omp_worker = (A118_ROOT / "projections" / "omp" / "agents" / "bbk_worker.md").read_text(encoding="utf-8")
-        generic_worker = (A118_ROOT / "projections" / "generic" / "agents" / "bbk_worker.md").read_text(encoding="utf-8")
-        claude_worker = (A118_ROOT / "projections" / "claude" / "agents" / "bbk-worker.md").read_text(encoding="utf-8")
-        for projection in (codex_worker, omp_worker, generic_worker, claude_worker):
-            self.assertIn("When writing code, follow YAGNI principles, and one-liner solutions.", projection)
+        for relative in (
+            "projections/codex/agents/bbk_worker.toml",
+            "projections/omp/agents/bbk_worker.md",
+            "projections/generic/agents/bbk_worker.md",
+            "projections/claude/agents/bbk-worker.md",
+        ):
+            projection = (A118_ROOT / relative).read_text(encoding="utf-8")
+            self.assertNotIn("When writing code, follow YAGNI principles, and one-liner solutions.", projection)
             self.assertIn("BLOCKED_AUTHORITY", projection)
             self.assertIn("capability zone", projection.lower())
 
@@ -1154,7 +1309,7 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
             self.assertIn(expected, execute)
         for expected in (
             "BLOCKED_TECHNICAL", "BLOCKED_AUTHORITY", "BLOCKED_DECISION",
-            "PAUSED_CAPACITY", "PAUSED_HOST_WINDOW", "timed out", "slot needed",
+            "PAUSED_CAPACITY", "PAUSED_HOST_WINDOW", "parent polling timeout",
         ):
             self.assertIn(expected, handoff)
 

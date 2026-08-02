@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-validator-return-v1.schema.json",
+  "title": "BBK BBK Validator return v1",
+  "description": "Role-specific `bbk.role-return.v1` contract for `bbk_validator`.",
+  "allOf": [
+    {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "contract": {
+          "const": "bbk.validator-return.v1"
+        },
+        "role": {
+          "const": "bbk_validator"
+        },
+        "invocation_mode": {
+          "enum": [
+            "ASSERTION_ATTEMPT"
+          ]
+        },
+        "return_kind": {
+          "enum": [
+            "CHECKPOINT",
+            "ASSERTION_REPORT"
+          ]
+        },
+        "operational_disposition": {
+          "enum": [
+            "COMPLETE",
+            "PARTIAL",
+            "BLOCKED_TECHNICAL",
+            "BLOCKED_AUTHORITY",
+            "BLOCKED_DECISION",
+            "PAUSED_CAPACITY",
+            "PAUSED_HOST_WINDOW",
+            "CANCELLED",
+            "INCONCLUSIVE"
+          ]
+        },
+        "semantic_state": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "value"
+          ],
+          "properties": {
+            "name": {
+              "const": "validator_attempt_state"
+            },
+            "value": {
+              "enum": [
+                "READY",
+                "RUNNING",
+                "CHECKPOINTED",
+                "READY_FOR_ORCHESTRATOR_INTEGRATION",
+                "NEEDS_CONTEXT_REBUILD",
+                "NEEDS_CHARTER_RECOMPILE",
+                "NEEDS_CAPABILITY_OR_ENVIRONMENT",
+                "NEEDS_PARENT_DECISION",
+                "NEEDS_PARENT_RECHARTER",
+                "PARTIAL_WITH_EXPLICIT_GAPS",
+                "PAUSED",
+                "STALE",
+                "BLOCKED",
+                "CANCELLED",
+                "FAILED"
+              ]
+            }
+          }
+        },
+        "result": {
+          "$ref": "https://bbk.local/schemas/bbk-validator-result-v1.schema.json"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "invocation_mode": {
+                "const": "ASSERTION_ATTEMPT"
+              }
+            },
+            "required": [
+              "invocation_mode"
+            ]
+          },
+          "then": {
+            "properties": {
+              "parent_ref": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "const": "canonical_role"
+                      },
+                      "id": {
+                        "enum": [
+                          "bbk_validator_orchestrator"
+                        ]
+                      },
+                      "invocation_mode": {
+                        "const": "ASSERTION_ATTEMPT"
+                      },
+                      "role": {
+                        "enum": [
+                          "bbk_validator_orchestrator"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "id",
+                      "invocation_mode",
+                      "role"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "x-bbk-role": "bbk_validator",
+  "x-bbk-contract": "bbk.validator-return.v1",
+  "x-bbk-envelope": "bbk.role-return.v1",
+  "x-bbk-semantic-state-name": "validator_attempt_state",
+  "x-bbk-requirements": [
+    "Return one `bbk.role-return.v1` object with `contract` = `bbk.validator-return.v1`, `role` = `bbk_validator`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `validator_attempt_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
+    "`READY_FOR_ORCHESTRATOR_INTEGRATION` requires an exact current candidate and assignment; verified immutable subject and context; every assigned assertion represented by a current schema-valid status; required evidence and raw carriers bound or explicit non-evidence states recorded; actual independence and exposure reported; candidate defects represented by immutable findings and infrastructure failures kept separate; no unauthorized candidate mutation, hidden scope expansion, silent method substitution, unresolved identity or integrity ambiguity, or unaccounted external effect; cleanup sufficiently reconciled; and a verified durable result and handoff. It authorizes only Validator-Orchestrator integration of this one attempt.",
+    "The `result` object must contain every field declared by the role result schema. Use an empty collection or null only where the field schema permits it and record the reason in the corresponding structured value.",
+    "Bind exact or substantial artifacts and evidence through verified durable references. A conversational summary, transport receipt, confident claim, or host task status is not a substitute for the required result and evidence carriers.",
+    "No Validator return, including operational `COMPLETE`, assertion `PASS`, or `READY_FOR_ORCHESTRATOR_INTEGRATION`, can derive the complete ReviewAggregate, close or waive a finding, authorize repair, accept a candidate or residual risk, close an issue, complete a territory or campaign, establish outcome achievement, declare compliance, safety or security, or grant release.",
+    "This return is governed by `spec/contracts/catalog.json`, the common `bbk.role-return.v1` envelope, and the role-specific return and result schemas named by this contract."
+  ],
+  "x-bbk-readiness-rule": "`READY_FOR_ORCHESTRATOR_INTEGRATION` requires an exact current candidate and assignment; verified immutable subject and context; every assigned assertion represented by a current schema-valid status; required evidence and raw carriers bound or explicit non-evidence states recorded; actual independence and exposure reported; candidate defects represented by immutable findings and infrastructure failures kept separate; no unauthorized candidate mutation, hidden scope expansion, silent method substitution, unresolved identity or integrity ambiguity, or unaccounted external effect; cleanup sufficiently reconciled; and a verified durable result and handoff. It authorizes only Validator-Orchestrator integration of this one attempt.",
+  "x-bbk-authority-boundary": "No Validator return, including operational `COMPLETE`, assertion `PASS`, or `READY_FOR_ORCHESTRATOR_INTEGRATION`, can derive the complete ReviewAggregate, close or waive a finding, authorize repair, accept a candidate or residual risk, close an issue, complete a territory or campaign, establish outcome achievement, declare compliance, safety or security, or grant release."
+}

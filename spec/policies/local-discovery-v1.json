@@ -1,0 +1,61 @@
+{
+  "schema": "bbk.local-discovery-policy.v1",
+  "policy_id": "bbk.local-discovery-policy.v1",
+  "revision": 1,
+  "lifecycle_state": "ACTIVE",
+  "default_allowance": "ZERO_WITHOUT_ACTIVE_ENVELOPE_AND_PERMIT",
+  "issuer_role": "bbk_territory_orchestrator",
+  "proposer_roles": [
+    "bbk_worker_orchestrator",
+    "bbk_worker"
+  ],
+  "budget": {
+    "item_unit": "DISCOVERY_ITEM",
+    "max_items_per_envelope": 2,
+    "effort_unit": "PLANNED_EFFORT_UNIT",
+    "effort_unit_semantics": "COHORT_CHARTER_RELATIVE_NONNEGATIVE_INTEGER",
+    "denominator_source": "COMPILED_COHORT_CHARTER",
+    "denominator_binding": "EXACT_COHORT_ID_REVISION_SHA256_AND_DECLARED_TOTAL",
+    "max_effort_basis_points": 1000,
+    "rounding": "FLOOR",
+    "missing_denominator_allowance": 0,
+    "cumulative_accounting": true
+  },
+  "scope": {
+    "ordinary_implied_work_requires_permit": false,
+    "genuinely_new_local_work_requires_permit": true,
+    "prohibited_changes": [
+      "OUTCOME",
+      "SCOPE",
+      "REQUIREMENT",
+      "ADR_OR_ARCHITECTURE",
+      "CANONICAL_INTERFACE",
+      "ASSERTION_MEANING_OR_OWNERSHIP",
+      "PROTECTED_FLOOR",
+      "AUTHORITY",
+      "TERRITORY_BOUNDARY",
+      "COHORT_MEANING",
+      "TOOLCHAIN_POLICY",
+      "VALIDATION_MEANING",
+      "EXTERNAL_EFFECT_ENVELOPE"
+    ]
+  },
+  "candidate_and_validation": {
+    "post_freeze_rule": "SUCCESSOR_COHORT_OR_PARENT_RECHARTER_REQUIRED",
+    "permit_refs_required_in_candidate_manifest": true,
+    "validation_scope_impact_must_be_declared": true,
+    "permit_cannot_establish_validation": true
+  },
+  "expiry_and_revocation": {
+    "expiry_required": true,
+    "revocation_owner_role": "bbk_territory_orchestrator",
+    "automatic_invalidation_triggers": [
+      "BOUNDARY_INVALIDATED_OR_SUPERSEDED",
+      "COHORT_INVALIDATED_OR_SUPERSEDED",
+      "WORK_UNIT_REMOVED_OR_RECHARTERED",
+      "BASELINE_OR_AUTHORITY_CHANGED",
+      "CANDIDATE_FROZEN_WITHOUT_SUCCESSOR_PATH",
+      "EXPIRY_REACHED"
+    ]
+  }
+}

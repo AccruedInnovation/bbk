@@ -19,6 +19,11 @@ Configured model and effort values are execution defaults, not capability proofs
 or authority grants. Material downgrades, unavailable routes, missing tools, and
 host limitations must be surfaced rather than silently represented as equivalent.
 
+
+## Contract implementation status
+
+Alpha.13 distinguishes implemented deterministic capabilities, bootstrap implementations, schema-defined companions, optional host-provided primitives, target-only concepts, and retired-not-implemented concepts. A schema-defined companion such as `TerritoryExecutionBoundary` establishes exact structure and ownership but does not claim a dedicated commit primitive or lease-backed mutation fence exists. Optional host capabilities and model routes must be qualified at invocation time.
+
 ## Logical and physical roles
 
 A BBK role is a logical responsibility, not proof that a separate model, process,

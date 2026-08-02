@@ -18,9 +18,13 @@ from typing import Any, Iterable, Sequence
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 TOP = f"bbk-{VERSION}"
-FIXED_TIME = (2026, 7, 30, 0, 0, 0)
+FIXED_TIME = (2026, 8, 2, 0, 0, 0)
 EXCLUDED_PARTS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
 EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
+# Package executability is an explicit release contract, not an accident of the
+# build host checkout. Alpha.13.1 exposes every command through an interpreter, so
+# the source archive intentionally has no native executable entrypoints.
+PACKAGE_EXECUTABLES: frozenset[str] = frozenset()
 
 
 def run(command: Sequence[str]) -> None:
@@ -52,7 +56,7 @@ def package_files() -> Iterable[Path]:
 
 
 def is_executable(path: Path) -> bool:
-    return bool(path.stat().st_mode & stat.S_IXUSR)
+    return path.relative_to(ROOT).as_posix() in PACKAGE_EXECUTABLES
 
 
 def build_manifest() -> dict[str, Any]:
@@ -64,13 +68,14 @@ def build_manifest() -> dict[str, Any]:
     projection = json.loads((ROOT / "projections" / "manifest.json").read_text(encoding="utf-8"))
     return {
         "schema": "bbk.package-manifest.v1", "name": "Blueprint Bootstrap Kit", "version": VERSION,
-        "created_at": "2026-07-30T00:00:00Z", "file_count": len(files), "files": files,
+        "created_at": "2026-08-02T00:00:00Z", "file_count": len(files), "files": files,
         "root_sha256": hashlib.sha256(canonical(payload)).hexdigest(),
         "targets": projection.get("targets", []), "role_count": projection.get("role_count"),
         "projection_count": projection.get("projection_count"), "projection_source_sha256": projection.get("source_sha256"),
-        "model_profile_count": projection.get("model_profile_count"),
+        "model_routing_schema": projection.get("model_routing_schema"),
+        "model_routing_mode": projection.get("model_routing_mode"),
+        "model_route_count": projection.get("model_route_count"),
         "model_routing_source_sha256": projection.get("model_routing_source_sha256"),
-        "role_profile_counts": projection.get("role_profile_counts", {}),
         "authority_disclaimer": "BBK is a temporary method harness and is not an official Blueprint release or authority-bearing package.",
     }
 

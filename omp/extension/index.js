@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -20,7 +21,7 @@ const versionPath = (() => {
   try { readFileSync(path.join(extensionDir, "VERSION")); return path.join(extensionDir, "VERSION"); }
   catch { return path.join(sourceRoot, "VERSION"); }
 })();
-let version = "0.1.0-alpha.11.12";
+let version = "0.1.0-alpha.13.1";
 try { version = readFileSync(versionPath, "utf8").trim() || version; } catch {}
 let packageRoot = sourceRoot;
 try {
@@ -156,23 +157,863 @@ function registerCommand(pi, name, description, baseArgv, { requireArgs = false 
   });
 }
 const BBK_MODE_ENTRY_TYPE = "bbk-mode-state";
-const BBK_MODE_SCHEMA = "bbk.omp-mode-state.v1";
-const BBK_MODE_STATUS_KEY = "bbk-mode";
-const BBK_MODE_PROMPT_MARKER = "<bbk-session-mode>";
-const BBK_MODE_SYSTEM_PROMPT = [
-  BBK_MODE_PROMPT_MARKER,
-  "BBK mode is active in this parent OMP session. Treat the current user message as part of the ongoing BBK-governed workflow, even when it does not mention BBK. Preserve the user's terminal condition and current `.bbk` project state. Use the installed `bbk` skill when procedure detail is needed.",
-  "Route unresolved planning or material uncertainty to `bbk_root_wayfinder`; accepted-baseline execution or recovery to `bbk_root_orchestrator`; bounded independent review to `bbk_reviewer`; and assertion-scoped acceptance to `bbk_validator_orchestrator`. Invoke named BBK task agents rather than imitating them so their model routing, skills, tools, spawn policy, and return contracts apply.",
-  "Continue existing work instead of restarting it, and keep this parent session user-facing. BBK mode remains active until `/bbk:exit`.",
-  "</bbk-session-mode>",
-].join("\n");
+const BBK_MODE_SCHEMA = "bbk.omp-mode-state.v2";
+const BBK_ACTIVITY_WIDGET_KEY = "bbk-worker-activity";
+const TASK_SUBAGENT_PROGRESS_CHANNEL = "task:subagent:progress";
+const TASK_SUBAGENT_LIFECYCLE_CHANNEL = "task:subagent:lifecycle";
+const BBK_CONTROLLER_PROMPT_MARKER = "<bbk-controller-system";
+const BBK_AGENT_PROMPT_MARKER = "<bbk-agent-system";
+const BBK_AGENT_BLOCK_RE = /<bbk-agent-system\b[^>]*\brole="([^"]+)"[^>]*>[\s\S]*?<\/bbk-agent-system>/i;
+const BBK_ROLE_NAME_RE = /^bbk_[a-z0-9_]+$/;
+const CONTROLLER_MANDATORY_SKILLS = ["bbk", "bbk-context-routing"];
 
-function createBbkModeController(pi) {
+function oneLine(value, max = 180) {
+  const text = String(value ?? "")
+    .replace(/\u001B(?:\[[0-?]*[ -/]*[@-~]|\][^\u0007]*(?:\u0007|\u001B\\))/g, "")
+    // Progress payloads are host-published but may contain model/tool text.
+    // Remove control and invisible format characters before rendering them in
+    // the persistent editor-adjacent HUD so they cannot alter terminal state,
+    // spoof text direction, or hide content.
+    .replace(/[\p{Cc}\p{Cf}\s]+/gu, " ")
+    .trim();
+  const points = Array.from(text);
+  if (points.length <= max) return text;
+  return `${points.slice(0, Math.max(1, max - 1)).join("").trimEnd()}…`;
+}
+function finiteNumber(value) {
+  const number = Number(value);
+  return Number.isFinite(number) && number >= 0 ? number : undefined;
+}
+function compactNumber(value) {
+  const number = finiteNumber(value);
+  if (number === undefined) return "?";
+  if (number >= 1_000_000) {
+    const digits = number >= 10_000_000 ? 0 : 1;
+    return `${(number / 1_000_000).toFixed(digits).replace(/\.0$/, "")}M`;
+  }
+  if (number >= 1_000) {
+    const digits = number >= 100_000 ? 0 : 1;
+    return `${(number / 1_000).toFixed(digits).replace(/\.0$/, "")}k`;
+  }
+  return String(Math.round(number));
+}
+function contextGauge(progress, { short = false } = {}) {
+  const current = finiteNumber(progress?.contextTokens);
+  const window = finiteNumber(progress?.contextWindow);
+  if (current !== undefined && window && window > 0) {
+    const percentage = Math.max(0, current / window * 100);
+    const precision = percentage < 10 ? 1 : 0;
+    const label = `${compactNumber(current)}/${compactNumber(window)} ${percentage.toFixed(precision)}%`;
+    return short ? label : `ctx ${label}`;
+  }
+  if (current !== undefined) return `${short ? "" : "ctx "}${compactNumber(current)}`;
+  const lifetime = finiteNumber(progress?.tokens);
+  if (lifetime !== undefined && lifetime > 0) return `${short ? "Σ" : "used "}${compactNumber(lifetime)}`;
+  return "";
+}
+function roleDisplayName(roleName) {
+  return String(roleName || "BBK worker")
+    .replace(/^bbk_/, "")
+    .split("_")
+    .filter(Boolean)
+    .map(part => part[0]?.toUpperCase() + part.slice(1))
+    .join(" ");
+}
+function progressActivity(progress) {
+  if (progress?.retryState) {
+    const retry = progress.retryState;
+    return `retrying provider request ${retry.attempt || "?"}/${retry.maxAttempts || "?"}: ${oneLine(retry.errorMessage || "rate limited", 96)}`;
+  }
+  const intent = oneLine(progress?.lastIntent, 112);
+  if (intent) return intent;
+  const tool = oneLine(progress?.currentTool, 40);
+  const args = oneLine(progress?.currentToolArgs, 84);
+  if (tool) return args ? `${tool}: ${args}` : `using ${tool}`;
+  const outputs = Array.isArray(progress?.recentOutput) ? progress.recentOutput : [];
+  const latestOutput = oneLine(outputs.at?.(-1) ?? outputs[outputs.length - 1], 112);
+  if (latestOutput) return latestOutput;
+  if (progress?.status === "pending") return "starting…";
+  if (progress?.status === "running") return "working…";
+  return oneLine(progress?.status || "working…", 112);
+}
+
+function stripFrontmatter(raw, sourceLabel) {
+  const text = String(raw || "").replace(/^\uFEFF/, "");
+  if (!text.startsWith("---\n") && !text.startsWith("---\r\n")) return text.trim();
+  const match = text.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n/);
+  if (!match) throw new Error(`invalid YAML frontmatter in ${sourceLabel}`);
+  return text.slice(match[0].length).trim();
+}
+function packageText(...parts) {
+  const target = path.join(packageRoot, ...parts);
+  return readFileSync(target, "utf8");
+}
+function loadControllerSkill(name) {
+  const body = stripFrontmatter(
+    packageText("shared", "skills", name, "SKILL.md"),
+    `shared/skills/${name}/SKILL.md`,
+  );
+  if (!body) throw new Error(`mandatory controller skill ${name} is empty`);
+  return body;
+}
+let cachedRoleCatalogue;
+const cachedCanonicalAgentBlocks = new Map();
+const CURRENT_OPERATIONAL_DISPOSITIONS = [
+  "COMPLETE", "PARTIAL", "BLOCKED_TECHNICAL", "BLOCKED_AUTHORITY",
+  "BLOCKED_DECISION", "PAUSED_CAPACITY", "PAUSED_HOST_WINDOW",
+  "CANCELLED", "INCONCLUSIVE",
+];
+const ROLE_RETURN_FIELD_KINDS = new Set([
+  "REFERENCE", "REFERENCE_LIST", "ARTIFACT_REFERENCE",
+  "ARTIFACT_REFERENCE_LIST", "STRUCTURED", "STRUCTURED_LIST", "STRING",
+  "STRING_LIST", "BOOLEAN", "INTEGER", "NUMBER", "ENUM", "ENUM_LIST",
+]);
+const ROLE_RETURN_CONTRACT_RE = /^bbk\.[a-z0-9][a-z0-9.-]*\.v[0-9]+$/;
+function isNonEmptyString(value) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+function isUniqueStringArray(value) {
+  return Array.isArray(value) && value.length > 0
+    && value.every(isNonEmptyString) && new Set(value).size === value.length;
+}
+function validateRoleReturnContract(role, catalogueEntry) {
+  const contract = role?.return_contract;
+  const required = [
+    "contract_id", "envelope_schema", "return_schema", "result_schema",
+    "semantic_state_name", "allowed_invocation_modes", "allowed_return_kinds",
+    "allowed_operational_dispositions", "allowed_semantic_states",
+    "supplemental_enums", "result_fields", "requirements",
+    "readiness_rule", "authority_boundary",
+  ];
+  if (!contract || typeof contract !== "object" || Array.isArray(contract)) {
+    throw new Error(`BBK role ${role?.name || "<unknown>"} has no exact return contract`);
+  }
+  const keys = Object.keys(contract).sort();
+  if (keys.join("\n") !== [...required].sort().join("\n")) {
+    throw new Error(`BBK role ${role.name} return contract fields are malformed`);
+  }
+  for (const key of ["contract_id", "envelope_schema", "return_schema", "result_schema", "semantic_state_name", "readiness_rule", "authority_boundary"]) {
+    if (!isNonEmptyString(contract[key])) throw new Error(`BBK role ${role.name} return contract ${key} is invalid`);
+  }
+  const slug = role.name.replace(/^bbk_/, "").replaceAll("_", "-");
+  if (!ROLE_RETURN_CONTRACT_RE.test(contract.contract_id)
+    || contract.contract_id !== `bbk.${slug}-return.v1`) {
+    throw new Error(`BBK role ${role.name} return contract ID is invalid`);
+  }
+  if (contract.envelope_schema !== "spec/schemas/bbk-role-return-v1.schema.json") {
+    throw new Error(`BBK role ${role.name} does not use the current common return envelope`);
+  }
+  if (contract.return_schema !== `spec/schemas/role-returns/${role.name.replaceAll("_", "-")}-return-v1.schema.json`
+    || contract.result_schema !== `spec/schemas/role-results/${role.name.replaceAll("_", "-")}-result-v1.schema.json`) {
+    throw new Error(`BBK role ${role.name} return schema paths are invalid`);
+  }
+  for (const key of ["allowed_invocation_modes", "allowed_return_kinds", "allowed_operational_dispositions", "allowed_semantic_states", "requirements"]) {
+    if (!isUniqueStringArray(contract[key])) throw new Error(`BBK role ${role.name} return contract ${key} is invalid`);
+  }
+  if (!catalogueEntry || catalogueEntry.name !== role.name || !Array.isArray(catalogueEntry.allowed_parent_modes)) {
+    throw new Error(`BBK role ${role.name} has no matching catalogue parent-mode entry`);
+  }
+  const expectedModes = [];
+  for (const item of catalogueEntry.allowed_parent_modes) {
+    if (!item || !isNonEmptyString(item.mode)) throw new Error(`BBK role ${role.name} has a malformed catalogue parent mode`);
+    if (!expectedModes.includes(item.mode)) expectedModes.push(item.mode);
+  }
+  if (contract.allowed_invocation_modes.join("\n") !== expectedModes.join("\n")) {
+    throw new Error(`BBK role ${role.name} return invocation modes do not match the catalogue`);
+  }
+  if (contract.allowed_operational_dispositions.join("\n") !== CURRENT_OPERATIONAL_DISPOSITIONS.join("\n")) {
+    throw new Error(`BBK role ${role.name} uses a noncanonical operational-disposition vocabulary`);
+  }
+  if (!contract.supplemental_enums || typeof contract.supplemental_enums !== "object" || Array.isArray(contract.supplemental_enums)) {
+    throw new Error(`BBK role ${role.name} supplemental return enums are invalid`);
+  }
+  for (const [name, values] of Object.entries(contract.supplemental_enums)) {
+    if (!isNonEmptyString(name) || !isUniqueStringArray(values)) throw new Error(`BBK role ${role.name} supplemental enum ${name} is invalid`);
+  }
+  if (!contract.result_fields || typeof contract.result_fields !== "object" || Array.isArray(contract.result_fields) || Object.keys(contract.result_fields).length === 0) {
+    throw new Error(`BBK role ${role.name} has no closed return-result fields`);
+  }
+  for (const [name, field] of Object.entries(contract.result_fields)) {
+    if (!isNonEmptyString(name) || !field || typeof field !== "object" || Array.isArray(field)
+      || !ROLE_RETURN_FIELD_KINDS.has(field.kind) || typeof field.nullable !== "boolean" || !isNonEmptyString(field.description)) {
+      throw new Error(`BBK role ${role.name} result field ${name} is invalid`);
+    }
+    const expectedFieldKeys = ["description", "kind", "nullable"];
+    if (["ENUM", "ENUM_LIST"].includes(field.kind)) expectedFieldKeys.push("enum_values");
+    if (Object.keys(field).sort().join("\n") !== expectedFieldKeys.sort().join("\n")) {
+      throw new Error(`BBK role ${role.name} result field ${name} has malformed metadata`);
+    }
+    if (["ENUM", "ENUM_LIST"].includes(field.kind) && !isUniqueStringArray(field.enum_values)) {
+      throw new Error(`BBK role ${role.name} result enum ${name} is invalid`);
+    }
+    if (/\bnull\b/i.test(field.description) && field.nullable !== true) {
+      throw new Error(`BBK role ${role.name} result field ${name} describes null but rejects it`);
+    }
+  }
+  return contract;
+}
+function exactRoleReturnContractBlock(role, catalogueEntry) {
+  const contract = validateRoleReturnContract(role, catalogueEntry);
+  const fieldLines = Object.entries(contract.result_fields).map(([name, field]) => {
+    const enumPart = Array.isArray(field.enum_values) ? `; enum=${field.enum_values.join("|")}` : "";
+    return `- ${name}: kind=${field.kind}; nullable=${field.nullable}${enumPart}; ${field.description}`;
+  });
+  return [
+    `<bbk-exact-role-return-contract role="${role.name}">`,
+    "Return one JSON object. The full role schema is controlling; conversational prose is not a substitute.",
+    `schema: bbk.role-return.v1`,
+    `contract: ${contract.contract_id}`,
+    `envelope_schema: ${contract.envelope_schema}`,
+    `return_schema: ${contract.return_schema}`,
+    `result_schema: ${contract.result_schema}`,
+    `role: ${role.name}`,
+    `invocation_mode: ${contract.allowed_invocation_modes.join(" | ")}`,
+    `return_kind: ${contract.allowed_return_kinds.join(" | ")}`,
+    `operational_disposition: ${contract.allowed_operational_dispositions.join(" | ")}`,
+    `semantic_state.name: ${contract.semantic_state_name}`,
+    `semantic_state.value: ${contract.allowed_semantic_states.join(" | ")}`,
+    "required_envelope_fields: schema, contract, role, invocation_mode, return_kind, subject_ref, parent_ref, attempt_ref, operational_disposition, semantic_state, summary, authority_and_effects_used, result, durable_handoff_refs, smallest_valid_next_action",
+    "required_result_fields:",
+    ...fieldLines,
+    "requirements:",
+    ...contract.requirements.map(item => `- ${item}`),
+    `readiness_rule: ${contract.readiness_rule}`,
+    `authority_boundary: ${contract.authority_boundary}`,
+    "Operational completion, role semantic readiness, accountable acceptance, and release remain separate. Do not emit READY_FOR_VALIDATION, BLOCKED, or PAUSED as current operational dispositions.",
+    "</bbk-exact-role-return-contract>",
+  ].join("\n");
+}
+const PROMPT_MODULE_ID_RE = /^bbk-prompt-[a-z0-9]+(?:-[a-z0-9]+)*$/;
+function sourceSha256(text) {
+  return createHash("sha256").update(Buffer.from(text, "utf8")).digest("hex");
+}
+function loadPromptModuleCatalogue(spec) {
+  if (spec?.prompt_module_package !== "spec/prompt-modules/catalog.json") {
+    throw new Error("installed role catalogue does not name the canonical prompt-module package");
+  }
+  const source = packageText("spec", "prompt-modules", "catalog.json");
+  const catalogue = JSON.parse(source);
+  if (catalogue?.schema_version !== "bbk.prompt-modules.v1"
+    || catalogue?.package_version !== spec.package_version
+    || !Array.isArray(catalogue?.module_entries)
+    || catalogue.module_entries.length === 0) {
+    throw new Error("installed prompt-module catalogue is invalid or version-incongruent");
+  }
+  const policy = catalogue.compilation_policy;
+  if (!policy || policy.role_field !== "prompt_modules"
+    || policy.skill_directive_syntax !== "{{bbk-module:<module-id>}}"
+    || policy.embed_each_module_once !== true
+    || policy.standalone_skill_expands_modules !== true
+    || policy.role_prompt_uses_compact_skill_references !== true
+    || !Number.isInteger(policy.mandatory_procedure_default)
+    || policy.mandatory_procedure_default < 1
+    || (policy.mandatory_procedure_maximum !== null
+      && (!Number.isInteger(policy.mandatory_procedure_maximum)
+        || policy.mandatory_procedure_maximum < 1))
+    || typeof policy.additional_mandatory_procedure_exceptions !== "object"
+    || Array.isArray(policy.additional_mandatory_procedure_exceptions)) {
+    throw new Error("installed prompt-module compilation policy is malformed");
+  }
+  const ids = [];
+  const paths = ["spec/prompt-modules/catalog.json"];
+  for (const entry of catalogue.module_entries) {
+    const id = String(entry?.id || "");
+    const expectedFile = `spec/prompt-modules/${id}.json`;
+    if (!PROMPT_MODULE_ID_RE.test(id) || entry?.file !== expectedFile || ids.includes(id)) {
+      throw new Error("installed prompt-module catalogue contains an invalid entry");
+    }
+    const module = JSON.parse(packageText("spec", "prompt-modules", `${id}.json`));
+    if (module?.schema_version !== "bbk.prompt-module.v1" || module?.id !== id
+      || !isNonEmptyString(module?.title) || !isNonEmptyString(module?.description)
+      || !Array.isArray(module?.clauses) || module.clauses.length === 0
+      || module.clauses.some(clause => !isNonEmptyString(clause?.id) || !isNonEmptyString(clause?.text))) {
+      throw new Error(`installed prompt module ${id} is malformed`);
+    }
+    ids.push(id);
+    paths.push(expectedFile);
+  }
+  const records = spec?.source_manifest?.prompt_modules;
+  if (!Array.isArray(records) || records.length !== paths.length) {
+    throw new Error("installed role projection has no exact prompt-module source manifest");
+  }
+  for (let index = 0; index < paths.length; index += 1) {
+    const expectedPath = paths[index];
+    const record = records[index];
+    const text = expectedPath === "spec/prompt-modules/catalog.json"
+      ? source
+      : packageText(...expectedPath.split("/"));
+    if (record?.path !== expectedPath
+      || record?.bytes !== Buffer.byteLength(text, "utf8")
+      || record?.sha256 !== sourceSha256(text)) {
+      throw new Error(`installed prompt-module source manifest drift at ${expectedPath}`);
+    }
+  }
+  const methodContentSource = packageText("spec", "method-content.json");
+  const methodContent = JSON.parse(methodContentSource);
+  if (methodContent?.schema !== "bbk.method-content.v2"
+    || methodContent?.version !== spec.package_version
+    || methodContent?.prompt_module_source !== "spec/prompt-modules/catalog.json"
+    || !methodContent?.skills || typeof methodContent.skills !== "object"
+    || Array.isArray(methodContent.skills)) {
+    throw new Error("installed method-content source is invalid or version-incongruent");
+  }
+  return {
+    catalogue, ids, policy, methodContent,
+    methodContentSha256: sourceSha256(methodContentSource),
+  };
+}
+function stripProcedureFrontmatter(value) {
+  let normalized = String(value || "").replace(/\r\n?/g, "\n");
+  if (normalized.startsWith("---\n")) {
+    const end = normalized.indexOf("\n---\n", 4);
+    if (end < 0) throw new Error("mandatory procedure contains unterminated YAML frontmatter");
+    normalized = normalized.slice(end + 5);
+  }
+  return normalized.trim();
+}
+function compactProcedureForMeasurement(template, promptModules) {
+  const compact = String(template || "").replace(
+    /\{\{bbk-module:(bbk-prompt-[a-z0-9]+(?:-[a-z0-9]+)*)\}\}/g,
+    (_match, moduleId) => {
+      if (!promptModules.ids.includes(moduleId)) {
+        throw new Error(`mandatory procedure references unknown prompt module ${moduleId}`);
+      }
+      return `> Apply the already embedded \`${moduleId}\` module here.`;
+    },
+  );
+  if (compact.includes("{{bbk-module:")) {
+    throw new Error("mandatory procedure contains a malformed prompt-module directive");
+  }
+  return stripProcedureFrontmatter(compact);
+}
+function expectedMandatoryProcedureMeasurement(role, promptModules) {
+  const bodies = role.mandatory_skills.map(skillName => {
+    const template = promptModules.methodContent.skills[skillName];
+    if (typeof template !== "string" || template.trim().length === 0) {
+      throw new Error(`mandatory procedure ${skillName} is missing from method content`);
+    }
+    return compactProcedureForMeasurement(template, promptModules);
+  });
+  const primaryBytes = Buffer.byteLength(bodies[0], "utf8");
+  const allBytes = Buffer.byteLength(bodies.join("\n\n"), "utf8");
+  return {
+    basis: "UTF8_BYTES_OF_FRONTMATTER_STRIPPED_COMPACT_PROCEDURE_BODIES_JOINED_BY_TWO_LF",
+    method_content_sha256: promptModules.methodContentSha256,
+    primary_body_bytes: primaryBytes,
+    all_mandatory_body_bytes: allBytes,
+    incremental_body_bytes: allBytes - primaryBytes,
+    duplicated_prompt_module_bodies: 0,
+  };
+}
+function validMeasuredMandatoryProcedureException(role, exception, promptModules) {
+  if (!exception || typeof exception !== "object" || Array.isArray(exception)) return false;
+  const keys = Object.keys(exception).sort().join("\n");
+  if (keys !== ["distinct_behavior", "mandatory_skills", "measurement", "rationale"].sort().join("\n")
+    || !Array.isArray(exception.mandatory_skills)
+    || exception.mandatory_skills.join("\n") !== role.mandatory_skills.join("\n")
+    || !isNonEmptyString(exception.rationale)
+    || !exception.distinct_behavior || typeof exception.distinct_behavior !== "object"
+    || Array.isArray(exception.distinct_behavior)) return false;
+  const expectedAdditional = role.mandatory_skills.slice(1).sort();
+  const actualAdditional = Object.keys(exception.distinct_behavior).sort();
+  if (expectedAdditional.join("\n") !== actualAdditional.join("\n")
+    || actualAdditional.some(name => !isNonEmptyString(exception.distinct_behavior[name]))) return false;
+  const expected = expectedMandatoryProcedureMeasurement(role, promptModules);
+  if (!exception.measurement || typeof exception.measurement !== "object"
+    || Array.isArray(exception.measurement)
+    || Object.keys(exception.measurement).sort().join("\n")
+      !== Object.keys(expected).sort().join("\n")) return false;
+  return Object.entries(expected).every(
+    ([key, value]) => exception.measurement[key] === value,
+  );
+}
+function countLiteral(text, value) {
+  let count = 0;
+  let offset = 0;
+  while (true) {
+    const index = text.indexOf(value, offset);
+    if (index < 0) return count;
+    count += 1;
+    offset = index + value.length;
+  }
+}
+function roleCatalogue() {
+  if (cachedRoleCatalogue) return cachedRoleCatalogue;
+  const spec = JSON.parse(packageText("spec", "roles.json"));
+  const stagedVersionAllowed = process.env.BBK_ALLOW_STAGED_ROLE_PACKAGE === "1";
+  if (spec?.schema_version !== "bbk.roles.v4" || !Array.isArray(spec?.roles)
+    || spec?.contract_package !== "spec/contracts/catalog.json"
+    || spec?.prompt_module_package !== "spec/prompt-modules/catalog.json"
+    || (!stagedVersionAllowed && spec?.package_version !== version)) {
+    throw new Error(`installed role catalogue does not match BBK ${version}`);
+  }
+  if (!Array.isArray(spec.role_entries) || spec.role_entries.length !== spec.roles.length) {
+    throw new Error("installed role catalogue has no exact role-entry index");
+  }
+  const promptModules = loadPromptModuleCatalogue(spec);
+  const entries = new Map();
+  for (const entry of spec.role_entries) {
+    if (!BBK_ROLE_NAME_RE.test(String(entry?.name || "")) || entries.has(entry.name)) {
+      throw new Error("installed role catalogue contains an invalid role entry");
+    }
+    entries.set(entry.name, entry);
+  }
+  const roles = new Map();
+  for (const role of spec.roles) {
+    if (!BBK_ROLE_NAME_RE.test(String(role?.name || "")) || roles.has(role.name)) continue;
+    if (!isNonEmptyString(role.primary_skill)
+      || !Array.isArray(role.mandatory_skills) || role.mandatory_skills.length === 0
+      || role.mandatory_skills[0] !== role.primary_skill
+      || !Array.isArray(role.skills) || !role.skills.includes(role.primary_skill)
+      || !Array.isArray(role.prompt_modules) || role.prompt_modules.length === 0
+      || new Set(role.prompt_modules).size !== role.prompt_modules.length) {
+      throw new Error(`BBK role ${role.name} has malformed prompt compilation metadata`);
+    }
+    const selected = new Set(role.prompt_modules);
+    const canonicalOrder = promptModules.ids.filter(id => selected.has(id));
+    if (canonicalOrder.join("\n") !== role.prompt_modules.join("\n")
+      || role.prompt_modules.some(id => !promptModules.ids.includes(id))) {
+      throw new Error(`BBK role ${role.name} has unknown or misordered prompt modules`);
+    }
+    const exception = promptModules.policy.additional_mandatory_procedure_exceptions[role.name];
+    if (role.mandatory_skills.length !== promptModules.policy.mandatory_procedure_default) {
+      if (!validMeasuredMandatoryProcedureException(role, exception, promptModules)) {
+        throw new Error(`BBK role ${role.name} has an unjustified mandatory-procedure count`);
+      }
+    } else if (exception) {
+      throw new Error(`BBK role ${role.name} has an unnecessary mandatory-procedure exception`);
+    }
+    if (promptModules.policy.mandatory_procedure_maximum !== null
+      && role.mandatory_skills.length > promptModules.policy.mandatory_procedure_maximum) {
+      throw new Error(`BBK role ${role.name} exceeds the configured mandatory-procedure maximum`);
+    }
+    validateRoleReturnContract(role, entries.get(role.name));
+    roles.set(role.name, role);
+  }
+  for (const roleName of Object.keys(promptModules.policy.additional_mandatory_procedure_exceptions)) {
+    if (!roles.has(roleName)) {
+      throw new Error(`prompt-module policy names unknown mandatory-procedure exception role ${roleName}`);
+    }
+  }
+  if (roles.size !== spec.roles.length || entries.size !== roles.size) throw new Error("installed role catalogue contains an invalid canonical role");
+  cachedRoleCatalogue = {
+    version: spec.package_version,
+    schemaVersion: spec.schema_version,
+    contractPackage: spec.contract_package,
+    promptModulePackage: spec.prompt_module_package,
+    promptModuleIds: promptModules.ids,
+    entries,
+    roles,
+  };
+  return cachedRoleCatalogue;
+}
+function normalizePromptBlock(value) {
+  return String(value || "")
+    .replace(/\r\n?/g, "\n")
+    .split("\n")
+    .map(line => line.replace(/[ \t]+$/g, ""))
+    .filter(line => line.trim().length > 0)
+    .join("\n")
+    .trim();
+}
+function canonicalAgentBlock(roleName) {
+  if (cachedCanonicalAgentBlocks.has(roleName)) return cachedCanonicalAgentBlocks.get(roleName);
+  const sourceLabel = `projections/omp/agents/${roleName}.md`;
+  const body = stripFrontmatter(
+    packageText("projections", "omp", "agents", `${roleName}.md`),
+    sourceLabel,
+  );
+  const match = body.match(BBK_AGENT_BLOCK_RE);
+  if (!match || match[1] !== roleName) {
+    throw new Error(`installed canonical OMP projection for ${roleName} is missing its closed BBK marker`);
+  }
+  const block = normalizePromptBlock(match[0]);
+  cachedCanonicalAgentBlocks.set(roleName, block);
+  return block;
+}
+function systemPromptBlocks(event) {
+  if (Array.isArray(event?.systemPrompt)) return event.systemPrompt.map(value => String(value || ""));
+  if (event?.systemPrompt == null) return [];
+  return [String(event.systemPrompt || "")];
+}
+function systemPromptText(event) {
+  return systemPromptBlocks(event).join("\n\n");
+}
+function parseOmpPromptSections(text) {
+  const normalized = String(text || "").replace(/\r\n?/g, "\n");
+  const lines = normalized.split("\n");
+  const headings = [];
+  const separator = /^[=─-]{3,}\s*$/;
+  const heading = /^[A-Z][A-Z0-9 _/()&.-]{1,}\s*$/;
+  const wrapperHeadings = new Set(["ROLE", "CONTEXT", "PLAN", "COOP", "COMPLETION"]);
+  for (let index = 0; index < lines.length; index += 1) {
+    const current = lines[index].trim();
+    const next = lines[index + 1]?.trim() || "";
+    const after = lines[index + 2]?.trim() || "";
+    if (heading.test(current) && wrapperHeadings.has(current.toUpperCase()) && separator.test(next)) {
+      headings.push({ name: current.toUpperCase(), markerStart: index, contentStart: index + 2 });
+      index += 1;
+      continue;
+    }
+    if (separator.test(current) && heading.test(next) && wrapperHeadings.has(next.toUpperCase()) && separator.test(after)) {
+      headings.push({ name: next.toUpperCase(), markerStart: index, contentStart: index + 3 });
+      index += 2;
+    }
+  }
+  return headings.map((item, index) => ({
+    name: item.name,
+    content: lines.slice(item.contentStart, headings[index + 1]?.markerStart ?? lines.length).join("\n").trim(),
+  }));
+}
+function extractHeadingSection(text, heading) {
+  const wanted = String(heading || "").trim().toUpperCase();
+  const divided = parseOmpPromptSections(text).find(section => section.name === wanted)?.content || "";
+  if (divided) return divided;
+  const escaped = String(heading || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const markdown = String(text || "").match(new RegExp(
+    `(?:^|\\n)#{1,6}\\s+${escaped}\\s*\\n([\\s\\S]*?)(?=\\n#{1,6}\\s+\\S|$)`,
+    "i",
+  ));
+  return markdown?.[1]?.trim() || "";
+}
+function firstCaptured(text, patterns) {
+  for (const pattern of patterns) {
+    const value = text.match(pattern)?.[1]?.trim();
+    if (value) return value;
+  }
+  return "";
+}
+function extractOmpInvocationData(text) {
+  const context = extractHeadingSection(text, "CONTEXT");
+  const planTag = text.match(/<plan\b([^>]*)>[\s\S]*?<\/plan>/i);
+  const plan = planTag?.[0]?.trim() || extractHeadingSection(text, "PLAN");
+  const planPath = planTag?.[1]?.match(/\bpath\s*=\s*["']([^"']*)["']/i)?.[1]?.trim() || "";
+  const worktree = firstCaptured(text, [
+    /(?:isolated (?:git )?(?:working )?tree|isolated worktree|worktree)[^`\n]*`([^`]+)`/i,
+    /(?:isolated (?:git )?(?:working )?tree|isolated worktree|worktree)\s*:\s*([^\n]+)/i,
+  ]);
+  const agentId = firstCaptured(text, [
+    /(?:your (?:IRC |hub |agent |peer )?id is|you are registered as)\s*`([^`]+)`/i,
+    /(?:your (?:IRC |hub |agent |peer )?id is|you are registered as)\s*([^\s,.;\n]+)/i,
+  ]);
+  const peerRoster = firstCaptured(text, [
+    /currently visible peers\s*:\s*\n([\s\S]*?)(?=\n\s*(?:use\s+`hub`|when communicating|send messages|[=─-]{3,}\s*$)|$)/i,
+    /peer roster\s*:\s*\n([\s\S]*?)(?=\n\s*(?:use\s+`hub`|when communicating|send messages|[=─-]{3,}\s*$)|$)/i,
+  ]);
+  const yieldSchema = firstCaptured(text, [
+    /(?:your\s+)?terminal\s+`yield`[^\n]*?(?:exactly this shape|exact schema)[^\n]*:\s*\n```(?:ts|typescript|json)?\s*\n([\s\S]*?)```/i,
+    /(?:submit|return|finish)[^\n]*?through\s+(?:the\s+)?`yield`[^\n]*?(?:exactly this shape|exact schema)[^\n]*:\s*\n```(?:ts|typescript|json)?\s*\n([\s\S]*?)```/i,
+    /(?:output|result)\s+schema\s*:\s*\n```(?:ts|typescript|json)?\s*\n([\s\S]*?)```/i,
+  ]);
+  const schemaOverridesAgent = /(?:caller|task|output)\s+schema[^\n]*(?:override|takes precedence|wins over)[^\n]*(?:agent|role)/i.test(text)
+    || /(?:override|takes precedence|wins over)[^\n]*(?:agent|role)[^\n]*(?:schema|field)/i.test(text);
+  return {
+    context,
+    plan,
+    planPath,
+    worktree,
+    agentId,
+    peerRoster,
+    yieldSchema,
+    schemaOverridesAgent,
+  };
+}
+function extractBbkAgentBlock(event) {
+  const blocks = systemPromptBlocks(event);
+  const replacementBlocks = blocks.filter(block => /^\s*<bbk-agent-replacement\b/i.test(block));
+  if (replacementBlocks.length > 0) return { alreadyReplaced: true };
+
+  const markerBlocks = blocks.filter(block => block.includes(BBK_AGENT_PROMPT_MARKER));
+  if (markerBlocks.length === 0) return undefined;
+  if (markerBlocks.length !== 1) throw new Error("ambiguous BBK agent-system marker blocks");
+
+  const sourceBlock = markerBlocks[0];
+  const match = sourceBlock.match(BBK_AGENT_BLOCK_RE);
+  if (!match) throw new Error("malformed BBK agent-system marker");
+  const roleName = match[1];
+  if (!BBK_ROLE_NAME_RE.test(roleName)) throw new Error(`invalid BBK role marker ${roleName}`);
+  const catalogue = roleCatalogue();
+  const role = catalogue.roles.get(roleName);
+  if (!role) throw new Error(`unknown BBK role marker ${roleName}`);
+  const roleBlock = match[0].trim();
+  if (normalizePromptBlock(roleBlock) !== canonicalAgentBlock(roleName)) {
+    throw new Error(`BBK role ${roleName} prompt does not match the installed canonical projection`);
+  }
+  for (const skill of role.mandatory_skills || []) {
+    if (!roleBlock.includes(`<bbk-inlined-skill name="${skill}"`)) {
+      throw new Error(`BBK role ${roleName} is missing mandatory inlined skill ${skill}`);
+    }
+  }
+  for (const moduleId of role.prompt_modules || []) {
+    const marker = `<bbk-prompt-module id="${moduleId}">`;
+    if (countLiteral(roleBlock, marker) !== 1) {
+      throw new Error(`BBK role ${roleName} must embed prompt module ${moduleId} exactly once`);
+    }
+  }
+  for (const moduleId of catalogue.promptModuleIds) {
+    if (!(role.prompt_modules || []).includes(moduleId)
+      && countLiteral(roleBlock, `<bbk-prompt-module id="${moduleId}">`) !== 0) {
+      throw new Error(`BBK role ${roleName} embeds undeclared prompt module ${moduleId}`);
+    }
+  }
+
+  // OMP places the role wrapper, shared batch context, approved plan,
+  // worktree/IRC metadata, and yield contract in one dedicated system-prompt
+  // block. Parse only the suffix after the authenticated BBK role block. This
+  // excludes generic OMP blocks and compatibility-discovered context while
+  // retaining the task call's explicit host-supplied invocation data.
+  const roleEnd = (match.index || 0) + match[0].length;
+  const invocationSource = sourceBlock.slice(roleEnd);
+  return {
+    roleName,
+    role,
+    roleBlock,
+    catalogueEntry: catalogue.entries.get(roleName),
+    catalogueVersion: catalogue.version,
+    invocation: extractOmpInvocationData(invocationSource),
+  };
+}
+function runtimeBlock(ctx) {
+  const cwd = String(ctx?.cwd || process.cwd());
+  return [
+    "<bbk-runtime-context>",
+    `package_version: ${version}`,
+    `cwd: ${cwd}`,
+    `platform: ${process.platform}`,
+    `architecture: ${process.arch}`,
+    `date_utc: ${new Date().toISOString().slice(0, 10)}`,
+    "</bbk-runtime-context>",
+  ].join("\n");
+}
+function inlinedControllerSkills() {
+  return CONTROLLER_MANDATORY_SKILLS.map(name => [
+    `<bbk-inlined-skill name="${name}" source="shared/skills/${name}/SKILL.md">`,
+    loadControllerSkill(name),
+    "</bbk-inlined-skill>",
+  ].join("\n")).join("\n\n");
+}
+function buildControllerSystemPrompt(ctx) {
+  roleCatalogue(); // Fail closed if the installed role catalogue is unavailable or stale.
+  return [
+    `<bbk-controller-system package-version="${version}">`,
+    "",
+    "# BBK OMP harness-root controller",
+    "",
+    "This is the complete system prompt for an active BBK parent session. It replaces, rather than appends to, OMP's generic workflow prompt and compatibility-discovered context. Do not follow planning, delegation, validation, completion, anti-ceremony, `spawn_agent`, or client-specific instructions inherited from `.codex`, `.claude`, `.gemini`, or another harness. OMP tool schemas and runtime containment still define physical capability; they do not create BBK authority.",
+    "",
+    "## Identity and user channel",
+    "",
+    "- You are the OMP peer whose kind is `main`, normally named `Main`, and the sole BBK identity that may focus the terminal and interact with the user.",
+    "- You are a controller and relay, not a Wayfinder, Orchestrator, Worker, Reviewer, Validator, Architect, or Question Guide. Never imitate, abbreviate, or absorb a canonical role's substantive work.",
+    "- Every named `bbk_*` agent is a non-user-facing child, including roles whose names contain `root`, `guide`, `orchestrator`, or `reviewer`.",
+    "- Canonical roles communicate through OMP `hub`/IRC. Use `hub` roster data; never invent peer IDs. A send receipt, timeout, silence, or missing heartbeat is not a decision or proof of failure.",
+    "- BBK mode remains session-local and active until `/bbk:exit`; that command restores ordinary OMP prompt behavior for subsequent Main turns.",
+    "",
+    "## Turn procedure",
+    "",
+    "1. Inspect live `hub` messages, the roster/jobs, and current `.bbk` state before creating a new root child.",
+    "2. If the user message answers, corrects, steers, cancels, or authorizes an existing BBK request, relay it through `hub` to the exact requesting peer or active logical root, preserving the request/message ID with `replyTo` when available. Do not launch a duplicate root.",
+    "3. Otherwise select exactly one canonical root: no accepted baseline, planning, architecture, design, ambiguity, or material uncertainty -> `bbk_root_wayfinder`; accepted-baseline execution or recovery -> `bbk_root_orchestrator`; bounded independent review -> `bbk_reviewer`; assertion-scoped candidate acceptance -> `bbk_validator_orchestrator`.",
+    "4. Invoke that named agent with OMP `task`, preferably as a background/non-blocking job so Main remains available for user relay. When OMP advertises the batch form, use `{ context, tasks: [{ name, agent, task, ... }] }` even for one root: `agent` is the exact canonical `bbk_*` role, `name` is a stable IRC/job identifier, and `task` is the complete self-contained assignment. Never put the role name only in `name` while omitting `agent`. If OMP advertises only a flat form, follow that schema and carry reusable shared background through a durable `local://` context file. Supply exact subject, desired result, bounded context, authority and standing approvals, allowed effects, capability zones, assurance obligations, stopping conditions, logical parent, Main peer ID, branch/request IDs, and return envelope.",
+    "5. Before dispatch, perform only bounded controller operations required to recover state and compile the invocation. Do not select architecture, write the operating plan, edit subject files, execute product work, review, validate, or certify in Main.",
+    "6. Supervise through task state and `hub`. Continue useful controller work and wait only when no other valid action remains. Resume or message the same logical child when possible instead of restarting discovery.",
+    "",
+    "## Human-request relay",
+    "",
+    "- A child needing a material decision, authority grant, private context, protected-floor exception, hard-to-reverse commitment, or explicit acceptance sends Main one compact `BBK_USER_REQUEST` over `hub`/IRC. It must include a stable request ID, the smallest material question, recommendation, credible alternatives, consequences, residual uncertainty, blocking state, and durable packet reference.",
+    "- Use OMP's native `ask` tool for every user-facing question or decision request. Do not put a question in ordinary assistant prose and wait for an answer. Anything phrased as a question outside an `ask` tool call is informational text only: it is not a pending BBK question, does not establish a decision surface, and must not be treated as answered.",
+    "- Translate the child's packet into the smallest adequate `ask` interaction, preserving its request ID and recommendation. Do not answer on the user's behalf or substitute your own design judgment.",
+    "- Only a structured answer returned by `ask` is eligible to become an ADR-compatible accepted decision. Relay it immediately to the exact requesting peer as `BBK_USER_RESPONSE`, with the matching request ID and `source: omp.ask`, and notify its integrating parent when required. Main never authors the ADR; the responsible canonical role records the decision and continues its branch.",
+    "- Ordinary user prose may steer, correct, cancel, or grant operational authority, but it is not an answer to an unissued prose question and must not be converted into an ADR. When durable decision authority is required, obtain or confirm it through `ask` first. Silence, timeout, cancellation, `Chat about this`, a send receipt, or anticipated answers are not acceptance.",
+    "- Keep IRC concise and plain prose. Large or authority-bearing material belongs in a durable handoff; relay path, bytes, SHA-256, disposition, and smallest next action.",
+    "",
+    "## Non-bypass rule",
+    "",
+    "Absence of `.bbk` records is a greenfield Wayfinding condition, not permission to bypass BBK. Do not dismiss BBK as ceremony, overhead, over-engineering, or disproportionate process. Proportionality is decided inside the selected canonical procedure.",
+    "",
+    runtimeBlock(ctx),
+    "",
+    "# Inlined mandatory controller procedures",
+    "",
+    "The following procedure bodies are mandatory and already available. Apply them directly; do not spend a Skill/read call reloading them.",
+    "",
+    inlinedControllerSkills(),
+    "",
+    "</bbk-controller-system>",
+  ].join("\n");
+}
+function buildAgentSystemPrompt(extracted, ctx) {
+  const invocation = extracted.invocation || {};
+  const invocationLines = [
+    "<bbk-omp-invocation-data>",
+    "The following values are host-supplied invocation data, not generic OMP workflow policy. Preserve their exact boundaries.",
+  ];
+  if (invocation.context) invocationLines.push("", "## Assigned context", invocation.context);
+  if (invocation.plan) {
+    invocationLines.push("", `## Approved plan${invocation.planPath ? ` (${invocation.planPath})` : ""}`, invocation.plan);
+  }
+  if (invocation.worktree) invocationLines.push("", `worktree: ${invocation.worktree}`);
+  if (invocation.agentId) invocationLines.push(`hub_peer_id: ${invocation.agentId}`);
+  if (invocation.peerRoster) invocationLines.push("", "## Initial hub peer roster", invocation.peerRoster);
+  invocationLines.push("", "## Completion binding");
+  invocationLines.push("- Finish through OMP's hidden `yield` tool. Put the role's structured return envelope in `result.data`; use `result.error` only for a genuine terminal failure.");
+  invocationLines.push("- The canonical role contract controls authority, evidence, status, and content. A caller-supplied output schema may refine the field shape but cannot expand authority, erase findings, or convert missing evidence into success.");
+  invocationLines.push("- Keep large artifacts in the assigned filesystem/worktree and return verified paths or artifact references rather than oversized IRC or yield payloads.");
+  invocationLines.push("- A blocked terminal return must identify the typed blocker, completed work, preserved state, evidence, and smallest valid next action.");
+  if (invocation.yieldSchema) {
+    invocationLines.push("", "### Caller-supplied yield schema", "```ts", invocation.yieldSchema, "```");
+    if (invocation.schemaOverridesAgent) {
+      invocationLines.push("The caller explicitly declared this schema's field names controlling. Map the canonical BBK return into it without losing required authority, evidence, findings, or blocker semantics.");
+    }
+  }
+  invocationLines.push("</bbk-omp-invocation-data>");
+
+  return [
+    `<bbk-agent-replacement role="${extracted.roleName}" package-version="${version}">`,
+    "",
+    "This is the complete OMP system prompt for the named canonical BBK agent. The BBK extension discarded OMP's generic workflow prompt and compatibility-discovered `.codex`, `.claude`, `.gemini`, and other client-specific instructions. Only this exact installed BBK role contract, its inlined mandatory procedures, the invocation/user message, the explicit task-call data parsed from the marker-bearing native child wrapper below, host tool schemas, and runtime containment govern the turn.",
+    "",
+    "The peer whose kind is `main`, normally `Main`, is the sole user-facing controller. Use OMP `hub`/IRC for live communication. Send ordinary coordination to the invoking parent and any permitted `BBK_USER_REQUEST` to Main while notifying the parent. Every request must carry a stable request ID and enough option/recommendation context for Main to invoke OMP `ask`. Accept a user decision for ADR-compatible recording only from a matching `BBK_USER_RESPONSE` marked `source: omp.ask`; ordinary prose, silence, timeouts, send receipts, and inferred intent are not decision evidence. Never call `ask` or another user-interaction surface yourself, seize focus, or infer a response. Discover peer IDs with `hub` list, send concise plain prose, use `replyTo`, keep large material in durable handoffs, continue independent authorized work after sending, and wait only when completely blocked.",
+    "",
+    runtimeBlock(ctx),
+    "",
+    invocationLines.join("\n"),
+    "",
+    extracted.roleBlock,
+    "",
+    exactRoleReturnContractBlock(extracted.role, extracted.catalogueEntry),
+    "",
+    "</bbk-agent-replacement>",
+  ].join("\n");
+}
+function failClosedSystemPrompt(reason, ctx) {
+  const safeReason = String(reason?.message || reason || "unknown prompt assembly error").slice(0, 800);
+  return [
+    `<bbk-prompt-assembly-failure package-version="${version}">`,
+    "BBK prompt assembly failed closed. Do not perform governed planning, design, implementation, review, validation, or product effects.",
+    `Reason: ${safeReason}`,
+    "If this is a child agent, report `BLOCKED_TECHNICAL` through `hub`/IRC to the invoking parent and Main. If this is Main, report the blocker to the user. Preserve existing files and state.",
+    runtimeBlock(ctx),
+    "</bbk-prompt-assembly-failure>",
+  ].join("\n");
+}
+
+function createBbkActivityHud(pi) {
+  let enabled = false;
+  let currentCtx;
+  let sequence = 0;
+  const agents = new Map();
+
+  function clearWidget() {
+    try { currentCtx?.ui?.setWidget?.(BBK_ACTIVITY_WIDGET_KEY, undefined, { placement: "aboveEditor" }); }
+    catch {}
+  }
+  function activeAgents() {
+    return [...agents.values()].filter(item => ["pending", "running"].includes(item.progress?.status));
+  }
+  function render() {
+    if (!enabled || !currentCtx?.ui?.setWidget) {
+      clearWidget();
+      return;
+    }
+    const active = activeAgents().sort((a, b) => b.updated - a.updated);
+    if (!active.length) {
+      currentCtx.ui.setWidget(
+        BBK_ACTIVITY_WIDGET_KEY,
+        ["BBK · ready"],
+        { placement: "aboveEditor" },
+      );
+      return;
+    }
+    const latest = active[0];
+    const name = oneLine(latest.progress?.id || latest.id || latest.description || roleDisplayName(latest.agent), 42);
+    const gauge = contextGauge(latest.progress);
+    const activity = progressActivity(latest.progress);
+    let line = `BBK · ${name}${gauge ? ` [${gauge}]` : ""}: ${activity}`;
+
+    const otherGauges = active.slice(1, 4).map(item => {
+      const otherName = oneLine(item.progress?.id || item.id || roleDisplayName(item.agent), 28);
+      const otherGauge = contextGauge(item.progress, { short: true });
+      return otherGauge ? `${otherName} ${otherGauge}` : otherName;
+    });
+    if (otherGauges.length) line += ` | ${otherGauges.join(" · ")}`;
+    if (active.length > 4) line += ` · +${active.length - 4} workers`;
+    currentCtx.ui.setWidget(BBK_ACTIVITY_WIDGET_KEY, [oneLine(line, 220)], { placement: "aboveEditor" });
+  }
+  function setMode(next, ctx) {
+    enabled = Boolean(next);
+    currentCtx = ctx || currentCtx;
+    if (!enabled) agents.clear();
+    render();
+  }
+  function reset(ctx) {
+    currentCtx = ctx || currentCtx;
+    agents.clear();
+    render();
+  }
+  function updateProgress(payload) {
+    if (!payload || !BBK_ROLE_NAME_RE.test(String(payload.agent || payload.progress?.agent || ""))) return;
+    const progress = payload.progress && typeof payload.progress === "object" ? payload.progress : {};
+    const id = String(progress.id || payload.id || payload.description || payload.agent || `bbk-worker-${sequence + 1}`);
+    agents.set(id, {
+      id,
+      agent: String(payload.agent || progress.agent || ""),
+      description: payload.description,
+      progress: { ...progress, id, agent: payload.agent || progress.agent },
+      updated: ++sequence,
+    });
+    render();
+  }
+  function updateLifecycle(payload) {
+    if (!payload || !BBK_ROLE_NAME_RE.test(String(payload.agent || ""))) return;
+    const id = String(payload.id || payload.description || payload.agent);
+    if (payload.status === "started") {
+      const previous = agents.get(id);
+      agents.set(id, {
+        id,
+        agent: String(payload.agent || ""),
+        description: payload.description,
+        progress: {
+          ...(previous?.progress || {}),
+          id,
+          agent: payload.agent,
+          status: previous?.progress?.status === "running" ? "running" : "pending",
+        },
+        updated: ++sequence,
+      });
+    } else {
+      agents.delete(id);
+    }
+    render();
+  }
+
+  const unsubscribe = [];
+  try {
+    const stop = pi.events?.on?.(TASK_SUBAGENT_PROGRESS_CHANNEL, updateProgress);
+    if (typeof stop === "function") unsubscribe.push(stop);
+  } catch {}
+  try {
+    const stop = pi.events?.on?.(TASK_SUBAGENT_LIFECYCLE_CHANNEL, updateLifecycle);
+    if (typeof stop === "function") unsubscribe.push(stop);
+  } catch {}
+  function dispose(ctx) {
+    currentCtx = ctx || currentCtx;
+    enabled = false;
+    agents.clear();
+    clearWidget();
+    for (const stop of unsubscribe.splice(0)) {
+      try { stop(); } catch {}
+    }
+  }
+  return { setMode, reset, updateProgress, updateLifecycle, dispose };
+}
+
+function createBbkModeController(pi, onStateChange = () => {}) {
   let enabled = false;
   let loaded = false;
 
-  function setStatus(ctx) {
-    ctx?.ui?.setStatus?.(BBK_MODE_STATUS_KEY, enabled ? "BBK" : undefined);
+  function publishState(ctx) {
+    try { onStateChange(enabled, ctx); } catch {}
   }
   function restore(ctx) {
     let found = false;
@@ -189,7 +1030,7 @@ function createBbkModeController(pi) {
     }
     enabled = found ? restored : false;
     loaded = true;
-    setStatus(ctx);
+    publishState(ctx);
     return enabled;
   }
   function ensure(ctx) {
@@ -208,21 +1049,24 @@ function createBbkModeController(pi) {
         enabled,
       });
     }
-    setStatus(ctx);
+    publishState(ctx);
     return changed;
   }
   function enter(ctx) { return persist(true, ctx); }
   function exit(ctx) { return persist(false, ctx); }
-  function promptOverlay(event, ctx) {
-    ensure(ctx);
-    if (!enabled) return undefined;
-    const existing = Array.isArray(event?.systemPrompt) ? event.systemPrompt : [];
-    const withoutPriorOverlay = existing.filter(
-      item => !String(item || "").includes(BBK_MODE_PROMPT_MARKER),
-    );
-    return { systemPrompt: [...withoutPriorOverlay, BBK_MODE_SYSTEM_PROMPT] };
+  function promptReplacement(event, ctx) {
+    try {
+      const extracted = extractBbkAgentBlock(event);
+      if (extracted?.alreadyReplaced) return { systemPrompt: systemPromptBlocks(event) };
+      if (extracted) return { systemPrompt: [buildAgentSystemPrompt(extracted, ctx)] };
+      ensure(ctx);
+      if (!enabled) return undefined;
+      return { systemPrompt: [buildControllerSystemPrompt(ctx)] };
+    } catch (error) {
+      return { systemPrompt: [failClosedSystemPrompt(error, ctx)] };
+    }
   }
-  return { enter, exit, restore, ensure, promptOverlay, isEnabled: () => enabled };
+  return { enter, exit, restore, ensure, promptReplacement, isEnabled: () => enabled };
 }
 
 function registerBbkEntrypoint(pi, mode) {
@@ -597,7 +1441,8 @@ export default function bbkExtension(pi) {
     parameters: z.object({ root: text() }), argv: p => ["package", "verify", ...(p.root ? [p.root] : [])],
   });
 
-  const bbkMode = createBbkModeController(pi);
+  const bbkActivity = createBbkActivityHud(pi);
+  const bbkMode = createBbkModeController(pi, (active, ctx) => bbkActivity.setMode(active, ctx));
   registerBbkEntrypoint(pi, bbkMode);
   registerModelRoutingCommand(pi);
   registerCommand(pi, "bbk:init", "initialize BBK in the current project", ["init"]);
@@ -634,8 +1479,9 @@ export default function bbkExtension(pi) {
   registerCommand(pi, "bbk:review-close", "--finding <path> --id <id> --disposition <value> --successor-ref <ref> --residual-impact <text> --output <path>", ["review", "close"], { requireArgs: true });
   registerCommand(pi, "bbk:review-learn", "--id <id> --type <type> --lesson <text> --scope <scope> --confidence <value> --uncertainty <text> --action <text> --output <path>", ["review", "learn"], { requireArgs: true });
 
-  pi.on?.("before_agent_start", async (event, ctx) => bbkMode.promptOverlay(event, ctx));
+  pi.on?.("before_agent_start", async (event, ctx) => bbkMode.promptReplacement(event, ctx));
   const restoreBbkMode = async (_event, ctx) => {
+    bbkActivity.reset(ctx);
     const active = bbkMode.restore(ctx);
     if (_event?.type === "session_start") {
       ctx?.ui?.notify?.(`BBK ${version} loaded in ${ctx?.cwd || process.cwd()}${active ? "; BBK mode restored" : ""}`, "info");
@@ -644,6 +1490,7 @@ export default function bbkExtension(pi) {
   for (const eventName of ["session_start", "session_switch", "session_branch", "session_tree"]) {
     pi.on?.(eventName, restoreBbkMode);
   }
+  pi.on?.("session_shutdown", async (_event, ctx) => bbkActivity.dispose(ctx));
   pi.on?.("tool_call", async event => {
     const encoded = JSON.stringify(event.input || {});
     if (["bash", "write", "edit"].includes(event.toolName) && protectedFragments.some(fragment => encoded.includes(fragment))) {

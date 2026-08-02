@@ -2,6 +2,15 @@
 
 BBK separates outcome fit, implementation structure, state/effect semantics, execution slicing, and work-unit execution so consequential design choices are visible before effects occur. Routine work may keep these distinctions inline; material, stateful, effectful, interface-heavy, or hard-to-reverse work records them explicitly.
 
+
+## Alpha.13 execution-boundary companions
+
+`TerritoryExecutionBoundary` binds the exact accepted baseline, territory and WorkUnit membership, mutation ownership, shared interfaces, allowed effects, resource budgets, assurance obligations, recovery, invalidation, and completion conditions for one Territory Orchestrator campaign. Root Orchestrator compiles and admits it; Territory Orchestrator operates within it. A semantic change after admission requires a successor boundary.
+
+Local discovery is deny-by-default. Territory Orchestrator is the sole issuer of an active `LocalDiscoveryEnvelope` and exact `LocalDiscoveryPermit`; Worker Orchestrator and Worker may propose but cannot self-grant discovery authority. V1 permits at most two cumulative items and at most floor(10% of the cryptographically bound cohort planning total), with a zero budget when the denominator is absent, stale, unbound, or non-positive. A permit cannot alter outcomes, scope, requirements, architecture, canonical interfaces, assertion meaning, protected floors, authority, territory boundaries, cohort meaning, toolchain policy, validation meaning, or external-effect envelopes.
+
+`WorkerValidationBatch` is not an active BBK object. Candidate production and candidate assurance are separate lifecycles joined by immutable candidate identity, revision, manifest, and digest.
+
 ## Implementation structure and execution slicing
 
 ### 1. Purpose

@@ -56,6 +56,15 @@ class PlannedFile:
     original_mode: int | None = None
 
 
+@dataclass
+class StaleFile:
+    path: Path
+    record: dict[str, Any]
+    backup: Path | None = None
+    original: bytes | None = None
+    original_mode: int | None = None
+
+
 def utc_now() -> str:
     return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
@@ -256,6 +265,104 @@ def plan_files(
     return planned
 
 
+def path_is_within(path: Path, directory: Path) -> bool:
+    path_key_value = normalized(path)
+    root_key = normalized(directory).rstrip("/")
+    return path_key_value == root_key or path_key_value.startswith(root_key + "/")
+
+
+def plan_stale_files(
+    old_records: Mapping[str, Mapping[str, Any]],
+    desired: Mapping[str, DesiredFile],
+    *,
+    codex_agents: Path,
+    force: bool,
+    backup_root: Path,
+) -> list[StaleFile]:
+    stale: list[StaleFile] = []
+    problems: list[str] = []
+    for key, raw in sorted(old_records.items()):
+        path = Path(str(raw["path"]))
+        if key in desired or not path_is_within(path, codex_agents):
+            continue
+        record = dict(raw)
+        if not path.exists():
+            stale.append(StaleFile(path=path, record=record))
+            continue
+        if not path.is_file():
+            problems.append(f"stale manifest-owned path is not a regular file: {path}")
+            continue
+        current_digest = install_tool.sha256_file(path)
+        mode_matches = (
+            os.name == "nt"
+            or "executable" not in record
+            or executable(path) == bool(record.get("executable"))
+        )
+        owned_current = current_digest == record.get("sha256") and mode_matches
+        if not owned_current and not force:
+            problems.append(
+                f"stale Codex file is locally modified: {path}; rerun with --force to back it up before removal"
+            )
+            continue
+        backup = install_tool.backup_path(backup_root, path) if not owned_current else None
+        stale.append(
+            StaleFile(
+                path=path,
+                record=record,
+                backup=backup,
+                original=path.read_bytes(),
+                original_mode=path.stat().st_mode,
+            )
+        )
+    if problems:
+        raise CodexUpdateError("Codex clean-replacement preflight failed:\n- " + "\n- ".join(problems))
+    return stale
+
+
+def stale_record(item: StaleFile) -> dict[str, Any]:
+    return {
+        "path": install_tool.json_path(item.path),
+        "action": "remove-stale",
+        "source": item.record.get("source"),
+        "expected": item.record.get("sha256"),
+        "backup": install_tool.json_path(item.backup) if item.backup else None,
+    }
+
+
+def apply_stale_files(plan: Sequence[StaleFile], *, dry_run: bool) -> list[dict[str, Any]]:
+    if dry_run:
+        return [stale_record(item) for item in plan]
+    completed: list[StaleFile] = []
+    try:
+        for item in plan:
+            if item.path.exists():
+                if item.backup is not None:
+                    item.backup.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(item.path, item.backup)
+                item.path.unlink()
+            completed.append(item)
+    except Exception as exc:
+        restore_stale_files(completed)
+        raise CodexUpdateError(
+            f"Codex stale-file removal failed and rollback was attempted: {exc}"
+        ) from exc
+    return [stale_record(item) for item in plan]
+
+
+def restore_stale_files(plan: Sequence[StaleFile]) -> None:
+    for item in reversed(plan):
+        if item.original is None:
+            continue
+        try:
+            install_tool.atomic_write(
+                item.path,
+                item.original,
+                (item.original_mode or 0o644) & 0o777,
+            )
+        except Exception:
+            pass
+
+
 def record_for(item: PlannedFile) -> dict[str, Any]:
     return {
         "path": install_tool.json_path(item.desired.path),
@@ -309,9 +416,13 @@ def merge_manifest(
     projection_meta: Mapping[str, Any],
     verification: Mapping[str, Any] | None,
     backup_root: Path,
+    removed_stale: Sequence[StaleFile] = (),
+    clean: bool = False,
 ) -> dict[str, Any]:
     """Update Codex ownership records without rebinding shared package state."""
     merged_records = record_map(old)
+    for item in removed_stale:
+        merged_records.pop(normalized(item.path), None)
     for record in updated_records:
         merged_records[normalized(Path(str(record["path"])))] = dict(record)
     result = dict(old)
@@ -354,6 +465,8 @@ def merge_manifest(
             "model_routing_source_sha256": projection_meta.get("model_routing_source_sha256"),
             "untouched_harnesses": [name for name in ("omp", "claude", "generic") if old.get(name)],
             "verification": dict(verification) if verification else None,
+            "clean_replacement": bool(clean),
+            "removed_stale_count": len(removed_stale),
         }
     )
     result["update_history"] = history
@@ -371,6 +484,8 @@ def update_codex(args: argparse.Namespace) -> dict[str, Any]:
                 failfast=bool(args.verification_failfast),
                 require_node=False,
                 echo=not args.json,
+                profile="codex",
+                jobs=1,
             )
         except install_tool.InstallError as exc:
             raise CodexUpdateError(str(exc)) from exc
@@ -390,7 +505,28 @@ def update_codex(args: argparse.Namespace) -> dict[str, Any]:
             temp_root=Path(raw_temp),
         )
         plan = plan_files(desired, old_records, force=bool(args.force), backup_root=backup_root)
-        update_records = apply_plan(plan, dry_run=bool(args.dry_run))
+        targets = install_tool.installation_targets(scope=args.scope, project=project)
+        codex_agents = targets.get("codex_agents")
+        if codex_agents is None:
+            raise CodexUpdateError("Cannot resolve Codex installation target")
+        stale_plan = (
+            plan_stale_files(
+                old_records,
+                desired,
+                codex_agents=codex_agents,
+                force=bool(args.force),
+                backup_root=backup_root,
+            )
+            if bool(getattr(args, "clean", False))
+            else []
+        )
+        stale_records = apply_stale_files(stale_plan, dry_run=bool(args.dry_run))
+        try:
+            update_records = apply_plan(plan, dry_run=bool(args.dry_run))
+        except Exception:
+            if not args.dry_run:
+                restore_stale_files(stale_plan)
+            raise
         merged = merge_manifest(
             old_manifest,
             update_records,
@@ -398,6 +534,8 @@ def update_codex(args: argparse.Namespace) -> dict[str, Any]:
             projection_meta=projection_meta,
             verification=verification,
             backup_root=backup_root,
+            removed_stale=stale_plan,
+            clean=bool(getattr(args, "clean", False)),
         )
         if not args.dry_run:
             install_tool.atomic_write(mpath, install_tool.json_bytes(merged), 0o600)
@@ -426,6 +564,9 @@ def update_codex(args: argparse.Namespace) -> dict[str, Any]:
         "effective_model_routing_updated": False,
         "source_release_root": install_tool.json_path(ROOT),
         "files": update_records,
+        "removed_stale_files": stale_records,
+        "removed_stale_count": len(stale_records),
+        "clean_replacement": bool(getattr(args, "clean", False)),
         "actions": actions,
         "codex_agent_count": len(projection_meta.get("agents", {})),
         "untouched_harnesses": untouched,
@@ -442,6 +583,7 @@ def human(value: Mapping[str, Any]) -> str:
         f"Version: {value.get('from_version')} -> {value.get('to_version')}\n"
         f"Files: {value.get('actions')}\n"
         f"Codex agents: {value.get('codex_agent_count')}\n"
+        f"Stale Codex files removed: {value.get('removed_stale_count', 0)}\n"
         f"Untouched harnesses: {', '.join(value.get('untouched_harnesses') or []) or 'none'}\n"
         f"Manifest: {value.get('manifest_path')}\n"
         "The update changes only BBK's Codex agent files and manifest metadata; it does not modify the shared package, launcher, model-routing file, OMP, Claude Code, or generic agent files. "
@@ -453,9 +595,18 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--scope", choices=["user", "project"], default="user")
     parser.add_argument("--root", help="project root for project-scoped installation")
-    parser.add_argument("--verify", action="store_true", help="run complete package verification before updating")
+    parser.add_argument(
+        "--verify",
+        action="store_true",
+        help="run package trust/drift checks and the Codex-focused regression selection before updating",
+    )
     parser.add_argument("--verification-failfast", action="store_true")
     parser.add_argument("--force", action="store_true", help="back up and replace locally modified targeted Codex files")
+    parser.add_argument(
+        "--clean",
+        action="store_true",
+        help="remove manifest-owned Codex files that are no longer part of the successor projection",
+    )
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--json", action="store_true")
     return parser

@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-root-orchestrator-result-v1.schema.json",
+  "title": "BBK BBK Root Orchestrator result payload v1",
+  "description": "Closed role-specific `result` payload for `bbk_root_orchestrator` returns.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "planning_counterpart_ref",
+    "root_execution_charter_ref",
+    "operating_baseline_ref",
+    "execution_baseline_ref",
+    "execution_authorization_ref",
+    "root_run_ref",
+    "campaign_state",
+    "territory_boundary_inventory",
+    "dependency_and_integration_state",
+    "active_children_and_attempts",
+    "resource_budget_and_schedule_state",
+    "authority_and_scope_fence_state",
+    "substrate_and_host_health",
+    "candidate_inventory",
+    "assurance_and_evidence_state",
+    "finding_and_review_state",
+    "discoveries_and_deviations",
+    "signals_and_parent_directions",
+    "invalidated_or_superseded_refs",
+    "recovery_and_interruption_state",
+    "cleanup_and_external_effect_state",
+    "completion_assessment",
+    "outcome_evidence_and_claims_not_established",
+    "residuals",
+    "blockers_and_pauses",
+    "parent_actions_requested"
+  ],
+  "properties": {
+    "planning_counterpart_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Responsible Root Wayfinder, accepted planning handoff, operating-baseline acceptance reference, outstanding planning signals, and exact route for successor direction."
+    },
+    "root_execution_charter_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Root instruction package identity, compiler receipt, source checkpoint, qualified role and model/profile route, included and excluded concerns, budgets, stopping, cancellation, recovery, invalidation, completion, and return schema."
+    },
+    "operating_baseline_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Accepted operating-baseline identity, revision, digest, lifecycle, acceptance authority and handoff, or an exact blocking mismatch."
+    },
+    "execution_baseline_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Exact compiled execution-baseline identity, revision, digest, source-object manifest, TerritoryExecutionBoundary and WorkUnit mapping, instruction-package set, lifecycle, and current validity."
+    },
+    "execution_authorization_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Authority receipt, holder, exact baseline and campaign, scope, repositories, workspaces, environments, tools, resource ceiling, run and replacement allowance, external effects, residual risks, cancellation and recovery terms, expiry, revocation, and current status."
+    },
+    "root_run_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Canonical root semantic-run identity, lifecycle, current physical attempt, predecessor or replacement attempts, active lease and fencing state where available, startup-handshake receipt, host session bindings, checkpoint, and recovery envelope."
+    },
+    "campaign_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Global capability, phase, boundary, WorkUnit, gate, validation, review, and completion frontier; exact current, ready, running, waiting, blocked, paused, recovering, validating, repairing, and terminal child states; projection watermark and freshness."
+    },
+    "territory_boundary_inventory": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every admitted, pending, invalidated, completed, failed, cancelled, or superseded TerritoryExecutionBoundary with exact source territories and architecture elements, WorkUnit membership, dependencies, interfaces, integration obligations, authority, scope fences, resources, child run, recovery, and completion state."
+    },
+    "dependency_and_integration_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Global dependency graph, cross-boundary bindings, critical path, eligibility, barriers, integration owners, assembly points, compatibility and failure semantics, gates, impact sets, invalidated edges, and unresolved integration work."
+    },
+    "active_children_and_attempts": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every current or historical direct-child Territory Orchestrator and Reviewer logical run, physical attempt, host session, lease, continuation, expected silence, status, last verified checkpoint, result, interruption, replacement, and immutable handoff."
+    },
+    "resource_budget_and_schedule_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Model, context, process, tool, environment, device, service, storage, network, cost, elapsed-time, run, retry, replacement, and concurrency budgets; shared-resource ownership; use, reservation, remaining capacity, deadlines, waits, backpressure, and exhausted ceilings."
+    },
+    "authority_and_scope_fence_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Root authority and effective semantic, resource, workspace, mutation, credential, network, device, external-system, and effect fences; child narrowing; local-discovery envelopes and permits; safeguards; expiry; revocation; violations; and current enforcement limitations."
+    },
+    "substrate_and_host_health": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Authoritative and projection substrate health, host and tool availability, degraded-operation mode, current capability impact, stale or untrusted state, expected-silence windows, liveness and useful-progress evidence, and recovery requirements."
+    },
+    "candidate_inventory": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every exact candidate, base and successor relationship, manifest, owning boundary and cohort, worker-quality attestation, freeze state, repository and external-state closure, invalidation, repair, and current eligibility."
+    },
+    "assurance_and_evidence_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Active AssuranceContract and assertion references, deterministic gates, Validator runs, assertion evaluations, EvidenceReceipts, environments, independence and exposure, evidence reuse and invalidation, operational observations, and exact claims established or not established."
+    },
+    "finding_and_review_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Immutable validation and review findings, correlation, affected assertions and objects, severity or consequence basis, repair route, dispositions, closure evidence, residual impact, reopening triggers, ReviewRuns, and outstanding independent-review obligations."
+    },
+    "discoveries_and_deviations": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Ordinary implied work, committed local discoveries and permits, repeated or cumulative discoveries, cross-boundary effects, contract conflicts, baseline deviations, affected objects, containment, calibration implications, and exact parent route."
+    },
+    "signals_and_parent_directions": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Durable execution signals and directions with identity, type, source run, baseline, campaign, boundary, WorkUnit, candidate, affected scope and objects, evidence, sequence, idempotency, delivery, owner, resolution, and resulting continuation or pause state."
+    },
+    "invalidated_or_superseded_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Baselines, boundaries, instructions, runs, attempts, candidates, evidence, findings, signals, directions, reviews, handoffs, or projections invalidated, reopened, cancelled, or superseded during the campaign, with exact cause and unaffected material retained."
+    },
+    "recovery_and_interruption_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Current recovery class, interruption reason and evidence, containment, fenced attempts, ambiguous effects, reconciled state, recovery package, continuation identity, replacement allowance, completed actions, unresolved actions, and next safe command."
+    },
+    "cleanup_and_external_effect_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Processes, packages, credentials, services, ports, locks, databases, workspaces, generated artifacts, devices, remote systems, deployments, migrations, publications, and other effects with pre-state, permits, receipts, cleanup, rollback, compensation, quarantine, residuals, and accountable owner."
+    },
+    "completion_assessment": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Current evaluation of every baseline completion condition, territory and integration terminal state, deterministic gate, validation, operational observation, review, finding disposition, cleanup, authority accounting, evidence integrity, and invalidation, with explicit unmet conditions. This is a report, not terminal acceptance."
+    },
+    "outcome_evidence_and_claims_not_established": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Outcome-level or operational evidence available after execution, its subject, environment, horizon, attribution and limits, plus explicit claims that execution completion does not establish, such as user acceptance, outcome achievement, compliance, safety, security, risk acceptance, or release."
+    },
+    "residuals": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Remaining work, findings, risks, debt, unknowns, deferred items, unavailable environments, monitoring needs, accepted or unaccepted residuals, owners, expiry, and reopening triggers."
+    },
+    "blockers_and_pauses": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Exact technical, authority and decision blockers kept separate from dependency wait, expected silence, capacity pause, host-window pause, recovery, and scheduling state, with affected scope, evidence, and smallest valid resolution."
+    },
+    "parent_actions_requested": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Exact controller, core, Root Wayfinder, accountable-authority, recovery, qualification, resource, successor-baseline, review, validation, operational-observation, acceptance, or release action requested, with affected objects and whether unaffected work may continue."
+    }
+  },
+  "x-bbk-role": "bbk_root_orchestrator",
+  "x-bbk-contract": "bbk.root-orchestrator-return.v1",
+  "x-bbk-supplemental-enums": {}
+}

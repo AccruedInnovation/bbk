@@ -2931,6 +2931,8 @@ def _handoff_shape_errors(value: Any) -> list[str]:
             errors.append(f"{field} must be a safe BBK identifier")
     if not isinstance(value.get("attempt"), int) or isinstance(value.get("attempt"), bool) or value.get("attempt", 0) < 1:
         errors.append("attempt must be an integer >= 1")
+    # Consume-only compatibility: READY_FOR_VALIDATION, BLOCKED, and PAUSED
+    # remain accepted when reading or verifying legacy bbk.handoff.v1 records.
     if value.get("disposition") not in {
         "COMPLETE", "READY_FOR_VALIDATION", "PARTIAL", "BLOCKED",
         "PAUSED", "BLOCKED_TECHNICAL", "BLOCKED_AUTHORITY",
@@ -3061,6 +3063,11 @@ def verify_handoff(path: Path, *, root: Path) -> dict[str, Any]:
 def cmd_handoff_create(args: argparse.Namespace) -> dict[str, Any]:
     root = resolve_root(args.root, required=True)
     assert root is not None
+    if args.disposition in {"READY_FOR_VALIDATION", "BLOCKED", "PAUSED"}:
+        raise BbkError(
+            f"{args.disposition} is consume-only legacy bbk.handoff.v1 vocabulary; "
+            "create a handoff with a current operational disposition and carry readiness separately"
+        )
     config = load_config(root)
     work_unit = validate_id(args.work_unit, "work-unit id")
     attempt = int(args.attempt)
@@ -3772,7 +3779,7 @@ def parser() -> argparse.ArgumentParser:
     x.add_argument("--interrupt-evidence", action="append")
     x.add_argument("--partial-work-location")
     x.add_argument("--disposition", choices=[
-        "COMPLETE", "READY_FOR_VALIDATION", "PARTIAL", "BLOCKED", "PAUSED",
+        "COMPLETE", "PARTIAL",
         "BLOCKED_TECHNICAL", "BLOCKED_AUTHORITY", "BLOCKED_DECISION",
         "PAUSED_CAPACITY", "PAUSED_HOST_WINDOW", "CANCELLED", "INCONCLUSIVE",
     ], required=True)

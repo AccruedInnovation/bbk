@@ -1,0 +1,446 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-local-discovery-envelope-v1.schema.json",
+  "title": "BBK LocalDiscoveryEnvelope v1",
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": true,
+      "minProperties": 1,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "id"
+          ]
+        },
+        {
+          "required": [
+            "path"
+          ]
+        }
+      ]
+    },
+    "referenceList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/reference"
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": true,
+      "minProperties": 1
+    },
+    "recordList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/record"
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "envelope_id",
+    "revision",
+    "lifecycle_state",
+    "policy_ref",
+    "boundary_ref",
+    "cohort_ref",
+    "operating_baseline_ref",
+    "execution_baseline_ref",
+    "authority_ref",
+    "issued_by",
+    "proposed_by_refs",
+    "eligible_work_unit_refs",
+    "candidate_state_at_issue",
+    "validation_scope_ref",
+    "budget",
+    "prohibited_changes",
+    "issued_at",
+    "activates_at",
+    "expires_at",
+    "revoked_at",
+    "superseded_by_ref",
+    "invalidation_triggers"
+  ],
+  "properties": {
+    "schema": {
+      "const": "bbk.local-discovery-envelope.v1"
+    },
+    "envelope_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "lifecycle_state": {
+      "enum": [
+        "DRAFT",
+        "PROPOSED",
+        "ACTIVE",
+        "SUSPENDED",
+        "EXHAUSTED",
+        "EXPIRED",
+        "REVOKED",
+        "SUPERSEDED"
+      ]
+    },
+    "policy_ref": {
+      "$ref": "#/$defs/reference"
+    },
+    "boundary_ref": {
+      "$ref": "#/$defs/reference"
+    },
+    "cohort_ref": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/reference"
+        },
+        {
+          "type": "object",
+          "required": [
+            "id",
+            "revision",
+            "digest"
+          ]
+        }
+      ]
+    },
+    "operating_baseline_ref": {
+      "$ref": "#/$defs/reference"
+    },
+    "execution_baseline_ref": {
+      "$ref": "#/$defs/reference"
+    },
+    "authority_ref": {
+      "$ref": "#/$defs/reference"
+    },
+    "issued_by": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "id"
+      ],
+      "properties": {
+        "role": {
+          "const": "bbk_territory_orchestrator"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "proposed_by_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "role",
+          "id"
+        ],
+        "properties": {
+          "role": {
+            "enum": [
+              "bbk_worker_orchestrator",
+              "bbk_worker"
+            ]
+          },
+          "id": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        }
+      },
+      "uniqueItems": true
+    },
+    "eligible_work_unit_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "allOf": [
+          {
+            "$ref": "#/$defs/reference"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "revision",
+              "digest"
+            ]
+          }
+        ]
+      },
+      "uniqueItems": true
+    },
+    "candidate_state_at_issue": {
+      "enum": [
+        "NO_CANDIDATE",
+        "DRAFT_CANDIDATE",
+        "SUCCESSOR_COHORT_PENDING"
+      ]
+    },
+    "validation_scope_ref": {
+      "$ref": "#/$defs/reference"
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "item_unit",
+        "item_limit",
+        "items_used",
+        "items_remaining",
+        "effort_unit",
+        "denominator_source",
+        "denominator_ref",
+        "planned_effort_units",
+        "effort_limit_basis_points",
+        "effort_limit_units",
+        "effort_used_units",
+        "effort_remaining_units",
+        "rounding"
+      ],
+      "properties": {
+        "item_unit": {
+          "const": "DISCOVERY_ITEM"
+        },
+        "item_limit": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "items_used": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "items_remaining": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "effort_unit": {
+          "const": "PLANNED_EFFORT_UNIT"
+        },
+        "denominator_source": {
+          "const": "COMPILED_COHORT_CHARTER"
+        },
+        "denominator_ref": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/reference"
+            },
+            {
+              "type": "object",
+              "required": [
+                "id",
+                "revision",
+                "digest"
+              ]
+            }
+          ]
+        },
+        "planned_effort_units": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "effort_limit_basis_points": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "effort_limit_units": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "effort_used_units": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "effort_remaining_units": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rounding": {
+          "const": "FLOOR"
+        }
+      }
+    },
+    "prohibited_changes": {
+      "type": "array",
+      "minItems": 12,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "issued_at": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "activates_at": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "expires_at": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "revoked_at": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/timestamp"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "superseded_by_ref": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/reference"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "invalidation_triggers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "lifecycle_state": {
+            "const": "REVOKED"
+          }
+        },
+        "required": [
+          "lifecycle_state"
+        ]
+      },
+      "then": {
+        "properties": {
+          "revoked_at": {
+            "$ref": "#/$defs/timestamp"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "lifecycle_state": {
+            "const": "SUPERSEDED"
+          }
+        },
+        "required": [
+          "lifecycle_state"
+        ]
+      },
+      "then": {
+        "properties": {
+          "superseded_by_ref": {
+            "$ref": "#/$defs/reference"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "lifecycle_state": {
+            "const": "EXHAUSTED"
+          }
+        },
+        "required": [
+          "lifecycle_state"
+        ]
+      },
+      "then": {
+        "properties": {
+          "budget": {
+            "anyOf": [
+              {
+                "properties": {
+                  "items_remaining": {
+                    "const": 0
+                  }
+                },
+                "required": [
+                  "items_remaining"
+                ]
+              },
+              {
+                "properties": {
+                  "effort_remaining_units": {
+                    "const": 0
+                  }
+                },
+                "required": [
+                  "effort_remaining_units"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

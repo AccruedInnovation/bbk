@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-territory-orchestrator-result-v1.schema.json",
+  "title": "BBK BBK Territory Orchestrator result payload v1",
+  "description": "Closed role-specific `result` payload for `bbk_territory_orchestrator` returns.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "territory_execution_charter_ref",
+    "operating_baseline_ref",
+    "execution_baseline_ref",
+    "execution_authorization_ref",
+    "boundary_ref",
+    "territory_run_ref",
+    "boundary_execution_state",
+    "work_unit_and_dependency_state",
+    "direct_children_and_attempts",
+    "workspace_resource_and_schedule_state",
+    "authority_and_scope_fence_state",
+    "integration_state",
+    "candidate_and_quality_state",
+    "validation_finding_and_repair_state",
+    "review_state",
+    "discovered_work_and_deviation_state",
+    "recovery_liveness_and_pause_state",
+    "cleanup_and_external_effect_state",
+    "durable_signals",
+    "claims_established_and_not_established",
+    "residuals_and_blockers",
+    "parent_actions_requested"
+  ],
+  "properties": {
+    "territory_execution_charter_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Territory instruction package identity, compiler or projection receipt, source checkpoint, qualified role and model/profile route, included and excluded concerns, budgets, stopping, cancellation, recovery, invalidation, completion and return schema."
+    },
+    "operating_baseline_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Accepted operating-baseline identity, revision, digest, lifecycle, acceptance receipt and planning handoff, or an exact blocking mismatch."
+    },
+    "execution_baseline_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Compiled execution-baseline identity, revision, digest, source-object manifest, exact boundary and WorkUnit mapping, instruction-package set, lifecycle and current validity."
+    },
+    "execution_authorization_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Authority receipt, holder, exact baseline, campaign and boundary, repositories, workspaces, environments, tools, resource ceiling, run and replacement allowance, external effects, safeguards, residual risks, cancellation and recovery terms, expiry, revocation and current status."
+    },
+    "boundary_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Immutable TerritoryExecutionBoundary identity, revision and digest; mapping rationale; source territories, architecture elements, capabilities, phases, ExecutionSlices and WorkUnits; dependencies, bindings and integration obligations; repositories and scopes; resources and concurrency; quality, validation, feared-event, containment, recovery, completion and escalation contracts; and current invalidation state."
+    },
+    "territory_run_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Canonical territory semantic-run identity, lifecycle, current physical attempt, predecessor or replacement attempts, host session, active lease and fencing state where exposed, startup or resume handshake, checkpoint and recovery envelope."
+    },
+    "boundary_execution_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Current local capability, phase, WorkUnit, cohort, integration, gate, validation, repair, review and completion frontier, with projection watermark and freshness."
+    },
+    "work_unit_and_dependency_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every boundary WorkUnit and local dependency with eligibility, owning cohort, predecessor and successor state, cross-boundary prerequisites, invalidation, discovery status and completion evidence."
+    },
+    "direct_children_and_attempts": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every current and historical Worker Orchestrator, Validator Orchestrator and Reviewer semantic run, physical attempt, host session, continuation, expected silence, state, checkpoint, result, interruption, replacement and verified handoff."
+    },
+    "workspace_resource_and_schedule_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Workspace requirements and live bindings where known; mutation owners; shared-resource serialization; repositories, processes, tools, environments, credentials, devices, services, storage, network and external targets; local concurrency, budgets, deadlines, waits, backpressure and exhausted ceilings."
+    },
+    "authority_and_scope_fence_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Effective semantic, resource, workspace, mutation, credential, network, device, service, external-system and effect fences; source grants, child narrowing, discovery permits, safeguards, expiry, revocation, violations and current host-enforcement limitations."
+    },
+    "integration_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every within-boundary and relevant cross-boundary integration obligation with participants, owner, interface and revision, assembly point, prerequisites, normal and failure semantics, recovery, gate, linked assertion and evidence, impact set, invalidation and unresolved work."
+    },
+    "candidate_and_quality_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every current or historical worker cohort, draft and frozen candidate, manifest, worker-quality attestation, successor or invalidated candidate, contributing WorkUnits, local-discovery additions, changed artifacts, external effects, quality results and exact handoff."
+    },
+    "validation_finding_and_repair_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every candidate-bound Validator Orchestrator run, assertion partition, evidence receipt, evaluation, immutable finding, infrastructure or context failure, aggregate disposition, repair route, successor candidate, revalidation scope, cycle count and unresolved governing issue."
+    },
+    "review_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every territory-level Reviewer charter, context and exposure policy, run, evidence, findings, disposition route, applicability and claim not established."
+    },
+    "discovered_work_and_deviation_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Ordinary implied work, committed or BBK-recorded local discovery, advisory drift and material divergence with source, affected objects, authority, permit or absence, budget use, candidate and validation impact, containment, escalation and planning consequence."
+    },
+    "recovery_liveness_and_pause_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Lifecycle, liveness, useful progress, expected silence, dependency wait, capacity or host-window pause, suspicion, probes, containment, checkpoints, replacement, fencing and unresolved recovery state for the territory and direct children."
+    },
+    "cleanup_and_external_effect_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Processes, packages, credentials, services, ports, locks, databases, generated files, caches, workspaces, devices, remote systems, publication, deployment, migration and other external effects with pre-state, actual effects, receipts, cleanup, rollback, compensation, quarantine, residuals and ownership."
+    },
+    "durable_signals": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every unresolved or material status, blocker, discovered-work, planning-decision, contract-conflict, validation-escalation, retry-exhaustion, recovery, authority-withdrawal, completion-readiness, failure or cancellation signal with identity, sequence, affected scope, evidence, delivery, owner and resolution state."
+    },
+    "claims_established_and_not_established": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Exact claims supported by current worker quality, validation, review, integration and operational evidence, plus material claims explicitly not established; no inference of acceptance, outcome achievement, safety, compliance or release beyond the evidence."
+    },
+    "residuals_and_blockers": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Residual uncertainty, stale or invalid objects, failed or inconclusive assertions, open findings, technical, authority and decision blockers, dependency waits, capacity and host-window pauses, expected silence, cleanup residuals and smallest valid resolution for each."
+    },
+    "parent_actions_requested": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Exact Root Orchestrator, core, planning, authority, resource, qualification, recovery, successor-boundary, successor-baseline, review, validation, operational-observation, completion-assessment or release action requested, with affected objects and whether positively isolated work may continue."
+    }
+  },
+  "x-bbk-role": "bbk_territory_orchestrator",
+  "x-bbk-contract": "bbk.territory-orchestrator-return.v1",
+  "x-bbk-supplemental-enums": {}
+}

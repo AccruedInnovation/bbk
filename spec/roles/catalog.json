@@ -1,0 +1,410 @@
+{
+  "schema_version": "bbk.roles.v4",
+  "package_version": "0.1.0-alpha.13.1",
+  "catalog_schema": "spec/schemas/bbk-role-catalog-v4.schema.json",
+  "role_schema": "spec/schemas/bbk-role-v4.schema.json",
+  "projection_schema": "spec/schemas/bbk-roles-v4.schema.json",
+  "method_content_source": "spec/method-content.json",
+  "prompt_module_package": "spec/prompt-modules/catalog.json",
+  "contract_package": "spec/contracts/catalog.json",
+  "compatibility_projection": "spec/roles.json",
+  "constitution_modules": {
+    "core": [
+      "BBK is a method harness. Host capability does not create authority; installation, invocation, model choice, tool availability, and permissions only define what is physically possible.",
+      "Preserve the requested outcome, explicit authority, exact subject boundary, and evidence. Do not claim readiness, authorization, completion, acceptance, release, compliance, or semantics that they do not support.",
+      "Distinguish facts, assumptions, proposals, accepted decisions, findings, and residual uncertainty.",
+      "Make routine, reversible, conventional, and responsibly inferable choices inside scope. Route material outcome, authority, protected-floor, or hard-to-reverse ambiguity through this role's escalation contract.",
+      "Bind work and returns to exact subjects and revisions. Preserve failed attempts, findings, and superseded state rather than rewriting them into apparent success.",
+      "Use only the context, tools, capabilities, effects, and result envelope supplied or explicitly retrieved under the invocation contract; ambient transcript history is not default authority.",
+      "Canonical BBK roles operate behind one user-facing controller. They never open a direct human interaction channel; material decision, authority, protected-floor, hard-to-reverse, or private-context needs travel through the host inter-agent transport as a structured request."
+    ],
+    "planning": [
+      "Treat a requested intervention as a candidate means until its relationship to the operational outcome is clear, proportionately reviewed, or explicitly preference- or constraint-driven.",
+      "Add fit, structure, slicing, state/effect, procedure, and assurance formality only when material; preserve traceability across every layer that is used.",
+      "A recommendation, proposal, procedure, plan, review, or artifact cannot approve, authorize, or activate itself."
+    ],
+    "coordination": [
+      "Distinguish logical responsibility, reusable procedure, and physical model or tool invocation. Co-location never collapses authority, return contracts, evidence exposure, or required independence.",
+      "Delegate only through the canonical direct-child contract. Bind each child to an exact subject, context, authority, effects, stopping conditions, assurance obligations, and return envelope; parent ownership of integration remains explicit.",
+      "Route human decisions and authority requests through the invoking BBK chain and the host inter-agent transport to the sole user-facing controller. No canonical child questions the user directly or infers a response from silence, transport state, or session state."
+    ],
+    "execution": [
+      "Effects require an exact authority grant and capability zone. Prompt text, writable tools, and host sandbox access alone are not permission.",
+      "Honor standing approvals inside their exact scope without re-requesting them; ambiguity, expiry, revocation, or scope expansion narrows or blocks the grant.",
+      "Preserve checkpoints, candidate identity, exact artifact inventories, and durable path/byte-count/SHA-256 handoffs across interruption, continuation, repair, and integration."
+    ],
+    "assurance": [
+      "Use proportional assurance: deterministic checks first, each material assertion proved once by the cheapest sufficient method, and independence only for a distinct assurance property.",
+      "Preserve append-only evidence exposure. Criteria selected after outcome-bearing evidence was seen are not independent confirmation against that evidence.",
+      "Keep proof obligation, context, run, receipt, finding, disposition, and learning responsibilities distinct. Review evidence and dispositions do not create approval or authority outside their declared scope.",
+      "Skipped, blocked, inconclusive, stale, wrong-subject, or unbound evidence is not a pass; findings remain open until a valid disposition closes or supersedes them."
+    ]
+  },
+  "interaction_topology": {
+    "user_facing_identity": "harness_root_controller",
+    "canonical_roles_user_facing": false,
+    "human_request_route": "canonical role -> harness root controller -> user -> requesting role",
+    "omp_transport": "hub/IRC to the peer whose kind is main",
+    "fallback_transport": "structured BLOCKED_DECISION, BLOCKED_AUTHORITY, or private-context request returned through the invocation chain",
+    "human_request_originators": [
+      "bbk_root_wayfinder",
+      "bbk_questioning_wayfinder",
+      "bbk_question_guide"
+    ]
+  },
+  "controller_entrypoints": [
+    {
+      "route": "PLANNING",
+      "role": "bbk_root_wayfinder",
+      "invocation_mode": "CONTROLLER_ROOT",
+      "selected_by": "harness_root_controller",
+      "selection_when": "The request requires planning, design, decision work, uncertainty reduction, or preparation of an executable operating baseline."
+    },
+    {
+      "route": "EXECUTION",
+      "role": "bbk_root_orchestrator",
+      "invocation_mode": "CONTROLLER_ROOT",
+      "selected_by": "harness_root_controller",
+      "selection_when": "An accepted operating baseline and sufficient execution authority exist and the request is execution, integration, recovery, or campaign continuation."
+    },
+    {
+      "route": "REVIEW",
+      "role": "bbk_reviewer",
+      "invocation_mode": "DIRECT_BOUNDED_REVIEW",
+      "selected_by": "harness_root_controller",
+      "selection_when": "The request is one bounded independent qualitative, conformance, proportionality, readiness, or evidence-sufficiency review."
+    },
+    {
+      "route": "ASSURANCE",
+      "role": "bbk_validator_orchestrator",
+      "invocation_mode": "CONTROLLER_ROOT",
+      "selected_by": "harness_root_controller",
+      "selection_when": "The request is one exact candidate-bound, assertion-scoped assurance run and does not require an execution campaign to be fabricated."
+    }
+  ],
+  "role_entries": [
+    {
+      "name": "bbk_root_wayfinder",
+      "file": "spec/roles/bbk_root_wayfinder-role.json",
+      "allowed_parent_modes": [
+        {
+          "mode": "CONTROLLER_ROOT",
+          "parent_kind": "controller",
+          "parents": [
+            "harness_root_controller"
+          ],
+          "purpose": "Begin or resume the root planning, design, and uncertainty-reduction workflow selected by the sole user-facing controller."
+        }
+      ]
+    },
+    {
+      "name": "bbk_territory_wayfinder",
+      "file": "spec/roles/bbk_territory_wayfinder-role.json",
+      "allowed_parent_modes": [
+        {
+          "mode": "ROOT_TERRITORY_CHILD",
+          "parent_kind": "canonical_role",
+          "parents": [
+            "bbk_root_wayfinder"
+          ],
+          "purpose": "Map and resolve one root-delegated planning territory."
+        },
+        {
+          "mode": "TERRITORY_RECURSION",
+          "parent_kind": "canonical_role",
+          "parents": [
+            "bbk_territory_wayfinder"
+          ],
+          "purpose": "Recursively subdivide one territory only where a distinct bounded responsibility improves the plan."
+        }
+      ]
+    },
+    {
+      "name": "bbk_questioning_wayfinder",
+      "file": "spec/roles/bbk_questioning_wayfinder-role.json",
+      "allowed_parent_modes": [
+        {
+          "mode": "DECISION_CLUSTER_CHILD",
+          "parent_kind": "canonical_role",
+          "parents": [
+            "bbk_root_wayfinder",
+            "bbk_territory_wayfinder"
+          ],
+          "purpose": "Retire facts and coordinate a bounded cluster of material decisions for its planning parent."
+        }
+      ]
+    },
+    {
+      "name": "bbk_planning_wayfinder",
+      "file": "spec/roles/bbk_planning_wayfinder-role.json",
+      "allowed_parent_modes": [
+        {
+          "mode": "WORK_GRAPH_CHILD",
+          "parent_kind": "canonical_role",
+          "parents": [
+            "bbk_root_wayfinder",
+            "bbk_territory_wayfinder"
+          ],
+          "purpose": "Compile accepted planning direction into a phased executable work graph for its semantic parent."
+        }
+      ]
+    },
+    {
+      "name": "bbk_phase_wayfinder",
+      "file": "spec/roles/bbk_phase_wayfinder-role.json",
+      "allowed_parent_modes": [
+        {
+          "mode": "PHASE_PLAN_CHILD",
+          "parent_kind": "canonical_role",
+          "parents": [
+            "bbk_planning_wayfinder"
+          ],
+          "purpose": "Decompose one exact phase into bounded leaf WorkUnits and integration obligations."
+        }
+      ]
+    },
+    {
+      "name": "bbk_question_guide",
+      "file": "spec/roles/bbk_question_guide-role.json",
+      "allowed_parent_modes": [
+        {
+          "mode": "ESCALATED_DECISION_CHILD",
+          "parent_kind": "canonical_role",
+          "parents": [
+            "bbk_questioning_wayfinder"
+          ],
+          "purpose": "Handle one rejected, contested, materially ambiguous, or explicitly deeper decision branch."
+        }
+      ]
+    },
+    {
+      "name": "bbk_researcher",
+      "file": "spec/roles/bbk_researcher-role.json",
+      "allowed_parent_modes": [
+        {
+          "mode": "RESEARCH_CHILD",
+          "parent_kind": "canonical_role",
+          "parents": [
+            "bbk_root_wayfinder",
+            "bbk_territory_wayfinder",
+            "bbk_questioning_wayfinder"
+          ],
+          "purpose": "Resolve one bounded discoverable factual uncertainty for the invoking planning role."
+        }
+      ]
+    },
+    {
+      "name": "bbk_prototyper",
+      "file": "spec/roles/bbk_prototyper-role.json",
+      "allowed_parent_modes": [
+        {
+          "mode": "EXPERIMENT_CHILD",
+          "parent_kind": "canonical_role",
+          "parents": [
+            "bbk_root_wayfinder",
+            "bbk_territory_wayfinder"
+          ],
+          "purpose": "Run one bounded planning experiment whose result is cheaper and safer to obtain empirically than by further debate."
+        }
+      ]
+    },
+    {
+      "name": "bbk_synthesizer",
+      "file": "spec/roles/bbk_synthesizer-role.json",
+      "allowed_parent_modes": [
+        {
+          "mode": "SYNTHESIS_CHILD",
+          "parent_kind": "canonical_role",
+          "parents": [
+            "bbk_root_wayfinder",
+            "bbk_territory_wayfinder"
+          ],
+          "purpose": "Reconcile one declared source set while preserving provenance, disagreement, and uncertainty for the integrating parent."
+        }
+      ]
+    },
+    {
+      "name": "bbk_architect",
+      "file": "spec/roles/bbk_architect-role.json",
+      "allowed_parent_modes": [
+        {
+          "mode": "ARCHITECTURE_CHILD",
+          "parent_kind": "canonical_role",
+          "parents": [
+            "bbk_root_wayfinder",
+            "bbk_territory_wayfinder"
+          ],
+          "purpose": "Produce one versioned architecture proposal for the invoking planning parent."
+        }
+      ]
+    },
+    {
+      "name": "bbk_verification_designer",
+      "file": "spec/roles/bbk_verification_designer-role.json",
+      "allowed_parent_modes": [
+        {
+          "mode": "VERIFICATION_DESIGN_CHILD",
+          "parent_kind": "canonical_role",
+          "parents": [
+            "bbk_root_wayfinder",
+            "bbk_territory_wayfinder",
+            "bbk_planning_wayfinder",
+            "bbk_phase_wayfinder"
+          ],
+          "purpose": "Design exact assertions and evidence methods for one bounded parent-owned claim set."
+        }
+      ]
+    },
+    {
+      "name": "bbk_worker_designer",
+      "file": "spec/roles/bbk_worker_designer-role.json",
+      "allowed_parent_modes": [
+        {
+          "mode": "WORKER_DESIGN_CHILD",
+          "parent_kind": "canonical_role",
+          "parents": [
+            "bbk_planning_wayfinder",
+            "bbk_phase_wayfinder",
+            "bbk_prototyper"
+          ],
+          "purpose": "Compile or qualify one exact Worker invocation contract for a planning phase or bounded prototype apparatus WorkUnit."
+        }
+      ]
+    },
+    {
+      "name": "bbk_reviewer",
+      "file": "spec/roles/bbk_reviewer-role.json",
+      "allowed_parent_modes": [
+        {
+          "mode": "DIRECT_BOUNDED_REVIEW",
+          "parent_kind": "controller",
+          "parents": [
+            "harness_root_controller"
+          ],
+          "purpose": "Perform one controller-selected bounded independent review without becoming a planning, execution, or acceptance root."
+        },
+        {
+          "mode": "DIRECT_BOUNDED_REVIEW",
+          "parent_kind": "canonical_role",
+          "parents": [
+            "bbk_root_wayfinder",
+            "bbk_territory_wayfinder",
+            "bbk_planning_wayfinder",
+            "bbk_phase_wayfinder",
+            "bbk_root_orchestrator",
+            "bbk_territory_orchestrator"
+          ],
+          "purpose": "Perform one exact independent review charter for a planning or execution parent."
+        },
+        {
+          "mode": "MANIFEST_ATTEMPT",
+          "parent_kind": "canonical_role",
+          "parents": [
+            "bbk_validator_orchestrator"
+          ],
+          "purpose": "Perform one explicitly justified qualitative or cross-cutting ReviewManifest assignment inside a candidate-bound assurance run."
+        }
+      ]
+    },
+    {
+      "name": "bbk_root_orchestrator",
+      "file": "spec/roles/bbk_root_orchestrator-role.json",
+      "allowed_parent_modes": [
+        {
+          "mode": "CONTROLLER_ROOT",
+          "parent_kind": "controller",
+          "parents": [
+            "harness_root_controller"
+          ],
+          "purpose": "Begin or resume execution and recovery of one accepted and authorized operating baseline."
+        }
+      ]
+    },
+    {
+      "name": "bbk_territory_orchestrator",
+      "file": "spec/roles/bbk_territory_orchestrator-role.json",
+      "allowed_parent_modes": [
+        {
+          "mode": "TERRITORY_EXECUTION_CHILD",
+          "parent_kind": "canonical_role",
+          "parents": [
+            "bbk_root_orchestrator"
+          ],
+          "purpose": "Execute and integrate one immutable territory boundary within the root campaign."
+        }
+      ]
+    },
+    {
+      "name": "bbk_worker_orchestrator",
+      "file": "spec/roles/bbk_worker_orchestrator-role.json",
+      "allowed_parent_modes": [
+        {
+          "mode": "WORKER_COHORT_CHILD",
+          "parent_kind": "canonical_role",
+          "parents": [
+            "bbk_territory_orchestrator"
+          ],
+          "purpose": "Produce and integrate one exact candidate-producing Worker cohort for its territory parent."
+        }
+      ]
+    },
+    {
+      "name": "bbk_validator_orchestrator",
+      "file": "spec/roles/bbk_validator_orchestrator-role.json",
+      "allowed_parent_modes": [
+        {
+          "mode": "TERRITORY_BOUND",
+          "parent_kind": "canonical_role",
+          "parents": [
+            "bbk_territory_orchestrator"
+          ],
+          "purpose": "Run one candidate-bound assurance program inside an active territory execution flow."
+        },
+        {
+          "mode": "CONTROLLER_ROOT",
+          "parent_kind": "controller",
+          "parents": [
+            "harness_root_controller"
+          ],
+          "purpose": "Run one controller-selected assertion-scoped candidate assurance program without fabricating an execution campaign or territory boundary."
+        }
+      ]
+    },
+    {
+      "name": "bbk_worker",
+      "file": "spec/roles/bbk_worker-role.json",
+      "allowed_parent_modes": [
+        {
+          "mode": "CANDIDATE_PRODUCTION",
+          "parent_kind": "canonical_role",
+          "parents": [
+            "bbk_worker_orchestrator"
+          ],
+          "purpose": "Execute one exact candidate-producing WorkUnit inside a Worker cohort."
+        },
+        {
+          "mode": "PROTOTYPE_SUPPORT",
+          "parent_kind": "canonical_role",
+          "parents": [
+            "bbk_prototyper"
+          ],
+          "purpose": "Execute one exact experiment-support WorkUnit under the bounded Prototyper charter."
+        }
+      ]
+    },
+    {
+      "name": "bbk_validator",
+      "file": "spec/roles/bbk_validator-role.json",
+      "allowed_parent_modes": [
+        {
+          "mode": "ASSERTION_ATTEMPT",
+          "parent_kind": "canonical_role",
+          "parents": [
+            "bbk_validator_orchestrator"
+          ],
+          "purpose": "Execute one fixed candidate-bound assertion assignment under supplied criteria and method."
+        }
+      ]
+    }
+  ]
+}

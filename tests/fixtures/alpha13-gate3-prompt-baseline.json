@@ -1,0 +1,3498 @@
+{
+  "schema": "bbk.prompt-compilation-baseline.v1",
+  "source_state": "cumulative-alpha13-gate3",
+  "measurement": "Generic model-facing instruction_text character count before Gate 4 prompt-module compilation.",
+  "generic_prompt_characters": {
+    "bbk_architect": 78392,
+    "bbk_phase_wayfinder": 69042,
+    "bbk_planning_wayfinder": 58517,
+    "bbk_prototyper": 81388,
+    "bbk_question_guide": 50174,
+    "bbk_questioning_wayfinder": 46681,
+    "bbk_researcher": 45605,
+    "bbk_reviewer": 68390,
+    "bbk_root_orchestrator": 80473,
+    "bbk_root_wayfinder": 31083,
+    "bbk_synthesizer": 52678,
+    "bbk_territory_orchestrator": 85965,
+    "bbk_territory_wayfinder": 35325,
+    "bbk_validator": 75712,
+    "bbk_validator_orchestrator": 94624,
+    "bbk_verification_designer": 76396,
+    "bbk_worker": 68945,
+    "bbk_worker_designer": 82778,
+    "bbk_worker_orchestrator": 81071
+  },
+  "roles": {
+    "bbk_architect": {
+      "behavior_sha256": "cd5ce588249d7174bd61fbd72f1856d82315d58af78984adddd0f866d6026e4f",
+      "mandatory_skills": [
+        "bbk-architecture",
+        "bbk-context-routing",
+        "bbk-handoff"
+      ]
+    },
+    "bbk_phase_wayfinder": {
+      "behavior_sha256": "e9f940cc2f2dfdf61759fd1d44e33fc8fe06210afda573ee0c427d167f94b1ec",
+      "mandatory_skills": [
+        "bbk-phase-plan",
+        "bbk-execution-slicing",
+        "bbk-context-routing",
+        "bbk-handoff"
+      ]
+    },
+    "bbk_planning_wayfinder": {
+      "behavior_sha256": "0f26bda939bdfa6329043e3a571a5829b66782088119664fe809f3d575e54160",
+      "mandatory_skills": [
+        "bbk-work-graph",
+        "bbk-execution-slicing",
+        "bbk-context-routing",
+        "bbk-handoff"
+      ]
+    },
+    "bbk_prototyper": {
+      "behavior_sha256": "0814ed8535f53746fe976bf4a04b323bb205be1dab29e4bde1945e1510511f87",
+      "mandatory_skills": [
+        "bbk-prototype",
+        "bbk-context-routing",
+        "bbk-handoff"
+      ]
+    },
+    "bbk_question_guide": {
+      "behavior_sha256": "03490300ba727ba7b955f2b37477908176ac0fedc32f27070dd076e9849b6030",
+      "mandatory_skills": [
+        "bbk-grill",
+        "bbk-context-routing"
+      ]
+    },
+    "bbk_questioning_wayfinder": {
+      "behavior_sha256": "d65853ec7c926ea2c5021493ba1d319ae42fa615e055302bea7b7265f9ad2ebc",
+      "mandatory_skills": [
+        "bbk-question-branch",
+        "bbk-context-routing"
+      ]
+    },
+    "bbk_researcher": {
+      "behavior_sha256": "6f6dced0eebc1fe4ba97c3ef148d836416547b6a10292ce82393632a2f330b43",
+      "mandatory_skills": [
+        "bbk-research",
+        "bbk-context-routing"
+      ]
+    },
+    "bbk_reviewer": {
+      "behavior_sha256": "1213eeb4d26d7e3428cae2a4a1037d7995b9457ba6e29c49fbd15f672c9e47f5",
+      "mandatory_skills": [
+        "bbk-review",
+        "bbk-evidence",
+        "bbk-review-findings",
+        "bbk-context-routing",
+        "bbk-handoff"
+      ]
+    },
+    "bbk_root_orchestrator": {
+      "behavior_sha256": "fcf6dccad2127fa81dd6d396aedb7c446cb15319ce50df673a1c1f5181b888e1",
+      "mandatory_skills": [
+        "bbk-root-execution",
+        "bbk-context-routing",
+        "bbk-handoff"
+      ]
+    },
+    "bbk_root_wayfinder": {
+      "behavior_sha256": "9873670e8be7700cb060a0464b8a5e73ba633533dcf98554c149bab32fe2f3b3",
+      "mandatory_skills": [
+        "bbk-wayfind",
+        "bbk-context-routing"
+      ]
+    },
+    "bbk_synthesizer": {
+      "behavior_sha256": "477c0a6283ea75ffa251e3924d973d078708c3192d488426d68fe3551581c73a",
+      "mandatory_skills": [
+        "bbk-synthesize",
+        "bbk-context-routing",
+        "bbk-handoff"
+      ]
+    },
+    "bbk_territory_orchestrator": {
+      "behavior_sha256": "6fae52f8a5de87f93481919f264d8641898c4e10c51fc44409f2f38d4ffd397c",
+      "mandatory_skills": [
+        "bbk-territory-execution",
+        "bbk-context-routing",
+        "bbk-handoff"
+      ]
+    },
+    "bbk_territory_wayfinder": {
+      "behavior_sha256": "49cefdb4a9331ae2a36566165cd41e04da3b46c76428cba197ef7fb5084763a7",
+      "mandatory_skills": [
+        "bbk-wayfind",
+        "bbk-context-routing"
+      ]
+    },
+    "bbk_validator": {
+      "behavior_sha256": "cd652fc3d93778142f6687f3a111b0e53f18ea0a1b33b4f644e73ef0b67df40a",
+      "mandatory_skills": [
+        "bbk-assertion-validation",
+        "bbk-evidence",
+        "bbk-review-findings",
+        "bbk-context-routing",
+        "bbk-handoff"
+      ]
+    },
+    "bbk_validator_orchestrator": {
+      "behavior_sha256": "9bc5ee36b1e98d5addf53594b0d0f6999d63689cd74ecd82cf337111908639d7",
+      "mandatory_skills": [
+        "bbk-validation-orchestration",
+        "bbk-evidence",
+        "bbk-context-routing",
+        "bbk-handoff"
+      ]
+    },
+    "bbk_verification_designer": {
+      "behavior_sha256": "09c786f9c1b3cb8a2d11bbed9c51d60cf6f5930e314022ab53ddf85e08f165b2",
+      "mandatory_skills": [
+        "bbk-verification-design",
+        "bbk-evidence",
+        "bbk-context-routing",
+        "bbk-handoff"
+      ]
+    },
+    "bbk_worker": {
+      "behavior_sha256": "f8b98fd442f1ed1ccbe2a364d6eb72c6b099f9e741489ed44055f75f5367cdc0",
+      "mandatory_skills": [
+        "bbk-work-unit-execution",
+        "bbk-context-routing",
+        "bbk-handoff"
+      ]
+    },
+    "bbk_worker_designer": {
+      "behavior_sha256": "c023d6d0e2ce2b35459ce8b8d0c18cc46ff349c8c9e871f689b672aba087ba6e",
+      "mandatory_skills": [
+        "bbk-worker-design",
+        "bbk-profile-routing",
+        "bbk-context-routing",
+        "bbk-handoff"
+      ]
+    },
+    "bbk_worker_orchestrator": {
+      "behavior_sha256": "964142ca100a673d5dc6c5c43a590d356c0b845f418ffeabedf9a1ae06c3e00b",
+      "mandatory_skills": [
+        "bbk-worker-execution",
+        "bbk-context-routing",
+        "bbk-handoff"
+      ]
+    }
+  },
+  "skills": {
+    "bbk": {
+      "template_characters": 6899,
+      "headings": [
+        "# BBK harness-root controller",
+        "## Identity and authority",
+        "## Select one canonical root",
+        "## Dispatch and supervision",
+        "## Human relay contract",
+        "## Focused procedure routing",
+        "## Controller obligations",
+        "## Final relay"
+      ],
+      "frontmatter_sha256": "e57115edb2dcd8f1cfb68f44ebe7a2ae677c0605d31454b4f0e29da2c2eb094f",
+      "sections": [
+        {
+          "heading": "# BBK harness-root controller",
+          "sha256": "53df61ed940fd7f9993023bbded1413975135dc9431d648153ebed8417d838a8",
+          "characters": 129
+        },
+        {
+          "heading": "## Identity and authority",
+          "sha256": "104a8213f74ceb211c4f638823a43afd0cbaf0de3996b4678227a74d777200a9",
+          "characters": 650
+        },
+        {
+          "heading": "## Select one canonical root",
+          "sha256": "bb5efc8e75b06cd4dbc03b296fb498787d68b6ccf702d698a7320ff0cc9432ec",
+          "characters": 970
+        },
+        {
+          "heading": "## Dispatch and supervision",
+          "sha256": "5ccb4a8f970a64c35c79961ac56cdc2c9309567199a3590fec367d5a908e6811",
+          "characters": 1394
+        },
+        {
+          "heading": "## Human relay contract",
+          "sha256": "675d46b475f3b3e9b4cde0535d24c8637b68578ce2ee5de563e0bd5c08ed083d",
+          "characters": 1396
+        },
+        {
+          "heading": "## Focused procedure routing",
+          "sha256": "d2b1866cd37bfc7bf7e17b20c83208e03f960f0d4b8d03413d22a1ab37849cfc",
+          "characters": 895
+        },
+        {
+          "heading": "## Controller obligations",
+          "sha256": "d84c91420d482bc412bc34b6ab40aa958000cc633884ac850f7e7987d371eae1",
+          "characters": 851
+        },
+        {
+          "heading": "## Final relay",
+          "sha256": "ef5fbd8463219f8d56510444a4309f01860dc9fb56dd1c22ea53c91b881adc53",
+          "characters": 303
+        }
+      ]
+    },
+    "bbk-architecture": {
+      "template_characters": 27878,
+      "headings": [
+        "# BBK Architecture",
+        "## 1. Bind the exact architecture charter",
+        "## 2. Qualify the source and decision baseline",
+        "## 3. Confirm architecture readiness and role fit",
+        "## 4. Map context before internal decomposition",
+        "## 5. Preserve fixed decisions and expose design freedom",
+        "## 6. Explore architecture concepts proportionately",
+        "## 7. Allocate coherent architecture elements",
+        "### Boundary intent",
+        "## 8. Assign canonical ownership",
+        "## 9. Define one canonical contract per material interface",
+        "## 10. Define material interaction scenarios",
+        "## 11. Define state, information, control, and effect architecture",
+        "## 12. Design failure containment and recovery",
+        "## 13. Define security, trust, privacy, safety, and authority boundaries",
+        "## 14. Define measurable quality-attribute scenarios",
+        "## 15. Define deployment, operation, and lifecycle",
+        "## 16. Define compatibility, migration, and evolution",
+        "## 17. Derive integration, verification, structure, and planning obligations",
+        "## 18. Produce consistent views and traceability",
+        "## 19. Perform a producer self-check",
+        "## 20. Handle invalidation and successor architecture",
+        "## 21. Keep the role leaf and preserve canonical integration",
+        "## 22. Determine the architecture state and return",
+        "### `READY_FOR_PARENT_INTEGRATION`",
+        "### Other states",
+        "## Profile interaction"
+      ],
+      "frontmatter_sha256": "f08c6d0d2a30718499aabba2655ccc18a120214cf992d9aae445d1e8a6e4d805",
+      "sections": [
+        {
+          "heading": "# BBK Architecture",
+          "sha256": "31dcbff4a80c7c0211503061bd318c06b7b2a43f17bef6aa9f3b8b1082258a0a",
+          "characters": 621
+        },
+        {
+          "heading": "## 1. Bind the exact architecture charter",
+          "sha256": "da4650e4901360cba0853e922bda84d2eec5607c3e06eb7b5216ed30393b2664",
+          "characters": 1275
+        },
+        {
+          "heading": "## 2. Qualify the source and decision baseline",
+          "sha256": "313e854e32431fe4bf49ab8e9c88cbd07de4f926cf87c429429404a58acea68c",
+          "characters": 921
+        },
+        {
+          "heading": "## 3. Confirm architecture readiness and role fit",
+          "sha256": "c7f56d6ab34e2cd2586627f2ce8093b18ca92b833f525e85956babea9fa19612",
+          "characters": 1111
+        },
+        {
+          "heading": "## 4. Map context before internal decomposition",
+          "sha256": "ae48b3b3dae869f467185dcc802969dbecd5f0b0d59529c21593c0cf67476fa1",
+          "characters": 990
+        },
+        {
+          "heading": "## 5. Preserve fixed decisions and expose design freedom",
+          "sha256": "edef462b51145851da3e53d695d8b60e2f18b35ac468ffeded77dd15fb1a2407",
+          "characters": 883
+        },
+        {
+          "heading": "## 6. Explore architecture concepts proportionately",
+          "sha256": "8b6f06d961ca4b9a2a7ac9f382bdbd153d5b1cf9ea57ec6314d77a928ad7da03",
+          "characters": 1024
+        },
+        {
+          "heading": "## 7. Allocate coherent architecture elements",
+          "sha256": "2e0b50d06e0d5766d315cae2377bc3837903552fd923858798bfd5dde6878f98",
+          "characters": 1063
+        },
+        {
+          "heading": "### Boundary intent",
+          "sha256": "00c495b40ac69ce837a7bdcb2f1958ff016b57f6dd6f00159a5ba8e637ae5f38",
+          "characters": 571
+        },
+        {
+          "heading": "## 8. Assign canonical ownership",
+          "sha256": "588b5b6fb5c494140c7d1ee4ec78ee58987d5d8c4808561c3678780f9e4055a7",
+          "characters": 1083
+        },
+        {
+          "heading": "## 9. Define one canonical contract per material interface",
+          "sha256": "5d0eaad930720aa3ffbc56c1a9ef47f737c551f58767be16bea9d3ea600bcb8f",
+          "characters": 1807
+        },
+        {
+          "heading": "## 10. Define material interaction scenarios",
+          "sha256": "3204a5b92c0cb49a258b720b4641b0c3eb89aedac05ee1042878f3c931857931",
+          "characters": 982
+        },
+        {
+          "heading": "## 11. Define state, information, control, and effect architecture",
+          "sha256": "b9610efbc0b96efafeb7a1f5baa5ed2d0241e0a420b6a3a95f6c93894b6be922",
+          "characters": 1116
+        },
+        {
+          "heading": "## 12. Design failure containment and recovery",
+          "sha256": "78b8a55c6e335db9ef8c730f681a8e361a93a0017e393de43e92889b527e4229",
+          "characters": 935
+        },
+        {
+          "heading": "## 13. Define security, trust, privacy, safety, and authority boundaries",
+          "sha256": "87b2b2d15f56b505d9ed90bf94376219aa5873ed1d969ff17c3e97e0d51411e6",
+          "characters": 895
+        },
+        {
+          "heading": "## 14. Define measurable quality-attribute scenarios",
+          "sha256": "f8ea4e983c80933eb982ea5d334f8dae9ecd0a150908c623d1445a0f43639464",
+          "characters": 825
+        },
+        {
+          "heading": "## 15. Define deployment, operation, and lifecycle",
+          "sha256": "77959a3eb0f052ae441dfc993470c26b2ff9cc3ee8120d38dff61aee76a347c3",
+          "characters": 959
+        },
+        {
+          "heading": "## 16. Define compatibility, migration, and evolution",
+          "sha256": "68c1a5487b4ab5a127dfd23bb9d92a912c08754e0543f15731bfdb44f940d09d",
+          "characters": 766
+        },
+        {
+          "heading": "## 17. Derive integration, verification, structure, and planning obligations",
+          "sha256": "7a1ae1cc21dc05481d1b5ceb3913d667758ddb6bda79aca254723109a24e1b5d",
+          "characters": 1374
+        },
+        {
+          "heading": "## 18. Produce consistent views and traceability",
+          "sha256": "dea24d757a89eee125abbc0c7fbcccc724a0a99a9c14276aa1dd69da3469135f",
+          "characters": 915
+        },
+        {
+          "heading": "## 19. Perform a producer self-check",
+          "sha256": "338b3199f994d4cd32e404fadda30590ad3c83ff488c1528fea7bc4598131223",
+          "characters": 1096
+        },
+        {
+          "heading": "## 20. Handle invalidation and successor architecture",
+          "sha256": "a8f2d380130e2a5872b6ce2fab9d3cfa8a71b3edf8c710e9ceeafe88e0b8b79e",
+          "characters": 736
+        },
+        {
+          "heading": "## 21. Keep the role leaf and preserve canonical integration",
+          "sha256": "93ad4fe83572e4e4d3d672d3c3036b0122a37c7636e51959ae12c99008051bb6",
+          "characters": 1247
+        },
+        {
+          "heading": "## 22. Determine the architecture state and return",
+          "sha256": "210759cd5c51e8485b42ce536f65a45de1083df0e8982ac653aacb5ceec94930",
+          "characters": 367
+        },
+        {
+          "heading": "### `READY_FOR_PARENT_INTEGRATION`",
+          "sha256": "ed06d59a2a602b6a7a5240837791602ea0d465056d391112bb2478a77820d6d6",
+          "characters": 726
+        },
+        {
+          "heading": "### Other states",
+          "sha256": "98fa7c66dbbf54416572566bc128bc634f56b4c4f52b4af6f9cf8192636ee22a",
+          "characters": 2156
+        },
+        {
+          "heading": "## Profile interaction",
+          "sha256": "d7308ed52a3b757b2fbde976ef92a7a953a5184cf71516c73e453281d2a9f314",
+          "characters": 965
+        }
+      ]
+    },
+    "bbk-assertion-validation": {
+      "template_characters": 23918,
+      "headings": [
+        "# BBK Assertion Validation",
+        "## 1. Preserve the role boundary",
+        "## 2. Bind the exact assignment",
+        "## 3. Confirm Validator role fit",
+        "## 4. Verify the exact candidate and eligibility",
+        "## 5. Preserve candidate read-only status",
+        "## 6. Verify the exact context",
+        "## 7. Freeze criteria and evidence exposure",
+        "## 8. Record independence as facts",
+        "## 9. Preserve ordered validation and assignment scope",
+        "## 10. Use the exact qualified method",
+        "## 11. Reuse evidence precisely",
+        "## 12. Collect evidence exactly",
+        "## 13. Match evidence realism to the claim",
+        "## 14. Separate observation from interpretation",
+        "## 15. Evaluate each assertion exactly",
+        "## 16. Classify failure before creating a finding",
+        "## 17. Create immutable findings",
+        "## 18. Keep finding, remediation and repair separate",
+        "## 19. Preserve outside-scope observations",
+        "## 20. Do not aggregate the run",
+        "## 21. Handle interruption and recovery honestly",
+        "## 22. Reconcile cleanup and secrets",
+        "## 23. Return one exact attempt report",
+        "## 24. Preserve current schema truth",
+        "## 25. Stop economically"
+      ],
+      "frontmatter_sha256": "510715bd8badf51bcba7265fdfb50db6668f4a9ddaa329487a3c06cbf26afbd9",
+      "sections": [
+        {
+          "heading": "# BBK Assertion Validation",
+          "sha256": "2254dcb844cbe75f7b337f43e29b1cb5f881c5002a88b2662c4b6f6eb965f2fc",
+          "characters": 1709
+        },
+        {
+          "heading": "## 1. Preserve the role boundary",
+          "sha256": "8cbc22c7a3678caf430a2938ec63982d2524bce8cd594804a3377c4f9e1ba69e",
+          "characters": 1549
+        },
+        {
+          "heading": "## 2. Bind the exact assignment",
+          "sha256": "042755e14919793d569de3ac1a3bae9f60a260c08cf2e0a559ae5b6f93397e0f",
+          "characters": 1358
+        },
+        {
+          "heading": "## 3. Confirm Validator role fit",
+          "sha256": "c823b15759dbf74228beb4220724be727caeab9a7b3c569c1eec805febb1a046",
+          "characters": 1054
+        },
+        {
+          "heading": "## 4. Verify the exact candidate and eligibility",
+          "sha256": "284bd26de5c84e130c63cc66a2d4badef9d5c2f0cb4f010c1900ac016823e5fa",
+          "characters": 1049
+        },
+        {
+          "heading": "## 5. Preserve candidate read-only status",
+          "sha256": "51a14560b7eb9e7dab2fd9d65e0d34195d7d882f3526fe02f9029f35fb8c0577",
+          "characters": 1045
+        },
+        {
+          "heading": "## 6. Verify the exact context",
+          "sha256": "28a272bdfc1eead3f8ef7c638237de1adcfaf48b5176022bb7e34c17c7e4becd",
+          "characters": 710
+        },
+        {
+          "heading": "## 7. Freeze criteria and evidence exposure",
+          "sha256": "76e69215a3a79adc65d6a9a9e46421c3f2da3b44a9ecdec6b6b644fc0d5f6a08",
+          "characters": 744
+        },
+        {
+          "heading": "## 8. Record independence as facts",
+          "sha256": "13c17451d96f365eeaea797890a508548df97c69ac245837b21d66bd633e90f2",
+          "characters": 688
+        },
+        {
+          "heading": "## 9. Preserve ordered validation and assignment scope",
+          "sha256": "ba59142b11473b81e6188e4f74c955b9cca6d8ab1ae0239ed20e07865f4eab1e",
+          "characters": 1008
+        },
+        {
+          "heading": "## 10. Use the exact qualified method",
+          "sha256": "cda1e141eaa23357b8d4a177f70e1077de12b0780aa8775693a61030518ebd67",
+          "characters": 860
+        },
+        {
+          "heading": "## 11. Reuse evidence precisely",
+          "sha256": "f891abc4e57d40f10717a268bc51ad0d1b5d2ebe851bb90add4f6591b7005b67",
+          "characters": 658
+        },
+        {
+          "heading": "## 12. Collect evidence exactly",
+          "sha256": "0a6054832e032e248f88361f5f6e421c1d6c376da0c252634b25b39b16f5ade8",
+          "characters": 922
+        },
+        {
+          "heading": "## 13. Match evidence realism to the claim",
+          "sha256": "8032a64ec72da31faeccc3ad70de5007774a2ceee2316be6a4484a35edaf242c",
+          "characters": 728
+        },
+        {
+          "heading": "## 14. Separate observation from interpretation",
+          "sha256": "7eb37aad9a962aff9cd5c970e89aae2e705deba105a286767b55dadbced92e1c",
+          "characters": 481
+        },
+        {
+          "heading": "## 15. Evaluate each assertion exactly",
+          "sha256": "78c48a9f7dd63a1f6ccec83e692b0c39719c506f5b377d10103e898e6f0d28bb",
+          "characters": 1038
+        },
+        {
+          "heading": "## 16. Classify failure before creating a finding",
+          "sha256": "c1ca4efb3b623a9bcd840be70349f4e857648befb90bfb528c37cc8f0e0b63ef",
+          "characters": 643
+        },
+        {
+          "heading": "## 17. Create immutable findings",
+          "sha256": "64763441f0701d8cb1dd77e0edc7fe8bb01398d31b75620fac8b7828bfa24efc",
+          "characters": 744
+        },
+        {
+          "heading": "## 18. Keep finding, remediation and repair separate",
+          "sha256": "89a054a2049748363eb187d12acbe1a95d97c0db4317a54bc23532ae3f7e3030",
+          "characters": 849
+        },
+        {
+          "heading": "## 19. Preserve outside-scope observations",
+          "sha256": "b3df671a38a191dc087f36ecb39e586aa5f7b443326705897cbc07c0e02c2e0d",
+          "characters": 456
+        },
+        {
+          "heading": "## 20. Do not aggregate the run",
+          "sha256": "f277ac41cb4899cb82f8cd940898e8f46777fb461f160b592e5c283b29a08c1c",
+          "characters": 598
+        },
+        {
+          "heading": "## 21. Handle interruption and recovery honestly",
+          "sha256": "83b2fd2bb280c1cdc732347c64195a6c962709c37824e62905393ef725eddc8c",
+          "characters": 924
+        },
+        {
+          "heading": "## 22. Reconcile cleanup and secrets",
+          "sha256": "1853f7c0b61f98c3327993374eea342e79324461e976ddd58598ed900d0b994b",
+          "characters": 634
+        },
+        {
+          "heading": "## 23. Return one exact attempt report",
+          "sha256": "ce98396fc04e9db7dc725c8e5ed2c8e3bcc9985f90b90f3750e841ab32126876",
+          "characters": 1501
+        },
+        {
+          "heading": "## 24. Preserve current schema truth",
+          "sha256": "3df75b23363d30055dceaadeb73db20349605a3a2340d0c67372d4aeaa7e01d8",
+          "characters": 672
+        },
+        {
+          "heading": "## 25. Stop economically",
+          "sha256": "fc929e742a83efeb94bd4febdd11d02f5570ce4e65313aad509e3269ae269b98",
+          "characters": 862
+        }
+      ]
+    },
+    "bbk-beads": {
+      "template_characters": 2458,
+      "headings": [
+        "# BBK Beads",
+        "## Profile-bound work",
+        "## Handoff command boundary"
+      ],
+      "frontmatter_sha256": "ca1220f9ce71afc450c3b7d9776234dd6e672271740c8dbae2e8d43dec5e2701",
+      "sections": [
+        {
+          "heading": "# BBK Beads",
+          "sha256": "1ce13a405f8493767a30b27bc10b6ab35183374fb85c08071f7a113e33cd805c",
+          "characters": 1505
+        },
+        {
+          "heading": "## Profile-bound work",
+          "sha256": "992a56f70b5ca4b9b0f541bee7b3c0b03a31b7a8afc42f912d28e254a1bf7c33",
+          "characters": 257
+        },
+        {
+          "heading": "## Handoff command boundary",
+          "sha256": "e5d2fb49bbe01c006a417dd4cca9951cf40875b8e47ccc5e8e9642a872466b52",
+          "characters": 402
+        }
+      ]
+    },
+    "bbk-context-routing": {
+      "template_characters": 4354,
+      "headings": [
+        "# BBK Context Routing",
+        "## Human relay edges",
+        "## Profile context edges"
+      ],
+      "frontmatter_sha256": "782b53986fc2aaedc1eb9a09a6bfc4b0e901887b1b192d2dda6f66f73eefe84d",
+      "sections": [
+        {
+          "heading": "# BBK Context Routing",
+          "sha256": "43a8b78922bc01dbcd7cb1913f57d545cf687bf7cc84089a72f07f0d0bd82d74",
+          "characters": 2553
+        },
+        {
+          "heading": "## Human relay edges",
+          "sha256": "b496a6fa3ede44869eab5b6f3276c092dfdd05d603a957e1a7a559a9d674cf0d",
+          "characters": 1151
+        },
+        {
+          "heading": "## Profile context edges",
+          "sha256": "c1c32c47ac8bd5cfd303de102545c3cd21fa069c71f95794cad44fcc379d1e37",
+          "characters": 331
+        }
+      ]
+    },
+    "bbk-evidence": {
+      "template_characters": 3392,
+      "headings": [
+        "# BBK Evidence",
+        "## EvidenceReceipt v2",
+        "## Durable handoff evidence",
+        "## Profile-bound evidence",
+        "## Lossless command evidence"
+      ],
+      "frontmatter_sha256": "558e81da2361121945812a22b52eb954d5556c10039a88cca8f65ebce64b9878",
+      "sections": [
+        {
+          "heading": "# BBK Evidence",
+          "sha256": "3a5242674efeb4b7a85ef635d6b1cb5602224ef64ac53b7af81bc2c2a175fd84",
+          "characters": 1592
+        },
+        {
+          "heading": "## EvidenceReceipt v2",
+          "sha256": "6273be4d8fdcd885737b5eb22526bbec0f2d344909e99a88496086ede9b51189",
+          "characters": 351
+        },
+        {
+          "heading": "## Durable handoff evidence",
+          "sha256": "23d016b1c5d1c2d8adf4507aaed06b75b9af6c279492e2248e957462768144dc",
+          "characters": 344
+        },
+        {
+          "heading": "## Profile-bound evidence",
+          "sha256": "0aa242b118d570579c052c5c630854b1fae5917a749382125d6250ba29db9fb8",
+          "characters": 472
+        },
+        {
+          "heading": "## Lossless command evidence",
+          "sha256": "61c23583a6da72ab24d880a721c1b14b6dade71e511ab0dd900f4b341ce32505",
+          "characters": 349
+        }
+      ]
+    },
+    "bbk-execute": {
+      "template_characters": 8860,
+      "headings": [
+        "# BBK Execute",
+        "## Bound planning artifacts",
+        "## Authority and capability zones",
+        "## Tool and payload contract",
+        "## Before effects",
+        "## During work",
+        "## Child lifecycle and operational state",
+        "## Freeze and validate",
+        "## Completion",
+        "## Alpha.7 execution bindings",
+        "## Language and domain profiles"
+      ],
+      "frontmatter_sha256": "d16f253e463bc5ad192e11d8fbe1720376f36df9bbf6dd790a937b5ee7a119e6",
+      "sections": [
+        {
+          "heading": "# BBK Execute",
+          "sha256": "36a4212766cd60f97dc6ce951221b8c0d2998a414f022f7ac5918797acc6ed77",
+          "characters": 104
+        },
+        {
+          "heading": "## Bound planning artifacts",
+          "sha256": "d02bb92315370bb8d532a77f6e9689ed60862ba0c9ff536da1689379159c382b",
+          "characters": 380
+        },
+        {
+          "heading": "## Authority and capability zones",
+          "sha256": "35ee8b75edaed9020229a4f22af4abaf6887d7acac44ba0d6346ae173dbc4d38",
+          "characters": 1063
+        },
+        {
+          "heading": "## Tool and payload contract",
+          "sha256": "ed32b232f42bd6a76f8b579928849d5cd2ab4427487cd5500993e009037d4491",
+          "characters": 830
+        },
+        {
+          "heading": "## Before effects",
+          "sha256": "6e003c968985c465c5eb9db56dffe37ade823514685b2982c3a74468981d0bd9",
+          "characters": 844
+        },
+        {
+          "heading": "## During work",
+          "sha256": "b81501b721e6164ec4789bf09af76e963e8d0a7752d15452a5135fa4653ab0bf",
+          "characters": 1104
+        },
+        {
+          "heading": "## Child lifecycle and operational state",
+          "sha256": "58ae0daf28dc3297916e266a595479cdd287d1fe41e399e8b064bdaa34edb144",
+          "characters": 1516
+        },
+        {
+          "heading": "## Freeze and validate",
+          "sha256": "02a6c88d06cadfa6cb63ef7339953e0b8ac0f72f39c5d24280d19c47f09818aa",
+          "characters": 1319
+        },
+        {
+          "heading": "## Completion",
+          "sha256": "af2d4b83f9945558650659d461c5fe88996c1f3fa7a19b408b09b8f32aa1363f",
+          "characters": 506
+        },
+        {
+          "heading": "## Alpha.7 execution bindings",
+          "sha256": "9f30c0a764b2cfb981589e638d18a398088222ebd27c73792f3135b9463141f0",
+          "characters": 364
+        },
+        {
+          "heading": "## Language and domain profiles",
+          "sha256": "7409a10226187ffe41c280fc50ceed1b6592b2a973cfe81c596a35a86038cb64",
+          "characters": 526
+        }
+      ]
+    },
+    "bbk-execution-slicing": {
+      "template_characters": 1396,
+      "headings": [
+        "## Language-profile projection"
+      ],
+      "frontmatter_sha256": "38e870cefca1958b772e155d043187afa2c6421bd191e0ad35dbe74c5405cdd9",
+      "sections": [
+        {
+          "heading": "## Language-profile projection",
+          "sha256": "01371af121052994084ba536df34ae437956d5d2aa1efe17070c756749e4e02d",
+          "characters": 399
+        }
+      ]
+    },
+    "bbk-grill": {
+      "template_characters": 18742,
+      "headings": [
+        "# BBK Grill",
+        "## 1. Enter only on a justified deep branch",
+        "## 2. Bind the exact logical branch",
+        "## 3. Preserve one root decision",
+        "## 4. Use Main and the authoritative question surface",
+        "## 5. Run the collaborative loop",
+        "## 6. Ask one material question at a time",
+        "## 7. Facts and adjacent specialist work",
+        "## 8. Interpret proposal responses precisely",
+        "## 9. Preserve related decisions and outward effects",
+        "## 10. Fence stale requests and responses",
+        "## 11. Apply the decision-readiness test",
+        "## 12. Pause, recover, and continue without semantic drift",
+        "## 13. Return a checkpoint or ADR-ready packet",
+        "## 14. Focused decision lenses"
+      ],
+      "frontmatter_sha256": "ab2dfd0b161ec5f7984c3f5fe81685eee5f4c09fe32250ab3e3d05c1809262a4",
+      "sections": [
+        {
+          "heading": "# BBK Grill",
+          "sha256": "725540fd399878804d8a0c15ba43ce989f01cff8e345a1caa282c699425d622c",
+          "characters": 633
+        },
+        {
+          "heading": "## 1. Enter only on a justified deep branch",
+          "sha256": "c8e258e72c5fd16a8e6905f7a165b48b2ea1a4aee3ce54d92d5032c90bb4df88",
+          "characters": 1142
+        },
+        {
+          "heading": "## 2. Bind the exact logical branch",
+          "sha256": "7631ed14d5147f4dcfe7d479951b42b9e48bda9350b9ff45bb67c885c67f54ec",
+          "characters": 1557
+        },
+        {
+          "heading": "## 3. Preserve one root decision",
+          "sha256": "21efb7a495d4501c130fc49d9b6d79db8fc2c1b5305f70fcabedc7347a23563d",
+          "characters": 866
+        },
+        {
+          "heading": "## 4. Use Main and the authoritative question surface",
+          "sha256": "c97ce0079d43a985c5caabb012e7f17002f35409ca378b9999db8a562375a63a",
+          "characters": 2420
+        },
+        {
+          "heading": "## 5. Run the collaborative loop",
+          "sha256": "8c7d279b919cc92c9a8c56de11a07b2cec76a27fd8557602d7eca4a5aeb7f66b",
+          "characters": 1683
+        },
+        {
+          "heading": "## 6. Ask one material question at a time",
+          "sha256": "ee2b680322dd413b253bb6708a0bc3e127358b5b0d7e2f792625fe40f8a6972a",
+          "characters": 894
+        },
+        {
+          "heading": "## 7. Facts and adjacent specialist work",
+          "sha256": "f5b0bb305e132cc4e91a24b24cb3f11a923c1df4eab41c566f6276b4b107cac7",
+          "characters": 836
+        },
+        {
+          "heading": "## 8. Interpret proposal responses precisely",
+          "sha256": "8eb6897f6d1c911cb0052c82a05f5b2c5f6fe7b8a6ca7b314ee636ef8446e590",
+          "characters": 1728
+        },
+        {
+          "heading": "## 9. Preserve related decisions and outward effects",
+          "sha256": "05def13ce17fd166ae1ce8c9948a98324f3f04eb0badadfb054dbaa16efcdaec",
+          "characters": 752
+        },
+        {
+          "heading": "## 10. Fence stale requests and responses",
+          "sha256": "f6f0d715292f63a05e2052d83f1ec551324b733185539f52babe342c5b240db3",
+          "characters": 708
+        },
+        {
+          "heading": "## 11. Apply the decision-readiness test",
+          "sha256": "fd2d2d2027cc671ce4d5bd10ec7ad7fdc55abe14e873edf6e789debba55745ba",
+          "characters": 1102
+        },
+        {
+          "heading": "## 12. Pause, recover, and continue without semantic drift",
+          "sha256": "97f3858eac69d002691d10cbb346516136261042fed61cd2d2d9b56f821ed272",
+          "characters": 1230
+        },
+        {
+          "heading": "## 13. Return a checkpoint or ADR-ready packet",
+          "sha256": "2d5e2db9cbac5624565bfb06622981dc9e314f4633c53828f6d75e36a1aea2a5",
+          "characters": 2123
+        },
+        {
+          "heading": "## 14. Focused decision lenses",
+          "sha256": "29e57b3de91f8cd6b886b547e48ab7c1bfdfeeac51ef2b2533d669471c364278",
+          "characters": 754
+        }
+      ]
+    },
+    "bbk-handoff": {
+      "template_characters": 7133,
+      "headings": [
+        "# BBK Handoff",
+        "## Create the carrier",
+        "## Keep disposition separate from readiness",
+        "## Consume the carrier",
+        "## Lossless return",
+        "## Communication and authority",
+        "## Pause, interruption, and recovery",
+        "## Discovery and tracker projection"
+      ],
+      "frontmatter_sha256": "d9cdae606588e96686f9e2322b287dd9595f25070219e46916c0448fc50e3704",
+      "sections": [
+        {
+          "heading": "# BBK Handoff",
+          "sha256": "aefeb97e11fac79b6a5a1760cf8b659a340a3166a04efb594b6f103ae4475b92",
+          "characters": 449
+        },
+        {
+          "heading": "## Create the carrier",
+          "sha256": "bab86bbe6090d5ca39b1023a031d803f910aa059389d5b75764d42322b8ce4ee",
+          "characters": 1426
+        },
+        {
+          "heading": "## Keep disposition separate from readiness",
+          "sha256": "e3f922c27d24c722ae7e9ab82391d56ed34abafec0303ad5a046fd459ee17792",
+          "characters": 1426
+        },
+        {
+          "heading": "## Consume the carrier",
+          "sha256": "b0601ed48aafdeaf929641d9dc15cce8fb79fce25376c6eea4a91294441b7027",
+          "characters": 958
+        },
+        {
+          "heading": "## Lossless return",
+          "sha256": "530731b134fe7dc99965fa3ab800da700185f2215f8956ceb5c48ebd13f19505",
+          "characters": 738
+        },
+        {
+          "heading": "## Communication and authority",
+          "sha256": "3c564a997f74430b6dc32e566d9790cbf207bd626279ee9f422cefdcdfd13ca5",
+          "characters": 605
+        },
+        {
+          "heading": "## Pause, interruption, and recovery",
+          "sha256": "de9623d55936a3748c233b3f54ef1643ef3d3c9ad2e30a85f841880a6dde657d",
+          "characters": 691
+        },
+        {
+          "heading": "## Discovery and tracker projection",
+          "sha256": "25fd5a5acd407ff8c556177ea80d49d1f58c0538fb6c246109427a4d3e26b4f2",
+          "characters": 524
+        }
+      ]
+    },
+    "bbk-implementation-structure": {
+      "template_characters": 1910,
+      "headings": [
+        "## Language-profile projection"
+      ],
+      "frontmatter_sha256": "13c51f8bff3343dde90aba1ce634c0cceac1fd8f067b1d8291d3df8f331e6881",
+      "sections": [
+        {
+          "heading": "## Language-profile projection",
+          "sha256": "ce336b6a0ab414ed5fb565d613b75cab8822a2abb68c6ababb399048b627e450",
+          "characters": 331
+        }
+      ]
+    },
+    "bbk-installed-profiles": {
+      "template_characters": 2636,
+      "headings": [
+        "# Installed BBK language and domain profiles",
+        "## BBK CLI discovery",
+        "## Use",
+        "## Installed profiles",
+        "## Authority boundary"
+      ],
+      "frontmatter_sha256": "ffa05c62c8befce0038ea09d7ade779b0154fdc991c50f47e695a934cf86e967",
+      "sections": [
+        {
+          "heading": "# Installed BBK language and domain profiles",
+          "sha256": "1bae49ce60564f10d9186fdde03f4d32dd0ac80fd0255f6401a394519e4a0c22",
+          "characters": 485
+        },
+        {
+          "heading": "## BBK CLI discovery",
+          "sha256": "48f766025654a6430eec07d5aa2bf4c245af1b62767b23f84d7b4f46931f69d3",
+          "characters": 343
+        },
+        {
+          "heading": "## Use",
+          "sha256": "f64841169635024738d413958fec76baee693e7ca8177903b0472e9a9a216d0b",
+          "characters": 961
+        },
+        {
+          "heading": "## Installed profiles",
+          "sha256": "19ef031ef4d0e505ddc02c0f06f493f4589404fb6c2b211b0efe10c41291b400",
+          "characters": 303
+        },
+        {
+          "heading": "## Authority boundary",
+          "sha256": "2db74dcb88a691ce28b0d077f6214d5f8470b436127cfbe2d9991d2da420e73f",
+          "characters": 292
+        }
+      ]
+    },
+    "bbk-phase-plan": {
+      "template_characters": 23088,
+      "headings": [
+        "# BBK Phase Plan",
+        "## 1. Bind the exact phase charter",
+        "## 2. Test the phase boundary before decomposing",
+        "## 3. Operationalize entry and exit without redefining them",
+        "## 4. Bind or refine phase-local slices, then define atomic work units",
+        "## 5. Compile the phase-local dependency graph",
+        "## 6. Assign mutation and workspace ownership",
+        "## 7. Create integration obligations for every work-unit split",
+        "## 8. Commission and integrate phase-local verification design",
+        "## 9. Commission and integrate exact Worker invocation contracts",
+        "## 10. Map structure, slices, and State–Decision–Effect obligations",
+        "## 11. Plan execution continuity without authorizing execution",
+        "## 12. Define the phase exit and later candidate contribution",
+        "## 13. Validate child returns",
+        "## 14. Handle discovered work and invalidation",
+        "## 15. Use review and decomposition proportionately",
+        "## 16. Return to the Planning Wayfinder",
+        "## Profile interaction"
+      ],
+      "frontmatter_sha256": "77f2384525c5ad9aeadfb53c2849a9239ccb0ed069f62e395e2fc50823cbc733",
+      "sections": [
+        {
+          "heading": "# BBK Phase Plan",
+          "sha256": "81a3fd3738bb9ae13fcff8d23582e18883bf3d75a3a537b00f4d902eb4dd115a",
+          "characters": 832
+        },
+        {
+          "heading": "## 1. Bind the exact phase charter",
+          "sha256": "a96a29840f8fa267ab4977ddec6fb08f571e636795245ea93c19ec7741454eef",
+          "characters": 1465
+        },
+        {
+          "heading": "## 2. Test the phase boundary before decomposing",
+          "sha256": "edd072124e7888352bf34df632871ee0fb6289946c680146a81e50424b5b5697",
+          "characters": 1204
+        },
+        {
+          "heading": "## 3. Operationalize entry and exit without redefining them",
+          "sha256": "3d1a5f0d9e6166bb3537c5db28adcfa0c1f65c0fffd44d3902fc881984c75cce",
+          "characters": 874
+        },
+        {
+          "heading": "## 4. Bind or refine phase-local slices, then define atomic work units",
+          "sha256": "8721a5d60a4a087fa0fd24abc96d8cdb4ebb4deeea47330f8dec92ee90d355f6",
+          "characters": 2427
+        },
+        {
+          "heading": "## 5. Compile the phase-local dependency graph",
+          "sha256": "e093a1e1b2e522e98d07d2b7007a2993c32696d801d8f1f6ddf9ca5c15ca9a5b",
+          "characters": 1135
+        },
+        {
+          "heading": "## 6. Assign mutation and workspace ownership",
+          "sha256": "4eb282ba490ac348442723f509d42292c16d415d5bc6f1cd443302767ae0bdee",
+          "characters": 915
+        },
+        {
+          "heading": "## 7. Create integration obligations for every work-unit split",
+          "sha256": "47019eb9f503e828b00056be026b062970b0b2621217046cb1420d5cd3e7b9eb",
+          "characters": 1288
+        },
+        {
+          "heading": "## 8. Commission and integrate phase-local verification design",
+          "sha256": "a26d7406015878e435e4ed91dc5ab8608e333de9701028a88fdf28417a6a0e22",
+          "characters": 1883
+        },
+        {
+          "heading": "## 9. Commission and integrate exact Worker invocation contracts",
+          "sha256": "1821f19ecaab825b1495e7920533bf6c5d24220a08fe03f1d81b3e6076f23aa1",
+          "characters": 1494
+        },
+        {
+          "heading": "## 10. Map structure, slices, and State–Decision–Effect obligations",
+          "sha256": "7435da50176b124e0c94f9eed8ade45286d5bb001aafd2ca8193795a1502df99",
+          "characters": 1401
+        },
+        {
+          "heading": "## 11. Plan execution continuity without authorizing execution",
+          "sha256": "41beae6b2bd8ec94684d68e3041529eaa07308bdd26546b2ccb256eed6ca0f11",
+          "characters": 1113
+        },
+        {
+          "heading": "## 12. Define the phase exit and later candidate contribution",
+          "sha256": "6d54fd0053ac5db75fb267138bfa67d4eb9e6eca8df2b03a268c62ff47d51afd",
+          "characters": 692
+        },
+        {
+          "heading": "## 13. Validate child returns",
+          "sha256": "b9364e072fec7de5171b30eff4de26d34ed39cbf04c6b095a3218afb1f1305d5",
+          "characters": 724
+        },
+        {
+          "heading": "## 14. Handle discovered work and invalidation",
+          "sha256": "5b67ee6b2e4b4b6a816f1d4795c673f2c7d9eaf57251a543fa99a2085a8149a3",
+          "characters": 1298
+        },
+        {
+          "heading": "## 15. Use review and decomposition proportionately",
+          "sha256": "d8f94eb1724cf59abab93af88e3bc0b29e5c1a00d3ca9d85c7530424ead473ee",
+          "characters": 884
+        },
+        {
+          "heading": "## 16. Return to the Planning Wayfinder",
+          "sha256": "a986f1abc82bdeba16975a09245022f8f28e91503248eceaf461a9f0ad583dd9",
+          "characters": 2307
+        },
+        {
+          "heading": "## Profile interaction",
+          "sha256": "73f3f1ec160b015090a4ab67e2db95fd946ebef0c919af91d7ab5414b83f6ef0",
+          "characters": 768
+        }
+      ]
+    },
+    "bbk-plan": {
+      "template_characters": 6888,
+      "headings": [
+        "# BBK Plan",
+        "## Execution-control compilation",
+        "## Language and domain profiles"
+      ],
+      "frontmatter_sha256": "03efb7629a377d8f39e646a3d1bf62896e2c2a507ee5975edc43982af54a1d7a",
+      "sections": [
+        {
+          "heading": "# BBK Plan",
+          "sha256": "6bcb6dbe81f1b333b0b71840135dec73e2b3034f403be95f18cc66cee3fb33c5",
+          "characters": 4675
+        },
+        {
+          "heading": "## Execution-control compilation",
+          "sha256": "f3a1011b8e648e2bda87eeaef83e9be9cc712ee79e53d52094e38073cfcc3bee",
+          "characters": 1462
+        },
+        {
+          "heading": "## Language and domain profiles",
+          "sha256": "b1510214110b8604780f409553eb413c784d8e98973b7aff76b9ad9121514df0",
+          "characters": 457
+        }
+      ]
+    },
+    "bbk-procedure-design": {
+      "template_characters": 2632,
+      "headings": [
+        "# BBK Procedure Design",
+        "## Profile-bound procedures"
+      ],
+      "frontmatter_sha256": "25ae9670835a1cc2ead2e0ae34a05a08e63422b32d0545159f94c9efa6c35d0c",
+      "sections": [
+        {
+          "heading": "# BBK Procedure Design",
+          "sha256": "2d9b07f0390155224b2c2c38e378481a6a541971cafbc324f6b78aa246436be7",
+          "characters": 2038
+        },
+        {
+          "heading": "## Profile-bound procedures",
+          "sha256": "f959fcbea521390fadca2e673f4e62550deed07706e98393b4a8c52ef77e569e",
+          "characters": 318
+        }
+      ]
+    },
+    "bbk-profile-routing": {
+      "template_characters": 3952,
+      "headings": [
+        "# BBK Profile Routing",
+        "## Installed-profile registry",
+        "## Discover the active profiles",
+        "## Capability dispatch"
+      ],
+      "frontmatter_sha256": "f118c051b41ea5857fac30a150d0c82f89aba56458910123e1a173c0f1cd2ebf",
+      "sections": [
+        {
+          "heading": "# BBK Profile Routing",
+          "sha256": "25b40e32e079915f8ee15d6058d0ca31539da4c8ffb320c695a49123d9507546",
+          "characters": 21
+        },
+        {
+          "heading": "## Installed-profile registry",
+          "sha256": "de4629d328a464b76101419bed5e9c099432f9b5501d222d450853bb445a1594",
+          "characters": 1385
+        },
+        {
+          "heading": "## Discover the active profiles",
+          "sha256": "7210c69aa4ebca20d7da9fa7112b988fdaaf23ee97b4bba966e9d9398a5ce9db",
+          "characters": 942
+        },
+        {
+          "heading": "## Capability dispatch",
+          "sha256": "2cd6c47e74c1d57530ba858fda68b5af125f332f3aee2ef65bfd370a256e38ea",
+          "characters": 1395
+        }
+      ]
+    },
+    "bbk-prototype": {
+      "template_characters": 33905,
+      "headings": [
+        "# BBK Prototype",
+        "## 1. Bind the exact experiment charter",
+        "## 2. Confirm this is Prototyper work",
+        "## 3. Freeze the evaluation commitment before results",
+        "## 4. Define authority, isolation, and the pre-state",
+        "## 5. Build the minimum discriminating apparatus",
+        "## 6. Decide whether a bounded Worker cohort is justified",
+        "## 7. Define experimental work units and invocation contracts",
+        "## 8. Dispatch, supervise, validate, and integrate Workers",
+        "## 9. Preflight before mutation",
+        "## 10. Execute controlled runs",
+        "## 11. Classify run validity before interpreting the result",
+        "## 12. Interpret evidence without overclaiming",
+        "## 13. Apply proportionate comparison and performance discipline",
+        "## 14. Record stateful, effectful, and failure behavior",
+        "## 15. Handle unexpected discoveries without scope escape",
+        "## 16. Establish applicability and reproducibility",
+        "## 17. Clean, roll back, quarantine, and disposition artifacts",
+        "## 18. Preserve interruption and recovery semantics",
+        "## 19. Stop economically",
+        "## 20. Return an exact experiment packet",
+        "## Bounded Worker-team and user-interaction boundary",
+        "## Profile interaction"
+      ],
+      "frontmatter_sha256": "3b2904455c58d9bfe7f5c8232593c791d667f869840841d74fabcc9724e114bc",
+      "sections": [
+        {
+          "heading": "# BBK Prototype",
+          "sha256": "0e1bde9e0b91dc50ff056376037e80decd5687e9d85c951de50f5e2112757b40",
+          "characters": 813
+        },
+        {
+          "heading": "## 1. Bind the exact experiment charter",
+          "sha256": "6ddf7fa110cde55cca480328392fed54348ccbb2bd14ea2795a29058cfa7e826",
+          "characters": 1683
+        },
+        {
+          "heading": "## 2. Confirm this is Prototyper work",
+          "sha256": "f35e51be3dcc72a7b92bd5f4124b8c067c21fa3f9a6114116e2e1de72ced25f7",
+          "characters": 2112
+        },
+        {
+          "heading": "## 3. Freeze the evaluation commitment before results",
+          "sha256": "76187a82ed7108e39ca376d39c8f8cff893164601901e264d0d8b474f8d0bcd3",
+          "characters": 1391
+        },
+        {
+          "heading": "## 4. Define authority, isolation, and the pre-state",
+          "sha256": "c3d3ac6feddde0892a5d1dd2ae35aed2c4d2a852c86194a6d401ecd700aaf694",
+          "characters": 1710
+        },
+        {
+          "heading": "## 5. Build the minimum discriminating apparatus",
+          "sha256": "5d247f7fde112521e4d8b60b4f08930c015d8d950836ef0188c8e747f9985c27",
+          "characters": 1037
+        },
+        {
+          "heading": "## 6. Decide whether a bounded Worker cohort is justified",
+          "sha256": "eb8712379a42c14759ecfa1169d911827f1e982b49a6a070e5768ff5b60a9525",
+          "characters": 1523
+        },
+        {
+          "heading": "## 7. Define experimental work units and invocation contracts",
+          "sha256": "a42b1a6e4f12cbd3390d21dd65de2d8db7a8fe8bf6eda24f8e51f5408f195b57",
+          "characters": 1769
+        },
+        {
+          "heading": "## 8. Dispatch, supervise, validate, and integrate Workers",
+          "sha256": "b9e04dca35552c92b06bd4808b240e027e0fa5492e559c59dfbc66337c2fa2cf",
+          "characters": 2465
+        },
+        {
+          "heading": "## 9. Preflight before mutation",
+          "sha256": "fb4911e464ad125ef13a23248afb7cbfce44c07a9e4a9b3982b33b3f1c120031",
+          "characters": 1237
+        },
+        {
+          "heading": "## 10. Execute controlled runs",
+          "sha256": "84df317a23869a534dca5e062b60153ae9a0576d1a02598093ffcdbd09f961f4",
+          "characters": 1609
+        },
+        {
+          "heading": "## 11. Classify run validity before interpreting the result",
+          "sha256": "b1b0c4289ad0c48303928dfdf0d9a343a937f01016f3bd4038087c6508e5b03b",
+          "characters": 1214
+        },
+        {
+          "heading": "## 12. Interpret evidence without overclaiming",
+          "sha256": "0953594d6545d8deda0b9da90b0d0ac981025919ff66f7743aa719a427d837e8",
+          "characters": 1039
+        },
+        {
+          "heading": "## 13. Apply proportionate comparison and performance discipline",
+          "sha256": "7266bd3ef1d13118d9ec9a1e323cd738943e9a4659f9c83aba05638f9a4deec7",
+          "characters": 1307
+        },
+        {
+          "heading": "## 14. Record stateful, effectful, and failure behavior",
+          "sha256": "ed0a03f47a14c54c68d7be6f0fea086629e3c7ae9d524be34a183ab194a680de",
+          "characters": 990
+        },
+        {
+          "heading": "## 15. Handle unexpected discoveries without scope escape",
+          "sha256": "dc247dcaf4271e799e84649e0e2480e0006e983960868bc5afb743dde435dfd6",
+          "characters": 844
+        },
+        {
+          "heading": "## 16. Establish applicability and reproducibility",
+          "sha256": "a4eb0794379baf5485b1aab7eac5f80cce053f550b453a5ea70540e2df91624b",
+          "characters": 1057
+        },
+        {
+          "heading": "## 17. Clean, roll back, quarantine, and disposition artifacts",
+          "sha256": "2efa76e7b8d79101fbdc22c075784e8beff7da5964c5f0bd9dcafafe130faa45",
+          "characters": 1745
+        },
+        {
+          "heading": "## 18. Preserve interruption and recovery semantics",
+          "sha256": "bdcf3b228b8ef14c8c220e8c7dff4362dcf6b16b7637b4d68a880fdf3da12f3f",
+          "characters": 1389
+        },
+        {
+          "heading": "## 19. Stop economically",
+          "sha256": "e1db29462b30e4b3eafd46827bf7e8a351850b25af87f976e0666a3beac4dd10",
+          "characters": 1372
+        },
+        {
+          "heading": "## 20. Return an exact experiment packet",
+          "sha256": "441ccda3bed4048f7a6a9a469a4b6f9004cc5cc18847da198a646b68bb1e889f",
+          "characters": 1981
+        },
+        {
+          "heading": "## Bounded Worker-team and user-interaction boundary",
+          "sha256": "e85f86b13ec0aa05533749d08158ec5eac3a95e9ffb1b401ffef0f70ef17eb7b",
+          "characters": 1559
+        },
+        {
+          "heading": "## Profile interaction",
+          "sha256": "2023c8ec2492b93eb55342766a85d3d95ea0c63def482c7c28d3400b35961361",
+          "characters": 1571
+        }
+      ]
+    },
+    "bbk-question-branch": {
+      "template_characters": 15747,
+      "headings": [
+        "# BBK Question Branch Program",
+        "## 1. Bind the decision cluster",
+        "## 2. Normalize the branch program",
+        "## 3. Classify authority and uncertainty",
+        "## 4. Prioritize user attention",
+        "## 5. Prepare a recommendation-first packet",
+        "## 6. Use the controller-mediated question channel",
+        "## 7. Interpret proposal response separately from root disposition",
+        "## 8. Escalate only a genuinely unresolved deep branch",
+        "## 9. Validate and reconcile returns",
+        "## 10. Persist durable state proportionately",
+        "## 11. Stop economically and return to the semantic parent",
+        "## Profile interaction"
+      ],
+      "frontmatter_sha256": "6f86d8510afb08928d2572589ab8e634da01aa38e147313f39c18d30daf5a89c",
+      "sections": [
+        {
+          "heading": "# BBK Question Branch Program",
+          "sha256": "0395953f6a60b4490d98ad2b81493914da441acaad578aac4a36194eee953e95",
+          "characters": 540
+        },
+        {
+          "heading": "## 1. Bind the decision cluster",
+          "sha256": "72ad334a536ca4ef05d20993821f169af9a90658a1f9fd7a0c50eb575d11e275",
+          "characters": 956
+        },
+        {
+          "heading": "## 2. Normalize the branch program",
+          "sha256": "0137fa8d686f697ac4343f4ac5147b434a0fd5d3ae952fd14cc57b821592881f",
+          "characters": 1816
+        },
+        {
+          "heading": "## 3. Classify authority and uncertainty",
+          "sha256": "40d7912231dba8a287c6c982937aa3f67134a46597648b7956acde8ff78c2169",
+          "characters": 1199
+        },
+        {
+          "heading": "## 4. Prioritize user attention",
+          "sha256": "676ecfeb1d05054ed5ea0d224fa65aaf850c6b3b017a12e652fadd80929a34bd",
+          "characters": 540
+        },
+        {
+          "heading": "## 5. Prepare a recommendation-first packet",
+          "sha256": "35aa62ab06a274f60fa24d45839d07bad01c1247ae0af0634656039cf8712b9b",
+          "characters": 954
+        },
+        {
+          "heading": "## 6. Use the controller-mediated question channel",
+          "sha256": "cda7cef47313b30e5241602149e9385f49b81dfe307c621f1212681d191a8902",
+          "characters": 1511
+        },
+        {
+          "heading": "## 7. Interpret proposal response separately from root disposition",
+          "sha256": "64cad81c96f537835a28aad505849f6b08119ea351b1bf4df7338bf223ddbceb",
+          "characters": 1260
+        },
+        {
+          "heading": "## 8. Escalate only a genuinely unresolved deep branch",
+          "sha256": "44b4be77626f3a5e6170089e9c0178fa547f4e14ee9671b3f936d2fcc8855994",
+          "characters": 2025
+        },
+        {
+          "heading": "## 9. Validate and reconcile returns",
+          "sha256": "9af37902ea98df7371c89cd3bef28bd46fe5081d69ea2e7f8a4570f32a046a58",
+          "characters": 1280
+        },
+        {
+          "heading": "## 10. Persist durable state proportionately",
+          "sha256": "2823bd76759eebb42b457c8a5c7a16331672b368bf39166f9dc7a59438ad9cc2",
+          "characters": 1400
+        },
+        {
+          "heading": "## 11. Stop economically and return to the semantic parent",
+          "sha256": "194375794d723ab47721e1a49ad9e294fcb99b2d4053c9cfd7bbca98a2c0579f",
+          "characters": 1330
+        },
+        {
+          "heading": "## Profile interaction",
+          "sha256": "34d0e6ccfd659ca2a79e54fa4032dcd4d58d2f2bdf5f51c9e71f12f74c32189a",
+          "characters": 590
+        }
+      ]
+    },
+    "bbk-recover": {
+      "template_characters": 3506,
+      "headings": [
+        "# BBK Recover",
+        "## Interruption evidence",
+        "## Profile-aware recovery"
+      ],
+      "frontmatter_sha256": "5d0f77d4a6c5e5954f8929ed15e2a46047b3855e4808d356fd70cdb5984728e9",
+      "sections": [
+        {
+          "heading": "# BBK Recover",
+          "sha256": "2347a37987fcf14b456cb92e6a01986919522c879701481818008682c75fae86",
+          "characters": 2467
+        },
+        {
+          "heading": "## Interruption evidence",
+          "sha256": "e0b13386cb9921b26b846c15a6b08bda494326ab76ccb96cf8e3e49fd9306d85",
+          "characters": 446
+        },
+        {
+          "heading": "## Profile-aware recovery",
+          "sha256": "030fda236eff734390336bf28edcde505092808c6583fd2e9105c753831d382e",
+          "characters": 323
+        }
+      ]
+    },
+    "bbk-research": {
+      "template_characters": 16722,
+      "headings": [
+        "# BBK Research",
+        "## 1. Bind the exact research charter",
+        "## 2. Classify the uncertainty before researching",
+        "## 3. Compile a bounded claim map",
+        "## 4. Select a claim-appropriate source strategy",
+        "## 5. Retrieve safely and preserve exact provenance",
+        "## 6. Evaluate source quality and applicability",
+        "## 7. Maintain a claim–evidence matrix",
+        "## 8. Reconcile conflicts without averaging them away",
+        "## 9. Distinguish negative evidence from missing evidence",
+        "## 10. Keep local inspection distinct from experimentation",
+        "## 11. State implications without making the decision",
+        "## 12. Stop economically",
+        "## 13. Return an exact research packet",
+        "## Parent routing and leaf-role boundary",
+        "## Profile interaction"
+      ],
+      "frontmatter_sha256": "dc9c01d84d4b969fe56ba13f473efb19265fb14f40a63e06114c4eaac6ef168f",
+      "sections": [
+        {
+          "heading": "# BBK Research",
+          "sha256": "97eb3749f4d4a755535c5f6d5b10a7ef53b0be792dc5af95f8fafbee72ec2c07",
+          "characters": 695
+        },
+        {
+          "heading": "## 1. Bind the exact research charter",
+          "sha256": "59b55e23da03f08ca75f5207465178ccf9432592099862dce1dd8b3f40ebecb5",
+          "characters": 1463
+        },
+        {
+          "heading": "## 2. Classify the uncertainty before researching",
+          "sha256": "a084329205fae7e7c91ad05107dca924341a853620244446c0c46cae61f9b7c6",
+          "characters": 1552
+        },
+        {
+          "heading": "## 3. Compile a bounded claim map",
+          "sha256": "4f41199fbff0cd5c689bd90cfa27bcde6c86da6b29a053adb9d83107165796df",
+          "characters": 659
+        },
+        {
+          "heading": "## 4. Select a claim-appropriate source strategy",
+          "sha256": "d8037e92d8ebc2ed06c69e0680f32a94ff78b7fa2e5b88593b31941f275d0794",
+          "characters": 1507
+        },
+        {
+          "heading": "## 5. Retrieve safely and preserve exact provenance",
+          "sha256": "870e73a85e04732a9faa5a66cc46395eb6849a1c2e5289a8497d91afe8150959",
+          "characters": 1525
+        },
+        {
+          "heading": "## 6. Evaluate source quality and applicability",
+          "sha256": "603fc62d2bd91a19f104d4bc1fbc2d6e137ae9c68bddb23c48aee2fe158129f3",
+          "characters": 859
+        },
+        {
+          "heading": "## 7. Maintain a claim–evidence matrix",
+          "sha256": "c18e9757750475d1aa460a0e4e12b6a1cf515e1d43e88f92cca17a35d21d4bb9",
+          "characters": 1115
+        },
+        {
+          "heading": "## 8. Reconcile conflicts without averaging them away",
+          "sha256": "a8809c708dcde4db8f2f6d7598d1e69b11d229a22a377d91ea5a2b2a29101bb6",
+          "characters": 868
+        },
+        {
+          "heading": "## 9. Distinguish negative evidence from missing evidence",
+          "sha256": "6505c365560c5c3411ae752257eb79a9b02599f88d8abd9e6409f9408a454b3e",
+          "characters": 891
+        },
+        {
+          "heading": "## 10. Keep local inspection distinct from experimentation",
+          "sha256": "1f5e089765d077c6b4ba72fdf052de795f79032eb601c2dc8c9c2c425f892959",
+          "characters": 1123
+        },
+        {
+          "heading": "## 11. State implications without making the decision",
+          "sha256": "3a88e790d72a4d5208c2d7ea73813de4685066356d81fddbd5aaedf3373b9d79",
+          "characters": 729
+        },
+        {
+          "heading": "## 12. Stop economically",
+          "sha256": "1ab6c739ede3bd74c403b3584f5e8ef22df5bff5ee8011a05c584ba69443915b",
+          "characters": 915
+        },
+        {
+          "heading": "## 13. Return an exact research packet",
+          "sha256": "f0cef61bd39b8b14adaa21c7957dfbc552a79395714845e86117c357ad58a7d9",
+          "characters": 1448
+        },
+        {
+          "heading": "## Parent routing and leaf-role boundary",
+          "sha256": "c88ecfe6218ba5bcb3b4016b0cb15b688767881eea805f24c9b6c94e9a33f4d0",
+          "characters": 570
+        },
+        {
+          "heading": "## Profile interaction",
+          "sha256": "3cb75dbf4380705a2599058545b4ae4df9e6c22a4c639731104aae98113cada4",
+          "characters": 398
+        }
+      ]
+    },
+    "bbk-review": {
+      "template_characters": 17686,
+      "headings": [
+        "# BBK Independent Review",
+        "## 1. Choose the invocation mode",
+        "## 2. Confirm role fit",
+        "## 3. Bind the exact charter",
+        "## 4. Verify the exact subject",
+        "## 5. Verify the context actually received",
+        "## 6. Freeze criteria and evidence exposure",
+        "## 7. Record independence as facts",
+        "## 8. Preserve the read-only boundary",
+        "## 9. Apply only the chartered lenses",
+        "## 10. Preserve intent when in scope",
+        "## 11. Reuse qualified deterministic evidence",
+        "## 12. Collect new evidence only when authorized",
+        "## 13. Separate observation from inference",
+        "## 14. Evaluate the assigned assertions",
+        "## 15. Classify failure before finding fault",
+        "## 16. Create immutable findings",
+        "## 17. Keep out-of-scope concerns visible",
+        "## 18. Recommend; do not repair or dispose",
+        "## 19. Targeted closure and blind reassessment",
+        "## 20. Use profiles without granting authority",
+        "## 21. Preserve sharding and central ownership",
+        "## 22. Invalidate rather than rewrite history",
+        "## 23. Checkpoint and recover honestly",
+        "## 24. Clean up without destroying evidence",
+        "## 25. Return an exact non-authoritative report",
+        "## 26. Stop proportionately"
+      ],
+      "frontmatter_sha256": "318b11b0bd9995aaf4131f67425e9b69982505f9d1eb87d1df6ecd21eb134c5b",
+      "sections": [
+        {
+          "heading": "# BBK Independent Review",
+          "sha256": "507a1f4abd75b8a673afad6ec1515a2efb807014ce93e77bb15f6cf8d7a1dc42",
+          "characters": 231
+        },
+        {
+          "heading": "## 1. Choose the invocation mode",
+          "sha256": "f1311fe732947c6be492093197f41ac9bba60ae785790d9898c0901a863ff772",
+          "characters": 800
+        },
+        {
+          "heading": "## 2. Confirm role fit",
+          "sha256": "2c546498959ce3cd700c5e6a8a25cce76345554acb53e792705f806800330429",
+          "characters": 991
+        },
+        {
+          "heading": "## 3. Bind the exact charter",
+          "sha256": "6f23f5f76213bb9979b844d6f24fdc4955b8f075dd1542b91c5560c9eafa7a97",
+          "characters": 948
+        },
+        {
+          "heading": "## 4. Verify the exact subject",
+          "sha256": "33ce1d1a5dbe5efd88c7b85b6817e7f87f81d4da38be8e3928e699c59ce0e501",
+          "characters": 633
+        },
+        {
+          "heading": "## 5. Verify the context actually received",
+          "sha256": "b16bf62835fef75e162cf7291279f3888b0d203f48bad7f044e850764c20b967",
+          "characters": 798
+        },
+        {
+          "heading": "## 6. Freeze criteria and evidence exposure",
+          "sha256": "2f316fc86a9ab36099a6fcfb326de0013c03bf18e7e1639bce17bf007f417576",
+          "characters": 645
+        },
+        {
+          "heading": "## 7. Record independence as facts",
+          "sha256": "d2e0753cc3d853c0bb322635c32489d28f2839e079a90434f0f91bc6c4a80584",
+          "characters": 587
+        },
+        {
+          "heading": "## 8. Preserve the read-only boundary",
+          "sha256": "d05ec64ecd3a6b424fb218125ca69fd1b9084938b12e96a7d1d3323e3836614f",
+          "characters": 689
+        },
+        {
+          "heading": "## 9. Apply only the chartered lenses",
+          "sha256": "df434cedd76ea36bb8bc1a4484a8b0111edc168fa189693130fe7a229e9f81fd",
+          "characters": 860
+        },
+        {
+          "heading": "## 10. Preserve intent when in scope",
+          "sha256": "9520ced1f7cc322806daaa0ef49e919323b5f78e7e7cfcd979636b062b874427",
+          "characters": 759
+        },
+        {
+          "heading": "## 11. Reuse qualified deterministic evidence",
+          "sha256": "6a78cd4dc5ea0f37e6c30105bdb2ad3504f9bb9f7abbe3eea0e31c98d9d7f515",
+          "characters": 588
+        },
+        {
+          "heading": "## 12. Collect new evidence only when authorized",
+          "sha256": "ad477505bdea1e97cfbfd78252fc528a37da55ea01fe809cffbd3644975b7d65",
+          "characters": 731
+        },
+        {
+          "heading": "## 13. Separate observation from inference",
+          "sha256": "3534a30f3059b6b2b2375e0baa51b572d39c439e78933887f6f25c841b34bfa7",
+          "characters": 462
+        },
+        {
+          "heading": "## 14. Evaluate the assigned assertions",
+          "sha256": "37ab44f73ec765105d2157769fdd619a3205c34e9a82f050e4f82a303a597af5",
+          "characters": 608
+        },
+        {
+          "heading": "## 15. Classify failure before finding fault",
+          "sha256": "e03f3521792a75085929ff974da7334c4e911cc5bb395722f33f0b2a87da055b",
+          "characters": 540
+        },
+        {
+          "heading": "## 16. Create immutable findings",
+          "sha256": "f996832424b3856481a8c5444aed2f22d871482e55973e5f551b59baeafec8c9",
+          "characters": 599
+        },
+        {
+          "heading": "## 17. Keep out-of-scope concerns visible",
+          "sha256": "b9a11d8541a526e9237eb911b4ee9ca6375f3f22fc5d60a8c22f283f616bd24f",
+          "characters": 421
+        },
+        {
+          "heading": "## 18. Recommend; do not repair or dispose",
+          "sha256": "4a70acf2082d265334b2634e20a1b69a13c0aeaf2540ed88517335ab51802f10",
+          "characters": 588
+        },
+        {
+          "heading": "## 19. Targeted closure and blind reassessment",
+          "sha256": "b1c527b82fee878cb9682082ff225f718d5edaff88a9e7152fbd2c53f024ac6d",
+          "characters": 673
+        },
+        {
+          "heading": "## 20. Use profiles without granting authority",
+          "sha256": "48dc4276548238a036c84361fea232b1f75046cca210f91c64fefbb07e9214d0",
+          "characters": 546
+        },
+        {
+          "heading": "## 21. Preserve sharding and central ownership",
+          "sha256": "8da1716dd1dd79f907f5f6f49d068a8439c6790ffcbbc8096e94b62dab78d075",
+          "characters": 607
+        },
+        {
+          "heading": "## 22. Invalidate rather than rewrite history",
+          "sha256": "b23cffcfdbaee50bf09f29c1f819b4f3ff3975d5bebd6ae9e9ed30644bbd2f9e",
+          "characters": 479
+        },
+        {
+          "heading": "## 23. Checkpoint and recover honestly",
+          "sha256": "4d6c3ffc81b7ef672525a4bd7fc05412614f01c9416937fa59bf124c81d3e0e6",
+          "characters": 620
+        },
+        {
+          "heading": "## 24. Clean up without destroying evidence",
+          "sha256": "0a04674a797c4c28a279b8947b77bb8893a86f482852f9054a16a46b4732d7d5",
+          "characters": 417
+        },
+        {
+          "heading": "## 25. Return an exact non-authoritative report",
+          "sha256": "65ae753c8a7514dd747b062dea352458264969f97936c2372acc4903e91eb958",
+          "characters": 922
+        },
+        {
+          "heading": "## 26. Stop proportionately",
+          "sha256": "b07934ef41d45be9d901cf74ec7e1db88b2f1dde24c8fdaa35cdecc308142277",
+          "characters": 506
+        }
+      ]
+    },
+    "bbk-review-context": {
+      "template_characters": 1744,
+      "headings": [
+        "# BBK Review Context",
+        "## Profile-aware context"
+      ],
+      "frontmatter_sha256": "ea7edc69607485cf757edcbf055b6172d0014d86537fe181819332eb22b83352",
+      "sections": [
+        {
+          "heading": "# BBK Review Context",
+          "sha256": "87f1daaac74a062d021d0fea75a142cc86a93e9aaac9c3dd36bf994ad384c12e",
+          "characters": 1197
+        },
+        {
+          "heading": "## Profile-aware context",
+          "sha256": "79f08458c4d92ca084d0f998990a663c92df6700cef18bc4cf28cb03164d5d30",
+          "characters": 342
+        }
+      ]
+    },
+    "bbk-review-findings": {
+      "template_characters": 1652,
+      "headings": [
+        "# BBK Review Findings",
+        "## Profile binding"
+      ],
+      "frontmatter_sha256": "0c7c7028c90cb0eb1df2bda8a2f2ed55c910a0c420190dbd745518618dec000b",
+      "sections": [
+        {
+          "heading": "# BBK Review Findings",
+          "sha256": "000bab1b39a96dff83f1c6c81cbee7c4b31e8b711f7e5dd75a075fbada28f050",
+          "characters": 1172
+        },
+        {
+          "heading": "## Profile binding",
+          "sha256": "41658d888eec1f337569c23af47947c29a6cda7e70c71796bd47a978d0745c2c",
+          "characters": 289
+        }
+      ]
+    },
+    "bbk-review-intent": {
+      "template_characters": 1284,
+      "headings": [
+        "# BBK Intent Conformance",
+        "## Profile conformance"
+      ],
+      "frontmatter_sha256": "5b5a4ab6bcb7f7db72c285090d787ff87e032d64e66b3125911fe35da6aa88ec",
+      "sections": [
+        {
+          "heading": "# BBK Intent Conformance",
+          "sha256": "90434517ddccb9694c3fce5dac9c29934e88300cd351acd89119d35b61541704",
+          "characters": 775
+        },
+        {
+          "heading": "## Profile conformance",
+          "sha256": "ba6e8a8ff62a58eaa0eb79df87db55d0a5b3aef1ce8b4e9e3368b05c9490b332",
+          "characters": 294
+        }
+      ]
+    },
+    "bbk-review-learn": {
+      "template_characters": 1135,
+      "headings": [
+        "# BBK Review Learning",
+        "## Profile-specific learning"
+      ],
+      "frontmatter_sha256": "2ea7bd898980842a99a6d40e215dbbc378f0954f4687f7b2038c5ccb31c0838d",
+      "sections": [
+        {
+          "heading": "# BBK Review Learning",
+          "sha256": "1dedee0e7ffdd96245babd1a5580dc5a7d7938d6a008655309419b06a06af1aa",
+          "characters": 690
+        },
+        {
+          "heading": "## Profile-specific learning",
+          "sha256": "0340a11f2457fdc551cfbf9c300de3f3d99058331b1748b5e662e2627e91e6b1",
+          "characters": 244
+        }
+      ]
+    },
+    "bbk-review-plan": {
+      "template_characters": 2279,
+      "headings": [
+        "# BBK Review Plan",
+        "## Profile-aware review planning"
+      ],
+      "frontmatter_sha256": "3606bd2ffb7e6641da86134c9614bd1f8aa5c068a9774600739d00672a004c9e",
+      "sections": [
+        {
+          "heading": "# BBK Review Plan",
+          "sha256": "477c5a316d2dfe6b684dc99bf494ab9d55a2f9c4506939ddc8827f8c96b4f62a",
+          "characters": 1762
+        },
+        {
+          "heading": "## Profile-aware review planning",
+          "sha256": "6515eb318c2188734c05ad29a55784e22f9d50d2d601782b1988f4fd82f50843",
+          "characters": 319
+        }
+      ]
+    },
+    "bbk-review-run": {
+      "template_characters": 2127,
+      "headings": [
+        "# BBK Review Run",
+        "## Profile-aware execution"
+      ],
+      "frontmatter_sha256": "236c9ee6345f58d3d19894fb93ff4a9918ce5f8ca8aa0e4ed42186495fcff2c6",
+      "sections": [
+        {
+          "heading": "# BBK Review Run",
+          "sha256": "62e0cf919cc4d77f2b14426c1691d887859f5ed2df73f3bdcf51c3686d0a8cbf",
+          "characters": 1548
+        },
+        {
+          "heading": "## Profile-aware execution",
+          "sha256": "ef697401d30b3fcbd4942217da6da6e607d079567901ea76a867088f9836e148",
+          "characters": 367
+        }
+      ]
+    },
+    "bbk-root-execution": {
+      "template_characters": 31514,
+      "headings": [
+        "# BBK Root Execution",
+        "## 1. Preserve the responsibility boundary",
+        "## 2. Bind the exact root execution charter",
+        "### Current BBK substrate rule",
+        "## 3. Verify startup and resume eligibility",
+        "## 4. Preserve semantic and physical identity",
+        "## 5. Maintain an orthogonal campaign state",
+        "## 6. Build the canonical campaign view",
+        "## 7. Compile and admit immutable TerritoryExecutionBoundaries",
+        "## 8. Compile and dispatch exact direct-child edges",
+        "## 9. Schedule globally without micromanaging locally",
+        "## 10. Coordinate cross-boundary integration without implementing it",
+        "## 11. Propagate authority, fences, budgets, and safeguards exactly",
+        "## 12. Consume and qualify child returns",
+        "## 13. Preserve candidate, evidence, finding, and review lineage",
+        "## 14. Maintain durable execution signals",
+        "## 15. Handle discovered work and material divergence",
+        "## 16. Distinguish waits, pauses, blockers, and failures",
+        "## 17. Interrupt and recover safely",
+        "## 18. Apply campaign controls safely",
+        "## 19. Use independent review proportionately",
+        "## 20. Maintain trustworthy controller-facing status",
+        "## 21. Assess completion-report readiness without self-certification",
+        "## 22. Return exact checkpoints and final reports",
+        "## 23. Stop proportionately"
+      ],
+      "frontmatter_sha256": "fa4d16cdb9bd504d6cebe0af781b4b54b01eeebfde276997da5e7b30ee61a533",
+      "sections": [
+        {
+          "heading": "# BBK Root Execution",
+          "sha256": "96c69b2f9f5a09cd5ebd50905c1ac0b59251f8417d33a3f6becee7a22c864d12",
+          "characters": 1288
+        },
+        {
+          "heading": "## 1. Preserve the responsibility boundary",
+          "sha256": "adb5be8f3e6f22289ae9c0e60f201a56ff365ef2906d850449365dbba3ccd4a0",
+          "characters": 2062
+        },
+        {
+          "heading": "## 2. Bind the exact root execution charter",
+          "sha256": "5d3f215b2f16c368f52d8c48aa941721282ed3b3eef9e820d7f129033bd14258",
+          "characters": 1811
+        },
+        {
+          "heading": "### Current BBK substrate rule",
+          "sha256": "9b3d4f9e4444df3894e1ddbad31cbdfd9cadc5f9f09a24c9a26c25c2a23dce42",
+          "characters": 681
+        },
+        {
+          "heading": "## 3. Verify startup and resume eligibility",
+          "sha256": "0754f4d0ea7a4d0eb8c3efe2aebdb160943552ecaa49a33b7215c6afde090565",
+          "characters": 1498
+        },
+        {
+          "heading": "## 4. Preserve semantic and physical identity",
+          "sha256": "776123c759d14378935746522bb18648256e3dc8ba3e72ac6d1566d25ddfbc1e",
+          "characters": 886
+        },
+        {
+          "heading": "## 5. Maintain an orthogonal campaign state",
+          "sha256": "d8932fc7cac2f5c9d67c37b1f9cad372a5f1fe5f2260d2c5bb6a441c5eeb68c4",
+          "characters": 1305
+        },
+        {
+          "heading": "## 6. Build the canonical campaign view",
+          "sha256": "bc8936a1aaad8aad635bb749264fa5c8486ddf28257433ec5c896e85598f0d76",
+          "characters": 1104
+        },
+        {
+          "heading": "## 7. Compile and admit immutable TerritoryExecutionBoundaries",
+          "sha256": "8a9cfbfc386b450792c7299ea3f8455094b94e638aa4c1326d8983ba0656bcf5",
+          "characters": 1867
+        },
+        {
+          "heading": "## 8. Compile and dispatch exact direct-child edges",
+          "sha256": "e9d87818f6bd52f8ad5f14af522f631322a4b923e82cc9744c332f85f02dfa4f",
+          "characters": 1218
+        },
+        {
+          "heading": "## 9. Schedule globally without micromanaging locally",
+          "sha256": "0380963cd7aa8c931277a35aad7f1f26c11a79eef42ec829e315ddc8ae83778f",
+          "characters": 826
+        },
+        {
+          "heading": "## 10. Coordinate cross-boundary integration without implementing it",
+          "sha256": "6be3c2d10b509cbe3f20f1f6328fea453e5a237e6f1b89755322497a7e170e02",
+          "characters": 926
+        },
+        {
+          "heading": "## 11. Propagate authority, fences, budgets, and safeguards exactly",
+          "sha256": "3d2090660790b3d7f0a87ee9f5f32777dae288aca77edf9d3d7f2df470bb2cb0",
+          "characters": 1042
+        },
+        {
+          "heading": "## 12. Consume and qualify child returns",
+          "sha256": "1f3996d6dc373e2e0ca3f0875b3711617da0c1844de12d53c5df2646f4f2ff14",
+          "characters": 865
+        },
+        {
+          "heading": "## 13. Preserve candidate, evidence, finding, and review lineage",
+          "sha256": "d2327c73e2cd35728ab631bfeb5da0e7f32f7248cda03f3d5227a301e9fae1ae",
+          "characters": 1284
+        },
+        {
+          "heading": "## 14. Maintain durable execution signals",
+          "sha256": "917b58e30814675513b96d663e312060ff7021c8811dc396a4ab11ca5e1e2eda",
+          "characters": 990
+        },
+        {
+          "heading": "## 15. Handle discovered work and material divergence",
+          "sha256": "d4557453ef9e453eb502f5ff0eac5c4c6a4c276fdc40c6e640a88252df93f304",
+          "characters": 1828
+        },
+        {
+          "heading": "## 16. Distinguish waits, pauses, blockers, and failures",
+          "sha256": "5e46bc3dc1935922fa63800e527cf510868e9fc3a41cbb78526481924f13e497",
+          "characters": 965
+        },
+        {
+          "heading": "## 17. Interrupt and recover safely",
+          "sha256": "1d010e2c88e45c09c603cd805b91acbfe36aaab5cf35ccfb0fc77f2b77c18ccf",
+          "characters": 1647
+        },
+        {
+          "heading": "## 18. Apply campaign controls safely",
+          "sha256": "ecace59523b4aa98703803826824024da9020260027c115b785a1afbdd16f021",
+          "characters": 1010
+        },
+        {
+          "heading": "## 19. Use independent review proportionately",
+          "sha256": "420010cda61b9cb6041aac21fd60424cd7b4549d27bd2bc18f75700232f44212",
+          "characters": 785
+        },
+        {
+          "heading": "## 20. Maintain trustworthy controller-facing status",
+          "sha256": "b500a23efb1367f63daf9754992d3cbe49f8b221ebd9a7c52cb4d617b4b9f54c",
+          "characters": 1116
+        },
+        {
+          "heading": "## 21. Assess completion-report readiness without self-certification",
+          "sha256": "a4c2045305382314e588fff3cd3ad324a259b82180cac4457cdfaed0b2dbe74a",
+          "characters": 1845
+        },
+        {
+          "heading": "## 22. Return exact checkpoints and final reports",
+          "sha256": "c6de8cd325edec55cfcb3c027993238c8fbbef7c153a3f690a5cb4173ec62806",
+          "characters": 1479
+        },
+        {
+          "heading": "## 23. Stop proportionately",
+          "sha256": "c4d9d80371ae8c791796a3acfba3b4f25dc5f836e1eb22833c039832ee338b7e",
+          "characters": 744
+        }
+      ]
+    },
+    "bbk-solution-outcome-fit": {
+      "template_characters": 2946,
+      "headings": [
+        "# BBK Solution–Outcome Fit",
+        "## Procedure",
+        "## Proportionality",
+        "## Deterministic support",
+        "## Profile interaction"
+      ],
+      "frontmatter_sha256": "13c08c27241dedab9aafd0eb594663b034c60ab1feabed9fe20c15290132f0c7",
+      "sections": [
+        {
+          "heading": "# BBK Solution–Outcome Fit",
+          "sha256": "44c37c5522f434177bf2d62eca176986a7f17760be54bbce1cfdd17f79d10742",
+          "characters": 180
+        },
+        {
+          "heading": "## Procedure",
+          "sha256": "349aed0b2785f71431bfabc760aad9b1bef9e27d14b1a065b9f28a6effabd588",
+          "characters": 1302
+        },
+        {
+          "heading": "## Proportionality",
+          "sha256": "8e6879e2228996b4e15a70a0a417416d915f1f8a72f0df32e0647adb4274b610",
+          "characters": 594
+        },
+        {
+          "heading": "## Deterministic support",
+          "sha256": "427a5926ecde138063dd182327666ea330cd69189749b430f816a4dae26709d4",
+          "characters": 323
+        },
+        {
+          "heading": "## Profile interaction",
+          "sha256": "0fbe35c0118b2fb3b8b9a6da7710f7ff563157540a45e3e5bd6f6eb9053d154b",
+          "characters": 285
+        }
+      ]
+    },
+    "bbk-state-decision-effect-design": {
+      "template_characters": 2906,
+      "headings": [
+        "# BBK State–Decision–Effect Design",
+        "## Language-profile projection"
+      ],
+      "frontmatter_sha256": "da36fd5f78c07d4eef2aef1779bf2ad7ebe3c52e9558c62fc3a4585a66702200",
+      "sections": [
+        {
+          "heading": "# BBK State–Decision–Effect Design",
+          "sha256": "3cecb93f1f7acd75244b439bdfd3b167ed4ecae394cf062eb4a5e16f7a7feb94",
+          "characters": 2291
+        },
+        {
+          "heading": "## Language-profile projection",
+          "sha256": "c4ff0f367e55c44a0d77afe534d548675a7f7d783f65d5859ac1355185400725",
+          "characters": 370
+        }
+      ]
+    },
+    "bbk-synthesize": {
+      "template_characters": 15791,
+      "headings": [
+        "# BBK Synthesize",
+        "## 1. Bind the synthesis charter",
+        "## 2. Build the exact source manifest",
+        "## 3. Normalize statements, not authority",
+        "## 4. Reconcile identity and lineage first",
+        "## 5. Expose contradiction without deciding it",
+        "## 6. Preserve dissent, alternatives, findings, and unknowns",
+        "## 7. Classify every derived statement",
+        "### `SOURCE_STATED`",
+        "### `DERIVED_OBLIGATION`",
+        "### `SYNTHESIS_INFERENCE`",
+        "### `PROPOSAL_ONLY`",
+        "## 8. Preserve specialist and parent boundaries",
+        "## 9. Compose the bounded synthesis packet",
+        "## 10. Maintain bidirectional traceability",
+        "## 11. Perform a fidelity self-check",
+        "## 12. Determine the synthesis state",
+        "### `READY_FOR_PARENT_INTEGRATION`",
+        "### `PARTIAL_WITH_EXPLICIT_GAPS`",
+        "### `NEEDS_SOURCE_REPAIR`",
+        "### `NEEDS_PARENT_DECISION`",
+        "### `NEEDS_PARENT_RECHARTER`",
+        "### `BLOCKED`",
+        "## 13. Handle invalidation and successor synthesis",
+        "## 14. Reduce context proportionately",
+        "## 15. Keep the role leaf and bounded",
+        "## 16. Use durable handoff for exact material",
+        "## 17. Return to the semantic parent"
+      ],
+      "frontmatter_sha256": "44743022241e02570be847969fe8d749c91a6f13a721fd497f7b82850111b697",
+      "sections": [
+        {
+          "heading": "# BBK Synthesize",
+          "sha256": "99dd974b21d64d3f8ebb57a3e3539e419e18085fe52005d6ba080209788d4b24",
+          "characters": 465
+        },
+        {
+          "heading": "## 1. Bind the synthesis charter",
+          "sha256": "08b841b7a09a63cb1a6581554dac95b8c25056849a7fe7e24dfbd1ce4cc0b0a7",
+          "characters": 870
+        },
+        {
+          "heading": "## 2. Build the exact source manifest",
+          "sha256": "83b6eef6688765421c5377d1072c6347d43a7c8a61136051a531d1dffb823e97",
+          "characters": 1115
+        },
+        {
+          "heading": "## 3. Normalize statements, not authority",
+          "sha256": "b44eb2d013c01f0b28f875f43ac91560bf568771e83fa31b909268aca0b41843",
+          "characters": 936
+        },
+        {
+          "heading": "## 4. Reconcile identity and lineage first",
+          "sha256": "cc1f0f8178f4e6ccaf59dddf8c300fd5da09fd0febaa491216e8b589189d6311",
+          "characters": 804
+        },
+        {
+          "heading": "## 5. Expose contradiction without deciding it",
+          "sha256": "e21ec75d171605cacf654c8e0d2f95dbe460b08786d5b20e83d81e428cf22430",
+          "characters": 793
+        },
+        {
+          "heading": "## 6. Preserve dissent, alternatives, findings, and unknowns",
+          "sha256": "654c0a9ffbac2cdd84e0bde0c5ac8aa378351f63093055bc2cfe9da272326458",
+          "characters": 754
+        },
+        {
+          "heading": "## 7. Classify every derived statement",
+          "sha256": "7bf8307ea9ebb80646dc7f5fccea4aeb11e00d9fa58475411bf2c6ffc4967721",
+          "characters": 144
+        },
+        {
+          "heading": "### `SOURCE_STATED`",
+          "sha256": "af1858c9518d26184026ac26524c3a1e2cd28d13e8e0a6ba4617c8b22c12902b",
+          "characters": 104
+        },
+        {
+          "heading": "### `DERIVED_OBLIGATION`",
+          "sha256": "bf47925e62295f5edf5d818986daa3ff6ac5f66aff04b8dbd0201ae6b0e1e599",
+          "characters": 472
+        },
+        {
+          "heading": "### `SYNTHESIS_INFERENCE`",
+          "sha256": "608e9b8f1aaa04e884897d1b975821ff5d0c52a0c8ef67eb60957471988bd52d",
+          "characters": 203
+        },
+        {
+          "heading": "### `PROPOSAL_ONLY`",
+          "sha256": "f498f4a973b02bc4de8f6f44e713b2e447352b14957aee4cfbf669aa24260ef4",
+          "characters": 164
+        },
+        {
+          "heading": "## 8. Preserve specialist and parent boundaries",
+          "sha256": "2d5226f3de3aca134965b23e97d071db213a0d26f4266c765d6ea6ce211ac968",
+          "characters": 935
+        },
+        {
+          "heading": "## 9. Compose the bounded synthesis packet",
+          "sha256": "2661a4dc8ebc6cb1308c3cf3f2378439f33de734cdeebe584865a135d5be3b35",
+          "characters": 1047
+        },
+        {
+          "heading": "## 10. Maintain bidirectional traceability",
+          "sha256": "16ebd50d4d1ccac936f32f32fe5184470112a1e491956cb774e167acb902ba86",
+          "characters": 632
+        },
+        {
+          "heading": "## 11. Perform a fidelity self-check",
+          "sha256": "913cf505ec731af1422bd79a4b96e0d57b1fa46e96278cfad9f2e79c66a66494",
+          "characters": 732
+        },
+        {
+          "heading": "## 12. Determine the synthesis state",
+          "sha256": "b7e79542b915fec7b4beddcba48765cac3b05167e09e835c7cc74a17cd082c20",
+          "characters": 112
+        },
+        {
+          "heading": "### `READY_FOR_PARENT_INTEGRATION`",
+          "sha256": "122bacceb76ebb97f1d740123a562eecaba3df543eeb838cf549eab15ddeca9e",
+          "characters": 574
+        },
+        {
+          "heading": "### `PARTIAL_WITH_EXPLICIT_GAPS`",
+          "sha256": "9c2cbebf4cc8ab6787e1ebacfcc6918fc8c7edd5c19c34fea2b676cdecd87fb5",
+          "characters": 216
+        },
+        {
+          "heading": "### `NEEDS_SOURCE_REPAIR`",
+          "sha256": "f43a69ef0c8ab2204d0460a243ef04a3e20afbad850f00c542193cf7ead6964b",
+          "characters": 166
+        },
+        {
+          "heading": "### `NEEDS_PARENT_DECISION`",
+          "sha256": "d80ea8a93274903b6ffa471efb2e351362bc72e001343283976c49cd817306d4",
+          "characters": 162
+        },
+        {
+          "heading": "### `NEEDS_PARENT_RECHARTER`",
+          "sha256": "332c6500599ab984bb65bd70ee0afd9a04743bcb7308e0df31e69d640eb57578",
+          "characters": 206
+        },
+        {
+          "heading": "### `BLOCKED`",
+          "sha256": "860f7608352ab7736c55501acfd4f32f0f6de3938bc3f487979b8a190c5e240b",
+          "characters": 131
+        },
+        {
+          "heading": "## 13. Handle invalidation and successor synthesis",
+          "sha256": "8474d2c64314edcaa1e67caca7ec039065c6022827ea80ac54cc6909ec3ab6ee",
+          "characters": 667
+        },
+        {
+          "heading": "## 14. Reduce context proportionately",
+          "sha256": "fbba90cd8066829a1ef7031cefa8f27643bb10277d8fb037467938b05bcb56e3",
+          "characters": 813
+        },
+        {
+          "heading": "## 15. Keep the role leaf and bounded",
+          "sha256": "e6b1508e705545141c2286ffe042e6e8cf15ad6fbfb731c63c4d68d46a4ec79e",
+          "characters": 617
+        },
+        {
+          "heading": "## 16. Use durable handoff for exact material",
+          "sha256": "13e9ec997d4cae3a5e1a8a8c5d4ff21b030cdb522c58dbb4e1efd6854347c93c",
+          "characters": 693
+        },
+        {
+          "heading": "## 17. Return to the semantic parent",
+          "sha256": "93e144c29ca42aa1735b47400aafc9c47d350e1fcb4f6cf476f656362cc4b9d3",
+          "characters": 846
+        }
+      ]
+    },
+    "bbk-territory-execution": {
+      "template_characters": 34145,
+      "headings": [
+        "# BBK Territory Execution",
+        "## 1. Preserve the responsibility boundary",
+        "## 2. Bind the exact territory execution charter",
+        "### Current BBK substrate rule",
+        "## 3. Verify entry and resume eligibility",
+        "## 4. Keep the boundary immutable",
+        "## 5. Preserve semantic and physical identity",
+        "## 6. Maintain orthogonal local state",
+        "## 7. Build the canonical boundary view",
+        "## 8. Schedule locally without becoming the root or the worker path",
+        "## 9. Admit coherent Worker Orchestrator cohorts",
+        "## 10. Preserve candidate and worker-quality ownership",
+        "## 11. Admit candidate-bound Validator Orchestrators",
+        "## 12. Coordinate finding-preserving repair",
+        "## 13. Use Reviewers only for distinct local judgment",
+        "## 14. Coordinate integration without implementing it",
+        "## 15. Propagate authority, fences, workspaces, and resources exactly",
+        "## 16. Consume and qualify direct-child returns",
+        "## 17. Handle bounded discovered work and deviation",
+        "## 18. Classify blockers, waits, failures, and containment",
+        "## 19. Recover the territory and direct children",
+        "## 20. Send durable signals to the Root Orchestrator",
+        "## 21. Report truthful boundary status",
+        "## 22. Prepare completion-readiness, not self-acceptance",
+        "## 23. Return exact checkpoint or final report",
+        "## 24. Stop proportionately"
+      ],
+      "frontmatter_sha256": "e98464cdddd03366d1154372b548a6dce7750883935ebfbe87c19d0ef7392d93",
+      "sections": [
+        {
+          "heading": "# BBK Territory Execution",
+          "sha256": "b6822d6b310d31f7201241f03c7a46123a12293cafba1df0527b537e8db06223",
+          "characters": 1569
+        },
+        {
+          "heading": "## 1. Preserve the responsibility boundary",
+          "sha256": "8657b845e548dd7e1cf479633538cd4d98582b857af34e9f1edbfb5997295a0a",
+          "characters": 2013
+        },
+        {
+          "heading": "## 2. Bind the exact territory execution charter",
+          "sha256": "d2a0a2c9e131feef36d644f7d041106746e0c694a6d281afdb2a806f8dde5832",
+          "characters": 2386
+        },
+        {
+          "heading": "### Current BBK substrate rule",
+          "sha256": "67dbccfd1968dff477a8f5653428b1eb00eca9bfa7395dd89bf7d622694dcdf8",
+          "characters": 958
+        },
+        {
+          "heading": "## 3. Verify entry and resume eligibility",
+          "sha256": "48e04adbaacc53e2e0cfa08b0985596748045081f13050f809ca599083029dd6",
+          "characters": 1791
+        },
+        {
+          "heading": "## 4. Keep the boundary immutable",
+          "sha256": "d3aa4dc781f6facb22d99f93f153b383fe228ec6410e1617cf4d3259f7797bb0",
+          "characters": 1230
+        },
+        {
+          "heading": "## 5. Preserve semantic and physical identity",
+          "sha256": "a813d58c9f0ba1280be505bf8668c4b78939cc2762cc482c9eee34418355db70",
+          "characters": 870
+        },
+        {
+          "heading": "## 6. Maintain orthogonal local state",
+          "sha256": "7d61d0d90687eb1b0ac72ef6d97bc19e0121b360b9f3b7fae62b4a6028f58161",
+          "characters": 1731
+        },
+        {
+          "heading": "## 7. Build the canonical boundary view",
+          "sha256": "fd3ea1b5e87b5dbb0f35da2651084799fba350ecb7ceafe878a9a91d9d105e34",
+          "characters": 1169
+        },
+        {
+          "heading": "## 8. Schedule locally without becoming the root or the worker path",
+          "sha256": "38144f29d3a7ad1cdc0306fc04b303cca2b8b84620b7b0e10d35f758af600b84",
+          "characters": 1049
+        },
+        {
+          "heading": "## 9. Admit coherent Worker Orchestrator cohorts",
+          "sha256": "ea3d35a29f8ed63ad85a8ad20465a6918b8fa5afdf4d2e24c62c2ec33783d3ce",
+          "characters": 1414
+        },
+        {
+          "heading": "## 10. Preserve candidate and worker-quality ownership",
+          "sha256": "2306b168bfe33ec276dfca54ab178a9042ba5d759f8c6162f3e86895c970823b",
+          "characters": 1089
+        },
+        {
+          "heading": "## 11. Admit candidate-bound Validator Orchestrators",
+          "sha256": "1dbd494c9a3e74cabe1af4875384d3ca4d727773f3dbcc1cb94051d28694f618",
+          "characters": 1006
+        },
+        {
+          "heading": "## 12. Coordinate finding-preserving repair",
+          "sha256": "4591a24e0d528f7df824b0f12a2d7b2f111158bfedc77f2e6b43a5de68829ccf",
+          "characters": 1621
+        },
+        {
+          "heading": "## 13. Use Reviewers only for distinct local judgment",
+          "sha256": "bc74535c5ba10510c7c2629e21ac21b0c9b8dd0268162704f4c3d6b9a51441e9",
+          "characters": 793
+        },
+        {
+          "heading": "## 14. Coordinate integration without implementing it",
+          "sha256": "22f03e0045ca3a87b71e87070db40c54a088fc6f3e57adda5af7e3f57a0d77c3",
+          "characters": 984
+        },
+        {
+          "heading": "## 15. Propagate authority, fences, workspaces, and resources exactly",
+          "sha256": "8dbd335b7f2402d57b2e864551a3577c7c9f669f04229efba3f8222bdbb987c7",
+          "characters": 1504
+        },
+        {
+          "heading": "## 16. Consume and qualify direct-child returns",
+          "sha256": "2a14250055024eba816c5734b6e8a4aeb8b2ef8779e43db56f59845c89456167",
+          "characters": 1036
+        },
+        {
+          "heading": "## 17. Handle bounded discovered work and deviation",
+          "sha256": "8bb87ba0a55c702d9aec965c9bb8567099b32361b6678440fb669135319d5a15",
+          "characters": 2306
+        },
+        {
+          "heading": "## 18. Classify blockers, waits, failures, and containment",
+          "sha256": "e32a21b9f608c26ed4a87dce3c66b652c9f6fef311db8a7bddf1c8b04fa4ca52",
+          "characters": 1111
+        },
+        {
+          "heading": "## 19. Recover the territory and direct children",
+          "sha256": "6cbcc6461ed9cec239af0d38d85d1c3ec060f82c9a537bc82e0d0be8672b923a",
+          "characters": 1030
+        },
+        {
+          "heading": "## 20. Send durable signals to the Root Orchestrator",
+          "sha256": "99935612104fb67a2a9524c925c7045effb7565c1883b7721207372451ffef33",
+          "characters": 1150
+        },
+        {
+          "heading": "## 21. Report truthful boundary status",
+          "sha256": "f194dd69998b5fffba352cc82babaea6e5c0f1c10bcb4ee3690e6aa49cbdf7a0",
+          "characters": 733
+        },
+        {
+          "heading": "## 22. Prepare completion-readiness, not self-acceptance",
+          "sha256": "52ef4cdad0c2173259df46e71897011634c12a5ee0b0de5d1fb759693d48d51e",
+          "characters": 1387
+        },
+        {
+          "heading": "## 23. Return exact checkpoint or final report",
+          "sha256": "bc7f489d1d5833ed72b5565189a058be649ef7d0b097ab1292bca6ea2eec4998",
+          "characters": 912
+        },
+        {
+          "heading": "## 24. Stop proportionately",
+          "sha256": "2a5b402a7c4dc13be1510999cfbabe7a7c0e92bd6932c1b83965118f3da67ee7",
+          "characters": 875
+        }
+      ]
+    },
+    "bbk-validation-orchestration": {
+      "template_characters": 38306,
+      "headings": [
+        "# BBK Validation Orchestration",
+        "## 1. Preserve the responsibility boundary",
+        "## 2. Bind one declared invocation mode",
+        "### `TERRITORY_BOUND`",
+        "### `CONTROLLER_ROOT`",
+        "## 3. Bind the exact assurance charter",
+        "## 4. Independently qualify candidate admission",
+        "## 5. Preserve one candidate per ReviewRun",
+        "## 6. Intersect authority and capability; never grant them",
+        "## 7. Maintain orthogonal assurance-run state",
+        "## 8. Compile or qualify the ReviewManifest",
+        "## 9. Assign one primary evaluator per required assertion",
+        "## 10. Select the correct evaluator path",
+        "### Use `bbk_validator` when",
+        "### Use `bbk_reviewer` when",
+        "### Reuse deterministic evidence when",
+        "## 11. Compile deterministic review context",
+        "## 12. Qualify profiles, tools, methods, and environments",
+        "## 13. Freeze criteria, purpose, and exposure before outcome-bearing evidence",
+        "## 14. Dispatch exact evaluator charters",
+        "## 15. Validate child checkpoints and returns",
+        "## 16. Keep production, assurance, and evidence objects separate",
+        "## 17. Interpret assertion results exactly",
+        "## 18. Classify failure before routing",
+        "### Candidate or assertion failure",
+        "### Evidence failure",
+        "### Evaluator or result failure",
+        "### Context failure",
+        "### Tool, environment, consumer, device, facility, or infrastructure failure",
+        "### Governing-design or authority failure",
+        "### Integrity failure",
+        "## 19. Preserve immutable findings and external dispositions",
+        "## 20. Derive one central non-averaging aggregate",
+        "## 21. Return candidate repair; do not perform it",
+        "## 22. Revalidate successor candidates minimally but sufficiently",
+        "## 23. Bound retries, repair cycles, and escalation",
+        "## 24. Handle liveness, interruption, and recovery honestly",
+        "## 25. Reconcile cleanup, secrets, and temporary effects",
+        "## 26. Preserve current BBK schema and enforcement truth",
+        "## 27. Return the exact assurance report",
+        "## 28. Stop proportionately"
+      ],
+      "frontmatter_sha256": "f481e957803f92e18477c295628c437f42fa0a535281a769f4962e820d38ac35",
+      "sections": [
+        {
+          "heading": "# BBK Validation Orchestration",
+          "sha256": "b6b467714257e531935c5e39dda30c72857e47effc5399453bd4769d0b615f89",
+          "characters": 1963
+        },
+        {
+          "heading": "## 1. Preserve the responsibility boundary",
+          "sha256": "02cd4c3bdec55238ccbc5aa4d4373ca6647b90f7d96ce79719e50eddca35ac98",
+          "characters": 2521
+        },
+        {
+          "heading": "## 2. Bind one declared invocation mode",
+          "sha256": "1f71d75eaae708098d37b27bac62d940ab4518fc04ba82d5397dee7bdb7801e1",
+          "characters": 80
+        },
+        {
+          "heading": "### `TERRITORY_BOUND`",
+          "sha256": "d7e70e7368107fa13bab0b165dfd07d2b4762495b0b153218d2f1348829b738a",
+          "characters": 483
+        },
+        {
+          "heading": "### `CONTROLLER_ROOT`",
+          "sha256": "295d0bf61e4ac2e0d6b68e4043595f9d7914944331423e5265148bff41637439",
+          "characters": 1006
+        },
+        {
+          "heading": "## 3. Bind the exact assurance charter",
+          "sha256": "6d64de79544714d5023b0f991ce65b844aa8d5443626d82a6189597b370505c5",
+          "characters": 1782
+        },
+        {
+          "heading": "## 4. Independently qualify candidate admission",
+          "sha256": "e2fbb741d4519e89eb8759dd8f8291f1fb6c819066c4b61a093ef990a8dced13",
+          "characters": 1509
+        },
+        {
+          "heading": "## 5. Preserve one candidate per ReviewRun",
+          "sha256": "57aec0f6f5bc97f149c83858d2d396aff37abf552319559a4b0e5efd957859a9",
+          "characters": 712
+        },
+        {
+          "heading": "## 6. Intersect authority and capability; never grant them",
+          "sha256": "dbbc6c181210c114c4498cacca22139079b46e4b0492499eb1d3e424b4b77c2b",
+          "characters": 1131
+        },
+        {
+          "heading": "## 7. Maintain orthogonal assurance-run state",
+          "sha256": "1142844fab68bbdfcce380c44f0e00d89c15178fdbc4420947080e0175e697d9",
+          "characters": 1025
+        },
+        {
+          "heading": "## 8. Compile or qualify the ReviewManifest",
+          "sha256": "09c880df08f9892a99e58e3a11b9f153bfdae719c543b5ec6072ba0bc8736f80",
+          "characters": 1372
+        },
+        {
+          "heading": "## 9. Assign one primary evaluator per required assertion",
+          "sha256": "ea8b7627e3bce2914011d24c253ed5178589dc24ed2a9680ee14480fa8572d8c",
+          "characters": 884
+        },
+        {
+          "heading": "## 10. Select the correct evaluator path",
+          "sha256": "a72c1ce1b90ed3a8224d7de9f8379675e750d9686d5203233e8b735c3bec6a69",
+          "characters": 40
+        },
+        {
+          "heading": "### Use `bbk_validator` when",
+          "sha256": "e8a6b87fa0d70acfc421a7d59d1c7178488ba0814efb28af81a3194019676744",
+          "characters": 362
+        },
+        {
+          "heading": "### Use `bbk_reviewer` when",
+          "sha256": "d9f6f39da68d1675f0c6920c75e470696fce184b330d1afa374703b3360429eb",
+          "characters": 684
+        },
+        {
+          "heading": "### Reuse deterministic evidence when",
+          "sha256": "ac47d8b6227c288c46741bf7d898555e281066fd4ab8d945af2a3f88e632651e",
+          "characters": 306
+        },
+        {
+          "heading": "## 11. Compile deterministic review context",
+          "sha256": "24c123d2c6357a99285bdafdc89953e3546863b5b9621d963e79d71f5b10ffe6",
+          "characters": 1063
+        },
+        {
+          "heading": "## 12. Qualify profiles, tools, methods, and environments",
+          "sha256": "335bd8e0e2f6aab4369a294344f88062d60942dfc6b85c1335f9521fe3843e3c",
+          "characters": 1208
+        },
+        {
+          "heading": "## 13. Freeze criteria, purpose, and exposure before outcome-bearing evidence",
+          "sha256": "e8c70d74dbda1632c2db03c4a674a0f1e769f0f9c1774470fed1359f44b22999",
+          "characters": 819
+        },
+        {
+          "heading": "## 14. Dispatch exact evaluator charters",
+          "sha256": "c7f8dffc73643ebe6aa06386603e128baeceff28f2e065d45845ad4db5cb6bfc",
+          "characters": 952
+        },
+        {
+          "heading": "## 15. Validate child checkpoints and returns",
+          "sha256": "1b947c3512a487d063244929983464b2fd6f71486bb771c927986a32fc5d9bc2",
+          "characters": 1018
+        },
+        {
+          "heading": "## 16. Keep production, assurance, and evidence objects separate",
+          "sha256": "2abf4e12face24e81936b73458689d343b9f4eefa1f0b1e6ac91034334a25789",
+          "characters": 1421
+        },
+        {
+          "heading": "## 17. Interpret assertion results exactly",
+          "sha256": "448bc0e8c1b043b1e0204b4109ce44b3bfad4e23b3d04b1aded14fab2664c153",
+          "characters": 742
+        },
+        {
+          "heading": "## 18. Classify failure before routing",
+          "sha256": "36751bc324990a850b77bf40477705a1a62464ee7512c91d4cbaacdd0b6412c9",
+          "characters": 61
+        },
+        {
+          "heading": "### Candidate or assertion failure",
+          "sha256": "61df56b4894a391b77f0f47a78c9af9c59b9fc90ff3f01ecd2eaf9401aca7ec7",
+          "characters": 337
+        },
+        {
+          "heading": "### Evidence failure",
+          "sha256": "496ef6644e1c477a9b65150b8b60ede59671e3ad3c1715778913a1687fedbbf7",
+          "characters": 315
+        },
+        {
+          "heading": "### Evaluator or result failure",
+          "sha256": "5960a63f22ced681b165c061ff022be6bfb8b1daaf3a5741f101c862e552a5d1",
+          "characters": 226
+        },
+        {
+          "heading": "### Context failure",
+          "sha256": "e75145af7785d930c5e38f9ae9deb43f5d97b399eb543b31edb1948afb8e777c",
+          "characters": 241
+        },
+        {
+          "heading": "### Tool, environment, consumer, device, facility, or infrastructure failure",
+          "sha256": "6a99c494be411c482012c0607460e485f6059bbb0ff3ceba598f39d4ca2692be",
+          "characters": 349
+        },
+        {
+          "heading": "### Governing-design or authority failure",
+          "sha256": "9ce4a6824a63bcf376fc83a4cd4848085506dae59a94dc64de89d63179ade713",
+          "characters": 337
+        },
+        {
+          "heading": "### Integrity failure",
+          "sha256": "41c8d878cb4f7c6f4b60f93f529b5b8b44d12baf5c3ce8906aff1c162bc56865",
+          "characters": 285
+        },
+        {
+          "heading": "## 19. Preserve immutable findings and external dispositions",
+          "sha256": "44a61b6377393925f62305624259cfb062fcb9bdba6392a63ba627b45fdbed3a",
+          "characters": 1198
+        },
+        {
+          "heading": "## 20. Derive one central non-averaging aggregate",
+          "sha256": "294cc1c6f06b4469c34a94da1acac364f9100cd19f8211611eb80bdcf79994fb",
+          "characters": 1326
+        },
+        {
+          "heading": "## 21. Return candidate repair; do not perform it",
+          "sha256": "9e486c218c8298715cab0e040a826a5ed9cea4a83cfa72806c29aeafd4d32e48",
+          "characters": 1102
+        },
+        {
+          "heading": "## 22. Revalidate successor candidates minimally but sufficiently",
+          "sha256": "c3316d79f3d4243619bb06686daba45cb418368f6fa4ecea2c2d751557433541",
+          "characters": 1179
+        },
+        {
+          "heading": "## 23. Bound retries, repair cycles, and escalation",
+          "sha256": "02962fd107fa9d049ea423b8a8dccea9c5327d339e5eebd74e84cf69e722a193",
+          "characters": 969
+        },
+        {
+          "heading": "## 24. Handle liveness, interruption, and recovery honestly",
+          "sha256": "a65e1d9007ac48997f998d149e66db710f06e741a278b7300b591ab87583aaad",
+          "characters": 1316
+        },
+        {
+          "heading": "## 25. Reconcile cleanup, secrets, and temporary effects",
+          "sha256": "7f84b7b8a187287e80f570ca5ca89c8e277b68d17bff923ad86943e7b022f5da",
+          "characters": 744
+        },
+        {
+          "heading": "## 26. Preserve current BBK schema and enforcement truth",
+          "sha256": "bc29a555368cffe4cda4ca7cad6b71f9826f4008e4c1441f2e0844ad09432b98",
+          "characters": 1414
+        },
+        {
+          "heading": "## 27. Return the exact assurance report",
+          "sha256": "7631b49ddfba2157c164ba5524fb73292631856435d97a1c5ed4da1bc2b5eb8a",
+          "characters": 2047
+        },
+        {
+          "heading": "## 28. Stop proportionately",
+          "sha256": "f7533dfbcf568819b7fd3186458fdd1763e585c9c1140a0c5c53a22e1b8698d9",
+          "characters": 1172
+        }
+      ]
+    },
+    "bbk-verification-design": {
+      "template_characters": 28886,
+      "headings": [
+        "# BBK Verification Design",
+        "## 1. Bind the exact verification charter",
+        "## 2. Qualify governing sources and authority",
+        "## 3. Build a bounded claim inventory",
+        "## 4. Select proportional assurance without averaging protected floors",
+        "## 5. Define exact assertions",
+        "## 6. Freeze criteria before outcome-bearing evidence",
+        "## 7. Keep verification categories distinct",
+        "### Integration checking",
+        "### Requirement verification",
+        "### Operational validation",
+        "### Outcome evidence",
+        "### Independent review",
+        "### Release or accountable acceptance",
+        "## 8. Select the cheapest sufficient method",
+        "## 9. Define the evidence contract",
+        "## 10. Qualify tools, profiles, environments, and fallbacks",
+        "## 11. Place gates and bind subject identity",
+        "## 12. Separate completion binding from evaluation ownership",
+        "## 13. Design independence and exposure deliberately",
+        "## 14. Define evidence reuse and invalidation",
+        "## 15. Design repair and revalidation",
+        "## 16. Keep ReviewManifest and validation execution downstream",
+        "## 17. Detect observability, testability, and design gaps",
+        "## 18. Preserve schema truth and companion detail",
+        "## 19. Remain a leaf specialist",
+        "## 20. Perform a producer self-check",
+        "## 21. Stop economically and return exact state"
+      ],
+      "frontmatter_sha256": "1e5940f68114de45d470051ef13e22bbc18e90811f2731970bd99dbcf0c242dd",
+      "sections": [
+        {
+          "heading": "# BBK Verification Design",
+          "sha256": "ecd157ac8c5eaf6afbf3d359de868493387dbadbf80303a29c4c453c6cd00f8c",
+          "characters": 1543
+        },
+        {
+          "heading": "## 1. Bind the exact verification charter",
+          "sha256": "454c88ab8cf1ced72c3e0a4958e5ca56b3418194a6030375afce046a0d37cd2d",
+          "characters": 1530
+        },
+        {
+          "heading": "## 2. Qualify governing sources and authority",
+          "sha256": "abda4d9152d4dffe35e67427f4ed344e998dc819676e569dc287ca7d32f0c3f5",
+          "characters": 993
+        },
+        {
+          "heading": "## 3. Build a bounded claim inventory",
+          "sha256": "c122a6afbd301730eb5887f5ed8757e8cb063400974aa026caf1d1bfe08a7ccc",
+          "characters": 1870
+        },
+        {
+          "heading": "## 4. Select proportional assurance without averaging protected floors",
+          "sha256": "022af7ee758c558e41cab59a894ce5aae5f40d5f68e0002d7d6e4df2a34aaf17",
+          "characters": 1035
+        },
+        {
+          "heading": "## 5. Define exact assertions",
+          "sha256": "1d0e9f85b819a81b23d0c1eafe063cfe6c6ab1c13c148e0fbecbf81d82dc332e",
+          "characters": 1731
+        },
+        {
+          "heading": "## 6. Freeze criteria before outcome-bearing evidence",
+          "sha256": "b300f408d4d34b04302f5df8c116ac706d46e97685d2dea20b8163da932fb5d8",
+          "characters": 735
+        },
+        {
+          "heading": "## 7. Keep verification categories distinct",
+          "sha256": "6cf9656eda175d019acb8c2208ca2513c7a55bcd847cd9244e463fe23b6bfde7",
+          "characters": 91
+        },
+        {
+          "heading": "### Integration checking",
+          "sha256": "8ee596b46f53cbd0ceeb6f24474fe9237ce0b597f55463e6bb828432194d0bac",
+          "characters": 190
+        },
+        {
+          "heading": "### Requirement verification",
+          "sha256": "02080d56dee635e2ca55c9219f1f40c1585e89d1f1e54b71778e46f34ffb386d",
+          "characters": 147
+        },
+        {
+          "heading": "### Operational validation",
+          "sha256": "ed3fa5c2c1c0cb7be1f74c2ef03a2b9b4caa7700a7e54a2c53f3bff8b8dcb498",
+          "characters": 223
+        },
+        {
+          "heading": "### Outcome evidence",
+          "sha256": "833ca7a5b27e50fe9cf8bee479c712a04ad0bf24f61309b8f0fc439c2037b131",
+          "characters": 159
+        },
+        {
+          "heading": "### Independent review",
+          "sha256": "c6bec7496aa37fccfa0768001310dbb0f6a5a64d8ac463a8a5f32bb77c8e653c",
+          "characters": 250
+        },
+        {
+          "heading": "### Release or accountable acceptance",
+          "sha256": "9cb7db9a3069586b11d133cfb344aa6ba545a521e0356c7bc884984fcbc3b6ba",
+          "characters": 470
+        },
+        {
+          "heading": "## 8. Select the cheapest sufficient method",
+          "sha256": "112fc9b47211abb35b1ed02d662776bf72111201cdea63977d6dd31d51c83699",
+          "characters": 1505
+        },
+        {
+          "heading": "## 9. Define the evidence contract",
+          "sha256": "af7cf586a1ed54926edab0b2382e96ebacd1eaf50945a4a27d5cf21ad707b085",
+          "characters": 1446
+        },
+        {
+          "heading": "## 10. Qualify tools, profiles, environments, and fallbacks",
+          "sha256": "c107272f1a642153a0b6bbeaea359be719af50d7dcbd688eee4f9cca6e5698c7",
+          "characters": 1632
+        },
+        {
+          "heading": "## 11. Place gates and bind subject identity",
+          "sha256": "65f8b464d7ce427492f97d88855df0f9e90bc24e09db628c143a602557a3031f",
+          "characters": 960
+        },
+        {
+          "heading": "## 12. Separate completion binding from evaluation ownership",
+          "sha256": "92a55bd38af810e4bae93fad0713fe3b9615dbb9c06b0e3424949bd34c1178ae",
+          "characters": 1396
+        },
+        {
+          "heading": "## 13. Design independence and exposure deliberately",
+          "sha256": "0ddab272772bd110054687668626718e4b4d434efb6c3a12a6d1979db327e372",
+          "characters": 1093
+        },
+        {
+          "heading": "## 14. Define evidence reuse and invalidation",
+          "sha256": "c6b601234c74d754dfe02d8bd20645635e05dfe949dfbffa9414ea9de06a1fd2",
+          "characters": 1217
+        },
+        {
+          "heading": "## 15. Design repair and revalidation",
+          "sha256": "f20e107067c854654d58c7e1b79a83d23c3fc12bd1242c5bc6a9f3793da4caa0",
+          "characters": 962
+        },
+        {
+          "heading": "## 16. Keep ReviewManifest and validation execution downstream",
+          "sha256": "cddf0b4bf799ad4cb0f56ae01640a0bb0909ae53b9b23818fa2ff7f9d85bf68b",
+          "characters": 1120
+        },
+        {
+          "heading": "## 17. Detect observability, testability, and design gaps",
+          "sha256": "c44d20bdd83db47af4135d6d5e8afc177c4277f2581fb21e487b6de301f79573",
+          "characters": 1027
+        },
+        {
+          "heading": "## 18. Preserve schema truth and companion detail",
+          "sha256": "89acffb2cfad0b95605b7f226ebe5d207d9b8378da05875bd2b1454f4d001193",
+          "characters": 1226
+        },
+        {
+          "heading": "## 19. Remain a leaf specialist",
+          "sha256": "4d539b9eff70651b7bea4b44827644f8b3004256c263693276397a14d6675531",
+          "characters": 882
+        },
+        {
+          "heading": "## 20. Perform a producer self-check",
+          "sha256": "5370c627d311fe87ac93085ac2d12dc602cd01f9799b3ee44bb33f4c6e8da8b5",
+          "characters": 1585
+        },
+        {
+          "heading": "## 21. Stop economically and return exact state",
+          "sha256": "020cf31921a518a5e1baa5b5bc53069360e3f86b02696bab7491f00957a50aef",
+          "characters": 1351
+        }
+      ]
+    },
+    "bbk-wayfind": {
+      "template_characters": 6020,
+      "headings": [
+        "# BBK Wayfind",
+        "## 1. Frame the destination and authority",
+        "## 2. Maintain the active planning state",
+        "## 3. Run the recursive loop",
+        "## 4. Route work without ceremony",
+        "## 5. Apply proportional pressure tests",
+        "## 6. Stop economically",
+        "## 7. Return a synthesis",
+        "## Profile interaction",
+        "## Durable question state"
+      ],
+      "frontmatter_sha256": "3ab4d20f70ffdcc6d91fe0a12b3284c1f8c0e807f6d00bf3bbe33d98b2e873ec",
+      "sections": [
+        {
+          "heading": "# BBK Wayfind",
+          "sha256": "49d3bb7ec6bf48bdbde5f26c206f5c2bd25e2bc91de4cca45d1ae6bd455e0271",
+          "characters": 97
+        },
+        {
+          "heading": "## 1. Frame the destination and authority",
+          "sha256": "c400f975d6c0fa2ba2288342b6358d5e967eb95252340020e90ae57b0217ee00",
+          "characters": 578
+        },
+        {
+          "heading": "## 2. Maintain the active planning state",
+          "sha256": "1f64491965fe260d083aa03c148db4809b0539d22d399ff4f754053b60cb45ab",
+          "characters": 535
+        },
+        {
+          "heading": "## 3. Run the recursive loop",
+          "sha256": "39e6855b69f13a351a5a8509955e29ab9d9577bc99ff6af82be76c6107fb6ff2",
+          "characters": 1276
+        },
+        {
+          "heading": "## 4. Route work without ceremony",
+          "sha256": "87594602427dca281cbbdb0bc56454c78e7dca05a8182750acd98a837aa42982",
+          "characters": 1091
+        },
+        {
+          "heading": "## 5. Apply proportional pressure tests",
+          "sha256": "7093a917aeec7f5612222feded22657a6db0c87fe25b8742e8221438ce4e37e0",
+          "characters": 352
+        },
+        {
+          "heading": "## 6. Stop economically",
+          "sha256": "87c72a8d8a341a1cfb8bf3e2146b1a4add2cc2f1d66bdfcbe9663fb0e8953dc0",
+          "characters": 506
+        },
+        {
+          "heading": "## 7. Return a synthesis",
+          "sha256": "070e6ed21b17dec4d0bed0db5563803f79bb06cff2fbf634848edf4662eb0449",
+          "characters": 445
+        },
+        {
+          "heading": "## Profile interaction",
+          "sha256": "b4f56d3e4155bebed4aba609258db9fb43983ae075dd4c2e58e569618241396e",
+          "characters": 385
+        },
+        {
+          "heading": "## Durable question state",
+          "sha256": "35d9d89471b8612b1e875ff7845158a5f40a98b22eae5a44cfe1a3d168da0557",
+          "characters": 444
+        }
+      ]
+    },
+    "bbk-work-graph": {
+      "template_characters": 17039,
+      "headings": [
+        "# BBK Work Graph",
+        "## 1. Bind the accepted planning basis",
+        "## 2. Define actor-visible capability increments",
+        "## 3. Define the phase topology",
+        "## 4. Create integration obligations for every split",
+        "## 5. Delegate and integrate phase plans",
+        "## 6. Commission and integrate verification design before sealing the graph",
+        "## 7. Commission and integrate Worker invocation design before sealing the graph",
+        "## 8. Validate graph invariants",
+        "## 9. Compile graph-level execution controls",
+        "## 10. Freeze candidates late",
+        "## 11. Preserve invalidation and partial reuse",
+        "## 12. Use review proportionately",
+        "## 13. Return to the semantic parent",
+        "## Profile interaction"
+      ],
+      "frontmatter_sha256": "38636d4b7fd48534537e0160fe35a86eea1dd1e89692fbb09b4e598184026a2a",
+      "sections": [
+        {
+          "heading": "# BBK Work Graph",
+          "sha256": "0d1bafb6231c3b39e472e5206139d5d43c538e77c04e325cae2c415acfe1779f",
+          "characters": 616
+        },
+        {
+          "heading": "## 1. Bind the accepted planning basis",
+          "sha256": "1d090cc127eccbd7dc2fac6e7a82d10726edf177b74554fdb5723ef5e7ae62d2",
+          "characters": 1436
+        },
+        {
+          "heading": "## 2. Define actor-visible capability increments",
+          "sha256": "eee2ed631e61951735ae39a7e911c16b1ae5e538d7719c9d5f1e35c15d68c1a1",
+          "characters": 1253
+        },
+        {
+          "heading": "## 3. Define the phase topology",
+          "sha256": "57cba57f4ecbad5a63152757bad9241fd5b6e3fc8a18bf64f3901f9687a74e24",
+          "characters": 1389
+        },
+        {
+          "heading": "## 4. Create integration obligations for every split",
+          "sha256": "ed684b569074ec06954990e78b6cd7a3ccdcfcce428c4f889f9d185157496829",
+          "characters": 1010
+        },
+        {
+          "heading": "## 5. Delegate and integrate phase plans",
+          "sha256": "dac5e0be02352be0c59e941152ee34a395f1d1fa6d0253e35c75a29d5baae8b7",
+          "characters": 1145
+        },
+        {
+          "heading": "## 6. Commission and integrate verification design before sealing the graph",
+          "sha256": "681b6a0b8c2d8861e79a94e2e81e33002baf588936df7b802defbbbf34771324",
+          "characters": 1824
+        },
+        {
+          "heading": "## 7. Commission and integrate Worker invocation design before sealing the graph",
+          "sha256": "ddcc6fdf2eb746aa3fdc73c7991222a28de98c66a5a484ddf5dc1b4e4e049a63",
+          "characters": 1506
+        },
+        {
+          "heading": "## 8. Validate graph invariants",
+          "sha256": "ca34cd8f4a546d0484152f65fa9803e0efed674a1ac64dfc1c6f5c3d3cae1f34",
+          "characters": 1257
+        },
+        {
+          "heading": "## 9. Compile graph-level execution controls",
+          "sha256": "30313ba774d2b8c9edffbb9b5ecad57d093858f4a65d7efcffc5743a8024ab3d",
+          "characters": 912
+        },
+        {
+          "heading": "## 10. Freeze candidates late",
+          "sha256": "1f24192135079f9254feb037b4f8c628a2015183d95e2fa0289bee6b42a26d9d",
+          "characters": 593
+        },
+        {
+          "heading": "## 11. Preserve invalidation and partial reuse",
+          "sha256": "ffcbef463786c7652636393b8b3c015425fc4420256ea63e6be120a9f04c8b38",
+          "characters": 865
+        },
+        {
+          "heading": "## 12. Use review proportionately",
+          "sha256": "49cf7679d6a75aab43151b3dcbcb5545a1d4db0dbd0b37bdc6d50df0b2c01baf",
+          "characters": 695
+        },
+        {
+          "heading": "## 13. Return to the semantic parent",
+          "sha256": "2030d8bb316f2d32797ece926554b5d4ceb739901613cec1f631053751924d14",
+          "characters": 1466
+        },
+        {
+          "heading": "## Profile interaction",
+          "sha256": "c70bd012af80a5e6018a4c3183685fc34702b99ff51586f204063ae11babb1da",
+          "characters": 702
+        }
+      ]
+    },
+    "bbk-work-unit-execution": {
+      "template_characters": 24185,
+      "headings": [
+        "# BBK WorkUnit Execution",
+        "## 1. Preserve the responsibility boundary",
+        "## 2. Bind the exact execution packet",
+        "## 3. Acknowledge and preflight before mutation",
+        "## 4. Keep semantic and physical identity separate",
+        "## 5. Enforce authority, capability and ownership",
+        "## 6. Verify workspace, pre-state and rollback",
+        "## 7. Apply the invocation exactly",
+        "## 8. Execute within delegated implementation freedom",
+        "## 9. Respect task-class boundaries",
+        "### Implementation or repair",
+        "### Integration, reconciliation, merge, migration or generation",
+        "### Test or fixture",
+        "### Documentation, specification or packaging",
+        "### Bounded diagnosis or inspection",
+        "### Experimental apparatus support",
+        "## 10. Mutate safely and account for exact bytes",
+        "## 11. Account for external effects",
+        "## 12. Run focused checks and preserve evidence",
+        "## 13. Handle discoveries without hidden scope growth",
+        "## 14. Report useful progress without exposing private reasoning",
+        "## 15. Checkpoint, continue and recover",
+        "## 16. Clean up and disposition temporary work",
+        "## 17. Return an exact Worker result",
+        "## 18. Parent-specific return boundaries",
+        "### Worker Orchestrator parent",
+        "### Prototyper parent",
+        "## 19. Use semantic result states honestly",
+        "## 20. Self-check before return",
+        "## 21. Stop economically"
+      ],
+      "frontmatter_sha256": "9de273839e4f4f534c1b2ed3e272acb1a8df6897ae38dbf3fccd94d42aac697c",
+      "sections": [
+        {
+          "heading": "# BBK WorkUnit Execution",
+          "sha256": "c59d70e7583906adbff3d4bf814b56d846c28ec71986f811609c973be8388b92",
+          "characters": 894
+        },
+        {
+          "heading": "## 1. Preserve the responsibility boundary",
+          "sha256": "24dd4f3f053ceb6eabd3d5d93bc3f1a5165ae437c4c453e3e0cdd097485aa0e6",
+          "characters": 1551
+        },
+        {
+          "heading": "## 2. Bind the exact execution packet",
+          "sha256": "34cd06dbca5ec5ce463b3e4c28c754891f6ca722dae39104c654c55af1360541",
+          "characters": 1316
+        },
+        {
+          "heading": "## 3. Acknowledge and preflight before mutation",
+          "sha256": "6b15421ea639cee042ff9b4d003eed978dbd1af062c3827d4712dc36195c1cbd",
+          "characters": 1196
+        },
+        {
+          "heading": "## 4. Keep semantic and physical identity separate",
+          "sha256": "b68938e9496a756bcd0767ca9bd30da9ed0ea061e69cd5ae64e644cf64575a26",
+          "characters": 907
+        },
+        {
+          "heading": "## 5. Enforce authority, capability and ownership",
+          "sha256": "c67aae053e25fba97255e7ed94ca252455e97495017dc76528736766f0be91b0",
+          "characters": 1110
+        },
+        {
+          "heading": "## 6. Verify workspace, pre-state and rollback",
+          "sha256": "2acf155b843b1aa3a0a53bbcb1a4f13042f3e2739f641d17898ff18465acfb74",
+          "characters": 941
+        },
+        {
+          "heading": "## 7. Apply the invocation exactly",
+          "sha256": "16d863657bbe68147532e7c4448662c1060e0c56caf5b3c5fafbc76ed7addfd6",
+          "characters": 1030
+        },
+        {
+          "heading": "## 8. Execute within delegated implementation freedom",
+          "sha256": "33b11797efc53b74c7ceabd9dd7cac398501160e69624f3932e9021cab425fe9",
+          "characters": 875
+        },
+        {
+          "heading": "## 9. Respect task-class boundaries",
+          "sha256": "17d4d8515a291a63101da53e8b960501d294e4bbb81e8170ed7a740dd1d0100c",
+          "characters": 110
+        },
+        {
+          "heading": "### Implementation or repair",
+          "sha256": "c06ea507e47002bd474d6a1194be1776c18a882cd1315c9502731657da25642e",
+          "characters": 292
+        },
+        {
+          "heading": "### Integration, reconciliation, merge, migration or generation",
+          "sha256": "9b1988d84e0ba3c80893dab761c68eedb665576120dfdf5dd6877bd4cd984e30",
+          "characters": 340
+        },
+        {
+          "heading": "### Test or fixture",
+          "sha256": "758416d9d7c4e7884d6ff4b710d45229dc9a538f648a476888e4dda084448257",
+          "characters": 229
+        },
+        {
+          "heading": "### Documentation, specification or packaging",
+          "sha256": "d39a76196b710597f012a9cb5aabedab3c4b86693c2257e6ec7017f02aafc098",
+          "characters": 272
+        },
+        {
+          "heading": "### Bounded diagnosis or inspection",
+          "sha256": "900e03fe41a11c5945d98282ea30256f66787b15d55473ab88d1ce8eecc644cf",
+          "characters": 240
+        },
+        {
+          "heading": "### Experimental apparatus support",
+          "sha256": "974a830fa748c252d8680997e583d32fcd9c34308498d094ebbbb09fe566e789",
+          "characters": 326
+        },
+        {
+          "heading": "## 10. Mutate safely and account for exact bytes",
+          "sha256": "ce1e0335935d1f441c57772e9d4b7e52ce817324bfaab5859b1718317525e4c9",
+          "characters": 1136
+        },
+        {
+          "heading": "## 11. Account for external effects",
+          "sha256": "a21707c6781a4a18019243bbd090330a1c8d22060f2a496190be2fd9ae1b83ec",
+          "characters": 641
+        },
+        {
+          "heading": "## 12. Run focused checks and preserve evidence",
+          "sha256": "fca7291e4ba6a19913cd757d1f19f5746537a2ed9eba7c82e8f80e3d72078632",
+          "characters": 1252
+        },
+        {
+          "heading": "## 13. Handle discoveries without hidden scope growth",
+          "sha256": "eb9b1117dd0508691acb0242e7d8708e6d02ca084451bea31518578a2bcf2d06",
+          "characters": 1201
+        },
+        {
+          "heading": "## 14. Report useful progress without exposing private reasoning",
+          "sha256": "7de361cb57daa7821ee37112660a60be2585a875be90d0d953cb8eb9b4d32d53",
+          "characters": 781
+        },
+        {
+          "heading": "## 15. Checkpoint, continue and recover",
+          "sha256": "b976fcc6747b12fcad86547368dd91c40e33f2f82ade03934ae60fa95a80e6c9",
+          "characters": 1332
+        },
+        {
+          "heading": "## 16. Clean up and disposition temporary work",
+          "sha256": "acfa52f9198777fea444221832e3a2408318190b42074db5bd065a437ddd026f",
+          "characters": 749
+        },
+        {
+          "heading": "## 17. Return an exact Worker result",
+          "sha256": "994b3354cadcd4333d88ef79f4dcecacb9fde4381d591e3b65f87c097eae82c4",
+          "characters": 1044
+        },
+        {
+          "heading": "## 18. Parent-specific return boundaries",
+          "sha256": "41d3d193b2e6f2af4d888d01d676d6ec9701cdf10185ebd6189ced8338aa0944",
+          "characters": 40
+        },
+        {
+          "heading": "### Worker Orchestrator parent",
+          "sha256": "6dd8df0d22c50d1f438e2b34e81985886aafc1bbfa21cc05352af8e4818a9157",
+          "characters": 434
+        },
+        {
+          "heading": "### Prototyper parent",
+          "sha256": "c38d573d693db06f276015b9b388e7e3fde88d812d22467a50ee2956c3d99d5d",
+          "characters": 330
+        },
+        {
+          "heading": "## 19. Use semantic result states honestly",
+          "sha256": "e4b32cdd0450106aff86f6c377b50b213fa36b721c97d63b9291038a1c632037",
+          "characters": 1240
+        },
+        {
+          "heading": "## 20. Self-check before return",
+          "sha256": "327bc2aa6fdbe7e0063e9d58249e97557d47665a705b0c8e452214e5df159b60",
+          "characters": 1081
+        },
+        {
+          "heading": "## 21. Stop economically",
+          "sha256": "28167b9218322750f50e5522d65b06e8de3d25cf476bae4c49257f609f6ca6e4",
+          "characters": 714
+        }
+      ]
+    },
+    "bbk-worker-design": {
+      "template_characters": 28565,
+      "headings": [
+        "# BBK Worker Design",
+        "## 1. Preserve the responsibility boundary",
+        "## 2. Bind the Worker Designer charter",
+        "## 3. Validate the WorkUnit before designing an invocation",
+        "## 4. Choose the correct artifact kind",
+        "### Concrete invocation",
+        "### Reusable template",
+        "### Instance rebind",
+        "## 5. Keep logical role and physical invocation distinct",
+        "## 6. Compute the effective authority and capability envelope",
+        "## 7. Compile filesystem and external-effect capabilities",
+        "### Disposable candidate root",
+        "### Protected worktree",
+        "### Sealed or historical evidence",
+        "## 8. Compile workspace and isolation requirements",
+        "## 9. Resolve the task profile",
+        "## 10. Resolve language and domain profiles",
+        "## 11. Select and qualify the model route",
+        "## 12. Compose instructions, skills and procedures",
+        "## 13. Compile the least-privilege context edge",
+        "## 14. Bind tools and environment exactly",
+        "## 15. Carry State–Decision–Effect and interface semantics",
+        "## 16. Carry assurance without becoming assurance authority",
+        "## 17. Compile budgets, continuation and interruption",
+        "## 18. Define discovery and scope-change handling",
+        "## 19. Define payload, result and handoff contracts",
+        "## 20. Define cleanup and artifact disposition",
+        "## 21. Separate host-neutral contract from host projection",
+        "## 22. Perform static and deterministic preflight",
+        "## 23. Validate least privilege and semantic fidelity",
+        "## 24. Preserve invalidation and successor history",
+        "## 25. Stop proportionately and return"
+      ],
+      "frontmatter_sha256": "6d9320a2197b99da71b6095d9eaba8bf02c7245faf036cc1623e570744fea915",
+      "sections": [
+        {
+          "heading": "# BBK Worker Design",
+          "sha256": "1edf6caa28da16524949608124f0db5595a917c7b060252dc2c7051b528b6584",
+          "characters": 893
+        },
+        {
+          "heading": "## 1. Preserve the responsibility boundary",
+          "sha256": "66829df2efe9a35084b6e7acc4ee10aece449076151529663149b4afe72583d8",
+          "characters": 1353
+        },
+        {
+          "heading": "## 2. Bind the Worker Designer charter",
+          "sha256": "92720514965857cbf9e38bbd8f0ff22b7c2e562ea90654528421da45cda31f38",
+          "characters": 1208
+        },
+        {
+          "heading": "## 3. Validate the WorkUnit before designing an invocation",
+          "sha256": "5e362a5431c0450c589e6d087da66adbb1cbd2513f9f9d8ba97d7ba892cf56d9",
+          "characters": 1078
+        },
+        {
+          "heading": "## 4. Choose the correct artifact kind",
+          "sha256": "b4643f4d2b794ce8c6c95cca4e4fdbf6f2b5f20a68af1a0c1e7b70315a5d8e1d",
+          "characters": 38
+        },
+        {
+          "heading": "### Concrete invocation",
+          "sha256": "340495ca9c13eac74100f48e10699170602a1083985879a6bd5e5489e7c62fa1",
+          "characters": 381
+        },
+        {
+          "heading": "### Reusable template",
+          "sha256": "435a5fc9491dae97e265bbd7599cd19a204414c781310de314639f8a304a4c66",
+          "characters": 675
+        },
+        {
+          "heading": "### Instance rebind",
+          "sha256": "139d8acbf6fa958a513b15ca99233a0d14daa1fca5f924478dc5570e7f832b41",
+          "characters": 243
+        },
+        {
+          "heading": "## 5. Keep logical role and physical invocation distinct",
+          "sha256": "b52f6d5f538d23dc0420f0a6c54b2d1f8cebee48937878db2c5cc25510b2340c",
+          "characters": 714
+        },
+        {
+          "heading": "## 6. Compute the effective authority and capability envelope",
+          "sha256": "59fe33566979e9a11234210279ee26568fd751b4edae94e7940817681760a6bd",
+          "characters": 1246
+        },
+        {
+          "heading": "## 7. Compile filesystem and external-effect capabilities",
+          "sha256": "2efd1501f1d949bddbdeb96012fea888d93e396ed4826e397ba9df5f82f68ef5",
+          "characters": 112
+        },
+        {
+          "heading": "### Disposable candidate root",
+          "sha256": "3426dc36d157bfd57308f3cf26c683f0402c6b6f569101ab07eb8869cbf05aa0",
+          "characters": 215
+        },
+        {
+          "heading": "### Protected worktree",
+          "sha256": "1715a0755520d70dea92416e5fa54a4938bb45c2754ed0ef309afe3443023c7c",
+          "characters": 208
+        },
+        {
+          "heading": "### Sealed or historical evidence",
+          "sha256": "3c0e3a8768e5f2a644499710caac167994c9d6233cd50699d7a3f6ae2f2c50b4",
+          "characters": 1074
+        },
+        {
+          "heading": "## 8. Compile workspace and isolation requirements",
+          "sha256": "483c26bd6a2e0574e3c2eece0b42a02d317e4c2680afa83707eeea02a5cb86db",
+          "characters": 789
+        },
+        {
+          "heading": "## 9. Resolve the task profile",
+          "sha256": "26406e34162da7780fcbf385cd22e5a25ef09449236d01570cf1995f34cbfe7f",
+          "characters": 652
+        },
+        {
+          "heading": "## 10. Resolve language and domain profiles",
+          "sha256": "a6dc8efacecc68ecd7cfc744504e9d20dbfff5526bfc92e0458f775dddec37a1",
+          "characters": 1176
+        },
+        {
+          "heading": "## 11. Select and qualify the model route",
+          "sha256": "e786d611a75662638690b48033112eae1461c5685c3c0c61b5698eea89e049dc",
+          "characters": 1137
+        },
+        {
+          "heading": "## 12. Compose instructions, skills and procedures",
+          "sha256": "27abcfcf329ba2054f39fd1b7d4022e9451c56f9d30a8820ccfc9a82c01fc348",
+          "characters": 1508
+        },
+        {
+          "heading": "## 13. Compile the least-privilege context edge",
+          "sha256": "f48c025119f30ef7e3fcfa4efabb5cc6d56713b55fdc3eb74722c18a48a594cb",
+          "characters": 1130
+        },
+        {
+          "heading": "## 14. Bind tools and environment exactly",
+          "sha256": "6f4711c2ebcd4c66c85a161c08130be678e0643099e63a73e3ce517c95374b67",
+          "characters": 1014
+        },
+        {
+          "heading": "## 15. Carry State–Decision–Effect and interface semantics",
+          "sha256": "aa1652ed01464fe3dba5940bebbc04046d2eca7febcae140c1b8dac82b4d3c89",
+          "characters": 839
+        },
+        {
+          "heading": "## 16. Carry assurance without becoming assurance authority",
+          "sha256": "5325a94040ef768961d8711942df8086bc0dadc3455185db3ae655219a249e31",
+          "characters": 962
+        },
+        {
+          "heading": "## 17. Compile budgets, continuation and interruption",
+          "sha256": "febe5ed39fa98daa65e0e4d84eff31c035154098cc9f5fbf3cf4d4c5db00865d",
+          "characters": 1020
+        },
+        {
+          "heading": "## 18. Define discovery and scope-change handling",
+          "sha256": "1d247baba8f417e621915a4563124adf30fda2da9feb04afd296bbc5ac0294b7",
+          "characters": 750
+        },
+        {
+          "heading": "## 19. Define payload, result and handoff contracts",
+          "sha256": "e73475defe00c2a5aad19bc86fdeb8143d2627ad4c70ae3835e18914633f4093",
+          "characters": 1573
+        },
+        {
+          "heading": "## 20. Define cleanup and artifact disposition",
+          "sha256": "e16899a137cfc47ce9399dd84e9dd580b4134002888280e92fa5aeaddaba2e85",
+          "characters": 722
+        },
+        {
+          "heading": "## 21. Separate host-neutral contract from host projection",
+          "sha256": "4e2943244b6080b3fd6c8ebb53075d962b7e6352ad7146fb8982222c522b11a5",
+          "characters": 823
+        },
+        {
+          "heading": "## 22. Perform static and deterministic preflight",
+          "sha256": "8b11bcbd70de68fae10217ed0e1c72841782588a5f787dc20447242d8e0b4a5b",
+          "characters": 1107
+        },
+        {
+          "heading": "## 23. Validate least privilege and semantic fidelity",
+          "sha256": "1a3d66a0318d9dfd4c350fdf9ebfb8428a51792bc0756fc1289af9bcbaa39e5a",
+          "characters": 853
+        },
+        {
+          "heading": "## 24. Preserve invalidation and successor history",
+          "sha256": "7aeb04aecf57aaad7f1aa95cebd30580998e7f3159171fdd21f65b7eb197b940",
+          "characters": 811
+        },
+        {
+          "heading": "## 25. Stop proportionately and return",
+          "sha256": "596f068c1fb7a9739ec39b4d94c04aee13930552c02016d678d5acb8de217017",
+          "characters": 1764
+        }
+      ]
+    },
+    "bbk-worker-execution": {
+      "template_characters": 31258,
+      "headings": [
+        "# BBK Worker Execution",
+        "## 1. Preserve the responsibility boundary",
+        "## 2. Bind the exact cohort charter",
+        "## 3. Qualify cohort coherence",
+        "## 4. Verify entry and resume eligibility",
+        "## 5. Keep semantic and physical identity separate",
+        "## 6. Maintain orthogonal cohort state",
+        "## 7. Coordinate workspaces and mutation ownership",
+        "## 8. Admit bounded Workers",
+        "## 9. Validate Worker checkpoints and returns",
+        "## 10. Handle bounded local discovery",
+        "## 11. Keep implementation draft until reconciliation is complete",
+        "## 12. Freeze one exact candidate late",
+        "## 13. Run candidate-bound worker-quality gates",
+        "## 14. Record worker-quality attestation honestly",
+        "## 15. Hand off for validation; do not launch it",
+        "## 16. Receive repair inputs through the parent without waiting live",
+        "## 17. Preserve findings during repair",
+        "## 18. Bound repair cycles",
+        "## 19. Coordinate liveness, interruption, and recovery",
+        "## 20. Reconcile cleanup and external effects",
+        "## 21. Report status without inventing terminal truth",
+        "## 22. Preserve current BBK capability and schema truth",
+        "## 23. Stop economically and safely"
+      ],
+      "frontmatter_sha256": "31b3a91ad0da80d1709a23a455768c19673529dd489cedb405491e528f61712c",
+      "sections": [
+        {
+          "heading": "# BBK Worker Execution",
+          "sha256": "4ab521904993835d0167c42be68b929be6301de8f7eaa14f24a62b003a2cca74",
+          "characters": 1489
+        },
+        {
+          "heading": "## 1. Preserve the responsibility boundary",
+          "sha256": "b090ff4973c7db5733701f66403f7171dfb38aa9045ee2a4773dca85f45cb0e3",
+          "characters": 2392
+        },
+        {
+          "heading": "## 2. Bind the exact cohort charter",
+          "sha256": "85810241bd503030dfe44aa22c61968509f42747b5407b2aef56156f69cb6f5d",
+          "characters": 1838
+        },
+        {
+          "heading": "## 3. Qualify cohort coherence",
+          "sha256": "590e263185f1ee96f3738b82d62884d4d73abfa93b8c0a964feaf22ae4a9beaf",
+          "characters": 1300
+        },
+        {
+          "heading": "## 4. Verify entry and resume eligibility",
+          "sha256": "b2fcf2f505cc28e5748f7408621a1d003d5acdab74caa552a4fd9cb0e7efc732",
+          "characters": 1314
+        },
+        {
+          "heading": "## 5. Keep semantic and physical identity separate",
+          "sha256": "9facef83806aaab9f0fe9e410f3a72dc8d82dcd93b690c5cad5de22fdfd25b6e",
+          "characters": 978
+        },
+        {
+          "heading": "## 6. Maintain orthogonal cohort state",
+          "sha256": "e84389a0dd2c72046760b30dd282265a7fa1c74a49845c75ad24617e5d45ad67",
+          "characters": 1805
+        },
+        {
+          "heading": "## 7. Coordinate workspaces and mutation ownership",
+          "sha256": "c2eee8d00a78d2a9c5e087cb79d74950578bf7a334e61800657ed770a695de59",
+          "characters": 1127
+        },
+        {
+          "heading": "## 8. Admit bounded Workers",
+          "sha256": "ef652e94116cd36e5dd1c5edfc902a37b00a181acf619cea2965bba7a84a63cd",
+          "characters": 934
+        },
+        {
+          "heading": "## 9. Validate Worker checkpoints and returns",
+          "sha256": "46785b2e409e1339ef1580e2a72cf02c9baf7aca4c8e7c5d46d40a4ab13518e3",
+          "characters": 1107
+        },
+        {
+          "heading": "## 10. Handle bounded local discovery",
+          "sha256": "4ea0cb91f114cbc278e78524ab0bd07a375725de055d8de258a1ab9bbb834d49",
+          "characters": 2593
+        },
+        {
+          "heading": "## 11. Keep implementation draft until reconciliation is complete",
+          "sha256": "1952ad4b195b4c175c9c40f097cfb03d0b9febc046fa2e212525cb6bf94c500b",
+          "characters": 1547
+        },
+        {
+          "heading": "## 12. Freeze one exact candidate late",
+          "sha256": "9e7519d42b9f2c9988bda94a9944c5b05233df7628b3361af8d92c489fea621d",
+          "characters": 1142
+        },
+        {
+          "heading": "## 13. Run candidate-bound worker-quality gates",
+          "sha256": "d461bb51857268bbdf7190297363f8abcefae256fcf5a97ba4dc3352115a9470",
+          "characters": 1432
+        },
+        {
+          "heading": "## 14. Record worker-quality attestation honestly",
+          "sha256": "687419345403a4a9e9ade950af773e76c40cc5d9a53cb7ed142981647a4b8dfd",
+          "characters": 1145
+        },
+        {
+          "heading": "## 15. Hand off for validation; do not launch it",
+          "sha256": "d85d7191a5c662b3bc4fc476740a1090f83c20ed29c0f9106387653fccec4682",
+          "characters": 872
+        },
+        {
+          "heading": "## 16. Receive repair inputs through the parent without waiting live",
+          "sha256": "4acc5b7fa71debdc8b862ca675b4404b78cdf749ae272032e40d7296048cdc2d",
+          "characters": 913
+        },
+        {
+          "heading": "## 17. Preserve findings during repair",
+          "sha256": "5f7f73fd1b5999784440ea1da14c83be47113006111f192883fb014686b4ea06",
+          "characters": 976
+        },
+        {
+          "heading": "## 18. Bound repair cycles",
+          "sha256": "bcf8e3ffbb47e225680cf8342bbb4dbe533bce43295ce02c8a74562c0b687859",
+          "characters": 546
+        },
+        {
+          "heading": "## 19. Coordinate liveness, interruption, and recovery",
+          "sha256": "d2712bea8b643c34bf8468cf57f2fdaa3806f01a9e281a920e93ccf2449d3f99",
+          "characters": 1070
+        },
+        {
+          "heading": "## 20. Reconcile cleanup and external effects",
+          "sha256": "b71db175b8e5e22de5d9b69a7c1d5a84a41d31502258cdbeeebc76762ba094e2",
+          "characters": 682
+        },
+        {
+          "heading": "## 21. Report status without inventing terminal truth",
+          "sha256": "b44f4398782457414885398f2af7fa0eaa0486b3670e7d93cdbb590697d0a86d",
+          "characters": 1108
+        },
+        {
+          "heading": "## 22. Preserve current BBK capability and schema truth",
+          "sha256": "4a2cacf9f084c8711bdf1166de84790c9df213b5b55c43140a9f8c42bfd04ded",
+          "characters": 1383
+        },
+        {
+          "heading": "## 23. Stop economically and safely",
+          "sha256": "015bcfede8770b71f3b122a999c24d11dd7eb8620c137b8ee3f17d5951f6c2f6",
+          "characters": 1079
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-roles-v4.schema.json",
+  "$defs": {
+    "sourceRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "roleSourceRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "path",
+        "bytes",
+        "sha256"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^bbk_[a-z][a-z0-9_]*$"
+        },
+        "path": {
+          "type": "string",
+          "pattern": "^spec/roles/bbk_[a-z][a-z0-9_]*-role\\.json$"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "package_version",
+    "projection_schema",
+    "source_catalog",
+    "prompt_module_package",
+    "contract_package",
+    "source_manifest",
+    "constitution_modules",
+    "interaction_topology",
+    "controller_entrypoints",
+    "role_entries",
+    "roles"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "bbk.roles.v4"
+    },
+    "package_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"
+    },
+    "projection_schema": {
+      "const": "spec/schemas/bbk-roles-v4.schema.json"
+    },
+    "source_catalog": {
+      "const": "spec/roles/catalog.json"
+    },
+    "prompt_module_package": {
+      "const": "spec/prompt-modules/catalog.json"
+    },
+    "contract_package": {
+      "const": "spec/contracts/catalog.json"
+    },
+    "source_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "catalog",
+        "roles",
+        "prompt_modules"
+      ],
+      "properties": {
+        "catalog": {
+          "$ref": "#/$defs/sourceRecord"
+        },
+        "roles": {
+          "type": "array",
+          "minItems": 19,
+          "maxItems": 19,
+          "items": {
+            "$ref": "#/$defs/roleSourceRecord"
+          }
+        },
+        "prompt_modules": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/sourceRecord"
+          }
+        }
+      }
+    },
+    "constitution_modules": {
+      "$ref": "https://bbk.local/schemas/bbk-role-catalog-v4.schema.json#/properties/constitution_modules"
+    },
+    "interaction_topology": {
+      "$ref": "https://bbk.local/schemas/bbk-role-catalog-v4.schema.json#/properties/interaction_topology"
+    },
+    "controller_entrypoints": {
+      "$ref": "https://bbk.local/schemas/bbk-role-catalog-v4.schema.json#/properties/controller_entrypoints"
+    },
+    "role_entries": {
+      "$ref": "https://bbk.local/schemas/bbk-role-catalog-v4.schema.json#/properties/role_entries"
+    },
+    "roles": {
+      "type": "array",
+      "minItems": 19,
+      "maxItems": 19,
+      "items": {
+        "$ref": "https://bbk.local/schemas/bbk-role-v4.schema.json"
+      }
+    }
+  }
+}

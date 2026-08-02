@@ -1,232 +1,219 @@
 # Agents, roles, and delegation
 
-BBK separates stable responsibility, reusable procedure, routed context, domain method, and one physical invocation:
+BBK separates stable responsibility, reusable procedure, routed context, domain method, physical invocation, and host transport:
 
 ```text
-role constitution modules
-+ role scope, responsibilities, direct-child triggers, and escalation contract
-+ selected model-routing profile and host model/effort settings
+canonical role contract
++ selected constitution modules and prompt modules
++ one or more role-specific mandatory procedures
 + task-kind and language/domain profiles
-+ accepted BBK records and explicit context edge
-+ exact authority, effects, tools, budget, stopping, and result envelope
++ exact invocation context, authority, effects, capability zones, and stopping conditions
++ direct per-role host model/effort route
++ exact role-return schema
 = effective agent invocation
 ```
 
-The canonical source is `spec/roles.json`. Generated Codex, OMP, Claude Code, and generic projections must not be edited directly.
+## Canonical split-role package
 
-## Modular constitution
+The canonical source is `bbk.roles.v4`:
 
-Alpha.11.12 replaces one shared constitution copied into every role with five modules:
+```text
+spec/roles/catalog.json             package metadata, deterministic role order, topology, controller roots, schemas
+spec/roles/bbk_*-role.json          19 independently maintained canonical role definitions
+spec/roles.json                     generated compatibility projection; do not edit
+```
+
+`tools/assemble_roles.py` validates the split package and regenerates `spec/roles.json`. `tools/create_role_spec.py` is a compatibility wrapper around the same assembler. Generated Codex, OMP, Claude Code, and generic projections must not be edited directly.
+
+The catalogue owns:
+
+- the four controller-selectable roots;
+- every allowed parent and invocation mode;
+- all direct-child edges and expected child-return modes;
+- the roles allowed to originate a structured human request;
+- the five constitution modules;
+- prompt-module and return-contract package bindings;
+- deterministic source ordering and compatibility-projection paths.
+
+The assembler rejects undeclared or one-sided edges, parent-mode drift, return-mode drift, unintended cycles, unreachable roles, controller-root drift, human-originator drift, noncanonical serialization, uncatalogued role files, and generated projection drift.
+
+
+## Prompt composition and return contracts
+
+A role prompt is compiled from four layers: canonical role contract, selected reusable prompt modules, role-specific mandatory procedures, and host projection instructions. Shared behavior is maintained once under `spec/prompt-modules/`; role-specific algorithms remain in `spec/method-content.json`. There is no fixed mandatory-procedure count. An additional mandatory procedure requires a measured catalogue exception proving distinct behavior and zero duplicated module bodies.
+
+Every canonical role returns `bbk.role-return.v1` with an exact role-specific payload schema. Operational dispositions describe the physical attempt; semantic states describe readiness for the parent. Neither successful tool access nor operational `COMPLETE` grants acceptance, candidate freeze, validation admission, or release authority.
+
+## Interaction topology
+
+The **harness-root controller** is the sole user-facing BBK identity. It classifies the request and selects one canonical root:
+
+| Route | Canonical root | Typical entry condition |
+|---|---|---|
+| Planning | `bbk_root_wayfinder` | planning, design, decisions, uncertainty reduction, or operating-baseline preparation |
+| Execution | `bbk_root_orchestrator` | accepted baseline plus sufficient authority for execution, integration, or recovery |
+| Review | `bbk_reviewer` | exact bounded independent review charter |
+| Assurance | `bbk_validator_orchestrator` | exact candidate and assertion-scoped assurance campaign |
+
+This is a deliberate multi-root graph. The union of the four roots reaches all 19 roles; not every role descends from `bbk_root_wayfinder`. `bbk_reviewer` may also run as a bounded child where its catalogue parent mode permits that use.
+
+Every canonical `bbk_*` role remains non-user-facing, including roles whose names contain `root`, `guide`, `orchestrator`, `reviewer`, or `validator`. A child never asks the user directly, calls a human-interaction surface, seizes terminal focus, or infers consent from silence or transport state.
+
+Only the roles declared as human-request originators may construct a controller request. They send a stable request ID, exact subject and revision, request kind, smallest question, recommendation, credible alternatives, consequences, blocker state, independently continuable work, expiry or invalidation conditions, durable packet reference when needed, and exact reply target. The controller asks the user and relays the authority-bound answer to the exact waiting role.
+
+In OMP, live child communication uses `hub`/IRC to the peer whose `kind` is `main`, normally `Main`. Use exact peer IDs from the roster and `replyTo` where available. A send receipt, timeout, silence, or missing heartbeat is non-evidence. Large or authority-bearing material remains in a durable handoff with path, bytes, and SHA-256.
+
+Codex and Claude Code use their native parent/child channels for the same logical packet. When live relay is unavailable, a child returns the typed request through the invocation chain as `BLOCKED_DECISION`, `BLOCKED_AUTHORITY`, or the applicable private-context state.
+
+## Role contract
+
+Every canonical role independently declares:
+
+```text
+purpose and family
+constitution modules
+scope and responsibilities
+direct children and per-child delegation trigger
+escalations and human-decision triggers
+prohibitions
+full skills, primary skill, mandatory procedures, and prompt modules
+mutation authority
+allowed parent modes and expected child returns
+exact machine-valid return contract
+```
+
+A role with no children is explicitly prohibited from spawning, impersonating, or silently absorbing another responsibility. It returns adjacent work to its parent.
+
+`bbk_prototyper` is intentionally not a leaf. It is a bounded experimental coordinator that may invoke only `bbk_worker_designer` and `bbk_worker` under a fixed experiment charter. It retains hypothesis, evaluation, apparatus integration, run-validity, interpretation, cleanup, and parent-return ownership. Workers invoked by a Prototyper cannot delegate.
+
+## Direct-child delegation
+
+The canonical role files contain each role's `spawns` list and per-child trigger; the catalogue carries the matching parent-mode and expected-return edge. An allowlist is not an instruction to invoke every permitted role.
+
+- **OMP:** native `spawns` is the enforceable direct-child allowlist. For batch `task`, each task's `agent` is the exact permitted `bbk_*` role, `name` is a stable logical job identity, and `task` is the complete self-contained assignment.
+- **Codex:** generated child names and delegation instructions mirror the same canonical edge set.
+- **Claude Code:** native `Agent(...)` permissions match the exact direct-child allowlist.
+- **Generic:** the prompt carries the same triggers but the host must enforce its own physical child capability.
+
+Every physical child invocation binds the sole user-facing controller, invoking parent peer, logical parent role, exact reply target, branch or decision identity, subject/revision, authority, effects, capability zones, assurance, stopping conditions, and return schema. Parent ownership of child validation and integration remains explicit.
+
+## Constitution and reusable prompt modules
+
+The five constitution modules remain:
 
 | Module | Loaded by | Purpose |
 |---|---|---|
-| `core` | all 19 roles | authority, exact-subject binding, epistemic labels, responsible inference, durable history, and bounded context |
-| `planning` | Wayfinders and planning/design specialists | outcome-versus-means, proportionate planning formality, traceability, and non-self-approval |
-| `coordination` | every role with canonical children | logical-versus-physical roles, exact child contracts, parent integration ownership, and user-interaction routing |
-| `execution` | effectful and execution-contract roles | standing authority, capability zones, checkpoints, candidate identity, and durable handoffs |
-| `assurance` | evidence, review, synthesis, and acceptance roles | proportional proof, exposure history, evidence-stage separation, and non-pass dispositions |
+| `core` | all roles | authority, exact-subject binding, epistemic labels, responsible inference, durable history, bounded context |
+| `planning` | Wayfinders and design/planning specialists | outcome-versus-means, proportionate planning, traceability, non-self-approval |
+| `coordination` | roles with canonical children | logical/physical separation, exact child contracts, parent integration, controller relay |
+| `execution` | effectful and execution-contract roles | standing authority, capability zones, checkpoints, candidate identity, durable handoffs |
+| `assurance` | evidence, review, synthesis, and acceptance roles | proportional proof, exposure history, stage separation, non-pass dispositions |
 
-Only the six `core` rules are universal. A role receives no planning, coordination, execution, or assurance clause unless that responsibility is material to its work. `tools/create_role_spec.py --check` enforces module coverage and rejects invalid combinations.
+Alpha.13 also has 21 reusable `bbk.prompt-module.v1` modules under `spec/prompt-modules/`. They carry materially identical behavior—role boundary, invocation binding, human relay, delegation/return, durable handoffs, state-claim truth, profile qualification, liveness/recovery, effects/cleanup, evidence lineage and receipts, finding lifecycle, candidate integrity, and related concerns—without duplicating the body in every procedure.
 
-The universal core is intentionally small. Removing another core rule would make at least one of authority, exact subject identity, epistemic status, responsible local inference, durable failed-history, or explicit context binding implicit again.
+Each selected module is embedded once in a compiled role prompt. A primary procedure references the already embedded module instead of restating it.
 
-## Complete canonical role contract
+## Mandatory procedure injection
 
-Every role now declares these fields independently of host projection:
+Every current role has one primary mandatory procedure because shared behavior has been factored into prompt modules. One is not a fixed maximum.
 
-```text
-purpose
-constitution modules
-scope
-responsibilities
-direct children
-per-child delegation trigger
-escalation routes
-permitted direct user interaction
-prohibitions
-procedure skills
-mutation authority
-return contract
-```
+Additional mandatory procedures are allowed when `spec/roles/catalog.json` contains a source-bound exception that identifies the exact ordered procedures, proves the distinct behavior supplied by each, binds current method-content digests and measured compact-body sizes, and contains no duplicated prompt-module body. Unmeasured, stale, incomplete, or duplicative exceptions fail validation.
 
-This makes four questions answerable from the role itself:
+Optional focused procedures and language/domain profiles remain available on demand. Correct baseline behavior does not depend on host skill-discovery or autoload behavior.
 
-1. What exact responsibility does this role own, and what does it not own?
-2. Which child may it invoke, and under what condition is that child actually needed?
-3. Which issue is handled locally, returned to the parent, routed to a Wayfinder, or presented to the user?
-4. What exact result must return before the parent may integrate, freeze, validate, or report completion?
+## Return contracts
 
-A role with no children is explicitly prohibited from spawning, impersonating, or silently absorbing another role. It returns adjacent work to its parent.
+Every role returns `bbk.role-return.v1` with a closed role-specific result schema. The common envelope separates physical-attempt disposition from semantic readiness and requires:
 
-## Entrypoint versus canonical sub-agents
+- exact subject, parent, attempt, role, and invocation mode;
+- return kind and current operational disposition;
+- role-specific semantic-state name and value;
+- summary and exact result payload;
+- authority and effects actually used;
+- durable handoff references;
+- smallest valid next action.
 
-The top-level `bbk` skill is an entry controller for the primary user-facing session. It selects the appropriate root role and relays decisions, authority requests, blockers, and final results.
-
-Canonical BBK roles do **not** autoload that entry skill. Each generated sub-agent instead receives its own constitution modules, scope, delegation triggers, escalation boundary, focused procedures, and return contract. This avoids repeated entry routing, removes a large irrelevant prompt payload, and prevents a child from promoting itself into another root role.
-
-## Direct-child delegation by host
-
-`spec/roles.json` contains both the exact allowlist and a trigger for every child.
-
-- **OMP:** native `spawns` remains the enforceable allowlist; the prompt also states when each allowed child should be used.
-- **Claude Code:** `Agent(...)` restricts the callable child set and the prompt carries the same triggers using installed agent names.
-- **Codex and generic:** the prompt carries the exact canonical child set and trigger for each child.
-- **Leaf roles:** the prompt states that the role has no child-agent authority.
-
-A child is not invoked merely because it is permitted. The parent delegates only when the child's distinct responsibility is needed and supplies:
+Current operational dispositions are:
 
 ```text
-exact subject and revision
-purpose and desired result
-bounded context and declared omissions
-authority source and allowed effects
-capability zones and writable ownership
-tools, profiles, budgets, and payload limits
-assurance obligations and independence reason
-stopping, continuation, and interruption conditions
-structured return envelope
+COMPLETE
+PARTIAL
+BLOCKED_TECHNICAL
+BLOCKED_AUTHORITY
+BLOCKED_DECISION
+PAUSED_CAPACITY
+PAUSED_HOST_WINDOW
+CANCELLED
+INCONCLUSIVE
 ```
 
-Host support for additional agents does not broaden the BBK topology or authority.
+`READY_FOR_VALIDATION`, `BLOCKED`, and `PAUSED` are consume-only legacy `bbk.handoff.v1` values. Candidate admission, parent integration, orchestrator integration, planning readiness, and similar meanings live in the role-specific semantic state rather than masquerading as operational completion.
 
-## Escalation and user interaction
+`tools/return_contracts.py` generates 19 result schemas, 19 complete return schemas, and the digest-bound return registry.
 
-Only two canonical roles may directly question the user, and only when they are the active user-facing invocation:
+## Planning and specialist ownership
 
-- `bbk_root_wayfinder` for initial outcome, posture, private context, authority, protected-floor exceptions, hard-to-reverse commitments, and baseline acceptance;
-- `bbk_question_guide` for one material question at a time inside an escalated Grill branch.
+Planning Wayfinder owns graph-level identification, semantic commissioning, integration, coverage, and readiness. Phase Wayfinder owns the equivalent phase-local responsibilities plus detailed phase decomposition and mutation/integration obligations.
 
-Every other role is explicitly non-user-facing. It returns a structured decision, authority, private-context, blocker, or scope request to its invoking parent. If an interactive role is itself running as a child, it also returns the question to the parent rather than opening a second user conversation.
+Verification Designer owns exact assertion and evidence-method design. Worker Designer owns exact executable Worker invocation-contract design. Wayfinders may identify the need, commission the specialist, validate the returned contract, integrate it, and decide readiness; they may not silently author, modify, repair, or approve the specialist contract they commissioned.
 
-Routine, reversible, conventional, and responsibly inferable choices stay local inside scope. Material outcome, authority, protected-floor, shared-interface, ownership, or hard-to-reverse ambiguity follows the role's declared escalation route.
+Reviewer owns bounded qualitative or interpretive judgment under an exact charter. Validator owns exact candidate/assertion/method evaluation. Missing assertions, criteria, methods, evidence requirements, or revalidation design return to Verification Designer.
 
-## Scope and mutation authority
+## OMP prompt boundary
 
-Host write access and BBK authority remain separate:
+Main receives a complete controller system-prompt replacement while persistent BBK mode is active. A marked BBK child receives a complete role-specific replacement after the extension authenticates the installed canonical projection. Compatibility-discovered `.codex`, `.claude`, `.gemini`, and other unrelated workflow instructions are excluded unless explicitly supplied as governed project data.
 
-- Codex roles inherit the parent sandbox, and Claude Code roles receive Edit/Write tools, so every role can persist bounded coordination artifacts when the workspace permits;
-- only `bbk_worker` and `bbk_prototyper` have canonical subject-mutation authority;
-- a worker may change only its exact work unit, assigned paths, and capability zones;
-- planners, orchestrators, reviewers, validators, and designers may create coordination records but may not edit the governed subject to make their own work easier;
-- sealed or historical evidence remains immutable.
+OMP markers remain model-visible because the runtime uses them for prompt authentication. Codex does not need this mechanism, so its `developer_instructions` use ordinary Markdown and contain no BBK XML-like build/provenance envelopes.
 
-The role catalogue's `mutates` field is semantic authority, not a sandbox selector.
+## Scope, sandbox, and mutation authority
 
-## Focused procedure loading
+Host workspace capability and BBK authority are separate.
 
-Each role now separates its full allowed `skills` set from `autoload_skills`. OMP `autoloadSkills` and Claude Code `skills` contain only the two or three procedures that are routinely necessary for that role. The prompt names the remaining allowed procedures and directs the agent to load one only when its method is material.
+Codex custom agents inherit the parent session's sandbox and approval policy; role projections do not silently broaden or narrow it. Claude Code projections similarly permit bounded coordination artifacts when the host workspace allows them. A read-only parent remains read-only.
 
-Examples:
+Workspace access permits coordination artifacts such as plans, ADRs, handoffs, manifests, evidence records, findings, dispositions, and result packets. It does not authorize mutation of subject or product artifacts.
 
-```text
-Root Wayfinder        autoloads wayfinding + context routing
-Question Guide        autoloads Grill + context routing
-Worker                autoloads execution + durable handoff
-Reviewer              autoloads review + review context + handoff
-Worker Orchestrator   autoloads execution + context routing + handoff
-```
+Only `bbk_worker` and `bbk_prototyper` may modify subject or product artifacts, and only inside the exact grant, ownership boundary, allowed effects, capability zones, and cleanup obligations of their invocation. Prototyper may also integrate bounded experimental apparatus produced by its permitted Workers. Every other role returns implementation needs to a permitted mutating role through its parent.
 
-Conditional fit, structure, slicing, state/effect, profile, recovery, evidence, and specialist review procedures remain available without being copied into every invocation. The validator caps native autoload at three skills per role, and regressions cap the resulting preload word budget.
+## Execution contracts
+
+`TerritoryExecutionBoundary` binds exact territory and WorkUnit membership, mutation ownership, interfaces and shared state, allowed effects, resource budgets, assurance, local discovery, recovery, invalidation, completion, and successor behavior. Root Orchestrator compiles and admits it; Territory Orchestrator operates within it. Semantic changes require a successor boundary.
+
+Local discovery is deny-by-default. Territory Orchestrator is the sole issuer and owner of a discovery envelope and permit. A valid permit is bound to an exact cohort charter/revision/digest and cannot alter outcomes, scope, requirements, architecture, canonical interfaces, assertion meaning, authority, territory boundaries, toolchain policy, or validation meaning.
+
+Candidate production and candidate assurance are separate lifecycles linked by immutable candidate identity. `WorkerValidationBatch` is retired and has no active runtime meaning.
 
 ## Language and domain profiles
 
-Profile-aware roles load `bbk-installed-profiles` and `bbk-profile-routing`. They consult the installation-specific registry before material language-, framework-, runtime-, or toolchain-specific work, select the smallest applicable profile, and load only the focused procedures needed for their role and assertion.
+The placeholder `bbk-installed-profiles` skill is package-source text. During installation it is replaced with a compact registry generated from the exact verified profile set. The full inventory is written to `effective-language-profiles.json` and bound into the install manifest.
 
-Question-only roles remain lean and do not load the registry unless language-specific procedure is actually material. A profile adds method and evidence requirements; it never broadens scope, grants tools or effects, waives assurance, or creates a pass.
+Preferred discovery is:
+
+```bash
+bbk --json profile list
+```
+
+The generated registry also records the exact `python tools/bbk.py` fallback, so a missing launcher in `PATH` does not by itself make profile discovery unavailable.
 
 ## Logical role is not physical invocation
 
-A logical role does not require one dedicated model call:
+A logical role boundary preserves ownership, authority, context, return semantics, and assurance even if a host co-locates work in one process or model. Conversely, a physical child call does not create a new logical role unless the canonical parent/child contract establishes it.
 
-- several compatible logical roles may share one physical invocation when no authority, return, exposure, or independence boundary is lost;
-- one logical role may use several physical invocations for scale or specialization;
-- physical separation remains mandatory for properties such as independent validation, non-self-approval, worker/integrator separation, or uncontaminated evidence.
+Model selection affects execution defaults, not role authority. The exact per-role routes live in `spec/model-routing.json` and generated host fields; responsibility remains in the role package.
 
-Co-location never erases the logical role's scope, escalation, return contract, or child allowlist.
+## Generated metadata and checks
 
-## Recommendation-first questioning
-
-The ordinary material-decision path remains:
-
-```text
-Root or Territory Wayfinder
-  → Questioning Wayfinder investigates facts and prepares a recommendation
-  → user-facing parent presents it
-      ├─ accepted or bounded correction: no Question Guide
-      └─ rejected, contested, materially ambiguous, or deeper exploration requested
-           → one Question Guide runs the focused Grill
-```
-
-The Questioning Wayfinder owns branch continuity and reconciliation. The Question Guide owns only the escalated root-decision conversation and does not absorb sibling decisions or implementation.
-
-## Execution continuity and durable returns
-
-Execution roles preserve standing authority, capability zones, candidate identity, checkpoints, and exact handoffs. Polling timeouts, silence, elapsed time, and absent heartbeats are not interruption evidence. Child continuation should reuse the same logical work and verified checkpoint where the host permits it.
-
-Exact or large results remain in files and return through path, byte count, and SHA-256. A parent verifies the referenced handoff before candidate freeze, integration, validation, or completion reporting.
-
-## Generated metadata and validation
-
-`projections/manifest.json` uses `bbk.projection-manifest.v4`. For each role it records:
-
-```text
-constitution modules
-scope
-direct-child allowlist and trigger map
-escalations
-user-interaction boundary
-skills and mutation authority
-model-routing profile and host model/effort settings
-generated filenames and source digests
-```
-
-The model-facing prompt omits build provenance, catalogue digests, and host projection labels. Those remain in metadata where they are auditable without consuming context.
+`projections/manifest.json` uses `bbk.projection-manifest.v8`. It externalizes role identity, host filenames, exact model routes, constitution and prompt-module selections, primary and mandatory procedures, mutability, topology, exact return contracts, source paths, and digests without requiring that provenance text to be repeated in every model-facing prompt.
 
 Run:
 
 ```bash
-python tools/create_role_spec.py --check
+python tools/assemble_roles.py --check
+python tools/return_contracts.py --check
+python tools/prompt_modules.py --check
+python tools/create_method_content.py --check
 python tools/model_routing.py --check
 python tools/generate_agents.py --check
 ```
 
-The regression suite additionally verifies all 76 projections for required sections, exact delegation triggers, user-facing boundaries, focused constitution modules, valid skill frontmatter, and absence of the entry-controller skill from canonical sub-agents.
-
-## Role-by-role disposition
-
-| Role | Constitution | Scope and delegation result | Escalation result |
-|---|---|---|---|
-| Root Wayfinder | core, planning, coordination | Owns the complete planning state. Its 11 children now have distinct triggers for territory mapping, decisions, research, prototypes, synthesis, architecture, verification design, worker design, review, executable planning, and execution. | Routes ordinary material decisions through the Questioning Wayfinder; asks the user only within its explicit user-facing boundary; reopens Wayfinding when execution exposes a baseline defect. |
-| Territory Wayfinder | core, planning, coordination | Owns one territory and may recursively divide only at real responsibility/containment boundaries. It no longer directly conducts material user questioning. | Sends outcome, shared-interface, cross-territory ownership, or standing-authority conflicts to the Root Wayfinder. |
-| Questioning Wayfinder | core, planning, coordination | Owns one decision cluster and the recommendation-first path. It uses Researcher for facts and Question Guide only after rejection, contest, material ambiguity, assumption conflict, or explicit deeper exploration. | Returns recommendations and decisions through the user-facing parent; keeps branch ownership while a Question Guide is active. |
-| Planning Wayfinder | core, planning, coordination | Owns the executable work graph from accepted decisions. Uses Phase Wayfinder for coherent increments, Verification Designer for claims, Worker Designer for invocations, and Reviewer for independent plan review. | Returns missing governing decisions rather than inventing them; cannot authorize execution. |
-| Phase Wayfinder | core, planning, coordination | Owns one accepted phase's decomposition, ownership, integration, checks, and handoffs. | Returns newly exposed governing decisions, cross-phase conflicts, missing authority, or infeasible evidence to the planning parent. |
-| Question Guide | core, planning | Owns one escalated root-decision conversation and no sibling work. It has no children. | May ask one user question at a time only when active user-facing Grill; returns factual gaps and sibling decisions to the Questioning Wayfinder. |
-| Researcher | core, assurance | Owns one bounded factual question and source/evidence return. It has no children. | Returns inability to reach decision-sufficient evidence, inaccessible required sources, and newly discovered decisions to the parent; never substitutes opinion for missing evidence. |
-| Prototyper | core, execution, assurance | Owns one bounded, disposable experiment with a discrimination/falsification criterion and cleanup boundary. It has no children. | Returns architecture/scope/authority changes and prototype limitations to the parent; never promotes a prototype into production. |
-| Synthesizer | core, planning, assurance | Owns reconciliation of named source objects, dissent, provenance, and uncertainty. It has no children. | Returns stale, contradictory, missing, or non-comparable inputs as `cannot synthesize yet` instead of manufacturing consensus. |
-| Architect | core, planning | Owns a versioned architecture proposal against accepted decisions and interfaces. It has no children. | Returns missing governing choices or stale source decisions to the responsible Wayfinder; proposal does not approve itself. |
-| Verification Designer | core, planning, assurance | Owns assertions, evidence methods, stages, independence, and revalidation design. It has no children. | Returns unprovable claims, missing tools, and unresolved acceptance policy to the planning parent; does not waive an assertion. |
-| Worker Designer | core, planning, execution | Owns compilation of a least-privilege worker invocation with profiles, tools, authority, capability zones, payload limits, continuation, and handoff. It has no children. | Returns missing work-unit inputs or requests for broader authority/new permanent roles to the responsible planning parent. |
-| Reviewer | core, assurance | Owns one exact charter, subject, context, assertion set, and independence reason. It has no children. | Returns findings and coverage gaps to the parent and requests a new charter rather than silently broadening scope. |
-| Root Orchestrator | core, coordination, execution, assurance | Owns global execution coordination, dependencies, integration, evidence readiness, and completion reporting. Uses Territory Orchestrator for admitted territory execution and Reviewer for global/cross-territory review. | Stops affected work for material baseline changes and routes them back to Wayfinding; final status goes to the user-facing parent. |
-| Territory Orchestrator | core, coordination, execution, assurance | Owns execution and recovery for one territory. Uses Worker Orchestrator for candidate-producing cohorts, Validator Orchestrator for frozen-candidate assurance, and Reviewer for independent cross-cutting questions. | Returns cross-territory, interface, authority, or repeated-repair problems to the Root Orchestrator. |
-| Worker Orchestrator | core, coordination, execution, assurance | Owns one worker cohort, isolated workspaces, candidate lifecycle, retries, pre-freeze checks, and exact handoffs. It invokes a Worker only when subject, workspace, ownership, profiles, tools, authority, checks, continuation, and return contract are complete. | Stops on baseline/interface/scope/authority/ownership changes and returns exact blocker state to the Territory Orchestrator. |
-| Validator Orchestrator | core, coordination, assurance | Owns one candidate-bound assurance run. Uses Validator for non-overlapping exact assertions and Reviewer for qualitative/cross-cutting independent charters. | Sends repairs to the worker path and governing assertion/waiver decisions upward; never repairs the candidate. |
-| Worker | core, execution | Owns one exact work unit and its declared mutation scope. It has no child-agent authority. | Stops and returns outcome, scope, interface, authority, effect, ownership, or recovery-semantic changes to the Worker Orchestrator; records adjacent work instead of doing it. |
-| Validator | core, assurance | Owns named assertions against one exact candidate and context. It has no child-agent authority. | Returns identity mismatches, charter ambiguity, tool/authority blockers, findings, and out-of-scope concerns to the Validator Orchestrator; never repairs or waives. |
-
-## Machine checks
-
-`tools/create_role_spec.py --check` rejects:
-
-- missing or unknown constitution modules;
-- incomplete scope, delegation, escalation, or user-interaction fields;
-- a delegation map that differs from the canonical child list;
-- user-interaction permissions on a non-interactive role;
-- missing coordination constitution on a parent role;
-- missing planning, execution, or assurance modules where required;
-- autoloading the top-level entry-controller skill from a canonical role;
-- unknown children, unreachable roles, or invalid topology.
-
-The regression suite verifies the corresponding content in all 76 generated projections.
+Any drift is a source or generation failure, not permission to edit a projection manually.

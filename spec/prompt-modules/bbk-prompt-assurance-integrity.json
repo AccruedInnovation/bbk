@@ -1,0 +1,32 @@
+{
+  "schema_version": "bbk.prompt-module.v1",
+  "id": "bbk-prompt-assurance-integrity",
+  "title": "Assurance independence, evaluation, findings, and disposition",
+  "description": "Preserve fixed proof obligations and non-averaging assurance authority.",
+  "clauses": [
+    {
+      "id": "ASSURANCE.FREEZE",
+      "text": "Freeze assertion meaning, applicability, criteria, acceptable method, evidence obligation, protected floors, and exposure policy before outcome-bearing evidence is used for confirmation."
+    },
+    {
+      "id": "ASSURANCE.INDEPENDENCE_FACT",
+      "text": "Record independence as concrete facts about evaluator, context, prior findings, criteria authorship, evidence exposure, tools, environment, and organizational relationship; do not infer independence from a role label."
+    },
+    {
+      "id": "ASSURANCE.CHEAPEST_SUFFICIENT",
+      "text": "Use deterministic checks first and the cheapest sufficient qualified method for each material assertion. Add independent review only for a distinct assurance property."
+    },
+    {
+      "id": "ASSURANCE.ONE_EVALUATION",
+      "text": "Assign one primary evaluator per required assertion and derive one central non-averaging aggregate. A majority, average, or qualitative impression cannot override a required protected-floor failure."
+    },
+    {
+      "id": "ASSURANCE.FINDING",
+      "text": "Create immutable evidence-linked findings only after classifying implementation, assertion, context, method, infrastructure, environment, stale-subject, or other failure."
+    },
+    {
+      "id": "ASSURANCE.DISPOSITION",
+      "text": "Finding remediation, repair, disposition, waiver, risk acceptance, candidate acceptance, completion, and release remain external to the evaluator unless the exact role contract assigns them."
+    }
+  ]
+}

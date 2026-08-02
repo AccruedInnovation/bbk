@@ -1,0 +1,222 @@
+{
+  "schema": "bbk.territory-execution-boundary.v1",
+  "boundary_id": "TEB-EXAMPLE-001",
+  "revision": 1,
+  "lifecycle_state": "ADMITTED",
+  "subject_ref": {
+    "id": "SUBJECT-EXAMPLE",
+    "revision": "1",
+    "digest": "1111111111111111111111111111111111111111111111111111111111111111"
+  },
+  "operating_baseline_ref": {
+    "id": "OB-EXAMPLE",
+    "revision": "1",
+    "digest": "2222222222222222222222222222222222222222222222222222222222222222"
+  },
+  "execution_baseline_ref": {
+    "id": "EB-EXAMPLE",
+    "revision": "1",
+    "digest": "3333333333333333333333333333333333333333333333333333333333333333"
+  },
+  "execution_authorization_ref": {
+    "id": "EA-EXAMPLE",
+    "revision": "1",
+    "digest": "4444444444444444444444444444444444444444444444444444444444444444"
+  },
+  "root_campaign_ref": {
+    "id": "CAMPAIGN-EXAMPLE"
+  },
+  "root_orchestrator_ref": {
+    "id": "ROOT-RUN-EXAMPLE"
+  },
+  "territory_orchestrator_ref": {
+    "id": "TERRITORY-RUN-EXAMPLE"
+  },
+  "parent_boundary_ref": null,
+  "predecessor_boundary_ref": null,
+  "admission": {
+    "compiled_by_role": "bbk_root_orchestrator",
+    "admitted_by_role": "bbk_root_orchestrator",
+    "source_manifest_refs": [
+      {
+        "id": "SOURCE-MANIFEST-EXAMPLE",
+        "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+      }
+    ],
+    "admitted_at": "2026-08-01T00:00:00Z"
+  },
+  "membership": {
+    "capability_refs": [
+      {
+        "id": "CAPABILITY-EXAMPLE"
+      }
+    ],
+    "phase_refs": [
+      {
+        "id": "PHASE-EXAMPLE"
+      }
+    ],
+    "work_unit_refs": [
+      {
+        "id": "WU-EXAMPLE",
+        "revision": "1",
+        "digest": "6666666666666666666666666666666666666666666666666666666666666666"
+      }
+    ],
+    "dependency_refs": [],
+    "integration_obligation_refs": [
+      {
+        "id": "INTEGRATION-EXAMPLE"
+      }
+    ]
+  },
+  "ownership": {
+    "integration_owner_ref": {
+      "id": "WU-EXAMPLE"
+    },
+    "mutation_owners": [
+      {
+        "surface_ref": {
+          "id": "SURFACE-EXAMPLE"
+        },
+        "owner_work_unit_ref": {
+          "id": "WU-EXAMPLE"
+        },
+        "workspace_ref": {
+          "id": "WORKSPACE-EXAMPLE"
+        },
+        "serialization_policy": "EXCLUSIVE"
+      }
+    ],
+    "shared_resources": []
+  },
+  "interfaces": [],
+  "authority_and_effects": {
+    "authority_holder_ref": {
+      "id": "AUTHORITY-HOLDER-EXAMPLE"
+    },
+    "allowed_effect_classes": [
+      "FILESYSTEM_WRITE_IN_WORKSPACE"
+    ],
+    "prohibited_effect_classes": [
+      "DEPLOYMENT",
+      "PUBLICATION"
+    ],
+    "safeguards": [],
+    "revocation_conditions": [
+      "AUTHORIZATION_REVOKED",
+      "BOUNDARY_SUPERSEDED"
+    ]
+  },
+  "resources_and_budgets": {
+    "planned_effort_unit_name": "PLANNED_EFFORT_UNIT",
+    "planned_effort_units": 20,
+    "concurrency_limit": 2,
+    "resource_allocations": [],
+    "stopping_conditions": [
+      "AUTHORITY_LOST",
+      "PROTECTED_FLOOR_AT_RISK",
+      "BUDGET_EXHAUSTED"
+    ]
+  },
+  "assurance": {
+    "assurance_contract_refs": [
+      {
+        "id": "ASSURANCE-EXAMPLE"
+      }
+    ],
+    "protected_floor_refs": [],
+    "completion_assertion_refs": [
+      {
+        "id": "ASSERTION-EXAMPLE"
+      }
+    ],
+    "worker_quality_gate_refs": [
+      {
+        "id": "GATE-EXAMPLE"
+      }
+    ],
+    "independent_evaluation_refs": [
+      {
+        "id": "VALIDATION-EXAMPLE"
+      }
+    ],
+    "candidate_lineage_policy": "Every mutation after freeze creates a successor candidate and invalidates affected evidence."
+  },
+  "local_discovery": {
+    "policy_ref": {
+      "id": "bbk.local-discovery-policy.v1",
+      "path": "spec/policies/local-discovery-v1.json"
+    },
+    "default_allowance": "ZERO_WITHOUT_ACTIVE_ENVELOPE_AND_PERMIT",
+    "issuer_role": "bbk_territory_orchestrator",
+    "active_envelope_ref": null
+  },
+  "recovery_and_invalidation": {
+    "recovery_owner_role": "bbk_territory_orchestrator",
+    "checkpoint_requirements": [
+      "PRESERVE_WORKSPACE_AND_ATTEMPT_IDENTITY",
+      "PRESERVE_CANDIDATE_AND_FINDING_LINEAGE"
+    ],
+    "invalidation_triggers": [
+      "BASELINE_CHANGED",
+      "AUTHORITY_CHANGED",
+      "MEMBERSHIP_CHANGED",
+      "OWNERSHIP_CHANGED"
+    ],
+    "successor_boundary_triggers": [
+      "WORK_UNIT_MEMBERSHIP_CHANGE",
+      "MUTATION_OWNERSHIP_CHANGE",
+      "CANONICAL_INTERFACE_CHANGE",
+      "AUTHORITY_OR_EFFECT_ENVELOPE_CHANGE",
+      "ASSURANCE_OR_COMPLETION_CONTRACT_CHANGE"
+    ]
+  },
+  "completion_contract": {
+    "completion_owner_role": "bbk_territory_orchestrator",
+    "required_work_unit_states": [
+      "READY_FOR_PARENT_INTEGRATION"
+    ],
+    "integration_obligation_refs": [
+      {
+        "id": "INTEGRATION-EXAMPLE"
+      }
+    ],
+    "assurance_obligation_refs": [
+      {
+        "id": "ASSERTION-EXAMPLE"
+      }
+    ],
+    "cleanup_requirements": [
+      "NO_UNOWNED_EXTERNAL_EFFECTS",
+      "REQUIRED_EVIDENCE_RETAINED"
+    ],
+    "claims_not_established": [
+      "OUTCOME_ACCEPTANCE",
+      "RISK_ACCEPTANCE",
+      "RELEASE"
+    ]
+  },
+  "immutability": {
+    "immutable_after": "ADMITTED",
+    "immutable_fields": [
+      "subject_ref",
+      "operating_baseline_ref",
+      "execution_baseline_ref",
+      "execution_authorization_ref",
+      "root_campaign_ref",
+      "membership",
+      "ownership",
+      "interfaces",
+      "authority_and_effects",
+      "resources_and_budgets",
+      "assurance",
+      "local_discovery.policy_ref",
+      "recovery_and_invalidation",
+      "completion_contract"
+    ],
+    "successor_required_for_change": true
+  },
+  "created_at": "2026-08-01T00:00:00Z",
+  "expires_at": null
+}

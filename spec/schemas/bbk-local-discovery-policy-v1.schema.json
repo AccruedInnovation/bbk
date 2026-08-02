@@ -1,0 +1,257 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-local-discovery-policy-v1.schema.json",
+  "title": "BBK local-discovery policy v1",
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": true,
+      "minProperties": 1,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "id"
+          ]
+        },
+        {
+          "required": [
+            "path"
+          ]
+        }
+      ]
+    },
+    "referenceList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/reference"
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": true,
+      "minProperties": 1
+    },
+    "recordList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/record"
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "policy_id",
+    "revision",
+    "lifecycle_state",
+    "default_allowance",
+    "issuer_role",
+    "proposer_roles",
+    "budget",
+    "scope",
+    "candidate_and_validation",
+    "expiry_and_revocation"
+  ],
+  "properties": {
+    "schema": {
+      "const": "bbk.local-discovery-policy.v1"
+    },
+    "policy_id": {
+      "const": "bbk.local-discovery-policy.v1"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "lifecycle_state": {
+      "const": "ACTIVE"
+    },
+    "default_allowance": {
+      "const": "ZERO_WITHOUT_ACTIVE_ENVELOPE_AND_PERMIT"
+    },
+    "issuer_role": {
+      "const": "bbk_territory_orchestrator"
+    },
+    "proposer_roles": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "prefixItems": [
+        {
+          "const": "bbk_worker_orchestrator"
+        },
+        {
+          "const": "bbk_worker"
+        }
+      ],
+      "items": false
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "item_unit",
+        "max_items_per_envelope",
+        "effort_unit",
+        "effort_unit_semantics",
+        "denominator_source",
+        "denominator_binding",
+        "max_effort_basis_points",
+        "rounding",
+        "missing_denominator_allowance",
+        "cumulative_accounting"
+      ],
+      "properties": {
+        "item_unit": {
+          "const": "DISCOVERY_ITEM"
+        },
+        "max_items_per_envelope": {
+          "const": 2
+        },
+        "effort_unit": {
+          "const": "PLANNED_EFFORT_UNIT"
+        },
+        "effort_unit_semantics": {
+          "const": "COHORT_CHARTER_RELATIVE_NONNEGATIVE_INTEGER"
+        },
+        "denominator_source": {
+          "const": "COMPILED_COHORT_CHARTER"
+        },
+        "denominator_binding": {
+          "const": "EXACT_COHORT_ID_REVISION_SHA256_AND_DECLARED_TOTAL"
+        },
+        "max_effort_basis_points": {
+          "const": 1000
+        },
+        "rounding": {
+          "const": "FLOOR"
+        },
+        "missing_denominator_allowance": {
+          "const": 0
+        },
+        "cumulative_accounting": {
+          "const": true
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ordinary_implied_work_requires_permit",
+        "genuinely_new_local_work_requires_permit",
+        "prohibited_changes"
+      ],
+      "properties": {
+        "ordinary_implied_work_requires_permit": {
+          "const": false
+        },
+        "genuinely_new_local_work_requires_permit": {
+          "const": true
+        },
+        "prohibited_changes": {
+          "type": "array",
+          "minItems": 12,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "candidate_and_validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "post_freeze_rule",
+        "permit_refs_required_in_candidate_manifest",
+        "validation_scope_impact_must_be_declared",
+        "permit_cannot_establish_validation"
+      ],
+      "properties": {
+        "post_freeze_rule": {
+          "const": "SUCCESSOR_COHORT_OR_PARENT_RECHARTER_REQUIRED"
+        },
+        "permit_refs_required_in_candidate_manifest": {
+          "const": true
+        },
+        "validation_scope_impact_must_be_declared": {
+          "const": true
+        },
+        "permit_cannot_establish_validation": {
+          "const": true
+        }
+      }
+    },
+    "expiry_and_revocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expiry_required",
+        "revocation_owner_role",
+        "automatic_invalidation_triggers"
+      ],
+      "properties": {
+        "expiry_required": {
+          "const": true
+        },
+        "revocation_owner_role": {
+          "const": "bbk_territory_orchestrator"
+        },
+        "automatic_invalidation_triggers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}

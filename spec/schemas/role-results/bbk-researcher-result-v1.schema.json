@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-researcher-result-v1.schema.json",
+  "title": "BBK BBK Researcher result payload v1",
+  "description": "Closed role-specific `result` payload for `bbk_researcher` returns.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "research_ref",
+    "answer_summary",
+    "claim_results",
+    "source_inventory",
+    "source_exposure",
+    "freshness_and_applicability",
+    "conflicts",
+    "unknowns_and_omissions",
+    "inspections_performed",
+    "implications",
+    "decisions_exposed_not_made",
+    "authority_and_effects",
+    "blockers",
+    "invalidation_triggers",
+    "research_artifact_ref"
+  ],
+  "properties": {
+    "research_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Stable research-question ID, attempt ID, exact root factual question, governed subject ID and revision, target version/edition/jurisdiction/time boundary, and evidence threshold."
+    },
+    "answer_summary": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/nonEmptyString",
+      "description": "Concise answer or honest non-answer, the threshold applied, and the material applicability boundary. It must not imply a product decision, review verdict, candidate pass, acceptance, or release."
+    },
+    "claim_results": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Every decision-relevant claim with stable ID, exact proposition, one allowed claim state, `OBSERVED`/`REPORTED`/`INFERRED` classification, supporting and contrary evidence refs, assumptions, applicability, qualitative confidence and basis, unresolved gaps, and invalidation trigger."
+    },
+    "source_inventory": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Material source records with source class, title/artifact identity, author/publisher/owner, stable locator, publication/release/effective/updated/accessed dates, version/edition/commit/configuration/jurisdiction/locale, precise locator, local path/bytes/SHA-256 where material, authority, directness, independence, method, applicability, and limitations."
+    },
+    "source_exposure": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Sources, prior conclusions, and outcome-bearing evidence visible to the Researcher, plus omissions, redactions, truncation, retrieval-only items, and any claimed independence limitation."
+    },
+    "freshness_and_applicability": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "As-of date, freshness horizon, subject/version/environment/jurisdiction fit, supersession state, and conditions under which the result becomes stale or inapplicable."
+    },
+    "conflicts": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Exact source or claim conflicts, reconciliation tests performed, surviving dissent, affected parent objects, and whether bounded research, empirical work, or an authority decision is needed."
+    },
+    "unknowns_and_omissions": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Facts still unknown, unavailable or inaccessible sources, search boundaries, evidence of absence versus absence of evidence, and residual uncertainty."
+    },
+    "inspections_performed": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Authorized local or remote read-only inspections and commands actually performed, including exact command/query, working context, tool/environment identity, authority, expected effects, exit/result state, authoritative output refs, and limitations."
+    },
+    "implications": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Only the smallest planning or execution implications supported by the evidence, including assumptions invalidated, alternatives affected, and parent objects that may require reopening."
+    },
+    "decisions_exposed_not_made": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Product, architecture, authority, risk, private-context, acceptance, release, or other governing choices revealed by the research, with no implied disposition."
+    },
+    "authority_and_effects": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Research access and effect authority supplied, authority actually used, credentials/private services explicitly not used, excluded powers, and any authority blocker."
+    },
+    "blockers": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Exact technical, authority, decision, source-access, profile, environment, or parent-rescoping blockers and the least costly valid remediation."
+    },
+    "invalidation_triggers": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Source, subject, version, date, jurisdiction, configuration, policy, evidence, or parent-decision changes that require re-evaluation."
+    },
+    "research_artifact_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/artifactReference",
+      "description": "Durable structured research-result path, byte count, and SHA-256 when persisted; inline content is permitted only for a routine small result whose exact state cannot be lost."
+    }
+  },
+  "x-bbk-role": "bbk_researcher",
+  "x-bbk-contract": "bbk.researcher-return.v1",
+  "x-bbk-supplemental-enums": {
+    "claim_states": [
+      "SUPPORTED",
+      "REFUTED",
+      "CONFLICTED",
+      "UNKNOWN",
+      "NOT_APPLICABLE"
+    ]
+  }
+}

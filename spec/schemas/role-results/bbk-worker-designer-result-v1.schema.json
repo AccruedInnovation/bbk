@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-worker-designer-result-v1.schema.json",
+  "title": "BBK BBK Worker Designer result payload v1",
+  "description": "Closed role-specific `result` payload for `bbk_worker_designer` returns.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "design_charter_ref",
+    "governing_source_refs",
+    "artifact_kind",
+    "worker_invocation_contract_ref",
+    "host_projection_refs",
+    "logical_role_and_physical_invocation",
+    "work_unit_semantic_validation",
+    "model_routing_and_qualification",
+    "task_profile_ref",
+    "domain_profile_refs",
+    "skill_and_instruction_manifest",
+    "context_manifest_ref",
+    "authority_state",
+    "effective_capability_envelope",
+    "filesystem_capability_zones",
+    "external_effect_capabilities",
+    "workspace_and_isolation_requirements",
+    "runtime_binding_state",
+    "tool_environment",
+    "environment_secret_and_network_bindings",
+    "assurance_and_gate_bindings",
+    "candidate_and_inventory_bindings",
+    "budget_continuation_and_interruption",
+    "discovery_and_scope_policy",
+    "payload_result_and_handoff_contract",
+    "cleanup_and_artifact_disposition",
+    "preflight_and_qualification",
+    "template_instantiation_policy",
+    "self_check",
+    "invalidated_or_superseded_refs",
+    "residual_uncertainty",
+    "blockers",
+    "parent_actions_requested"
+  ],
+  "properties": {
+    "design_charter_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Worker Designer charter identity, attempt, requested artifact kind, target host or host-neutral requirement, included and excluded concerns, budget, stopping conditions, invalidation triggers and result schema."
+    },
+    "governing_source_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Current outcome, decision, architecture, interface, structure, slice, phase, work graph, assurance, profile, routing, authority, environment and policy references with identity, acceptance, freshness and applicability state."
+    },
+    "artifact_kind": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "`CONCRETE_INVOCATION`, `REUSABLE_TEMPLATE`, or `INSTANCE_REBIND`, with rationale and permitted consumers."
+    },
+    "worker_invocation_contract_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Versioned host-neutral invocation contract or companion structured artifact path, byte count, SHA-256, schema identity, revision, lifecycle and validation state, or an exact explanation of why it cannot yet be produced."
+    },
+    "host_projection_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Any generated OMP, Codex, Claude Code, generic or other host projection identities, digests, compiler and fidelity state, or the exact runtime materialization requirement when no projection is yet appropriate."
+    },
+    "logical_role_and_physical_invocation": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Canonical logical role, reusable procedures, effective model or process, host adapter, physical invocation expectations, prohibited co-locations and any qualification or separation obligations."
+    },
+    "work_unit_semantic_validation": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Completeness and consistency state for purpose, scope, behavior, inputs, outputs, dependencies, interfaces, ownership, assertions, cleanup, continuation, result and handoff, including exact gaps returned to the parent."
+    },
+    "model_routing_and_qualification": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Effective `bbk_worker` routing source, provider, model, effort or thinking level, relevant limits and capabilities, fallback or escalation policy, override provenance, qualification status and advisories."
+    },
+    "task_profile_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Exactly one primary task-kind profile identity and rationale, or an explicit blocking absence."
+    },
+    "domain_profile_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Smallest applicable language, domain, framework, runtime and toolchain profile locks with identity, version, digest, router, focused modules, capabilities, qualification, gates and unavailable-capability disposition."
+    },
+    "skill_and_instruction_manifest": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Resolved mandatory and optional skills, procedures and model-facing instruction modules; conflict and duplication checks; untrusted-data treatment; and audit metadata kept outside the prompt."
+    },
+    "context_manifest_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Exact least-privilege context edge, included objects and summaries, references and digests, omissions, redactions, retrieval rights, freshness, dependency closure, evidence exposure, context budget and recompilation triggers."
+    },
+    "authority_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Accepted authority sources, standing status, exact scope, allowed and prohibited effects, safeguards, expiry, revocation, already approved routine effects, uncovered required effects and parent action."
+    },
+    "effective_capability_envelope": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Intersection of role maximum, definition defaults, accepted authority, WorkUnit need, repository and organizational policy, user narrowing and host capability, with no permission broadening."
+    },
+    "filesystem_capability_zones": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Disposable candidate roots, protected worktrees and sealed evidence paths with exact operations, owner, guards, expected-hash or fencing rules, lifecycle and cleanup."
+    },
+    "external_effect_capabilities": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Explicit VCS, process, package, network, secret, service, container, database, device, external API, remote-system, messaging, publication and other non-filesystem effect classes, constraints and schema-carrier state."
+    },
+    "workspace_and_isolation_requirements": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Required workspace kind, source or baseline, readable and writable surfaces, branch or worktree policy, shared resources, collision and fencing controls, pre-state, rollback and cleanup; distinguish requirement from a runtime lease."
+    },
+    "runtime_binding_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Exact live workspace, session, credential, endpoint, device, lease, scheduler or other dynamic bindings supplied, pending or prohibited, and whether `NEEDS_RUNTIME_BINDING` applies."
+    },
+    "tool_environment": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Tool IDs, command or adapter entrypoints, exact paths or argv, version probes, expected versions or digests, platform, shell, working directory, activation, environment, fallback and allowed operation classes."
+    },
+    "environment_secret_and_network_bindings": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Environment variables, secret handles, credential scope, data classification, network endpoints, proxy or transport, service and external-resource constraints without exposing secret values unnecessarily."
+    },
+    "assurance_and_gate_bindings": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Assertions, deterministic and focused checks, evidence requirements, gate stages, independence boundaries, invalidation rules and unavailable-capability disposition carried from the AssuranceContract and parent plan."
+    },
+    "candidate_and_inventory_bindings": {
+      "anyOf": [
+        {
+          "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+          "description": "Applicable artifact or candidate identity, inventory, freeze, expected-hash, successor and evidence-binding rules; null or not applicable when the WorkUnit is not candidate-producing."
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Applicable artifact or candidate identity, inventory, freeze, expected-hash, successor and evidence-binding rules; null or not applicable when the WorkUnit is not candidate-producing."
+    },
+    "budget_continuation_and_interruption": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Context and output constraints, runtime and cost ceilings, bounded or resumable mode, checkpoints, continuation identity, same-thread preference, retries, non-progress, allowed interruption reasons, cancellation, recovery and payload limits."
+    },
+    "discovery_and_scope_policy": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Routine local decisions and discoveries the Worker may handle, required discovery reporting, adjacent-work treatment, and exact stop-and-return triggers for material changes."
+    },
+    "payload_result_and_handoff_contract": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Inline and tool-result limits, fail-before-mutation and no-truncation rules, structured Worker result schema, active operational dispositions, separate semantic WorkUnit execution state, exact fields, evidence and command receipts, continuation state, file-bytes-SHA-256 transport and exact return route; `READY_FOR_VALIDATION` is consume-only legacy input."
+    },
+    "cleanup_and_artifact_disposition": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Cleanup and disposition obligations for processes, packages, credentials, services, ports, locks, databases, generated files, workspaces, devices and external effects, including owner, receipts, rollback, quarantine and retention."
+    },
+    "preflight_and_qualification": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Static definition validation, profile, skill, model and tool resolution, authority and path simulation, prohibited-action probes, context and schema round trip, handoff dry run, host-projection fidelity, qualification state and advisories."
+    },
+    "template_instantiation_policy": {
+      "anyOf": [
+        {
+          "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+          "description": "For reusable templates, required per-instance subject, context, authority, workspace, profile, model, tool, assertion, evidence, cleanup, runtime and preflight bindings; null for a concrete invocation."
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "For reusable templates, required per-instance subject, context, authority, workspace, profile, model, tool, assertion, evidence, cleanup, runtime and preflight bindings; null for a concrete invocation."
+    },
+    "self_check": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Producer check for least privilege, semantic fidelity, profile and tool qualification, context sufficiency, authority intersection, capability coverage, assurance preservation, continuation, cleanup, result and projection fidelity; explicitly not independent review or execution evidence."
+    },
+    "invalidated_or_superseded_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Prior invocation contracts, templates, projections, qualifications or instances invalidated, reopened, rejected or superseded, with exact cause and unaffected material retained."
+    },
+    "residual_uncertainty": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Bounded uncertainty retained after proportional stopping, with consequence, owner, expiry, qualification need and reopening trigger."
+    },
+    "blockers": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Typed WorkUnit, decision, authority, profile, skill, model, tool, host, environment, workspace, schema, context, assertion, payload, transport, capacity or host-window blockers with affected contract fields and smallest remediation."
+    },
+    "parent_actions_requested": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Exact recharter, decision, authority, profile or tool qualification, host capability, runtime binding, planning, assurance, orchestration or new-role action requested from the semantic parent."
+    }
+  },
+  "x-bbk-role": "bbk_worker_designer",
+  "x-bbk-contract": "bbk.worker-designer-return.v1",
+  "x-bbk-supplemental-enums": {}
+}

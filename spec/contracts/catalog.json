@@ -1,0 +1,82 @@
+{
+  "schema": "bbk.contract-catalog.v1",
+  "package_version": "0.1.0-alpha.13.1",
+  "source_role_catalog": "spec/roles/catalog.json",
+  "capability_status_inventory": "spec/capability-status.json",
+  "role_return_package": {
+    "source_of_truth": "Each canonical split role file owns its `return_contract`; generated schemas and registry are compatibility projections checked for drift.",
+    "common_envelope": "spec/schemas/bbk-role-return-v1.schema.json",
+    "generated_registry": "spec/contracts/role-return-registry.json",
+    "registry_schema": "spec/schemas/bbk-role-return-registry-v1.schema.json",
+    "generator": "tools/return_contracts.py",
+    "return_schema_directory": "spec/schemas/role-returns",
+    "result_schema_directory": "spec/schemas/role-results"
+  },
+  "execution_contracts": [
+    {
+      "contract_id": "bbk.territory-execution-boundary.v1",
+      "kind": "EXECUTION_BOUNDARY",
+      "status": "SCHEMA_DEFINED_COMPANION",
+      "schema": "spec/schemas/bbk-territory-execution-boundary-v1.schema.json",
+      "source": "templates/contracts/territory-execution-boundary.json",
+      "lifecycle_owner": "bbk_root_orchestrator",
+      "producer_roles": [
+        "bbk_root_orchestrator"
+      ],
+      "consumer_roles": [
+        "bbk_territory_orchestrator",
+        "bbk_worker_orchestrator",
+        "bbk_validator_orchestrator"
+      ],
+      "authority_boundary": "Root Orchestrator compiles and admits the boundary. Territory Orchestrator operates within it. Immutable-field changes require a successor boundary and do not create authority beyond the referenced execution authorization."
+    },
+    {
+      "contract_id": "bbk.local-discovery-policy.v1",
+      "kind": "POLICY",
+      "status": "ACTIVE_POLICY",
+      "schema": "spec/schemas/bbk-local-discovery-policy-v1.schema.json",
+      "source": "spec/policies/local-discovery-v1.json",
+      "lifecycle_owner": "bbk_territory_orchestrator",
+      "producer_roles": [
+        "bbk_territory_orchestrator"
+      ],
+      "consumer_roles": [
+        "bbk_worker_orchestrator",
+        "bbk_worker"
+      ],
+      "authority_boundary": "The policy grants zero work by itself. It defines the ceiling and lifecycle for a separately active envelope and exact permit."
+    },
+    {
+      "contract_id": "bbk.local-discovery-envelope.v1",
+      "kind": "AUTHORITY_ENVELOPE",
+      "status": "SCHEMA_DEFINED_COMPANION",
+      "schema": "spec/schemas/bbk-local-discovery-envelope-v1.schema.json",
+      "source": "templates/contracts/local-discovery-envelope.json",
+      "lifecycle_owner": "bbk_territory_orchestrator",
+      "producer_roles": [
+        "bbk_territory_orchestrator"
+      ],
+      "consumer_roles": [
+        "bbk_worker_orchestrator",
+        "bbk_worker"
+      ],
+      "authority_boundary": "Only the Territory Orchestrator may issue, activate, suspend, revoke, expire, exhaust, or supersede an envelope. An envelope does not authorize an item without an exact permit."
+    },
+    {
+      "contract_id": "bbk.local-discovery-permit.v1",
+      "kind": "AUTHORITY_PERMIT",
+      "status": "SCHEMA_DEFINED_COMPANION",
+      "schema": "spec/schemas/bbk-local-discovery-permit-v1.schema.json",
+      "source": "templates/contracts/local-discovery-permit.json",
+      "lifecycle_owner": "bbk_territory_orchestrator",
+      "producer_roles": [
+        "bbk_territory_orchestrator"
+      ],
+      "consumer_roles": [
+        "bbk_worker_orchestrator",
+        "bbk_worker"
+      ],
+      "authority_boundary": "One permit authorizes one bounded local item under one active envelope. It cannot alter any governing baseline, boundary, cohort meaning, interface, assertion, protected floor, authority, validation meaning, toolchain policy, or external-effect envelope."
+    }
+  ]
+}

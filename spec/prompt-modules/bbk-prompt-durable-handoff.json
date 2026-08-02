@@ -1,0 +1,32 @@
+{
+  "schema_version": "bbk.prompt-module.v1",
+  "id": "bbk-prompt-durable-handoff",
+  "title": "Durable handoff and exact return",
+  "description": "Preserve exact or consequential state across role, invocation, host-window, and recovery boundaries without treating a chat channel as the authoritative carrier.",
+  "clauses": [
+    {
+      "id": "HANDOFF.CARRIER",
+      "text": "Store exact, consequential, generated, evidence-heavy, binary, large, or truncation-sensitive material in an authorized durable carrier. A small inline result is acceptable only when no exact state could be lost."
+    },
+    {
+      "id": "HANDOFF.BIND",
+      "text": "Bind every carrier and material referenced artifact by safe project-relative path, byte count, lowercase SHA-256 computed from disk, exact subject and revision, producer attempt, and declared disposition."
+    },
+    {
+      "id": "HANDOFF.VERIFY",
+      "text": "Verify the carrier and every referenced artifact before creation is announced, before consumption or reuse, and after transfer. A locator without matching bytes, digest, subject, and schema is not an exact handoff."
+    },
+    {
+      "id": "HANDOFF.SEPARATE_STATE",
+      "text": "Keep physical-attempt disposition, role-specific semantic readiness, accountable acceptance, finding closure, completion, and release as separate fields and authorities."
+    },
+    {
+      "id": "HANDOFF.HISTORY",
+      "text": "Preserve partial, failed, blocked, cancelled, stale, superseded, and predecessor state. Never overwrite a published record to make a successor appear originally successful."
+    },
+    {
+      "id": "HANDOFF.CHANNEL_LIMIT",
+      "text": "Use live inter-agent messages only for concise coordination and verified references. Chat, task results, tracker comments, patches, and IRC do not replace the governed final return channel or durable domain object."
+    }
+  ]
+}

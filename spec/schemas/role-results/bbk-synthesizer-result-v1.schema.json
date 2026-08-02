@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-synthesizer-result-v1.schema.json",
+  "title": "BBK BBK Synthesizer result payload v1",
+  "description": "Closed role-specific `result` payload for `bbk_synthesizer` returns.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "synthesis_ref",
+    "synthesis_charter",
+    "source_manifest",
+    "source_disposition_matrix",
+    "authority_and_lifecycle_map",
+    "normalized_statement_ledger",
+    "terminology_and_identity_map",
+    "reconciliation_results",
+    "synthesis_packet",
+    "derived_implications",
+    "outward_impacts",
+    "dissent_findings_and_uncertainty",
+    "fidelity_check",
+    "invalidated_or_superseded_refs",
+    "omissions_redactions_and_access_limits",
+    "blockers",
+    "synthesis_artifact_ref"
+  ],
+  "properties": {
+    "synthesis_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Stable synthesis ID, attempt, revision, and predecessor or successor relationship."
+    },
+    "synthesis_charter": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Purpose, intended consumers, included and excluded source classes, required output, compression level, authority and lifecycle rules, freshness horizon, budget, omissions, stopping conditions, and invalidation triggers."
+    },
+    "source_manifest": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every declared source with identity, subject, revision, digest or verified locator, authority, lifecycle, freshness, provenance, applicability, access status, and inspection state."
+    },
+    "source_disposition_matrix": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "One visible disposition for every declared source, including where represented or the exact reason for exclusion, conflict, staleness, or blockage."
+    },
+    "authority_and_lifecycle_map": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Current, proposed, supporting, superseded, rejected, dissenting, stale, historical, and non-authoritative source classifications."
+    },
+    "normalized_statement_ledger": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Material source statements with stable identities, status, authority, applicability, source links, and affected objects."
+    },
+    "terminology_and_identity_map": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Canonical terms, aliases, historical names, collisions, duplicate identities, projections, and lineage relationships."
+    },
+    "reconciliation_results": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Duplicates, refinements, scope-specific coexistence, supersession, divergence, contradictions, missing ownership, and unresolved source relationships."
+    },
+    "synthesis_packet": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "The bounded current synthesis of responsibilities, boundaries, decisions, interfaces, assumptions, risks, evidence, findings, work, unknowns, and required downstream implications appropriate to the charter."
+    },
+    "derived_implications": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Each architecture, planning, verification, worker, profile, review, execution, or parent-action implication classified as source-stated, derived obligation, synthesis inference, or proposal and bound to supporting sources."
+    },
+    "outward_impacts": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Affected parent, sibling, architecture, planning, assurance, execution, candidate, or authority objects and their current or proposed invalidation state."
+    },
+    "dissent_findings_and_uncertainty": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Rejected alternatives, unresolved dissent, open findings, accepted unknowns, evidence limits, waivers, omissions, residual uncertainty, and required owners or conditions."
+    },
+    "fidelity_check": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Bidirectional comparison results covering every material synthesis statement and every declared source, including detected omissions, status promotion, unsupported conclusions, or terminology drift. State explicitly that this is self-check, not independent review."
+    },
+    "invalidated_or_superseded_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Prior synthesis or downstream objects made stale or superseded, with exact causes and unaffected material retained."
+    },
+    "omissions_redactions_and_access_limits": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Exact material omitted, redacted, unavailable, uninspected, or inaccessible and the effect on synthesis confidence or completeness."
+    },
+    "blockers": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Typed technical, authority, decision, source-repair, or recharter blockers with smallest remediation."
+    },
+    "synthesis_artifact_ref": {
+      "anyOf": [
+        {
+          "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/artifactReference",
+          "description": "Durable synthesis packet path, byte count, SHA-256, schema, revision, and lifecycle, or null with a proportionate inline-result rationale."
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Durable synthesis packet path, byte count, SHA-256, schema, revision, and lifecycle, or null with a proportionate inline-result rationale."
+    }
+  },
+  "x-bbk-role": "bbk_synthesizer",
+  "x-bbk-contract": "bbk.synthesizer-return.v1",
+  "x-bbk-supplemental-enums": {}
+}

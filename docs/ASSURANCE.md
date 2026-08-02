@@ -15,6 +15,11 @@ AssuranceContract
               → optional LearningCandidate
 ```
 
+
+## Role-return boundary
+
+Reviewer and Validator results use different exact schemas. A Validator evaluates fixed candidate-bound assertions through fixed methods and returns assertion results to Validator Orchestrator. A Reviewer performs bounded qualitative, cross-cutting, conformance, proportionality, readiness, or evidence-sufficiency judgment. Missing assertion, criteria, evidence-method, or revalidation design returns to Verification Designer. Operational `COMPLETE` means the attempt completed; it does not itself mean the candidate passed, findings are closed, or release is authorized.
+
 ## Object responsibilities
 
 ### AssuranceContract

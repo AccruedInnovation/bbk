@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blueprint.example/schemas/bbk-prompt-module-catalog-v1.schema.json",
+  "title": "BBK Prompt Module Catalog v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "package_version",
+    "module_schema",
+    "catalog_schema",
+    "module_entries",
+    "compilation_policy"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "bbk.prompt-modules.v1"
+    },
+    "package_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "module_schema": {
+      "const": "spec/schemas/bbk-prompt-module-v1.schema.json"
+    },
+    "catalog_schema": {
+      "const": "spec/schemas/bbk-prompt-module-catalog-v1.schema.json"
+    },
+    "module_entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "file"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^bbk-prompt-[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "file": {
+            "type": "string",
+            "pattern": "^spec/prompt-modules/bbk-prompt-[a-z0-9]+(?:-[a-z0-9]+)*\\.json$"
+          }
+        }
+      }
+    },
+    "compilation_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role_field",
+        "skill_directive_syntax",
+        "embed_each_module_once",
+        "standalone_skill_expands_modules",
+        "role_prompt_uses_compact_skill_references",
+        "mandatory_procedure_default",
+        "mandatory_procedure_maximum",
+        "additional_mandatory_procedure_rule",
+        "additional_mandatory_procedure_exceptions"
+      ],
+      "properties": {
+        "role_field": {
+          "const": "prompt_modules"
+        },
+        "skill_directive_syntax": {
+          "const": "{{bbk-module:<module-id>}}"
+        },
+        "embed_each_module_once": {
+          "const": true
+        },
+        "standalone_skill_expands_modules": {
+          "const": true
+        },
+        "role_prompt_uses_compact_skill_references": {
+          "const": true
+        },
+        "mandatory_procedure_default": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "mandatory_procedure_maximum": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "additional_mandatory_procedure_rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "additional_mandatory_procedure_exceptions": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "mandatory_skills",
+              "distinct_behavior",
+              "measurement",
+              "rationale"
+            ],
+            "properties": {
+              "mandatory_skills": {
+                "type": "array",
+                "minItems": 2,
+                "items": {
+                  "type": "string",
+                  "pattern": "^bbk(?:-[a-z0-9]+)+$"
+                },
+                "uniqueItems": true
+              },
+              "distinct_behavior": {
+                "type": "object",
+                "minProperties": 1,
+                "additionalProperties": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "propertyNames": {
+                  "pattern": "^bbk(?:-[a-z0-9]+)+$"
+                }
+              },
+              "measurement": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "basis",
+                  "method_content_sha256",
+                  "primary_body_bytes",
+                  "all_mandatory_body_bytes",
+                  "incremental_body_bytes",
+                  "duplicated_prompt_module_bodies"
+                ],
+                "properties": {
+                  "basis": {
+                    "const": "UTF8_BYTES_OF_FRONTMATTER_STRIPPED_COMPACT_PROCEDURE_BODIES_JOINED_BY_TWO_LF"
+                  },
+                  "method_content_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "primary_body_bytes": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "all_mandatory_body_bytes": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "incremental_body_bytes": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "duplicated_prompt_module_bodies": {
+                    "const": 0
+                  }
+                }
+              },
+              "rationale": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

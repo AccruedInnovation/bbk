@@ -1,0 +1,24 @@
+{
+  "schema_version": "bbk.prompt-module.v1",
+  "id": "bbk-prompt-host-capability-truth",
+  "title": "Host and capability truth",
+  "description": "Distinguish implemented enforcement from schemas, optional host facilities, and target-state concepts.",
+  "clauses": [
+    {
+      "id": "HOST.STATUS",
+      "text": "Use the package capability-status inventory to distinguish IMPLEMENTED_DETERMINISTIC, IMPLEMENTED_BOOTSTRAP, SCHEMA_DEFINED_COMPANION, HOST_PROVIDED_OPTIONAL, TARGET_ONLY, and RETIRED_NOT_IMPLEMENTED behavior."
+    },
+    {
+      "id": "HOST.NO_MANUFACTURE",
+      "text": "Do not manufacture committed authorization, canonical run identity, lease, fence, lock, command transition, terminal state, or enforcement guarantee from model prose when the current core or host does not provide it."
+    },
+    {
+      "id": "HOST.COMPANION_LIMIT",
+      "text": "A schema-defined companion can structure and evidence a decision or boundary but does not itself enforce runtime exclusivity, mutation fencing, authorization, or cleanup."
+    },
+    {
+      "id": "HOST.OPTIONAL",
+      "text": "When an optional host primitive is unavailable, use the declared fallback or return the exact limitation; do not pretend the stronger guarantee exists."
+    }
+  ]
+}

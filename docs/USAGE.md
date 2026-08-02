@@ -1,6 +1,6 @@
-# BBK alpha.11.12 usage
+# BBK alpha.13 usage
 
-Alpha.11.12 is the current canonical successor. It adds complete per-role scope, delegation-trigger, escalation, and user-interaction contracts; modular role constitutions; and lean canonical sub-agents that no longer autoload the top-level entry controller. It retains persistent session-local BBK mode, bundled profiles, ordered verification, installation safeguards, model routing, selective host updates, recommendation-first Wayfinding, escalation-only Grill, durable handoffs, resumable workers, and explicit execution control.
+Alpha.13 uses the harness-root session as the sole user-facing controller and exposes four controller-selectable canonical roots. All 19 roles are non-user-facing children compiled from split v4 role sources, selected prompt modules, exact role-specific procedures, and exact return contracts. OMP still replaces Main and child system prompts so conflicting generic or client-specific instructions cannot govern BBK work. The reviewed per-role model policy, persistent mode, activity/context line, `ask` provenance, bounded verification, harness-scoped updates, and project-record formats remain available.
 
 ## Enter BBK
 
@@ -15,29 +15,34 @@ Alpha.11.12 is the current canonical successor. It adds complete per-role scope,
 /bbk:status          deterministic project status; mode is unchanged
 ```
 
-`/bbk` persists a session-local state entry with `appendEntry`, shows `BBK` in the footer, and does not inject a chat message. While active, `before_agent_start` adds a concise system-prompt overlay to every ordinary agent turn. The overlay makes each new message a continuation or directive within the BBK-governed workflow and routes work to the appropriate named agent:
+`/bbk` persists a session-local `bbk.omp-mode-state.v2` entry with `appendEntry` and does not inject a chat message. The state is restored from the active branch when a session is resumed, switched, branched, or navigated.
+
+BBK renders one live line immediately above the editor for the full lifetime of active BBK mode. It reads `BBK · ready` when no canonical child is working. Otherwise the newest worker supplies its job name and latest public intent/tool/output; current context consumption is shown as `used/window` plus percentage when OMP publishes those fields, and up to three additional workers receive compact context gauges. The same widget returns to `BBK · ready` when work finishes and is cleared on mode exit. BBK no longer adds a second `setStatus` row. OMP's current public interactive extension API cannot replace the built-in `pi` footer brand, so that host-owned label remains unchanged.
+
+While active, `before_agent_start` performs a complete **system-prompt replacement** for the peer whose `kind` is `main`, normally `Main`. The replacement excludes OMP's generic workflow prompt and compatibility-discovered `.codex`, `.claude`, `.gemini`, and other client-specific context. It injects the mandatory `bbk` and `bbk-context-routing` procedures and establishes Main as a controller/relay that invokes exactly one named root:
 
 ```text
 no accepted executable baseline, planning, architecture, or material uncertainty
   → bbk_root_wayfinder
-
 accepted sufficiently specified execution/recovery baseline
   → bbk_root_orchestrator
-
 bounded independent review
   → bbk_reviewer
-
-assertion-scoped acceptance run
+assertion-scoped candidate acceptance
   → bbk_validator_orchestrator
 ```
 
-`/bbk <request>` sends only the request text through `sendUserMessage`; it does not copy the full `bbk` skill into the transcript. `/bbk` with no arguments and `/bbk:exit` are local UI/state operations and do not start an agent turn. The mode is restored from the active branch when a session is resumed, switched, branched, or navigated.
+With OMP's advertised batch form, dispatch even one root as `{ context, tasks: [{ name, agent, task, ... }] }`. Set `agent` to the exact canonical `bbk_*` role, use `name` only as a stable IRC/job identifier, and put the complete self-contained assignment in `task`. When OMP advertises only the flat form, follow it exactly and put reusable shared background in a durable `local://` context file.
 
-BBK mode is session-local. It does not change the parent model, thinking level, toolset, or sub-agent model routing, and it does not replace OMP's native plan or vibe modes. Use `/bbk:exit` before returning to an unrelated main-session workflow.
+All named `bbk_*` agents are non-user-facing children. Their generated definitions carry a `<bbk-agent-system>` marker and complete inlined `mandatory_skills`. On child start, the same hook verifies the marker-bearing wrapper's role block against the installed canonical projection, replaces the complete incoming prompt, and preserves only explicit task-call context, approved plan/path, worktree, hub identity/roster, and caller yield schema. A child finishes through OMP's hidden `yield` tool with its governed result in `result.data`.
+
+Children coordinate through `hub`/IRC. A material human need is sent to Main as a stable `BBK_USER_REQUEST`. Main must use OMP's native `ask` tool for the user-facing question and relay its structured answer to the exact waiting peer as a matching `BBK_USER_RESPONSE` marked `source: omp.ask`, with `replyTo` when available. Anything phrased as a question only in ordinary assistant prose is informational text: it is not pending, cannot be treated as answered, and cannot become ADR authority. The responsible canonical role—not Main—creates the ADR from an ask-backed response. Delivery, timeout, silence, or missing heartbeat is not a response. Continue independent authorized work after sending and wait only when completely blocked.
+
+`/bbk <request>` sends only the request text through `sendUserMessage`. `/bbk` with no arguments and `/bbk:exit` are local UI/state operations and do not start a model turn. BBK mode does not change the parent model, thinking level, toolset, child model routing, or containment. `/bbk:exit` restores ordinary prompting for subsequent Main turns; named BBK children still receive role-specific replacement whenever invoked.
 
 ### Codex, Claude Code, and generic hosts
 
-Invoke the installed baseline `bbk` skill. It carries the entry-controller responsibility for the current request. Use a named generated BBK agent where the host supports one so its model, effort, skills, tool policy, spawn policy, and return contract apply. Adopt the selected logical role in the current session only where named-agent invocation is unavailable.
+Invoke the installed baseline `bbk` controller procedure in the visible parent session. That session is the only user-facing endpoint. Invoke a named canonical role where the host supports children so its model, effort, inlined mandatory procedures, tools, spawn policy, and return contract apply. Children return human-decision packets through the parent channel; they never open a separate user interaction. Only when named-agent invocation is genuinely unavailable may the visible session adopt a logical role, and it must preserve the same authority and communication boundaries.
 
 For Codex, choose the parent turn's sandbox and approval policy before delegation. BBK custom agents do not force `read-only`; they inherit that parent setting. Claude Code roles likewise receive Edit/Write so non-mutating roles can persist coordination artifacts. Inherited write access does not authorize subject or product changes: those remain limited to the canonical mutating roles and their exact grants.
 
@@ -111,12 +116,21 @@ Use `bbk manifest create` and `bbk manifest compare` for exact directory invento
 
 ## Test and install
 
-Complete ordered verification:
+Complete release/CI qualification:
 
 ```bash
 python tools/run_tests.py --all --require-node
 python tools/bootstrap.py --test --require-node
 ```
+
+For a selective OMP or Codex update, the `--test-and-update-*` commands automatically run only the matching trust-gated regression profile. Direct equivalents are:
+
+```bash
+python tools/verify_all.py --profile omp --require-node
+python tools/verify_all.py --profile codex
+```
+
+The full unittest modules run concurrently by default. Use `python tools/run_tests.py -v --jobs 1` when a serial diagnostic transcript is preferable.
 
 Verify and install only on PASS. All five bundled profiles are installed by default:
 
@@ -150,7 +164,15 @@ See `INSTALL.md` and `LANGUAGE-PROFILES.md` for dry runs, source-mode semantics,
 
 ## Select sub-agent models
 
-The packaged default is `spec/model-routing.json`. It maps all 19 roles through `judgment`, `coordination`, and `mechanical` profiles and emits native model/effort fields for OMP, Codex, and Claude Code.
+The canonical install-time policy is `spec/model-routing.json` with:
+
+```json
+{
+  "schema_version": "bbk.model-routing.v2"
+}
+```
+
+It contains one independent OMP, Codex, and Claude Code route for each of the 19 canonical roles. There are no governing `judgment`, `coordination`, or `mechanical` buckets in v2; identical packaged values are duplicated deliberately so one role can be changed without affecting any other role.
 
 Validate it with:
 
@@ -159,7 +181,7 @@ python tools/model_routing.py --check
 python tools/generate_agents.py --check
 ```
 
-For a customized installation, copy the policy outside the verified package, edit profile settings or role assignments, validate the copy, and pass it to the installer:
+For a customized installation, copy the policy outside the verified package, edit the exact role entries, validate the copy, and pass it to the installer:
 
 ```bash
 python tools/model_routing.py --path /path/to/model-routing.json --check
@@ -167,7 +189,9 @@ python tools/install.py install --scope project --root /path/to/repo \
   --omp --codex --claude --model-routing /path/to/model-routing.json
 ```
 
-OMP accepts its configured role aliases such as `@default`, `@smol`, `@slow`, `@vision`, `@plan`, `@designer`, `@commit`, `@tiny`, `@task`, and `@advisor`, or a direct selector such as `deepseek/deepseek-v4-flash`. Model routing is an execution default, not an authority grant or proof that the selected model is sufficient for every invocation. See `MODEL-ROUTING.md`.
+Legacy `bbk.model-routing.v1` policies remain accepted. Their profile names were never limited to the original three: any valid profile name may be defined and referenced by the complete role map. V2 is preferred because direct role entries avoid category coupling.
+
+OMP routes may use configured aliases such as `@default`, `@smol`, `@slow`, `@vision`, `@plan`, `@designer`, `@commit`, `@tiny`, `@task`, and `@advisor`, or direct selectors such as `deepseek/deepseek-v4-flash`. Routing is an execution default, not an authority grant or proof that the selected model is sufficient for every invocation. See `MODEL-ROUTING.md`.
 
 ## OMP sub-agent model menu
 
@@ -175,7 +199,7 @@ OMP accepts its configured role aliases such as `@default`, `@smol`, `@slow`, `@
 /bbk:models
 ```
 
-Choose `testing-flash` for fast low-cost BBK functional tests, `deepseek-economy` for DeepSeek-only routing, `default` for the packaged tiered route, or `installation-default` to return to the exact install-time routes. The menu can set `model` and `thinkingLevel` for any BBK sub-agent, apply an external `omp-model-routing-profile.json`, and export the current BBK-managed routes. Changes apply to future spawns; already-running sub-agents are unaffected.
+Choose `testing-flash` for fast low-cost BBK functional tests, `deepseek-economy` for DeepSeek-only routing, `default` for the packaged per-role route, or `installation-default` to return to the exact install-time routes. The menu can set `model` and `thinkingLevel` for any BBK sub-agent, apply an external `omp-model-routing-profile.json`, and export the current BBK-managed routes. Changes apply to future spawns; already-running sub-agents are unaffected.
 
 The menu populates model choices from authenticated OMP models, the packaged profiles, the current route, and OMP's built-in aliases. It warns when OMP cannot currently resolve a selected model but permits saving it for later provider configuration. OMP `task.agentModelOverrides` and higher-precedence project agent definitions can supersede BBK-managed frontmatter; use `/bbk:models status` and inspect OMP configuration when a spawned model differs from the displayed BBK route.
 
@@ -241,13 +265,13 @@ Root or Territory Wayfinder
   → Questioning Wayfinder
       → investigate discoverable facts
       → prepare a decision-ready recommendation
-  → user-facing parent presents it
+  → harness-root controller presents it
       ├─ accepted → ADR-compatible decision packet; no Question Guide
       ├─ bounded correction → revise the recommendation
       └─ rejected, contested, materially ambiguous, or deeper exploration requested
            → one focused Question Guide conducts the deep Grill
            → validated result returns through the Questioning Wayfinder
-  → parent synthesis
+  → controller-mediated parent synthesis
 ```
 
 The Questioning Wayfinder may share a physical model invocation with another logical role when policy permits. Record the mapping and preserve any required approval, validation, integration, or evidence-independence separation. Do not spawn a Question Guide merely because a decision exists.
@@ -264,9 +288,11 @@ Evidence exposure is append-only. Exploratory criteria or selections made after 
 
 ## Role scope, delegation, escalation, and installed profiles
 
-Each canonical role carries an explicit `## Scope`, `## Delegation`, and `## Escalation and user interaction` contract. OMP's native `spawns` field remains the enforceable direct-child allowlist, while the OMP prompt now states the exact condition under which each child should be used. Codex, Claude Code, and generic projections carry the same trigger map. Do not delegate merely because a child is available, delegate to an unlisted role, or absorb a listed child's distinct responsibility merely because the parent model could perform it.
+Each canonical role carries explicit `## Runtime identity and interaction topology`, `## Scope`, `## Delegation`, `## Escalation and human relay`, invocation, and return contracts. OMP's native `spawns` field remains the enforceable direct-child allowlist, while every projection states the exact trigger for each child. Do not delegate merely because a child is available, delegate to an unlisted role, or absorb a listed child's responsibility because the parent model could perform it.
 
-Only the active Root Wayfinder and an active Question Guide may ask the user directly, within their declared limits. Every other role returns a structured decision, authority, private-context, blocker, or scope request to its parent. Canonical sub-agents do not autoload the top-level `bbk` entry-controller skill. OMP and Claude preload only each role's two- or three-skill procedure core; the full allowed procedure list remains visible and is loaded on demand. See `AGENTS.md`.
+All 19 canonical roles are non-user-facing. `human_decision_triggers` identify when a role must send a structured decision, authority, private-context, protected-floor, hard-to-reverse, acceptance, blocker, or scope request to the harness-root controller. In OMP, use `hub`/IRC to the peer whose `kind` is `main`; in Codex and Claude Code, return the same packet through the native parent channel. No child infers consent from silence or transport state.
+
+Canonical projections embed each role's assigned prompt modules and exact role-specific mandatory procedures. Every current role uses one primary procedure, but one is not a fixed maximum: additional procedures require a source-bound measured exception proving distinct behavior and zero duplicated module bodies. OMP has no `autoloadSkills` requirement and Claude Code has no mandatory `skills` frontmatter. Optional procedures and language/domain profiles remain visible and load only when material. See `AGENTS.md`.
 
 Before material language-, framework-, runtime-, or toolchain-specific work, consult the installed `bbk-installed-profiles` skill and confirm discovery:
 
@@ -274,9 +300,7 @@ Before material language-, framework-, runtime-, or toolchain-specific work, con
 bbk --json profile list
 ```
 
-The installed registry records the preferred launcher and an exact Python/script fallback. If a shell or mise environment cannot resolve `bbk`, invoke that bound path before classifying profile discovery as unavailable.
-
-Load the selected profile router, then only the focused procedures needed for the current role and assertion. Carry the profile lock/digest, toolchain assumptions, required gates, and unavailable-capability disposition into child context and returns.
+The installed registry records the preferred launcher and an exact Python/script fallback. If a shell or mise environment cannot resolve `bbk`, invoke that bound path before classifying profile discovery as unavailable. Load the selected router and only the focused procedures required for the current assertion. Carry the profile identity, lock/digest, toolchain assumptions, gates, and unavailable-capability disposition into child context and returns.
 
 ## Typed language/domain profile resolution
 
@@ -459,7 +483,7 @@ Use the `bbk-recover` skill when ownership, candidate identity, effects, evidenc
 
 Deterministic BBK slash commands are UI operations, not prompts. `/bbk:models`, `/bbk:status`, `/bbk:doctor`, `/bbk:exit`, the other deterministic `/bbk:*` commands, and every bundled language-profile slash command report concise UI summaries and do not inject CLI JSON into model context.
 
-Persistent mode state is written with `appendEntry`, which is not sent to the LLM. While the mode is active, `before_agent_start` adds the small BBK system-prompt overlay for each ordinary turn. The only slash-command path that invokes `sendUserMessage` is `/bbk <request>`, and it forwards only the user's directive. `/bbk` with no arguments does not trigger a model turn.
+Persistent mode state is written with `appendEntry`, which is not sent to the LLM. While active, `before_agent_start` replaces Main's complete system prompt and injects the mandatory controller procedures. For named BBK children it replaces OMP's subagent workflow prompt while preserving only sanitized invocation data. `/bbk <request>` is the sole slash-command path that invokes `sendUserMessage`, and it forwards only the user's directive. `/bbk` with no arguments does not trigger a model turn.
 
 To update only BBK's Codex custom-agent definitions while preserving OMP and its active model-routing state:
 
@@ -475,4 +499,4 @@ To update only OMP while Codex remains running:
 python tools/setup.py --test-and-update-omp --scope user
 ```
 
-After it succeeds, run `/reload-plugins` in OMP. The updater preserves the current model-routing profile and does not modify `.codex` agent files.
+After it succeeds, run `/reload-plugins` in OMP. The updater preserves the current OMP runtime-routing state and does not modify `.codex` agent files.

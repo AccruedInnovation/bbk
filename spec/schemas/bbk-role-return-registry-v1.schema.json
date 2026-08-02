@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-role-return-registry-v1.schema.json",
+  "title": "BBK generated role-return registry v1",
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "fileRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "package_version",
+    "source_role_catalog",
+    "envelope_schema",
+    "generator",
+    "role_count",
+    "operational_dispositions",
+    "entries"
+  ],
+  "properties": {
+    "schema": {
+      "const": "bbk.role-return-registry.v1"
+    },
+    "package_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_role_catalog": {
+      "$ref": "#/$defs/relativePath"
+    },
+    "envelope_schema": {
+      "$ref": "#/$defs/relativePath"
+    },
+    "generator": {
+      "$ref": "#/$defs/relativePath"
+    },
+    "role_count": {
+      "const": 19
+    },
+    "operational_dispositions": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z][A-Z0-9_]*$"
+      }
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 19,
+      "maxItems": 19,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "role",
+          "contract_id",
+          "semantic_state_name",
+          "return_schema",
+          "result_schema",
+          "source"
+        ],
+        "properties": {
+          "role": {
+            "type": "string",
+            "pattern": "^bbk_[a-z][a-z0-9_]*$"
+          },
+          "contract_id": {
+            "type": "string",
+            "pattern": "^bbk\\.[a-z0-9][a-z0-9.-]*\\.v[0-9]+$"
+          },
+          "semantic_state_name": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "return_schema": {
+            "$ref": "#/$defs/fileRecord"
+          },
+          "result_schema": {
+            "$ref": "#/$defs/fileRecord"
+          },
+          "source": {
+            "$ref": "#/$defs/fileRecord"
+          }
+        }
+      }
+    }
+  }
+}

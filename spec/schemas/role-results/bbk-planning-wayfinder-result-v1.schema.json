@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-planning-wayfinder-result-v1.schema.json",
+  "title": "BBK BBK Planning Wayfinder result payload v1",
+  "description": "Closed role-specific `result` payload for `bbk_planning_wayfinder` returns.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "root_outcome_ref",
+    "accepted_source_refs",
+    "work_graph_ref",
+    "capability_increment_refs",
+    "phase_refs",
+    "work_unit_refs",
+    "dependency_and_parallelism_state",
+    "integration_obligation_refs",
+    "interface_readiness_state",
+    "requirement_and_assertion_coverage",
+    "assurance_refs",
+    "worker_invocation_refs",
+    "authority_and_capability_state",
+    "tool_profile_environment_state",
+    "candidate_and_validation_plan",
+    "child_return_refs",
+    "review_state",
+    "invalidated_or_superseded_refs",
+    "residual_uncertainty",
+    "blockers",
+    "parent_actions_requested"
+  ],
+  "properties": {
+    "root_outcome_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Current root outcome and success-evidence reference preserved through the graph."
+    },
+    "accepted_source_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Current accepted planning-source fit, architecture, structure, slice, interface, requirement, decision, authority, assurance, profile, and environment references, including explicit not-applicable dispositions."
+    },
+    "work_graph_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Versioned canonical graph artifact or exact structured result reference."
+    },
+    "capability_increment_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Capability identities, outcome traceability, entry and exit behavior, risks retired, evidence expectations, dependencies, and enabled successors."
+    },
+    "phase_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Phase charters, ordering, entry and exit conditions, participating territories and interfaces, integration owners, risks retired, and gates."
+    },
+    "work_unit_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Compiled leaf work-unit identities and ownership, including phase-owned units returned by children and any explicitly co-located logical Phase Wayfinder result; no work unit is authored directly by the Planning Wayfinder merely because it is small."
+    },
+    "dependency_and_parallelism_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Global execution order, dependency closure, safe parallelism, serialization, workspace boundaries, explicit iteration or recovery loops, and unresolved cycles."
+    },
+    "integration_obligation_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Every decomposition-created integration obligation, owner, assembly point, interface, exercise point, failure and recovery behavior, linked assertion, and evidence."
+    },
+    "interface_readiness_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Current stable, prototype-only, exception-bound, stale, or blocking status of every material interface needed by coordinated work."
+    },
+    "requirement_and_assertion_coverage": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Traceability and coverage state, including exactly one completing leaf work unit per active assertion and the distinction among integration, verification, operational validation, outcome evidence, and review."
+    },
+    "assurance_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Current AssuranceContract, Verification Designer, review-manifest, independent-review, gate, and evidence-design references or exact blockers."
+    },
+    "worker_invocation_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Current Worker Designer contracts for every executable work unit, or an explicit not-ready or blocked disposition for each missing contract."
+    },
+    "authority_and_capability_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Standing-authority sources, per-work-unit effect requirements, capability-zone assignments, safeguards, exclusions, expiry or revocation, and unresolved authority blockers."
+    },
+    "tool_profile_environment_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Applicable profile locks and plan-level tool, runtime, compiler, inspection, environment, credential-availability, fallback, payload, runtime, cost, and continuation requirements."
+    },
+    "candidate_and_validation_plan": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Late-freeze conditions, exact candidate inventory, pre-freeze integration and deterministic gates, candidate-bound assertion sequence, invalidation rules, and validation dependencies."
+    },
+    "child_return_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Validated Phase Wayfinder, Verification Designer, Worker Designer, and Reviewer returns with subject, revision, freshness, authority, and schema state."
+    },
+    "review_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Review applicability, exact completed or pending charters, findings, dispositions, independence rationale, and unresolved coverage."
+    },
+    "invalidated_or_superseded_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Prior graph nodes, child returns, assertions, worker contracts, or evidence invalidated, reopened, rejected, or superseded during this invocation."
+    },
+    "residual_uncertainty": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Bounded uncertainty retained after proportional stopping, with consequence, owner, expiry, and reopening trigger."
+    },
+    "blockers": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Exact decision, resynthesis, authority, technical, interface, dependency, integration, evidence, child-return, capacity, or host-window blockers and affected nodes."
+    },
+    "parent_actions_requested": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Exact upstream decisions, acceptances, resynthesis, authority grants, interface dispositions, waivers, or integration actions requested from the semantic parent."
+    }
+  },
+  "x-bbk-role": "bbk_planning_wayfinder",
+  "x-bbk-contract": "bbk.planning-wayfinder-return.v1",
+  "x-bbk-supplemental-enums": {}
+}

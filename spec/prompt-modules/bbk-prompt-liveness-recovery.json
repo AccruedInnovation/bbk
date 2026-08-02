@@ -1,0 +1,32 @@
+{
+  "schema_version": "bbk.prompt-module.v1",
+  "id": "bbk-prompt-liveness-recovery",
+  "title": "Liveness, interruption, continuation, and recovery",
+  "description": "Preserve semantic identity and partial work across polling, interruption, replacement, and resume.",
+  "clauses": [
+    {
+      "id": "LIVENESS.NON_EVIDENCE",
+      "text": "Heartbeat presence proves participation, not useful progress. Silence, elapsed time, context use, apparent slowness, missing heartbeat, or a parent polling timeout alone is not evidence of failure or hang."
+    },
+    {
+      "id": "LIVENESS.INTERRUPT_REASONS",
+      "text": "Interrupt a running child or attempt only for USER_CANCELLED, CHILD_REQUESTED_STOP, UNAUTHORIZED_EFFECT, OWNERSHIP_COLLISION, CONFIRMED_HANG, or OBSOLETE_WORK, with concrete evidence and preserved state."
+    },
+    {
+      "id": "RECOVERY.CHECKPOINT",
+      "text": "A recovery-capable checkpoint binds semantic run, physical attempt, subject, instructions, authority, completed and remaining work, artifacts, effects, descendants, evidence, findings, cleanup, budgets, and smallest next action."
+    },
+    {
+      "id": "RECOVERY.SAME_RUN",
+      "text": "Resume the same semantic run only while immutable subject, instructions, baseline, authority, criteria, context policy, and completion meaning remain unchanged; otherwise create a successor and preserve the predecessor."
+    },
+    {
+      "id": "RECOVERY.REPLACE",
+      "text": "Before replacement, terminate or epoch-fence the old attempt where supported and reconcile workspaces, effects, descendants, messages, candidates, evidence, findings, budgets, and cleanup."
+    },
+    {
+      "id": "RECOVERY.NO_BLIND_RETRY",
+      "text": "Do not blindly retry an ambiguous non-idempotent, irreversible, or externally consequential effect. Reconcile actual state or return for authority and direction."
+    }
+  ]
+}

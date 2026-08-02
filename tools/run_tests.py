@@ -20,12 +20,14 @@ from __future__ import annotations
 
 import argparse
 import codecs
+import concurrent.futures
 import os
 import re
 import signal
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import unittest
 from pathlib import Path
@@ -34,8 +36,9 @@ from typing import NamedTuple, Sequence, TextIO
 ROOT = Path(__file__).resolve().parents[1]
 TESTS = ROOT / "tests"
 RUN_COUNT_RE = re.compile(r"^Ran (\d+) tests? in ", re.MULTILINE)
-DEFAULT_SUITE_TIMEOUT = 900.0
+DEFAULT_SUITE_TIMEOUT = 300.0
 DEFAULT_HEARTBEAT_SECONDS = 15.0
+DEFAULT_PARALLEL_JOBS = 0
 ISSUE_HEADING_RE = re.compile(r"^(ERROR|FAIL): (.+)$")
 SUBPROCESS_OUTPUT_ENCODING = "utf-8"
 SUBPROCESS_OUTPUT_ERRORS = "backslashreplace"
@@ -61,6 +64,45 @@ class SuiteResult(NamedTuple):
     @property
     def passed(self) -> bool:
         return self.returncode == 0
+
+
+class SuiteProgressStream:
+    """Thread-safe sink exposing the latest visible child-test activity.
+
+    Parallel execution buffers complete suite output until completion so
+    tracebacks cannot interleave. This sink still lets heartbeat messages name
+    the test or operation currently visible in each running suite.
+    """
+
+    encoding = SUBPROCESS_OUTPUT_ENCODING
+    errors = SUBPROCESS_OUTPUT_ERRORS
+
+    def __init__(self, *, limit: int = 320) -> None:
+        self._lock = threading.Lock()
+        self._pending = ""
+        self._latest = ""
+        self._limit = max(80, int(limit))
+
+    def write(self, value: str) -> int:
+        text = str(value)
+        normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+        with self._lock:
+            combined = self._pending + normalized
+            parts = combined.split("\n")
+            self._pending = parts[-1]
+            for line in parts[:-1]:
+                if line.strip():
+                    self._latest = line.strip()[-self._limit :]
+            if self._pending.strip():
+                self._latest = self._pending.strip()[-self._limit :]
+        return len(text)
+
+    def flush(self) -> None:
+        return None
+
+    def snapshot(self) -> str:
+        with self._lock:
+            return self._latest
 
 
 def _stream_text(stream: TextIO, value: str) -> str:
@@ -240,12 +282,21 @@ def _terminate_process_tree(process: subprocess.Popen[bytes]) -> None:
     if process.poll() is not None:
         return
     if os.name == "nt":
-        subprocess.run(
-            ["taskkill", "/PID", str(process.pid), "/T", "/F"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            check=False,
-        )
+        try:
+            subprocess.run(
+                ["taskkill", "/PID", str(process.pid), "/T", "/F"],
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=False,
+                timeout=10,
+            )
+        except (OSError, subprocess.TimeoutExpired):
+            # A wedged taskkill must not wedge the verification runner too.
+            try:
+                process.kill()
+            except OSError:
+                pass
     else:
         try:
             os.killpg(process.pid, signal.SIGTERM)
@@ -258,8 +309,16 @@ def _terminate_process_tree(process: subprocess.Popen[bytes]) -> None:
     try:
         process.wait(timeout=5)
     except subprocess.TimeoutExpired:
-        process.kill()
-        process.wait()
+        try:
+            process.kill()
+        except OSError:
+            pass
+        try:
+            process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            # Preserve the bounded failure contract even if the OS refuses to
+            # reap a damaged process immediately.
+            pass
 
 
 def _remove_capture_file(path: Path, *, attempts: int = 20, delay: float = 0.05) -> None:
@@ -323,6 +382,7 @@ def execute_discovered(
             process = subprocess.Popen(
                 command,
                 cwd=ROOT,
+                stdin=subprocess.DEVNULL,
                 stdout=writer,
                 stderr=subprocess.STDOUT,
                 env=_subprocess_environment(),
@@ -364,7 +424,11 @@ def execute_discovered(
 
             if process.poll() is None:
                 _terminate_process_tree(process)
-            returncode = process.wait()
+            try:
+                returncode = process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                timed_out = True
+                returncode = 2
             if stream is None:
                 reader.seek(0)
                 output = reader.read().decode(
@@ -534,9 +598,32 @@ def run_test_files(
     stream: TextIO | None = None,
     suite_timeout: float = DEFAULT_SUITE_TIMEOUT,
     heartbeat_seconds: float = DEFAULT_HEARTBEAT_SECONDS,
+    jobs: int = 1,
 ) -> int:
     """Run each test module independently and aggregate exact pass/fail state."""
     target = stream if stream is not None else sys.stdout
+    resolved_jobs = min(
+        len(files),
+        max(1, (min(4, os.cpu_count() or 1) if jobs == 0 else jobs)),
+    )
+    # Fail-fast is only meaningful when suites are launched serially. Avoid
+    # starting work that the caller explicitly asked us not to run after the
+    # first failure.
+    if failfast:
+        resolved_jobs = 1
+
+    if resolved_jobs > 1:
+        return _run_test_files_parallel(
+            files,
+            quiet=quiet,
+            verbose=verbose,
+            buffer=buffer,
+            stream=target,
+            suite_timeout=suite_timeout,
+            heartbeat_seconds=heartbeat_seconds,
+            jobs=resolved_jobs,
+        )
+
     results: list[SuiteResult] = []
     total_started = time.monotonic()
     for index, path in enumerate(files, start=1):
@@ -580,6 +667,120 @@ def run_test_files(
     return exit_code
 
 
+def _run_test_files_parallel(
+    files: Sequence[Path],
+    *,
+    quiet: bool,
+    verbose: bool,
+    buffer: bool,
+    stream: TextIO,
+    suite_timeout: float,
+    heartbeat_seconds: float,
+    jobs: int,
+) -> int:
+    """Run independent unittest modules concurrently with deterministic roll-up.
+
+    Each module still executes in its own bounded process tree and capture file.
+    Only module-level scheduling is parallelized; individual test ordering and
+    isolation inside a module remain unchanged. Captured output is emitted as a
+    complete block when that module finishes, preventing interleaved tracebacks.
+    """
+    results_by_index: dict[int, SuiteResult] = {}
+    started_by_index: dict[int, float] = {}
+    progress_by_index: dict[int, SuiteProgressStream] = {}
+    total_started = time.monotonic()
+    _write_text(
+        stream,
+        f"Running {len(files)} unittest suites with {jobs} parallel workers.\n",
+        flush=True,
+    )
+    for index, path in enumerate(files, start=1):
+        _write_text(stream, f"==> [{index}/{len(files)}] {path.name} (queued)\n", flush=True)
+
+    def execute(index: int, path: Path) -> tuple[int, SuiteResult, float]:
+        started = time.monotonic()
+        result = execute_discovered(
+            path.name,
+            quiet=quiet,
+            verbose=verbose,
+            failfast=False,
+            buffer=buffer,
+            stream=progress_by_index[index],
+            timeout=suite_timeout,
+            heartbeat_seconds=0,
+        )
+        return index, result, time.monotonic() - started
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=jobs, thread_name_prefix="bbk-tests") as pool:
+        pending: dict[concurrent.futures.Future[tuple[int, SuiteResult, float]], tuple[int, Path]] = {}
+        for index, path in enumerate(files, start=1):
+            started_by_index[index] = time.monotonic()
+            progress_by_index[index] = SuiteProgressStream()
+            pending[pool.submit(execute, index, path)] = (index, path)
+
+        while pending:
+            timeout = heartbeat_seconds if heartbeat_seconds > 0 else None
+            done, _ = concurrent.futures.wait(
+                pending,
+                timeout=timeout,
+                return_when=concurrent.futures.FIRST_COMPLETED,
+            )
+            if not done:
+                elapsed = time.monotonic() - total_started
+                running = sorted(pending.values())
+                noun = "suite" if len(running) == 1 else "suites"
+                _write_text(
+                    stream,
+                    f"    ... {len(running)} {noun} still running after {elapsed:.0f}s",
+                )
+                if suite_timeout > 0:
+                    _write_text(stream, f" (hard timeout {suite_timeout:g}s)")
+                _write_text(stream, ":\n")
+                for index, path in running[:4]:
+                    current = progress_by_index[index].snapshot()
+                    detail = f" — {current}" if current else ""
+                    _write_text(stream, f"        {path.name}{detail}\n")
+                if len(running) > 4:
+                    _write_text(stream, f"        … and {len(running) - 4} more\n")
+                stream.flush()
+                continue
+
+            for future in sorted(done, key=lambda item: pending[item][0]):
+                index, path = pending.pop(future)
+                try:
+                    _, result, elapsed = future.result()
+                except BaseException as exc:  # pragma: no cover - defensive scheduler path
+                    issue = TestIssue("PROCESS ERROR", path.name, f"{type(exc).__name__}: {exc}")
+                    result = SuiteResult(path.name, 2, "", None, (issue,))
+                    elapsed = time.monotonic() - started_by_index[index]
+                results_by_index[index] = result
+                _write_text(stream, f"\n==> [{index}/{len(files)}] {path.name} output\n", flush=True)
+                _write_output(result.output, stream)
+                count_text = f", {result.tests_run} tests" if result.tests_run is not None else ""
+                _write_text(
+                    stream,
+                    f"<== [{index}/{len(files)}] {path.name}: "
+                    f"{'PASS' if result.passed else 'FAIL'} ({elapsed:.1f}s{count_text})\n",
+                    flush=True,
+                )
+
+    results = [results_by_index[index] for index in range(1, len(files) + 1)]
+    total_elapsed = time.monotonic() - total_started
+    _write_text(
+        stream,
+        f"Completed {len(results)}/{len(files)} unittest suites in {total_elapsed:.1f}s.\n",
+        flush=True,
+    )
+    exit_code = 1 if any(not result.passed for result in results) else 0
+    print_final_summary(
+        results,
+        expected_suites=len(files),
+        exit_code=exit_code,
+        stream=stream,
+    )
+    return exit_code
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     _configure_standard_stream(sys.stdout)
     _configure_standard_stream(sys.stderr)
@@ -608,13 +809,19 @@ def main(argv: Sequence[str] | None = None) -> int:
         "--suite-timeout",
         type=float,
         default=DEFAULT_SUITE_TIMEOUT,
-        help="maximum seconds for any one unittest module (0 disables; default: 900)",
+        help="maximum seconds for any one unittest module (0 disables; default: 300)",
     )
     parser.add_argument(
         "--heartbeat-seconds",
         type=float,
         default=DEFAULT_HEARTBEAT_SECONDS,
         help="emit a still-running notice after this many quiet seconds (0 disables; default: 15)",
+    )
+    parser.add_argument(
+        "--jobs",
+        type=int,
+        default=DEFAULT_PARALLEL_JOBS,
+        help="unittest modules to run concurrently; 0 selects up to four automatically (default: 0)",
     )
     args = parser.parse_args(argv)
     if args.verbose and args.quiet:
@@ -623,6 +830,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.error("--suite-timeout must be zero or positive")
     if args.heartbeat_seconds < 0:
         parser.error("--heartbeat-seconds must be zero or positive")
+    if args.jobs < 0:
+        parser.error("--jobs must be zero or positive")
     if args.all:
         if args.quiet or args.buffer or args.pattern != "test*.py" or args.heartbeat_seconds != DEFAULT_HEARTBEAT_SECONDS:
             parser.error("--all cannot be combined with --quiet, --buffer, --pattern, or --heartbeat-seconds")
@@ -632,6 +841,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             failfast=args.failfast,
             require_node=args.require_node,
             skip_package_manifest=args.skip_package_manifest,
+            jobs=args.jobs,
         )
     if args.require_node or args.skip_package_manifest:
         parser.error("--require-node and --skip-package-manifest require --all")
@@ -653,6 +863,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         buffer=args.buffer,
         suite_timeout=args.suite_timeout,
         heartbeat_seconds=args.heartbeat_seconds,
+        jobs=args.jobs,
     )
 
 

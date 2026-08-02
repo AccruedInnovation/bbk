@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-worker-orchestrator-result-v1.schema.json",
+  "title": "BBK BBK Worker Orchestrator result payload v1",
+  "description": "Closed role-specific `result` payload for `bbk_worker_orchestrator` returns.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "cohort_ref",
+    "territory_and_authority_ref",
+    "work_unit_and_batch_state",
+    "direct_workers_and_attempts",
+    "workspace_resource_and_schedule_state",
+    "authority_and_scope_fence_state",
+    "draft_reconciliation_and_integration_state",
+    "local_discovery_state",
+    "candidate_lineage",
+    "quality_gate_and_attestation_state",
+    "validation_and_finding_input_state",
+    "repair_and_revalidation_state",
+    "recovery_liveness_and_pause_state",
+    "cleanup_and_external_effect_state",
+    "claims_established_and_not_established",
+    "invalidated_or_superseded_refs",
+    "residuals_and_blockers",
+    "parent_actions_requested"
+  ],
+  "properties": {
+    "cohort_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Candidate-producing Worker cohort identity, revision and digest, including any governing `candidate-producing Worker cohort` reference; admitted WorkUnits and optional issues; downstream validation meaning; cohort-membership freeze state; completing and contributing assertions; integration obligations; LocalDiscoveryEnvelope; repair policy; and current invalidation state."
+    },
+    "territory_and_authority_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Exact operating and execution baseline identities and digests, root campaign, TerritoryExecutionBoundary and Territory Orchestrator parent, execution authorization and effective child fence, semantic run, current physical attempt, host session, lease and fencing state where exposed, and return route."
+    },
+    "work_unit_and_batch_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every admitted WorkUnit or issue with exact revision, purpose, dependency, invocation contract, owning Worker, eligibility, current result, integration responsibility, completing and contributing assertions, local discovery, invalidation and closure condition."
+    },
+    "direct_workers_and_attempts": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every current and historical Worker semantic run, physical attempt, host session, model and profile route, context and tool lock, workspace, continuation, expected silence, state, checkpoint, result, interruption, replacement and verified handoff."
+    },
+    "workspace_resource_and_schedule_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Cohort and Worker workspaces, candidate assembly point, bases, mutation owners, integration owner, shared-resource serialization, tools, environments, credentials, devices, services, databases, network and external targets, concurrency, budgets, waits, leases, fencing and host-enforcement limitations."
+    },
+    "authority_and_scope_fence_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Effective semantic, resource, workspace, mutation, credential, network, service, device, external-system and effect fences; source grants, child narrowing, safeguards, expiry, revocation, local-discovery permits, violations and unresolved ambiguity."
+    },
+    "draft_reconciliation_and_integration_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Current draft state, Worker outputs, exact changed-surface inventory, reconciliation and integration owner, merge or assembly operations, focused checks, unresolved collisions, causal or structural drift, temporary state and readiness for candidate freeze."
+    },
+    "local_discovery_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every ordinary implied item, proposed or permitted local discovery, envelope and budget use, authority, affected objects, Worker owner, candidate and validation impact, parent notification and rejected or deferred adjacent work."
+    },
+    "candidate_lineage": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every draft, frozen, failed, invalidated and successor candidate with identity, subject, source roots, base revisions, manifest path and digest, contributing WorkUnits and Workers, changed and deleted artifacts, local permits, structure or State-Decision-Effect references, external effects, producer run and supersession links."
+    },
+    "quality_gate_and_attestation_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Quality-gate manifest and digest, resolved DAG, applicability, commands, tools, environments, complete receipts and stream carriers, reuse basis, blocking results, exact candidate binding, worker-quality attestation, authority disclaimer, currentness, coverage gaps and validation eligibility."
+    },
+    "validation_and_finding_input_state": {
+      "anyOf": [
+        {
+          "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+          "description": "Any parent-routed candidate-bound validation result, assertion scope, immutable findings, evidence, aggregate disposition, infrastructure or context failures and exact repair route received after handoff; null with reason before validation or when the cohort has yielded and no repair package is active."
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Any parent-routed candidate-bound validation result, assertion scope, immutable findings, evidence, aggregate disposition, infrastructure or context failures and exact repair route received after handoff; null with reason before validation or when the cohort has yielded and no repair package is active."
+    },
+    "repair_and_revalidation_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Repair-cycle count, exact findings and candidate addressed, repair WorkUnit and Worker, unchanged or changed cohort assumptions, successor candidate and attestation, invalidated receipts, smallest revalidation scope, repeated-failure classification and escalation threshold."
+    },
+    "recovery_liveness_and_pause_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Cohort and direct-Worker lifecycle, liveness, useful progress, expected silence, dependency wait, capacity or host-window pause, suspicion, probes, checkpoints, replacement, fencing, continuation and unresolved recovery state."
+    },
+    "cleanup_and_external_effect_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Processes, packages, credentials, services, ports, locks, databases, caches, generated files, workspaces, devices, remote systems, publication, deployment, migration and other effects with pre-state, actual operations, receipts, cleanup, rollback, compensation, quarantine, residuals and owner."
+    },
+    "claims_established_and_not_established": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Exact claims supported by current Worker results, candidate identity and configured worker-quality evidence, plus material claims explicitly not established. Mechanical eligibility must not be represented as requirement, architecture, operational, outcome, acceptance or release proof."
+    },
+    "invalidated_or_superseded_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Prior Worker attempts, invocation instances, workspaces, candidate manifests, gate receipts, attestations, repair packages, handoffs or cohort reports invalidated, replaced, reopened or superseded, with exact cause and unaffected material retained."
+    },
+    "residuals_and_blockers": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Residual uncertainty, failed or unavailable gates, stale sources, invalid handoffs, workspace or ownership conflicts, technical, authority and decision blockers, dependency waits, capacity and host-window pauses, cleanup residuals, repeated-repair concerns and smallest valid resolution for each."
+    },
+    "parent_actions_requested": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Exact Territory Orchestrator action requested: continue, wait, bind runtime state, recompile a Worker invocation, qualify a profile or tool, assess candidate admission to validation, route repair, resolve integration, grant or withdraw authority, replan, create a successor cohort or baseline, recover, cancel or correctly stop."
+    }
+  },
+  "x-bbk-role": "bbk_worker_orchestrator",
+  "x-bbk-contract": "bbk.worker-orchestrator-return.v1",
+  "x-bbk-supplemental-enums": {}
+}

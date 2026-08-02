@@ -1,0 +1,107 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-model-routing-v2.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BBK Model Routing v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "package_version",
+    "description",
+    "roles"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "bbk.model-routing.v2"
+    },
+    "package_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "roles": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^bbk_[a-z][a-z0-9_]*$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/route"
+      }
+    }
+  },
+  "$defs": {
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "omp",
+        "codex",
+        "claude"
+      ],
+      "properties": {
+        "omp": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "model",
+            "thinkingLevel"
+          ],
+          "properties": {
+            "model": {
+              "type": "string",
+              "minLength": 1
+            },
+            "thinkingLevel": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "codex": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "model",
+            "model_reasoning_effort"
+          ],
+          "properties": {
+            "model": {
+              "type": "string",
+              "minLength": 1
+            },
+            "model_reasoning_effort": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "claude": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "model",
+            "effort"
+          ],
+          "properties": {
+            "model": {
+              "type": "string",
+              "minLength": 1
+            },
+            "effort": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

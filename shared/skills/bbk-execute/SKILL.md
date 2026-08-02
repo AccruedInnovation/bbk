@@ -59,7 +59,6 @@ Use these operational states for execution coordination:
 ```text
 COMPLETE
 PARTIAL
-READY_FOR_VALIDATION
 BLOCKED_TECHNICAL
 BLOCKED_AUTHORITY
 BLOCKED_DECISION
@@ -68,6 +67,8 @@ PAUSED_HOST_WINDOW
 CANCELLED
 INCONCLUSIVE
 ```
+
+Keep semantic readiness separate. `READY_FOR_PARENT_INTEGRATION` may describe a WorkUnit contribution in the role result, but it is not an operational disposition and does not freeze a candidate or authorize validation admission. Accept `READY_FOR_VALIDATION` only when consuming a legacy `bbk.handoff.v1` record.
 
 Only the three `BLOCKED_*` states affect the development disposition. Capacity and host-window pauses are scheduling or infrastructure states and preserve the current candidate/work-unit disposition.
 

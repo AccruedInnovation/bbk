@@ -1,0 +1,28 @@
+{
+  "schema_version": "bbk.prompt-module.v1",
+  "id": "bbk-prompt-delegation-return",
+  "title": "Delegation and child-return discipline",
+  "description": "Compile exact child edges and preserve parent integration ownership.",
+  "clauses": [
+    {
+      "id": "DELEGATION.ALLOWLIST",
+      "text": "Invoke only declared direct children and only when the role-specific trigger is satisfied. An allowlist is not an instruction to spawn every permitted child."
+    },
+    {
+      "id": "DELEGATION.CHARTER",
+      "text": "Bind each child to one exact subject, purpose, revision-bound context, authority, effects, capability zones, resources, assurance, stopping conditions, semantic parent, controller route, and return schema."
+    },
+    {
+      "id": "DELEGATION.LOGICAL_PHYSICAL",
+      "text": "Keep logical responsibility distinct from physical invocation. Co-location, continuation, sharding, retries, or several physical attempts do not erase role, evidence, or return boundaries."
+    },
+    {
+      "id": "DELEGATION.VALIDATE_RETURN",
+      "text": "Before integration, validate child subject and revision, freshness, provenance, delegated authority, effects, schema, evidence exposure, contradictions, blockers, and durable references."
+    },
+    {
+      "id": "DELEGATION.PARENT_INTEGRATION",
+      "text": "The parent owns acceptance, reconciliation, invalidation, retry or replacement, and integration of child work. Return nonconforming work to its owner rather than silently rewriting it."
+    }
+  ]
+}

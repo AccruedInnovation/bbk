@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-worker-result-v1.schema.json",
+  "title": "BBK BBK Worker result payload v1",
+  "description": "Closed role-specific `result` payload for `bbk_worker` returns.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "work_unit_ref",
+    "governing_sources_and_fixed_decisions",
+    "authority_and_capability_use",
+    "workspace_and_prestate",
+    "model_profile_tool_and_context",
+    "actions_and_commands",
+    "changed_artifacts",
+    "external_effects",
+    "checks_and_evidence",
+    "discoveries_and_deviations",
+    "parent_specific_contribution",
+    "cleanup_and_residuals",
+    "continuation_and_recovery",
+    "claims_established_and_not_established",
+    "blockers",
+    "durable_artifact_and_handoff",
+    "invalidation_and_supersession"
+  ],
+  "properties": {
+    "work_unit_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Exact WorkUnit identity, revision, digest, governed subject, supported outcome or experiment obligation, phase or slice references, predecessor or repair reference, currentness, and invalidation state."
+    },
+    "governing_sources_and_fixed_decisions": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Accepted outcome, requirement, architecture, interface, ImplementationStructureContract, ExecutionSlice, State–Decision–Effect, assurance, profile, tool, environment, discovery, cleanup, and completion references with identity, freshness, applicability, delegated freedom, and any contradiction exposed."
+    },
+    "authority_and_capability_use": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Authority source and holder; exact allowed and prohibited semantic, filesystem, VCS, process, package, credential, network, service, database, device, remote-system, publication, deployment, migration, and other effects; safeguards, expiry and revocation; actual effects used; denied or uncovered effects; and any violation or ambiguity."
+    },
+    "workspace_and_prestate": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Workspace root and base, readable and writable surfaces, mutation and integration owners, expected prior hashes or guards, shared-resource serialization, pre-state, rollback point, host lease or fencing evidence where exposed, and unresolved ownership limitations."
+    },
+    "model_profile_tool_and_context": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Effective provider and model, effort or thinking level, context manifest, task and domain profile locks, procedures and skills, tool identities and versions, environment activation, credentials or handles, endpoints, devices, services, fallbacks, qualification, and any mismatch or substitution attempt."
+    },
+    "actions_and_commands": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Chronological material actions and commands with working directory, inputs, tool and environment, start and end or interruption state, exit result, output carrier, cost or resource information where material, and whether each action was read-only, mutating, or externally effectful."
+    },
+    "changed_artifacts": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every created, changed, renamed, deleted, generated, vendored, executable, configuration, documentation, test, fixture, package, migration, integration, cleanup, or other artifact with exact path or locator, prior-state guard where material, final byte count and SHA-256 where material, purpose, owning WorkUnit, and retention or successor disposition."
+    },
+    "external_effects": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Processes, packages, credentials, services, ports, locks, databases, caches, networks, devices, remote systems, messages, publication, deployment, migration and other non-file effects with pre-state, actual operation, result, receipt, rollback or compensation, cleanup, residual state, and owner."
+    },
+    "checks_and_evidence": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Focused and completion checks with assertion or WorkUnit link, applicability, command or method, tool and version, environment and inputs, exit or observation state, complete output or evidence references, path/bytes/SHA-256 where material, limitations, skipped or unavailable status, and exact claims supported and not supported. No independent-validation claim is permitted."
+    },
+    "discoveries_and_deviations": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Ordinary implied work completed, proposed or permitted local discoveries, adjacent work, contract mismatches, material deviations, affected objects, parent notifications or permits, isolated work that continued, and any required recharter, authority, design, profile, tool, or environment action."
+    },
+    "parent_specific_contribution": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "For candidate production, the exact cohort contribution, changed surfaces, integration prerequisites, focused-check status, and readiness for parent reconciliation. For prototype support, the exact apparatus, condition, run, instrumentation, cleanup or other contribution while leaving hypothesis, criteria, run validity and interpretation to the Prototyper."
+    },
+    "cleanup_and_residuals": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "One allowed cleanup state plus temporary scaffolding, processes, packages, credentials, services, workspaces, devices, remote state, evidence retention, quarantine, residual owner, and any cleanup blocker or deferred obligation."
+    },
+    "continuation_and_recovery": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Completed and remaining steps, durable checkpoint identity and path, byte count and SHA-256, exact resume prerequisites, same-thread or replacement policy, prior-attempt state, interruption reason, duplicate-attempt risk, and smallest safe continuation action."
+    },
+    "claims_established_and_not_established": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Exact bounded claims supported by current Worker actions and self-check evidence, plus material claims explicitly not established. Worker execution must never be represented as independent validation, candidate acceptance, finding closure, experiment conclusion, outcome achievement, or release."
+    },
+    "blockers": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Typed technical, authority, decision, capacity, host-window, ownership, integrity, payload, context, profile, tool, environment, cleanup, recovery, or parent-direction blockers with evidence, affected scope, containment, and work that remains safe to continue."
+    },
+    "durable_artifact_and_handoff": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Structured Worker result and `bbk-handoff` references with schema, exact subject and revision, path, byte count, SHA-256, producer, attempt, creation time, verification status, discovery path for related artifacts, and compact inline summary."
+    },
+    "invalidation_and_supersession": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Changes that invalidate this result, checkpoint, check, evidence, artifact, authority, profile, tool, environment or continuation; predecessor and successor links; stale or superseded objects preserved; and unaffected material eligible for reuse."
+    }
+  },
+  "x-bbk-role": "bbk_worker",
+  "x-bbk-contract": "bbk.worker-return.v1",
+  "x-bbk-supplemental-enums": {
+    "cleanup_states": [
+      "CLEAN",
+      "ROLLED_BACK",
+      "QUARANTINED",
+      "RESIDUALS_RECORDED",
+      "CLEANUP_BLOCKED",
+      "NOT_APPLICABLE"
+    ]
+  }
+}

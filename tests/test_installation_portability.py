@@ -13,6 +13,7 @@ import io
 import json
 import unittest
 from pathlib import Path, PureWindowsPath
+from tests._cli_support import run_cli as test_run_cli
 m1_ROOT = Path(__file__).resolve().parents[1]
 
 def m1_load_module(name: str, relative_path: str):
@@ -300,7 +301,7 @@ class Alpha101EntrySetupTests(unittest.TestCase):
 
     def test_version_and_canonical_inputs_agree(self):
         version = (m4_ROOT / 'VERSION').read_text(encoding='utf-8').strip()
-        self.assertEqual(version, '0.1.0-alpha.11.12')
+        self.assertEqual(version, '0.1.0-alpha.13.1')
         self.assertEqual(json.loads((m4_ROOT / 'spec' / 'roles.json').read_text(encoding='utf-8'))['package_version'], version)
         self.assertEqual(json.loads((m4_ROOT / 'spec' / 'model-routing.json').read_text(encoding='utf-8'))['package_version'], version)
         self.assertEqual(json.loads((m4_ROOT / 'spec' / 'method-content.json').read_text(encoding='utf-8'))['version'], version)
@@ -313,24 +314,70 @@ class Alpha101EntrySetupTests(unittest.TestCase):
         self.assertIn('package-source placeholder', rendered)
         self.assertIn('No language or domain profile is managed', rendered)
 
-    def test_baseline_skill_is_an_entry_controller_without_recursive_rerouting(self):
+    def test_baseline_skill_is_the_harness_root_controller_without_recursive_rerouting(self):
         canonical = json.loads((m4_ROOT / 'spec' / 'method-content.json').read_text(encoding='utf-8'))['skills']['bbk']
         rendered = (m4_ROOT / 'shared' / 'skills' / 'bbk' / 'SKILL.md').read_text(encoding='utf-8')
         self.assertEqual(canonical, rendered)
-        self.assertEqual(rendered.count('# BBK entry controller'), 1)
-        self.assertEqual(rendered.count('## Enter the role system'), 1)
-        for value in ('primary user-facing session', 'bbk_root_wayfinder', 'bbk_root_orchestrator', 'bbk_reviewer', 'bbk_validator_orchestrator', 'Invoke the named agent', 'do not perform entry routing'):
+        self.assertEqual(rendered.count('# BBK harness-root controller'), 1)
+        self.assertEqual(rendered.count('## Select one canonical root'), 1)
+        for value in ('visible top-level harness session', 'bbk_root_wayfinder', 'bbk_root_orchestrator', 'bbk_reviewer', 'bbk_validator_orchestrator', 'Invoke the named canonical agent', 'must not perform, abbreviate, or imitate'):
             self.assertIn(value, rendered)
-        self.assertIn('baseline is invalid', rendered)
+        self.assertIn('material baseline defect', rendered)
         roles = json.loads((m4_ROOT / 'spec' / 'roles.json').read_text(encoding='utf-8'))
-        self.assertTrue(all('bbk' not in role['autoload_skills'] for role in roles['roles']))
+        self.assertTrue(all('bbk' not in role['mandatory_skills'] for role in roles['roles']))
+        self.assertFalse(roles['interaction_topology']['canonical_roles_user_facing'])
 
     @unittest.skipUnless(shutil.which('node'), 'Node.js is required for OMP extension behavior')
     def test_omp_bbk_command_enters_persistent_mode_and_keeps_status_command(self):
         with tempfile.TemporaryDirectory() as temp:
             script = Path(temp) / 'omp-entrypoint.mjs'
-            script.write_text(textwrap.dedent(f"\n                const chain = () => ({{ optional() {{ return this; }} }});\n                const z = {{ object: value => value, string: chain, boolean: chain,\n                  enum: values => chain(), array: value => chain() }};\n                const tools = [], commands = new Map(), messages = [], handlers = new Map(), entries = [], statuses = [];\n                const branch = [];\n                const pi = {{ zod: {{ z }}, setLabel() {{}},\n                  registerTool(value) {{ tools.push(value); }},\n                  registerCommand(name, value) {{ commands.set(name, value); }},\n                  on(name, value) {{ if (!handlers.has(name)) handlers.set(name, []); handlers.get(name).push(value); }},\n                  appendEntry(customType, data) {{ entries.push([customType, data]); branch.push({{type:'custom', customType, data}}); }},\n                  async sendUserMessage(value, options) {{ messages.push([value, options || null]); }}\n                }};\n                const ctx = {{\n                  cwd: {json.dumps(str(m4_ROOT))}, isIdle() {{ return true; }},\n                  sessionManager: {{ getBranch() {{ return branch; }} }},\n                  ui: {{ notify() {{}}, setStatus(key, value) {{ statuses.push([key, value ?? null]); }} }}\n                }};\n                const mod = await import({json.dumps((m4_ROOT / 'omp' / 'extension' / 'index.js').as_uri())});\n                mod.default(pi);\n                if (commands.size !== 27) throw new Error(`commands=${{commands.size}}`);\n                if (!commands.has('bbk') || !commands.has('bbk:status') || !commands.has('bbk:exit')) throw new Error('missing BBK commands');\n                const entered = await commands.get('bbk').handler('', ctx);\n                if (entered !== undefined) throw new Error(`unexpected command payload: ${{JSON.stringify(entered)}}`);\n                if (messages.length !== 0) throw new Error(`no-argument /bbk started a model turn`);\n                if (entries.length !== 1 || entries[0][1].enabled !== true) throw new Error('mode was not persisted');\n                const before = handlers.get('before_agent_start')?.[0];\n                if (!before) throw new Error('missing before_agent_start');\n                const overlay = await before({{systemPrompt:['base']}}, ctx);\n                const joined = overlay.systemPrompt.join(String.fromCharCode(10));\n                for (const expected of ['<bbk-session-mode>', 'bbk_root_wayfinder', 'bbk_root_orchestrator',\n                  'bbk_reviewer', 'bbk_validator_orchestrator', '/bbk:exit']) {{\n                  if (!joined.includes(expected)) throw new Error(`missing ${{expected}}`);\n                }}\n                await commands.get('bbk').handler('Implement the accepted baseline', ctx);\n                if (messages.length !== 1 || messages[0][0] !== 'Implement the accepted baseline') throw new Error('request was not forwarded verbatim');\n                if (messages[0][0].includes('bbk_root_wayfinder')) throw new Error('mode prompt leaked into user message');\n                console.log(JSON.stringify({{commands: commands.size, messages: messages.length, entries: entries.length, overlayLength: joined.length}}));\n            "), encoding='utf-8')
-            result = subprocess.run([shutil.which('node') or 'node', script], cwd=m4_ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8', errors='replace', check=False)
+            script.write_text(textwrap.dedent(f'''\
+                const chain = () => ({{ optional() {{ return this; }} }});
+                const z = {{ object: value => value, string: chain, boolean: chain,
+                  enum: values => chain(), array: value => chain() }};
+                const tools = [], commands = new Map(), messages = [], handlers = new Map(), entries = [], statuses = [];
+                const branch = [];
+                const pi = {{ zod: {{ z }}, setLabel() {{}},
+                  registerTool(value) {{ tools.push(value); }},
+                  registerCommand(name, value) {{ commands.set(name, value); }},
+                  on(name, value) {{ if (!handlers.has(name)) handlers.set(name, []); handlers.get(name).push(value); }},
+                  appendEntry(customType, data) {{ entries.push([customType, data]); branch.push({{type:'custom', customType, data}}); }},
+                  async sendUserMessage(value, options) {{ messages.push([value, options || null]); }}
+                }};
+                const ctx = {{
+                  cwd: {json.dumps(str(m4_ROOT))}, isIdle() {{ return true; }},
+                  sessionManager: {{ getBranch() {{ return branch; }} }},
+                  ui: {{ notify() {{}}, setStatus(key, value) {{ statuses.push([key, value ?? null]); }} }}
+                }};
+                const mod = await import({json.dumps((m4_ROOT / 'omp' / 'extension' / 'index.js').as_uri())});
+                mod.default(pi);
+                if (commands.size !== 27) throw new Error(`commands=${{commands.size}}`);
+                if (!commands.has('bbk') || !commands.has('bbk:status') || !commands.has('bbk:exit')) throw new Error('missing BBK commands');
+                const entered = await commands.get('bbk').handler('', ctx);
+                if (entered !== undefined) throw new Error(`unexpected command payload: ${{JSON.stringify(entered)}}`);
+                if (messages.length !== 0) throw new Error(`no-argument /bbk started a model turn`);
+                if (entries.length !== 1 || entries[0][1].enabled !== true) throw new Error('mode was not persisted');
+                const before = handlers.get('before_agent_start')?.[0];
+                if (!before) throw new Error('missing before_agent_start');
+                const replacement = await before({{systemPrompt:[
+                  'OMP DEFAULT NEVER outsource the top-level plan',
+                  'C:/Users/Tombstone/.codex/AGENTS.md spawn_agent one-liner solutions'
+                ]}}, ctx);
+                const joined = replacement.systemPrompt.join(String.fromCharCode(10));
+                for (const expected of ['<bbk-controller-system ', 'bbk_root_wayfinder', 'bbk_root_orchestrator',
+                  'bbk_reviewer', 'bbk_validator_orchestrator', '/bbk:exit', '<bbk-inlined-skill name="bbk"',
+                  '<bbk-inlined-skill name="bbk-context-routing"', '`task`', '`hub`/IRC', 'Main']) {{
+                  if (!joined.includes(expected)) throw new Error(`missing ${{expected}}`);
+                }}
+                for (const excluded of ['OMP DEFAULT', '.codex/AGENTS.md', 'one-liner solutions']) {{
+                  if (joined.includes(excluded)) throw new Error(`retained ${{excluded}}`);
+                }}
+                await commands.get('bbk').handler('Implement the accepted baseline', ctx);
+                if (messages.length !== 1 || messages[0][0] !== 'Implement the accepted baseline') throw new Error('request was not forwarded verbatim');
+                if (messages[0][0].includes('bbk_root_wayfinder')) throw new Error('mode prompt leaked into user message');
+                console.log(JSON.stringify({{commands: commands.size, messages: messages.length, entries: entries.length, replacementLength: joined.length}}));
+            '''), encoding='utf-8')
+            result = subprocess.run([shutil.which('node') or 'node', script], cwd=m4_ROOT, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8', errors='replace', check=False, timeout=30)
             self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
             value = json.loads(result.stdout)
             self.assertEqual(value['commands'], 27)
@@ -348,7 +395,12 @@ class Alpha101EntrySetupTests(unittest.TestCase):
         with mock.patch.dict(sys.modules, {'verify_all': fake}):
             result = run_tests.main(['--all', '--failfast', '--require-node'])
         self.assertEqual(result, 7)
-        self.assertEqual(calls, [{'failfast': True, 'require_node': True, 'skip_package_manifest': False}])
+        self.assertEqual(calls, [{
+            'failfast': True,
+            'require_node': True,
+            'skip_package_manifest': False,
+            'jobs': 0,
+        }])
         files = run_tests.matching_test_files('test*.py')
         self.assertEqual(files, sorted(files))
 
@@ -361,17 +413,49 @@ class Alpha101EntrySetupTests(unittest.TestCase):
         self.assertIn('Method-content projection drift', names)
         self.assertIn('Agent projection drift', names)
         self.assertIn('Python compilation and JSON parsing', names)
+        # The Alpha.8 validator remains a supported standalone maintainer tool,
+        # but its complete typed-dispatch corpus is already exercised by
+        # Alpha8ProfileDispatchTests. Do not execute the same expensive profile
+        # subprocess matrix twice during full qualification.
+        self.assertNotIn('Alpha.8 typed-profile fixtures', names)
         self.assertIn('All unittest suites', names)
         self.assertIn('OMP extension JavaScript syntax', names)
         self.assertEqual(names[-1], 'Package manifest integrity (post-test mutation check)')
         unittest_step = next((step for step in steps if step.name == 'All unittest suites'))
-        self.assertEqual(unittest_step.command[-1], '-v')
+        self.assertIn('-v', unittest_step.command)
+        self.assertIn('--jobs', unittest_step.command)
+
+    def test_selective_update_profiles_keep_trust_checks_but_skip_unrelated_suites(self):
+        with mock.patch.object(verify_all.shutil, 'which', return_value='node'):
+            omp_steps = verify_all.verification_steps(profile='omp', require_node=True)
+            codex_steps = verify_all.verification_steps(profile='codex')
+
+        omp_names = [step.name for step in omp_steps]
+        codex_names = [step.name for step in codex_steps]
+        for names in (omp_names, codex_names):
+            self.assertEqual(names[0], 'Package manifest integrity (pre-execution trust gate)')
+            self.assertIn('Method-content projection drift', names)
+            self.assertIn('Role-specification projection drift', names)
+            self.assertIn('Model-routing policy', names)
+            self.assertIn('Agent projection drift', names)
+            self.assertIn('Python compilation and JSON parsing', names)
+            self.assertEqual(names[-1], 'Package manifest integrity (post-test mutation check)')
+            self.assertNotIn('Alpha.7 semantic fixtures', names)
+            self.assertNotIn('Alpha.8 typed-profile fixtures', names)
+            self.assertNotIn('All unittest suites', names)
+
+        self.assertIn('OMP-focused unittest suite', omp_names)
+        self.assertIn('OMP extension JavaScript syntax', omp_names)
+        self.assertNotIn('Codex-focused unittest selection', omp_names)
+        self.assertIn('Codex-focused unittest selection', codex_names)
+        self.assertNotIn('OMP extension JavaScript syntax', codex_names)
+        self.assertNotIn('OMP-focused unittest suite', codex_names)
 
     def test_setup_exposes_requested_test_and_install_flags(self):
         parser = setup_tool.build_parser()
         test = parser.parse_args(['--test'])
         self.assertTrue(test.test)
-        combined = parser.parse_args(['--test-and-install', '--scope', 'project', '--root', '/tmp/project', '--omp', '--language-profiles', 'profiles.zip', '--profile-id', 'rust'])
+        combined = parser.parse_args(['--test-and-install', '--scope', 'project', '--root', '/tmp/project', '--omp', '--language-profiles', 'profiles.zip', '--profile-id', 'rust', '--uninstall-existing'])
         self.assertTrue(combined.test_and_install)
         values = setup_tool.install_arguments(combined)
         self.assertIn('--verify', values)
@@ -379,6 +463,7 @@ class Alpha101EntrySetupTests(unittest.TestCase):
         self.assertIn('profiles.zip', values)
         self.assertIn('--profile-id', values)
         self.assertIn('rust', values)
+        self.assertIn('--uninstall-existing', values)
 
     def test_profile_zip_extraction_rejects_traversal_and_symlinks(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -439,6 +524,266 @@ class Alpha101EntrySetupTests(unittest.TestCase):
         self.assertEqual(args.language_profiles, ['profiles.zip'])
         self.assertEqual(args.profile_id, ['python'])
 
+    def test_existing_install_prompt_defaults_to_clean_replacement_but_automation_is_explicit(self):
+        class InteractiveInput(io.StringIO):
+            def isatty(self) -> bool:
+                return True
+
+        existing = {
+            'version': '0.1.0-alpha.12.1',
+            'harnesses': ['omp', 'codex'],
+            'file_count': 123,
+            'manifest_path': Path('/tmp/install-manifest.json'),
+        }
+        parser = install_tool.build_parser()
+
+        interactive = parser.parse_args(['install', '--scope', 'user', '--omp', '--no-language-profiles'])
+
+        class LineMediatedOutput:
+            """Expose only newline-terminated writes, like Windows PowerShell may."""
+
+            encoding = 'utf-8'
+
+            def __init__(self) -> None:
+                self.pending = ''
+                self.visible = ''
+
+            def write(self, value: str) -> int:
+                self.pending += value
+                while '\n' in self.pending:
+                    line, self.pending = self.pending.split('\n', 1)
+                    self.visible += line + '\n'
+                return len(value)
+
+            def flush(self) -> None:
+                return None
+
+        line_output = LineMediatedOutput()
+
+        class PromptCheckingInput(InteractiveInput):
+            def readline(self, *args, **kwargs):
+                self_test.assertIn(
+                    'Clean-replace the selected omp harness now? [Y/n]\n',
+                    line_output.visible,
+                    'interactive prompt must be visible through a line-oriented host before input is read',
+                )
+                return super().readline(*args, **kwargs)
+
+        self_test = self
+        with mock.patch.object(install_tool.sys, 'stdin', PromptCheckingInput('\n')), mock.patch.object(install_tool.sys, 'stdout', line_output):
+            self.assertEqual(install_tool.choose_existing_install_action(interactive, existing), 'replace')
+        self.assertEqual(line_output.pending, '')
+
+        decline_output = io.StringIO()
+        with mock.patch.object(install_tool.sys, 'stdin', InteractiveInput('n\n')), mock.patch.object(install_tool.sys, 'stdout', decline_output):
+            self.assertEqual(install_tool.choose_existing_install_action(interactive, existing), 'keep')
+        self.assertTrue(decline_output.getvalue().endswith('[Y/n]\n'))
+
+        full_existing = dict(existing, harnesses=['omp'])
+        full_output = io.StringIO()
+        with mock.patch.object(install_tool.sys, 'stdin', InteractiveInput('\n')), mock.patch.object(install_tool.sys, 'stdout', full_output):
+            self.assertEqual(install_tool.choose_existing_install_action(interactive, full_existing), 'replace')
+        self.assertIn('A full clean replacement removes every manifest-owned BBK file', full_output.getvalue())
+        self.assertTrue(full_output.getvalue().endswith('Uninstall the existing BBK installation first? [Y/n]\n'))
+
+        unsupported = parser.parse_args(['install', '--scope', 'user', '--claude', '--no-language-profiles'])
+        with mock.patch.object(install_tool.sys, 'stdin', InteractiveInput('\n')), mock.patch.object(install_tool.sys, 'stdout', io.StringIO()):
+            with self.assertRaises(install_tool.InstallError):
+                install_tool.choose_existing_install_action(unsupported, existing)
+
+        json_args = parser.parse_args(['--json', 'install', '--scope', 'user', '--omp', '--no-language-profiles'])
+        self.assertEqual(install_tool.choose_existing_install_action(json_args, existing), 'keep')
+        dry_args = parser.parse_args(['install', '--scope', 'user', '--omp', '--no-language-profiles', '--dry-run'])
+        self.assertEqual(install_tool.choose_existing_install_action(dry_args, existing), 'keep')
+        replace_args = parser.parse_args(['install', '--scope', 'user', '--omp', '--no-language-profiles', '--uninstall-existing'])
+        self.assertEqual(install_tool.choose_existing_install_action(replace_args, existing), 'replace')
+        keep_args = parser.parse_args(['install', '--scope', 'user', '--omp', '--no-language-profiles', '--keep-existing'])
+        self.assertEqual(install_tool.choose_existing_install_action(keep_args, existing), 'keep')
+
+    def test_clean_replacement_preserves_unowned_omp_extension_files(self):
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            home = base / 'home'
+            home.mkdir()
+            env = os.environ.copy()
+            env.update({
+                'BBK_HOME': str(home),
+                'HOME': str(home),
+                'BBK_INSTALL_ROOT': str(base / 'data'),
+                'BBK_BIN_DIR': str(base / 'bin'),
+            })
+            base_command = [
+                sys.executable,
+                str(m4_ROOT / 'tools' / 'install.py'),
+                '--json',
+                'install',
+                '--scope', 'user',
+                '--omp',
+                '--no-language-profiles',
+            ]
+            first = test_run_cli(base_command, cwd=m4_ROOT, env=env, check=False, timeout=120)
+            self.assertEqual(first.returncode, 0, first.stderr or first.stdout)
+            first_value = json.loads(first.stdout)
+            self.assertFalse(first_value['preexisting_install']['detected'])
+
+            custom = home / '.omp' / 'agent' / 'extensions' / 'bbk' / 'custom-model-profile.json'
+            custom.write_text('{"ownedBy":"user"}\n', encoding='utf-8')
+
+            second = test_run_cli([*base_command, '--uninstall-existing'], cwd=m4_ROOT, env=env, check=False, timeout=120)
+            self.assertEqual(second.returncode, 0, second.stderr or second.stdout)
+            value = json.loads(second.stdout)
+            replacement = value['preexisting_install']
+            self.assertTrue(replacement['detected'])
+            self.assertEqual(replacement['decision'], 'replace')
+            self.assertTrue(replacement['uninstalled'])
+            self.assertEqual(replacement['previous_version'], (m4_ROOT / 'VERSION').read_text(encoding='utf-8').strip())
+            self.assertGreater(replacement['removed_count'], 0)
+            self.assertTrue(custom.is_file())
+            self.assertEqual(custom.read_text(encoding='utf-8'), '{"ownedBy":"user"}\n')
+
+            removed = test_run_cli(
+                [sys.executable, str(m4_ROOT / 'tools' / 'install.py'), '--json', 'uninstall', '--scope', 'user'],
+                cwd=m4_ROOT, env=env, check=False, timeout=120,
+            )
+            self.assertEqual(removed.returncode, 0, removed.stderr or removed.stdout)
+            self.assertTrue(custom.is_file())
+
+    def test_omp_scoped_clean_replacement_preserves_codex_and_unowned_files(self):
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            home = base / 'home'
+            home.mkdir()
+            env = os.environ.copy()
+            env.update({
+                'BBK_HOME': str(home),
+                'HOME': str(home),
+                'BBK_INSTALL_ROOT': str(base / 'data'),
+                'BBK_BIN_DIR': str(base / 'bin'),
+            })
+            install_cmd = [
+                sys.executable, str(m4_ROOT / 'tools' / 'install.py'), '--json', 'install',
+                '--scope', 'user', '--omp', '--codex', '--no-language-profiles',
+            ]
+            first = test_run_cli(
+                install_cmd, cwd=m4_ROOT, env=env, check=False, timeout=180,
+            )
+            self.assertEqual(first.returncode, 0, first.stderr or first.stdout)
+            installed = json.loads(first.stdout)
+            manifest_path = Path(installed['manifest_path'])
+            manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+
+            codex_root = home / '.codex' / 'agents'
+            codex_before = {
+                path.name: hashlib.sha256(path.read_bytes()).hexdigest()
+                for path in sorted(codex_root.glob('bbk_*.toml'))
+            }
+            stale = home / '.omp' / 'agent' / 'agents' / 'bbk_obsolete.md'
+            stale.write_text('obsolete managed OMP agent\n', encoding='utf-8')
+            manifest['files'].append({
+                'path': install_tool.json_path(stale),
+                'sha256': hashlib.sha256(stale.read_bytes()).hexdigest(),
+                'action': 'create',
+                'source': 'test:stale-omp-agent',
+                'backup': None,
+                'executable': False,
+            })
+            manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
+            custom = home / '.omp' / 'agent' / 'extensions' / 'bbk' / 'custom-model-profile.json'
+            custom.write_text('{"ownedBy":"user"}\n', encoding='utf-8')
+
+            second = test_run_cli(
+                [sys.executable, str(m4_ROOT / 'tools' / 'install.py'), '--json', 'install',
+                 '--scope', 'user', '--omp', '--uninstall-existing'],
+                cwd=m4_ROOT, env=env, check=False, timeout=180,
+            )
+            self.assertEqual(second.returncode, 0, second.stderr or second.stdout)
+            value = json.loads(second.stdout)
+            self.assertEqual(value['preexisting_install']['decision'], 'replace-selected')
+            self.assertEqual(value['preexisting_install']['selected_harnesses'], ['omp'])
+            self.assertEqual(value['preexisting_install']['preserved_harnesses'], ['codex'])
+            self.assertFalse(value['preexisting_install']['full_install_uninstalled'])
+            self.assertGreaterEqual(value['preexisting_install']['removed_stale_count'], 1)
+            self.assertTrue(value['omp'])
+            self.assertTrue(value['codex'])
+            self.assertFalse(stale.exists())
+            self.assertTrue(custom.is_file())
+            codex_after = {
+                path.name: hashlib.sha256(path.read_bytes()).hexdigest()
+                for path in sorted(codex_root.glob('bbk_*.toml'))
+            }
+            self.assertEqual(codex_before, codex_after)
+            final_manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+            final_paths = {install_tool.portable_path_key(item['path']) for item in final_manifest['files']}
+            self.assertNotIn(install_tool.portable_path_key(stale), final_paths)
+
+    def test_codex_scoped_clean_replacement_preserves_omp_and_unowned_files(self):
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            home = base / 'home'
+            home.mkdir()
+            env = os.environ.copy()
+            env.update({
+                'BBK_HOME': str(home),
+                'HOME': str(home),
+                'BBK_INSTALL_ROOT': str(base / 'data'),
+                'BBK_BIN_DIR': str(base / 'bin'),
+            })
+            install_cmd = [
+                sys.executable, str(m4_ROOT / 'tools' / 'install.py'), '--json', 'install',
+                '--scope', 'user', '--omp', '--codex', '--no-language-profiles',
+            ]
+            first = test_run_cli(
+                install_cmd, cwd=m4_ROOT, env=env, check=False, timeout=180,
+            )
+            self.assertEqual(first.returncode, 0, first.stderr or first.stdout)
+            installed = json.loads(first.stdout)
+            manifest_path = Path(installed['manifest_path'])
+            manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+
+            omp_root = home / '.omp'
+            omp_before = {
+                path.relative_to(omp_root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+                for path in sorted(omp_root.rglob('*')) if path.is_file()
+            }
+            stale = home / '.codex' / 'agents' / 'bbk_obsolete.toml'
+            stale.write_text('name = "bbk_obsolete"\n', encoding='utf-8')
+            manifest['files'].append({
+                'path': install_tool.json_path(stale),
+                'sha256': hashlib.sha256(stale.read_bytes()).hexdigest(),
+                'action': 'create',
+                'source': 'test:stale-codex-agent',
+                'backup': None,
+                'executable': False,
+            })
+            manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
+            custom = home / '.codex' / 'agents' / 'custom-user-agent.toml'
+            custom.write_text('name = "custom_user_agent"\n', encoding='utf-8')
+
+            second = test_run_cli(
+                [sys.executable, str(m4_ROOT / 'tools' / 'install.py'), '--json', 'install',
+                 '--scope', 'user', '--codex', '--uninstall-existing'],
+                cwd=m4_ROOT, env=env, check=False, timeout=180,
+            )
+            self.assertEqual(second.returncode, 0, second.stderr or second.stdout)
+            value = json.loads(second.stdout)
+            self.assertEqual(value['preexisting_install']['decision'], 'replace-selected')
+            self.assertEqual(value['preexisting_install']['selected_harnesses'], ['codex'])
+            self.assertEqual(value['preexisting_install']['preserved_harnesses'], ['omp'])
+            self.assertFalse(value['preexisting_install']['full_install_uninstalled'])
+            self.assertGreaterEqual(value['preexisting_install']['removed_stale_count'], 1)
+            self.assertTrue(value['omp'])
+            self.assertTrue(value['codex'])
+            self.assertFalse(stale.exists())
+            self.assertTrue(custom.is_file())
+            omp_after = {
+                path.relative_to(omp_root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+                for path in sorted(omp_root.rglob('*')) if path.is_file()
+            }
+            self.assertEqual(omp_before, omp_after)
+            final_manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+            final_paths = {install_tool.portable_path_key(item['path']) for item in final_manifest['files']}
+            self.assertNotIn(install_tool.portable_path_key(stale), final_paths)
+
     def test_profile_bundle_installs_with_core_in_one_manifest_and_uninstalls(self):
         with tempfile.TemporaryDirectory() as temp:
             base = Path(temp)
@@ -446,7 +791,7 @@ class Alpha101EntrySetupTests(unittest.TestCase):
             env = os.environ.copy()
             env.update({'BBK_HOME': str(base / 'home'), 'BBK_INSTALL_ROOT': str(base / 'data'), 'BBK_BIN_DIR': str(base / 'bin')})
             command = [sys.executable, str(m4_ROOT / 'tools' / 'install.py'), '--json', 'install', '--scope', 'user', '--codex', '--omp', '--language-profiles', str(bundle)]
-            dry = subprocess.run([*command, '--dry-run'], cwd=m4_ROOT, env=env, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8', errors='replace')
+            dry = test_run_cli([*command, '--dry-run'], cwd=m4_ROOT, env=env, check=False, timeout=120)
             self.assertEqual(dry.returncode, 0, dry.stderr or dry.stdout)
             dry_value = json.loads(dry.stdout)
             self.assertEqual([item['id'] for item in dry_value['language_profiles']], ['sample'])
@@ -456,7 +801,7 @@ class Alpha101EntrySetupTests(unittest.TestCase):
             self.assertFalse(Path(dry_value['manifest_path']).exists())
             self.assertTrue(any((str(item.get('source', '')).startswith('profile:sample@') for item in dry_value['files'])))
             self.assertTrue(any((item.get('source') == 'generated:installed-profile-registry-skill' for item in dry_value['files'])))
-            installed = subprocess.run(command, cwd=m4_ROOT, env=env, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8', errors='replace')
+            installed = test_run_cli(command, cwd=m4_ROOT, env=env, check=False, timeout=120)
             self.assertEqual(installed.returncode, 0, installed.stderr or installed.stdout)
             value = json.loads(installed.stdout)
             self.assertEqual(value['schema'], 'bbk.install-manifest.v1')
@@ -489,13 +834,13 @@ class Alpha101EntrySetupTests(unittest.TestCase):
             self.assertEqual(effective_profiles['profiles'][0]['skills'][0]['kind'], 'router')
             self.assertEqual(value['language_profile_registry']['profile_count'], 1)
             self.assertEqual(value['language_profile_registry']['skill'], 'bbk-installed-profiles')
-            status = subprocess.run([sys.executable, str(m4_ROOT / 'tools' / 'install.py'), '--json', 'status', '--scope', 'user'], cwd=m4_ROOT, env=env, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8', errors='replace')
+            status = test_run_cli([sys.executable, str(m4_ROOT / 'tools' / 'install.py'), '--json', 'status', '--scope', 'user'], cwd=m4_ROOT, env=env, check=False, timeout=120)
             self.assertEqual(status.returncode, 0, status.stderr or status.stdout)
             status_value = json.loads(status.stdout)
             self.assertEqual(status_value['summary'].get('current'), len(status_value['files']))
             self.assertEqual([item['id'] for item in status_value['language_profiles']], ['sample'])
             self.assertEqual(status_value['language_profile_registry']['profile_count'], 1)
-            removed = subprocess.run([sys.executable, str(m4_ROOT / 'tools' / 'install.py'), '--json', 'uninstall', '--scope', 'user'], cwd=m4_ROOT, env=env, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8', errors='replace')
+            removed = test_run_cli([sys.executable, str(m4_ROOT / 'tools' / 'install.py'), '--json', 'uninstall', '--scope', 'user'], cwd=m4_ROOT, env=env, check=False, timeout=120)
             self.assertEqual(removed.returncode, 0, removed.stderr or removed.stdout)
             self.assertFalse((base / 'data' / 'install-manifest.json').exists())
             self.assertFalse((base / 'home' / '.agents' / 'skills' / 'sample' / 'SKILL.md').exists())
@@ -586,7 +931,7 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
         cls._prepared_temp.cleanup()
 
     def test_current_successor_is_repository_native_and_self_contained(self):
-        self.assertEqual((m5_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.11.12')
+        self.assertEqual((m5_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.13.1')
         self.assertTrue((m5_ROOT / 'docs' / 'README.md').is_file())
         self.assertTrue((m5_ROOT / 'docs' / 'DEVELOPMENT.md').is_file())
         self.assertTrue((m5_ROOT / 'bundled-language-profiles' / 'packages').is_dir())
@@ -666,7 +1011,7 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         self.assertFalse(module.version_supports_structure_contract('0.1.0-alpha.3'))
-        for version in ('0.1.0-alpha.4', '0.1.0-alpha.8', '0.1.0-alpha.11.11', '0.1.0-alpha.11.12', '0.1.0', '0.2.0-alpha.1'):
+        for version in ('0.1.0-alpha.4', '0.1.0-alpha.8', '0.1.0-alpha.11.11', '0.1.0-alpha.11.12', '0.1.0-alpha.12', '0.1.0-alpha.12.2', '0.1.0-alpha.12.4', '0.1.0-alpha.13', '0.1.0-alpha.13.1', '0.1.0', '0.2.0-alpha.1'):
             with self.subTest(version=version):
                 self.assertTrue(module.version_supports_structure_contract(version))
         gates = json.loads((item.root / 'gates' / 'python-gates.json').read_text(encoding='utf-8'))
@@ -759,7 +1104,7 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
 
     def test_current_documentation_states_the_default_and_single_archive_contract(self):
         combined = '\n'.join(((m5_ROOT / relative).read_text(encoding='utf-8') for relative in ('README.md', 'docs/INSTALL.md', 'docs/LANGUAGE-PROFILES.md', 'RELEASE-NOTES.md')))
-        for expected in ('0.1.0-alpha.11.12', 'installed by default', '--no-language-profiles', '--profile-id', 'bundled-language-profiles', 'TypeScript/JavaScript'):
+        for expected in ('0.1.0-alpha.13.1', 'installed by default', '--no-language-profiles', '--profile-id', 'bundled-language-profiles', 'TypeScript/JavaScript'):
             self.assertIn(expected, combined)
 
 # ---------------------------------------------------------------------------
@@ -782,7 +1127,7 @@ class Alpha112WindowsUtf8Tests(unittest.TestCase):
 
     def test_current_version_and_utf8_canonical_input_are_read_explicitly(self):
         version = (m6_ROOT / 'VERSION').read_text(encoding='utf-8').strip()
-        self.assertEqual(version, '0.1.0-alpha.11.12')
+        self.assertEqual(version, '0.1.0-alpha.13.1')
         method_content = json.loads((m6_ROOT / 'spec' / 'method-content.json').read_text(encoding='utf-8'))
         self.assertEqual(method_content['version'], version)
 
@@ -804,7 +1149,15 @@ class Alpha112WindowsUtf8Tests(unittest.TestCase):
             decoy = Path(temp) / 'ambient-bbk-home'
             env = os.environ.copy()
             env.update({'BBK_HOME': str(decoy), 'PYTHONDONTWRITEBYTECODE': '1'})
-            result = subprocess.run([sys.executable, '-m', 'unittest', '-v', 'test_core_contracts.Alpha6CongruenceTests.test_installer_refuses_divergence_and_backs_up_force_replacement', 'test_system.BbkTests.test_installed_omp_extension_executes_copied_cli', 'test_system.BbkTests.test_user_install_all_targets_and_uninstall'], cwd=m6_ROOT / 'tests', env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding='utf-8', errors='replace')
+            result = subprocess.run([
+                sys.executable,
+                '-m',
+                'unittest',
+                '-v',
+                'tests.test_core_contracts.Alpha6CongruenceTests.test_installer_refuses_divergence_and_backs_up_force_replacement',
+                'tests.test_system.BbkTests.test_installed_omp_extension_executes_copied_cli',
+                'tests.test_system.BbkTests.test_user_install_all_targets_and_uninstall',
+            ], cwd=m6_ROOT, env=env, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding='utf-8', errors='replace', timeout=180)
             self.assertEqual(result.returncode, 0, result.stdout)
             self.assertFalse(decoy.exists(), result.stdout)
 
@@ -832,7 +1185,7 @@ m7_VERSION = (m7_ROOT / 'VERSION').read_text(encoding='utf-8').strip()
 from path_compat import path_key as m7_path_key
 
 def m7_run(command, *, env=None, check=True):
-    return subprocess.run([str(value) for value in command], cwd=m7_ROOT, env=env, check=check, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8', errors='replace', timeout=180)
+    return test_run_cli([str(value) for value in command], cwd=m7_ROOT, env=env, check=check, timeout=180)
 
 def m7_run_json(command, *, env=None, check=True):
     result = m7_run(command, env=env, check=check)
@@ -849,7 +1202,7 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
         cls.by_name = {item['name']: item for item in cls.roles}
 
     def test_current_version_matches_release(self) -> None:
-        self.assertEqual(m7_VERSION, '0.1.0-alpha.11.12')
+        self.assertEqual(m7_VERSION, '0.1.0-alpha.13.1')
 
     def test_all_codex_agents_inherit_parent_sandbox(self) -> None:
         files = sorted(m7_CODEX_AGENTS.glob('*.toml'))
@@ -860,8 +1213,22 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
                 value = tomllib.loads(path.read_text(encoding='utf-8'))
                 self.assertNotIn('sandbox_mode', value)
                 instructions = value['developer_instructions']
-                self.assertIn("inherits the parent turn's active Codex sandbox and approval settings", instructions)
-                self.assertIn('notes, handoffs, plans, ADRs, manifests, evidence records', instructions)
+                self.assertIn("Inherit the parent turn's active sandbox and approval settings", instructions)
+                self.assertIn('Persist bounded BBK coordination artifacts inside the permitted workspace', instructions)
+                self.assertIn('Host capability does not create authority', instructions)
+                for item in self.by_name[path.stem]['scope']:
+                    self.assertIn(item, instructions)
+                # Codex already carries identity, model, and effort in native TOML
+                # fields. Do not duplicate BBK build/provenance metadata as XML-like
+                # tags inside the model-facing developer instructions.
+                self.assertNotIn('<bbk-', instructions)
+                self.assertNotIn('</bbk-', instructions)
+                self.assertNotIn('package-version=', instructions)
+                self.assertNotIn('source="shared/skills/', instructions)
+                self.assertIn('## Exact role-return contract', instructions)
+                self.assertIn('## Mandatory procedures — injected', instructions)
+                for skill in self.by_name[path.stem].get('mandatory_skills', []):
+                    self.assertIn(f'### Mandatory procedure: `{skill}`', instructions)
 
     def test_semantic_mutation_boundary_remains_role_specific(self) -> None:
         for role in self.roles:
@@ -869,11 +1236,11 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
             instructions = tomllib.loads(path.read_text(encoding='utf-8'))['developer_instructions']
             with self.subTest(agent=role['name'], mutates=role.get('mutates')):
                 if role.get('mutates'):
-                    self.assertIn('may also modify subject or product artifacts only within', instructions)
-                    self.assertNotIn('Inherited host write access does not authorize changes', instructions)
+                    self.assertIn('Modify subject or product artifacts only within the exact invocation scope', instructions)
+                    self.assertNotIn('Writable host tools do not authorize subject or product mutation for this non-mutating role', instructions)
                 else:
-                    self.assertIn('Inherited host write access does not authorize changes to subject or product artifacts', instructions)
-                    self.assertNotIn('may also modify subject or product artifacts only within', instructions)
+                    self.assertIn('Writable host tools do not authorize subject or product mutation for this non-mutating role', instructions)
+                    self.assertNotIn('Modify subject or product artifacts only within the exact invocation scope', instructions)
 
     def test_generator_no_longer_projects_read_only_codex_overrides(self) -> None:
         source = (m7_ROOT / 'tools' / 'generate_agents.py').read_text(encoding='utf-8')
@@ -981,8 +1348,13 @@ import path_compat
 import profile_install
 import run_tests
 import windows_compat
+m8_build_release = m1_load_module('bbk_build_release_alpha13', 'tools/build_release.py')
 
 class Alpha117GitRepositoryTests(unittest.TestCase):
+
+    def test_release_package_uses_an_explicit_cross_extractor_mode_policy(self):
+        self.assertEqual(m8_build_release.PACKAGE_EXECUTABLES, frozenset())
+        self.assertTrue(all((not m8_build_release.is_executable(path) for path in m8_build_release.package_files())))
 
     def _expanded_profiles(self, destination: Path, *, count: int | None=None) -> list[Path]:
         packages = destination / 'packages'
@@ -1111,6 +1483,68 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
         self.assertIn('<== [1/1] test_slow.py: PASS', output)
         self.assertIn('Completed 1/1 unittest suites', output)
 
+    def test_parallel_runner_heartbeat_names_the_current_test(self):
+        with tempfile.TemporaryDirectory() as raw_root:
+            root = Path(raw_root)
+            tests = root / 'tests'
+            tests.mkdir()
+            slow = tests / 'test_visible_slow.py'
+            slow.write_text(textwrap.dedent('''
+                    import time
+                    import unittest
+
+                    class VisibleSlowTests(unittest.TestCase):
+                        def test_current_operation_is_visible(self):
+                            time.sleep(0.25)
+                    '''), encoding='utf-8')
+            fast = tests / 'test_visible_fast.py'
+            fast.write_text(textwrap.dedent('''
+                    import unittest
+
+                    class VisibleFastTests(unittest.TestCase):
+                        def test_finishes(self):
+                            self.assertTrue(True)
+                    '''), encoding='utf-8')
+            stream = io.StringIO()
+            with mock.patch.object(run_tests, 'ROOT', root), mock.patch.object(run_tests, 'TESTS', tests):
+                code = run_tests.run_test_files(
+                    [fast, slow],
+                    verbose=True,
+                    stream=stream,
+                    heartbeat_seconds=0.05,
+                    suite_timeout=5,
+                    jobs=2,
+                )
+            output = stream.getvalue()
+        self.assertEqual(code, 0, output)
+        self.assertIn('test_visible_slow.py', output)
+        self.assertIn('test_current_operation_is_visible', output)
+        self.assertIn('hard timeout 5s', output)
+
+    def test_suite_children_cannot_read_the_developer_console(self):
+        with tempfile.TemporaryDirectory() as raw_root:
+            root = Path(raw_root)
+            tests = root / 'tests'
+            tests.mkdir()
+            test_file = tests / 'test_stdin.py'
+            test_file.write_text(textwrap.dedent('''
+                    import unittest
+
+                    class StdinIsolationTests(unittest.TestCase):
+                        def test_stdin_is_closed(self):
+                            with self.assertRaises(EOFError):
+                                input('this prompt must never reach the developer console: ')
+                    '''), encoding='utf-8')
+            with mock.patch.object(run_tests, 'ROOT', root), mock.patch.object(run_tests, 'TESTS', tests):
+                result = run_tests.execute_discovered(
+                    test_file.name,
+                    verbose=True,
+                    timeout=5,
+                    heartbeat_seconds=0,
+                )
+        self.assertTrue(result.passed, result.output)
+        self.assertIn('test_stdin_is_closed', result.output)
+
     def test_test_runner_survives_cp1252_console_and_non_utf8_child_bytes(self):
         with tempfile.TemporaryDirectory() as raw_root:
             root = Path(raw_root)
@@ -1187,6 +1621,35 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
                     )
             self.assertFalse(capture.exists())
 
+    def test_windows_process_tree_cleanup_bounds_taskkill(self):
+        class FakeProcess:
+            pid = 4242
+
+            def __init__(self):
+                self.killed = False
+
+            def poll(self):
+                return None
+
+            def kill(self):
+                self.killed = True
+
+            def wait(self, timeout=None):
+                if self.killed:
+                    return -9
+                raise subprocess.TimeoutExpired('fake-suite', timeout)
+
+        process = FakeProcess()
+        with mock.patch.object(run_tests.os, 'name', 'nt'), mock.patch.object(
+            run_tests.subprocess,
+            'run',
+            side_effect=subprocess.TimeoutExpired('taskkill', 10),
+        ) as taskkill:
+            run_tests._terminate_process_tree(process)
+        self.assertTrue(process.killed)
+        self.assertEqual(taskkill.call_args.kwargs['timeout'], 10)
+        self.assertIs(taskkill.call_args.kwargs['stdin'], subprocess.DEVNULL)
+
     def test_capture_cleanup_retries_and_suppresses_windows_sharing_violation(self):
         capture = Path('bbk-test-suite-locked.log')
         locked = PermissionError(32, 'file is being used by another process')
@@ -1234,6 +1697,7 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
         observed = {}
 
         def fake_popen(command, **kwargs):
+            observed['command'] = list(command)
             observed.update(kwargs)
             report_path = Path(command[command.index('--report-file') + 1])
             report_path.write_text(json.dumps({
@@ -1261,6 +1725,8 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
                 failfast=False,
                 require_node=False,
                 echo=True,
+                profile='omp',
+                jobs=1,
             )
         stream.flush()
         output = raw_output.getvalue().decode('cp1252')
@@ -1269,6 +1735,8 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
         self.assertEqual(observed['encoding'], 'utf-8')
         self.assertEqual(observed['errors'], 'backslashreplace')
         self.assertEqual(observed['env']['PYTHONIOENCODING'], 'utf-8:backslashreplace')
+        self.assertEqual(observed['command'][observed['command'].index('--profile') + 1], 'omp')
+        self.assertEqual(observed['command'][observed['command'].index('--jobs') + 1], '1')
         self.assertIn('Résumé', output)
         self.assertIn('\\u2192', output)
         self.assertIn('\\U0001f680', output)

@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-verification-designer-result-v1.schema.json",
+  "title": "BBK BBK Verification Designer result payload v1",
+  "description": "Closed role-specific `result` payload for `bbk_verification_designer` returns.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "verification_charter_ref",
+    "governing_source_refs",
+    "assurance_contract_ref",
+    "verification_design_artifact_ref",
+    "risk_and_protected_floor_state",
+    "change_class_state",
+    "claim_inventory",
+    "assertion_refs",
+    "claim_to_assertion_coverage",
+    "verification_category_state",
+    "method_and_evidence_state",
+    "environment_tool_profile_state",
+    "gate_and_stage_state",
+    "completion_binding_state",
+    "primary_evaluation_ownership",
+    "independence_and_exposure_state",
+    "evidence_reuse_and_invalidation",
+    "repair_and_revalidation_policy",
+    "review_manifest_implications",
+    "validator_and_operational_observation_implications",
+    "observability_and_design_gaps",
+    "source_schema_limitations",
+    "self_check",
+    "unresolved_decisions",
+    "invalidated_or_superseded_refs",
+    "residual_uncertainty",
+    "blockers",
+    "parent_actions_requested"
+  ],
+  "properties": {
+    "verification_charter_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Charter identity, attempt, predecessor or successor, included and excluded claims, intended consumers, budget, stopping conditions, invalidation triggers, and result schema."
+    },
+    "governing_source_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Current outcome, baseline, requirement, decision, protected-floor, architecture, interface, structure, slice, work-graph, quality, feared-event, risk, authority, candidate-policy, profile, tool, and environment references with acceptance and freshness state."
+    },
+    "assurance_contract_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Versioned `bbk.assurance-contract.v1` proposal or successor path, byte count, SHA-256, identity, revision, lifecycle, and validation state, or an exact explanation of why it cannot yet be produced."
+    },
+    "verification_design_artifact_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/artifactReference",
+      "description": "Companion structured design artifact carrying per-assertion criteria, stages, selectors, environments, exposure, evaluation owners, completion bindings, revalidation, limitations, and schema-gap details not representable in AssuranceContract v1."
+    },
+    "risk_and_protected_floor_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Risk tier, consequence and reversibility rationale, protected floors, non-averaging and blocking policy, waiver authority, residual-risk authority, and unresolved policy gaps."
+    },
+    "change_class_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Current change classes, affected claims and evidence, special migration or compatibility treatment, and invalidation consequences."
+    },
+    "claim_inventory": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every material source-stated or derived claim in scope, exact source trace, category, risk, applicability, and disposition; omitted or out-of-scope claims remain explicit."
+    },
+    "assertion_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Every active assertion with stable identity, subject, source trace, observable statement, falsifier, criteria, applicability, methods, evidence, environment, gate, blocking behavior, independence, exposure, reuse, invalidation, repair, and stated limits."
+    },
+    "claim_to_assertion_coverage": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Bidirectional traceability from requirements, outcomes, interfaces, risks, protected floors, and derived obligations to assertions, including uncovered, duplicated, intentionally combined, or not-applicable items and rationale."
+    },
+    "verification_category_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Explicit distinction and coverage for integration checking, requirement verification, operational validation, outcome evidence, independent review, and accountable acceptance or release input."
+    },
+    "method_and_evidence_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Cheapest-sufficient method rationale, required evidence carriers, trust and completeness, criteria application, raw-output retention, reproducibility, redaction, and claims not established."
+    },
+    "environment_tool_profile_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Required and optional tools, versions, profiles, adapters, environments, data, consumers, devices, facilities, credentials, qualifications, fallbacks, unavailable capabilities, and typed blockers."
+    },
+    "gate_and_stage_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Earliest sufficient gate for every assertion, candidate or artifact freeze requirements, prerequisites, subject-binding rules, later revalidation, and changes that invalidate prior evidence."
+    },
+    "completion_binding_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Required or current exactly-one completing leaf work-unit mapping for every active assertion, with missing, duplicated, stale, or parent-owned bindings distinguished from evaluation ownership."
+    },
+    "primary_evaluation_ownership": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Required or proposed exactly-one primary evaluation owner per assertion for later review or validation, with complementary evaluations and distinct method or independence rationale."
+    },
+    "independence_and_exposure_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Required independence dimensions, actual or planned context and prior-finding visibility, outcome-bearing evidence exposure, confirmatory or exploratory classification, and limitations on independence claims."
+    },
+    "evidence_reuse_and_invalidation": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Complete dependency keys, validity window, freshness, partial reuse, required fresh runs, subject and environment closure, and exact invalidation rules."
+    },
+    "repair_and_revalidation_policy": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Successor-subject rules, ordinary and hard repair limits, early escalation, affected assertion and evidence closure, smallest rerun set, targeted closure, blind reassessment, recurrence, residual-risk, waiver, and reopening policy."
+    },
+    "review_manifest_implications": {
+      "anyOf": [
+        {
+          "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+          "description": "Review applicability and any bounded ReviewManifest, context, lens, sharding, aggregation, retry, or prior-finding requirements; null or not applicable when only the AssuranceContract is being designed."
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Review applicability and any bounded ReviewManifest, context, lens, sharding, aggregation, retry, or prior-finding requirements; null or not applicable when only the AssuranceContract is being designed."
+    },
+    "validator_and_operational_observation_implications": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Candidate-bound Validator, Validator Orchestrator, deterministic-gate, actual-consumer, device, operator, field, or outcome-observation requirements and exact downstream owners, without claiming execution."
+    },
+    "observability_and_design_gaps": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Claims that cannot responsibly be proven under the current architecture, interface, structure, state/effect, instrumentation, identity, environment, consumer, data, migration, or outcome-measurement design, with smallest upstream action."
+    },
+    "source_schema_limitations": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Details required by the verification design but not representable in current canonical schemas, their companion carrier, and assurance that unsupported fields were not inserted into those schemas."
+    },
+    "self_check": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Producer check for source and claim completeness, assertion quality, criteria timing, method sufficiency, evidence design, ownership, gate placement, independence, reuse, repair, traceability, proportionality, schema truth, and overclaim; explicitly not independent review."
+    },
+    "unresolved_decisions": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Acceptance policy, claim meaning, protected-floor, risk, waiver, release, human, architecture, work-graph, capability, or authority decisions exposed but not made."
+    },
+    "invalidated_or_superseded_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Prior AssuranceContracts, assertions, methods, evidence requirements, gates, work bindings, review plans, or downstream objects invalidated, reopened, rejected, or superseded, with exact cause and unaffected material retained."
+    },
+    "residual_uncertainty": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Bounded uncertainty retained after proportional stopping, with consequence, owner, evidence limit, freshness or expiry, and reopening trigger."
+    },
+    "blockers": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Typed claim, source, decision, authority, redesign, research, prototype, capability, work-graph, tool, environment, profile, access, transport, capacity, or host-window blockers with affected assertions and smallest remediation."
+    },
+    "parent_actions_requested": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Exact claim clarification, decision, source repair, architecture or observability redesign, investigation, capability qualification, work-graph binding, review, validation, authority, waiver, or integration actions requested from the semantic parent."
+    }
+  },
+  "x-bbk-role": "bbk_verification_designer",
+  "x-bbk-contract": "bbk.verification-designer-return.v1",
+  "x-bbk-supplemental-enums": {}
+}

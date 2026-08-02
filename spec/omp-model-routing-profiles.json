@@ -1,9 +1,9 @@
 {
   "description": "Bundled OMP runtime routing profiles for BBK sub-agents. These profiles affect future OMP spawns only and do not change role authority or assurance obligations.",
-  "package_version": "0.1.0-alpha.11.12",
+  "package_version": "0.1.0-alpha.13.1",
   "profiles": {
     "deepseek-economy": {
-      "description": "DeepSeek-only economy profile: V4 Pro for judgment and coordination roles, V4 Flash for mechanical roles.",
+      "description": "DeepSeek-only economy profile: V4 Pro for broader and coordination-heavy roles, V4 Flash for bounded leaf roles.",
       "roles": {
         "bbk_architect": {
           "model": "deepseek/deepseek-v4-pro",
@@ -84,7 +84,7 @@
       }
     },
     "default": {
-      "description": "Qualified BBK default: GPT-5.6 Sol for high-judgment roles, DeepSeek V4 Pro for coordination, and DeepSeek V4 Flash for mechanical work.",
+      "description": "Packaged alpha.13 OMP defaults, exactly matching the OMP route selected for every role in spec/model-routing.json.",
       "roles": {
         "bbk_architect": {
           "model": "openai-codex/gpt-5.6-sol",
@@ -99,8 +99,8 @@
           "thinkingLevel": "high"
         },
         "bbk_prototyper": {
-          "model": "deepseek/deepseek-v4-pro",
-          "thinkingLevel": "high"
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "max"
         },
         "bbk_question_guide": {
           "model": "openai-codex/gpt-5.6-sol",
@@ -108,11 +108,11 @@
         },
         "bbk_questioning_wayfinder": {
           "model": "openai-codex/gpt-5.6-sol",
-          "thinkingLevel": "high"
+          "thinkingLevel": "medium"
         },
         "bbk_researcher": {
-          "model": "deepseek/deepseek-v4-pro",
-          "thinkingLevel": "high"
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "max"
         },
         "bbk_reviewer": {
           "model": "openai-codex/gpt-5.6-sol",
@@ -128,23 +128,23 @@
         },
         "bbk_synthesizer": {
           "model": "openai-codex/gpt-5.6-sol",
-          "thinkingLevel": "high"
+          "thinkingLevel": "medium"
         },
         "bbk_territory_orchestrator": {
-          "model": "deepseek/deepseek-v4-pro",
-          "thinkingLevel": "high"
+          "model": "openai-codex/gpt-5.6-luna",
+          "thinkingLevel": "xhigh"
         },
         "bbk_territory_wayfinder": {
           "model": "openai-codex/gpt-5.6-sol",
-          "thinkingLevel": "high"
+          "thinkingLevel": "medium"
         },
         "bbk_validator": {
           "model": "deepseek/deepseek-v4-flash",
-          "thinkingLevel": "high"
+          "thinkingLevel": "max"
         },
         "bbk_validator_orchestrator": {
-          "model": "deepseek/deepseek-v4-pro",
-          "thinkingLevel": "high"
+          "model": "openai-codex/gpt-5.6-sol",
+          "thinkingLevel": "medium"
         },
         "bbk_verification_designer": {
           "model": "openai-codex/gpt-5.6-sol",
@@ -152,15 +152,15 @@
         },
         "bbk_worker": {
           "model": "deepseek/deepseek-v4-flash",
-          "thinkingLevel": "high"
+          "thinkingLevel": "max"
         },
         "bbk_worker_designer": {
           "model": "openai-codex/gpt-5.6-sol",
           "thinkingLevel": "high"
         },
         "bbk_worker_orchestrator": {
-          "model": "deepseek/deepseek-v4-pro",
-          "thinkingLevel": "high"
+          "model": "deepseek/deepseek-v4-flash",
+          "thinkingLevel": "max"
         }
       }
     },

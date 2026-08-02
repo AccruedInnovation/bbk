@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-contract-catalog-v1.schema.json",
+  "title": "BBK contract package catalog v1",
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+    },
+    "roleName": {
+      "type": "string",
+      "pattern": "^bbk_[a-z][a-z0-9_]*$"
+    },
+    "roleList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/roleName"
+      },
+      "uniqueItems": true
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "package_version",
+    "source_role_catalog",
+    "role_return_package",
+    "execution_contracts",
+    "capability_status_inventory"
+  ],
+  "properties": {
+    "schema": {
+      "const": "bbk.contract-catalog.v1"
+    },
+    "package_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_role_catalog": {
+      "$ref": "#/$defs/relativePath"
+    },
+    "capability_status_inventory": {
+      "$ref": "#/$defs/relativePath"
+    },
+    "role_return_package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_of_truth",
+        "common_envelope",
+        "generated_registry",
+        "registry_schema",
+        "generator",
+        "return_schema_directory",
+        "result_schema_directory"
+      ],
+      "properties": {
+        "source_of_truth": {
+          "type": "string",
+          "minLength": 1
+        },
+        "common_envelope": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "generated_registry": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "registry_schema": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "generator": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "return_schema_directory": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "result_schema_directory": {
+          "$ref": "#/$defs/relativePath"
+        }
+      }
+    },
+    "execution_contracts": {
+      "type": "array",
+      "minItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "contract_id",
+          "kind",
+          "status",
+          "schema",
+          "source",
+          "lifecycle_owner",
+          "producer_roles",
+          "consumer_roles",
+          "authority_boundary"
+        ],
+        "properties": {
+          "contract_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "EXECUTION_BOUNDARY",
+              "POLICY",
+              "AUTHORITY_ENVELOPE",
+              "AUTHORITY_PERMIT"
+            ]
+          },
+          "status": {
+            "enum": [
+              "ACTIVE_POLICY",
+              "SCHEMA_DEFINED_COMPANION"
+            ]
+          },
+          "schema": {
+            "$ref": "#/$defs/relativePath"
+          },
+          "source": {
+            "$ref": "#/$defs/relativePath"
+          },
+          "lifecycle_owner": {
+            "$ref": "#/$defs/roleName"
+          },
+          "producer_roles": {
+            "$ref": "#/$defs/roleList"
+          },
+          "consumer_roles": {
+            "$ref": "#/$defs/roleList"
+          },
+          "authority_boundary": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

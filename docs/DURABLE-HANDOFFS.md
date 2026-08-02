@@ -2,6 +2,25 @@
 
 Agent messages are coordination channels, not guaranteed lossless artifact transports. Exact paths, hashes, schemas, evidence carriers, and large outputs must survive host truncation and execution-window interruption.
 
+
+## Current operational disposition vocabulary
+
+Current role returns and new handoffs distinguish physical attempt state from semantic readiness:
+
+```text
+COMPLETE
+PARTIAL
+BLOCKED_TECHNICAL
+BLOCKED_AUTHORITY
+BLOCKED_DECISION
+PAUSED_CAPACITY
+PAUSED_HOST_WINDOW
+CANCELLED
+INCONCLUSIVE
+```
+
+A role-specific semantic state such as `READY_FOR_PARENT_INTEGRATION` or `READY_FOR_TERRITORY_VALIDATION_ADMISSION` is a separate field and carries only the authority defined by that role contract. `READY_FOR_VALIDATION`, `BLOCKED`, and `PAUSED` are accepted only while consuming or verifying legacy `bbk.handoff.v1` records; current writers reject them.
+
 ## Authoritative carrier
 
 BBK uses a UTF-8 JSON handoff whose referenced files are bound by:

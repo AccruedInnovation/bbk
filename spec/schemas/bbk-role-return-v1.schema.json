@@ -1,0 +1,447 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-role-return-v1.schema.json",
+  "title": "BBK canonical role-return envelope v1",
+  "description": "Common machine-valid envelope for every canonical BBK role return. Operational disposition, role semantic state, role payload assessment, acceptance, completion, and release remain separate dimensions.",
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "stringList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      },
+      "uniqueItems": true
+    },
+    "reference": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "schema": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "revision": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "$ref": "#/$defs/nonEmptyString"
+            }
+          ]
+        },
+        "digest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "path": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "uri": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "lifecycle_state": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "id"
+          ]
+        },
+        {
+          "required": [
+            "path"
+          ]
+        },
+        {
+          "required": [
+            "uri"
+          ]
+        }
+      ]
+    },
+    "referenceList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/reference"
+      }
+    },
+    "structured": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": true
+    },
+    "structuredList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/structured"
+      }
+    },
+    "subjectReference": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/reference"
+        },
+        {
+          "type": "object",
+          "required": [
+            "id"
+          ]
+        }
+      ]
+    },
+    "parentReference": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "kind",
+        "id",
+        "invocation_mode"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "controller",
+            "canonical_role"
+          ]
+        },
+        "id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "role": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^bbk_[a-z][a-z0-9_]*$"
+        },
+        "invocation_mode": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        },
+        "invocation_id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "return_route": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "canonical_role"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "role"
+            ],
+            "properties": {
+              "role": {
+                "type": "string",
+                "pattern": "^bbk_[a-z][a-z0-9_]*$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "controller"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "role": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "attemptReference": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "semantic_run_id",
+        "physical_attempt_id"
+      ],
+      "properties": {
+        "semantic_run_id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "physical_attempt_id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "host_session_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "continuation_of": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "replacement_of": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      }
+    },
+    "artifactReference": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/reference"
+        },
+        {
+          "type": "object",
+          "required": [
+            "path",
+            "bytes",
+            "sha256"
+          ],
+          "properties": {
+            "path": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "bytes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "sha256": {
+              "$ref": "#/$defs/sha256"
+            }
+          }
+        }
+      ]
+    },
+    "artifactReferenceList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/artifactReference"
+      }
+    },
+    "authorityAndEffects": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "authority_refs",
+        "allowed_effect_classes",
+        "effects_used",
+        "denied_or_uncovered_effects",
+        "violations_or_ambiguities"
+      ],
+      "properties": {
+        "authority_refs": {
+          "$ref": "#/$defs/referenceList"
+        },
+        "allowed_effect_classes": {
+          "$ref": "#/$defs/stringList"
+        },
+        "effects_used": {
+          "$ref": "#/$defs/structuredList"
+        },
+        "denied_or_uncovered_effects": {
+          "$ref": "#/$defs/structuredList"
+        },
+        "violations_or_ambiguities": {
+          "$ref": "#/$defs/structuredList"
+        }
+      }
+    },
+    "handoffReference": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "id",
+        "path",
+        "bytes",
+        "sha256"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "path": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "schema": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "subject_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "producer_attempt_ref": {
+          "$ref": "#/$defs/attemptReference"
+        }
+      }
+    },
+    "nextAction": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "action",
+        "owner",
+        "reason"
+      ],
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "owner": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "reason": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "affected_refs": {
+          "$ref": "#/$defs/referenceList"
+        },
+        "unaffected_work_may_continue": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "contract",
+    "role",
+    "invocation_mode",
+    "return_kind",
+    "subject_ref",
+    "parent_ref",
+    "attempt_ref",
+    "operational_disposition",
+    "semantic_state",
+    "summary",
+    "authority_and_effects_used",
+    "result",
+    "durable_handoff_refs",
+    "smallest_valid_next_action"
+  ],
+  "properties": {
+    "schema": {
+      "const": "bbk.role-return.v1"
+    },
+    "contract": {
+      "type": "string",
+      "pattern": "^bbk\\.[a-z0-9][a-z0-9.-]*\\.v[0-9]+$"
+    },
+    "role": {
+      "type": "string",
+      "pattern": "^bbk_[a-z][a-z0-9_]*$"
+    },
+    "invocation_mode": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]*$"
+    },
+    "return_kind": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]*$"
+    },
+    "subject_ref": {
+      "$ref": "#/$defs/subjectReference"
+    },
+    "parent_ref": {
+      "$ref": "#/$defs/parentReference"
+    },
+    "attempt_ref": {
+      "$ref": "#/$defs/attemptReference"
+    },
+    "operational_disposition": {
+      "enum": [
+        "COMPLETE",
+        "PARTIAL",
+        "BLOCKED_TECHNICAL",
+        "BLOCKED_AUTHORITY",
+        "BLOCKED_DECISION",
+        "PAUSED_CAPACITY",
+        "PAUSED_HOST_WINDOW",
+        "CANCELLED",
+        "INCONCLUSIVE"
+      ]
+    },
+    "semantic_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "value"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        }
+      }
+    },
+    "summary": {
+      "$ref": "#/$defs/nonEmptyString"
+    },
+    "authority_and_effects_used": {
+      "$ref": "#/$defs/authorityAndEffects"
+    },
+    "result": {
+      "type": "object"
+    },
+    "durable_handoff_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/handoffReference"
+      }
+    },
+    "smallest_valid_next_action": {
+      "$ref": "#/$defs/nextAction"
+    }
+  }
+}

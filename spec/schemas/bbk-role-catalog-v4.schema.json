@@ -1,0 +1,381 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-role-catalog-v4.schema.json",
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "roleName": {
+      "type": "string",
+      "pattern": "^bbk_[a-z][a-z0-9_]*$"
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+    },
+    "parentMode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "parent_kind",
+        "parents",
+        "purpose"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        },
+        "parent_kind": {
+          "enum": [
+            "controller",
+            "canonical_role"
+          ]
+        },
+        "parents": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "purpose": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "parent_kind": {
+                "const": "controller"
+              }
+            },
+            "required": [
+              "parent_kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "parents": {
+                "items": {
+                  "const": "harness_root_controller"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "parent_kind": {
+                "const": "canonical_role"
+              }
+            },
+            "required": [
+              "parent_kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "parents": {
+                "items": {
+                  "$ref": "#/$defs/roleName"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "controllerEntrypoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "route",
+        "role",
+        "invocation_mode",
+        "selected_by",
+        "selection_when"
+      ],
+      "properties": {
+        "route": {
+          "enum": [
+            "PLANNING",
+            "EXECUTION",
+            "REVIEW",
+            "ASSURANCE"
+          ]
+        },
+        "role": {
+          "$ref": "#/$defs/roleName"
+        },
+        "invocation_mode": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        },
+        "selected_by": {
+          "const": "harness_root_controller"
+        },
+        "selection_when": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "package_version",
+    "catalog_schema",
+    "role_schema",
+    "projection_schema",
+    "method_content_source",
+    "prompt_module_package",
+    "contract_package",
+    "compatibility_projection",
+    "constitution_modules",
+    "interaction_topology",
+    "controller_entrypoints",
+    "role_entries"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "bbk.roles.v4"
+    },
+    "package_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"
+    },
+    "catalog_schema": {
+      "$ref": "#/$defs/relativePath"
+    },
+    "role_schema": {
+      "$ref": "#/$defs/relativePath"
+    },
+    "projection_schema": {
+      "$ref": "#/$defs/relativePath"
+    },
+    "method_content_source": {
+      "$ref": "#/$defs/relativePath"
+    },
+    "prompt_module_package": {
+      "const": "spec/prompt-modules/catalog.json"
+    },
+    "contract_package": {
+      "const": "spec/contracts/catalog.json"
+    },
+    "compatibility_projection": {
+      "$ref": "#/$defs/relativePath"
+    },
+    "constitution_modules": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9_]*$"
+      },
+      "additionalProperties": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "uniqueItems": true
+      },
+      "required": [
+        "core"
+      ]
+    },
+    "interaction_topology": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "user_facing_identity",
+        "canonical_roles_user_facing",
+        "human_request_route",
+        "human_request_originators",
+        "omp_transport",
+        "fallback_transport"
+      ],
+      "properties": {
+        "user_facing_identity": {
+          "const": "harness_root_controller"
+        },
+        "canonical_roles_user_facing": {
+          "const": false
+        },
+        "human_request_route": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "human_request_originators": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "prefixItems": [
+            {
+              "const": "bbk_root_wayfinder"
+            },
+            {
+              "const": "bbk_questioning_wayfinder"
+            },
+            {
+              "const": "bbk_question_guide"
+            }
+          ],
+          "items": false
+        },
+        "omp_transport": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "fallback_transport": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "controller_entrypoints": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "prefixItems": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/controllerEntrypoint"
+            },
+            {
+              "properties": {
+                "route": {
+                  "const": "PLANNING"
+                },
+                "role": {
+                  "const": "bbk_root_wayfinder"
+                },
+                "invocation_mode": {
+                  "const": "CONTROLLER_ROOT"
+                }
+              },
+              "required": [
+                "route",
+                "role",
+                "invocation_mode"
+              ]
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/controllerEntrypoint"
+            },
+            {
+              "properties": {
+                "route": {
+                  "const": "EXECUTION"
+                },
+                "role": {
+                  "const": "bbk_root_orchestrator"
+                },
+                "invocation_mode": {
+                  "const": "CONTROLLER_ROOT"
+                }
+              },
+              "required": [
+                "route",
+                "role",
+                "invocation_mode"
+              ]
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/controllerEntrypoint"
+            },
+            {
+              "properties": {
+                "route": {
+                  "const": "REVIEW"
+                },
+                "role": {
+                  "const": "bbk_reviewer"
+                },
+                "invocation_mode": {
+                  "const": "DIRECT_BOUNDED_REVIEW"
+                }
+              },
+              "required": [
+                "route",
+                "role",
+                "invocation_mode"
+              ]
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/controllerEntrypoint"
+            },
+            {
+              "properties": {
+                "route": {
+                  "const": "ASSURANCE"
+                },
+                "role": {
+                  "const": "bbk_validator_orchestrator"
+                },
+                "invocation_mode": {
+                  "const": "CONTROLLER_ROOT"
+                }
+              },
+              "required": [
+                "route",
+                "role",
+                "invocation_mode"
+              ]
+            }
+          ]
+        }
+      ],
+      "items": false
+    },
+    "role_entries": {
+      "type": "array",
+      "minItems": 19,
+      "maxItems": 19,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "file",
+          "allowed_parent_modes"
+        ],
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/roleName"
+          },
+          "file": {
+            "type": "string",
+            "pattern": "^spec/roles/bbk_[a-z][a-z0-9_]*-role\\.json$"
+          },
+          "allowed_parent_modes": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/$defs/parentMode"
+            }
+          }
+        }
+      }
+    }
+  }
+}

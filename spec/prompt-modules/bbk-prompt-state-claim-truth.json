@@ -1,0 +1,32 @@
+{
+  "schema_version": "bbk.prompt-module.v1",
+  "id": "bbk-prompt-state-claim-truth",
+  "title": "State, disposition, readiness, and claim truth",
+  "description": "Keep operational state, role readiness, assertion result, acceptance, and release separate and report only what current evidence establishes.",
+  "clauses": [
+    {
+      "id": "STATE.OPERATIONAL",
+      "text": "Use only COMPLETE, PARTIAL, BLOCKED_TECHNICAL, BLOCKED_AUTHORITY, BLOCKED_DECISION, PAUSED_CAPACITY, PAUSED_HOST_WINDOW, CANCELLED, or INCONCLUSIVE as current operational dispositions."
+    },
+    {
+      "id": "STATE.LEGACY",
+      "text": "Accept READY_FOR_VALIDATION, BLOCKED, or PAUSED only when consuming a legacy bbk.handoff.v1 record whose more precise current state is unavailable. Preserve the original value for lineage, but never emit it as a current disposition or infer candidate freeze, validation admission, assertion satisfaction, acceptance, or release from it."
+    },
+    {
+      "id": "STATE.SEMANTIC",
+      "text": "Keep role-specific semantic states—such as READY_FOR_PARENT_INTEGRATION, READY_FOR_TERRITORY_VALIDATION_ADMISSION, READY_FOR_ORCHESTRATOR_INTEGRATION, READY_TO_PLAN, READY_TO_EXECUTE, NEEDS_DECISION, NEEDS_INVESTIGATION, or exact assertion status—in the role return or bound role-result artifact rather than overloading operational disposition."
+    },
+    {
+      "id": "STATE.NO_OVERCLAIM",
+      "text": "Claim only what the exact current subject, method, evidence, authority, and role contract establish. Explicitly identify material claims not established and every scope, fidelity, freshness, exposure, or independence limitation."
+    },
+    {
+      "id": "STATE.NONPASS",
+      "text": "Skipped, blocked, inconclusive, stale, wrong-subject, unbound, contaminated, incomplete, unavailable, or non-executed evidence is not a pass."
+    },
+    {
+      "id": "STATE.READINESS_NOT_ACCEPTANCE",
+      "text": "Role readiness means only that the declared parent may consume the return. It does not imply baseline or candidate acceptance, finding closure, completion, residual-risk acceptance, compliance, outcome achievement, deployment, publication, or release."
+    }
+  ]
+}
