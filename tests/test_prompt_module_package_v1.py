@@ -42,6 +42,13 @@ EXCLUSIVE_MODULE_ROLES = {
         "bbk_validator_orchestrator", "bbk_verification_designer", "bbk_worker",
         "bbk_worker_designer", "bbk_worker_orchestrator",
     },
+    "bbk-prompt-executable-baseline": {
+        "bbk_architect", "bbk_phase_wayfinder", "bbk_planning_wayfinder",
+        "bbk_prototyper", "bbk_reviewer", "bbk_root_orchestrator",
+        "bbk_root_wayfinder", "bbk_territory_orchestrator",
+        "bbk_territory_wayfinder", "bbk_verification_designer",
+        "bbk_worker", "bbk_worker_designer", "bbk_worker_orchestrator",
+    },
     "bbk-prompt-execution-slicing": {
         "bbk_planning_wayfinder", "bbk_phase_wayfinder",
     },
@@ -161,6 +168,15 @@ GATE5_PRODUCT_NEUTRAL_SUBSTITUTIONS = {
     },
 }
 
+ALPHA132_BEADS_OWNER_ROLES = {
+    "bbk_root_wayfinder", "bbk_territory_wayfinder",
+    "bbk_planning_wayfinder", "bbk_phase_wayfinder",
+    "bbk_root_orchestrator", "bbk_territory_orchestrator",
+    "bbk_worker_orchestrator", "bbk_questioning_wayfinder",
+}
+
+ALPHA132_INTENTIONAL_SKILL_REPLACEMENTS = {"bbk-beads"}
+
 AUXILIARY_PROCEDURE_MODULES = {
     "bbk-context-routing": {
         "bbk-prompt-context-human-relay", "bbk-prompt-human-request",
@@ -258,7 +274,7 @@ class PromptModulePackageV1Tests(unittest.TestCase):
             validator.validate(module)
 
     def test_module_inventory_order_and_clause_identities_are_unique(self) -> None:
-        self.assertEqual(len(self.package.modules), 21)
+        self.assertEqual(len(self.package.modules), 22)
         self.assertEqual(len(self.package.ordered_ids), len(set(self.package.ordered_ids)))
         clause_ids = [
             clause["id"]
@@ -352,6 +368,107 @@ class PromptModulePackageV1Tests(unittest.TestCase):
                 }
                 self.assertEqual(actual, expected)
 
+    def test_alpha133_coordination_recovery_and_executable_truth_are_scoped_and_compiled(self) -> None:
+        human = self.package.by_id["bbk-prompt-human-request"]
+        human_clause = next(
+            clause["text"] for clause in human["clauses"]
+            if clause["id"] == "HUMAN.CALLBACK_SAFE_CHILDREN"
+        )
+        delegation = self.package.by_id["bbk-prompt-delegation-return"]
+        interrupt_clause = next(
+            clause["text"] for clause in delegation["clauses"]
+            if clause["id"] == "DELEGATION.INTERRUPT_SAFE_LIFETIME"
+        )
+        partial_clause = next(
+            clause["text"] for clause in delegation["clauses"]
+            if clause["id"] == "DELEGATION.CANCELLED_PARTIAL"
+        )
+        state = self.package.by_id["bbk-prompt-state-claim-truth"]
+        transport_clause = next(
+            clause["text"] for clause in state["clauses"]
+            if clause["id"] == "STATE.TRANSPORT_NOT_INTEGRATION"
+        )
+        executable = self.package.by_id["bbk-prompt-executable-baseline"]
+        executable_text = [clause["text"] for clause in executable["clauses"]]
+
+        human_roles = {
+            role["name"] for role in self.roles
+            if "bbk-prompt-human-request" in role["prompt_modules"]
+        }
+        self.assertEqual(human_roles, {
+            "bbk_root_wayfinder", "bbk_questioning_wayfinder", "bbk_question_guide",
+        })
+        for role in self.roles:
+            rendered = instruction_text(self.spec, role, host="generic")
+            with self.subTest(role=role["name"]):
+                self.assertEqual(rendered.count(transport_clause), 1)
+                self.assertEqual(
+                    rendered.count(human_clause),
+                    1 if role["name"] in human_roles else 0,
+                )
+                if "bbk-prompt-delegation-return" in role["prompt_modules"]:
+                    self.assertEqual(rendered.count(interrupt_clause), 1)
+                    self.assertEqual(rendered.count(partial_clause), 1)
+                else:
+                    self.assertNotIn(interrupt_clause, rendered)
+                    self.assertNotIn(partial_clause, rendered)
+                expects_executable = role["name"] in EXCLUSIVE_MODULE_ROLES[
+                    "bbk-prompt-executable-baseline"
+                ]
+                for clause in executable_text:
+                    self.assertEqual(rendered.count(clause), 1 if expects_executable else 0)
+
+        research = self.method["skills"]["bbk-research"]
+        self.assertIn("Rank research by decision impact and prerequisite order.", research)
+        self.assertIn("primary path and immediate fallback", research)
+        self.assertIn("Stop when the parent can make the bounded decision", research)
+
+        candidate = self.package.by_id["bbk-prompt-candidate-integrity"]
+        successor = next(
+            clause["text"] for clause in candidate["clauses"]
+            if clause["id"] == "CANDIDATE.SUCCESSOR"
+        )
+        self.assertIn("successor identity", successor)
+        self.assertIn("invalidates evidence", successor)
+        reviewer = next(role for role in self.roles if role["name"] == "bbk_reviewer")
+        reviewer_invalidation = next(
+            responsibility for responsibility in reviewer["responsibilities"]
+            if "A material change to the subject" in responsibility
+        )
+        self.assertIn("invalidates the affected attempt or conclusion", reviewer_invalidation)
+        self.assertIn("normally requires a successor attempt", reviewer_invalidation)
+        boundary = self.package.by_id["bbk-prompt-role-boundary"]
+        self.assertTrue(any(
+            clause["id"] == "ROLE.NO_ABSORPTION" and "Do not spawn, imitate, approve, repair, validate, integrate, or decide" in clause["text"]
+            for clause in boundary["clauses"]
+        ))
+
+        lifetime_doc = (ROOT / "docs" / "OMP-CHILD-LIFETIME.md").read_text(encoding="utf-8")
+        for expected in (
+            "`async.enabled=true`",
+            "`blocking: false`",
+            "parent tool-call `AbortSignal`",
+            "native OMP path",
+            "scheduling fallback",
+            "File existence is not a complete specialist return",
+            "explicit cancel operations",
+        ):
+            self.assertIn(expected, lifetime_doc)
+
+    def test_alpha133_omp_agents_explicitly_prefer_native_nonblocking_jobs(self) -> None:
+        outputs, _manifest = expected_files()
+        omp_outputs = {
+            path: payload.decode("utf-8")
+            for path, payload in outputs.items()
+            if path.parent == ROOT / "projections" / "omp" / "agents"
+        }
+        self.assertEqual(len(omp_outputs), 19)
+        for path, text in omp_outputs.items():
+            with self.subTest(agent=path.name):
+                frontmatter = normalized_frontmatter(text)
+                self.assertEqual(frontmatter.count("\nblocking: false\n"), 1)
+                self.assertNotIn("blocking: true", frontmatter)
+
     def test_tagged_hosts_embed_each_assigned_module_once(self) -> None:
         for host in ("omp", "claude", "generic"):
             for role in self.roles:
@@ -405,6 +522,14 @@ class PromptModulePackageV1Tests(unittest.TestCase):
         excluded = {"primary_skill", "mandatory_skills", "prompt_modules"}
         for role in self.roles:
             behavior = {key: value for key, value in role.items() if key not in excluded}
+            if role["name"] in ALPHA132_BEADS_OWNER_ROLES:
+                behavior["skills"] = [
+                    value for value in behavior.get("skills", []) if value != "bbk-beads"
+                ]
+                behavior["responsibilities"] = [
+                    value for value in behavior.get("responsibilities", [])
+                    if "bbk-beads" not in value
+                ]
             digest = hashlib.sha256(
                 json.dumps(
                     behavior, ensure_ascii=False, sort_keys=True, separators=(",", ":"),
@@ -417,6 +542,8 @@ class PromptModulePackageV1Tests(unittest.TestCase):
     def test_gate3_frontmatter_and_headings_are_preserved(self) -> None:
         for name, baseline in self.baseline["skills"].items():
             with self.subTest(skill=name):
+                if name in ALPHA132_INTENTIONAL_SKILL_REPLACEMENTS:
+                    continue
                 current = self.method["skills"][name]
                 frontmatter_sha = hashlib.sha256(
                     normalized_frontmatter(current).encode("utf-8")
@@ -427,6 +554,8 @@ class PromptModulePackageV1Tests(unittest.TestCase):
 
     def test_gate3_sections_not_replaced_by_modules_are_byte_semantically_unchanged(self) -> None:
         for name, baseline in self.baseline["skills"].items():
+            if name in ALPHA132_INTENTIONAL_SKILL_REPLACEMENTS:
+                continue
             current_sections = heading_sections(self.method["skills"][name])
             cursor = 0
             for old in baseline["sections"]:
@@ -445,6 +574,21 @@ class PromptModulePackageV1Tests(unittest.TestCase):
                     section = section.replace(current_text, gate3_text)
                 digest = hashlib.sha256(section.encode("utf-8")).hexdigest()
                 self.assertEqual(digest, old["sha256"], f"{name}: {old['heading']}")
+
+    def test_alpha132_beads_skill_is_the_normal_role_owned_coordination_projection(self) -> None:
+        text = self.method["skills"]["bbk-beads"]
+        for required in (
+            "Beads is BBK's default coordination projection for newly initialized projects.",
+            "Root and Territory Wayfinders: project, territory, and decision records.",
+            "Planning and Phase Wayfinders: capability increments, phases, and WorkUnits.",
+            "Root, Territory, and Worker Orchestrators: execution-state records and durable-handoff pointers.",
+            "Questioning Wayfinder: question records.",
+            "bbk beads plan --root <project> --kind <owned-kind>",
+            "deterministically and idempotently",
+            "never apply last-write-wins reconciliation",
+            "The BBK file remains authoritative.",
+        ):
+            self.assertIn(required, text)
 
 
     def test_gate3_role_specific_structured_protocols_remain_explicit(self) -> None:
@@ -666,3 +810,6 @@ class PromptModulePackageV1Tests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+# Deterministic fast/standard/release selection used by tools/run_tests.py.
+from tests._test_profiles import load_profiled_tests as load_tests

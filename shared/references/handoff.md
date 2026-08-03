@@ -10,7 +10,7 @@ path + byte count + SHA-256
 
 Use `bbk handoff create` to build a record and `bbk handoff verify` before another role relies on it. A conversational message may summarize the handoff, but it must not be the sole carrier for exact schemas, hashes, paths, or evidence that can be truncated by the host.
 
-For a work tracker such as Beads, append only a compact pointer containing the BBK work-unit ID, disposition, handoff path, handoff byte count, handoff SHA-256, and smallest next action. The durable BBK handoff remains authoritative.
+For Beads, append only a compact pointer containing the target BBK ID, subject, producer role, WorkUnit ID, disposition, handoff path, handoff byte count, handoff SHA-256, and smallest next action. Worker Orchestrator normally targets the mapped WorkUnit. Root or Territory Orchestrator uses `--target-bbk-id` for the exact mapped project or territory record it owns. Never translate BBK semantic state into Beads workflow status. The durable BBK handoff remains authoritative.
 
 Rediscover a carrier whose conversational locator was truncated with `bbk handoff list --root <project> --work-unit <id> --latest`. Generate a compact tracker update with `bbk beads handoff-plan`; use `--apply` only after the project mapping explicitly enables Beads writes.
 

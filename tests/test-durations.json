@@ -1,0 +1,14 @@
+{
+  "schema": "bbk.test-duration-seed.v1",
+  "source": "alpha.13.3 same-host isolated module profiling",
+  "modules": {
+    "test_assurance_state.py": 4.82,
+    "test_contract_package_v1.py": 2.588,
+    "test_core_contracts.py": 7.794,
+    "test_installation_portability.py": 25.389,
+    "test_omp_runtime.py": 22.544,
+    "test_prompt_module_package_v1.py": 2.734,
+    "test_role_package_v4.py": 2.966,
+    "test_system.py": 20.717
+  }
+}

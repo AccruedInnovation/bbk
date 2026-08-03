@@ -407,6 +407,7 @@ def render_omp(
         f"description: {yaml_scalar(role['description'])}",
         f"model: {yaml_scalar(omp['model'])}",
         f"thinkingLevel: {yaml_scalar(omp['thinkingLevel'])}",
+        "blocking: false",
     ]
     if role.get("spawns"):
         lines.append("spawns: " + ", ".join(role["spawns"]))

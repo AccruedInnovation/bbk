@@ -1,27 +1,46 @@
 ---
 name: bbk-beads
-description: Map optional BBK project, territory, question, capability, phase, and work-unit records into Beads for coordination while keeping BBK vocabulary and records authoritative for the bootstrap method. Use only when a project has elected Beads projection.
+description: Project the BBK records owned by the invoking role into the project Beads workspace as normal coordination state while keeping BBK records, authority, evidence, decisions, and lifecycle semantics canonical. Load on demand when an owning role creates or changes a project, territory, decision, question, capability increment, phase, WorkUnit, execution-state record, or durable handoff pointer.
 ---
 
 # BBK Beads
 
-Beads is an optional coordination projection, not BBK semantic authority.
+Beads is BBK's default coordination projection for newly initialized projects. It is not BBK semantic authority.
 
-1. Confirm `.bbk/mappings/beads.json` enables projection and names the exact Beads workspace.
-2. Run a dry-run plan before any Beads mutation.
-3. Keep BBK IDs stable and store Beads IDs only as foreign bindings.
-4. Use the default mapping: project → root epic; territory → epic/sub-epic; question → task; capability increment → milestone/epic; phase → milestone/epic; work unit → task.
-5. Keep BBK lifecycle meaning separate from Beads workflow status. A Beads close never accepts a decision, proves validation, or establishes outcome completion.
-6. Project deterministically and idempotently. Unexpected direct edits become drift to review; never apply last-write-wins reconciliation.
-7. Permit Beads-to-BBK input only as a typed observation or proposed update that a responsible agent reviews.
-8. For worker or validator handoff, keep the complete carrier in an authorized BBK file. Project only a compact append-only bead comment containing the BBK work-unit ID, disposition, handoff path, byte count, SHA-256, and next action. Do not store large evidence in the bead or use a mutable field as the authoritative carrier.
-9. Verify a Beads write after it is applied, especially with concurrent writers or sync/server modes. Treat a missing projected comment as coordination drift, not loss of the authoritative BBK handoff.
-10. Do not build direct Dolt semantics into BBK. Use a replaceable adapter or CLI boundary.
+## Ownership and triggers
+
+Load this skill only for record kinds owned by the current role:
+
+- Root and Territory Wayfinders: project, territory, and decision records.
+- Planning and Phase Wayfinders: capability increments, phases, and WorkUnits.
+- Root, Territory, and Worker Orchestrators: execution-state records and durable-handoff pointers.
+- Questioning Wayfinder: question records.
+
+Project only after the canonical BBK record is durable. Another role may inspect the projection, but must not mutate a record kind it does not own.
+
+## Normal synchronization
+
+1. Read `.bbk/mappings/beads.json`; new projects default to `enabled=true`, `write_enabled=true`, `workspace="."`, and first-use initialization enabled.
+2. Run `bbk beads plan --root <project> --kind <owned-kind>` before mutation. Review the exact create, update, inspect, initialization, parent-binding, and stale-binding operations.
+3. When the plan is valid and the role has authority for every selected record, run the same command with `--apply`. The BBK adapter initializes Beads on first use when configured, invokes `bd` through a replaceable CLI boundary, verifies each returned issue, and records the Beads ID only as a foreign binding.
+4. If `bd` is unavailable, the workspace cannot be initialized, or a binding is ambiguous or drifted, preserve the canonical BBK change and report a typed coordination warning. Do not block otherwise-valid planning or execution solely because the optional tracker capability is unavailable.
+5. Keep BBK IDs stable. Never search by title and silently adopt a Beads issue; create or repair the explicit foreign binding under accountable review.
+6. Use the default mapping: project → root epic; territory → epic/sub-epic; decision → task; question → task; capability increment → epic; phase → epic; WorkUnit → task. Parent-child links are coordination structure only.
+7. Keep BBK lifecycle meaning separate from Beads workflow status. A Beads claim, status, dependency, close, comment, or deletion never accepts a decision, proves an assertion, closes a finding, validates a candidate, establishes outcome completion, or authorizes release.
+8. Project deterministically and idempotently. Unexpected direct edits, missing issues, parent changes, duplicate bindings, and incompatible issue types are drift to review; never apply last-write-wins reconciliation.
+9. Permit Beads-to-BBK input only as a typed observation or proposed update that the responsible BBK role evaluates against current canonical state and authority.
+10. Do not place secrets, credentials, protected evidence, large artifacts, or private reasoning in Beads. Project only the minimum coordination metadata authorized for the workspace.
+
+## Execution-state and durable-handoff pointers
+
+For an execution-state transition or Worker, Validator, Reviewer, or orchestrator handoff, keep the complete carrier in an authorized BBK file. Append only a verified compact pointer; never translate BBK semantic state into Beads workflow status.
+
+- Worker Orchestrator normally targets the mapped WorkUnit with `bbk beads handoff-plan --handoff <file>`.
+- Root or Territory Orchestrator passes `--target-bbk-id <project-or-territory-id>` to bind the pointer to the exact mapped record it owns. An explicit target must already have a unique mapping, and a simultaneously supplied `--bead` must match that binding.
+- `--bead <id>` without `--target-bbk-id` is reserved for an explicitly reviewed foreign target when no WorkUnit binding exists. It does not create a BBK-to-Beads binding.
+
+The compact comment contains the target BBK ID, subject kind and ID, producer role, WorkUnit ID, disposition, handoff path, byte count, SHA-256, and smallest next action. Add `--apply` only when the mapping is enabled and write-enabled. The adapter verifies the resulting Beads issue after mutation. The BBK file remains authoritative. The durable carrier remains the authoritative payload.
 
 ## Profile-bound work
 
-When a projected work item depends on a language or domain profile, preserve the profile identity, effective lock or digest, and required gates as coordination metadata. Beads does not discover, select, validate, or override profiles.
-
-## Handoff command boundary
-
-Use `bbk beads handoff-plan --handoff <file> --bead <id>` to generate the compact append-only update. Add `--apply` only when `.bbk/mappings/beads.json` explicitly has both `enabled=true` and `write_enabled=true`; BBK then calls `bd comments add <id> <pointer>`. Verify the resulting bead when concurrency or synchronization is material. The BBK file remains authoritative.
+When a projected WorkUnit depends on a language or domain profile, preserve only the profile identity, effective lock or digest, and required gate identifiers as coordination metadata. Beads does not discover, select, validate, or override profiles.

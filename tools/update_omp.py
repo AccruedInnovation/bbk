@@ -324,6 +324,7 @@ def make_desired_files(
         "review_assurance.py",
         "verify_package.py",
         "path_compat.py",
+        "artifact_classification.py",
         "omp_model_routing.py",
     ]:
         add_file(desired, ROOT / "tools" / name, extension / name)
@@ -333,11 +334,12 @@ def make_desired_files(
         extension / "bbk-package-root.json",
         install_tool.json_bytes(
             {
-                "schema": "bbk.omp-package-binding.v2",
+                "schema": "bbk.omp-package-binding.v3",
                 "version": VERSION,
                 "path": install_tool.json_path(package_root),
                 "package_root": install_tool.json_path(package_root),
                 "scope": scope,
+                "project_root": install_tool.json_path(project) if project else None,
                 "manifest_path": install_tool.json_path(manifest_path),
                 "omp_agents": install_tool.json_path(omp_agents),
                 "state_path": install_tool.json_path(state_path),

@@ -401,6 +401,8 @@ Compile exact child edges and preserve parent integration ownership.
 - `DELEGATION.LOGICAL_PHYSICAL` — Keep logical responsibility distinct from physical invocation. Co-location, continuation, sharding, retries, or several physical attempts do not erase role, evidence, or return boundaries.
 - `DELEGATION.VALIDATE_RETURN` — Before integration, validate child subject and revision, freshness, provenance, delegated authority, effects, schema, evidence exposure, contradictions, blockers, and durable references.
 - `DELEGATION.PARENT_INTEGRATION` — The parent owns acceptance, reconciliation, invalidation, retry or replacement, and integration of child work. Return nonconforming work to its owner rather than silently rewriting it.
+- `DELEGATION.INTERRUPT_SAFE_LIFETIME` — A steering message, user response, IRC wake, or other parent-turn interruption is not by itself authority to cancel independently useful child work. Use a host-proven detached or non-cascading child lifetime when useful work may continue across the parent wake. When the host exposes only a cancellation-sensitive blocking wait, sequence the callback and child dispatch safely instead. Cancel a child or cohort only through an explicit request, declared parent-abort policy, session or process termination, or unrecoverable runtime failure.
+- `DELEGATION.CANCELLED_PARTIAL` — Bind every physical child attempt to a stable attempt identity. A cancelled, interrupted, failed, or incomplete attempt remains provisional even when it wrote plausible files: file existence is not a complete specialist return. A successor must record whether it resumed, adopted and repaired, replaced, or discarded the partial attempt, and the parent may claim specialist completion only from the successful validated return and its attempt identity.
 
 <!-- End BBK prompt module bbk-prompt-delegation-return -->
 
@@ -437,6 +439,7 @@ Keep operational state, role readiness, assertion result, acceptance, and releas
 - `STATE.NO_OVERCLAIM` — Claim only what the exact current subject, method, evidence, authority, and role contract establish. Explicitly identify material claims not established and every scope, fidelity, freshness, exposure, or independence limitation.
 - `STATE.NONPASS` — Skipped, blocked, inconclusive, stale, wrong-subject, unbound, contaminated, incomplete, unavailable, or non-executed evidence is not a pass.
 - `STATE.READINESS_NOT_ACCEPTANCE` — Role readiness means only that the declared parent may consume the return. It does not imply baseline or candidate acceptance, finding closure, completion, residual-risk acceptance, compliance, outcome achievement, deployment, publication, or release.
+- `STATE.TRANSPORT_NOT_INTEGRATION` — Delivered, received, or relayed may be claimed from exact transport evidence. Recorded, integrated, accepted, completed, or decision-applied requires a durable artifact or structured role return bound to the exact subject; a send receipt or wake event alone is not proof of semantic integration.
 
 <!-- End BBK prompt module bbk-prompt-state-claim-truth -->
 

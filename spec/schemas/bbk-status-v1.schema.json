@@ -1,0 +1,150 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-status-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BBK status result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "command_status",
+    "project_state",
+    "artifact_integrity",
+    "semantic_readiness",
+    "execution_authorization",
+    "bbk_version",
+    "package",
+    "project",
+    "disclaimer"
+  ],
+  "properties": {
+    "schema": {"const": "bbk.status.v1"},
+    "status": {"enum": ["PASS", "UNINITIALIZED"]},
+    "command_status": {"const": "PASS"},
+    "project_state": {"enum": ["NO_PROJECT_SELECTED", "UNINITIALIZED", "INITIALIZED"]},
+    "artifact_integrity": {"enum": ["NOT_ASSESSED", "NOT_APPLICABLE", "OBSERVED"]},
+    "semantic_readiness": {"const": "NOT_ASSESSED"},
+    "execution_authorization": {"enum": ["NOT_ESTABLISHED", "NOT_AUTHORIZED"]},
+    "bbk_version": {"type": "string", "minLength": 1},
+    "package": {"$ref": "#/$defs/package"},
+    "project": {"type": ["object", "null"]},
+    "planning_artifacts": {"$ref": "#/$defs/planningCounts"},
+    "examples_available": {"$ref": "#/$defs/exampleCounts"},
+    "next_action": {"$ref": "#/$defs/nextAction"},
+    "git": {"type": "object"},
+    "active_workspaces": {"type": "array"},
+    "candidates": {"type": "array"},
+    "beads": {"type": "object"},
+    "recent_gate_receipts": {"type": "array"},
+    "disclaimer": {"type": "string", "minLength": 1}
+  },
+  "$defs": {
+    "package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "package_root", "roles", "targets", "projections", "schemas", "features"],
+      "properties": {
+        "version": {"type": "string", "minLength": 1},
+        "package_root": {"type": "string", "minLength": 1},
+        "roles": {"type": ["integer", "null"], "minimum": 0},
+        "targets": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "projections": {"type": ["integer", "null"], "minimum": 0},
+        "schemas": {"type": "integer", "minimum": 0},
+        "features": {"type": "object", "additionalProperties": {"type": "boolean"}}
+      }
+    },
+    "planningCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fit", "structures", "slices", "work_units"],
+      "properties": {
+        "fit": {"type": "integer", "minimum": 0},
+        "structures": {"type": "integer", "minimum": 0},
+        "slices": {"type": "integer", "minimum": 0},
+        "work_units": {"type": "integer", "minimum": 0}
+      }
+    },
+    "exampleCounts": {
+      "type": "object",
+      "required": ["fit", "structures", "slices", "work_units", "questions", "handoffs", "reviews", "total"],
+      "properties": {
+        "fit": {"type": "integer", "minimum": 0},
+        "structures": {"type": "integer", "minimum": 0},
+        "slices": {"type": "integer", "minimum": 0},
+        "work_units": {"type": "integer", "minimum": 0},
+        "state_effects": {"type": "integer", "minimum": 0},
+        "traces": {"type": "integer", "minimum": 0},
+        "questions": {"type": "integer", "minimum": 0},
+        "handoffs": {"type": "integer", "minimum": 0},
+        "reviews": {"type": "integer", "minimum": 0},
+        "total": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "nextAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command", "reason"],
+      "properties": {
+        "command": {"const": "bbk init"},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"project_state": {"const": "NO_PROJECT_SELECTED"}}, "required": ["project_state"]},
+      "then": {
+        "properties": {
+          "status": {"const": "PASS"},
+          "project": {"type": "null"},
+          "artifact_integrity": {"const": "NOT_ASSESSED"},
+          "execution_authorization": {"const": "NOT_ESTABLISHED"}
+        },
+        "not": {"anyOf": [{"required": ["planning_artifacts"]}, {"required": ["examples_available"]}, {"required": ["next_action"]}]}
+      }
+    },
+    {
+      "if": {"properties": {"project_state": {"const": "UNINITIALIZED"}}, "required": ["project_state"]},
+      "then": {
+        "required": ["planning_artifacts", "examples_available", "next_action"],
+        "properties": {
+          "status": {"const": "UNINITIALIZED"},
+          "artifact_integrity": {"const": "NOT_APPLICABLE"},
+          "execution_authorization": {"const": "NOT_AUTHORIZED"},
+          "project": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["root", "initialized"],
+            "properties": {
+              "root": {"type": "string", "minLength": 1},
+              "initialized": {"const": false}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"project_state": {"const": "INITIALIZED"}}, "required": ["project_state"]},
+      "then": {
+        "required": ["planning_artifacts", "examples_available", "git", "active_workspaces", "candidates", "beads", "recent_gate_receipts"],
+        "properties": {
+          "status": {"const": "PASS"},
+          "artifact_integrity": {"const": "OBSERVED"},
+          "execution_authorization": {"const": "NOT_ESTABLISHED"},
+          "project": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "title", "root", "initialized"],
+            "properties": {
+              "id": {"type": "string", "minLength": 1},
+              "title": {"type": "string"},
+              "root": {"type": "string", "minLength": 1},
+              "initialized": {"const": true}
+            }
+          }
+        }
+      }
+    }
+  ]
+}

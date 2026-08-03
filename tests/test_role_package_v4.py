@@ -7,7 +7,6 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-from tests._cli_support import run_cli as test_run_cli
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOLS = ROOT / "tools"
@@ -105,6 +104,31 @@ class SplitRolePackageV4Tests(unittest.TestCase):
         referenced = {skill for role in self.roles for skill in role["skills"]}
         self.assertTrue(referenced <= known)
         self.assertEqual(len(known), 39)
+
+    def test_beads_on_demand_skill_is_owned_by_exact_record_authorities(self) -> None:
+        expected = {
+            "bbk_root_wayfinder",
+            "bbk_territory_wayfinder",
+            "bbk_planning_wayfinder",
+            "bbk_phase_wayfinder",
+            "bbk_root_orchestrator",
+            "bbk_territory_orchestrator",
+            "bbk_worker_orchestrator",
+            "bbk_questioning_wayfinder",
+        }
+        actual = {
+            role["name"] for role in self.roles
+            if "bbk-beads" in role["skills"]
+        }
+        self.assertEqual(actual, expected)
+        for role in self.roles:
+            with self.subTest(role=role["name"]):
+                self.assertNotIn("bbk-beads", role["mandatory_skills"])
+                if role["name"] in expected:
+                    self.assertTrue(
+                        any("bbk-beads" in responsibility for responsibility in role["responsibilities"]),
+                        f"{role['name']} has the skill but no explicit record-ownership responsibility",
+                    )
 
     def test_primary_procedure_and_prompt_module_metadata_are_explicit(self) -> None:
         prompt_catalog = json.loads(
@@ -406,10 +430,15 @@ class SplitRolePackageV4Tests(unittest.TestCase):
             )
 
     def test_legacy_command_surface_invokes_v4_assembler(self) -> None:
-        completed = test_run_cli(
+        completed = subprocess.run(
             [sys.executable, ROOT / "tools" / "create_role_spec.py", "--check"],
             cwd=ROOT,
             check=False,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             timeout=60,
         )
         self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
@@ -418,3 +447,6 @@ class SplitRolePackageV4Tests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+# Deterministic fast/standard/release selection used by tools/run_tests.py.
+from tests._test_profiles import load_profiled_tests as load_tests

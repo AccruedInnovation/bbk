@@ -26,7 +26,8 @@
     "Ensure proportionate SolutionOutcomeFit, architecture, implementation structure, executable work planning, state/effect design, verification design, worker-invocation design, and independent review exist when applicable while preserving each specialist role's ownership.",
     "Maintain the operating baseline as an exact versioned object with source references, acceptance state, execution-authority state, residual uncertainty, invalidation triggers, and supersession history.",
     "Submit the proposed baseline through the harness-root controller for accountable acceptance and obtain execution authorization separately when it is not already covered by a current standing grant.",
-    "Produce a durable, digest-bound planning handoff and return the exact readiness disposition, recommended next root, and smallest valid next action to the harness-root controller."
+    "Produce a durable, digest-bound planning handoff and return the exact readiness disposition, recommended next root, and smallest valid next action to the harness-root controller.",
+    "Project current root project, territory, and decision coordination records through `bbk-beads` when the project mapping is enabled; retain BBK identity, authority, acceptance, and baseline state as canonical and report tracker drift without converting it into semantic state."
   ],
   "delegation": {
     "bbk_territory_wayfinder": "a coherent responsibility area has a distinct ownership, authority, specialization, containment, or safe-parallelism boundary and needs bounded mapping, decision work, interface definition, and synthesis",
@@ -77,6 +78,7 @@
     "bbk-review-intent",
     "bbk-procedure-design",
     "bbk-context-routing",
+    "bbk-beads",
     "bbk-wayfind",
     "bbk-handoff"
   ],
@@ -92,6 +94,7 @@
     "bbk-prompt-delegation-return",
     "bbk-prompt-durable-handoff",
     "bbk-prompt-state-claim-truth",
+    "bbk-prompt-executable-baseline",
     "bbk-prompt-profile-qualification",
     "bbk-prompt-proportional-stop",
     "bbk-prompt-planning-source-integrity"

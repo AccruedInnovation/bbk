@@ -12,6 +12,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -19,11 +20,11 @@ import textwrap
 import unittest
 from pathlib import Path
 from tests._cli_support import run_cli as test_run_cli
+from tests._path_support import assert_labeled_path, assert_same_path, paths_identify_same
 m1_ROOT = Path(__file__).resolve().parents[1]
 m1_TOOLS = m1_ROOT / 'tools'
 if str(m1_TOOLS) not in sys.path:
     sys.path.insert(0, str(m1_TOOLS))
-from path_compat import path_key as m_path_key
 m1_INSTALL = m1_ROOT / 'tools' / 'install.py'
 m1_ROUTING = m1_ROOT / 'tools' / 'omp_model_routing.py'
 m1_PROFILES = m1_ROOT / 'spec' / 'omp-model-routing-profiles.json'
@@ -51,13 +52,112 @@ def m1_frontmatter(path: Path) -> dict[str, str]:
         result[key] = parsed
     return result
 
+
+def m1_write_minimal_routing_install(*, base: Path, home: Path, scope: str, project: Path | None = None) -> dict[str, Path]:
+    """Create the authenticated routing surface without recopying the full BBK package.
+
+    Full user and project installation behavior is covered elsewhere. This
+    fixture isolates the OMP scope resolver and mutable-routing contract, which
+    otherwise spends most of its runtime copying hundreds of unrelated files
+    three times (especially costly on Windows).
+    """
+    if scope not in {'user', 'project'} or (scope == 'project') != (project is not None):
+        raise ValueError('scope/project mismatch')
+    if scope == 'user':
+        extension = home / '.omp' / 'agent' / 'extensions' / 'bbk'
+        agents = home / '.omp' / 'agent' / 'agents'
+        state_path = base / 'data' / 'effective-omp-model-routing.json'
+        manifest_path = base / 'data' / 'install-manifest.json'
+        package_root = base / 'data' / '0.1.0-alpha.13.5'
+    else:
+        assert project is not None
+        extension = project / '.omp' / 'extensions' / 'bbk'
+        agents = project / '.omp' / 'agents'
+        state_path = project / '.bbk-kit' / 'effective-omp-model-routing.json'
+        manifest_path = project / '.bbk-kit-install.json'
+        package_root = project / '.bbk-kit' / '0.1.0-alpha.13.5'
+    extension.mkdir(parents=True, exist_ok=True)
+    agents.mkdir(parents=True, exist_ok=True)
+    state_path.parent.mkdir(parents=True, exist_ok=True)
+    (package_root / 'spec').mkdir(parents=True, exist_ok=True)
+    shutil.copy2(m1_ROOT / 'VERSION', package_root / 'VERSION')
+    shutil.copy2(m1_ROOT / 'spec' / 'roles.json', package_root / 'spec' / 'roles.json')
+    shutil.copy2(
+        m1_ROOT / 'spec' / 'omp-model-routing-profiles.json',
+        package_root / 'spec' / 'omp-model-routing-profiles.json',
+    )
+    for name in ('index.js', 'package.json'):
+        shutil.copy2(m1_ROOT / 'omp' / 'extension' / name, extension / name)
+    for name in ('omp_model_routing.py', 'path_compat.py'):
+        shutil.copy2(m1_ROOT / 'tools' / name, extension / name)
+    shutil.copy2(m1_ROOT / 'VERSION', extension / 'VERSION')
+
+    routing = json.loads((m1_ROOT / 'spec' / 'model-routing.json').read_text(encoding='utf-8'))
+    routes = {name: value['omp'] for name, value in routing['roles'].items()}
+    for role in routes:
+        shutil.copy2(m1_ROOT / 'projections' / 'omp' / 'agents' / f'{role}.md', agents / f'{role}.md')
+    canonical_routes = json.dumps(routes, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode('utf-8')
+    state = {
+        'schema': 'bbk.omp-model-routing-state.v1',
+        'package_version': '0.1.0-alpha.13.5',
+        'active_profile': 'installation-default',
+        'source': 'minimal-routing-test-fixture',
+        'description': 'Canonical installation-default routing for an isolated OMP scope test.',
+        'updated_at': '2026-08-02T00:00:00Z',
+        'installation_default': routes,
+        'roles': routes,
+        'routes_sha256': hashlib.sha256(canonical_routes).hexdigest(),
+    }
+    state_path.write_text(json.dumps(state, indent=2, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
+
+    owned = [state_path, *(agents / f'{role}.md' for role in routes)]
+    records = [
+        {
+            'path': str(path.resolve()),
+            'bytes': path.stat().st_size,
+            'sha256': hashlib.sha256(path.read_bytes()).hexdigest(),
+            'source': 'minimal-routing-test-fixture',
+        }
+        for path in owned
+    ]
+    manifest = {
+        'schema': 'bbk.install-manifest.v1',
+        'version': '0.1.0-alpha.13.5',
+        'scope': scope,
+        'project_root': str(project.resolve()) if project else None,
+        'omp': True,
+        'files': records,
+    }
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
+    binding = {
+        'schema': 'bbk.omp-package-binding.v3',
+        'version': '0.1.0-alpha.13.5',
+        'path': str(package_root.resolve()),
+        'package_root': str(package_root.resolve()),
+        'scope': scope,
+        'project_root': str(project.resolve()) if project else None,
+        'manifest_path': str(manifest_path.resolve()),
+        'omp_agents': str(agents.resolve()),
+        'state_path': str(state_path.resolve()),
+    }
+    binding_path = extension / 'bbk-package-root.json'
+    binding_path.write_text(json.dumps(binding, indent=2, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
+    return {
+        'extension': extension,
+        'agents': agents,
+        'state': state_path,
+        'manifest': manifest_path,
+        'binding': binding_path,
+    }
+
 class Alpha113OmpModelMenuTests(unittest.TestCase):
 
     def test_bundled_profiles_cover_every_role_and_include_requested_cost_modes(self):
         value = json.loads(m1_PROFILES.read_text(encoding='utf-8'))
         roles = {item['name'] for item in json.loads((m1_ROOT / 'spec' / 'roles.json').read_text(encoding='utf-8'))['roles']}
         self.assertEqual(value['schema_version'], 'bbk.omp-model-routing-profiles.v1')
-        self.assertEqual(value['package_version'], '0.1.0-alpha.13.1')
+        self.assertEqual(value['package_version'], '0.1.0-alpha.13.5')
         self.assertEqual(set(value['profiles']), {'default', 'testing-flash', 'deepseek-economy'})
         for profile in value['profiles'].values():
             self.assertEqual(set(profile['roles']), roles)
@@ -68,10 +168,206 @@ class Alpha113OmpModelMenuTests(unittest.TestCase):
         self.assertIn('deepseek/deepseek-v4-pro', {route['model'] for route in economy.values()})
         self.assertIn('deepseek/deepseek-v4-flash', {route['model'] for route in economy.values()})
 
+    @unittest.skipUnless(shutil.which('node'), 'Node.js is required for OMP routing-scope behavior')
+    def test_project_profiles_are_isolated_and_broken_project_installs_do_not_fall_back(self):
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            home = base / 'home'
+            project_a = base / 'project-a'
+            project_b = base / 'project-b'
+            broken = base / 'broken-project'
+            broken_router = base / 'broken-router-project'
+            for path in (home, project_a, project_b, broken / 'nested', broken_router):
+                path.mkdir(parents=True)
+            routing_cwd_a = project_a / 'src'
+            project_a_input_spelling = project_a
+            alias = base / 'project-a-alias'
+            try:
+                alias.symlink_to(project_a, target_is_directory=True)
+                routing_cwd_a = alias / 'src'
+                project_a_input_spelling = alias
+            except OSError:
+                pass
+            env = os.environ.copy()
+            env.update({
+                'BBK_HOME': str(home),
+                'HOME': str(home),
+                'BBK_INSTALL_ROOT': str(base / 'data'),
+                'BBK_BIN_DIR': str(base / 'bin'),
+            })
+            m1_write_minimal_routing_install(base=base, home=home, scope='user')
+            m1_write_minimal_routing_install(base=base, home=home, scope='project', project=project_a)
+            m1_write_minimal_routing_install(base=base, home=home, scope='project', project=project_b)
+            m1_write_minimal_routing_install(base=base, home=home, scope='project', project=broken_router)
+
+            user_extension = home / '.omp' / 'agent' / 'extensions' / 'bbk'
+            script = base / 'project-routing.mjs'
+            script.write_text(textwrap.dedent(f'''
+                const chain = () => ({{ optional() {{ return this; }} }});
+                const z = {{ object: value => value, string: chain, boolean: chain,
+                  enum: values => chain(), array: value => chain() }};
+                const commands = new Map(), notifications = [], confirmations = [];
+                const pi = {{ zod: {{ z }}, setLabel() {{}}, registerTool() {{}}, on() {{}},
+                  events: {{ on() {{ return () => {{}}; }} }},
+                  registerCommand(name, value) {{ commands.set(name, value); }} }};
+                const {{ unlinkSync }} = await import('node:fs');
+                const mod = await import({json.dumps((user_extension / 'index.js').as_uri())});
+                mod.default(pi);
+                const command = commands.get('bbk:models');
+                function context(cwd) {{
+                  return {{
+                    cwd, hasUI: true,
+                    models: {{ list() {{ return []; }}, resolve() {{ return true; }} }},
+                    ui: {{
+                      notify(message, level) {{ notifications.push({{cwd, message, level}}); }},
+                      async confirm(title, body) {{ confirmations.push({{cwd, title, body}}); return false; }},
+                    }},
+                  }};
+                }}
+                const a = context({json.dumps(str(routing_cwd_a))});
+                const b = context({json.dumps(str(project_b))});
+                const u = context({json.dumps(str(base))});
+                const broken = context({json.dumps(str(broken / 'nested'))});
+                const brokenRouter = context({json.dumps(str(broken_router))});
+                await command.handler('profile testing-flash', a);
+                await command.handler('status', a);
+                await command.handler('profile deepseek-economy', b);
+                await command.handler('status', b);
+                await command.handler('user profile testing-flash', u);
+                await command.handler('status', broken);
+                unlinkSync({json.dumps(str(broken_router / '.omp' / 'extensions' / 'bbk' / 'omp_model_routing.py'))});
+                await command.handler('status', brokenRouter);
+                console.log(JSON.stringify({{notifications, confirmations}}));
+            '''), encoding='utf-8')
+            (project_a / 'src').mkdir()
+            broken_manifest = {
+                'schema': 'bbk.install-manifest.v1',
+                'version': 'broken-test',
+                'scope': 'project',
+                'omp': True,
+                'files': [],
+            }
+            (broken / '.bbk-kit-install.json').write_text(json.dumps(broken_manifest, indent=2) + '\n', encoding='utf-8')
+            ui = json.loads(m1_run(['node', script], env=env).stdout)
+
+            state_a = json.loads((project_a / '.bbk-kit' / 'effective-omp-model-routing.json').read_text(encoding='utf-8'))
+            state_b = json.loads((project_b / '.bbk-kit' / 'effective-omp-model-routing.json').read_text(encoding='utf-8'))
+            state_user = json.loads((base / 'data' / 'effective-omp-model-routing.json').read_text(encoding='utf-8'))
+            self.assertEqual(state_a['active_profile'], 'testing-flash')
+            self.assertEqual(state_b['active_profile'], 'deepseek-economy')
+            self.assertEqual(state_user['active_profile'], 'installation-default')
+            self.assertEqual(len(ui['confirmations']), 1)
+            self.assertIn('shared user-scoped BBK installation', ui['confirmations'][0]['body'])
+
+            messages = [item['message'] for item in ui['notifications']]
+            assert_labeled_path(self, messages, 'Project', project_a_input_spelling, required_text='Scope: project')
+            assert_labeled_path(
+                self,
+                messages,
+                'Binding',
+                project_a_input_spelling / '.omp' / 'extensions' / 'bbk' / 'bbk-package-root.json',
+            )
+            assert_labeled_path(
+                self,
+                messages,
+                'State',
+                project_b / '.bbk-kit' / 'effective-omp-model-routing.json',
+            )
+            self.assertTrue(any('routing did not fall back to user scope' in message for message in messages))
+            self.assertTrue(any('missing its bound router' in message and 'did not fall back' in message for message in messages))
+            broken_router_state = json.loads((broken_router / '.bbk-kit' / 'effective-omp-model-routing.json').read_text(encoding='utf-8'))
+            self.assertEqual(broken_router_state['active_profile'], 'installation-default')
+
+            for project, expected_profile in ((project_a, 'testing-flash'), (project_b, 'deepseek-economy')):
+                binding = json.loads((project / '.omp' / 'extensions' / 'bbk' / 'bbk-package-root.json').read_text(encoding='utf-8'))
+                self.assertEqual(binding['schema'], 'bbk.omp-package-binding.v3')
+                self.assertEqual(binding['scope'], 'project')
+                assert_same_path(self, binding['project_root'], project)
+                status, _ = m1_run_json([
+                    sys.executable, project / '.omp' / 'extensions' / 'bbk' / 'omp_model_routing.py',
+                    '--binding', project / '.omp' / 'extensions' / 'bbk' / 'bbk-package-root.json',
+                    '--json', 'status',
+                ], env=env)
+                self.assertEqual(status['scope'], 'project')
+                assert_same_path(self, status['project_root'], project)
+                self.assertEqual(status['active_profile'], expected_profile)
+                assert_same_path(self, status['omp_agents'], project / '.omp' / 'agents')
+                self.assertFalse(status['global_effect'])
+
+            user_binding = user_extension / 'bbk-package-root.json'
+            user_status, _ = m1_run_json([
+                sys.executable, user_extension / 'omp_model_routing.py',
+                '--binding', user_binding, '--json', 'status',
+            ], env=env)
+            self.assertEqual(user_status['scope'], 'user')
+            self.assertTrue(user_status['global_effect'])
+
+    @unittest.skipUnless(shutil.which('node'), 'Node.js is required for OMP UTF-8 transport behavior')
+    def test_installed_omp_tool_transport_round_trips_utf8_strictly(self):
+        title = "Baffle Connector — Δ測試 — café — 🚧"
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            project = base / 'project'
+            project.mkdir()
+            script = base / 'utf8-roundtrip.mjs'
+            script.write_text(textwrap.dedent(f"""
+                const chain = () => ({{ optional() {{ return this; }} }});
+                const z = {{ object: value => value, string: chain, boolean: chain,
+                  enum: values => chain(), array: value => chain() }};
+                const tools = new Map();
+                const pi = {{ zod: {{ z }}, setLabel() {{}}, on() {{}},
+                  events: {{ on() {{ return () => {{}}; }} }},
+                  registerCommand() {{}}, registerTool(value) {{ tools.set(value.name, value); }} }};
+                const mod = await import({json.dumps((m1_ROOT / 'omp' / 'extension' / 'index.js').as_uri())});
+                mod.default(pi);
+                const ctx = {{ cwd: {json.dumps(str(project))} }};
+                const init = await tools.get('bbk_init').execute('init', {{
+                  root: {json.dumps(str(project))}, title: {json.dumps(title)}, projectId: 'BBK-UTF8-OMP'
+                }}, undefined, undefined, ctx);
+                const status = await tools.get('bbk_status').execute('status', {{root: {json.dumps(str(project))}}}, undefined, undefined, ctx);
+                console.log(JSON.stringify({{init, status}}));
+            """), encoding='utf-8')
+            env = {**os.environ, 'BBK_PYTHON': sys.executable, 'BBK_CLI': str(m1_ROOT / 'tools' / 'bbk.py')}
+            value = json.loads(m1_run(['node', script], env=env).stdout)
+            self.assertFalse(value['init']['isError'])
+            self.assertFalse(value['status']['isError'])
+            self.assertEqual(value['init']['details']['title'], title)
+            self.assertEqual(value['status']['details']['project']['title'], title)
+            self.assertNotIn('�', json.dumps(value, ensure_ascii=False))
+            self.assertEqual(json.loads((project / '.bbk' / 'config.json').read_text(encoding='utf-8'))['title'], title)
+            self.assertIn(title, (project / '.bbk' / 'project.md').read_text(encoding='utf-8'))
+
+    @unittest.skipUnless(shutil.which('node') and os.name != 'nt', 'POSIX executable shim required for invalid UTF-8 transport test')
+    def test_omp_tool_transport_rejects_invalid_utf8_without_replacement(self):
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            fake = base / 'fake-python'
+            fake.write_text("#!/bin/sh\nprintf '\\377'\n", encoding='utf-8')
+            fake.chmod(0o755)
+            script = base / 'invalid-utf8.mjs'
+            script.write_text(textwrap.dedent(f"""
+                const chain = () => ({{ optional() {{ return this; }} }});
+                const z = {{ object: value => value, string: chain, boolean: chain,
+                  enum: values => chain(), array: value => chain() }};
+                const tools = new Map();
+                const pi = {{ zod: {{ z }}, setLabel() {{}}, on() {{}},
+                  events: {{ on() {{ return () => {{}}; }} }}, registerCommand() {{}},
+                  registerTool(value) {{ tools.set(value.name, value); }} }};
+                const mod = await import({json.dumps((m1_ROOT / 'omp' / 'extension' / 'index.js').as_uri())});
+                mod.default(pi);
+                const value = await tools.get('bbk_status').execute('status', {{}}, undefined, undefined, {{cwd: {json.dumps(str(base))}}});
+                console.log(JSON.stringify(value));
+            """), encoding='utf-8')
+            value = json.loads(m1_run(['node', script], env={**os.environ, 'BBK_PYTHON': str(fake)}).stdout)
+            self.assertTrue(value['isError'])
+            self.assertEqual(value['details']['schema'], 'bbk.utf8-transport-error.v1')
+            self.assertIn('not valid UTF-8', value['details']['error'])
+            self.assertNotIn('�', json.dumps(value, ensure_ascii=False))
+
     def test_template_is_compact_and_valid_for_runtime_application(self):
         value = json.loads(m1_TEMPLATE.read_text(encoding='utf-8'))
         self.assertEqual(value['schema_version'], 'bbk.omp-model-routing-profile.v1')
-        self.assertEqual(value['package_version'], '0.1.0-alpha.13.1')
+        self.assertEqual(value['package_version'], '0.1.0-alpha.13.5')
         self.assertEqual(set(value['default']), {'model', 'thinkingLevel'})
         canonical = {item['name'] for item in json.loads((m1_ROOT / 'spec' / 'roles.json').read_text(encoding='utf-8'))['roles']}
         self.assertLessEqual(set(value['roles']), canonical)
@@ -86,7 +382,9 @@ class Alpha113OmpModelMenuTests(unittest.TestCase):
             installed, _ = m1_run_json([sys.executable, m1_INSTALL, '--json', 'install', '--scope', 'user', '--omp', '--no-language-profiles'], env=env)
             extension = home / '.omp' / 'agent' / 'extensions' / 'bbk'
             binding = json.loads((extension / 'bbk-package-root.json').read_text(encoding='utf-8'))
-            self.assertEqual(binding['schema'], 'bbk.omp-package-binding.v2')
+            self.assertEqual(binding['schema'], 'bbk.omp-package-binding.v3')
+            self.assertEqual(binding['scope'], 'user')
+            self.assertIsNone(binding['project_root'])
             self.assertTrue((extension / 'omp_model_routing.py').is_file())
             self.assertTrue((extension / 'path_compat.py').is_file())
             self.assertTrue(Path(binding['state_path']).is_file())
@@ -157,7 +455,7 @@ class Alpha113OmpModelMenuTests(unittest.TestCase):
 
     def test_version_and_extension_metadata_agree(self):
         version = (m1_ROOT / 'VERSION').read_text(encoding='utf-8').strip()
-        self.assertEqual(version, '0.1.0-alpha.13.1')
+        self.assertEqual(version, '0.1.0-alpha.13.5')
         self.assertEqual(json.loads((m1_ROOT / 'omp' / 'extension' / 'package.json').read_text(encoding='utf-8'))['version'], version)
         self.assertEqual(json.loads(m1_PROFILES.read_text(encoding='utf-8'))['package_version'], version)
 
@@ -216,19 +514,24 @@ class Alpha114OmpContextAndUpdateTests(unittest.TestCase):
             home.mkdir()
             env = os.environ.copy()
             env.update({'BBK_HOME': str(home), 'HOME': str(home), 'BBK_INSTALL_ROOT': str(base / 'data'), 'BBK_BIN_DIR': str(base / 'bin')})
-            m2_run([sys.executable, m2_INSTALL, 'install', '--scope', 'user', '--omp', '--no-language-profiles'], env=env)
-            extension = home / '.omp' / 'agent' / 'extensions' / 'bbk' / 'index.js'
+            installation = m1_write_minimal_routing_install(base=base, home=home, scope='user')
+            binding = json.loads(installation['binding'].read_text(encoding='utf-8'))
+            binding['path'] = str(m1_ROOT.resolve())
+            binding['package_root'] = str(m1_ROOT.resolve())
+            installation['binding'].write_text(json.dumps(binding, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+            extension = installation['extension'] / 'index.js'
             script = base / 'context-boundary.mjs'
             script.write_text(textwrap.dedent(f"\n                    const chain = () => ({{ optional() {{ return this; }} }});\n                    const z = {{ object: value => value, string: chain, boolean: chain,\n                      enum: values => chain(), array: value => chain() }};\n                    const commands = new Map(), handlers = new Map();\n                    const messages = [], userMessages = [], notifications = [], entries = [], statuses = [];\n                    const branch = [];\n                    const pi = {{\n                      zod: {{ z }}, setLabel() {{}}, registerTool() {{}},\n                      on(name, value) {{ if (!handlers.has(name)) handlers.set(name, []); handlers.get(name).push(value); }},\n                      registerCommand(name, value) {{ commands.set(name, value); }},\n                      sendMessage(value, options) {{ messages.push({{value, options}}); }},\n                      async sendUserMessage(value, options) {{ userMessages.push({{value, options}}); }},\n                      appendEntry(customType, data) {{ entries.push({{customType, data}}); branch.push({{type:'custom', customType, data}}); }},\n                    }};\n                    const mod = await import({json.dumps(extension.as_uri())});\n                    mod.default(pi);\n                    const ctx = {{\n                      cwd: {json.dumps(str(base))}, hasUI: true,\n                      isIdle() {{ return true; }},\n                      sessionManager: {{ getBranch() {{ return branch; }} }},\n                      models: {{ list() {{ return []; }}, resolve() {{ return true; }} }},\n                      ui: {{\n                        notify(message, level) {{ notifications.push({{message, level}}); }},\n                        setStatus(key, value) {{ statuses.push({{key, value: value ?? null}}); }},\n                        async select() {{ throw new Error('unexpected interactive menu'); }},\n                      }},\n                    }};\n                    const results = [];\n                    const commandNames = [...commands.keys()].sort();\n                    for (const name of commandNames) {{\n                      if (name === 'bbk') {{\n                        results.push(await commands.get(name).handler('status', ctx));\n                      }} else if (name === 'bbk:models') {{\n                        results.push(await commands.get(name).handler('status', ctx));\n                      }} else {{\n                        results.push(await commands.get(name).handler('', ctx));\n                      }}\n                    }}\n                    const beforeMode = {{ messages: messages.length, userMessages: userMessages.length, entries: entries.length }};\n                    results.push(await commands.get('bbk').handler('', ctx));\n                    const afterEnter = {{ messages: messages.length, userMessages: userMessages.length, entries: entries.length }};\n                    const beforeAgent = handlers.get('before_agent_start')?.[0];\n                    if (!beforeAgent) throw new Error('missing before_agent_start');\n                    const activeOverlay = await beforeAgent({{systemPrompt:['<<OMP-INHERITED-CONTAMINATION>>']}}, ctx);\n                    results.push(await commands.get('bbk').handler('Plan the sample system', ctx));\n                    results.push(await commands.get('bbk:exit').handler('', ctx));\n                    const inactiveOverlay = await beforeAgent({{systemPrompt:['<<OMP-INHERITED-CONTAMINATION>>']}}, ctx);\n                    console.log(JSON.stringify({{\n                      allUndefined: results.every(value => value === undefined),\n                      commandNames,\n                      messages: messages.length,\n                      userMessages: userMessages.length,\n                      beforeMode,\n                      afterEnter,\n                      entries,\n                      statuses,\n                      notifications: notifications.length,\n                      prompt: userMessages[0]?.value || '',\n                      activeOverlay: activeOverlay?.systemPrompt?.join(String.fromCharCode(10)) || '',\n                      inactiveOverlay: inactiveOverlay ?? null,\n                    }}));\n                    "), encoding='utf-8')
             value = json.loads(m2_run([shutil.which('node') or 'node', script], env=env).stdout)
             self.assertTrue(value['allUndefined'])
-            self.assertEqual(len(value['commandNames']), 27)
+            self.assertEqual(len(value['commandNames']), 29)
+            self.assertIn('bbk:agents', value['commandNames'])
             self.assertIn('bbk:exit', value['commandNames'])
             self.assertEqual(value['messages'], 0)
             self.assertEqual(value['beforeMode'], {'messages': 0, 'userMessages': 0, 'entries': 0})
             self.assertEqual(value['afterEnter'], {'messages': 0, 'userMessages': 0, 'entries': 1})
             self.assertEqual(value['userMessages'], 1)
-            self.assertGreaterEqual(value['notifications'], 27)
+            self.assertGreaterEqual(value['notifications'], 28)
             self.assertEqual(value['prompt'], 'Plan the sample system')
             self.assertNotIn('bbk_root_wayfinder', value['prompt'])
             self.assertIn('<bbk-controller-system', value['activeOverlay'])
@@ -294,7 +597,7 @@ class Alpha114OmpContextAndUpdateTests(unittest.TestCase):
             predecessor_manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
             predecessor_manifest['files'] = [
                 record for record in predecessor_manifest['files']
-                if m_path_key(record['path']) != m_path_key(helper)
+                if not paths_identify_same(record['path'], helper)
             ]
             manifest_path.write_text(
                 json.dumps(predecessor_manifest, indent=2, ensure_ascii=False, sort_keys=True) + '\n',
@@ -465,7 +768,7 @@ class Alpha12OmpPromptBoundaryTests(unittest.TestCase):
                   notifications: notificationsFor(),
                 }}));
         '''))
-        self.assertEqual(value['commands'], 27)
+        self.assertEqual(value['commands'], 29)
         self.assertIsNone(value['inactive'])
         self.assertTrue(value['enterUndefined'])
         self.assertTrue(value['exitUndefined'])
@@ -753,7 +1056,7 @@ You NEVER give up due to uncertainty. You MUST keep going until this ticket is c
         self.assertEqual(active['key'], 'bbk-worker-activity')
         self.assertEqual(active['options'], {'placement': 'aboveEditor'})
         line = active['content'][0]
-        self.assertIn('BBK · RelayWayfinder [ctx 264k/1M 26%]', line)
+        self.assertIn('BBK · 2 active · RelayWayfinder [ctx 264k/1M 26%]', line)
         self.assertIn("Incorporating the user's answers into the operating baseline", line)
         self.assertIn('RelayOrchestrator 44.7k/1M 4.5%', line)
         self.assertNotIn('\n', line)
@@ -761,8 +1064,315 @@ You NEVER give up due to uncertainty. You MUST keep going until this ticket is c
         self.assertNotIn('\u200b', line)
         self.assertNotIn('\u202e', line)
         self.assertNotIn('ignore me', line)
-        self.assertEqual(value['afterComplete']['content'], ['BBK · ready'])
+        self.assertEqual(value['afterComplete']['content'], ['BBK · ready · 2 agents in history'])
         self.assertIsNone(value['afterExit']['content'])
+
+    def test_nested_agent_tree_preserves_lineage_details_and_deduplicates_direct_events(self):
+        value = m3_run_node(textwrap.dedent(f'''\
+                {m3_MOCK_PREFIX}
+                const mod = await import({json.dumps(m3_EXTENSION.as_uri())});
+                mod.default(pi);
+                await commands.get("bbk").handler("", ctx);
+                const progress = busHandlers.get("task:subagent:progress")?.[0];
+                const lifecycle = busHandlers.get("task:subagent:lifecycle")?.[0];
+                if (!progress || !lifecycle) throw new Error("BBK activity event handlers missing");
+
+                progress({{
+                  agent: "bbk_root_wayfinder",
+                  progress: {{
+                    id: "RootWayfinder-1",
+                    name: "RootWayfinder-1",
+                    agent: "bbk_root_wayfinder",
+                    status: "running",
+                    model: "openai-codex/gpt-5.6-sol",
+                    task: "Compile the accepted planning baseline",
+                    sessionId: "session-root",
+                    toolCallId: "tool-root",
+                    inflightTaskDetails: {{
+                      progress: [{{
+                        id: "PlanningWayfinder-1",
+                        name: "PlanningWayfinder-1",
+                        agent: "bbk_planning_wayfinder",
+                        status: "running",
+                        model: "deepseek/deepseek-v4-pro",
+                        task: "Decompose capability increments",
+                        sessionId: "session-planning",
+                        toolCallId: "tool-planning",
+                        parentToolCallId: "tool-root",
+                        inflightTaskDetails: {{
+                          progress: [{{
+                            id: "ArchitectChild-1",
+                            name: "ArchitectChild-1",
+                            agent: "bbk_architect",
+                            status: "running",
+                            model: "openai-codex/gpt-5.6-sol",
+                            task: "Define the system boundary",
+                            sessionId: "session-architect",
+                            sessionFile: "/sessions/architect.jsonl",
+                            toolCallId: "tool-architect",
+                            parentToolCallId: "tool-planning",
+                            contextTokens: 12000,
+                            contextWindow: 200000,
+                          }}],
+                        }},
+                      }}],
+                    }},
+                  }},
+                }});
+                await commands.get("bbk:agents").handler("all", ctx);
+                const nestedTree = notifications.at(-1).message;
+
+                // OMP can subsequently publish a direct event for the same physical
+                // descendant. The direct event must enrich, not flatten or duplicate it.
+                progress({{
+                  id: "ArchitectChild-1",
+                  agent: "bbk_architect",
+                  status: "running",
+                  currentTool: "read",
+                  currentToolArgs: "architecture.md",
+                  contextTokens: 14000,
+                  contextWindow: 200000,
+                }});
+                await commands.get("bbk:agents").handler("details ArchitectChild-1", ctx);
+                const details = JSON.parse(notifications.at(-1).message);
+                await commands.get("bbk:agents").handler("all", ctx);
+                const deduplicatedTree = notifications.at(-1).message;
+
+                // OMP moves completed nested task details into
+                // extractedToolData.task after the parent's task call returns.
+                progress({{
+                  id: "RootWayfinder-1",
+                  agent: "bbk_root_wayfinder",
+                  status: "running",
+                  extractedToolData: {{
+                    task: [{{
+                      progress: [],
+                      results: [{{
+                        id: "CompletedResearcher-1",
+                        name: "CompletedResearcher-1",
+                        agent: "bbk_researcher",
+                        task: "Confirm one external fact",
+                        exitCode: 0,
+                        resolvedModel: "deepseek/deepseek-v4-flash",
+                        sessionFile: "/sessions/researcher.jsonl",
+                      }}],
+                      totalDurationMs: 50,
+                    }}],
+                  }},
+                }});
+                await commands.get("bbk:agents").handler("all", ctx);
+                const finalizedTree = notifications.at(-1).message;
+
+                lifecycle({{id:"ArchitectChild-1", agent:"bbk_architect", status:"completed"}});
+                lifecycle({{id:"PlanningWayfinder-1", agent:"bbk_planning_wayfinder", status:"completed"}});
+                lifecycle({{id:"RootWayfinder-1", agent:"bbk_root_wayfinder", status:"completed"}});
+                await commands.get("bbk:agents").handler("all", ctx);
+                const terminalTree = notifications.at(-1).message;
+                await commands.get("bbk:agents").handler("active", ctx);
+                const activeTree = notifications.at(-1).message;
+                console.log(JSON.stringify({{
+                  nestedTree,
+                  deduplicatedTree,
+                  finalizedTree,
+                  terminalTree,
+                  activeTree,
+                  details,
+                }}));
+        '''))
+        self.assertIn('Main', value['nestedTree'])
+        self.assertIn('RootWayfinder-1 [bbk_root_wayfinder]', value['nestedTree'])
+        self.assertIn('PlanningWayfinder-1 [bbk_planning_wayfinder]', value['nestedTree'])
+        self.assertIn('ArchitectChild-1 [bbk_architect]', value['nestedTree'])
+        self.assertIn('└─ RootWayfinder-1', value['nestedTree'])
+        self.assertIn('   └─ PlanningWayfinder-1', value['nestedTree'])
+        self.assertIn('      └─ ArchitectChild-1', value['nestedTree'])
+        self.assertEqual(value['deduplicatedTree'].count('ArchitectChild-1 [bbk_architect]'), 1)
+        self.assertIn('3 active / 3 known', value['deduplicatedTree'])
+        self.assertIn('3 active / 4 known', value['finalizedTree'])
+        self.assertIn('CompletedResearcher-1 [bbk_researcher] · completed', value['finalizedTree'])
+        self.assertIn('   └─ CompletedResearcher-1', value['finalizedTree'])
+
+        self.assertEqual(value['details']['schema'], 'bbk.omp-agent-details.v1')
+        self.assertEqual(len(value['details']['matches']), 1)
+        detail = value['details']['matches'][0]
+        self.assertEqual(detail['id'], 'ArchitectChild-1')
+        self.assertEqual(detail['role'], 'bbk_architect')
+        self.assertEqual(detail['parent_id'], 'PlanningWayfinder-1')
+        self.assertEqual(detail['depth'], 2)
+        self.assertEqual(detail['spawn_mode'], 'synchronous')
+        self.assertEqual(detail['model'], 'openai-codex/gpt-5.6-sol')
+        self.assertEqual(detail['session_id'], 'session-architect')
+        self.assertEqual(detail['session_file'], '/sessions/architect.jsonl')
+        self.assertEqual(detail['tool_call_id'], 'tool-architect')
+        self.assertEqual(detail['parent_tool_call_id'], 'tool-planning')
+        self.assertEqual(detail['current_tool'], 'read')
+        self.assertEqual(detail['current_tool_args'], 'architecture.md')
+        self.assertEqual(detail['context_tokens'], 14000)
+        self.assertEqual(detail['context_window'], 200000)
+
+        self.assertIn('0 active / 4 known', value['terminalTree'])
+        self.assertIn('ArchitectChild-1 [bbk_architect] · completed', value['terminalTree'])
+        self.assertIn('0 active / 4 known', value['activeTree'])
+        self.assertEqual(value['activeTree'].strip().splitlines()[-1], 'Main')
+
+    def test_nested_agent_tree_recursively_flattens_omp_progress_and_retains_details(self):
+        value = m3_run_node(textwrap.dedent(f'''\
+                {m3_MOCK_PREFIX}
+                const mod = await import({json.dumps(m3_EXTENSION.as_uri())});
+                mod.default(pi);
+                await commands.get("bbk").handler("", ctx);
+                const lifecycle = busHandlers.get("task:subagent:lifecycle")?.[0];
+                const progress = busHandlers.get("task:subagent:progress")?.[0];
+                if (!lifecycle || !progress) throw new Error("BBK activity event handlers missing");
+
+                progress({{
+                  id: "root-1",
+                  name: "RootWayfinder",
+                  agent: "bbk_root_wayfinder",
+                  detached: true,
+                  progress: {{
+                    status: "running",
+                    lastIntent: "Compiling the operating plan",
+                    contextTokens: 120000,
+                    contextWindow: 1000000,
+                    inflightTaskDetails: {{
+                      progress: [
+                        {{
+                          id: "planning-1",
+                          name: "PlanningWayfinder",
+                          agent: "bbk_planning_wayfinder",
+                          detached: false,
+                          resolvedModel: "openai-codex/gpt-5.6-sol",
+                          progress: {{
+                            status: "running",
+                            lastIntent: "Decomposing capability increments",
+                            inflightTaskDetails: {{
+                              tasks: [
+                                {{
+                                  id: "architect-1",
+                                  name: "Architect",
+                                  agent: "bbk_architect",
+                                  detached: false,
+                                  toolCallId: "tool-architect",
+                                  sessionId: "session-architect",
+                                  progress: {{
+                                    status: "running",
+                                    currentTool: "read",
+                                    currentToolArgs: "spec/architecture.json",
+                                    contextTokens: 45000,
+                                    contextWindow: 1000000,
+                                  }},
+                                }},
+                                {{
+                                  id: "architect-2",
+                                  name: "Architect",
+                                  agent: "bbk_architect",
+                                  detached: false,
+                                  toolCallId: "tool-architect-2",
+                                  sessionId: "session-architect-2",
+                                  progress: {{
+                                    status: "waiting",
+                                    lastIntent: "Checking an independent architecture boundary",
+                                    contextTokens: 8000,
+                                    contextWindow: 1000000,
+                                  }},
+                                }},
+                              ],
+                            }},
+                          }},
+                        }},
+                        {{
+                          id: "question-1",
+                          name: "QuestioningWayfinder",
+                          agent: "bbk_questioning_wayfinder",
+                          detached: true,
+                          progress: {{status: "waiting", lastIntent: "Preparing one material question"}},
+                        }},
+                      ],
+                    }},
+                  }},
+                }});
+                // OMP also emits a direct lifecycle/progress stream for some descendants.
+                // These records must enrich, not duplicate, the nested snapshot record.
+                lifecycle({{
+                  id: "architect-1",
+                  name: "Architect",
+                  agent: "bbk_architect",
+                  parentAgentId: "planning-1",
+                  status: "started",
+                  detached: false,
+                  sessionId: "session-architect",
+                }});
+                progress({{
+                  id: "architect-1",
+                  name: "Architect",
+                  agent: "bbk_architect",
+                  parentAgentId: "planning-1",
+                  progress: {{
+                    status: "running",
+                    currentTool: "read",
+                    currentToolArgs: "spec/architecture.json",
+                    contextTokens: 46000,
+                    contextWindow: 1000000,
+                  }},
+                }});
+
+                await commands.get("bbk:agents").handler("json", ctx);
+                const initial = JSON.parse(notifications.at(-1).message);
+                await commands.get("bbk:agents").handler("details architect-1", ctx);
+                const details = JSON.parse(notifications.at(-1).message);
+
+                lifecycle({{
+                  id: "architect-1",
+                  name: "Architect",
+                  agent: "bbk_architect",
+                  parentAgentId: "planning-1",
+                  status: "completed",
+                  detached: false,
+                }});
+                await commands.get("bbk:agents").handler("json", ctx);
+                const completed = JSON.parse(notifications.at(-1).message);
+                await commands.get("bbk:agents").handler("active", ctx);
+                const activeText = notifications.at(-1).message;
+                console.log(JSON.stringify({{initial, details, completed, activeText, widget: widgets.at(-1)}}));
+        '''))
+        initial = value['initial']
+        self.assertEqual(initial['schema'], 'bbk.omp-agent-tree.v1')
+        self.assertEqual(initial['agent_count'], 5)
+        self.assertEqual(initial['active_count'], 5)
+        records = {item['id']: item for item in initial['agents']}
+        self.assertEqual(set(records), {'root-1', 'planning-1', 'architect-1', 'architect-2', 'question-1'})
+        self.assertEqual(records['root-1']['parent_id'], 'Main')
+        self.assertEqual(records['planning-1']['parent_id'], 'root-1')
+        self.assertEqual(records['architect-1']['parent_id'], 'planning-1')
+        self.assertEqual(records['architect-2']['parent_id'], 'planning-1')
+        self.assertEqual(records['question-1']['parent_id'], 'root-1')
+        self.assertEqual(records['root-1']['depth'], 0)
+        self.assertEqual(records['planning-1']['depth'], 1)
+        self.assertEqual(records['architect-1']['depth'], 2)
+        self.assertFalse(records['planning-1']['detached'])
+        self.assertTrue(records['question-1']['detached'])
+        self.assertEqual(records['architect-1']['context_tokens'], 46000)
+        self.assertEqual(records['architect-1']['current_tool'], 'read')
+        self.assertEqual(records['architect-1']['session_id'], 'session-architect')
+        tree = '\n'.join(initial['tree'])
+        self.assertIn('RootWayfinder [bbk_root_wayfinder]', tree)
+        self.assertIn('PlanningWayfinder [bbk_planning_wayfinder]', tree)
+        self.assertEqual(tree.count('Architect [bbk_architect]'), 2)
+        self.assertIn('QuestioningWayfinder [bbk_questioning_wayfinder]', tree)
+
+        self.assertEqual(len(value['details']['matches']), 1)
+        self.assertEqual(value['details']['matches'][0]['id'], 'architect-1')
+        self.assertEqual(value['details']['matches'][0]['parent_id'], 'planning-1')
+
+        completed = value['completed']
+        self.assertEqual(completed['agent_count'], 5)
+        self.assertEqual(completed['active_count'], 4)
+        completed_records = {item['id']: item for item in completed['agents']}
+        self.assertEqual(completed_records['architect-1']['status'], 'completed')
+        self.assertIn('4 active / 5 known', value['activeText'])
+        self.assertEqual(value['activeText'].count('Architect [bbk_architect]'), 1)
+        self.assertIn('RootWayfinder', value['widget']['content'][0])
 
     def test_child_replacement_accepts_omp_presentation_whitespace_but_not_semantic_drift(self):
         worker = (m3_ROOT / 'projections' / 'omp' / 'agents' / 'bbk_worker.md').read_text(encoding='utf-8')
@@ -877,3 +1487,6 @@ You NEVER give up due to uncertainty. You MUST keep going until this ticket is c
             self.assertIn(expected, text)
         self.assertIn('excludes', text)
         self.assertIn('.codex', text)
+
+# Deterministic fast/standard/release selection used by tools/run_tests.py.
+from tests._test_profiles import load_profiled_tests as load_tests

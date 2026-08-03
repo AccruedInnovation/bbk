@@ -111,56 +111,53 @@ Effectful work should classify paths as:
 
 Operational returns distinguish `BLOCKED_TECHNICAL`, `BLOCKED_AUTHORITY`, and `BLOCKED_DECISION` from `PAUSED_CAPACITY` and `PAUSED_HOST_WINDOW`. A capacity or host-window pause does not fail the candidate.
 
-Use `bbk manifest create` and `bbk manifest compare` for exact directory inventories. Use `bbk candidate freeze`, `check`, and `verify` for candidate identity. Use `bbk handoff create`/`verify` for structured, digest-bound returns and `bbk handoff list --latest` for deterministic rediscovery.
+Use `bbk manifest create` and `bbk manifest compare` for exact directory inventories. Shipped `EXAMPLE-*` templates are excluded by default; `--include-examples` is the explicit opt-in for a template-oriented manifest or candidate. Use `bbk candidate freeze`, `check`, and `verify` for candidate identity. Use `bbk handoff create`/`verify` for structured, digest-bound returns and `bbk handoff list --latest` for deterministic rediscovery.
 
 
 ## Test and install
 
-Complete release/CI qualification:
+Routine verification covers product, integration, platform, installer, Git, Node/OMP, Beads, routing, and user-facing schema behavior:
 
 ```bash
-python tools/run_tests.py --all --require-node
-python tools/bootstrap.py --test --require-node
+python tools/setup.py --test --require-node
 ```
 
-For a selective OMP or Codex update, the `--test-and-update-*` commands automatically run only the matching trust-gated regression profile. Direct equivalents are:
+Use the compact contract profile during active development, and the exhaustive profile for release qualification:
+
+```bash
+python tools/setup.py --test-fast
+python tools/setup.py --release-test --require-node
+```
+
+The lower-level forms are `python tools/verify_all.py --profile fast|standard|release`. `auto` uses up to six workers on high-core hosts; Windows groups modules into a bounded pool, POSIX retains module isolation, and sharding is informed by retained module durations. Timing reports are stored outside the package. Use `--mode isolated --jobs 1` only for fresh-process diagnosis.
+
+For a selective OMP or Codex update, the `--test-and-update-*` commands run the matching trust-gated profile. Direct equivalents remain:
 
 ```bash
 python tools/verify_all.py --profile omp --require-node
 python tools/verify_all.py --profile codex
 ```
 
-The full unittest modules run concurrently by default. Use `python tools/run_tests.py -v --jobs 1` when a serial diagnostic transcript is preferable.
-
-Verify and install only on PASS. All five bundled profiles are installed by default:
+Verify and install only on PASS. All five bundled profiles are selected by default:
 
 ```bash
 python tools/bootstrap.py --test-and-install --scope user --omp --codex --claude
 ```
 
-Install a bundled subset:
+Install a bundled subset or core only:
 
 ```bash
 python tools/bootstrap.py --test-and-install --scope user --omp --codex \
   --profile-id rust --profile-id python
-```
-
-Install core BBK only:
-
-```bash
 python tools/bootstrap.py --test-and-install --scope user --omp --codex \
   --no-language-profiles
 ```
 
-Use the profile-focused wrapper with the bundled default:
+Every selected profile package is authenticated. If a pre-existing profile's exact package digest, layout, harness set, installed bytes, and modes already match, alpha.13.4 reuses those files instead of rewriting them. Local divergence still follows the normal refusal and `--force` rules.
 
-```bash
-python tools/install_profiles.py --scope user --omp --codex --claude
-```
+Use `python tools/install_profiles.py --scope user --omp --codex --claude` for the profile-focused wrapper. Supplying `--language-profiles /path/to/source` replaces the bundled source for that invocation.
 
-Supplying `--language-profiles /path/to/bundle.zip` or `install_profiles.py --bundle ...` replaces the bundled source for that invocation. The path may also be an expanded profile package tree or the directly published `bbk-language-profiles` repository.
-
-See `INSTALL.md` and `LANGUAGE-PROFILES.md` for dry runs, source-mode semantics, direct installer equivalents, and the complete preflight boundary.
+See `INSTALL.md` and `LANGUAGE-PROFILES.md` for the complete boundary.
 
 ## Select sub-agent models
 
@@ -207,11 +204,18 @@ Scriptable forms:
 
 ```text
 /bbk:models status
-/bbk:models profile testing-flash
+/bbk:models project status
+/bbk:models user status
+/bbk:models project profile testing-flash
+/bbk:models user profile default
 /bbk:models set bbk_validator @task medium
 /bbk:models apply D:\Profiles\bbk-cheap.json
 /bbk:models export D:\Profiles\bbk-current.json current-bbk
 ```
+
+The default `auto` target selects the nearest valid project-scoped OMP installation and otherwise the user-scoped installation. Explicit `project` and `user` prefixes remove ambiguity. An expected but invalid project binding fails closed; it does not fall through to the shared user route. User-scope changes require interactive confirmation and affect future spawns in all projects using that user installation. Project-scope installations retain independent profiles.
+
+Use `/bbk:agents`, `/bbk:agents active`, `/bbk:agents details <id-or-name>`, or `/bbk:agents json` to inspect the complete nested BBK hierarchy. The tree includes synchronous descendants carried in parent task progress, not only directly listed detached agents, and retains bounded terminal history for post-run inspection.
 
 See `MODEL-ROUTING.md` and `../templates/omp-model-routing-profile.json`.
 
@@ -221,6 +225,8 @@ See `MODEL-ROUTING.md` and `../templates/omp-model-routing-profile.json`.
 bbk init --title "Project name"
 bbk status
 ```
+
+`bbk status --root <existing-empty-directory>` is a successful `UNINITIALIZED` result with zero live planning counts and an explicit `bbk init` next action. Initialized-project counts exclude `EXAMPLE-*` templates and report them separately under `examples_available`. The successful result shapes are defined by `spec/schemas/bbk-status-v1.schema.json`.
 
 ## Method flow
 
@@ -254,7 +260,7 @@ bbk handoff verify .bbk/handoffs/WU-001/HO-WU-001-1.json --root .
 bbk handoff list --root . --work-unit WU-001 --latest
 ```
 
-Use `bbk beads handoff-plan` for a compact append-only Beads pointer. `--apply` is allowed only after the project mapping explicitly enables writes.
+Use `bbk beads handoff-plan` for a compact append-only Beads pointer. New projects enable writes by default, while existing projects retain their recorded mapping. Worker Orchestrator normally targets the mapped WorkUnit; Root or Territory Orchestrator passes `--target-bbk-id <project-or-territory-id>` for the exact mapped owner record. `--bead` without `--target-bbk-id` is an explicitly reviewed foreign target and does not create a mapping. Never project BBK semantic state into Beads workflow status.
 
 ## Decision branches and context
 
@@ -448,8 +454,13 @@ bbk status
 bbk doctor
 bbk workspace list --all
 bbk beads plan
+bbk beads plan --apply
 bbk schema status
 ```
+
+New projects enable the Beads projection, writes, and first-use `bd init --quiet --skip-agents` by default. The external `bd` command is not bundled. `bbk beads plan` is the non-mutating review surface; `--apply` creates, inspects, or updates exact role-owned projections and records foreign IDs and verified projection digests. Repeating an unchanged apply is idempotent. Direct tracker edits, duplicate bindings, hierarchy changes, type changes, or mismatched foreign identity produce explicit drift/reconciliation results rather than last-write-wins mutation. Set `enabled` or `write_enabled` to `false` deliberately when a project must not project into Beads.
+
+The ownership split is: Root/Territory Wayfinders for project, territory, and decision records; Planning/Phase Wayfinders for capability increments, phases, and WorkUnits; Root/Territory/Worker Orchestrators for execution-state and compact handoff pointers; Questioning Wayfinder for question records. BBK IDs, accepted decisions, execution authority, candidate identity, findings, evidence, validation, completion, and release state remain canonical under `.bbk/`.
 
 Long-running workers use an extended logical execution window, checkpoint before host interruption, and resume the same logical thread when possible. Host-window expiry is infrastructure interruption unless evidence establishes a candidate defect.
 
@@ -467,7 +478,7 @@ python tools\bbk.py handoff verify `
   .bbk\handoffs\WU-001\HO-WU-001-1.json --root D:\Project
 ```
 
-Project-relative path, byte count, and SHA-256 are authoritative. Keep the conversational envelope compact. Use `bbk beads handoff-plan` to append only a verified pointer to a bead; do not paste the large artifact into the issue. Beads coordination cannot accept a BBK decision or finding, and closing a bead does not prove validation or outcome completion.
+Project-relative path, byte count, and SHA-256 are authoritative. Keep the conversational envelope compact. Use `bbk beads handoff-plan` to append only a verified pointer; do not paste the large artifact into the issue. Worker Orchestrator normally targets the mapped WorkUnit. Root or Territory Orchestrator passes `--target-bbk-id` for the exact mapped project or territory record it owns. An explicit target must already have one unique mapping, and a simultaneously supplied `--bead` must match it. Beads coordination cannot accept a BBK decision or finding, and closing a bead does not prove validation or outcome completion.
 
 For Draft 2020-12 validation:
 
@@ -481,7 +492,7 @@ Use the `bbk-recover` skill when ownership, candidate identity, effects, evidenc
 
 ## OMP slash-command context boundary
 
-Deterministic BBK slash commands are UI operations, not prompts. `/bbk:models`, `/bbk:status`, `/bbk:doctor`, `/bbk:exit`, the other deterministic `/bbk:*` commands, and every bundled language-profile slash command report concise UI summaries and do not inject CLI JSON into model context.
+Deterministic BBK slash commands are UI operations, not prompts. `/bbk:models`, `/bbk:agents`, `/bbk:beads`, `/bbk:status`, `/bbk:doctor`, `/bbk:exit`, the other deterministic `/bbk:*` commands, and every bundled language-profile slash command report concise UI summaries and do not inject CLI JSON into model context.
 
 Persistent mode state is written with `appendEntry`, which is not sent to the LLM. While active, `before_agent_start` replaces Main's complete system prompt and injects the mandatory controller procedures. For named BBK children it replaces OMP's subagent workflow prompt while preserving only sanitized invocation data. `/bbk <request>` is the sole slash-command path that invokes `sendUserMessage`, and it forwards only the user's directive. `/bbk` with no arguments does not trigger a model turn.
 

@@ -61,7 +61,7 @@ def main() -> int:
     parser.add_argument(
         "--allow-staged",
         action="store_true",
-        help="allow staged canonical sources while repository VERSION remains at the prior release during intermediate gates",
+        help="allow canonical alpha.13 sources while repository VERSION remains at the prior release during intermediate gates",
     )
     args = parser.parse_args()
     allow_staged = args.allow_staged or os.environ.get("BBK_ALLOW_STAGED_ROLE_PACKAGE") == "1"

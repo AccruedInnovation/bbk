@@ -11,12 +11,20 @@ from __future__ import annotations
 import importlib.util
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from tests import _cli_support as cli_support
 from tests._cli_support import run_cli as test_run_cli
+from tests._path_support import assert_same_path
+
+try:
+    import jsonschema as m1_jsonschema
+except ImportError:  # Optional independent Draft 2020-12 cross-check.
+    m1_jsonschema = None
 m1_ROOT = Path(__file__).resolve().parents[1]
 m1_BBK = m1_ROOT / 'tools' / 'bbk.py'
 m1_spec = importlib.util.spec_from_file_location('bbk_alpha6_cli', m1_BBK)
@@ -153,6 +161,179 @@ class Alpha6CongruenceTests(unittest.TestCase):
             self.assertEqual(marker.read_text(encoding='utf-8'), 'preserve me\n')
             self.assertIn('.bbk/project.md', second.get('preserved', []))
 
+    @unittest.skipUnless(m1_jsonschema is not None, "optional jsonschema capability is unavailable")
+    def test_status_results_validate_against_published_schema(self):
+        schema = self.load('spec/schemas/bbk-status-v1.schema.json')
+        validator = m1_jsonschema.Draft202012Validator(schema)
+        validator.check_schema(schema)
+        no_project = json.loads(self.cli('--json', 'status').stdout)
+        validator.validate(no_project)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            uninitialized = json.loads(self.cli('--json', 'status', '--root', str(root)).stdout)
+            validator.validate(uninitialized)
+            self.cli('--json', 'init', '--root', str(root), '--project-id', 'BBK-STATUS-SCHEMA')
+            initialized = json.loads(self.cli('--json', 'status', '--root', str(root)).stdout)
+            validator.validate(initialized)
+
+    def test_unicode_initialization_examples_and_uninitialized_status_are_truthful(self):
+        title = "Baffle Connector — Δ測試 — café — 🚧"
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            empty = json.loads(self.cli('--json', 'status', '--root', str(root)).stdout)
+            self.assertEqual(empty['status'], 'UNINITIALIZED')
+            self.assertEqual(empty['command_status'], 'PASS')
+            self.assertFalse(empty['project']['initialized'])
+            self.assertEqual(empty['planning_artifacts'], {'fit': 0, 'structures': 0, 'slices': 0, 'work_units': 0})
+            self.assertEqual(empty['next_action']['command'], 'bbk init')
+
+            initialized = json.loads(self.cli('--json', 'init', '--root', str(root), '--project-id', 'BBK-UNICODE', '--title', title).stdout)
+            self.assertEqual(initialized['title'], title)
+            direct_root = root / 'direct-cli'
+            direct = test_run_cli(
+                [sys.executable, '-X', 'utf8', str(m1_BBK), '--json', 'init', '--root', str(direct_root), '--project-id', 'BBK-UNICODE-DIRECT', '--title', title],
+                cwd=m1_ROOT,
+                env={**os.environ, 'PYTHONUTF8': '1', 'PYTHONIOENCODING': 'utf-8'},
+                force_subprocess=True,
+            )
+            self.assertEqual(json.loads(direct.stdout)['title'], title)
+            self.assertNotIn('�', direct.stdout)
+            self.assertEqual(
+                json.loads((direct_root / '.bbk' / 'config.json').read_text(encoding='utf-8'))['title'],
+                title,
+            )
+            config = json.loads((root / '.bbk' / 'config.json').read_text(encoding='utf-8'))
+            self.assertEqual(config['title'], title)
+            project_bytes = (root / '.bbk' / 'project.md').read_bytes()
+            self.assertEqual(project_bytes.decode('utf-8').splitlines()[0], f'# {title}')
+            self.assertNotIn('�', project_bytes.decode('utf-8'))
+
+            status = json.loads(self.cli('--json', 'status', '--root', str(root)).stdout)
+            self.assertEqual(status['project']['title'], title)
+            self.assertTrue(status['project']['initialized'])
+            self.assertEqual(status['planning_artifacts'], {'fit': 0, 'structures': 0, 'slices': 0, 'work_units': 0})
+            expected_examples = sum(
+                1
+                for path in (root / '.bbk').rglob('*')
+                if path.is_file() and path.name.casefold().startswith('example-')
+            )
+            self.assertGreater(expected_examples, 0)
+            self.assertEqual(status['examples_available']['total'], expected_examples)
+
+            questions = json.loads(self.cli('--json', 'question', 'list', '--root', str(root)).stdout)
+            handoffs = json.loads(self.cli('--json', 'handoff', 'list', '--root', str(root)).stdout)
+            self.assertEqual(questions['count'], 0)
+            self.assertEqual(handoffs['count'], 0)
+
+            copies = {
+                'fit/real-fit.json': m1_ROOT / 'fixtures' / 'fit' / 'confirmed-fit.json',
+                'structures/real-structure.json': m1_ROOT / 'fixtures' / 'structure' / 'software-contract.json',
+                'slices/real-slice.json': m1_ROOT / 'fixtures' / 'slices' / 'software-slice-1.json',
+                'work-units/real-work-unit.json': m1_ROOT / 'fixtures' / 'work-units' / 'query-service.json',
+            }
+            for rel, source in copies.items():
+                shutil.copy2(source, root / '.bbk' / rel)
+            status = json.loads(self.cli('--json', 'status', '--root', str(root)).stdout)
+            self.assertEqual(status['planning_artifacts'], {'fit': 1, 'structures': 1, 'slices': 1, 'work_units': 1})
+
+            manifest = json.loads(self.cli('--json', 'manifest', 'create', '--root', str(root), '--source', str(root / '.bbk')).stdout)
+            self.assertGreaterEqual(manifest['examples_excluded'], expected_examples)
+            self.assertFalse(manifest['include_examples'])
+            self.assertFalse(any(Path(item['path']).name.startswith('EXAMPLE-') for item in manifest['files']))
+
+            explicit_examples = json.loads(self.cli(
+                '--json', 'manifest', 'create', '--root', str(root),
+                '--source', str(root / '.bbk'), '--include-examples',
+            ).stdout)
+            self.assertTrue(explicit_examples['include_examples'])
+            self.assertEqual(explicit_examples['examples_excluded'], 0)
+            self.assertTrue(any(Path(item['path']).name.startswith('EXAMPLE-') for item in explicit_examples['files']))
+
+            standalone_source = root / 'standalone-candidate-source'
+            standalone_source.mkdir()
+            (standalone_source / 'EXAMPLE-template.json').write_text('{"template": true}\n', encoding='utf-8')
+            (standalone_source / 'real.json').write_text('{"real": true}\n', encoding='utf-8')
+            default_candidate = root / 'candidate-default.json'
+            self.cli('--json', 'candidate', 'freeze', '--root', str(standalone_source),
+                     '--source', str(standalone_source), '--output', str(default_candidate))
+            default_value = json.loads(default_candidate.read_text(encoding='utf-8'))
+            self.assertEqual({item['path'] for item in default_value['files']}, {'real.json'})
+            explicit_candidate = root / 'candidate-with-examples.json'
+            self.cli('--json', 'candidate', 'freeze', '--root', str(standalone_source),
+                     '--source', str(standalone_source), '--output', str(explicit_candidate),
+                     '--include-examples')
+            explicit_value = json.loads(explicit_candidate.read_text(encoding='utf-8'))
+            self.assertEqual({item['path'] for item in explicit_value['files']}, {'EXAMPLE-template.json', 'real.json'})
+
+            direct = test_run_cli(
+                [sys.executable, str(m1_BBK), '--json', 'status', '--root', str(root)],
+                env={**os.environ, 'PYTHONIOENCODING': 'cp1252'},
+                force_subprocess=True,
+            )
+            self.assertEqual(json.loads(direct.stdout)['project']['title'], title)
+            self.assertNotIn('�', direct.stdout)
+
+            malformed = root / 'malformed'
+            (malformed / '.bbk').mkdir(parents=True)
+            (malformed / '.bbk' / 'config.json').write_text('{bad json', encoding='utf-8')
+            failed = self.cli('--json', 'status', '--root', str(malformed), check=False)
+            self.assertEqual(failed.returncode, 2)
+            self.assertEqual(json.loads(failed.stdout)['status'], 'ERROR')
+
+            missing = root / 'does-not-exist'
+            failed = self.cli('--json', 'status', '--root', str(missing), check=False)
+            self.assertEqual(failed.returncode, 2)
+            self.assertIn('does not exist', json.loads(failed.stdout)['error'])
+
+    def test_cancelled_partial_attempt_remains_provisional_until_successor_return(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.cli('--json', 'init', '--root', str(root), '--project-id', 'BBK-ATTEMPT-LINEAGE')
+            partial = root / 'partial-architecture.md'
+            partial.write_text('# Provisional\n\nIncomplete attempt output.\n', encoding='utf-8')
+            cancelled = json.loads(self.cli(
+                '--json', 'handoff', 'create', '--root', str(root),
+                '--id', 'HO-WU-ARCH-1', '--work-unit', 'WU-ARCH', '--attempt', '1',
+                '--role', 'bbk_architect', '--disposition', 'CANCELLED',
+                '--summary', 'Parent explicitly cancelled attempt 1; partial output is provisional.',
+                '--interrupt-reason', 'USER_CANCELLED',
+                '--interrupt-evidence', 'controller cancellation request CANCEL-1',
+                '--partial-work-location', str(partial), '--artifact', str(partial),
+                '--continuation-state', 'READY', '--checkpoint', str(partial),
+                '--no-resume-same-thread',
+                '--next-action', 'Commission a successor attempt that explicitly adopts, repairs, replaces, or discards the partial output.',
+            ).stdout)
+            self.assertTrue(cancelled['valid'])
+            first_path = root / cancelled['handoff']['path']
+            first = json.loads(first_path.read_text(encoding='utf-8'))
+            self.assertEqual(first['attempt'], 1)
+            self.assertEqual(first['disposition'], 'CANCELLED')
+            self.assertEqual(first['interrupt']['partial_work_location'], 'partial-architecture.md')
+
+            final = root / 'architecture.md'
+            final.write_text('# Architecture\n\nValidated successor output.\n', encoding='utf-8')
+            successor = json.loads(self.cli(
+                '--json', 'handoff', 'create', '--root', str(root),
+                '--id', 'HO-WU-ARCH-2', '--work-unit', 'WU-ARCH', '--attempt', '2',
+                '--role', 'bbk_architect', '--disposition', 'COMPLETE',
+                '--summary', 'Successor attempt 2 replaced cancelled attempt 1 after independently validating the usable content.',
+                '--work-performed', 'Disposition for attempt 1 partial output: REPLACED',
+                '--artifact', str(final), '--completed-step', 'Replaced and superseded attempt 1 partial output',
+                '--next-action', 'Parent validates and integrates successful attempt 2 only.',
+            ).stdout)
+            self.assertTrue(successor['valid'])
+            second = json.loads((root / successor['handoff']['path']).read_text(encoding='utf-8'))
+            self.assertEqual(second['attempt'], 2)
+            self.assertEqual(second['disposition'], 'COMPLETE')
+            self.assertIn('replaced cancelled attempt 1', second['summary'].lower())
+            self.assertEqual(second['work_performed'], ['Disposition for attempt 1 partial output: REPLACED'])
+
+            listed = json.loads(self.cli('--json', 'handoff', 'list', '--root', str(root), '--work-unit', 'WU-ARCH').stdout)
+            self.assertEqual(listed['count'], 2)
+            by_attempt = {item['attempt']: item for item in listed['handoffs']}
+            self.assertEqual(by_attempt[1]['disposition'], 'CANCELLED')
+            self.assertEqual(by_attempt[2]['disposition'], 'COMPLETE')
+
     def test_standalone_candidate_and_recorded_gate_receipt_remain_bound(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -176,13 +357,13 @@ class Alpha6CongruenceTests(unittest.TestCase):
             home.mkdir()
             env = {**os.environ, 'BBK_HOME': str(home), 'HOME': str(home), 'BBK_INSTALL_ROOT': str(base / 'data'), 'BBK_BIN_DIR': str(base / 'bin')}
             install = m1_ROOT / 'tools' / 'install.py'
-            test_run_cli([sys.executable, str(install), 'install', '--scope', 'user', '--codex'], check=True, env=env)
+            test_run_cli([sys.executable, str(install), 'install', '--scope', 'user', '--codex', '--no-language-profiles'], check=True, env=env)
             target = home / '.codex' / 'agents' / 'bbk_worker.toml'
             target.write_text(target.read_text(encoding='utf-8') + '\n# local divergence\n', encoding='utf-8')
-            rejected = test_run_cli([sys.executable, str(install), '--json', 'install', '--scope', 'user', '--codex'], check=False, env=env)
+            rejected = test_run_cli([sys.executable, str(install), '--json', 'install', '--scope', 'user', '--codex', '--no-language-profiles'], check=False, env=env)
             self.assertEqual(rejected.returncode, 2)
             self.assertIn('Destination differs', json.loads(rejected.stdout)['error'])
-            replaced = test_run_cli([sys.executable, str(install), '--json', 'install', '--scope', 'user', '--codex', '--force'], check=True, env=env)
+            replaced = test_run_cli([sys.executable, str(install), '--json', 'install', '--scope', 'user', '--codex', '--no-language-profiles', '--force'], check=True, env=env)
             records = [item for item in json.loads(replaced.stdout)['files'] if Path(item['path']).exists() and Path(item['path']).samefile(target)]
             self.assertEqual(len(records), 1, records)
             record = records[0]
@@ -214,7 +395,7 @@ m2_BBK = m2_ROOT / 'tools' / 'bbk.py'
 class Alpha7CongruenceTests(unittest.TestCase):
 
     def test_release_is_additive_over_alpha6(self):
-        self.assertEqual((m2_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.13.1')
+        self.assertEqual((m2_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.13.5')
         help_text = test_run_cli([sys.executable, m2_BBK, '--help'], cwd=m2_ROOT).stdout
         for command in ('fit', 'structure', 'slice', 'profile', 'manifest', 'candidate', 'gate', 'workspace', 'worktree', 'package'):
             self.assertIn(command, help_text)
@@ -252,14 +433,14 @@ class Alpha7CongruenceTests(unittest.TestCase):
         tools = re.findall('name: "(bbk_[^"]+)"', source)
         commands = re.findall('registerCommand\\(pi, "(bbk(?::[^"]*)?)"', source)
         commands += re.findall('pi\\.registerCommand\\("(bbk(?::[^"]*)?)"', source)
-        self.assertEqual(len(tools), 26)
-        self.assertEqual(len(commands), 27)
+        self.assertEqual(len(tools), 28)
+        self.assertEqual(len(commands), 29)
         for name in ('bbk_manifest', 'bbk_candidate', 'bbk_gate', 'bbk_workspace', 'bbk_review_plan', 'bbk_review_run', 'bbk_state_effect_validate'):
             self.assertIn(name, tools)
 
     def test_installer_copies_alpha7_cli_modules(self):
         source = (m2_ROOT / 'tools' / 'install.py').read_text(encoding='utf-8')
-        for name in ('bbk.py', 'contracts.py', 'state_effect.py', 'review_assurance.py', 'verify_package.py'):
+        for name in ('bbk.py', 'contracts.py', 'state_effect.py', 'review_assurance.py', 'artifact_classification.py', 'verify_package.py'):
             self.assertIn(name, source)
 
     def test_public_documentation_is_current_facing_and_compact(self):
@@ -268,6 +449,7 @@ class Alpha7CongruenceTests(unittest.TestCase):
             'AGENTS.md', 'WAYFINDING-AND-GRILL.md', 'SOLUTION-OUTCOME-FIT.md',
             'EXECUTION-DESIGN.md', 'DURABLE-HANDOFFS.md', 'ASSURANCE.md',
             'LANGUAGE-PROFILES.md', 'MODEL-ROUTING.md', 'BOUNDARIES.md',
+            'OMP-CHILD-LIFETIME.md',
         }
         actual = {path.name for path in (m2_ROOT / 'docs').iterdir() if path.is_file()}
         self.assertEqual(actual, expected)
@@ -305,6 +487,55 @@ def m3_run_json(args: list[str]) -> dict:
     return json.loads(completed.stdout)
 
 class Alpha8ProfileDispatchTests(unittest.TestCase):
+
+    def test_fixture_profile_python_entrypoints_reuse_the_test_interpreter(self):
+        script = m3_A8 / 'tools' / 'profile.py'
+        eligible = cli_support._eligible_nested_python_script(
+            [sys.executable, str(script), '--json', 'resolve']
+        )
+        self.assertIsNotNone(eligible)
+        assert eligible is not None
+        assert_same_path(self, eligible[0], script)
+        self.assertEqual(eligible[1], ['--json', 'resolve'])
+        self.assertIsNone(
+            cli_support._eligible_nested_python_script(
+                [sys.executable, str(m3_ROOT / 'tools' / 'bbk.py'), '--help']
+            )
+        )
+        result = cli_support._run_nested_python_script(
+            [sys.executable, str(script), '--json', 'resolve'],
+            m3_ROOT,
+            timeout=30,
+            env=os.environ.copy(),
+        )
+        self.assertIsNotNone(result)
+        assert result is not None
+        self.assertEqual(result['returncode'], 0, result['stderr'])
+        self.assertEqual(json.loads(result['stdout'])['profileId'], 'alpha8-fixture')
+
+    def test_trusted_installed_routing_copy_reuses_canonical_main_with_adjacent_binding(self):
+        with tempfile.TemporaryDirectory() as temp:
+            extension = Path(temp)
+            source = m3_ROOT / 'tools' / 'omp_model_routing.py'
+            copied = extension / source.name
+            shutil.copy2(source, copied)
+            binding = extension / 'bbk-package-root.json'
+            binding.write_text('{}\n', encoding='utf-8')
+            parsed = cli_support._python_script(
+                [sys.executable, str(copied), '--json', 'status']
+            )
+            self.assertIsNotNone(parsed)
+            assert parsed is not None
+            assert_same_path(self, parsed[0], source)
+            self.assertEqual(parsed[1][0], '--binding')
+            assert_same_path(self, parsed[1][1], binding)
+            self.assertEqual(parsed[1][2:], ['--json', 'status'])
+            copied.write_text(copied.read_text(encoding='utf-8') + '\n# modified\n', encoding='utf-8')
+            self.assertIsNone(
+                cli_support._python_script(
+                    [sys.executable, str(copied), '--json', 'status']
+                )
+            )
 
     def test_alpha7_declaration_remains_valid_but_is_not_auto_dispatched(self):
         inspected = m3_run_json(['profile', 'inspect', '--id', 'alpha7-fixture', '--profile-dir', str(m3_A7)])
@@ -381,7 +612,7 @@ class Alpha8ProfileDispatchTests(unittest.TestCase):
             self.assertEqual(lock['effective_sha256'], value['effective_sha256'])
 
     def test_alpha8_package_surface_is_present(self):
-        self.assertEqual((m3_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.13.1')
+        self.assertEqual((m3_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.13.5')
         for rel in ['docs/LANGUAGE-PROFILES.md', 'spec/schemas/bbk-profile-capability-request-v1.schema.json', 'spec/schemas/bbk-profile-capability-result-v1.schema.json', 'spec/schemas/bbk-profile-dispatch-v1.schema.json', 'templates/profile-capability-request.json']:
             self.assertTrue((m3_ROOT / rel).is_file(), rel)
 
@@ -437,7 +668,7 @@ class PublicRepositoryBoundaryTests(unittest.TestCase):
 
     def test_context_and_procedure_methods_are_canonical_and_projected(self):
         method = m4_load('spec/method-content.json')
-        self.assertEqual(method['version'], '0.1.0-alpha.13.1')
+        self.assertEqual(method['version'], '0.1.0-alpha.13.5')
         self.assertIn('bbk-context-routing', method['skills'])
         self.assertIn('bbk-procedure-design', method['skills'])
         self.assertIn('context-routing.md', method['references'])
@@ -563,7 +794,7 @@ class Alpha10ModelRoutingTests(unittest.TestCase):
                 encoding='utf-8'
             )
         )
-        self.assertEqual(reviewed['package_version'], '0.1.0-alpha.13.1')
+        self.assertEqual(reviewed['package_version'], '0.1.0-alpha.13.5')
         self.assertEqual(set(reviewed['roles']), self.role_names)
         self.assertEqual(self.routing, reviewed)
 
@@ -693,7 +924,7 @@ class Alpha10ModelRoutingTests(unittest.TestCase):
             policy.write_text(json.dumps(custom, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
             installed = m5_run([sys.executable, m5_INSTALL, '--json', 'install', '--scope', 'project', '--root', project, '--codex', '--omp', '--claude', '--generic', '--model-routing', policy, '--no-language-profiles'])
             value = json.loads(installed.stdout)
-            self.assertEqual(value['model_routing']['source'], policy.resolve().as_posix())
+            assert_same_path(self, value['model_routing']['source'], policy)
             effective = project / '.bbk-kit' / 'effective-model-routing.json'
             self.assertEqual(json.loads(effective.read_text(encoding='utf-8')), custom)
             omp = m5_frontmatter(project / '.omp' / 'agents' / 'bbk_worker.md')
@@ -715,6 +946,13 @@ class Alpha10ModelRoutingTests(unittest.TestCase):
             self.assertNotIn('package-source placeholder', empty_registry)
             self.assertEqual(value['language_profile_registry']['profile_count'], 0)
             self.assertEqual(value['model_routing']['sha256'], hashlib.sha256(json.dumps(custom, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode('utf-8')).hexdigest())
+            binding_path = project / '.omp' / 'extensions' / 'bbk' / 'bbk-package-root.json'
+            binding = json.loads(binding_path.read_text(encoding='utf-8'))
+            self.assertEqual(binding['schema'], 'bbk.omp-package-binding.v3')
+            self.assertEqual(binding['scope'], 'project')
+            assert_same_path(self, binding['project_root'], project)
+            assert_same_path(self, binding['omp_agents'], project / '.omp' / 'agents')
+            assert_same_path(self, binding['state_path'], project / '.bbk-kit' / 'effective-omp-model-routing.json')
             m5_run([sys.executable, m5_INSTALL, 'uninstall', '--scope', 'project', '--root', project])
         self.assertEqual(m5_sha256(canonical_worker), before)
 
@@ -740,3 +978,6 @@ class Alpha10ModelRoutingTests(unittest.TestCase):
         self.assertIn('19 roles have individual model routes', checked.stdout)
         generated = m5_run([sys.executable, m5_GENERATOR, '--check'])
         self.assertIn('19 roles, 19 direct model routes, 4 targets, and 76 projections', generated.stdout)
+
+# Deterministic fast/standard/release selection used by tools/run_tests.py.
+from tests._test_profiles import load_profiled_tests as load_tests

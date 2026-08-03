@@ -1,6 +1,6 @@
 {
   "schema_version": "bbk.roles.v4",
-  "package_version": "0.1.0-alpha.13.1",
+  "package_version": "0.1.0-alpha.13.5",
   "projection_schema": "spec/schemas/bbk-roles-v4.schema.json",
   "source_catalog": "spec/roles/catalog.json",
   "prompt_module_package": "spec/prompt-modules/catalog.json",
@@ -9,38 +9,38 @@
     "catalog": {
       "path": "spec/roles/catalog.json",
       "bytes": 16941,
-      "sha256": "d6309946dcd3db73f2416bcbac9ac3955a4fcd3fa330a91db7476ad2fd2a19ee"
+      "sha256": "c9e5c4b2a958a25938a614c268a33b3b9611ea3e24969439fb32a91cd2ce2ace"
     },
     "roles": [
       {
         "name": "bbk_root_wayfinder",
         "path": "spec/roles/bbk_root_wayfinder-role.json",
-        "bytes": 17603,
-        "sha256": "bf75f4f5a3759bbdd9b39eb70c8cb0e21673937d8c392a32e4f581e2b7132675"
+        "bytes": 17941,
+        "sha256": "5fa7ea98f460c93ad04730c8417e44e7987adee3ce7ca9c9c7e9014b4210dff6"
       },
       {
         "name": "bbk_territory_wayfinder",
         "path": "spec/roles/bbk_territory_wayfinder-role.json",
-        "bytes": 23245,
-        "sha256": "6fe85435ac7d4368d7bc87e91ddc32404d4640f524d5588a0a1b2f8ddd7c3022"
+        "bytes": 23543,
+        "sha256": "16f2d26a804590dc9175dcac76904e69b2b516cdb0014965258a1dd099e797f9"
       },
       {
         "name": "bbk_questioning_wayfinder",
         "path": "spec/roles/bbk_questioning_wayfinder-role.json",
-        "bytes": 26530,
-        "sha256": "324b2cb77a9c9f2b0f258f45f6c2339df7b470209edf6c56368936b8fb774824"
+        "bytes": 26819,
+        "sha256": "a0efe302fb596b8dfdbb43eb4f9db6dbd073dd04658195eb66381c2dca89bb60"
       },
       {
         "name": "bbk_planning_wayfinder",
         "path": "spec/roles/bbk_planning_wayfinder-role.json",
-        "bytes": 28633,
-        "sha256": "2b8009ec0d851f975720b2ba9a02a87b3c25befc51a38d102bcafe70d8bf401c"
+        "bytes": 28942,
+        "sha256": "eb54f78e09650a11db7affffaae4bfd4daed4efc33249c2a13963bd1d465f4af"
       },
       {
         "name": "bbk_phase_wayfinder",
         "path": "spec/roles/bbk_phase_wayfinder-role.json",
-        "bytes": 34963,
-        "sha256": "b9bdca137f93c18215d351f601c4b4fcac70b396a5bcac310ed24679974f44e0"
+        "bytes": 35269,
+        "sha256": "2bd5c596b45179ec07ebbd6aaf94feb6179acb95a8a35b0a7e5f13abe4e259b9"
       },
       {
         "name": "bbk_question_guide",
@@ -57,8 +57,8 @@
       {
         "name": "bbk_prototyper",
         "path": "spec/roles/bbk_prototyper-role.json",
-        "bytes": 36256,
-        "sha256": "68cc5930f2b5f4cf94b626ad010f81a6ac96dccf9a0d8b38da785800039c02e6"
+        "bytes": 36294,
+        "sha256": "68427471fdc486dda3c8747df6e4f359896208eed874c08906b0aafa4e220b4c"
       },
       {
         "name": "bbk_synthesizer",
@@ -69,44 +69,44 @@
       {
         "name": "bbk_architect",
         "path": "spec/roles/bbk_architect-role.json",
-        "bytes": 40646,
-        "sha256": "4975975bdad1380557b7329a347cdee054be5612b58b99d947b409ce9b58b285"
+        "bytes": 40684,
+        "sha256": "32ccbe4eb2e41ea4d8970635957ffb8a1c837d151a83cfbcc29980cf2e270bfa"
       },
       {
         "name": "bbk_verification_designer",
         "path": "spec/roles/bbk_verification_designer-role.json",
-        "bytes": 34252,
-        "sha256": "021b2cbaa082efb965eccfd6c100e0ed5c8cdd2ec9501021f43eed5c9630ec9d"
+        "bytes": 34290,
+        "sha256": "45c5b619ab61d693fbc88afb2486743be1c4c2afe3b0ef112d109748196c118f"
       },
       {
         "name": "bbk_worker_designer",
         "path": "spec/roles/bbk_worker_designer-role.json",
-        "bytes": 40350,
-        "sha256": "ba782b9442b97d095df470d1a08af882d9f1b4ade1f9ab8fd364a617812f8c0a"
+        "bytes": 40388,
+        "sha256": "3dd55dc77ac5c6492cdaa8006b9b2546094a417759a4d9c458f5bb3471d20e3a"
       },
       {
         "name": "bbk_reviewer",
         "path": "spec/roles/bbk_reviewer-role.json",
-        "bytes": 36690,
-        "sha256": "81d1a10d9c3de782ec963716be6444364f66f52d1225b36d046bd6ef3abafeb8"
+        "bytes": 36728,
+        "sha256": "fd2f7f5a7c191995995d6d3e721baa3c012dd1cd724ff0fce418e111eb1a4c16"
       },
       {
         "name": "bbk_root_orchestrator",
         "path": "spec/roles/bbk_root_orchestrator-role.json",
-        "bytes": 39136,
-        "sha256": "70535944e44edb7f4e07d4d4db08805433fb643c2ac7df6dbd009958fb164bc9"
+        "bytes": 39441,
+        "sha256": "eb4d98ad5d360320a799248ab3219bbc12d20000dc002ea2faeb3ae0c523ae42"
       },
       {
         "name": "bbk_territory_orchestrator",
         "path": "spec/roles/bbk_territory_orchestrator-role.json",
-        "bytes": 41789,
-        "sha256": "dde61f7264c40c3a38982b13baa819000da71485de081561625a2c09e0ac8f8e"
+        "bytes": 42093,
+        "sha256": "d84b89cc8d4dd3410e8f9ba8a8a8c03835d1f16563585f6998f3515b66b158b3"
       },
       {
         "name": "bbk_worker_orchestrator",
         "path": "spec/roles/bbk_worker_orchestrator-role.json",
-        "bytes": 40487,
-        "sha256": "3282792a0f1802195ed97b75a12ad865a7a578c8095f9e8a0b5acc51f77c6423"
+        "bytes": 40769,
+        "sha256": "1df80f1fd282b7fdde23bff87879fee52f70af9bb489284c53e49c64855bf451"
       },
       {
         "name": "bbk_validator_orchestrator",
@@ -117,8 +117,8 @@
       {
         "name": "bbk_worker",
         "path": "spec/roles/bbk_worker-role.json",
-        "bytes": 32449,
-        "sha256": "e8ef1e1e3d7152d363de3b544176bd6345cc54d63c66ef2df9e9dc554bb2d0d3"
+        "bytes": 32487,
+        "sha256": "c9842baa9a6e6fd919378b06daea4ee747e9fe65a6c8aa58d2e6ef572585ce35"
       },
       {
         "name": "bbk_validator",
@@ -130,8 +130,8 @@
     "prompt_modules": [
       {
         "path": "spec/prompt-modules/catalog.json",
-        "bytes": 3555,
-        "sha256": "4ca434c8a0b3f138034be23d71e8ae9accf2e5c8e35472df0ca7c4f0119e701b"
+        "bytes": 3686,
+        "sha256": "918043f975db4a48a371f139abd6f40c08d693cb0d842550c1f55248a93adb4c"
       },
       {
         "path": "spec/prompt-modules/bbk-prompt-role-boundary.json",
@@ -150,13 +150,13 @@
       },
       {
         "path": "spec/prompt-modules/bbk-prompt-human-request.json",
-        "bytes": 2436,
-        "sha256": "ed9580efd567d56a1c45a740c06f591a36d977a5d7ee9a87603227a4d32a6c3b"
+        "bytes": 3046,
+        "sha256": "068f2991761e2de2648270f8a0ddb1874a723c1b042ffc36099745b093f2de5c"
       },
       {
         "path": "spec/prompt-modules/bbk-prompt-delegation-return.json",
-        "bytes": 1518,
-        "sha256": "b1f8dc3c9e3b2243e57362d1c9faa0f971b3c9d8c4764637920b34c7fdcd45d8"
+        "bytes": 2664,
+        "sha256": "c60f1038876350be3b7fd7112272054aad8bff06b670c7a54596e50492af542f"
       },
       {
         "path": "spec/prompt-modules/bbk-prompt-durable-handoff.json",
@@ -170,8 +170,13 @@
       },
       {
         "path": "spec/prompt-modules/bbk-prompt-state-claim-truth.json",
-        "bytes": 2197,
-        "sha256": "f5198517600e83d976d8ca8666d9900ead13d0db9e28f00407b2cace06d6d225"
+        "bytes": 2569,
+        "sha256": "0b781cbacabdab56781155ce0813d39f9cfc4ace292726dd203309760699ca75"
+      },
+      {
+        "path": "spec/prompt-modules/bbk-prompt-executable-baseline.json",
+        "bytes": 1466,
+        "sha256": "8614d8b9eff6515942633e373087633a5e1c3425dead4c4bcea819ed81b922dc"
       },
       {
         "path": "spec/prompt-modules/bbk-prompt-profile-qualification.json",
@@ -668,7 +673,8 @@
         "Ensure proportionate SolutionOutcomeFit, architecture, implementation structure, executable work planning, state/effect design, verification design, worker-invocation design, and independent review exist when applicable while preserving each specialist role's ownership.",
         "Maintain the operating baseline as an exact versioned object with source references, acceptance state, execution-authority state, residual uncertainty, invalidation triggers, and supersession history.",
         "Submit the proposed baseline through the harness-root controller for accountable acceptance and obtain execution authorization separately when it is not already covered by a current standing grant.",
-        "Produce a durable, digest-bound planning handoff and return the exact readiness disposition, recommended next root, and smallest valid next action to the harness-root controller."
+        "Produce a durable, digest-bound planning handoff and return the exact readiness disposition, recommended next root, and smallest valid next action to the harness-root controller.",
+        "Project current root project, territory, and decision coordination records through `bbk-beads` when the project mapping is enabled; retain BBK identity, authority, acceptance, and baseline state as canonical and report tracker drift without converting it into semantic state."
       ],
       "delegation": {
         "bbk_territory_wayfinder": "a coherent responsibility area has a distinct ownership, authority, specialization, containment, or safe-parallelism boundary and needs bounded mapping, decision work, interface definition, and synthesis",
@@ -719,6 +725,7 @@
         "bbk-review-intent",
         "bbk-procedure-design",
         "bbk-context-routing",
+        "bbk-beads",
         "bbk-wayfind",
         "bbk-handoff"
       ],
@@ -734,6 +741,7 @@
         "bbk-prompt-delegation-return",
         "bbk-prompt-durable-handoff",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
         "bbk-prompt-planning-source-integrity"
@@ -898,7 +906,8 @@
         "Ensure proportionate territory-level fit refinement, architecture, implementation structure, state–decision–effect design, verification design, local executable planning, profile routing, and independent review exist when applicable while preserving each specialist role's ownership and the parent's global integration authority.",
         "Invoke `bbk_planning_wayfinder` only when the governing territory decisions, architecture or program-area direction, boundary contracts, delegated authority, and assurance posture are current enough to compile a local executable work graph without deciding global sequencing, shared ownership, or cross-territory integration. Treat any local work graph as subordinate input to the parent operating baseline.",
         "Assess territory and deep-module readiness from coherent purpose, explicit ownership, sufficiently narrow and current boundary contracts, contained internal complexity, defined failure and recovery behavior, observability, current source context, resolved blocking frontier items, proportional assurance, and the expected information value of further work.",
-        "Return a compact, versioned territory synthesis to the semantic parent with current decisions, boundary state, outward impacts, local work implications, assurance obligations, invalidated state, residual uncertainty, readiness, blockers, and the smallest valid next action. Use a verified `bbk-handoff` reference when exact or large material should not cross the model channel inline."
+        "Return a compact, versioned territory synthesis to the semantic parent with current decisions, boundary state, outward impacts, local work implications, assurance obligations, invalidated state, residual uncertainty, readiness, blockers, and the smallest valid next action. Use a verified `bbk-handoff` reference when exact or large material should not cross the model channel inline.",
+        "Project current territory and territory-owned decision coordination records through `bbk-beads` when the project mapping is enabled; retain the canonical territory plan and decision authority in BBK and report tracker drift explicitly."
       ],
       "delegation": {
         "bbk_territory_wayfinder": "a child responsibility can be given one coherent purpose, explicit owned, consumed, provided, and excluded boundaries, delegated authority, non-overlapping ownership, integration obligations, and an independent return contract, and subdivision materially improves responsibility, specialization, containment, or safe parallelism",
@@ -944,6 +953,7 @@
         "bbk-review-intent",
         "bbk-procedure-design",
         "bbk-context-routing",
+        "bbk-beads",
         "bbk-wayfind",
         "bbk-handoff"
       ],
@@ -958,6 +968,7 @@
         "bbk-prompt-delegation-return",
         "bbk-prompt-durable-handoff",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
         "bbk-prompt-planning-source-integrity"
@@ -1144,7 +1155,8 @@
         "Compile the Guide's smallest sufficient context edge and preserve the same logical branch across host pauses or replacement invocations. Validate every Researcher and Guide return for exact subject and revision, freshness, provenance, authority, evidence exposure, response references, root-decision continuity, affected scope, invalidation impact, and return-contract conformance before updating canonical branch state.",
         "Create or update an ADR-compatible decision packet only after valid authority evidence exists. Preserve the exact answer or delegated authority, rationale, alternatives, assumptions, exposure history, lineage, affected objects and interfaces, residual uncertainty, and invalidation triggers. The recommendation, Guide packet, controller relay, role, and record cannot approve themselves.",
         "Reconcile related branches without erasing disagreement. Propagate new independent questions, cross-branch contradictions, shared-interface impacts, scope or authority changes, stale outstanding requests, and downstream invalidation to the semantic parent with exact affected subjects and the smallest valid next action.",
-        "Persist branch state proportionately and return a compact, versioned cluster result to the semantic parent. Include resolved and explicitly non-resolved branches, pending requests, parked or active state, decision and ADR references, research and Guide packets, exposure history, outward impacts, residual uncertainty, stopping assessment, and requested parent actions. Use a verified `bbk-handoff` reference for exact or large material."
+        "Persist branch state proportionately and return a compact, versioned cluster result to the semantic parent. Include resolved and explicitly non-resolved branches, pending requests, parked or active state, decision and ADR references, research and Guide packets, exposure history, outward impacts, residual uncertainty, stopping assessment, and requested parent actions. Use a verified `bbk-handoff` reference for exact or large material.",
+        "Project current question-branch and decision-request coordination records through `bbk-beads` when the project mapping is enabled; preserve request identity, authoritative responses, accepted decisions, and branch closure in BBK rather than tracker workflow state."
       ],
       "delegation": {
         "bbk_question_guide": "one declared root decision remains materially unresolved after proportionate factual work and a genuine recommendation-first attempt because a matching authoritative response rejected or materially contested the recommendation, the user explicitly requested deeper exploration, conflicting human values or assumptions require collaborative examination, or no decision-ready recommendation can responsibly be formed without that examination; the branch has a complete context edge and no other foreground Guide is active",
@@ -1183,6 +1195,7 @@
         "bbk-profile-routing",
         "bbk-installed-profiles",
         "bbk-context-routing",
+        "bbk-beads",
         "bbk-question-branch",
         "bbk-handoff"
       ],
@@ -1395,7 +1408,8 @@
         "Validate every child return for subject and revision identity, freshness, provenance, delegated authority, declared effects, schema completeness, evidence exposure, contradictions, and unresolved blockers before integrating it. Return contract-nonconforming or stale child work to its owner rather than silently rewriting it.",
         "When an accepted fact, decision, interface, architecture element, requirement, authority grant, profile, environment, or subject revision changes, preserve the prior graph, identify every affected node and evidence dependency, invalidate only the impacted subgraph, and request the smallest sufficient replan or resynthesis.",
         "Apply proportionality to decomposition and review. Avoid micro-work created only for tracking, ceremonial phases, duplicate assertions, and independent review without a distinct property; stop when the graph is sufficiently executable for its consequence and further planning has lower value than its cost, preserving residual uncertainty explicitly.",
-        "Calculate work-graph readiness from current source bindings, dependency and integration closure, assertion coverage, worker-contract coverage, authority feasibility, environment feasibility, child-return freshness, review dispositions, and exact handoff integrity. Return the versioned graph to the semantic parent for integration; never claim global baseline acceptance or execution readiness."
+        "Calculate work-graph readiness from current source bindings, dependency and integration closure, assertion coverage, worker-contract coverage, authority feasibility, environment feasibility, child-return freshness, review dispositions, and exact handoff integrity. Return the versioned graph to the semantic parent for integration; never claim global baseline acceptance or execution readiness.",
+        "Project current capability-increment, phase-topology, and planning WorkUnit coordination records through `bbk-beads` when the project mapping is enabled; preserve graph identity and readiness in BBK rather than inferring them from tracker status."
       ],
       "delegation": {
         "bbk_phase_wayfinder": "a defined phase needs phase-owned work-unit decomposition, internal ordering, mutation ownership, safe parallelism, integration touchpoints, checks, continuation, and handoffs; the phase may advance one or several capability increments and an increment may span several phases",
@@ -1427,6 +1441,7 @@
         "Do not overwrite stale or superseded work graphs. Preserve history, identify the invalidation cause and affected nodes, and create a successor revision."
       ],
       "skills": [
+        "bbk-beads",
         "bbk-work-graph",
         "bbk-execution-slicing",
         "bbk-profile-routing",
@@ -1448,6 +1463,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-execution-slicing",
         "bbk-prompt-proportional-stop",
@@ -1660,7 +1676,8 @@
         "Validate every Verification Designer, Worker Designer, and Reviewer return for exact subject and revision, freshness, provenance, delegated authority, declared effects, schema completeness, evidence exposure, contradictions, and unresolved blockers before integration. Return stale, unauthorized, overlapping, incomplete, or contract-nonconforming work to its owner rather than silently rewriting it and attributing the repair to that child.",
         "When an accepted phase charter, capability relation, architecture element, structure contract, interface, requirement, decision, authority grant, assertion, profile, environment, or parent-graph revision changes, preserve the prior phase plan, identify the affected slices, work units, worker contracts, assertions, evidence dependencies, and successors, invalidate only the impacted subgraph, and create or request the smallest sufficient successor plan.",
         "Apply proportionality to phase decomposition. Avoid work units created only for tracking, duplicate gates, speculative scaffolding, or independent review without a distinct property. Stop when the phase plan is dependency-valid, integration-complete, mutation-safe, assertion-covered, worker-ready, authority- and environment-feasible, and exact enough for parent integration; preserve residual uncertainty and reopening triggers rather than manufacturing detail.",
-        "Calculate phase-plan readiness from current charter and source bindings, work-unit bounds, dependency and integration closure, mutation and workspace ownership, assertion coverage, worker-contract coverage, authority and environment feasibility, child-return freshness, review dispositions, invalidation closure, and exact handoff integrity. Return the versioned phase plan to the Planning Wayfinder; never claim global baseline acceptance, phase completion, or readiness to execute."
+        "Calculate phase-plan readiness from current charter and source bindings, work-unit bounds, dependency and integration closure, mutation and workspace ownership, assertion coverage, worker-contract coverage, authority and environment feasibility, child-return freshness, review dispositions, invalidation closure, and exact handoff integrity. Return the versioned phase plan to the Planning Wayfinder; never claim global baseline acceptance, phase completion, or readiness to execute.",
+        "Project current phase and phase-owned WorkUnit coordination records through `bbk-beads` when the project mapping is enabled; preserve exact WorkUnit semantics, ownership, and readiness in BBK and treat tracker divergence as coordination drift."
       ],
       "delegation": {
         "bbk_verification_designer": "one coherent phase-local claim set, phase-exit behavior, integration obligation, feared event, recovery behavior, or evidence gate lacks a current exact assertion, method, environment, acceptance threshold, evidence requirement, applicability boundary, independence rationale, or unambiguous completing-work-unit owner; the Phase Wayfinder owns identification, commissioning, return validation, integration, and readiness, while Verification Designer owns exact assertion and evidence-method design",
@@ -1692,6 +1709,7 @@
         "Do not overwrite a stale or superseded phase plan. Preserve history, bind the invalidation cause and affected objects, and create a successor revision."
       ],
       "skills": [
+        "bbk-beads",
         "bbk-phase-plan",
         "bbk-execution-slicing",
         "bbk-implementation-structure",
@@ -1715,6 +1733,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-execution-slicing",
         "bbk-prompt-proportional-stop",
@@ -2522,6 +2541,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
         "bbk-prompt-liveness-recovery",
@@ -3036,6 +3056,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
         "bbk-prompt-evidence-lineage",
@@ -3324,6 +3345,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
         "bbk-prompt-evidence-lineage",
@@ -3634,6 +3656,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-profile-dispatch",
         "bbk-prompt-proportional-stop",
@@ -3964,6 +3987,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
         "bbk-prompt-liveness-recovery",
@@ -4190,7 +4214,8 @@
         "Expose controller-facing status only as a projection of durable state: exact ownership, current boundaries and work, dependencies, resources, candidates, assertions, findings, blockers, waits, recovery, requested intervention, unaffected work, and projection freshness. Do not invent progress percentages or let a stale status display become execution truth.",
         "Assess readiness for controller completion determination from exact current territory returns, dependency and integration closure, candidate and evidence identity, assertion and finding dispositions, review obligations, cleanup and external-effect reconciliation, authority and budget accounting, invalidation, and the campaign completion contract. Return `READY_FOR_CONTROLLER_COMPLETION_ASSESSMENT`; do not commit terminal completion, outcome achievement, residual-risk acceptance, or release.",
         "Preserve outcome-level or operational observations with exact subject, environment, horizon, attribution, evidence, and limitations, while stating explicitly which actor-outcome, compliance, safety, security, legal, acceptance, and release claims execution completion does not establish.",
-        "Produce one durable, digest-bound checkpoint or final report containing the exact subject, controller and planning routes, campaign charter, operating and execution baselines, authorization, semantic run and attempts, boundaries, dependencies, integration, resources, authority, candidates, evidence, findings, reviews, discoveries, signals, recovery, cleanup, residuals, completion assessment, requested parent actions, and smallest valid next action."
+        "Produce one durable, digest-bound checkpoint or final report containing the exact subject, controller and planning routes, campaign charter, operating and execution baselines, authorization, semantic run and attempts, boundaries, dependencies, integration, resources, authority, candidates, evidence, findings, reviews, discoveries, signals, recovery, cleanup, residuals, completion assessment, requested parent actions, and smallest valid next action.",
+        "Project root execution-state transitions and compact handoff pointers through `bbk-beads` when the project mapping is enabled; keep execution authority, candidate identity, validation admission, completion, and release state canonical in BBK."
       ],
       "delegation": {
         "bbk_territory_orchestrator": "one current immutable TerritoryExecutionBoundary has satisfied its full entry contract, including coherent responsibility and completion semantics, closed WorkUnit and dependency membership, exact source and interface bindings, bounded authority and effect fence, workspace and resource isolation, quality and validation obligations, containment and recovery, qualified roles and tools, exact context, and a durable return contract",
@@ -4224,6 +4249,7 @@
         "Do not describe completion-report readiness as release, legal or regulatory acceptance, residual-risk acceptance, compliance, safety, security, or proof of actor outcome unless a separate current authority-bound record and exact evidence establish that claim."
       ],
       "skills": [
+        "bbk-beads",
         "bbk-root-execution",
         "bbk-recover",
         "bbk-evidence",
@@ -4247,6 +4273,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
         "bbk-prompt-liveness-recovery",
@@ -4500,7 +4527,8 @@
         "Use durable typed signals to `bbk_root_orchestrator` for status, blocker, discovered work, planning decision required, contract conflict, validation escalation, retry exhaustion, recovery required, authority withdrawal, completion readiness, failure and cancellation. Bind source run and attempt, campaign, boundary, WorkUnit, candidate, affected objects, evidence, sequence, idempotency, containment, owner and resolution state. Signal delivery or acknowledgement is not decision or resolution.",
         "Keep the role non-user-facing. Normal communication and exact return travel to `bbk_root_orchestrator` through the declared hub/IRC or host edge; Main remains the user-facing controller. Do not call `ask`, contact the user, create an ADR, or treat ordinary prose, silence, timeout or an IRC receipt as authority. Use an explicitly authorized emergency route only for parent unavailability plus immediate containment or authority risk, and return to the semantic parent as soon as possible.",
         "Prepare `READY_FOR_ROOT_COMPLETION_ASSESSMENT` only when the exact boundary and governing sources remain current; every required WorkUnit and cohort has a qualified terminal result; local integration obligations are satisfied; required worker-quality gates, candidate-bound validations and independent reviews are complete or explicitly non-applicable; all blocking findings have evidenced dispositions; cleanup and external effects are reconciled; no active blocker, invalidation, ownership collision, unauthorized effect, unresolved repair or catastrophic-control condition remains; and every exact handoff verifies. The report does not commit terminal state, outcome achievement, acceptance or release.",
-        "Apply the boundary's time, cost, context, process, storage, network, device, service, retry, replacement and concurrency budgets. Stop, pause, narrow, recover or escalate when continued local coordination has lower expected value than its cost or exceeds the authorized envelope. Preserve completed sibling work and exact residual state rather than restarting the territory for ceremonial completeness."
+        "Apply the boundary's time, cost, context, process, storage, network, device, service, retry, replacement and concurrency budgets. Stop, pause, narrow, recover or escalate when continued local coordination has lower expected value than its cost or exceeds the authorized envelope. Preserve completed sibling work and exact residual state rather than restarting the territory for ceremonial completeness.",
+        "Project territory execution-state transitions and compact territory handoff pointers through `bbk-beads` when the project mapping is enabled; do not treat tracker status as territory completion, candidate admission, or assurance disposition."
       ],
       "delegation": {
         "bbk_worker_orchestrator": "one exact coherent worker-validation cohort is admitted inside the current immutable TerritoryExecutionBoundary, with fixed WorkUnit membership, one candidate meaning, non-overlapping mutation ownership, complete invocation contracts, local dependencies and integration obligations, bounded authority and discovery envelope, qualified models/profiles/tools/environments, workspace and resource isolation, worker-quality gates, repair policy, continuation, cleanup, and exact result and handoff contracts",
@@ -4535,6 +4563,7 @@
         "Do not return `READY_FOR_ROOT_COMPLETION_ASSESSMENT` while a required WorkUnit, integration obligation, gate, validation, review, finding disposition, cleanup, external-effect reconciliation, authority check or handoff remains blocking, stale, invalid, inconclusive or unverified."
       ],
       "skills": [
+        "bbk-beads",
         "bbk-territory-execution",
         "bbk-recover",
         "bbk-evidence",
@@ -4558,6 +4587,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
         "bbk-prompt-liveness-recovery",
@@ -4790,7 +4820,8 @@
         "Apply the accepted repair policy. Unless a stricter contract applies, allow two ordinary local repair cycles and require parent planning review by the third unresolved cycle, with earlier escalation for recurring, broadening, architectural, interface, authority, protected-floor, cross-boundary, integrity, containment or budget-exhausting failure. Cohort membership may not grow during repair, and repeated small fixes may not be used to evade replanning.",
         "Coordinate recovery only for this cohort and direct Worker children. Preserve verified checkpoints, workspaces, partial changes, effects, candidate and gate state, findings, budgets, continuation and pending parent signals. Treat host-window expiry, capacity pressure, declared quiet work, silence, missing heartbeat and parent polling timeout as non-evidence. Interrupt or replace a running Worker only for an allowed reason with concrete evidence, preserve partial state first, and prefer same-thread continuation where supported. Where a stale attempt cannot be fenced, stop new effects and return for reconciliation rather than risking duplicate mutation.",
         "Reconcile cleanup and external effects before candidate handoff or final report. Track processes, packages, credentials, services, ports, locks, databases, caches, generated files, workspaces, devices, remote systems, publication, deployment, migration and other effects with pre-state, actual operations, receipts, cleanup, rollback, compensation, quarantine and residual owner. Do not delete evidence, a workspace required for repair or validation, or historical candidates merely to reclaim capacity.",
-        "Report current cohort status, blockers, pauses, discoveries, candidates, gates, repairs, recovery and candidate-readiness to the Territory Orchestrator through exact structured returns and durable signals. Once a candidate handoff is accepted for downstream routing, preserve the cohort's durable repair state and yield. Cohort, WorkUnit or issue closure, territory completion, candidate acceptance, outcome assessment and release remain parent, core or accountable-authority transitions; the Worker Orchestrator does not report or commit them as its own terminal success."
+        "Report current cohort status, blockers, pauses, discoveries, candidates, gates, repairs, recovery and candidate-readiness to the Territory Orchestrator through exact structured returns and durable signals. Once a candidate handoff is accepted for downstream routing, preserve the cohort's durable repair state and yield. Cohort, WorkUnit or issue closure, territory completion, candidate acceptance, outcome assessment and release remain parent, core or accountable-authority transitions; the Worker Orchestrator does not report or commit them as its own terminal success.",
+        "Project cohort and WorkUnit execution-state transitions plus compact verified handoff pointers through `bbk-beads` when the project mapping is enabled; retain candidate, gate, repair, and readiness truth in BBK records."
       ],
       "delegation": {
         "bbk_worker": "one exact admitted WorkUnit, integration WorkUnit or in-scope repair unit has a current Worker invocation contract, exact subject and source bindings, isolated or serialized workspace and one mutation owner, qualified model, profiles, tools and environment, bounded authority and effects, focused checks and evidence, continuation and cleanup, and an exact return route into this one coherent cohort without changing cohort membership or candidate meaning"
@@ -4816,6 +4847,7 @@
         "Do not ask the user, call `ask`, create an ADR from execution prose or treat ordinary chat, silence, timeout or transport acknowledgement as authority. Route every planning or authority need through the Territory Orchestrator, Root Orchestrator and harness-root controller."
       ],
       "skills": [
+        "bbk-beads",
         "bbk-worker-execution",
         "bbk-recover",
         "bbk-evidence",
@@ -4839,6 +4871,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
         "bbk-prompt-liveness-recovery",
@@ -5420,6 +5453,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
         "bbk-prompt-liveness-recovery",

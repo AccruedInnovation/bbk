@@ -1,8 +1,10 @@
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { readFileSync, realpathSync, statSync } from "node:fs";
+import { homedir } from "node:os";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { TextDecoder } from "node:util";
 
 const extensionDir = path.dirname(fileURLToPath(import.meta.url));
 const sourceRoot = path.resolve(extensionDir, "..", "..");
@@ -16,18 +18,188 @@ const sourceRoutingCli = path.join(sourceRoot, "tools", "omp_model_routing.py");
 const routingCliPath = process.env.BBK_OMP_ROUTING_CLI || (() => {
   try { readFileSync(adjacentRoutingCli); return adjacentRoutingCli; } catch { return sourceRoutingCli; }
 })();
-const routingBindingPath = process.env.BBK_OMP_ROUTING_BINDING || path.join(extensionDir, "bbk-package-root.json");
+const defaultRoutingBindingPath = path.join(extensionDir, "bbk-package-root.json");
+const explicitRoutingBindingPath = process.env.BBK_OMP_ROUTING_BINDING || null;
 const versionPath = (() => {
   try { readFileSync(path.join(extensionDir, "VERSION")); return path.join(extensionDir, "VERSION"); }
   catch { return path.join(sourceRoot, "VERSION"); }
 })();
-let version = "0.1.0-alpha.13.1";
+let version = "0.1.0-alpha.13.5";
 try { version = readFileSync(versionPath, "utf8").trim() || version; } catch {}
+
+function normalizedFsPath(value) {
+  const requested = path.resolve(String(value || ""));
+  let probe = requested;
+  const suffix = [];
+  let resolved = requested;
+  while (true) {
+    try {
+      resolved = typeof realpathSync.native === "function" ? realpathSync.native(probe) : realpathSync(probe);
+      if (suffix.length) resolved = path.join(resolved, ...suffix.reverse());
+      break;
+    } catch {
+      const parent = path.dirname(probe);
+      if (parent === probe) break;
+      suffix.push(path.basename(probe));
+      probe = parent;
+    }
+  }
+  return process.platform === "win32" ? resolved.toLowerCase() : resolved;
+}
+function sameFsPath(left, right) {
+  return normalizedFsPath(left) === normalizedFsPath(right);
+}
+function pathContains(root, candidate) {
+  const base = normalizedFsPath(root);
+  const child = normalizedFsPath(candidate);
+  return child === base || child.startsWith(base.endsWith(path.sep) ? base : `${base}${path.sep}`);
+}
+function readableFile(target) {
+  try { readFileSync(target); return true; } catch { return false; }
+}
+function projectOmpInstallExpectation(projectRoot) {
+  const extensionRoot = path.join(projectRoot, ".omp", "extensions", "bbk");
+  const routingState = path.join(projectRoot, ".bbk-kit", "effective-omp-model-routing.json");
+  if (pathExists(extensionRoot, { directory: true })) return extensionRoot;
+  if (readableFile(routingState)) return routingState;
+  const manifestPath = path.join(projectRoot, ".bbk-kit-install.json");
+  if (!readableFile(manifestPath)) return null;
+  try {
+    const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+    if (manifest?.schema === "bbk.install-manifest.v1" && manifest?.omp === true) return manifestPath;
+  } catch {}
+  return null;
+}
+function pathExists(candidate, { directory = false } = {}) {
+  try {
+    const stat = statSync(candidate);
+    return directory ? stat.isDirectory() : true;
+  } catch {
+    return false;
+  }
+}
+function readRoutingBinding(bindingPath) {
+  try {
+    const value = JSON.parse(readFileSync(bindingPath, "utf8"));
+    if (!["bbk.omp-package-binding.v2", "bbk.omp-package-binding.v3"].includes(value?.schema)) return null;
+    if (!value?.package_root || !value?.manifest_path || !value?.omp_agents || !value?.state_path) return null;
+    return value;
+  } catch {
+    return null;
+  }
+}
+function routingTargetFromPath(bindingPath, source) {
+  const resolved = path.resolve(bindingPath);
+  const binding = readRoutingBinding(resolved);
+  if (!binding) return null;
+  const scope = binding.scope === "project" ? "project" : binding.scope === "user" ? "user" : "unknown";
+  const projectRoot = typeof binding.project_root === "string" && binding.project_root.trim()
+    ? path.resolve(binding.project_root)
+    : null;
+  if (binding.schema === "bbk.omp-package-binding.v3") {
+    if (!['project', 'user'].includes(scope)) return null;
+    if (scope === "project" && !projectRoot) return null;
+    if (scope === "user" && projectRoot) return null;
+  }
+  return {
+    scope,
+    projectRoot,
+    bindingPath: resolved,
+    binding,
+    packageRoot: path.resolve(binding.package_root || binding.path),
+    source,
+  };
+}
+
+function ancestorDirectories(start) {
+  const result = [];
+  let current = path.resolve(start || process.cwd());
+  for (;;) {
+    result.push(current);
+    const parent = path.dirname(current);
+    if (parent === current) break;
+    current = parent;
+  }
+  return result;
+}
+function nearestProjectRoutingTarget(cwd) {
+  for (const projectRoot of ancestorDirectories(cwd)) {
+    const extensionRoot = path.join(projectRoot, ".omp", "extensions", "bbk");
+    const bindingPath = path.join(extensionRoot, "bbk-package-root.json");
+    const expectation = projectOmpInstallExpectation(projectRoot);
+    if (!expectation && !pathExists(bindingPath)) continue;
+    const target = routingTargetFromPath(bindingPath, "nearest-project");
+    if (!target) {
+      throw new Error(`A project-scoped BBK OMP installation is present at ${projectRoot}, but ${bindingPath} is missing or invalid; routing did not fall back to user scope`);
+    }
+    if (target.scope !== "project") {
+      throw new Error(`Project BBK binding ${bindingPath} declares scope ${target.scope}; routing did not fall back to user scope`);
+    }
+    const declaredRoot = target.projectRoot || projectRoot;
+    if (!sameFsPath(declaredRoot, projectRoot)) {
+      throw new Error(`Project BBK binding ${bindingPath} declares a different project_root: ${declaredRoot}`);
+    }
+    target.projectRoot = projectRoot;
+    return target;
+  }
+  const local = routingTargetFromPath(defaultRoutingBindingPath, "loaded-extension");
+  if (local?.scope === "project" && local.projectRoot && pathContains(local.projectRoot, cwd)) return local;
+  return null;
+}
+
+function userRoutingTarget() {
+  const local = routingTargetFromPath(defaultRoutingBindingPath, "loaded-extension");
+  if (local?.scope === "user") return local;
+  const roots = [
+    process.env.PI_CODING_AGENT_DIR,
+    process.env.OMP_AGENT_DIR,
+    path.join(homedir(), ".omp", "agent"),
+  ].filter(Boolean);
+  for (const root of roots) {
+    const target = routingTargetFromPath(
+      path.join(path.resolve(root), "extensions", "bbk", "bbk-package-root.json"),
+      "user-installation",
+    );
+    if (target?.scope === "user") return target;
+  }
+  return null;
+}
+function resolveRoutingTarget(cwd, requestedScope = "auto") {
+  if (!["auto", "project", "user"].includes(requestedScope)) {
+    throw new Error(`Unknown BBK routing target scope: ${requestedScope}`);
+  }
+  if (explicitRoutingBindingPath) {
+    const target = routingTargetFromPath(explicitRoutingBindingPath, "environment");
+    if (!target) throw new Error(`BBK_OMP_ROUTING_BINDING is not a valid BBK OMP binding: ${explicitRoutingBindingPath}`);
+    if (requestedScope !== "auto" && target.scope !== requestedScope) {
+      throw new Error(`BBK_OMP_ROUTING_BINDING is ${target.scope}-scoped, not ${requestedScope}-scoped`);
+    }
+    return target;
+  }
+  if (requestedScope === "project") {
+    const target = nearestProjectRoutingTarget(cwd);
+    if (!target) {
+      throw new Error(`No project-scoped BBK OMP installation was found at or above ${path.resolve(cwd)}; project routing was not changed`);
+    }
+    return target;
+  }
+  if (requestedScope === "user") {
+    const target = userRoutingTarget();
+    if (!target) throw new Error("No user-scoped BBK OMP installation was found; user routing was not changed");
+    return target;
+  }
+  const project = nearestProjectRoutingTarget(cwd);
+  if (project) return project;
+  const local = routingTargetFromPath(defaultRoutingBindingPath, "loaded-extension");
+  if (local?.scope === "user") return local;
+  const user = userRoutingTarget();
+  if (user) return user;
+  throw new Error(`No valid BBK OMP routing binding was found for ${path.resolve(cwd)}`);
+}
+
 let packageRoot = sourceRoot;
-try {
-  const binding = JSON.parse(readFileSync(path.join(extensionDir, "bbk-package-root.json"), "utf8"));
-  if (binding?.path) packageRoot = binding.path;
-} catch {}
+const loadedBinding = routingTargetFromPath(defaultRoutingBindingPath, "loaded-extension");
+if (loadedBinding?.packageRoot) packageRoot = loadedBinding.packageRoot;
 
 const protectedFragments = [
   `${path.sep}.bbk${path.sep}candidates${path.sep}`,
@@ -42,47 +214,140 @@ function pythonCommand() {
   return process.env.BBK_PYTHON || (process.platform === "win32" ? "py" : "python3");
 }
 function commandPrefix() {
-  return process.platform === "win32" && !process.env.BBK_PYTHON ? ["-3", cliPath] : [cliPath];
+  return process.platform === "win32" && !process.env.BBK_PYTHON
+    ? ["-3", "-X", "utf8", cliPath]
+    : ["-X", "utf8", cliPath];
 }
 function scriptPrefix(script) {
-  return process.platform === "win32" && !process.env.BBK_PYTHON ? ["-3", script] : [script];
+  return process.platform === "win32" && !process.env.BBK_PYTHON
+    ? ["-3", "-X", "utf8", script]
+    : ["-X", "utf8", script];
 }
-function runRouting(args, cwd, signal) {
-  return new Promise((resolve, reject) => {
-    const child = spawn(pythonCommand(), [...scriptPrefix(routingCliPath), "--binding", routingBindingPath, "--json", ...args], {
-      cwd, env: { ...process.env, BBK_PACKAGE_ROOT: packageRoot }, windowsHide: true, stdio: ["ignore", "pipe", "pipe"],
+function pythonUtf8Environment(extra = {}) {
+  return {
+    ...process.env,
+    PYTHONUTF8: "1",
+    PYTHONIOENCODING: "utf-8",
+    ...extra,
+  };
+}
+function decodeStrictUtf8(chunks, streamName) {
+  try {
+    return new TextDecoder("utf-8", { fatal: true }).decode(Buffer.concat(chunks));
+  } catch (error) {
+    const failure = new Error(`BBK Python ${streamName} was not valid UTF-8: ${String(error?.message || error)}`);
+    failure.code = "BBK_INVALID_UTF8";
+    failure.streamName = streamName;
+    throw failure;
+  }
+}
+function utf8TransportFailure(error, target = null) {
+  return {
+    code: 2,
+    details: {
+      schema: "bbk.utf8-transport-error.v1",
+      status: "ERROR",
+      stream: error?.streamName || null,
+      error: String(error?.message || error),
+    },
+    stdout: "",
+    stderr: "",
+    ...(target ? { target } : {}),
+  };
+}
+function runRouting(args, cwd, signal, requestedScope = "auto") {
+  let target;
+  try {
+    target = resolveRoutingTarget(cwd, requestedScope);
+  } catch (error) {
+    return Promise.resolve({
+      code: 2,
+      details: {
+        schema: "bbk.omp-model-routing-target-error.v1",
+        status: "ERROR",
+        requested_scope: requestedScope,
+        error: String(error?.message || error),
+      },
+      stdout: "",
+      stderr: "",
     });
-    let stdout = "", stderr = "";
-    child.stdout.setEncoding("utf8"); child.stderr.setEncoding("utf8");
-    child.stdout.on("data", chunk => { stdout += chunk; });
-    child.stderr.on("data", chunk => { stderr += chunk; });
+  }
+  const targetRoutingCliPath = process.env.BBK_OMP_ROUTING_CLI
+    ? path.resolve(process.env.BBK_OMP_ROUTING_CLI)
+    : path.join(path.dirname(target.bindingPath), "omp_model_routing.py");
+  if (!readableFile(targetRoutingCliPath)) {
+    return Promise.resolve({
+      code: 2,
+      details: {
+        schema: "bbk.omp-model-routing-target-error.v1",
+        status: "ERROR",
+        requested_scope: requestedScope,
+        resolved_scope: target.scope,
+        resolved_project_root: target.projectRoot || null,
+        resolution_source: target.source,
+        binding_path: target.bindingPath,
+        error: `The selected BBK routing installation is missing its bound router: ${targetRoutingCliPath}; routing did not fall back to another scope or package version`,
+      },
+      stdout: "",
+      stderr: "",
+      target,
+    });
+  }
+  return new Promise((resolve, reject) => {
+    const child = spawn(pythonCommand(), [...scriptPrefix(targetRoutingCliPath), "--binding", target.bindingPath, "--json", ...args], {
+      cwd,
+      env: pythonUtf8Environment({ BBK_PACKAGE_ROOT: target.packageRoot }),
+      windowsHide: true,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    const stdoutChunks = [], stderrChunks = [];
+    child.stdout.on("data", chunk => { stdoutChunks.push(Buffer.from(chunk)); });
+    child.stderr.on("data", chunk => { stderrChunks.push(Buffer.from(chunk)); });
     const abort = () => child.kill("SIGTERM");
     signal?.addEventListener?.("abort", abort, { once: true });
     child.on("error", reject);
     child.on("close", code => {
       signal?.removeEventListener?.("abort", abort);
+      let stdout, stderr;
+      try {
+        stdout = decodeStrictUtf8(stdoutChunks, "stdout");
+        stderr = decodeStrictUtf8(stderrChunks, "stderr");
+      } catch (error) {
+        resolve(utf8TransportFailure(error, target));
+        return;
+      }
       let details;
       try { details = stdout.trim() ? JSON.parse(stdout) : { status: code === 0 ? "PASS" : "ERROR" }; }
       catch { details = { status: "ERROR", stdout, stderr, parseError: "BBK OMP routing CLI did not return JSON" }; }
       if (stderr.trim()) details.stderr = stderr;
-      resolve({ code, details, stdout, stderr });
+      details.resolved_scope = details.scope || target.scope;
+      details.resolved_project_root = details.project_root || target.projectRoot || null;
+      details.resolution_source = target.source;
+      resolve({ code, details, stdout, stderr, target });
     });
   });
 }
 function runBbk(args, cwd, signal) {
   return new Promise((resolve, reject) => {
     const child = spawn(pythonCommand(), [...commandPrefix(), "--json", ...args], {
-      cwd, env: { ...process.env, BBK_PACKAGE_ROOT: packageRoot }, windowsHide: true, stdio: ["ignore", "pipe", "pipe"],
+      cwd, env: pythonUtf8Environment({ BBK_PACKAGE_ROOT: packageRoot }), windowsHide: true, stdio: ["ignore", "pipe", "pipe"],
     });
-    let stdout = "", stderr = "";
-    child.stdout.setEncoding("utf8"); child.stderr.setEncoding("utf8");
-    child.stdout.on("data", chunk => { stdout += chunk; });
-    child.stderr.on("data", chunk => { stderr += chunk; });
+    const stdoutChunks = [], stderrChunks = [];
+    child.stdout.on("data", chunk => { stdoutChunks.push(Buffer.from(chunk)); });
+    child.stderr.on("data", chunk => { stderrChunks.push(Buffer.from(chunk)); });
     const abort = () => child.kill("SIGTERM");
     signal?.addEventListener?.("abort", abort, { once: true });
     child.on("error", reject);
     child.on("close", code => {
       signal?.removeEventListener?.("abort", abort);
+      let stdout, stderr;
+      try {
+        stdout = decodeStrictUtf8(stdoutChunks, "stdout");
+        stderr = decodeStrictUtf8(stderrChunks, "stderr");
+      } catch (error) {
+        resolve(utf8TransportFailure(error));
+        return;
+      }
       let details;
       try { details = stdout.trim() ? JSON.parse(stdout) : { status: code === 0 ? "PASS" : "ERROR" }; }
       catch { details = { status: "ERROR", stdout, stderr, parseError: "BBK CLI did not return JSON" }; }
@@ -903,13 +1168,49 @@ function createBbkActivityHud(pi) {
   let currentCtx;
   let sequence = 0;
   const agents = new Map();
+  const aliases = new Map();
+  const MAX_RETAINED_AGENTS = 256;
+  const ACTIVE_STATUSES = new Set(["pending", "queued", "running", "waiting", "retrying", "starting"]);
+  const TERMINAL_STATUSES = new Set(["completed", "failed", "error", "aborted", "cancelled", "canceled", "stopped", "terminated"]);
 
   function clearWidget() {
     try { currentCtx?.ui?.setWidget?.(BBK_ACTIVITY_WIDGET_KEY, undefined, { placement: "aboveEditor" }); }
     catch {}
   }
+  function statusOf(value, fallback = "running") {
+    const raw = String(value || fallback).trim().toLowerCase();
+    if (raw === "started") return "pending";
+    if (raw === "complete" || raw === "done" || raw === "success" || raw === "succeeded") return "completed";
+    if (raw === "failure") return "failed";
+    return raw || fallback;
+  }
   function activeAgents() {
-    return [...agents.values()].filter(item => ["pending", "running"].includes(item.progress?.status));
+    return [...agents.values()].filter(item => ACTIVE_STATUSES.has(statusOf(item.progress?.status)));
+  }
+  function agentLabel(item, max = 42) {
+    return oneLine(item?.name || item?.id || item?.description || roleDisplayName(item?.agent), max);
+  }
+  function ancestorPath(item) {
+    const values = [];
+    const seen = new Set();
+    let current = item;
+    while (current && !seen.has(current.key)) {
+      seen.add(current.key);
+      values.push(agentLabel(current, 28));
+      current = current.parentKey ? agents.get(current.parentKey) : null;
+    }
+    return values.reverse();
+  }
+  function depthOf(item) {
+    let depth = 0;
+    const seen = new Set();
+    let parent = item?.parentKey ? agents.get(item.parentKey) : null;
+    while (parent && !seen.has(parent.key)) {
+      seen.add(parent.key);
+      depth += 1;
+      parent = parent.parentKey ? agents.get(parent.parentKey) : null;
+    }
+    return depth;
   }
   function render() {
     if (!enabled || !currentCtx?.ui?.setWidget) {
@@ -918,73 +1219,325 @@ function createBbkActivityHud(pi) {
     }
     const active = activeAgents().sort((a, b) => b.updated - a.updated);
     if (!active.length) {
+      const known = agents.size;
       currentCtx.ui.setWidget(
         BBK_ACTIVITY_WIDGET_KEY,
-        ["BBK · ready"],
+        [known ? `BBK · ready · ${known} agent${known === 1 ? "" : "s"} in history` : "BBK · ready"],
         { placement: "aboveEditor" },
       );
       return;
     }
     const latest = active[0];
-    const name = oneLine(latest.progress?.id || latest.id || latest.description || roleDisplayName(latest.agent), 42);
+    const pathLabel = ancestorPath(latest).join(" › ") || agentLabel(latest);
     const gauge = contextGauge(latest.progress);
     const activity = progressActivity(latest.progress);
-    let line = `BBK · ${name}${gauge ? ` [${gauge}]` : ""}: ${activity}`;
+    let line = `BBK · ${active.length} active · ${pathLabel}${gauge ? ` [${gauge}]` : ""}: ${activity}`;
 
     const otherGauges = active.slice(1, 4).map(item => {
-      const otherName = oneLine(item.progress?.id || item.id || roleDisplayName(item.agent), 28);
+      const otherName = agentLabel(item, 24);
       const otherGauge = contextGauge(item.progress, { short: true });
       return otherGauge ? `${otherName} ${otherGauge}` : otherName;
     });
     if (otherGauges.length) line += ` | ${otherGauges.join(" · ")}`;
-    if (active.length > 4) line += ` · +${active.length - 4} workers`;
-    currentCtx.ui.setWidget(BBK_ACTIVITY_WIDGET_KEY, [oneLine(line, 220)], { placement: "aboveEditor" });
+    if (active.length > 4) line += ` · +${active.length - 4} agents`;
+    currentCtx.ui.setWidget(BBK_ACTIVITY_WIDGET_KEY, [oneLine(line, 260)], { placement: "aboveEditor" });
+  }
+  function strongAliasValues(raw, progress, parentKey) {
+    const values = [
+      raw?.id, raw?.taskId, raw?.task_id, raw?.agentId, raw?.agent_id,
+      raw?.toolCallId, raw?.tool_call_id,
+      progress?.id, progress?.taskId, progress?.task_id,
+      progress?.agentId, progress?.agent_id, progress?.toolCallId, progress?.tool_call_id,
+    ];
+    const result = [];
+    for (const value of values) {
+      if (typeof value !== "string" || !value.trim()) continue;
+      const clean = value.trim();
+      result.push(`id:${clean}`, `${parentKey || "Main"}::id:${clean}`);
+    }
+    return [...new Set(result)];
+  }
+  function weakAliasValue(raw, progress, role, parentKey) {
+    const name = raw?.name || progress?.name || raw?.description || raw?.task || progress?.task;
+    return typeof name === "string" && name.trim()
+      ? `${parentKey || "Main"}::${role}::${name.trim()}`
+      : null;
+  }
+  function roleFrom(raw, progress) {
+    const values = [
+      raw?.agent, progress?.agent, raw?.role, progress?.role,
+      raw?.agentName, progress?.agentName,
+      raw?.agent?.name, progress?.agent?.name,
+      raw?.agent?.id, progress?.agent?.id,
+    ];
+    for (const value of values) {
+      const role = String(value || "").trim();
+      if (BBK_ROLE_NAME_RE.test(role)) return role;
+    }
+    return "";
+  }
+  function resolveAlias(value, parentKey) {
+    if (typeof value !== "string" || !value.trim()) return null;
+    const clean = value.trim();
+    return aliases.get(`${parentKey || "Main"}::id:${clean}`) || aliases.get(`id:${clean}`) || null;
+  }
+  function directParentKey(raw, progress, inheritedParentKey) {
+    if (inheritedParentKey) return inheritedParentKey;
+    const values = [
+      raw?.parentAgentId, raw?.parent_agent_id, raw?.parentId, raw?.parent_id,
+      raw?.parentTaskId, raw?.parent_task_id, raw?.parentName,
+      progress?.parentAgentId, progress?.parent_agent_id, progress?.parentId, progress?.parent_id,
+      progress?.parentTaskId, progress?.parent_task_id, progress?.parentName,
+    ];
+    for (const value of values) {
+      const resolved = resolveAlias(value, null);
+      if (resolved) return resolved;
+    }
+    return null;
+  }
+  function detailItems(value) {
+    if (!value) return [];
+    if (Array.isArray(value)) return value;
+    if (typeof value !== "object") return [];
+    for (const key of ["progress", "tasks", "items", "children", "inflight", "details"]) {
+      if (Array.isArray(value[key])) return value[key];
+    }
+    const candidates = Object.values(value).filter(item => item && typeof item === "object");
+    return candidates.length && candidates.every(item => !Array.isArray(item)) ? candidates : [];
+  }
+  function nestedItems(raw, progress) {
+    const result = [];
+    const containers = [
+      raw?.inflightTaskDetails, raw?.inflight_task_details,
+      progress?.inflightTaskDetails, progress?.inflight_task_details,
+      raw?.extractedToolData?.task, raw?.extracted_tool_data?.task,
+      progress?.extractedToolData?.task, progress?.extracted_tool_data?.task,
+      Array.isArray(raw?.progress) ? raw.progress : null,
+      Array.isArray(progress?.progress) ? progress.progress : null,
+      raw?.results, progress?.results,
+      raw?.children, progress?.children,
+    ];
+    for (const container of containers) result.push(...detailItems(container));
+    return result;
+  }
+  function trimHistory() {
+    if (agents.size <= MAX_RETAINED_AGENTS) return;
+    const removable = [...agents.values()]
+      .filter(item => !ACTIVE_STATUSES.has(statusOf(item.progress?.status)))
+      .sort((a, b) => a.updated - b.updated);
+    while (agents.size > MAX_RETAINED_AGENTS && removable.length) {
+      const item = removable.shift();
+      agents.delete(item.key);
+      for (const [alias, key] of aliases) if (key === item.key) aliases.delete(alias);
+    }
+  }
+  function upsert(rawValue, inheritedParentKey = null, source = "progress", visited = new Set()) {
+    if (!rawValue || typeof rawValue !== "object" || visited.has(rawValue)) return null;
+    visited.add(rawValue);
+    const raw = rawValue;
+    const progress = raw.progress && typeof raw.progress === "object" && !Array.isArray(raw.progress)
+      ? raw.progress
+      : raw;
+    const role = roleFrom(raw, progress);
+    let parentKey = directParentKey(raw, progress, inheritedParentKey);
+    let key = null;
+    const candidateAliases = role ? strongAliasValues(raw, progress, parentKey) : [];
+    for (const alias of candidateAliases) {
+      const found = aliases.get(alias);
+      if (found) { key = found; break; }
+    }
+    const weakAlias = role && !candidateAliases.length
+      ? weakAliasValue(raw, progress, role, parentKey)
+      : null;
+    if (!key && weakAlias) key = aliases.get(weakAlias) || null;
+    if (role) {
+      const fallbackName = String(
+        progress.id || raw.id || raw.name || progress.name || raw.taskId || progress.taskId
+        || raw.description || raw.task || progress.task || role,
+      ).trim();
+      if (!key) key = `${parentKey || "Main"}/${role}/${fallbackName}`;
+      const previous = agents.get(key);
+      if (!parentKey && previous?.parentKey) parentKey = previous.parentKey;
+      const exitCodeValue = progress.exitCode ?? raw.exitCode;
+      const hasExitCode = exitCodeValue !== undefined
+        && exitCodeValue !== null
+        && Number.isFinite(Number(exitCodeValue));
+      const inferredTerminalStatus = Boolean(progress.aborted ?? raw.aborted)
+        ? "aborted"
+        : progress.error || raw.error
+          ? "failed"
+          : hasExitCode
+            ? Number(exitCodeValue) === 0 ? "completed" : "failed"
+            : undefined;
+      const status = statusOf(
+        progress.status || raw.status || inferredTerminalStatus,
+        previous?.progress?.status || (source === "lifecycle" ? "pending" : "running"),
+      );
+      const id = String(progress.id || raw.id || progress.taskId || raw.taskId || raw.name || progress.name || fallbackName);
+      const name = String(raw.name || progress.name || id);
+      const description = oneLine(raw.task || raw.assignment || raw.description || progress.task || progress.assignment || progress.description || "", 240);
+      const mergedProgress = {
+        ...(previous?.progress || {}),
+        ...progress,
+        id,
+        name,
+        agent: role,
+        status,
+      };
+      const modelValue = raw.resolvedModel || progress.resolvedModel || raw.modelOverride || progress.modelOverride || raw.model || progress.model;
+      const model = typeof modelValue === "string" ? modelValue : modelSelector(modelValue);
+      const item = {
+        ...(previous || {}),
+        key,
+        id,
+        name,
+        agent: role,
+        description: description || previous?.description || "",
+        parentKey: parentKey || null,
+        depth: parentKey && agents.get(parentKey) ? Number(agents.get(parentKey).depth || 0) + 1 : 0,
+        detached: Boolean(raw.detached ?? progress.detached ?? previous?.detached),
+        model: model || previous?.model || "",
+        sessionId: String(raw.sessionId || raw.session_id || progress.sessionId || progress.session_id || previous?.sessionId || ""),
+        sessionFile: String(raw.sessionFile || raw.session_file || progress.sessionFile || progress.session_file || previous?.sessionFile || ""),
+        toolCallId: String(raw.toolCallId || raw.tool_call_id || progress.toolCallId || progress.tool_call_id || previous?.toolCallId || ""),
+        parentToolCallId: String(raw.parentToolCallId || raw.parent_tool_call_id || progress.parentToolCallId || progress.parent_tool_call_id || previous?.parentToolCallId || ""),
+        agentSource: String(raw.agentSource || raw.agent_source || progress.agentSource || progress.agent_source || previous?.agentSource || ""),
+        assignment: oneLine(raw.assignment || progress.assignment || previous?.assignment || "", 240),
+        index: finiteNumber(raw.index ?? progress.index ?? previous?.index),
+        source,
+        progress: mergedProgress,
+        updated: ++sequence,
+        started: previous?.started || sequence,
+        completed: TERMINAL_STATUSES.has(status) ? sequence : null,
+      };
+      agents.set(key, item);
+      for (const alias of candidateAliases) aliases.set(alias, key);
+      if (weakAlias) aliases.set(weakAlias, key);
+      aliases.set(key, key);
+      aliases.set(`id:${id}`, key);
+      aliases.set(`${parentKey || "Main"}::id:${id}`, key);
+    }
+    const childParent = key || inheritedParentKey;
+    for (const child of nestedItems(raw, progress)) upsert(child, childParent, "nested-progress", visited);
+    return key;
   }
   function setMode(next, ctx) {
     enabled = Boolean(next);
     currentCtx = ctx || currentCtx;
-    if (!enabled) agents.clear();
+    if (!enabled) {
+      agents.clear();
+      aliases.clear();
+    }
     render();
   }
   function reset(ctx) {
     currentCtx = ctx || currentCtx;
     agents.clear();
+    aliases.clear();
     render();
   }
   function updateProgress(payload) {
-    if (!payload || !BBK_ROLE_NAME_RE.test(String(payload.agent || payload.progress?.agent || ""))) return;
-    const progress = payload.progress && typeof payload.progress === "object" ? payload.progress : {};
-    const id = String(progress.id || payload.id || payload.description || payload.agent || `bbk-worker-${sequence + 1}`);
-    agents.set(id, {
-      id,
-      agent: String(payload.agent || progress.agent || ""),
-      description: payload.description,
-      progress: { ...progress, id, agent: payload.agent || progress.agent },
-      updated: ++sequence,
-    });
+    if (!enabled || !payload || typeof payload !== "object") return;
+    upsert(payload, null, "progress");
+    trimHistory();
     render();
   }
   function updateLifecycle(payload) {
-    if (!payload || !BBK_ROLE_NAME_RE.test(String(payload.agent || ""))) return;
-    const id = String(payload.id || payload.description || payload.agent);
-    if (payload.status === "started") {
-      const previous = agents.get(id);
-      agents.set(id, {
-        id,
-        agent: String(payload.agent || ""),
-        description: payload.description,
-        progress: {
-          ...(previous?.progress || {}),
-          id,
-          agent: payload.agent,
-          status: previous?.progress?.status === "running" ? "running" : "pending",
-        },
-        updated: ++sequence,
-      });
-    } else {
-      agents.delete(id);
-    }
+    if (!enabled || !payload || typeof payload !== "object") return;
+    const role = roleFrom(payload, payload.progress || {});
+    if (!role) return;
+    const status = statusOf(payload.status, "pending");
+    upsert({ ...payload, progress: { ...(payload.progress || {}), status } }, null, "lifecycle");
+    trimHistory();
     render();
+  }
+  function childrenOf(parentKey) {
+    return [...agents.values()]
+      .filter(item => (item.parentKey || null) === (parentKey || null))
+      .sort((a, b) => (a.started - b.started) || a.name.localeCompare(b.name));
+  }
+  function lineFor(item, prefix = "") {
+    const status = statusOf(item.progress?.status);
+    const gauge = contextGauge(item.progress);
+    const model = item.model ? ` · ${item.model}` : "";
+    const detached = item.detached ? " · detached" : " · synchronous";
+    return `${prefix}${agentLabel(item, 72)} [${item.agent}] · ${status}${gauge ? ` · ${gauge}` : ""}${model}${detached}`;
+  }
+  function treeLines({ activeOnly = false } = {}) {
+    const included = new Set(
+      [...agents.values()]
+        .filter(item => !activeOnly || ACTIVE_STATUSES.has(statusOf(item.progress?.status)))
+        .map(item => item.key),
+    );
+    if (activeOnly) {
+      for (const key of [...included]) {
+        let parent = agents.get(key)?.parentKey;
+        while (parent) { included.add(parent); parent = agents.get(parent)?.parentKey; }
+      }
+    }
+    const roots = [...agents.values()]
+      .filter(item => included.has(item.key) && (!item.parentKey || !included.has(item.parentKey)))
+      .sort((a, b) => (a.started - b.started) || a.name.localeCompare(b.name));
+    const lines = ["Main"];
+    const visit = (item, prefix, isLast) => {
+      lines.push(lineFor(item, `${prefix}${isLast ? "└─ " : "├─ "}`));
+      const children = childrenOf(item.key).filter(child => included.has(child.key));
+      children.forEach((child, index) => visit(child, `${prefix}${isLast ? "   " : "│  "}`, index === children.length - 1));
+    };
+    roots.forEach((item, index) => visit(item, "", index === roots.length - 1));
+    return lines;
+  }
+  function publicRecord(item) {
+    return {
+      id: item.id,
+      name: item.name,
+      role: item.agent,
+      parent_id: item.parentKey ? agents.get(item.parentKey)?.id || item.parentKey : "Main",
+      depth: depthOf(item),
+      status: statusOf(item.progress?.status),
+      detached: item.detached,
+      spawn_mode: item.detached ? "detached" : "synchronous",
+      model: item.model || null,
+      task: item.description || null,
+      assignment: item.assignment || null,
+      activity: progressActivity(item.progress),
+      current_tool: oneLine(item.progress?.currentTool || "", 80) || null,
+      current_tool_args: oneLine(item.progress?.currentToolArgs || "", 240) || null,
+      context_tokens: finiteNumber(item.progress?.contextTokens) ?? null,
+      context_window: finiteNumber(item.progress?.contextWindow) ?? null,
+      lifetime_tokens: finiteNumber(item.progress?.tokens) ?? null,
+      session_id: item.sessionId || null,
+      session_file: item.sessionFile || null,
+      tool_call_id: item.toolCallId || null,
+      parent_tool_call_id: item.parentToolCallId || null,
+      agent_source: item.agentSource || null,
+      source: item.source,
+      index: item.index ?? null,
+      updated_sequence: item.updated,
+    };
+  }
+  function snapshot({ activeOnly = false } = {}) {
+    const records = [...agents.values()]
+      .filter(item => !activeOnly || ACTIVE_STATUSES.has(statusOf(item.progress?.status)))
+      .sort((a, b) => (depthOf(a) - depthOf(b)) || (a.started - b.started) || a.name.localeCompare(b.name));
+    return {
+      schema: "bbk.omp-agent-tree.v1",
+      status: "PASS",
+      package_version: version,
+      active_count: activeAgents().length,
+      agent_count: agents.size,
+      agents: records.map(publicRecord),
+      tree: treeLines({ activeOnly }),
+    };
+  }
+  function details(selector) {
+    const query = String(selector || "").trim().toLowerCase();
+    if (!query) return [];
+    return [...agents.values()]
+      .filter(item => [item.id, item.name, item.agent, item.sessionId, item.toolCallId, item.key]
+        .some(value => String(value || "").toLowerCase() === query))
+      .sort((a, b) => b.updated - a.updated)
+      .map(publicRecord);
   }
 
   const unsubscribe = [];
@@ -1000,12 +1553,70 @@ function createBbkActivityHud(pi) {
     currentCtx = ctx || currentCtx;
     enabled = false;
     agents.clear();
+    aliases.clear();
     clearWidget();
     for (const stop of unsubscribe.splice(0)) {
       try { stop(); } catch {}
     }
   }
-  return { setMode, reset, updateProgress, updateLifecycle, dispose };
+  return { setMode, reset, updateProgress, updateLifecycle, snapshot, details, dispose };
+}
+
+function registerAgentViewCommand(pi, activity) {
+  pi.registerCommand("bbk:agents", {
+    description: "show the complete BBK sub-agent tree or inspect one nested agent",
+    handler: async (first, second) => {
+      const { args, ctx } = commandInvocation(first, second);
+      const tokens = splitArgs(args);
+      const mode = String(tokens[0] || "all").toLowerCase();
+      let text;
+      if (mode === "json") {
+        text = JSON.stringify(activity.snapshot({ activeOnly: false }), null, 2);
+      } else if (mode === "active") {
+        const value = activity.snapshot({ activeOnly: true });
+        text = `BBK agents: ${value.active_count} active / ${value.agent_count} known\n${value.tree.join("\n")}`;
+      } else if (mode === "all" || mode === "tree") {
+        const value = activity.snapshot({ activeOnly: false });
+        text = `BBK agents: ${value.active_count} active / ${value.agent_count} known\n${value.tree.join("\n")}`;
+      } else {
+        const selector = mode === "details" ? tokens.slice(1).join(" ") : tokens.join(" ");
+        if (!selector) {
+          text = "Usage: /bbk:agents [all|active|json|details <agent-id-or-name>]";
+        } else {
+          const found = activity.details(selector);
+          text = found.length
+            ? JSON.stringify({ schema: "bbk.omp-agent-details.v1", status: "PASS", matches: found }, null, 2)
+            : `No BBK agent matched ${selector}. Use /bbk:agents to view the complete tree.`;
+        }
+      }
+      ctx?.ui?.notify?.(text, "info");
+      return undefined;
+    },
+  });
+}
+
+function registerBeadsCommand(pi) {
+  pi.registerCommand("bbk:beads", {
+    description: "plan or apply normal BBK-to-Beads coordination projection",
+    handler: async (first, second) => {
+      const { args, ctx } = commandInvocation(first, second);
+      const tokens = splitArgs(args);
+      const action = String(tokens.shift() || "plan").toLowerCase();
+      let argv;
+      if (action === "plan" || action === "status") argv = ["beads", "plan", ...tokens];
+      else if (action === "apply" || action === "sync") argv = ["beads", "plan", ...tokens, "--apply"];
+      else if (action === "handoff" || action === "handoff-plan") argv = ["beads", "handoff-plan", ...tokens];
+      else if (action === "handoff-apply") argv = ["beads", "handoff-plan", ...tokens, "--apply"];
+      else {
+        ctx?.ui?.notify?.(
+          "Usage: /bbk:beads [plan|apply] [--kind <kind> ...] or /bbk:beads [handoff|handoff-apply] --handoff <file> [--target-bbk-id <id>] [--bead <id>]",
+          "warning",
+        );
+        return undefined;
+      }
+      return publishCommandResult(pi, ctx, await runBbk(argv, ctx?.cwd || process.cwd()), "bbk:beads");
+    },
+  });
 }
 
 function createBbkModeController(pi, onStateChange = () => {}) {
@@ -1141,9 +1752,29 @@ async function unresolvedSelectors(ctx, selectors) {
   }
   return result;
 }
+function routingScope(details) {
+  return String(details?.scope || details?.resolved_scope || "unknown");
+}
+function routingScopeNotice(details) {
+  const scope = routingScope(details);
+  if (scope === "user") {
+    return "This is the shared user-scoped BBK installation. A change affects future BBK sub-agent spawns in every project that uses it.";
+  }
+  if (scope === "project") {
+    return `This change is isolated to project ${details.project_root || details.resolved_project_root || "(unknown project root)"}.`;
+  }
+  return "The routing target scope could not be established; do not mutate it until the binding is repaired.";
+}
 function routeSummaryText(details) {
   const lines = [
     `Active BBK-managed profile: ${details.active_profile || "unknown"}`,
+    `Scope: ${routingScope(details)}`,
+    `Project: ${details.project_root || details.resolved_project_root || "n/a"}`,
+    `Resolution: ${details.resolution_source || "binding"}`,
+    `Binding: ${details.binding_path || "unknown"}`,
+    `Agents: ${details.omp_agents || "unknown"}`,
+    `State: ${details.state_path || "unknown"}`,
+    `Manifest: ${details.manifest_path || "unknown"}`,
     `Source: ${details.source || "unknown"}`,
     "",
     "Routes:",
@@ -1152,6 +1783,7 @@ function routeSummaryText(details) {
     lines.push(`- ${item.roles} roles: ${item.model} / ${item.thinkingLevel}`);
   }
   if (details.precedence_note) lines.push("", `Precedence: ${details.precedence_note}`);
+  lines.push("", routingScopeNotice(details));
   return lines.join("\n");
 }
 async function publishRoutingResult(_pi, ctx, value, label) {
@@ -1159,13 +1791,13 @@ async function publishRoutingResult(_pi, ctx, value, label) {
     const details = value.details || {};
     let text;
     if (details.status === "EXPORTED") {
-      text = `${label}: EXPORTED${details.path ? `\npath: ${details.path}` : ""}`;
+      text = `${label}: EXPORTED${details.path ? `\npath: ${details.path}` : ""}\nScope: ${routingScope(details)}${details.project_root ? `\nProject: ${details.project_root}` : ""}`;
     } else if (details.roles || details.summary) {
       text = routeSummaryText(details);
       if (typeof details.changed_role_count === "number") {
         text += `\nChanged roles: ${details.changed_role_count}`;
       }
-      text += "\nApplies to future BBK sub-agent spawns.";
+      text += "\nApplies to future BBK sub-agent spawns; already-running agents are unchanged.";
     } else {
       text = conciseResultText(value, label);
     }
@@ -1189,21 +1821,59 @@ async function chooseModel(ctx, status, role) {
   const entered = await ctx.ui.input("Model selector", current || "provider/model");
   return String(entered || "").trim() || null;
 }
-async function interactiveRoutingMenu(pi, ctx) {
-  if (!ctx?.hasUI || typeof ctx?.ui?.select !== "function") {
-    return publishRoutingResult(pi, ctx, await runRouting(["status"], ctx?.cwd || process.cwd()), "bbk:models status");
+async function confirmRoutingMutation(ctx, details, title, body) {
+  const scope = routingScope(details);
+  const notice = routingScopeNotice(details);
+  if (!['user', 'project'].includes(scope)) {
+    ctx?.ui?.notify?.(`${notice}\nNo routing change was made.`, "warning");
+    return false;
   }
-  const initial = await runRouting(["status"], ctx.cwd || process.cwd());
+  if (typeof ctx?.ui?.confirm === "function") {
+    return Boolean(await ctx.ui.confirm(title, `${body}\n\n${notice}`));
+  }
+  if (scope === "user") {
+    ctx?.ui?.notify?.(`${notice}\nUse an explicit 'user' target from a UI-enabled OMP session to confirm this shared change.`, "warning");
+    return false;
+  }
+  return true;
+}
+function routingTargetLabels() {
+  return [
+    "Automatic — nearest project installation, otherwise user installation",
+    "Project — nearest project-scoped BBK installation",
+    "User — shared user-scoped BBK installation",
+    "Cancel",
+  ];
+}
+function routingTargetFromLabel(label) {
+  if (String(label || "").startsWith("Project")) return "project";
+  if (String(label || "").startsWith("User")) return "user";
+  if (String(label || "").startsWith("Automatic")) return "auto";
+  return null;
+}
+async function interactiveRoutingMenu(pi, ctx, requestedScope = "auto") {
+  if (!ctx?.hasUI || typeof ctx?.ui?.select !== "function") {
+    return publishRoutingResult(pi, ctx, await runRouting(["status"], ctx?.cwd || process.cwd(), undefined, requestedScope), "bbk:models status");
+  }
+  const initial = await runRouting(["status"], ctx.cwd || process.cwd(), undefined, requestedScope);
   if (initial.code !== 0) return publishRoutingResult(pi, ctx, initial, "bbk:models status");
-  const action = await ctx.ui.select("BBK OMP sub-agent model routing", [
+  const scopeLabel = `${routingScope(initial.details)}${initial.details.project_root ? ` · ${initial.details.project_root}` : ""}`;
+  const action = await ctx.ui.select(`BBK OMP sub-agent model routing [${scopeLabel}]`, [
     "Apply a routing profile",
     "Edit one sub-agent",
     "View current routing",
+    "Choose routing target",
     "Apply a profile file",
     "Export current routing",
     "Cancel",
   ]);
   if (!action || action === "Cancel") return;
+  if (action === "Choose routing target") {
+    const selected = await ctx.ui.select("Routing target", routingTargetLabels());
+    const nextScope = routingTargetFromLabel(selected);
+    if (!nextScope) return;
+    return interactiveRoutingMenu(pi, ctx, nextScope);
+  }
   if (action === "View current routing") {
     return publishRoutingResult(pi, ctx, initial, "bbk:models status");
   }
@@ -1219,9 +1889,19 @@ async function interactiveRoutingMenu(pi, ctx) {
     const availability = unresolved.length
       ? `\n\nOMP cannot currently resolve: ${unresolved.join(", ")}\nThe profile can still be saved for use after model/provider configuration is available.`
       : "";
-    const ok = await ctx.ui.confirm("Apply routing profile?", `${profile.id}\n\n${profile.description}\n\nFuture BBK sub-agent spawns will use this profile.${availability}`);
+    const ok = await confirmRoutingMutation(
+      ctx,
+      initial.details,
+      "Apply routing profile?",
+      `${profile.id}\n\n${profile.description}\n\nFuture BBK sub-agent spawns will use this profile.${availability}`,
+    );
     if (!ok) return;
-    return publishRoutingResult(pi, ctx, await runRouting(["apply-profile", profile.id], ctx.cwd || process.cwd()), `bbk:models ${profile.id}`);
+    return publishRoutingResult(
+      pi,
+      ctx,
+      await runRouting(["apply-profile", profile.id], ctx.cwd || process.cwd(), undefined, requestedScope),
+      `bbk:models ${profile.id}`,
+    );
   }
   if (action === "Edit one sub-agent") {
     const roles = Object.keys(initial.details.roles || {}).sort();
@@ -1240,17 +1920,27 @@ async function interactiveRoutingMenu(pi, ctx) {
     const availability = resolved === false
       ? "\n\nWarning: OMP cannot currently resolve this selector. Save it only if the model/provider or alias will be configured before the agent is spawned."
       : "";
-    const ok = await ctx.ui.confirm("Apply sub-agent route?", `${role}\nModel: ${model}\nThinking: ${thinking}${availability}`);
+    const ok = await confirmRoutingMutation(ctx, initial.details, "Apply sub-agent route?", `${role}\nModel: ${model}\nThinking: ${thinking}${availability}`);
     if (!ok) return;
-    return publishRoutingResult(pi, ctx, await runRouting(["set-role", role, "--model", model, "--thinking-level", thinking], ctx.cwd || process.cwd()), `bbk:models ${role}`);
+    return publishRoutingResult(
+      pi,
+      ctx,
+      await runRouting(["set-role", role, "--model", model, "--thinking-level", thinking], ctx.cwd || process.cwd(), undefined, requestedScope),
+      `bbk:models ${role}`,
+    );
   }
   if (action === "Apply a profile file") {
     const rawPath = await ctx.ui.input("Profile JSON path", "");
     const profilePath = String(rawPath || "").trim();
     if (!profilePath) return;
-    const ok = await ctx.ui.confirm("Apply profile file?", profilePath);
+    const ok = await confirmRoutingMutation(ctx, initial.details, "Apply profile file?", profilePath);
     if (!ok) return;
-    return publishRoutingResult(pi, ctx, await runRouting(["apply-file", profilePath], ctx.cwd || process.cwd()), "bbk:models apply-file");
+    return publishRoutingResult(
+      pi,
+      ctx,
+      await runRouting(["apply-file", profilePath], ctx.cwd || process.cwd(), undefined, requestedScope),
+      "bbk:models apply-file",
+    );
   }
   if (action === "Export current routing") {
     const rawPath = await ctx.ui.input("Export path", "bbk-omp-model-routing.json");
@@ -1259,32 +1949,84 @@ async function interactiveRoutingMenu(pi, ctx) {
     const rawId = await ctx.ui.input("Profile id", "exported-profile");
     const profileId = String(rawId || "").trim();
     if (!profileId) return;
-    return publishRoutingResult(pi, ctx, await runRouting(["export", outputPath, "--id", profileId], ctx.cwd || process.cwd()), "bbk:models export");
+    return publishRoutingResult(
+      pi,
+      ctx,
+      await runRouting(["export", outputPath, "--id", profileId], ctx.cwd || process.cwd(), undefined, requestedScope),
+      "bbk:models export",
+    );
   }
 }
 
 function registerModelRoutingCommand(pi) {
   pi.registerCommand("bbk:models", {
-    description: "interactively inspect or change BBK OMP sub-agent model routing",
+    description: "inspect or change project- or user-scoped BBK OMP sub-agent model routing",
     handler: async (first, second) => {
       const { args, ctx } = commandInvocation(first, second);
       const tokens = splitArgs(args);
-      if (!tokens.length) return interactiveRoutingMenu(pi, ctx);
+      if (!tokens.length) return interactiveRoutingMenu(pi, ctx, "auto");
+      let requestedScope = "auto";
+      if (tokens[0] === "--scope" && ["auto", "project", "user"].includes(tokens[1])) {
+        tokens.shift();
+        requestedScope = tokens.shift();
+      } else if (["auto", "project", "user"].includes(tokens[0])) {
+        requestedScope = tokens.shift();
+      }
       const [action, ...rest] = tokens;
       let argv;
-      if (["status", "profiles", "list"].includes(action)) argv = ["status"];
-      else if (action === "profile" && rest.length === 1) argv = ["apply-profile", rest[0]];
-      else if (action === "set" && rest.length === 3) argv = ["set-role", rest[0], "--model", rest[1], "--thinking-level", rest[2]];
-      else if (["apply", "apply-file"].includes(action) && rest.length === 1) argv = ["apply-file", rest[0]];
+      let mutating = false;
+      if (!action || ["status", "profiles", "list"].includes(action)) argv = ["status"];
+      else if (action === "profile" && rest.length === 1) { argv = ["apply-profile", rest[0]]; mutating = true; }
+      else if (action === "set" && rest.length === 3) { argv = ["set-role", rest[0], "--model", rest[1], "--thinking-level", rest[2]]; mutating = true; }
+      else if (["apply", "apply-file"].includes(action) && rest.length === 1) { argv = ["apply-file", rest[0]]; mutating = true; }
       else if (action === "export" && rest.length >= 1) argv = ["export", rest[0], ...(rest[1] ? ["--id", rest[1]] : [])];
       else {
-        ctx?.ui?.notify?.("Usage: /bbk:models [status | profile <id> | set <role> <model> <thinking> | apply <file> | export <file> [id]]", "warning");
+        ctx?.ui?.notify?.("Usage: /bbk:models [auto|project|user] [status | profile <id> | set <role> <model> <thinking> | apply <file> | export <file> [id]]", "warning");
         return;
       }
-      return publishRoutingResult(pi, ctx, await runRouting(argv, ctx?.cwd || process.cwd()), "bbk:models");
+      if (mutating) {
+        // Direct slash commands already carry a complete action. Resolve the
+        // target from its v3 binding in-process so project mutations need only
+        // one routing CLI invocation. The Python router still authenticates the
+        // complete binding, manifest, state, and managed agents before writing.
+        let target;
+        try {
+          target = resolveRoutingTarget(ctx?.cwd || process.cwd(), requestedScope);
+        } catch (error) {
+          return publishRoutingResult(pi, ctx, {
+            code: 2,
+            details: {
+              schema: "bbk.omp-model-routing-target-error.v1",
+              status: "ERROR",
+              requested_scope: requestedScope,
+              error: String(error?.message || error),
+            },
+          }, "bbk:models target");
+        }
+        const targetDetails = {
+          scope: target.scope,
+          resolved_scope: target.scope,
+          project_root: target.projectRoot,
+          resolved_project_root: target.projectRoot,
+          binding_path: target.bindingPath,
+          resolution_source: target.source,
+        };
+        if (target.scope !== "project") {
+          const ok = await confirmRoutingMutation(
+            ctx,
+            targetDetails,
+            target.scope === "user" ? "Change shared user routing?" : "Change routing with unresolved scope?",
+            `Command: ${tokens.join(" ")}\n\nAlready-running agents are unchanged.`,
+          );
+          if (!ok) return;
+        }
+      }
+      return publishRoutingResult(pi, ctx, await runRouting(argv, ctx?.cwd || process.cwd(), undefined, requestedScope), "bbk:models");
     },
   });
 }
+
+
 
 export default function bbkExtension(pi) {
   const { z } = pi.zod;
@@ -1323,6 +2065,18 @@ export default function bbkExtension(pi) {
     name: "bbk_workspace", label: "BBK Workspace", description: "Create, list, inspect, renew, or conservatively clean BBK-owned Git worktrees with leases.",
     parameters: z.object({ action: z.enum(["create", "list", "inspect", "renew", "cleanup"]), root: text(), id: text(), base: text(), purpose: text(), force: bool() }),
     argv: p => ["workspace", p.action, ...rootArgs(p.root), ...(p.id ? ["--id", p.id] : []), ...(p.base && p.action === "create" ? ["--base", p.base] : []), ...(p.purpose && p.action === "create" ? ["--purpose", p.purpose] : []), ...(p.force && p.action === "cleanup" ? ["--force"] : [])],
+  });
+  registerCliTool(pi, {
+    name: "bbk_beads_sync", label: "BBK Beads Projection", description: "Plan or apply the role-owned BBK-to-Beads coordination projection while keeping canonical BBK records authoritative.",
+    parameters: z.object({ root: text(), workUnit: text(), kinds: texts(), ids: texts(), apply: bool(), initialize: bool() }),
+    argv: p => ["beads", "plan", ...rootArgs(p.root), ...(p.workUnit ? ["--work-unit", p.workUnit] : []),
+      ...repeated("--kind", p.kinds), ...repeated("--id", p.ids), ...(p.apply ? ["--apply"] : []), ...(p.initialize ? ["--initialize"] : [])],
+  });
+  registerCliTool(pi, {
+    name: "bbk_beads_handoff", label: "BBK Beads Handoff Pointer", description: "Plan or append a compact verified BBK handoff pointer to its bound Beads issue.",
+    parameters: z.object({ root: text(), handoff: z.string(), targetBbkId: text(), bead: text(), apply: bool() }),
+    argv: p => ["beads", "handoff-plan", ...rootArgs(p.root), "--handoff", p.handoff,
+      ...(p.targetBbkId ? ["--target-bbk-id", p.targetBbkId] : []), ...(p.bead ? ["--bead", p.bead] : []), ...(p.apply ? ["--apply"] : [])],
   });
   registerCliTool(pi, {
     name: "bbk_fit_validate", label: "BBK Solution–Outcome Fit", description: "Validate a SolutionOutcomeFit and derive its planning disposition.",
@@ -1445,6 +2199,8 @@ export default function bbkExtension(pi) {
   const bbkMode = createBbkModeController(pi, (active, ctx) => bbkActivity.setMode(active, ctx));
   registerBbkEntrypoint(pi, bbkMode);
   registerModelRoutingCommand(pi);
+  registerAgentViewCommand(pi, bbkActivity);
+  registerBeadsCommand(pi);
   registerCommand(pi, "bbk:init", "initialize BBK in the current project", ["init"]);
   registerCommand(pi, "bbk:status", "show BBK status", ["status"]);
   registerCommand(pi, "bbk:doctor", "run BBK diagnostics", ["doctor"]);

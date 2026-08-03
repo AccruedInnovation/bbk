@@ -27,7 +27,7 @@ import time
 import uuid
 from importlib import metadata as importlib_metadata
 from pathlib import Path, PurePath
-from typing import Any, Iterable, Iterator, Sequence
+from typing import Any, Iterable, Iterator, Mapping, Sequence
 
 # When executed from the source package, ``tools`` is the script directory.
 # The OMP installer also places ``bbk.py`` and ``contracts.py`` beside one
@@ -131,6 +131,13 @@ except ModuleNotFoundError:
         validate_review_run,
     )
 
+try:
+    from artifact_classification import is_non_operational_example
+except ModuleNotFoundError:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from artifact_classification import is_non_operational_example
+
+
 def _read_package_version() -> str:
     script = Path(__file__).resolve()
     candidates = [script.parents[1] / "VERSION", script.parent / "VERSION"]
@@ -177,6 +184,24 @@ SCHEMA_DIR = PACKAGE_ROOT / "spec" / "schemas"
 
 class BbkError(RuntimeError):
     pass
+
+
+def configure_utf8_standard_streams() -> None:
+    """Make direct CLI JSON/text transport UTF-8 and fail on corruption.
+
+    OMP launches the CLI in UTF-8 mode, but users and test runners can also
+    invoke ``python tools/bbk.py`` directly from a legacy Windows code page.
+    Governed text must be emitted as UTF-8 rather than being replaced or
+    rejected by an inherited locale-dependent stream encoding.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if not callable(reconfigure):
+            continue
+        try:
+            reconfigure(encoding="utf-8", errors="strict")
+        except (AttributeError, OSError, TypeError, ValueError):
+            pass
 
 
 def utc_now() -> str:
@@ -253,18 +278,49 @@ def run(argv: Sequence[str], cwd: Path, *, timeout: float | None = None, env: di
     try:
         result = subprocess.run(
             command, cwd=str(cwd), env=env, timeout=timeout, check=False,
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
-            encoding="utf-8", errors="replace",
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
         )
+        try:
+            stdout = result.stdout.decode("utf-8", "strict")
+            stderr = result.stderr.decode("utf-8", "strict")
+        except UnicodeDecodeError as exc:
+            return {
+                "argv": command, "cwd": str(cwd), "returncode": 126,
+                "stdout": "",
+                "stderr": f"BBK child-process output was not valid UTF-8: {exc}",
+                "duration_seconds": round(time.monotonic() - started, 6),
+                "timed_out": False, "executable": executable,
+                "encoding_error": {
+                    "schema": "bbk.utf8-transport-error.v1",
+                    "status": "ERROR",
+                    "stream": "stdout" if exc.object is result.stdout else "stderr",
+                    "reason": str(exc),
+                },
+            }
         return {
             "argv": command, "cwd": str(cwd), "returncode": result.returncode,
-            "stdout": result.stdout, "stderr": result.stderr,
+            "stdout": stdout, "stderr": stderr,
             "duration_seconds": round(time.monotonic() - started, 6),
             "timed_out": False, "executable": executable,
         }
     except subprocess.TimeoutExpired as exc:
-        stdout = exc.stdout.decode("utf-8", "replace") if isinstance(exc.stdout, bytes) else (exc.stdout or "")
-        stderr = exc.stderr.decode("utf-8", "replace") if isinstance(exc.stderr, bytes) else (exc.stderr or "")
+        try:
+            stdout = exc.stdout.decode("utf-8", "strict") if isinstance(exc.stdout, bytes) else (exc.stdout or "")
+            stderr = exc.stderr.decode("utf-8", "strict") if isinstance(exc.stderr, bytes) else (exc.stderr or "")
+        except UnicodeDecodeError as decode_exc:
+            return {
+                "argv": command, "cwd": str(cwd), "returncode": 126,
+                "stdout": "",
+                "stderr": f"Timed-out BBK child-process output was not valid UTF-8: {decode_exc}",
+                "duration_seconds": round(time.monotonic() - started, 6),
+                "timed_out": True, "executable": executable,
+                "encoding_error": {
+                    "schema": "bbk.utf8-transport-error.v1",
+                    "status": "ERROR",
+                    "stream": "stdout" if decode_exc.object is exc.stdout else "stderr",
+                    "reason": str(decode_exc),
+                },
+            }
         return {
             "argv": command, "cwd": str(cwd), "returncode": 124,
             "stdout": stdout, "stderr": stderr,
@@ -1904,6 +1960,17 @@ def git_metadata(root: Path) -> dict[str, Any]:
     }
 
 
+
+def operational_json_paths(base: Path, *, recursive: bool = False) -> list[Path]:
+    iterator = base.rglob("*.json") if recursive else base.glob("*.json")
+    return [path for path in sorted(iterator) if not is_non_operational_example(path)]
+
+
+def example_paths(base: Path, *, recursive: bool = False) -> list[Path]:
+    iterator = base.rglob("*") if recursive else base.glob("*")
+    return [path for path in sorted(iterator) if path.is_file() and is_non_operational_example(path)]
+
+
 def is_excluded(rel: str, patterns: Sequence[str]) -> bool:
     rel = rel.lstrip("./")
     for pattern in patterns:
@@ -1925,11 +1992,17 @@ def semantic_json(path: Path) -> tuple[str | None, str | None]:
         return None, str(exc)
 
 
-def collect_manifest(source: Path, excludes: Sequence[str] | None = None) -> dict[str, Any]:
+def collect_manifest(
+    source: Path,
+    excludes: Sequence[str] | None = None,
+    *,
+    include_examples: bool = False,
+) -> dict[str, Any]:
     source = source.resolve()
     patterns = list(dict.fromkeys([*DEFAULT_EXCLUDES, *(excludes or [])]))
     files: list[dict[str, Any]] = []
     warnings: list[str] = []
+    excluded_examples: list[str] = []
     for dirpath, dirnames, filenames in os.walk(source, topdown=True, followlinks=False):
         directory = Path(dirpath)
         kept: list[str] = []
@@ -1937,6 +2010,9 @@ def collect_manifest(source: Path, excludes: Sequence[str] | None = None) -> dic
             path = directory / name
             rel = path.relative_to(source).as_posix()
             if is_excluded(rel, patterns):
+                continue
+            if not include_examples and is_non_operational_example(path):
+                excluded_examples.append(rel)
                 continue
             if path.is_symlink():
                 target = os.readlink(path)
@@ -1948,6 +2024,9 @@ def collect_manifest(source: Path, excludes: Sequence[str] | None = None) -> dic
             path = directory / name
             rel = path.relative_to(source).as_posix()
             if is_excluded(rel, patterns):
+                continue
+            if not include_examples and is_non_operational_example(path):
+                excluded_examples.append(rel)
                 continue
             try:
                 info = path.lstat()
@@ -1972,10 +2051,13 @@ def collect_manifest(source: Path, excludes: Sequence[str] | None = None) -> dic
             except OSError as exc:
                 warnings.append(f"Unable to read {rel}: {exc}")
     content = {"schema": "bbk.manifest-content.v1", "root_label": source.name, "files": files}
+    excluded_examples.sort()
     return {
         "schema": "bbk.manifest.v1", "bbk_version": VERSION, "created_at": utc_now(),
         "root": str(source), "excludes": patterns, "content_sha256": sha256_bytes(canonical_bytes(content)),
         "file_count": len(files), "files": files, "git": git_metadata(source), "warnings": warnings,
+        "include_examples": include_examples,
+        "examples_excluded": len(excluded_examples), "excluded_example_paths": excluded_examples,
     }
 
 
@@ -2033,7 +2115,7 @@ def initial_files(title: str, project_id: str) -> dict[str, bytes]:
         "manifest": {"excludes": DEFAULT_EXCLUDES},
         "workspaces": {"root": "../.bbk-worktrees", "default_lease_hours": 24},
         "prevalidation": {"allow_empty": False},
-        "beads": {"enabled": False, "write_enabled": False},
+        "beads": {"enabled": True, "write_enabled": True, "workspace": ".", "auto_initialize": True},
         "profiles": {"enabled": True, "lock_file": "profile-lock.json"},
         "planning_artifacts": {
             "solution_outcome_fit": True,
@@ -2051,6 +2133,7 @@ def initial_files(title: str, project_id: str) -> dict[str, bytes]:
             "destination": {"outcome": "", "success_evidence": [], "in_scope": [], "out_of_scope": [], "constraints": []},
             "posture": {"user_decides": [], "wayfinder_recommends": [], "delegated": [], "constraint_driven": [], "interrupt_for": []},
             "territories": [],
+            "decisions": [],
             "questions": [],
             "frontier": [],
             "blockers": [],
@@ -2065,10 +2148,10 @@ def initial_files(title: str, project_id: str) -> dict[str, bytes]:
         "gates.json": {"schema": "bbk.gates.v1", "prevalidation": {"allow_empty": False}, "gates": [{"id": "example-focused-check", "description": "Replace this disabled example with a project-specific deterministic check.", "enabled": False, "phases": ["prefreeze", "prevalidate"], "command": ["python3", "-m", "unittest"], "cwd": ".", "blocking": True, "timeout_seconds": 300, "requires": ["python3"], "assertions": ["project-specific-focused-checks-pass"]}]},
         "profile-lock.json": {"schema": "bbk.profile-lock.v1", "project_id": project_id, "generated_at": None, "profiles": [], "effective_sha256": None},
         "review-index.json": {"schema": "bbk.review-index.v1", "project_id": project_id, "manifests": [], "contexts": [], "runs": [], "findings": [], "dispositions": [], "learning_candidates": []},
-        "mappings/beads.json": {"schema": "bbk.beads-mapping.v1", "enabled": False, "write_enabled": False, "workspace": None, "objects": [], "policy": {"source_identity": "bbk", "last_write_wins": False, "close_implies_completion": False}},
+        "mappings/beads.json": {"schema": "bbk.beads-mapping.v1", "enabled": True, "write_enabled": True, "workspace": ".", "auto_initialize": True, "objects": [], "policy": {"source_identity": "bbk", "last_write_wins": False, "close_implies_completion": False}},
     }
     files = {name: pretty_bytes(value) for name, value in values.items()}
-    files["project.md"] = f"# {title}\n\n**BBK project:** `{project_id}`  \n**Initialized:** {created}\n\n## Operational outcome\n\nDescribe what must be observably true when this effort succeeds.\n\n## Boundary\n\n- In scope:\n- Out of scope:\n- Constraints:\n- Accountable authority:\n\n> `.bbk/` is a practical bootstrap record, not an official Blueprint baseline.\n".encode()
+    files["project.md"] = f"# {title}\n\n**BBK project:** `{project_id}`  \n**Initialized:** {created}\n\n## Operational outcome\n\nDescribe what must be observably true when this effort succeeds.\n\n## Boundary\n\n- In scope:\n- Out of scope:\n- Constraints:\n- Accountable authority:\n\n> `.bbk/` is a practical bootstrap record, not an official Blueprint baseline.\n".encode("utf-8")
     files["decisions.md"] = b"# Decisions\n\n| ID | Status | Decision | Authority | Affected scope |\n|---|---|---|---|---|\n"
     files["status.md"] = b"# BBK status\n\n- State: initialized\n- Active work: none\n- Current candidate: none\n- Blockers: none recorded\n"
     files[".gitignore"] = b"runtime/\nlogs/\nworkspaces/\n*.tmp\n"
@@ -2136,7 +2219,11 @@ def cmd_manifest_create(args: argparse.Namespace) -> dict[str, Any]:
     excludes: list[str] = []
     if (root / ".bbk" / "config.json").is_file():
         excludes = load_config(root).get("manifest", {}).get("excludes", [])
-    manifest = collect_manifest(source, [*excludes, *(args.exclude or [])])
+    manifest = collect_manifest(
+        source,
+        [*excludes, *(args.exclude or [])],
+        include_examples=bool(getattr(args, "include_examples", False)),
+    )
     if args.output:
         output = Path(args.output).expanduser()
         if not output.is_absolute():
@@ -2160,7 +2247,9 @@ def cmd_manifest_compare(args: argparse.Namespace) -> dict[str, Any]:
     else:
         source = Path(args.source).expanduser().resolve() if args.source else root
         excludes = load_config(root).get("manifest", {}).get("excludes", []) if (root / ".bbk" / "config.json").is_file() else []
-        right = collect_manifest(source, excludes)
+        right = collect_manifest(
+            source, excludes, include_examples=bool(getattr(args, "include_examples", False))
+        )
     return compare_manifests(left, right)
 
 
@@ -2238,7 +2327,9 @@ def cmd_candidate_freeze(args: argparse.Namespace) -> dict[str, Any]:
             excludes.append(standalone_path.relative_to(source).as_posix())
         except ValueError:
             pass
-    manifest = collect_manifest(source, excludes)
+    manifest = collect_manifest(
+        source, excludes, include_examples=bool(getattr(args, "include_examples", False))
+    )
     if manifest["warnings"] and not args.allow_warnings:
         raise BbkError("Manifest warnings block freeze:\n- " + "\n- ".join(manifest["warnings"]))
     file_records = [
@@ -2376,7 +2467,13 @@ def capture_preview(path: Path) -> tuple[str, int, bool]:
     with path.open("rb") as handle:
         raw = handle.read(MAX_CAPTURE)
     truncated = size > len(raw)
-    preview = raw.decode("utf-8", "replace")
+    try:
+        preview = raw.decode("utf-8", errors="strict")
+    except UnicodeDecodeError as exc:
+        preview = (
+            "[BBK preview unavailable: captured output is not valid UTF-8; "
+            f"verify the bound output file for authoritative bytes ({exc})]\n"
+        )
     if truncated:
         preview += "\n[BBK preview truncated; verify the bound output file for complete bytes]\n"
     return preview, size, truncated
@@ -2890,7 +2987,7 @@ def cmd_question_list(args: argparse.Namespace) -> dict[str, Any]:
     base = root / ".bbk" / "questions"
     items: list[dict[str, Any]] = []
     if base.is_dir():
-        for path in sorted(base.glob("*.json")):
+        for path in operational_json_paths(base):
             value = read_json(path)
             errors = _question_branch_errors(value)
             if args.status and value.get("status") != args.status:
@@ -3183,7 +3280,7 @@ def cmd_handoff_list(args: argparse.Namespace) -> dict[str, Any]:
     base = root / ".bbk" / "handoffs"
     items: list[dict[str, Any]] = []
     if base.is_dir():
-        for path in sorted(base.rglob("*.json")):
+        for path in operational_json_paths(base, recursive=True):
             try:
                 value = read_json(path)
                 if args.work_unit and value.get("work_unit_id") != args.work_unit:
@@ -3372,6 +3469,373 @@ def cmd_schema_validate(args: argparse.Namespace) -> dict[str, Any]:
     }
 
 
+BEADS_OBJECT_KINDS = {
+    "project", "territory", "decision", "question", "capability_increment", "phase", "work_unit"
+}
+BEADS_KIND_TYPES = {
+    "project": "epic",
+    "territory": "epic",
+    "decision": "task",
+    "question": "task",
+    "capability_increment": "epic",
+    "phase": "epic",
+    "work_unit": "task",
+}
+
+
+def _beads_mapping(root: Path) -> tuple[Path, dict[str, Any]]:
+    path = root / ".bbk" / "mappings" / "beads.json"
+    value = read_json(path)
+    if value.get("schema") != "bbk.beads-mapping.v1":
+        raise BbkError(f"Unsupported Beads mapping schema in {path}: {value.get('schema')!r}")
+    objects = value.get("objects")
+    if not isinstance(objects, list):
+        raise BbkError(f"Beads mapping objects must be an array: {path}")
+    return path, value
+
+
+def _beads_bound_id(mapping: Mapping[str, Any], bbk_id: str) -> str | None:
+    """Return the exact foreign Beads identifier bound to one canonical BBK id."""
+    found: str | None = None
+    for raw in mapping.get("objects", []):
+        if not isinstance(raw, Mapping) or raw.get("bbk_id") != bbk_id:
+            continue
+        bead_id = raw.get("bead_id")
+        if not isinstance(bead_id, str) or not bead_id.strip():
+            raise BbkError(f"Beads binding for {bbk_id} does not contain a valid bead_id")
+        if found is not None and found != bead_id:
+            raise BbkError(f"Duplicate Beads bindings exist for {bbk_id}; reconcile them before projection")
+        found = bead_id
+    return found
+
+
+def _beads_workspace(root: Path, mapping: Mapping[str, Any]) -> Path:
+    workspace_raw = mapping.get("workspace")
+    workspace = root
+    if isinstance(workspace_raw, str) and workspace_raw.strip():
+        candidate = Path(workspace_raw).expanduser()
+        workspace = (root / candidate).resolve() if not candidate.is_absolute() else candidate.resolve()
+    if not workspace.is_dir():
+        raise BbkError(f"Configured Beads workspace is not a directory: {workspace}")
+    return workspace
+
+
+def _beads_parse_json_output(raw: str) -> Any:
+    text = str(raw or "").strip()
+    if not text:
+        return None
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        # Some bd versions write a short informational line before JSON. Search
+        # line boundaries from the end without accepting an arbitrary substring.
+        lines = text.splitlines()
+        for index in range(len(lines) - 1, -1, -1):
+            candidate = "\n".join(lines[index:]).strip()
+            if not candidate or candidate[0] not in "[{":
+                continue
+            with contextlib.suppress(json.JSONDecodeError):
+                return json.loads(candidate)
+    return None
+
+
+def _beads_issue_record(value: Any) -> dict[str, Any] | None:
+    if isinstance(value, list):
+        for item in value:
+            found = _beads_issue_record(item)
+            if found is not None:
+                return found
+        return None
+    if not isinstance(value, Mapping):
+        return None
+    if isinstance(value.get("id"), str) and value.get("id"):
+        return dict(value)
+    for key in ("issue", "data", "result", "created", "updated"):
+        found = _beads_issue_record(value.get(key))
+        if found is not None:
+            return found
+    return None
+
+
+def _beads_run_json(executable: str, argv: Sequence[str], workspace: Path, timeout: float) -> tuple[dict[str, Any], dict[str, Any] | None]:
+    executed = run([executable, *argv], workspace, timeout=timeout)
+    parsed = _beads_parse_json_output(str(executed.get("stdout") or ""))
+    issue = _beads_issue_record(parsed)
+    return executed, issue
+
+
+def _beads_object_description(item: Mapping[str, Any]) -> str:
+    parent = item.get("parent_bbk_id") or "none"
+    lines = [
+        "BBK coordination projection; canonical state remains under .bbk/.",
+        f"bbk_id={item['bbk_id']}",
+        f"bbk_kind={item['kind']}",
+        f"parent_bbk_id={parent}",
+    ]
+    profile = item.get("profile")
+    if isinstance(profile, str) and profile:
+        lines.append(f"profile={profile}")
+    return "\n".join(lines)
+
+
+def _beads_source_digest(item: Mapping[str, Any]) -> str:
+    material = {
+        "bbk_id": item.get("bbk_id"),
+        "kind": item.get("kind"),
+        "title": item.get("title"),
+        "parent_bbk_id": item.get("parent_bbk_id"),
+        "beads_type": item.get("beads_type"),
+        "profile": item.get("profile"),
+    }
+    return sha256_bytes(canonical_bytes(material))
+
+
+def _beads_parent_from_issue(issue: Mapping[str, Any]) -> str | None:
+    for key in ("parent_id", "parentId", "parent", "parent_issue_id", "parentIssueId"):
+        value = issue.get(key)
+        if isinstance(value, Mapping):
+            value = value.get("id")
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    issue_id = issue.get("id")
+    if isinstance(issue_id, str) and "." in issue_id:
+        return issue_id.rsplit(".", 1)[0]
+    return None
+
+
+def _beads_issue_projection(issue: Mapping[str, Any]) -> dict[str, Any]:
+    issue_type = issue.get("issue_type") or issue.get("issueType") or issue.get("type")
+    description = issue.get("description")
+    return {
+        "id": str(issue.get("id") or "").strip(),
+        "title": str(issue.get("title") or "").strip(),
+        "description": str(description or "").replace("\r\n", "\n").strip(),
+        "beads_type": str(issue_type or "").strip(),
+        "parent_bead_id": _beads_parent_from_issue(issue),
+    }
+
+
+def _beads_expected_projection(
+    item: Mapping[str, Any],
+    *,
+    bead_id: str,
+    parent_bead_id: str | None,
+) -> dict[str, Any]:
+    return {
+        "id": bead_id,
+        "title": str(item.get("title") or "").strip(),
+        "description": _beads_object_description(item).replace("\r\n", "\n").strip(),
+        "beads_type": str(item.get("beads_type") or "").strip(),
+        "parent_bead_id": parent_bead_id,
+    }
+
+
+def _beads_projection_digest(value: Mapping[str, Any]) -> str:
+    return sha256_bytes(canonical_bytes({
+        "id": value.get("id"),
+        "title": value.get("title"),
+        "description": value.get("description"),
+        "beads_type": value.get("beads_type"),
+        "parent_bead_id": value.get("parent_bead_id"),
+    }))
+
+
+def _beads_projection_differences(
+    expected: Mapping[str, Any],
+    observed: Mapping[str, Any],
+) -> list[dict[str, Any]]:
+    differences: list[dict[str, Any]] = []
+    for field in ("id", "title", "description", "beads_type", "parent_bead_id"):
+        expected_value = expected.get(field)
+        observed_value = observed.get(field)
+        if expected_value != observed_value:
+            differences.append({"field": field, "expected": expected_value, "observed": observed_value})
+    return differences
+
+
+def _beads_binding_projection(binding: Mapping[str, Any]) -> dict[str, Any] | None:
+    bead_id = binding.get("bead_id")
+    if not isinstance(bead_id, str) or not bead_id.strip():
+        return None
+    stored = binding.get("projected_issue")
+    if isinstance(stored, Mapping):
+        value = dict(stored)
+        value["id"] = bead_id
+        return value
+    required = ("bbk_id", "kind", "title", "beads_type")
+    if not all(binding.get(key) is not None for key in required):
+        return None
+    return _beads_expected_projection(
+        binding,
+        bead_id=bead_id,
+        parent_bead_id=(str(binding.get("parent_bead_id")) if binding.get("parent_bead_id") else None),
+    )
+
+
+def _beads_collect_objects(root: Path, *, work_unit_path: Path | None = None) -> list[dict[str, Any]]:
+    if work_unit_path is not None:
+        data = read_json(work_unit_path)
+        report = validate_work_unit(data)
+        if not report.get("valid"):
+            raise BbkError(f"Invalid work unit {work_unit_path}: {report.get('errors')}")
+        item = report.get("normalized") or data
+        profile = None
+        binding = item.get("profile_binding")
+        if isinstance(binding, Mapping):
+            profile = binding.get("profile_id") or binding.get("id")
+        return [{
+            "bbk_id": item.get("id"),
+            "kind": "work_unit",
+            "title": item.get("purpose") or item.get("title") or item.get("id"),
+            "parent_bbk_id": item.get("phase_id"),
+            "beads_type": "task",
+            "profile": profile,
+        }]
+
+    mapping = read_json(root / ".bbk" / "map.json")
+    work = read_json(root / ".bbk" / "work.json")
+    config = load_config(root)
+    project_id = config["project_id"]
+    objects: list[dict[str, Any]] = [{
+        "bbk_id": project_id,
+        "kind": "project",
+        "title": config["title"],
+        "parent_bbk_id": None,
+        "beads_type": "epic",
+    }]
+    definitions = [
+        ("territories", "territory", "epic"),
+        ("decisions", "decision", "task"),
+        ("questions", "question", "task"),
+        ("capability_increments", "capability_increment", "epic"),
+        ("phases", "phase", "epic"),
+    ]
+    for key, kind, beads_type in definitions:
+        for item in mapping.get(key, []):
+            if not isinstance(item, Mapping):
+                continue
+            title = (
+                item.get("name") or item.get("title") or item.get("decision")
+                or item.get("accepted_decision") or item.get("root_decision") or item.get("id")
+            )
+            parent = item.get("parent_id") or item.get("territory_id") or item.get("capability_increment_id")
+            objects.append({
+                "bbk_id": item.get("id"),
+                "kind": kind,
+                "title": title,
+                "parent_bbk_id": parent or project_id,
+                "beads_type": beads_type,
+            })
+    for item in work.get("work_units", []):
+        if not isinstance(item, Mapping):
+            continue
+        profile = None
+        binding = item.get("profile_binding")
+        if isinstance(binding, Mapping):
+            profile = binding.get("profile_id") or binding.get("id")
+        objects.append({
+            "bbk_id": item.get("id"),
+            "kind": "work_unit",
+            "title": item.get("purpose") or item.get("title") or item.get("id"),
+            "parent_bbk_id": item.get("phase_id") or project_id,
+            "beads_type": "task",
+            "profile": profile,
+        })
+    result: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for item in objects:
+        raw_id = item.get("bbk_id")
+        if not isinstance(raw_id, str) or not raw_id:
+            continue
+        bbk_id = validate_id(raw_id, "Beads-projected BBK id")
+        if bbk_id in seen:
+            raise BbkError(f"Duplicate BBK id in Beads projection source: {bbk_id}")
+        seen.add(bbk_id)
+        clean = dict(item)
+        clean["bbk_id"] = bbk_id
+        clean["title"] = str(clean.get("title") or bbk_id).strip()
+        if not clean["title"]:
+            clean["title"] = bbk_id
+        clean["source_sha256"] = _beads_source_digest(clean)
+        result.append(clean)
+    return result
+
+
+def _beads_operation_plan(
+    objects: Sequence[Mapping[str, Any]],
+    mapping: Mapping[str, Any],
+    *,
+    canonical_ids: set[str] | None = None,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, dict[str, Any]]]:
+    bindings: dict[str, dict[str, Any]] = {}
+    duplicates: set[str] = set()
+    for raw in mapping.get("objects", []):
+        if not isinstance(raw, Mapping) or not isinstance(raw.get("bbk_id"), str):
+            continue
+        bbk_id = str(raw["bbk_id"])
+        if bbk_id in bindings:
+            duplicates.add(bbk_id)
+        bindings[bbk_id] = dict(raw)
+    if duplicates:
+        raise BbkError(f"Duplicate Beads foreign bindings require reconciliation: {sorted(duplicates)}")
+
+    source_ids = canonical_ids if canonical_ids is not None else {str(item["bbk_id"]) for item in objects}
+    stale = [dict(item) for bbk_id, item in sorted(bindings.items()) if bbk_id not in source_ids]
+    operations: list[dict[str, Any]] = []
+    for item_raw in objects:
+        item = dict(item_raw)
+        binding = bindings.get(item["bbk_id"])
+        if binding is None:
+            operation = "create"
+        else:
+            bead_id = binding.get("bead_id")
+            if not isinstance(bead_id, str) or not bead_id.strip():
+                operation = "binding_invalid"
+            elif binding.get("kind") != item.get("kind") or binding.get("beads_type") != item.get("beads_type"):
+                operation = "type_change_required"
+            elif binding.get("parent_bbk_id") != item.get("parent_bbk_id"):
+                operation = "reparent_required"
+            elif binding.get("source_sha256") == item.get("source_sha256"):
+                operation = "inspect"
+            else:
+                operation = "update"
+        operations.append({
+            "operation": operation,
+            "object": item,
+            **({"binding": binding} if binding is not None else {}),
+        })
+    return operations, stale, bindings
+
+
+def _beads_execution_record(executed: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        "argv": list(executed.get("argv") or []),
+        "cwd": str(executed.get("cwd") or ""),
+        "returncode": int(executed.get("returncode") or 0),
+        "duration_seconds": executed.get("duration_seconds"),
+        "timed_out": bool(executed.get("timed_out")),
+        "stdout_sha256": sha256_bytes(str(executed.get("stdout") or "").encode("utf-8")),
+        "stderr_sha256": sha256_bytes(str(executed.get("stderr") or "").encode("utf-8")),
+    }
+
+
+def _beads_verify_issue(executable: str, bead_id: str, workspace: Path, timeout: float) -> dict[str, Any]:
+    executed, issue = _beads_run_json(executable, ["show", bead_id, "--json"], workspace, timeout)
+    if executed["returncode"] != 0:
+        raise BbkError((executed.get("stderr") or executed.get("stdout") or f"bd show {bead_id} failed").strip())
+    if issue is None:
+        raise BbkError(f"bd show {bead_id} did not return a machine-readable issue record")
+    if str(issue.get("id")) != bead_id:
+        raise BbkError(f"bd show returned issue {issue.get('id')!r} while verifying {bead_id!r}")
+    projection = _beads_issue_projection(issue)
+    return {
+        "issue": issue,
+        "projection": projection,
+        "projection_sha256": _beads_projection_digest(projection),
+        "execution": _beads_execution_record(executed),
+    }
+
+
 def cmd_beads_handoff_plan(args: argparse.Namespace) -> dict[str, Any]:
     path = Path(args.handoff).expanduser().resolve()
     root = resolve_root(args.root, required=False)
@@ -3383,8 +3847,31 @@ def cmd_beads_handoff_plan(args: argparse.Namespace) -> dict[str, Any]:
         raise BbkError("Cannot project an invalid handoff into Beads: " + "; ".join(verification["errors"]))
     item = read_json(path)
     handoff = verification["handoff"]
+    mapping_path, mapping = _beads_mapping(root)
+    explicit_target = getattr(args, "target_bbk_id", None)
+    target_bbk_id = validate_id(explicit_target, "Beads handoff target BBK id") if explicit_target else str(item["work_unit_id"])
+    bound_bead_id = _beads_bound_id(mapping, target_bbk_id)
+    if explicit_target and not bound_bead_id:
+        raise BbkError(
+            f"No Beads binding exists for explicit target {target_bbk_id}; project that canonical record before appending execution-state or handoff pointers"
+        )
+    if args.bead and bound_bead_id and args.bead != bound_bead_id:
+        raise BbkError(
+            f"Explicit Beads issue {args.bead!r} does not match the binding {bound_bead_id!r} for {target_bbk_id}"
+        )
+    bead_id = args.bead or bound_bead_id
+    if not bead_id:
+        raise BbkError(
+            f"No Beads binding exists for WorkUnit {item['work_unit_id']}; project the WorkUnit first or pass --bead"
+        )
+    target_resolution = "MAPPED" if bound_bead_id else "EXPLICIT_FOREIGN"
+    subject = item.get("subject") if isinstance(item.get("subject"), Mapping) else {}
+    producer = item.get("producer") if isinstance(item.get("producer"), Mapping) else {}
     note = "\n".join([
         f"BBK handoff {item['work_unit_id']} attempt {item['attempt']}: {item['disposition']}",
+        f"target={target_bbk_id}",
+        f"subject={subject.get('kind')}:{subject.get('id')}",
+        f"producer={producer.get('role')}",
         f"handoff={handoff['path']}",
         f"bytes={handoff['bytes']}",
         f"sha256={handoff['sha256']}",
@@ -3392,24 +3879,30 @@ def cmd_beads_handoff_plan(args: argparse.Namespace) -> dict[str, Any]:
     ])
     if len(note.encode("utf-8")) > 4096:
         raise BbkError("Compact Beads handoff pointer exceeds 4096 UTF-8 bytes")
-    argv = ["bd", "comments", "add", args.bead, note]
+    argv = ["bd", "comments", "add", bead_id, note]
     value: dict[str, Any] = {
         "schema": "bbk.beads-handoff-plan.v1",
         "status": "PASS",
         "dry_run": not bool(args.apply),
-        "bead_id": args.bead,
+        "bead_id": bead_id,
+        "target": {
+            "bbk_id": target_bbk_id,
+            "bead_id": bead_id,
+            "resolution": target_resolution,
+            "subject_kind": subject.get("kind"),
+            "subject_id": subject.get("id"),
+            "producer_role": producer.get("role"),
+        },
         "handoff": handoff,
         "note": note,
         "argv": argv,
         "warnings": [
             "The Beads comment is an append-only coordination pointer; the verified BBK handoff file remains authoritative.",
-            "Do not paste large artifacts or evidence into the Beads comment.",
+            "Do not paste large artifacts, protected evidence, credentials, or secrets into the Beads comment.",
             "A Beads update does not prove validation, acceptance, completion, or release.",
         ],
     }
     if args.apply:
-        mapping_path = root / ".bbk" / "mappings" / "beads.json"
-        mapping = read_json(mapping_path)
         if not mapping.get("enabled") or not mapping.get("write_enabled"):
             raise BbkError(
                 "Beads handoff writes require .bbk/mappings/beads.json with enabled=true and write_enabled=true"
@@ -3417,26 +3910,16 @@ def cmd_beads_handoff_plan(args: argparse.Namespace) -> dict[str, Any]:
         executable = shutil.which("bd")
         if not executable:
             raise BbkError("Cannot apply Beads handoff: bd is not available on PATH")
-        workspace_raw = mapping.get("workspace")
-        workspace = root
-        if isinstance(workspace_raw, str) and workspace_raw.strip():
-            candidate = Path(workspace_raw).expanduser()
-            workspace = (root / candidate).resolve() if not candidate.is_absolute() else candidate.resolve()
-        if not workspace.is_dir():
-            raise BbkError(f"Configured Beads workspace is not a directory: {workspace}")
-        executed = run([executable, "comments", "add", args.bead, note], workspace, timeout=args.timeout)
-        value["execution"] = {
-            "cwd": str(workspace),
-            "returncode": executed["returncode"],
-            "duration_seconds": executed["duration_seconds"],
-            "stdout_sha256": sha256_bytes(str(executed.get("stdout") or "").encode("utf-8")),
-            "stderr_sha256": sha256_bytes(str(executed.get("stderr") or "").encode("utf-8")),
-        }
+        workspace = _beads_workspace(root, mapping)
+        executed = run([executable, "comments", "add", bead_id, note], workspace, timeout=args.timeout)
+        value["execution"] = _beads_execution_record(executed)
         if executed["returncode"] != 0:
             value["status"] = "ERROR"
             value["error"] = (executed.get("stderr") or executed.get("stdout") or "bd comments add failed").strip()
         else:
+            value["verification"] = _beads_verify_issue(executable, bead_id, workspace, args.timeout)
             value["applied"] = True
+            value["dry_run"] = False
     if args.output:
         output = Path(args.output).expanduser().resolve()
         write_json(output, value)
@@ -3446,51 +3929,238 @@ def cmd_beads_handoff_plan(args: argparse.Namespace) -> dict[str, Any]:
 
 def cmd_beads_plan(args: argparse.Namespace) -> dict[str, Any]:
     root = resolve_root(args.root, required=False)
-    if args.work_unit:
-        path = Path(args.work_unit).expanduser().resolve()
-        data = read_json(path)
-        report = validate_work_unit(data)
-        if not report.get("valid"):
-            raise BbkError(f"Invalid work unit {path}: {report.get('errors')}")
-        item = report.get("normalized") or data
-        result = {
-            "schema": "bbk.beads-plan.v1", "dry_run": True, "enabled": False,
-            "write_enabled": False, "workspace": None,
-            "operations": [{
-                "operation": "create-or-inspect", "object": {
-                    "bbk_id": item.get("id"), "kind": "work_unit",
-                    "title": item.get("purpose"), "beads_type": "task",
-                },
-            }],
-            "warnings": [
-                "BBK IDs remain authoritative for BBK records.",
-                "Closing a Beads item does not prove validation or outcome completion.",
-                "This alpha does not perform Beads writes.",
-            ],
-        }
-        if args.output:
-            write_json(Path(args.output).expanduser().resolve(), result)
-            result["output"] = str(Path(args.output).expanduser().resolve())
-        return result
-    if root is None:
+    work_unit_path = Path(args.work_unit).expanduser().resolve() if args.work_unit else None
+    if root is None and work_unit_path is not None:
+        root = project_root(work_unit_path.parent, required=False)
+    if root is None and work_unit_path is None:
         raise BbkError("Project-level Beads planning requires an initialized BBK project or --work-unit")
-    mapping = read_json(root / ".bbk" / "mappings" / "beads.json")
-    project_map = read_json(root / ".bbk" / "map.json")
-    work = read_json(root / ".bbk" / "work.json")
-    config = load_config(root)
-    objects = [{"bbk_id": config["project_id"], "kind": "project", "title": config["title"], "beads_type": "epic"}]
-    for key, kind, default_type in [("territories", "territory", "epic"), ("questions", "question", "task"), ("capability_increments", "capability_increment", "epic"), ("phases", "phase", "epic")]:
-        for item in project_map.get(key, []):
-            objects.append({"bbk_id": item.get("id"), "kind": kind, "title": item.get("name") or item.get("title") or item.get("root_decision"), "parent": item.get("parent_id") or item.get("territory_id"), "beads_type": default_type})
-    for item in work.get("work_units", []):
-        objects.append({"bbk_id": item.get("id"), "kind": "work_unit", "title": item.get("purpose") or item.get("title"), "parent": item.get("phase_id"), "beads_type": "task"})
-    existing = {item.get("bbk_id"): item for item in mapping.get("objects", [])}
-    operations = [{"operation": "inspect_or_update" if item.get("bbk_id") in existing else "create", "object": item, **({"binding": existing[item["bbk_id"]]} if item.get("bbk_id") in existing else {})} for item in objects if item.get("bbk_id")]
-    result = {"schema": "bbk.beads-plan.v1", "dry_run": True, "enabled": mapping.get("enabled", False), "write_enabled": mapping.get("write_enabled", False), "workspace": mapping.get("workspace"), "operations": operations, "warnings": ["BBK IDs remain authoritative for BBK records.", "Closing a Beads item does not prove validation or outcome completion.", "This alpha does not perform Beads writes."]}
-    if args.output:
-        output = Path(args.output).expanduser().resolve(); write_json(output, result); result["output"] = str(output)
-    return result
 
+    if root is None:
+        mapping = {
+            "schema": "bbk.beads-mapping.v1", "enabled": False, "write_enabled": False,
+            "workspace": None, "auto_initialize": False, "objects": [],
+        }
+        mapping_path = None
+        workspace = work_unit_path.parent if work_unit_path else Path.cwd()
+    else:
+        mapping_path, mapping = _beads_mapping(root)
+        workspace = _beads_workspace(root, mapping)
+
+    canonical_objects = _beads_collect_objects(root, work_unit_path=work_unit_path) if root is not None else _beads_collect_objects(workspace, work_unit_path=work_unit_path)
+    objects = list(canonical_objects)
+    selected_kinds = set(args.kind or [])
+    selected_ids = set(args.id or [])
+    unknown_kinds = sorted(selected_kinds - BEADS_OBJECT_KINDS)
+    if unknown_kinds:
+        raise BbkError(f"Unknown Beads projection kinds: {unknown_kinds}")
+    if selected_kinds:
+        objects = [item for item in objects if item["kind"] in selected_kinds]
+    if selected_ids:
+        objects = [item for item in objects if item["bbk_id"] in selected_ids]
+        found = {item["bbk_id"] for item in objects}
+        missing = sorted(selected_ids - found)
+        if missing:
+            raise BbkError(f"Requested Beads projection IDs were not found in canonical BBK state: {missing}")
+    operations, stale, bindings = _beads_operation_plan(
+        objects,
+        mapping,
+        canonical_ids={str(item["bbk_id"]) for item in canonical_objects},
+    )
+    executable = shutil.which("bd")
+    initialized = (workspace / ".beads").exists()
+    result: dict[str, Any] = {
+        "schema": "bbk.beads-plan.v2",
+        "status": "PASS",
+        "dry_run": not bool(args.apply),
+        "enabled": bool(mapping.get("enabled", False)),
+        "write_enabled": bool(mapping.get("write_enabled", False)),
+        "auto_initialize": bool(mapping.get("auto_initialize", False)),
+        "workspace": str(workspace),
+        "mapping_path": str(mapping_path) if mapping_path is not None else None,
+        "capability": {
+            "bd": executable,
+            "status": "READY" if executable and initialized else ("NOT_INITIALIZED" if executable else "NOT_INSTALLED"),
+            "initialized": initialized,
+        },
+        "selected_kinds": sorted(selected_kinds) if selected_kinds else sorted({item["kind"] for item in objects}),
+        "selected_ids": sorted(selected_ids),
+        "operations": operations,
+        "stale_bindings": stale,
+        "warnings": [
+            "BBK IDs and canonical .bbk records remain authoritative.",
+            "Closing, claiming, or changing a Beads issue does not prove a BBK decision, validation, finding disposition, outcome, or release.",
+            "Stale or directly edited bindings require review; BBK never uses last-write-wins reconciliation.",
+        ],
+    }
+    if not executable:
+        result["warnings"].append("Beads coordination is enabled but bd is not available on PATH; canonical BBK work may continue.")
+    elif not initialized:
+        result["warnings"].append("The configured Beads workspace is not initialized; apply will initialize it only when auto_initialize=true or --initialize is supplied.")
+
+    if args.apply:
+        if root is None or mapping_path is None:
+            raise BbkError("Applying Beads projection requires an initialized BBK project")
+        if not mapping.get("enabled") or not mapping.get("write_enabled"):
+            raise BbkError("Beads writes require enabled=true and write_enabled=true in .bbk/mappings/beads.json")
+        if not executable:
+            raise BbkError("Cannot apply Beads projection: bd is not available on PATH")
+        invalid_actions = sorted(
+            (item["operation"], item["object"]["bbk_id"])
+            for item in operations
+            if item["operation"] in {"binding_invalid", "type_change_required", "reparent_required"}
+        )
+        if invalid_actions:
+            raise BbkError(
+                "Beads bindings require explicit reconciliation before apply: "
+                + ", ".join(f"{bbk_id} ({action})" for action, bbk_id in invalid_actions)
+            )
+
+        executions: list[dict[str, Any]] = []
+        if not initialized:
+            if bindings:
+                raise BbkError("Beads bindings exist but the configured workspace is not initialized; reconcile the workspace before apply")
+            if not (args.initialize or mapping.get("auto_initialize")):
+                raise BbkError("Beads workspace is not initialized; rerun with --initialize or enable auto_initialize")
+            init_exec = run([executable, "init", "--quiet", "--skip-agents"], workspace, timeout=args.timeout)
+            executions.append({"operation": "initialize", "execution": _beads_execution_record(init_exec)})
+            result["initialization"] = executions[-1]
+            if init_exec["returncode"] != 0:
+                raise BbkError((init_exec.get("stderr") or init_exec.get("stdout") or "bd init failed").strip())
+            initialized = True
+            result["capability"]["initialized"] = True
+            result["capability"]["status"] = "READY"
+
+        current_bindings = {key: dict(value) for key, value in bindings.items()}
+        preflight: dict[str, dict[str, Any]] = {}
+        drift: list[dict[str, Any]] = []
+        for operation in operations:
+            if operation["operation"] == "create":
+                continue
+            item = operation["object"]
+            binding = current_bindings[item["bbk_id"]]
+            bead_id = str(binding["bead_id"])
+            verification = _beads_verify_issue(executable, bead_id, workspace, args.timeout)
+            preflight[item["bbk_id"]] = verification
+            expected_previous = _beads_binding_projection(binding)
+            if expected_previous is None:
+                drift.append({
+                    "bbk_id": item["bbk_id"],
+                    "bead_id": bead_id,
+                    "reason": "binding_missing_projected_issue",
+                    "observed": verification["projection"],
+                    "verification": verification,
+                })
+                continue
+            differences = _beads_projection_differences(expected_previous, verification["projection"])
+            expected_digest = binding.get("projected_issue_sha256") or _beads_projection_digest(expected_previous)
+            if differences or verification["projection_sha256"] != expected_digest:
+                drift.append({
+                    "bbk_id": item["bbk_id"],
+                    "bead_id": bead_id,
+                    "reason": "foreign_issue_drift",
+                    "expected": expected_previous,
+                    "expected_sha256": expected_digest,
+                    "observed": verification["projection"],
+                    "observed_sha256": verification["projection_sha256"],
+                    "differences": differences,
+                    "verification": verification,
+                })
+        if drift:
+            result.update({
+                "status": "DRIFT",
+                "dry_run": False,
+                "applied": False,
+                "drift": drift,
+                "message": "Direct or unbound Beads changes were observed. BBK did not overwrite them; reconcile the foreign issues or bindings explicitly.",
+            })
+        else:
+            applied: list[dict[str, Any]] = []
+            for operation in operations:
+                action = operation["operation"]
+                item = operation["object"]
+                parent_bead = None
+                parent_bbk = item.get("parent_bbk_id")
+                if parent_bbk:
+                    parent_binding = current_bindings.get(str(parent_bbk))
+                    if parent_binding is None or not isinstance(parent_binding.get("bead_id"), str):
+                        raise BbkError(
+                            f"Cannot project {item['bbk_id']}: parent BBK id {parent_bbk} has no verified Beads binding. "
+                            "Include the parent kind in the plan or reconcile its binding first."
+                        )
+                    parent_bead = str(parent_binding["bead_id"])
+                description = _beads_object_description(item)
+                if action == "create":
+                    argv = ["create", item["title"], "-t", item["beads_type"], "--description", description]
+                    if parent_bead:
+                        argv.extend(["--parent", parent_bead])
+                    argv.append("--json")
+                    executed, issue = _beads_run_json(executable, argv, workspace, args.timeout)
+                    if executed["returncode"] != 0 or issue is None or not isinstance(issue.get("id"), str):
+                        raise BbkError((executed.get("stderr") or executed.get("stdout") or f"bd create failed for {item['bbk_id']}").strip())
+                    bead_id = str(issue["id"])
+                    execution_record = _beads_execution_record(executed)
+                    verification = _beads_verify_issue(executable, bead_id, workspace, args.timeout)
+                else:
+                    binding = current_bindings[item["bbk_id"]]
+                    bead_id = str(binding["bead_id"])
+                    if action == "update":
+                        argv = ["update", bead_id, "--title", item["title"], "--description", description, "--json"]
+                        executed, _issue = _beads_run_json(executable, argv, workspace, args.timeout)
+                        if executed["returncode"] != 0:
+                            raise BbkError((executed.get("stderr") or executed.get("stdout") or f"bd update failed for {bead_id}").strip())
+                        execution_record = _beads_execution_record(executed)
+                        verification = _beads_verify_issue(executable, bead_id, workspace, args.timeout)
+                    else:
+                        verification = preflight[item["bbk_id"]]
+                        execution_record = verification["execution"]
+                expected_projection = _beads_expected_projection(
+                    item,
+                    bead_id=bead_id,
+                    parent_bead_id=parent_bead,
+                )
+                differences = _beads_projection_differences(expected_projection, verification["projection"])
+                if differences:
+                    raise BbkError(
+                        f"Beads verification mismatch after {action} for {item['bbk_id']}: "
+                        + json.dumps(differences, ensure_ascii=False, sort_keys=True)
+                    )
+                projected_at = utc_now()
+                record = {
+                    "bbk_id": item["bbk_id"],
+                    "kind": item["kind"],
+                    "bead_id": bead_id,
+                    "beads_type": item["beads_type"],
+                    "title": item["title"],
+                    "profile": item.get("profile"),
+                    "parent_bbk_id": parent_bbk,
+                    "parent_bead_id": parent_bead,
+                    "source_sha256": item["source_sha256"],
+                    "projected_issue": expected_projection,
+                    "projected_issue_sha256": _beads_projection_digest(expected_projection),
+                    "projected_at": projected_at,
+                    "verified_at": projected_at,
+                }
+                current_bindings[item["bbk_id"]] = record
+                mapping["objects"] = [current_bindings[key] for key in sorted(current_bindings)]
+                mapping["last_projected_at"] = projected_at
+                write_json(mapping_path, mapping)
+                applied.append({
+                    "operation": action,
+                    "bbk_id": item["bbk_id"],
+                    "bead_id": bead_id,
+                    "execution": execution_record,
+                    "verification": verification,
+                })
+            result["applied"] = True
+            result["dry_run"] = False
+            result["applied_operations"] = applied
+            result["mapping_sha256"] = sha256_file(mapping_path)
+
+    if args.output:
+        output = Path(args.output).expanduser().resolve()
+        write_json(output, result)
+        result["output"] = str(output)
+    return result
 
 def cmd_status(args: argparse.Namespace) -> dict[str, Any]:
     root = resolve_root(args.root, required=False)
@@ -3515,14 +4185,34 @@ def cmd_status(args: argparse.Namespace) -> dict[str, Any]:
             "recursive_wayfinding": True,
             "durable_question_branches": True,
             "durable_handoffs": True,
+            "beads_coordination_projection": True,
             "draft_2020_12_schema_adapter": True,
         },
     }
+    disclaimer = "BBK status is not official Blueprint lifecycle or readiness state."
     if root is None:
         return {
-            "schema": "bbk.status.v1", "status": "PASS", "bbk_version": VERSION,
-            "package": package_view, "project": None,
-            "disclaimer": "BBK status is not official Blueprint lifecycle or readiness state.",
+            "schema": "bbk.status.v1", "status": "PASS", "command_status": "PASS",
+            "project_state": "NO_PROJECT_SELECTED", "artifact_integrity": "NOT_ASSESSED",
+            "semantic_readiness": "NOT_ASSESSED", "execution_authorization": "NOT_ESTABLISHED",
+            "bbk_version": VERSION, "package": package_view, "project": None,
+            "disclaimer": disclaimer,
+        }
+    if not root.exists() or not root.is_dir():
+        raise BbkError(f"Project root does not exist or is not a directory: {root}")
+    config_path = root / ".bbk" / "config.json"
+    zero_counts = {"fit": 0, "structures": 0, "slices": 0, "work_units": 0}
+    if not config_path.is_file():
+        return {
+            "schema": "bbk.status.v1", "status": "UNINITIALIZED", "command_status": "PASS",
+            "project_state": "UNINITIALIZED", "artifact_integrity": "NOT_APPLICABLE",
+            "semantic_readiness": "NOT_ASSESSED", "execution_authorization": "NOT_AUTHORIZED",
+            "bbk_version": VERSION, "package": package_view,
+            "project": {"root": str(root), "initialized": False},
+            "planning_artifacts": zero_counts,
+            "examples_available": {**zero_counts, "questions": 0, "handoffs": 0, "reviews": 0, "total": 0},
+            "next_action": {"command": "bbk init", "reason": "No .bbk/config.json exists at the requested root"},
+            "disclaimer": disclaimer,
         }
     config = load_config(root)
     _, registry = workspace_registry(root)
@@ -3537,13 +4227,51 @@ def cmd_status(args: argparse.Namespace) -> dict[str, Any]:
         with contextlib.suppress(BbkError):
             item = read_json(path)
             recent.append({"gate_id": item.get("gate_id"), "status": item.get("status"), "candidate_id": item.get("candidate_id"), "completed_at": item.get("completed_at"), "path": str(path)})
-    artifact_counts = {
-        "fit": len(list((root / ".bbk" / "fit").glob("*.json"))),
-        "structures": len(list((root / ".bbk" / "structures").glob("*.json"))),
-        "slices": len(list((root / ".bbk" / "slices").glob("*.json"))),
-        "work_units": len(list((root / ".bbk" / "work-units").glob("*.json"))),
+    artifact_dirs = {
+        "fit": root / ".bbk" / "fit",
+        "structures": root / ".bbk" / "structures",
+        "slices": root / ".bbk" / "slices",
+        "work_units": root / ".bbk" / "work-units",
     }
-    return {"schema": "bbk.status.v1", "status": "PASS", "bbk_version": VERSION, "package": package_view, "project": {"id": config["project_id"], "title": config["title"], "root": str(root)}, "git": git_metadata(root), "active_workspaces": [{**item, "inspection": workspace_inspection(item)} for item in registry.get("workspaces", []) if item.get("state") == "ACTIVE"], "candidates": candidates, "planning_artifacts": artifact_counts, "recent_gate_receipts": recent, "disclaimer": "BBK status is not official Blueprint lifecycle or readiness state."}
+    artifact_counts = {name: len(operational_json_paths(directory)) for name, directory in artifact_dirs.items()}
+    example_counts = {name: len(example_paths(directory)) for name, directory in artifact_dirs.items()}
+    example_counts.update({
+        "state_effects": len(example_paths(root / ".bbk" / "state-effects")),
+        "traces": len(example_paths(root / ".bbk" / "traces")),
+        "questions": len(example_paths(root / ".bbk" / "questions")),
+        "handoffs": len(example_paths(root / ".bbk" / "handoffs", recursive=True)),
+        "reviews": len(example_paths(root / ".bbk" / "reviews", recursive=True)),
+    })
+    example_counts["total"] = sum(example_counts.values())
+    beads_path, beads_mapping = _beads_mapping(root)
+    beads_workspace = _beads_workspace(root, beads_mapping)
+    beads_executable = shutil.which("bd")
+    beads_view = {
+        "enabled": bool(beads_mapping.get("enabled")),
+        "write_enabled": bool(beads_mapping.get("write_enabled")),
+        "auto_initialize": bool(beads_mapping.get("auto_initialize")),
+        "mapping_path": str(beads_path),
+        "workspace": str(beads_workspace),
+        "binding_count": len(beads_mapping.get("objects", [])),
+        "bd": beads_executable,
+        "initialized": (beads_workspace / ".beads").exists(),
+    }
+    return {
+        "schema": "bbk.status.v1", "status": "PASS", "command_status": "PASS",
+        "project_state": "INITIALIZED", "artifact_integrity": "OBSERVED",
+        "semantic_readiness": "NOT_ASSESSED", "execution_authorization": "NOT_ESTABLISHED",
+        "bbk_version": VERSION,
+        "package": package_view,
+        "project": {"id": config["project_id"], "title": config["title"], "root": str(root), "initialized": True},
+        "git": git_metadata(root),
+        "active_workspaces": [{**item, "inspection": workspace_inspection(item)} for item in registry.get("workspaces", []) if item.get("state") == "ACTIVE"],
+        "candidates": candidates,
+        "planning_artifacts": artifact_counts,
+        "examples_available": example_counts,
+        "beads": beads_view,
+        "recent_gate_receipts": recent,
+        "disclaimer": disclaimer,
+    }
 
 
 def cmd_doctor(args: argparse.Namespace) -> dict[str, Any]:
@@ -3588,6 +4316,25 @@ def cmd_doctor(args: argparse.Namespace) -> dict[str, Any]:
             for name in ["map.json", "interfaces.json", "work.json", "assurance.json", "gates.json", "profile-lock.json", "mappings/beads.json"]:
                 read_json(root / ".bbk" / name)
                 add(f"project-file:{name}", "PASS", "valid JSON")
+            _beads_path, beads_mapping = _beads_mapping(root)
+            beads_workspace = _beads_workspace(root, beads_mapping)
+            beads_executable = shutil.which("bd")
+            if not beads_mapping.get("enabled"):
+                beads_status = "DISABLED"
+            elif not beads_executable:
+                beads_status = "NOT_INSTALLED"
+            elif not (beads_workspace / ".beads").exists():
+                beads_status = "NOT_INITIALIZED"
+            else:
+                beads_status = "PASS"
+            add("beads-coordination", beads_status, {
+                "enabled": bool(beads_mapping.get("enabled")),
+                "write_enabled": bool(beads_mapping.get("write_enabled")),
+                "auto_initialize": bool(beads_mapping.get("auto_initialize")),
+                "workspace": str(beads_workspace),
+                "bd": beads_executable,
+                "binding_count": len(beads_mapping.get("objects", [])),
+            })
         except BbkError as exc:
             add("project-config", "FAIL", str(exc))
     else:
@@ -3714,11 +4461,11 @@ def parser() -> argparse.ArgumentParser:
     x = review.add_parser("learn"); x.add_argument("--id", required=True); x.add_argument("--type", required=True); x.add_argument("--lesson", required=True); x.add_argument("--scope", required=True); x.add_argument("--supporting", action="append"); x.add_argument("--contrary", action="append"); x.add_argument("--finding", action="append"); x.add_argument("--run", action="append"); x.add_argument("--disposition", action="append"); x.add_argument("--confidence", required=True); x.add_argument("--uncertainty", required=True); x.add_argument("--action", required=True); x.add_argument("--privacy-class", default="project-local"); x.add_argument("--export-class", default="restricted"); x.add_argument("--output", required=True); x.set_defaults(func=cmd_review_learn)
 
     m = sub.add_parser("manifest").add_subparsers(dest="manifest_command", required=True)
-    x = m.add_parser("create"); x.add_argument("--root"); x.add_argument("--source"); x.add_argument("--output"); x.add_argument("--exclude", action="append"); x.set_defaults(func=cmd_manifest_create)
-    x = m.add_parser("compare"); x.add_argument("--root"); x.add_argument("--left", required=True); g = x.add_mutually_exclusive_group(); g.add_argument("--right"); g.add_argument("--source"); x.set_defaults(func=cmd_manifest_compare)
+    x = m.add_parser("create"); x.add_argument("--root"); x.add_argument("--source"); x.add_argument("--output"); x.add_argument("--exclude", action="append"); x.add_argument("--include-examples", action="store_true", help="explicitly include shipped EXAMPLE-* templates"); x.set_defaults(func=cmd_manifest_create)
+    x = m.add_parser("compare"); x.add_argument("--root"); x.add_argument("--left", required=True); g = x.add_mutually_exclusive_group(); g.add_argument("--right"); g.add_argument("--source"); x.add_argument("--include-examples", action="store_true", help="include EXAMPLE-* templates when compiling --source"); x.set_defaults(func=cmd_manifest_compare)
 
     c = sub.add_parser("candidate").add_subparsers(dest="candidate_command", required=True)
-    x = c.add_parser("freeze"); x.add_argument("--root"); x.add_argument("--id"); x.add_argument("--source"); x.add_argument("--note"); x.add_argument("--output"); x.add_argument("--structure-inventory", action="append"); x.add_argument("--trace", action="append"); x.add_argument("--formal-model", action="append"); x.add_argument("--allow-warnings", action="store_true"); x.add_argument("--allow-external-source", action="store_true"); x.set_defaults(func=cmd_candidate_freeze)
+    x = c.add_parser("freeze"); x.add_argument("--root"); x.add_argument("--id"); x.add_argument("--source"); x.add_argument("--note"); x.add_argument("--output"); x.add_argument("--structure-inventory", action="append"); x.add_argument("--trace", action="append"); x.add_argument("--formal-model", action="append"); x.add_argument("--allow-warnings", action="store_true"); x.add_argument("--allow-external-source", action="store_true"); x.add_argument("--include-examples", action="store_true", help="explicitly include shipped EXAMPLE-* templates in candidate content"); x.set_defaults(func=cmd_candidate_freeze)
     x = c.add_parser("check"); x.add_argument("--root"); x.add_argument("--id", required=True); x.set_defaults(func=cmd_candidate_check)
     x = c.add_parser("status"); x.add_argument("--root"); x.add_argument("--id", required=True); x.add_argument("--check", action="store_true"); x.set_defaults(func=cmd_candidate_status)
     x = c.add_parser("invalidate"); x.add_argument("--root"); x.add_argument("--id", required=True); x.add_argument("--reason", required=True); x.set_defaults(func=cmd_candidate_invalidate)
@@ -3811,8 +4558,8 @@ def parser() -> argparse.ArgumentParser:
     x = schema.add_parser("validate"); x.add_argument("--schema", required=True); x.add_argument("--instance", action="append", required=True); x.add_argument("--root"); x.add_argument("--ensure", action="store_true"); x.add_argument("--tool-dir"); x.add_argument("--wheelhouse"); x.add_argument("--timeout", type=float, default=900.0); x.set_defaults(func=cmd_schema_validate)
 
     b = sub.add_parser("beads").add_subparsers(dest="beads_command", required=True)
-    x = b.add_parser("plan"); x.add_argument("--root"); x.add_argument("--work-unit"); x.add_argument("--output"); x.set_defaults(func=cmd_beads_plan)
-    x = b.add_parser("handoff-plan"); x.add_argument("--root"); x.add_argument("--handoff", required=True); x.add_argument("--bead", required=True); x.add_argument("--output"); x.add_argument("--apply", action="store_true"); x.add_argument("--timeout", type=float, default=60.0); x.set_defaults(func=cmd_beads_handoff_plan)
+    x = b.add_parser("plan"); x.add_argument("--root"); x.add_argument("--work-unit"); x.add_argument("--kind", action="append", choices=sorted(BEADS_OBJECT_KINDS)); x.add_argument("--id", action="append"); x.add_argument("--output"); x.add_argument("--apply", action="store_true"); x.add_argument("--initialize", action="store_true"); x.add_argument("--timeout", type=float, default=60.0); x.set_defaults(func=cmd_beads_plan)
+    x = b.add_parser("handoff-plan"); x.add_argument("--root"); x.add_argument("--handoff", required=True); x.add_argument("--target-bbk-id"); x.add_argument("--bead"); x.add_argument("--output"); x.add_argument("--apply", action="store_true"); x.add_argument("--timeout", type=float, default=60.0); x.set_defaults(func=cmd_beads_handoff_plan)
 
     package = sub.add_parser("package").add_subparsers(dest="package_command", required=True)
     x = package.add_parser("verify"); x.add_argument("package_root", nargs="?", default=str(PACKAGE_ROOT)); x.set_defaults(func=cmd_package_verify)
@@ -3820,6 +4567,7 @@ def parser() -> argparse.ArgumentParser:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
+    configure_utf8_standard_streams()
     args = parser().parse_args(argv)
     if args.command == "version":
         print(VERSION)
@@ -3833,7 +4581,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"bbk: error: {exc}", file=sys.stderr)
         return 2
     print(json.dumps(value, indent=2, ensure_ascii=False, sort_keys=True) if args.json else human(value))
-    if isinstance(value, dict) and (value.get("status") in {"FAIL", "BLOCKED", "ERROR"} or value.get("valid") is False):
+    if isinstance(value, dict) and (value.get("status") in {"FAIL", "BLOCKED", "ERROR", "DRIFT"} or value.get("valid") is False):
         return 1
     return 0
 

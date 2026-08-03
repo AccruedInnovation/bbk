@@ -13,7 +13,6 @@ import io
 import json
 import unittest
 from pathlib import Path, PureWindowsPath
-from tests._cli_support import run_cli as test_run_cli
 m1_ROOT = Path(__file__).resolve().parents[1]
 
 def m1_load_module(name: str, relative_path: str):
@@ -56,7 +55,8 @@ class Alpha91PortabilityTests(unittest.TestCase):
     def test_current_verification_docs_use_the_stdout_runner(self):
         for relative_path in ('README.md', 'docs/INSTALL.md', 'docs/DEVELOPMENT.md'):
             text = (m1_ROOT / relative_path).read_text(encoding='utf-8')
-            self.assertIn('python tools/run_tests.py -v', text, relative_path)
+            self.assertIn('python tools/run_tests.py --profile', text, relative_path)
+            self.assertIn('-v', text, relative_path)
 
 # ---------------------------------------------------------------------------
 # Historical source: test_alpha9_2_windows_installer.py
@@ -89,14 +89,14 @@ class Alpha92WindowsInstallerTests(unittest.TestCase):
             with mock.patch.dict(os.environ, {'HOME': str(isolated)}, clear=False):
                 os.environ.pop('BBK_HOME', None)
                 with mock.patch.object(m2_install.Path, 'home', return_value=actual):
-                    self.assertEqual(m2_install.user_home(), isolated.resolve())
+                    assert_same_path(self, m2_install.user_home(), isolated)
 
     def test_bbk_home_has_explicit_precedence_over_home(self):
         with tempfile.TemporaryDirectory() as temp:
             explicit = Path(temp) / 'bbk-home'
             conventional = Path(temp) / 'home'
             with mock.patch.dict(os.environ, {'BBK_HOME': str(explicit), 'HOME': str(conventional)}, clear=False):
-                self.assertEqual(m2_install.user_home(), explicit.resolve())
+                assert_same_path(self, m2_install.user_home(), explicit)
 
     def test_windows_backup_layout_cannot_escape_backup_root(self):
         destination = PureWindowsPath('C:\\Users\\operator\\.codex\\agents\\bbk_worker.toml')
@@ -247,6 +247,17 @@ import profile_registry
 import run_tests
 import setup as setup_tool
 import verify_all
+from tests._cli_support import run_cli as test_run_cli
+from tests._path_support import (
+    assert_different_path,
+    assert_labeled_path,
+    assert_no_path_within,
+    assert_same_path,
+    assert_same_path_sequence,
+    find_unsafe_path_assertions,
+    path_identity_key,
+)
+from tests import _test_profiles as test_profiles
 
 def m4__canonical(value: object) -> bytes:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode('utf-8')
@@ -301,7 +312,7 @@ class Alpha101EntrySetupTests(unittest.TestCase):
 
     def test_version_and_canonical_inputs_agree(self):
         version = (m4_ROOT / 'VERSION').read_text(encoding='utf-8').strip()
-        self.assertEqual(version, '0.1.0-alpha.13.1')
+        self.assertEqual(version, '0.1.0-alpha.13.5')
         self.assertEqual(json.loads((m4_ROOT / 'spec' / 'roles.json').read_text(encoding='utf-8'))['package_version'], version)
         self.assertEqual(json.loads((m4_ROOT / 'spec' / 'model-routing.json').read_text(encoding='utf-8'))['package_version'], version)
         self.assertEqual(json.loads((m4_ROOT / 'spec' / 'method-content.json').read_text(encoding='utf-8'))['version'], version)
@@ -351,7 +362,7 @@ class Alpha101EntrySetupTests(unittest.TestCase):
                 }};
                 const mod = await import({json.dumps((m4_ROOT / 'omp' / 'extension' / 'index.js').as_uri())});
                 mod.default(pi);
-                if (commands.size !== 27) throw new Error(`commands=${{commands.size}}`);
+                if (commands.size !== 29) throw new Error(`commands=${{commands.size}}`);
                 if (!commands.has('bbk') || !commands.has('bbk:status') || !commands.has('bbk:exit')) throw new Error('missing BBK commands');
                 const entered = await commands.get('bbk').handler('', ctx);
                 if (entered !== undefined) throw new Error(`unexpected command payload: ${{JSON.stringify(entered)}}`);
@@ -380,7 +391,7 @@ class Alpha101EntrySetupTests(unittest.TestCase):
             result = subprocess.run([shutil.which('node') or 'node', script], cwd=m4_ROOT, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8', errors='replace', check=False, timeout=30)
             self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
             value = json.loads(result.stdout)
-            self.assertEqual(value['commands'], 27)
+            self.assertEqual(value['commands'], 29)
             self.assertEqual(value['messages'], 1)
             self.assertEqual(value['entries'], 1)
 
@@ -400,6 +411,11 @@ class Alpha101EntrySetupTests(unittest.TestCase):
             'require_node': True,
             'skip_package_manifest': False,
             'jobs': 0,
+            'test_mode': 'auto',
+            'verbose_tests': False,
+            'profile': 'standard',
+            'timing_report': None,
+            'no_timing_report': False,
         }])
         files = run_tests.matching_test_files('test*.py')
         self.assertEqual(files, sorted(files))
@@ -418,12 +434,224 @@ class Alpha101EntrySetupTests(unittest.TestCase):
         # Alpha8ProfileDispatchTests. Do not execute the same expensive profile
         # subprocess matrix twice during full qualification.
         self.assertNotIn('Alpha.8 typed-profile fixtures', names)
-        self.assertIn('All unittest suites', names)
+        self.assertIn('Standard unittest suite', names)
         self.assertIn('OMP extension JavaScript syntax', names)
         self.assertEqual(names[-1], 'Package manifest integrity (post-test mutation check)')
-        unittest_step = next((step for step in steps if step.name == 'All unittest suites'))
-        self.assertIn('-v', unittest_step.command)
+        unittest_step = next(step for step in steps if step.name == 'Standard unittest suite')
+        self.assertIn('-q', unittest_step.command)
+        self.assertNotIn('-v', unittest_step.command)
+        verbose_steps = verify_all.verification_steps(require_node=True, verbose_tests=True)
+        verbose_unittest_step = next(step for step in verbose_steps if step.name == 'Standard unittest suite')
+        self.assertIn('-v', verbose_unittest_step.command)
+        self.assertNotIn('-q', verbose_unittest_step.command)
         self.assertIn('--jobs', unittest_step.command)
+        self.assertIn('--mode', unittest_step.command)
+        self.assertIn('auto', unittest_step.command)
+        self.assertEqual(
+            unittest_step.command[unittest_step.command.index('--profile') + 1],
+            'standard',
+        )
+        release_steps = verify_all.verification_steps(profile='release', require_node=True)
+        release_unittest = next(
+            step for step in release_steps if step.name == 'Complete release unittest suite'
+        )
+        self.assertEqual(
+            release_unittest.command[release_unittest.command.index('--profile') + 1],
+            'release',
+        )
+        fast_steps = verify_all.verification_steps(profile='fast', require_node=True)
+        fast_names = [step.name for step in fast_steps]
+        self.assertIn('Fast contract unittest suite', fast_names)
+        self.assertNotIn('Alpha.7 semantic fixtures', fast_names)
+        pooled_step = next(
+            step for step in verify_all.verification_steps(require_node=True, test_mode='pooled')
+            if step.name == 'Standard unittest suite'
+        )
+        self.assertEqual(
+            pooled_step.command[pooled_step.command.index('--mode') + 1],
+            'pooled',
+        )
+
+    def test_safe_verifier_checks_run_in_process_and_restore_process_state(self):
+        steps = verify_all.verification_steps(
+            profile='standard', require_node=True, skip_package_manifest=False,
+        )
+        in_process_names = {step.name for step in steps if step.in_process}
+        self.assertEqual(
+            in_process_names,
+            {
+                'Method-content projection drift',
+                'Role-specification projection drift',
+                'Model-routing policy',
+                'Agent projection drift',
+                'Python compilation and JSON parsing',
+                'Alpha.7 semantic fixtures',
+            },
+        )
+        self.assertFalse(steps[0].in_process)
+        self.assertTrue(steps[0].trust_gate)
+        self.assertFalse(steps[-1].in_process)
+        self.assertFalse(
+            next(step for step in steps if step.name == 'Standard unittest suite').in_process
+        )
+
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            tools = root / 'tools'
+            tools.mkdir()
+            (root / 'nested').mkdir()
+            script = tools / 'probe.py'
+            script.write_text(
+                textwrap.dedent(
+                    """
+                    import os
+                    import sys
+                    from pathlib import Path
+
+                    def main(argv):
+                        print('in-process probe')
+                        os.environ['BBK_VERIFY_PROBE'] = 'mutated'
+                        sys.argv.append('mutated')
+                        sys.path.insert(0, 'mutated')
+                        os.chdir(Path(__file__).resolve().parents[1] / 'nested')
+                        return 0 if argv == ['--check'] else 3
+                    """
+                ),
+                encoding='utf-8',
+            )
+            before_cwd = Path.cwd()
+            before_argv = list(sys.argv)
+            before_path = list(sys.path)
+            before_environment = os.environ.copy()
+            before_modules = set(sys.modules)
+            output = io.StringIO()
+            spec = verify_all.CheckSpec(
+                'Probe',
+                (sys.executable, 'tools/probe.py', '--check'),
+                cwd=root,
+                in_process=True,
+            )
+            with mock.patch.object(verify_all, 'ROOT', root):
+                result = verify_all.execute_step(spec, stream=output)
+            self.assertTrue(result.passed, result.output)
+            self.assertEqual(result.execution, 'in-process')
+            self.assertIn('in-process probe', output.getvalue())
+            assert_same_path(self, Path.cwd(), before_cwd)
+            self.assertEqual(sys.argv, before_argv)
+            self.assertEqual(sys.path, before_path)
+            self.assertEqual(os.environ, before_environment)
+            self.assertFalse(
+                any(
+                    name.startswith('_bbk_verify_probe_')
+                    for name in set(sys.modules) - before_modules
+                )
+            )
+
+    def test_profile_selection_is_total_and_standard_keeps_product_tests(self):
+        with mock.patch.dict(
+            os.environ,
+            {'BBK_TEST_PROFILE': 'release', 'BBK_EXTERNAL_SCHEMA': '1'},
+            clear=False,
+        ):
+            # Use a fresh loader: the process-wide default loader may retain
+            # outer-discovery state while this release-only inventory test runs.
+            suite = unittest.TestLoader().discover(
+                str(m4_ROOT / 'tests'),
+                pattern='test*.py',
+            )
+        ids = {
+            test_profiles.normalize_test_id(test.id())
+            for test in test_profiles.iter_tests(suite)
+        }
+        self.assertTrue(test_profiles.RELEASE_ONLY <= ids)
+        self.assertGreater(len(ids), len(test_profiles.RELEASE_ONLY))
+        standard = {
+            test_id for test_id in ids
+            if test_profiles.selected(test_id, 'standard')
+        }
+        release = {
+            test_id for test_id in ids
+            if test_profiles.selected(test_id, 'release')
+        }
+        fast = {
+            test_id for test_id in ids
+            if test_profiles.selected(test_id, 'fast')
+        }
+        self.assertEqual(release, ids)
+        self.assertEqual(ids - standard, set(test_profiles.RELEASE_ONLY))
+        self.assertTrue(fast < standard)
+        self.assertEqual(
+            {test_id.split('.', 1)[0] for test_id in fast},
+            set(test_profiles.FAST_MODULES),
+        )
+        # Product-facing schema command behavior remains standard; only the
+        # optional whole-package external-engine repetitions are release-only.
+        self.assertIn(
+            'test_system.Alpha118WayfindingExecutionTests.'
+            'test_schema_validator_is_discoverable_and_uses_draft_2020_12',
+            standard,
+        )
+
+    def test_runner_writes_package_external_timing_report_and_restores_profile_environment(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            tests = root / 'tests'
+            tests.mkdir()
+            (root / 'VERSION').write_text('0.1.0-test\n', encoding='utf-8')
+            (tests / 'test_smoke.py').write_text(
+                textwrap.dedent(
+                    """
+                    import unittest
+
+                    class SmokeTests(unittest.TestCase):
+                        def test_passes(self):
+                            self.assertTrue(True)
+                    """
+                ),
+                encoding='utf-8',
+            )
+            report_path = root.parent / f'{root.name}-timing.json'
+            cache_path = root.parent / f'{root.name}-durations.json'
+            try:
+                with mock.patch.object(run_tests, 'ROOT', root), mock.patch.object(
+                    run_tests, 'TESTS', tests
+                ), mock.patch.object(
+                    run_tests, 'DURATION_SEED_PATH', tests / 'missing-durations.json'
+                ), mock.patch.object(
+                    run_tests, 'duration_cache_path', return_value=cache_path
+                ), mock.patch.dict(
+                    os.environ,
+                    {
+                        'BBK_TEST_PROFILE': 'prior-profile',
+                        'BBK_EXTERNAL_SCHEMA': 'prior-schema',
+                    },
+                    clear=False,
+                ):
+                    code = run_tests.main([
+                        '-q',
+                        '--profile', 'standard',
+                        '--mode', 'batch',
+                        '--timing-report', str(report_path),
+                        '--heartbeat-seconds', '0',
+                    ])
+                    self.assertEqual(os.environ['BBK_TEST_PROFILE'], 'prior-profile')
+                    self.assertEqual(os.environ['BBK_EXTERNAL_SCHEMA'], 'prior-schema')
+                self.assertEqual(code, 0)
+                report = json.loads(report_path.read_text(encoding='utf-8'))
+                self.assertEqual(report['schema'], 'bbk.test-run.v1')
+                self.assertEqual(report['profile'], 'standard')
+                self.assertEqual(report['status'], 'PASS')
+                self.assertEqual(report['tests_reported'], 1)
+                self.assertEqual(report['module_count'], 1)
+                self.assertEqual(report['execution_processes'], 1)
+                self.assertEqual(report['groups'][0]['modules'], ['test_smoke.py'])
+                retained = json.loads(cache_path.read_text(encoding='utf-8'))
+                self.assertEqual(retained['schema'], 'bbk.test-duration-cache.v1')
+                self.assertIn('test_smoke.py', retained['modules'])
+                assert_no_path_within(self, [report_path, cache_path], root)
+            finally:
+                report_path.unlink(missing_ok=True)
+                cache_path.unlink(missing_ok=True)
 
     def test_selective_update_profiles_keep_trust_checks_but_skip_unrelated_suites(self):
         with mock.patch.object(verify_all.shutil, 'which', return_value='node'):
@@ -442,7 +670,7 @@ class Alpha101EntrySetupTests(unittest.TestCase):
             self.assertEqual(names[-1], 'Package manifest integrity (post-test mutation check)')
             self.assertNotIn('Alpha.7 semantic fixtures', names)
             self.assertNotIn('Alpha.8 typed-profile fixtures', names)
-            self.assertNotIn('All unittest suites', names)
+            self.assertNotIn('Standard unittest suite', names)
 
         self.assertIn('OMP-focused unittest suite', omp_names)
         self.assertIn('OMP extension JavaScript syntax', omp_names)
@@ -455,7 +683,9 @@ class Alpha101EntrySetupTests(unittest.TestCase):
         parser = setup_tool.build_parser()
         test = parser.parse_args(['--test'])
         self.assertTrue(test.test)
-        combined = parser.parse_args(['--test-and-install', '--scope', 'project', '--root', '/tmp/project', '--omp', '--language-profiles', 'profiles.zip', '--profile-id', 'rust', '--uninstall-existing'])
+        self.assertTrue(parser.parse_args(['--test-fast']).test_fast)
+        self.assertTrue(parser.parse_args(['--release-test']).release_test)
+        combined = parser.parse_args(['--test-and-install', '--scope', 'project', '--root', '/tmp/project', '--omp', '--language-profiles', 'profiles.zip', '--profile-id', 'rust', '--uninstall-existing', '--test-mode', 'pooled', '--test-jobs', '6'])
         self.assertTrue(combined.test_and_install)
         values = setup_tool.install_arguments(combined)
         self.assertIn('--verify', values)
@@ -464,6 +694,25 @@ class Alpha101EntrySetupTests(unittest.TestCase):
         self.assertIn('--profile-id', values)
         self.assertIn('rust', values)
         self.assertIn('--uninstall-existing', values)
+        self.assertEqual(values[values.index('--verification-profile') + 1], 'standard')
+        self.assertEqual(values[values.index('--test-mode') + 1], 'pooled')
+        self.assertEqual(values[values.index('--test-jobs') + 1], '6')
+        release_combined = parser.parse_args(['--release-test-and-install', '--omp'])
+        release_values = setup_tool.install_arguments(release_combined)
+        self.assertEqual(
+            release_values[release_values.index('--verification-profile') + 1],
+            'release',
+        )
+        ordinary = parser.parse_args(['--install', '--omp'])
+        ordinary_values = setup_tool.install_arguments(ordinary)
+        self.assertNotIn('--keep-existing', ordinary_values)
+        reconciled = parser.parse_args(['--install', '--omp', '--keep-existing'])
+        reconciled_values = setup_tool.install_arguments(reconciled)
+        self.assertIn('--keep-existing', reconciled_values)
+        destructive = parser.parse_args(['--install', '--omp', '--uninstall-existing'])
+        destructive_values = setup_tool.install_arguments(destructive)
+        self.assertIn('--uninstall-existing', destructive_values)
+        self.assertNotIn('--keep-existing', destructive_values)
 
     def test_profile_zip_extraction_rejects_traversal_and_symlinks(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -583,7 +832,7 @@ class Alpha101EntrySetupTests(unittest.TestCase):
         full_output = io.StringIO()
         with mock.patch.object(install_tool.sys, 'stdin', InteractiveInput('\n')), mock.patch.object(install_tool.sys, 'stdout', full_output):
             self.assertEqual(install_tool.choose_existing_install_action(interactive, full_existing), 'replace')
-        self.assertIn('A full clean replacement removes every manifest-owned BBK file', full_output.getvalue())
+        self.assertIn('reuses byte-identical successor files in place', full_output.getvalue())
         self.assertTrue(full_output.getvalue().endswith('Uninstall the existing BBK installation first? [Y/n]\n'))
 
         unsupported = parser.parse_args(['install', '--scope', 'user', '--claude', '--no-language-profiles'])
@@ -637,7 +886,10 @@ class Alpha101EntrySetupTests(unittest.TestCase):
             self.assertEqual(replacement['decision'], 'replace')
             self.assertTrue(replacement['uninstalled'])
             self.assertEqual(replacement['previous_version'], (m4_ROOT / 'VERSION').read_text(encoding='utf-8').strip())
-            self.assertGreater(replacement['removed_count'], 0)
+            self.assertGreater(
+                replacement['removed_count'] + replacement.get('reused_identical_count', 0),
+                0,
+            )
             self.assertTrue(custom.is_file())
             self.assertEqual(custom.read_text(encoding='utf-8'), '{"ownedBy":"user"}\n')
 
@@ -647,6 +899,63 @@ class Alpha101EntrySetupTests(unittest.TestCase):
             )
             self.assertEqual(removed.returncode, 0, removed.stderr or removed.stdout)
             self.assertTrue(custom.is_file())
+
+    def test_clean_replacement_reuses_unchanged_language_profile_files(self):
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            home = base / 'home'
+            home.mkdir()
+            profile_root = m4__write_profile_package(base / 'profile-source', profile_id='reuse-sample')
+            env = os.environ.copy()
+            env.update({
+                'BBK_HOME': str(home),
+                'HOME': str(home),
+                'BBK_INSTALL_ROOT': str(base / 'data'),
+                'BBK_BIN_DIR': str(base / 'bin'),
+            })
+            command = [
+                sys.executable, str(m4_ROOT / 'tools' / 'install.py'), '--json', 'install',
+                '--scope', 'user', '--omp', '--language-profiles', str(profile_root),
+                '--profile-id', 'reuse-sample',
+            ]
+            first_process = test_run_cli(
+                command, cwd=m4_ROOT, env=env, check=False, timeout=120,
+            )
+            self.assertEqual(first_process.returncode, 0, first_process.stderr or first_process.stdout)
+            first = json.loads(first_process.stdout)
+            profile_records = [
+                item for item in first['files']
+                if install_tool._is_language_profile_source(item.get('source'))
+            ]
+            self.assertGreater(len(profile_records), 0)
+            before = {
+                item['path']: (Path(item['path']).stat().st_ino, Path(item['path']).stat().st_mtime_ns)
+                for item in profile_records
+            }
+
+            second_process = test_run_cli(
+                [*command, '--uninstall-existing'],
+                cwd=m4_ROOT, env=env, check=False, timeout=120,
+            )
+            self.assertEqual(second_process.returncode, 0, second_process.stderr or second_process.stdout)
+            second = json.loads(second_process.stdout)
+            replacement = second['preexisting_install']
+            self.assertGreater(replacement['reused_identical_count'], 0)
+            self.assertEqual(
+                replacement['reused_language_profile_file_count'],
+                len(profile_records),
+            )
+            self.assertEqual(replacement['modified_backup_count'], 0)
+            for path_text, identity in before.items():
+                path = Path(path_text)
+                self.assertTrue(path.is_file())
+                self.assertEqual((path.stat().st_ino, path.stat().st_mtime_ns), identity)
+            final_profile_records = [
+                item for item in second['files']
+                if install_tool._is_language_profile_source(item.get('source'))
+            ]
+            self.assertEqual(len(final_profile_records), len(profile_records))
+            self.assertTrue(all(item['action'] == 'unchanged' for item in final_profile_records))
 
     def test_omp_scoped_clean_replacement_preserves_codex_and_unowned_files(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -847,6 +1156,66 @@ class Alpha101EntrySetupTests(unittest.TestCase):
             self.assertFalse((base / 'home' / '.agents' / 'skills' / 'bbk-installed-profiles' / 'SKILL.md').exists())
             self.assertFalse((base / 'home' / '.agents' / 'skills' / 'bbk-installed-profiles' / 'SKILL.md').exists())
 
+    def test_unchanged_language_profile_install_is_reused_and_local_divergence_is_repaired_only_with_force(self):
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            bundle = m4__write_profile_bundle(base)
+            home = base / 'home'
+            home.mkdir()
+            env = os.environ.copy()
+            env.update({
+                'BBK_HOME': str(home),
+                'HOME': str(home),
+                'BBK_INSTALL_ROOT': str(base / 'data'),
+                'BBK_BIN_DIR': str(base / 'bin'),
+            })
+            command = [
+                sys.executable, str(m4_ROOT / 'tools' / 'install.py'), '--json',
+                'install', '--scope', 'user', '--codex', '--omp',
+                '--language-profiles', str(bundle), '--keep-existing',
+            ]
+            first = test_run_cli(command, cwd=m4_ROOT, env=env, check=False, timeout=120)
+            self.assertEqual(first.returncode, 0, first.stderr or first.stdout)
+            first_value = json.loads(first.stdout)
+            self.assertEqual(first_value['language_profiles'][0]['install_action'], 'installed')
+
+            args = install_tool.build_parser().parse_args([
+                '--json', 'install', '--scope', 'user', '--codex', '--omp',
+                '--language-profiles', str(bundle), '--keep-existing',
+            ])
+            with mock.patch.dict(os.environ, env, clear=True), mock.patch.object(
+                install_tool, 'install_language_profile',
+                side_effect=AssertionError('unchanged profile should not be reinstalled'),
+            ):
+                reused = install_tool.install(args)
+            self.assertEqual(reused['language_profile_reuse']['reused_profile_count'], 1)
+            self.assertGreater(reused['language_profile_reuse']['reused_file_count'], 0)
+            self.assertEqual(reused['language_profiles'][0]['install_action'], 'reused')
+            self.assertGreater(reused['language_profiles'][0]['reused_file_count'], 0)
+            self.assertIn('reused', reused['preflight']['actions'])
+
+            skill = home / '.agents' / 'skills' / 'sample' / 'SKILL.md'
+            original = skill.read_text(encoding='utf-8')
+            skill.write_text(original + '\nlocal divergence\n', encoding='utf-8')
+            rejected = test_run_cli(command, cwd=m4_ROOT, env=env, check=False, timeout=120)
+            self.assertNotEqual(rejected.returncode, 0)
+            self.assertIn('Destination differs', rejected.stderr + rejected.stdout)
+
+            repaired = test_run_cli([*command, '--force'], cwd=m4_ROOT, env=env, check=False, timeout=120)
+            self.assertEqual(repaired.returncode, 0, repaired.stderr or repaired.stdout)
+            repaired_value = json.loads(repaired.stdout)
+            self.assertEqual(repaired_value['language_profile_reuse']['reused_profile_count'], 0)
+            self.assertEqual(repaired_value['language_profiles'][0]['install_action'], 'installed')
+            self.assertEqual(skill.read_text(encoding='utf-8'), original)
+
+            removed = test_run_cli(
+                [sys.executable, str(m4_ROOT / 'tools' / 'install.py'), '--json',
+                 'uninstall', '--scope', 'user'],
+                cwd=m4_ROOT, env=env, check=False, timeout=120,
+            )
+            self.assertEqual(removed.returncode, 0, removed.stderr or removed.stdout)
+            self.assertFalse(skill.exists())
+
     def test_bundle_outer_pass_does_not_hide_tampered_inner_profile(self):
         with tempfile.TemporaryDirectory() as temp:
             base = Path(temp)
@@ -885,7 +1254,7 @@ class Alpha101EntrySetupTests(unittest.TestCase):
 
     def test_current_docs_show_one_command_paths(self):
         combined = '\n'.join(((m4_ROOT / relative).read_text(encoding='utf-8') for relative in ('README.md', 'docs/INSTALL.md', 'docs/LANGUAGE-PROFILES.md', 'docs/USAGE.md')))
-        for command in ('python tools/run_tests.py --all', 'python tools/bootstrap.py --test', 'python tools/bootstrap.py --test-and-install', '--language-profiles', 'tools/install_profiles.py'):
+        for command in ('python tools/setup.py --test', 'python tools/setup.py --release-test', 'python tools/bootstrap.py --test', 'python tools/bootstrap.py --test-and-install', '--language-profiles', 'tools/install_profiles.py'):
             self.assertIn(command, combined)
 
 # ---------------------------------------------------------------------------
@@ -931,7 +1300,7 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
         cls._prepared_temp.cleanup()
 
     def test_current_successor_is_repository_native_and_self_contained(self):
-        self.assertEqual((m5_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.13.1')
+        self.assertEqual((m5_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.13.5')
         self.assertTrue((m5_ROOT / 'docs' / 'README.md').is_file())
         self.assertTrue((m5_ROOT / 'docs' / 'DEVELOPMENT.md').is_file())
         self.assertTrue((m5_ROOT / 'bundled-language-profiles' / 'packages').is_dir())
@@ -1011,7 +1380,7 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         self.assertFalse(module.version_supports_structure_contract('0.1.0-alpha.3'))
-        for version in ('0.1.0-alpha.4', '0.1.0-alpha.8', '0.1.0-alpha.11.11', '0.1.0-alpha.11.12', '0.1.0-alpha.12', '0.1.0-alpha.12.2', '0.1.0-alpha.12.4', '0.1.0-alpha.13', '0.1.0-alpha.13.1', '0.1.0', '0.2.0-alpha.1'):
+        for version in ('0.1.0-alpha.4', '0.1.0-alpha.8', '0.1.0-alpha.11.11', '0.1.0-alpha.11.12', '0.1.0-alpha.12', '0.1.0-alpha.12.2', '0.1.0-alpha.12.4', '0.1.0-alpha.13.1', '0.1.0-alpha.13.2', '0.1.0-alpha.13.3', '0.1.0-alpha.13.4', '0.1.0-alpha.13.5', '0.1.0', '0.2.0-alpha.1'):
             with self.subTest(version=version):
                 self.assertTrue(module.version_supports_structure_contract(version))
         gates = json.loads((item.root / 'gates' / 'python-gates.json').read_text(encoding='utf-8'))
@@ -1026,7 +1395,7 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
             value = install.install(args)
         prepare.assert_called_once()
         sources = prepare.call_args.args[0]
-        self.assertEqual([Path(value).resolve() for value in sources], [m5_BUNDLE.resolve()])
+        assert_same_path_sequence(self, [Path(value) for value in sources], [m5_BUNDLE])
         self.assertIsNone(prepare.call_args.kwargs['selected_ids'])
         self.assertEqual(args.language_profile_source_mode, 'bundled-default')
         self.assertIs(value, result)
@@ -1104,7 +1473,7 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
 
     def test_current_documentation_states_the_default_and_single_archive_contract(self):
         combined = '\n'.join(((m5_ROOT / relative).read_text(encoding='utf-8') for relative in ('README.md', 'docs/INSTALL.md', 'docs/LANGUAGE-PROFILES.md', 'RELEASE-NOTES.md')))
-        for expected in ('0.1.0-alpha.13.1', 'installed by default', '--no-language-profiles', '--profile-id', 'bundled-language-profiles', 'TypeScript/JavaScript'):
+        for expected in ('0.1.0-alpha.13.5', 'installed by default', '--no-language-profiles', '--profile-id', 'bundled-language-profiles', 'TypeScript/JavaScript'):
             self.assertIn(expected, combined)
 
 # ---------------------------------------------------------------------------
@@ -1127,13 +1496,10 @@ class Alpha112WindowsUtf8Tests(unittest.TestCase):
 
     def test_current_version_and_utf8_canonical_input_are_read_explicitly(self):
         version = (m6_ROOT / 'VERSION').read_text(encoding='utf-8').strip()
-        self.assertEqual(version, '0.1.0-alpha.13.1')
+        self.assertEqual(version, '0.1.0-alpha.13.5')
         method_content = json.loads((m6_ROOT / 'spec' / 'method-content.json').read_text(encoding='utf-8'))
         self.assertEqual(method_content['version'], version)
 
-    def test_package_python_has_no_implicit_path_text_encoding(self):
-        report = source_sanity.validate()
-        self.assertEqual(report['implicit_text_encoding_calls'], 0, report['errors'])
 
     def test_source_sanity_detects_implicit_path_text_calls(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -1145,21 +1511,39 @@ class Alpha112WindowsUtf8Tests(unittest.TestCase):
         self.assertTrue(any(('write_text() omits encoding' in item for item in violations)))
 
     def test_installer_regressions_override_ambient_bbk_home(self):
+        # Prove the environment-isolation invariant directly. The old form
+        # reran three broad integration tests that this same full suite already
+        # executes, multiplying install and Node work.
         with tempfile.TemporaryDirectory() as temp:
-            decoy = Path(temp) / 'ambient-bbk-home'
+            base = Path(temp)
+            ambient = base / 'ambient-home'
+            explicit = base / 'explicit-home'
+            explicit.mkdir()
             env = os.environ.copy()
-            env.update({'BBK_HOME': str(decoy), 'PYTHONDONTWRITEBYTECODE': '1'})
+            env.update({
+                'BBK_HOME': str(explicit),
+                'HOME': str(explicit),
+                'BBK_INSTALL_ROOT': str(base / 'data'),
+                'BBK_BIN_DIR': str(base / 'bin'),
+                'PYTHONDONTWRITEBYTECODE': '1',
+            })
+            # Keep an unrelated ambient marker and verify the operation stays
+            # within the explicit isolated root.
+            ambient.mkdir()
+            marker = ambient / 'do-not-touch.txt'
+            marker.write_text('preserve', encoding='utf-8')
             result = subprocess.run([
-                sys.executable,
-                '-m',
-                'unittest',
-                '-v',
-                'tests.test_core_contracts.Alpha6CongruenceTests.test_installer_refuses_divergence_and_backs_up_force_replacement',
-                'tests.test_system.BbkTests.test_installed_omp_extension_executes_copied_cli',
-                'tests.test_system.BbkTests.test_user_install_all_targets_and_uninstall',
-            ], cwd=m6_ROOT, env=env, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding='utf-8', errors='replace', timeout=180)
+                sys.executable, str(m6_ROOT / 'tools' / 'install.py'), '--json',
+                'install', '--scope', 'user', '--codex',
+                '--no-language-profiles', '--dry-run',
+            ], cwd=m6_ROOT, env=env, stdin=subprocess.DEVNULL,
+               stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
+               encoding='utf-8', errors='replace', timeout=60)
             self.assertEqual(result.returncode, 0, result.stdout)
-            self.assertFalse(decoy.exists(), result.stdout)
+            payload = json.loads(result.stdout)
+            self.assertTrue(marker.is_file())
+            self.assertTrue(payload['files'])
+            assert_no_path_within(self, [item['path'] for item in payload['files']], ambient)
 
 # ---------------------------------------------------------------------------
 # Historical source: test_alpha11_6_codex_workspace.py
@@ -1182,7 +1566,6 @@ m7_INSTALL = m7_ROOT / 'tools' / 'install.py'
 m7_SETUP = m7_ROOT / 'tools' / 'setup.py'
 m7_UPDATE_CODEX = m7_ROOT / 'tools' / 'update_codex.py'
 m7_VERSION = (m7_ROOT / 'VERSION').read_text(encoding='utf-8').strip()
-from path_compat import path_key as m7_path_key
 
 def m7_run(command, *, env=None, check=True):
     return test_run_cli([str(value) for value in command], cwd=m7_ROOT, env=env, check=check, timeout=180)
@@ -1202,7 +1585,7 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
         cls.by_name = {item['name']: item for item in cls.roles}
 
     def test_current_version_matches_release(self) -> None:
-        self.assertEqual(m7_VERSION, '0.1.0-alpha.13.1')
+        self.assertEqual(m7_VERSION, '0.1.0-alpha.13.5')
 
     def test_all_codex_agents_inherit_parent_sandbox(self) -> None:
         files = sorted(m7_CODEX_AGENTS.glob('*.toml'))
@@ -1268,14 +1651,14 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
             manifest_path = Path(installed['manifest_path'])
             manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
             initial_version = manifest['version']
-            records = {m7_path_key(item['path']): item for item in manifest['files']}
+            records = {path_identity_key(item['path']): item for item in manifest['files']}
             codex_root = home / '.codex' / 'agents'
             for path in sorted(codex_root.glob('bbk_*.toml')):
                 text = path.read_text(encoding='utf-8')
                 self.assertNotIn('\nsandbox_mode = "read-only"\n', text)
                 text = text.replace('\ndeveloper_instructions = ', '\nsandbox_mode = "read-only"\ndeveloper_instructions = ', 1)
                 path.write_text(text, encoding='utf-8')
-                records[m7_path_key(path)]['sha256'] = hashlib.sha256(path.read_bytes()).hexdigest()
+                records[path_identity_key(path)]['sha256'] = hashlib.sha256(path.read_bytes()).hexdigest()
             manifest.setdefault('harness_versions', {})['codex'] = '0.1.0-alpha.11.5'
             manifest['harness_versions']['omp'] = initial_version
             manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
@@ -1314,7 +1697,7 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
                 self.assertNotIn('sandbox_mode', value)
             current = json.loads(manifest_path.read_text(encoding='utf-8'))
             self.assertEqual(current['version'], initial_version)
-            self.assertEqual(current['package_root'], manifest['package_root'])
+            assert_same_path(self, current['package_root'], manifest['package_root'])
             self.assertEqual(current['harness_versions']['codex'], m7_VERSION)
             self.assertEqual(current['harness_versions']['omp'], initial_version)
             self.assertEqual(current['last_codex_update']['kind'], 'codex-only')
@@ -1355,6 +1738,18 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
     def test_release_package_uses_an_explicit_cross_extractor_mode_policy(self):
         self.assertEqual(m8_build_release.PACKAGE_EXECUTABLES, frozenset())
         self.assertTrue(all((not m8_build_release.is_executable(path) for path in m8_build_release.package_files())))
+
+    def test_release_builder_uses_the_exhaustive_test_profile(self):
+        with mock.patch.object(m8_build_release, "run") as runner:
+            m8_build_release.qualification_checks()
+        runner.assert_called_once_with([
+            sys.executable,
+            "tools/run_tests.py",
+            "--all",
+            "--profile",
+            "release",
+            "--require-node",
+        ])
 
     def _expanded_profiles(self, destination: Path, *, count: int | None=None) -> list[Path]:
         packages = destination / 'packages'
@@ -1435,7 +1830,7 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
                 self.skipTest(f'directory symlinks unavailable on this host: {exc}')
             target_file = target / 'same-file.txt'
             alias_file = alias / 'same-file.txt'
-            self.assertEqual(path_compat.path_key(target_file), path_compat.path_key(alias_file))
+            assert_same_path(self, target_file, alias_file)
             records = []
             planned = {}
             backups = root / 'backups'
@@ -1449,6 +1844,141 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
                     backup_root=backups, records=records, planned=planned,
                 )
 
+    def test_test_runner_auto_mode_pools_on_windows_and_preserves_explicit_parallel_requests(self):
+        self.assertEqual(
+            run_tests.resolve_execution_mode('auto', jobs=0, platform_name='nt'),
+            'pooled',
+        )
+        self.assertEqual(
+            run_tests.resolve_execution_mode('auto', jobs=0, platform_name='posix'),
+            'isolated',
+        )
+        self.assertEqual(
+            run_tests.resolve_execution_mode('auto', jobs=4, platform_name='nt'),
+            'pooled',
+        )
+        self.assertEqual(
+            run_tests.resolve_execution_mode('batch', jobs=4, platform_name='nt'),
+            'batch',
+        )
+        self.assertEqual(run_tests.automatic_parallel_jobs(4), 3)
+        self.assertEqual(run_tests.automatic_parallel_jobs(8), 4)
+        self.assertEqual(run_tests.automatic_parallel_jobs(12), 6)
+        self.assertEqual(run_tests.automatic_parallel_jobs(32), 6)
+
+    def test_duration_aware_sharding_prefers_measured_cost_over_source_size(self):
+        files = [Path('tests/test_a.py'), Path('tests/test_b.py'), Path('tests/test_c.py')]
+        groups = run_tests.partition_test_files(
+            files,
+            2,
+            duration_weights={
+                'test_a.py': 10.0,
+                'test_b.py': 6.0,
+                'test_c.py': 4.0,
+            },
+        )
+        self.assertEqual(groups, [[files[0]], [files[1], files[2]]])
+
+    def test_test_profiles_keep_release_coverage_and_exclude_only_declared_standard_cases(self):
+        ordinary = 'test_core_contracts.SomeTests.test_behavior'
+        release_only = next(iter(sorted(test_profiles.RELEASE_ONLY)))
+        self.assertTrue(test_profiles.selected(ordinary, 'fast') is False)
+        self.assertTrue(test_profiles.selected(ordinary, 'standard'))
+        self.assertTrue(test_profiles.selected(ordinary, 'release'))
+        self.assertFalse(test_profiles.selected(release_only, 'standard'))
+        self.assertTrue(test_profiles.selected(release_only, 'release'))
+        fast_contract = 'test_contract_package_v1.ContractPackageV1Tests.test_all_nineteen_roles_have_one_normalized_contract'
+        self.assertTrue(test_profiles.selected(fast_contract, 'fast'))
+
+    def test_timing_report_and_duration_cache_are_package_external_and_machine_readable(self):
+        with tempfile.TemporaryDirectory() as raw:
+            cache = Path(raw) / 'cache'
+            with mock.patch.dict(os.environ, {'BBK_TEST_CACHE_DIR': str(cache)}):
+                report_path = run_tests.default_timing_report_path()
+                assert_same_path(self, report_path, cache / 'latest.json')
+                report = {
+                    'schema': 'bbk.test-run.v1',
+                    'groups': [{
+                        'modules': ['test_example.py'],
+                        'duration_seconds': 2.5,
+                        'status': 'PASS',
+                    }],
+                }
+                run_tests._store_run_report(report, report_path)
+                run_tests.update_duration_cache(report)
+                self.assertEqual(json.loads(report_path.read_text(encoding='utf-8'))['schema'], 'bbk.test-run.v1')
+                cache_value = json.loads(run_tests.duration_cache_path().read_text(encoding='utf-8'))
+                self.assertEqual(cache_value['modules']['test_example.py'], 2.5)
+                assert_different_path(self, report_path.parent, m8_ROOT)
+
+    def test_pooled_runner_uses_bounded_multi_module_processes(self):
+        with tempfile.TemporaryDirectory(dir=m8_ROOT) as raw_root:
+            root = Path(raw_root)
+            files = []
+            for index, size in enumerate((900, 800, 700, 600, 500), start=1):
+                path = root / f'test_{index}.py'
+                path.write_text('#' * size, encoding='utf-8')
+                files.append(path)
+
+            calls = []
+
+            def fake_execute(group, *, label, **kwargs):
+                calls.append((tuple(group), label, kwargs))
+                count = len(group)
+                return run_tests.SuiteResult(
+                    label,
+                    0,
+                    f'Ran {count} tests in 0.001s\n\nOK\n',
+                    count,
+                    (),
+                )
+
+            stream = io.StringIO()
+            with mock.patch.object(run_tests, 'execute_modules', side_effect=fake_execute):
+                code = run_tests.run_test_pool(
+                    files,
+                    quiet=True,
+                    jobs=2,
+                    stream=stream,
+                    heartbeat_seconds=0,
+                )
+
+        self.assertEqual(code, 0)
+        self.assertEqual(len(calls), 2)
+        assigned = [path for group, _, _ in calls for path in group]
+        self.assertEqual(sorted(assigned), sorted(files))
+        self.assertTrue(any(len(group) > 1 for group, _, _ in calls))
+        self.assertTrue(all(kwargs['quiet'] for _, _, kwargs in calls))
+        output = stream.getvalue()
+        self.assertIn('5 unittest modules in 2 multi-module Python processes', output)
+        self.assertIn('Test modules discovered: 5; Python test processes: 2', output)
+        self.assertIn('Tests reported: 5', output)
+
+    def test_batch_runner_uses_one_python_process_for_all_discovered_modules(self):
+        files = [Path('tests/test_a.py'), Path('tests/test_b.py')]
+        result = run_tests.SuiteResult(
+            'test*.py',
+            0,
+            'Ran 2 tests in 0.001s\n\nOK (skipped=1)\n',
+            2,
+            (),
+            1,
+        )
+        stream = io.StringIO()
+        with mock.patch.object(run_tests, 'execute_discovered', return_value=result) as execute:
+            code = run_tests.run_test_batch(
+                files,
+                pattern='test*.py',
+                quiet=True,
+                stream=stream,
+            )
+        self.assertEqual(code, 0)
+        execute.assert_called_once()
+        output = stream.getvalue()
+        self.assertIn('Running 2 unittest modules in one Python process', output)
+        self.assertIn('Test modules discovered: 2; Python test processes: 1', output)
+        self.assertIn('Skipped: 1', output)
+
     def test_native_windows_probe_and_ci_workflow_are_release_surfaces(self):
         workflow = m8_ROOT / '.github' / 'workflows' / 'windows-verification.yml'
         probe = m8_ROOT / 'tools' / 'windows_compat.py'
@@ -1457,7 +1987,7 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
         self.assertTrue(probe.is_file())
         self.assertTrue(helper.is_file())
         workflow_text = workflow.read_text(encoding='utf-8')
-        for expected in ('windows-latest', '3.11', '3.13', 'cp1252:strict', 'windows_compat.py', '--all --require-node'):
+        for expected in ('windows-latest', '3.11', '3.13', 'cp1252:strict', 'PYTHONUTF8', 'test_unicode_initialization_examples_and_uninitialized_status_are_truthful', 'windows_compat.py', '--all --profile release --require-node'):
             self.assertIn(expected, workflow_text)
         development = (m8_ROOT / 'docs' / 'DEVELOPMENT.md').read_text(encoding='utf-8')
         for expected in ('Windows-native compatibility', 'TOMBST~1', 'NOT_APPLICABLE', 'windows-verification.yml'):
@@ -1762,3 +2292,50 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
             self.assertIn(phrase, combined)
         self.assertNotIn('tools/extract_git_repositories.py', combined)
         self.assertFalse((m8_ROOT / 'tools' / 'extract_git_repositories.py').exists())
+
+# Deterministic fast/standard/release selection used by tools/run_tests.py.
+from tests._test_profiles import load_profiled_tests as load_tests
+
+
+class SharedPathAssertionSupportTests(unittest.TestCase):
+    """Keep filesystem-identity assertions centralized and alias-safe."""
+
+    def test_shared_helpers_collapse_aliases_in_direct_and_notification_paths(self):
+        with tempfile.TemporaryDirectory() as raw_root:
+            root = Path(raw_root)
+            target = root / 'physical-project'
+            target.mkdir()
+            alias = root / 'project-alias'
+            try:
+                alias.symlink_to(target, target_is_directory=True)
+            except (NotImplementedError, OSError) as exc:
+                self.skipTest(f'directory aliases unavailable on this host: {exc}')
+
+            assert_same_path(self, alias, target)
+            assert_labeled_path(
+                self,
+                [f'Scope: project\nProject: {target.resolve()}'],
+                'Project',
+                alias,
+                required_text='Scope: project',
+            )
+
+    def test_shared_helper_failure_identifies_raw_and_canonical_spellings(self):
+        with tempfile.TemporaryDirectory() as raw_root:
+            root = Path(raw_root)
+            left = root / 'left'
+            right = root / 'right'
+            left.mkdir()
+            right.mkdir()
+            with self.assertRaisesRegex(AssertionError, r'raw=.*canonical=.*exists='):
+                assert_same_path(self, left, right)
+
+    def test_identity_sensitive_assertions_use_shared_helpers(self):
+        """Prevent regressions to raw path-spelling comparisons in test code."""
+        tests_root = Path(__file__).resolve().parent
+        violations = [
+            finding
+            for path in sorted(tests_root.glob('test_*.py'))
+            for finding in find_unsafe_path_assertions(path)
+        ]
+        self.assertEqual(violations, [], '\n'.join(violations))

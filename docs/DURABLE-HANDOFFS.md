@@ -78,7 +78,7 @@ New projects record this policy in `.bbk/config.json` under `execution`.
 
 ## Beads projection
 
-Beads is useful as a searchable work graph and coordination index. Keep the full handoff in BBK and append a compact pointer to the corresponding bead:
+Beads is BBK's normal searchable work graph and coordination index for newly initialized projects. Keep the full handoff in BBK and append a compact pointer to the corresponding bead:
 
 ```powershell
 python tools\bbk.py beads handoff-plan `
@@ -89,7 +89,7 @@ python tools\bbk.py beads handoff-plan `
 
 The dry-run plan uses `bd comments add <id> <pointer>`. The comment contains only the work-unit ID, attempt, disposition, handoff path, byte count, SHA-256, and next action. It does not paste large artifacts into the bead, and closing the bead does not prove BBK validation or outcome completion.
 
-To apply the pointer directly, first set both `enabled` and `write_enabled` to `true` in `.bbk/mappings/beads.json`, bind the exact workspace, and add `--apply`. The command remains fail-closed when `bd` is unavailable or the mapping is not explicitly write-enabled.
+New projects already set `enabled`, `write_enabled`, and first-use initialization to true. Review the dry run, then add `--apply`. Existing projects retain their prior mapping and may require a deliberate migration. The command remains fail-closed when `bd` is unavailable, the mapping is not write-enabled, the target binding is ambiguous, or tracker state has drifted. A project may explicitly disable projection or writes.
 
 ## Lossless configured-gate output
 

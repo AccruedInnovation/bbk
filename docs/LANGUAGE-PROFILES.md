@@ -172,6 +172,17 @@ python tools/install.py uninstall --scope user
 
 Uninstall is conservative: content or executable-mode divergence is preserved and reported unless `--force` is explicit.
 
+## Verified reuse on update
+
+Alpha.13.4 does not blindly reinstall a profile merely because it is selected again. Preparation and package authentication still run for every selected source. Reuse is permitted only after the existing manifest proves the same profile ID, package version, package-root SHA-256, layout version, harness set, owned file bytes, and executable modes.
+
+Two update paths use the same content truth:
+
+- **reconciliation:** a fully current profile is registered as `reused` and the profile-copy routine is not entered;
+- **clean replacement:** successor-owned files with identical bytes and modes are retained in place while changed or obsolete files follow the normal replacement plan.
+
+The unified manifest records a `language_profile_reuse` summary plus per-profile `install_action` and `reused_file_count`. A changed, missing, mode-divergent, or locally modified file prevents full-profile reuse. Existing conservative refusal and `--force` repair semantics continue to apply. Version equality alone is never sufficient.
+
 ## Capability generations
 
 - Earlier packages may be `legacy-unprojected`, `legacy-summary`, or `legacy-no-review-manifest`.

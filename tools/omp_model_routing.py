@@ -12,13 +12,15 @@ import sys
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-from path_compat import path_key
+from path_compat import canonical_path_text, path_key
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 DEFAULT_BINDING = SCRIPT_DIR / "bbk-package-root.json"
 THINKING_LEVELS = {"auto", "off", "minimal", "low", "medium", "high", "xhigh", "max"}
 ROLE_PATTERN = re.compile(r"^bbk_[a-z0-9_]+$")
 PROFILE_PATTERN = re.compile(r"^[a-z][a-z0-9_-]*$")
+BINDING_SCHEMAS = {"bbk.omp-package-binding.v2", "bbk.omp-package-binding.v3"}
+ROUTING_SCOPES = {"user", "project"}
 PRECEDENCE_NOTE = (
     "These are BBK-managed OMP agent-frontmatter routes. OMP task.agentModelOverrides, "
     "or a higher-precedence project agent definition with the same role name, can supersede them."
@@ -53,6 +55,11 @@ def json_path(path: Path) -> str:
     return path.as_posix()
 
 
+def canonical_path(path: str | os.PathLike[str] | Path) -> Path:
+    """Collapse physical aliases before applying ownership or scope policy."""
+    return Path(canonical_path_text(path))
+
+
 def load_json(path: Path, label: str) -> dict[str, Any]:
     try:
         value = json.loads(path.read_text(encoding="utf-8"))
@@ -74,6 +81,34 @@ def atomic_write(path: Path, data: bytes, mode: int | None = None) -> None:
 
 def normalized_path(path: Path) -> str:
     return path_key(path)
+
+
+def path_is_within(path: Path, root: Path) -> bool:
+    path_text = canonical_path_text(path)
+    root_text = canonical_path_text(root)
+    try:
+        return os.path.commonpath(
+            [os.path.normcase(path_text), os.path.normcase(root_text)]
+        ) == os.path.normcase(root_text)
+    except ValueError:
+        return False
+
+
+def scope_metadata(context: Mapping[str, Any]) -> dict[str, Any]:
+    scope = str(context.get("scope") or "unknown")
+    project_root = context.get("project_root")
+    return {
+        "scope": scope,
+        "project_root": json_path(project_root) if isinstance(project_root, Path) else None,
+        "global_effect": scope == "user",
+        "scope_description": (
+            "Shared user-scoped routing; changes affect future BBK spawns in every project using this installation."
+            if scope == "user"
+            else "Project-scoped routing; changes are isolated to the bound project."
+            if scope == "project"
+            else "Routing scope is unknown; mutation should be treated as unsafe."
+        ),
+    }
 
 
 def validate_route(value: Any, where: str) -> dict[str, str]:
@@ -171,14 +206,25 @@ def load_custom_profile(path: Path, version: str, roles: list[str]) -> tuple[str
 
 def load_binding(path: Path) -> dict[str, Any]:
     value = load_json(path, "OMP package binding")
-    if value.get("schema") != "bbk.omp-package-binding.v2":
+    schema = value.get("schema")
+    if schema not in BINDING_SCHEMAS:
         raise RoutingError(
-            "This BBK installation does not expose mutable OMP routing metadata; reinstall alpha.11.3 or later"
+            "This BBK installation does not expose supported mutable OMP routing metadata; reinstall alpha.13.2 or later"
         )
     required = {"version", "package_root", "manifest_path", "omp_agents", "state_path"}
+    if schema == "bbk.omp-package-binding.v3":
+        required |= {"scope", "project_root"}
     missing = sorted(required - set(value))
     if missing:
         raise RoutingError(f"OMP package binding is missing fields: {missing}")
+    scope = value.get("scope")
+    if scope is not None and scope not in ROUTING_SCOPES:
+        raise RoutingError(f"OMP package binding scope must be one of {sorted(ROUTING_SCOPES)}")
+    project_root = value.get("project_root")
+    if scope == "project" and (not isinstance(project_root, str) or not project_root.strip()):
+        raise RoutingError("Project-scoped OMP package binding requires project_root")
+    if scope == "user" and project_root is not None:
+        raise RoutingError("User-scoped OMP package binding must set project_root to null")
     return value
 
 
@@ -266,12 +312,30 @@ def compact_counts(routes: Mapping[str, Mapping[str, str]]) -> list[dict[str, An
 
 
 def load_context(binding_path: Path) -> dict[str, Any]:
-    binding = load_binding(binding_path.resolve())
-    package_root = Path(binding["package_root"]).expanduser().resolve()
-    manifest_path = Path(binding["manifest_path"]).expanduser().resolve()
-    agents_dir = Path(binding["omp_agents"]).expanduser().resolve()
-    state_path = Path(binding["state_path"]).expanduser().resolve()
+    binding_path = canonical_path(binding_path)
+    binding = load_binding(binding_path)
+    package_root = canonical_path(Path(binding["package_root"]).expanduser())
+    manifest_path = canonical_path(Path(binding["manifest_path"]).expanduser())
+    agents_dir = canonical_path(Path(binding["omp_agents"]).expanduser())
+    state_path = canonical_path(Path(binding["state_path"]).expanduser())
     version = str(binding["version"])
+    scope = str(binding.get("scope") or "unknown")
+    project_root_value = binding.get("project_root")
+    project_root_path = (
+        canonical_path(Path(project_root_value).expanduser())
+        if isinstance(project_root_value, str) and project_root_value.strip()
+        else None
+    )
+    if scope == "project" and project_root_path is not None:
+        constrained = {
+            "package_root": package_root,
+            "manifest_path": manifest_path,
+            "omp_agents": agents_dir,
+            "state_path": state_path,
+        }
+        escaped = [label for label, candidate in constrained.items() if not path_is_within(candidate, project_root_path)]
+        if escaped:
+            raise RoutingError(f"Project-scoped OMP binding paths escape project_root: {escaped}")
     if (package_root / "VERSION").read_text(encoding="utf-8").strip() != version:
         raise RoutingError("OMP package binding does not match its installed package root")
     roles = role_names(package_root)
@@ -315,12 +379,14 @@ def load_context(binding_path: Path) -> dict[str, Any]:
     clean_baseline = {name: validate_route(baseline[name], f"installation_default.{name}") for name in roles}
     return {
         "binding": binding,
-        "binding_path": binding_path.resolve(),
+        "binding_path": binding_path,
         "package_root": package_root,
         "manifest_path": manifest_path,
         "agents_dir": agents_dir,
         "state_path": state_path,
         "version": version,
+        "scope": scope,
+        "project_root": project_root_path,
         "roles": roles,
         "profiles": profiles,
         "manifest": manifest,
@@ -432,6 +498,11 @@ def apply_routes(
         "active_profile": active_profile,
         "source": source,
         "description": description,
+        **scope_metadata(context),
+        "binding_path": json_path(context["binding_path"]),
+        "manifest_path": json_path(context["manifest_path"]),
+        "state_path": json_path(context["state_path"]),
+        "omp_agents": json_path(context["agents_dir"]),
         "changed_roles": changed,
         "changed_role_count": len(changed),
         "routes_sha256": new_state["routes_sha256"],
@@ -451,6 +522,7 @@ def status_result(context: Mapping[str, Any]) -> dict[str, Any]:
         "schema": "bbk.omp-model-routing-status.v1",
         "status": "PASS",
         "package_version": context["version"],
+        **scope_metadata(context),
         "active_profile": state.get("active_profile"),
         "source": state.get("source"),
         "description": state.get("description"),
@@ -561,6 +633,8 @@ def export_profile(context: Mapping[str, Any], path: Path, profile_id: str, desc
         "status": "EXPORTED",
         "path": json_path(output),
         "id": profile_id,
+        **scope_metadata(context),
+        "binding_path": json_path(context["binding_path"]),
         "default": default,
         "override_count": len(overrides),
         "sha256": sha256_file(output),
@@ -572,6 +646,13 @@ def human(value: Mapping[str, Any]) -> str:
     if schema == "bbk.omp-model-routing-status.v1":
         lines = [
             f"BBK OMP routing: {value.get('active_profile')}",
+            f"Scope: {value.get('scope') or 'unknown'}",
+            f"Project: {value.get('project_root') or 'n/a'}",
+            f"Global effect: {'yes' if value.get('global_effect') else 'no'}",
+            f"Scope boundary: {value.get('scope_description') or 'unknown'}",
+            f"Binding: {value.get('binding_path') or 'unknown'}",
+            f"Agents: {value.get('omp_agents') or 'unknown'}",
+            f"State: {value.get('state_path') or 'unknown'}",
             f"Source: {value.get('source')}",
             "Routes:",
         ]

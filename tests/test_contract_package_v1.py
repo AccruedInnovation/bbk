@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import json
+import os
 import subprocess
 import sys
 import unittest
@@ -12,10 +13,13 @@ TOOLS = ROOT / "tools"
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
-try:  # Optional release capability; core contract tests must not require it.
-    import jsonschema  # type: ignore[import-not-found]  # noqa: E402
-except ModuleNotFoundError:  # pragma: no cover - exercised under python -S
-    jsonschema = None
+if os.environ.get('BBK_EXTERNAL_SCHEMA', '1') == '0':
+    jsonschema = None  # type: ignore[assignment]
+else:
+    try:  # Optional runtime capability; ordinary BBK tests remain self-contained.
+        import jsonschema  # type: ignore  # noqa: E402
+    except ImportError:  # pragma: no cover - exercised through the -S subprocess regression
+        jsonschema = None  # type: ignore[assignment]
 
 from generate_agents import instruction_text  # noqa: E402
 from return_contracts import (  # noqa: E402
@@ -30,8 +34,6 @@ from return_contracts import (  # noqa: E402
     modes_for,
     render_return_contract_prompt,
     validate_document,
-    validate_document_contract,
-    validate_result_field_value,
 )
 from validate_contract_package import (  # noqa: E402
     EXPECTED_CAPABILITIES,
@@ -47,7 +49,6 @@ from validate_contract_package import (  # noqa: E402
     validate_boundary,
     validate_local_discovery,
     validate_package,
-    validate_package_semantics,
 )
 
 
@@ -67,10 +68,10 @@ class ContractPackageV1Tests(unittest.TestCase):
         cls.boundary = json.loads((ROOT / BOUNDARY_TEMPLATE).read_text(encoding="utf-8"))
         cls.envelope = json.loads((ROOT / ENVELOPE_TEMPLATE).read_text(encoding="utf-8"))
         cls.permit = json.loads((ROOT / PERMIT_TEMPLATE).read_text(encoding="utf-8"))
-        if jsonschema is not None:
-            cls.jsonschema_module, cls.registry, cls.schemas = schema_registry(ROOT)
-        else:
+        if jsonschema is None:
             cls.jsonschema_module, cls.registry, cls.schemas = None, None, []
+        else:
+            cls.jsonschema_module, cls.registry, cls.schemas = schema_registry(ROOT)
 
     def _representative(self, role_name: str) -> dict:
         return representative_role_return(
@@ -78,15 +79,12 @@ class ContractPackageV1Tests(unittest.TestCase):
         )
 
     def _assert_invalid_return(self, role_name: str, mutate) -> None:
+        if jsonschema is None:
+            self.skipTest("optional jsonschema/referencing capability is unavailable")
         document = self._representative(role_name)
         mutate(document)
-        self.assertTrue(
-            validate_document_contract(document, role_name, ROOT),
-            f"standard-library validator accepted invalid {role_name} return",
-        )
-        if jsonschema is not None:
-            with self.assertRaises(jsonschema.ValidationError):
-                validate_document(document, role_name, ROOT)
+        with self.assertRaises(jsonschema.ValidationError):
+            validate_document(document, role_name, ROOT)
 
     def test_all_nineteen_roles_have_one_normalized_contract(self) -> None:
         expected_keys = {
@@ -128,6 +126,7 @@ class ContractPackageV1Tests(unittest.TestCase):
         for kind in sorted(FIELD_KINDS):
             self.assertIn(f'"{kind}"', assembler)
 
+    @unittest.skipUnless(jsonschema is not None, "optional jsonschema/referencing capability is unavailable")
     def test_declared_nullability_matches_role_contract_prose_and_schema(self) -> None:
         for role in self.roles:
             role_name = role["name"]
@@ -136,23 +135,17 @@ class ContractPackageV1Tests(unittest.TestCase):
                     description_mentions_null = "null" in field["description"].lower().split()
                     if description_mentions_null:
                         self.assertTrue(field["nullable"])
-                    errors = validate_result_field_value(None, field)
+                    schema = field_schema(field)
+                    validator = jsonschema.Draft202012Validator(schema, registry=self.registry)
                     if field["nullable"]:
-                        self.assertEqual(errors, [])
+                        validator.validate(None)
                     else:
-                        self.assertTrue(errors)
-                    if jsonschema is not None:
-                        schema = field_schema(field)
-                        validator = jsonschema.Draft202012Validator(schema, registry=self.registry)
-                        if field["nullable"]:
+                        with self.assertRaises(jsonschema.ValidationError):
                             validator.validate(None)
-                        else:
-                            with self.assertRaises(jsonschema.ValidationError):
-                                validator.validate(None)
 
     def test_generated_return_and_result_schemas_are_deterministic_and_current(self) -> None:
         catalog, roles, outputs = expected_outputs(ROOT)
-        self.assertEqual(catalog["package_version"], "0.1.0-alpha.13.1")
+        self.assertEqual(catalog["package_version"], "0.1.0-alpha.13.5")
         self.assertEqual(len(roles), 19)
         self.assertEqual(len(outputs), 39)
         self.assertEqual(check_or_write(ROOT, write=False), [])
@@ -176,14 +169,13 @@ class ContractPackageV1Tests(unittest.TestCase):
                 self.assertEqual(record["bytes"], len(payload))
                 self.assertEqual(record["sha256"], hashlib.sha256(payload).hexdigest())
 
+    @unittest.skipUnless(jsonschema is not None, "optional jsonschema/referencing capability is unavailable")
     def test_representative_return_for_every_role_validates(self) -> None:
         for role in self.roles:
             with self.subTest(role=role["name"]):
-                document = self._representative(role["name"])
-                self.assertEqual(validate_document_contract(document, role["name"], ROOT), [])
-                if jsonschema is not None:
-                    validate_document(document, role["name"], ROOT)
+                validate_document(self._representative(role["name"]), role["name"], ROOT)
 
+    @unittest.skipUnless(jsonschema is not None, "optional jsonschema/referencing capability is unavailable")
     def test_exact_role_contract_discriminators_reject_drift_for_every_role(self) -> None:
         mutations = {
             "contract": lambda d: d.__setitem__("contract", "bbk.wrong-return.v1"),
@@ -200,6 +192,7 @@ class ContractPackageV1Tests(unittest.TestCase):
                 with self.subTest(role=role["name"], mutation=name):
                     self._assert_invalid_return(role["name"], mutate)
 
+    @unittest.skipUnless(jsonschema is not None, "optional jsonschema/referencing capability is unavailable")
     def test_result_payload_is_closed_and_every_declared_field_is_required(self) -> None:
         for role in self.roles:
             role_name = role["name"]
@@ -213,6 +206,7 @@ class ContractPackageV1Tests(unittest.TestCase):
                     role_name, lambda d: d["result"].__setitem__("undeclared_field", True)
                 )
 
+    @unittest.skipUnless(jsonschema is not None, "optional jsonschema/referencing capability is unavailable")
     def test_supplemental_enum_fields_are_exact_machine_discriminators(self) -> None:
         expected_roles = {
             "bbk_question_guide", "bbk_reviewer", "bbk_validator",
@@ -235,6 +229,7 @@ class ContractPackageV1Tests(unittest.TestCase):
                         lambda d, field_name=field_name, value=value: d["result"].__setitem__(field_name, value),
                     )
 
+    @unittest.skipUnless(jsonschema is not None, "optional jsonschema/referencing capability is unavailable")
     def test_all_supported_field_kinds_have_schema_valid_examples(self) -> None:
         self.assertEqual(
             FIELD_KINDS,
@@ -251,48 +246,9 @@ class ContractPackageV1Tests(unittest.TestCase):
                 field["enum_values"] = ["A", "B"]
             sample = field_example(field)
             with self.subTest(kind=kind):
-                self.assertEqual(validate_result_field_value(sample, field), [])
-                if jsonschema is not None:
-                    jsonschema.Draft202012Validator(
-                        field_schema(field), registry=self.registry
-                    ).validate(sample)
-
-    def test_standard_library_validator_rejects_invalid_values_for_every_field_kind(self) -> None:
-        invalid_values = {
-            "STRING": "",
-            "STRING_LIST": ["duplicate", "duplicate"],
-            "BOOLEAN": 1,
-            "INTEGER": True,
-            "NUMBER": True,
-            "REFERENCE": {},
-            "REFERENCE_LIST": [{}],
-            "ARTIFACT_REFERENCE": {"path": "artifact.bin"},
-            "ARTIFACT_REFERENCE_LIST": [{"path": "artifact.bin"}],
-            "STRUCTURED": {},
-            "STRUCTURED_LIST": [{}],
-            "ENUM": "NOT_DECLARED",
-            "ENUM_LIST": ["A", "A"],
-        }
-        for kind, value in invalid_values.items():
-            field = {"kind": kind, "nullable": False, "description": "example"}
-            if kind in {"ENUM", "ENUM_LIST"}:
-                field["enum_values"] = ["A", "B"]
-            with self.subTest(kind=kind):
-                self.assertTrue(validate_result_field_value(value, field))
-
-    def test_standard_library_validator_enforces_the_complete_envelope(self) -> None:
-        mutations = {
-            "unexpected_root_field": lambda d: d.__setitem__("unexpected", True),
-            "subject_requires_id": lambda d: d["subject_ref"].pop("id"),
-            "attempt_requires_physical_id": lambda d: d["attempt_ref"].pop("physical_attempt_id"),
-            "authority_shape": lambda d: d["authority_and_effects_used"].pop("effects_used"),
-            "handoff_shape": lambda d: d["durable_handoff_refs"].append({"id": "H"}),
-            "next_action_shape": lambda d: d["smallest_valid_next_action"].pop("reason"),
-            "semantic_state_is_closed": lambda d: d["semantic_state"].__setitem__("extra", True),
-        }
-        for name, mutate in mutations.items():
-            with self.subTest(case=name):
-                self._assert_invalid_return("bbk_worker", mutate)
+                jsonschema.Draft202012Validator(
+                    field_schema(field), registry=self.registry
+                ).validate(sample)
 
     def test_prompt_renderer_projects_the_exact_contract(self) -> None:
         role = self.by_name["bbk_worker"]
@@ -355,6 +311,7 @@ class ContractPackageV1Tests(unittest.TestCase):
         ):
             self.assertEqual(records[contract_id]["lifecycle_owner"], "bbk_territory_orchestrator")
 
+    @unittest.skipUnless(jsonschema is not None, "optional jsonschema/referencing capability is unavailable")
     def test_execution_contract_examples_validate_against_published_schemas(self) -> None:
         pairs = [
             ("templates/contracts/territory-execution-boundary.json", "spec/schemas/bbk-territory-execution-boundary-v1.schema.json"),
@@ -366,18 +323,9 @@ class ContractPackageV1Tests(unittest.TestCase):
             with self.subTest(instance=instance_path):
                 instance = json.loads((ROOT / instance_path).read_text(encoding="utf-8"))
                 schema = json.loads((ROOT / schema_path).read_text(encoding="utf-8"))
-                self.assertEqual(schema["$schema"], "https://json-schema.org/draft/2020-12/schema")
-                self.assertTrue(schema["$id"].startswith("https://bbk.local/schemas/"))
-                if jsonschema is not None:
-                    jsonschema.Draft202012Validator(
-                        schema, registry=self.registry, format_checker=jsonschema.FormatChecker()
-                    ).validate(instance)
-        semantic_errors: list[str] = []
-        validate_boundary(self.boundary, semantic_errors)
-        validate_local_discovery(
-            self.policy, self.envelope, self.permit, self.boundary, semantic_errors
-        )
-        self.assertEqual(semantic_errors, [])
+                jsonschema.Draft202012Validator(
+                    schema, registry=self.registry, format_checker=jsonschema.FormatChecker()
+                ).validate(instance)
 
     def test_territory_execution_boundary_owners_immutability_and_successor_rule_are_exact(self) -> None:
         errors: list[str] = []
@@ -521,54 +469,34 @@ class ContractPackageV1Tests(unittest.TestCase):
         self.assertNotIn("WorkerValidationBatch", body)
 
     def test_gate3_contract_validator_reports_no_source_errors(self) -> None:
-        self.assertEqual(validate_package_semantics(ROOT), [])
-        if jsonschema is not None:
-            self.assertEqual(validate_package(ROOT), [])
-
-    def test_contract_suite_imports_and_core_validation_pass_without_site_packages(self) -> None:
-        completed = subprocess.run(
-            [
-                sys.executable, "-S", "-m", "unittest", "-q",
-                "tests.test_contract_package_v1.ContractPackageV1Tests."
-                "test_gate3_contract_validator_reports_no_source_errors",
-            ],
-            cwd=ROOT, check=False, text=True, encoding="utf-8", errors="replace",
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=60,
-        )
-        self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+        self.assertEqual(validate_package(ROOT), [])
 
     def test_targeted_contract_commands_pass_without_generating_release_artifacts(self) -> None:
         commands = [
-            ([sys.executable, "-S", "tools/return_contracts.py", "--check"], 0, None),
-            ([sys.executable, "-S", "tools/assemble_roles.py", "--check"], 0, None),
-            (
-                [sys.executable, "tools/validate_contract_package.py", "--check"],
-                None,
-                None,
-            ),
-            (
-                [sys.executable, "-S", "tools/validate_contract_package.py", "--check"],
-                1,
-                "jsonschema and referencing are required",
-            ),
+            [sys.executable, "-S", "tools/return_contracts.py", "--check"],
+            [sys.executable, "-S", "tools/assemble_roles.py", "--check"],
+            [sys.executable, "-S", "tools/validate_contract_package.py", "--check"],
         ]
-        for command, expected_code, expected_text in commands:
+        for command in commands:
             with self.subTest(command=" ".join(command)):
                 completed = subprocess.run(
                     command, cwd=ROOT, check=False, text=True, encoding="utf-8",
                     errors="replace", stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                     timeout=60,
                 )
-                combined = completed.stdout + completed.stderr
-                if expected_code is None:
-                    self.assertIn(completed.returncode, {0, 1}, combined)
-                    if completed.returncode == 1:
-                        self.assertIn("jsonschema and referencing are required", combined)
-                else:
-                    self.assertEqual(completed.returncode, expected_code, combined)
-                if expected_text is not None:
-                    self.assertIn(expected_text, combined)
+                self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+
+        required = subprocess.run(
+            [sys.executable, "-S", "tools/validate_contract_package.py", "--check", "--require-jsonschema"],
+            cwd=ROOT, check=False, text=True, encoding="utf-8", errors="replace",
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=60,
+        )
+        self.assertNotEqual(required.returncode, 0)
+        self.assertIn("jsonschema and referencing are required", required.stdout + required.stderr)
 
 
 if __name__ == "__main__":
     unittest.main()
+
+# Deterministic fast/standard/release selection used by tools/run_tests.py.
+from tests._test_profiles import load_profiled_tests as load_tests

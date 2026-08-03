@@ -1,4 +1,4 @@
-# BBK alpha.12 OMP extension
+# BBK alpha.13.4 OMP extension
 
 This adapter exposes BBK's deterministic project, fit, structure, State–Decision–Effect, slicing, assurance, candidate, gate, review, evidence, profile, workspace, model-routing, and orchestration-entrypoint surfaces.
 
@@ -26,10 +26,21 @@ BBK · ready
 While canonical `bbk_*` jobs are pending or running, the same line becomes:
 
 ```text
-BBK · RelayWayfinder [ctx 264k/1M 26%]: Incorporating the user's answers into the operating baseline | RelayOrchestrator 44.7k/1M 4.5%
+BBK · 3 active · Root plan › Phase plan › Architecture [ctx 264k/1M 26%]: compiling interfaces | Verification 44.7k/1M 4.5%
 ```
 
-The most recently active BBK job supplies the name and latest public intent, tool/action, or recent public output. When OMP publishes `contextTokens` and `contextWindow`, BBK shows current context use and percentage; up to three other active jobs receive compact gauges. ANSI/control characters and embedded newlines are removed and non-BBK task events are ignored. Completion returns the line to `BBK · ready`; session navigation rebuilds it from restored mode state; mode exit and shutdown clear it.
+The most recently active BBK job supplies its full Main-to-descendant path and latest public intent, tool/action, or recent public output. The extension recursively consumes OMP `inflightTaskDetails.progress`, finalized task results, lifecycle events, and direct progress events, so synchronous descendants remain visible even when a detached-only host list shows only Main's direct child. Direct and nested observations are deduplicated by stable agent, task, session, and tool-call identities. When OMP publishes `contextTokens` and `contextWindow`, BBK shows current context use and percentage; up to three other active jobs receive compact gauges. ANSI/control characters and embedded newlines are removed and non-BBK task events are ignored. Completion returns the line to `BBK · ready` while retaining bounded terminal history; session navigation rebuilds it from restored mode state; mode exit and shutdown clear it.
+
+The complete hierarchy and per-agent metadata are available through:
+
+```text
+/bbk:agents
+/bbk:agents active
+/bbk:agents details <agent-id-or-name>
+/bbk:agents json
+```
+
+The view includes parentage, depth, status, synchronous/detached mode, selected model, assignment, current activity/tool, context use, session identity, and task-call identity.
 
 The old separate `setStatus`-based `BBK` row is no longer emitted. OMP's public `setFooter` extension method is currently not effective in interactive mode, so an extension cannot replace the built-in `pi` footer brand. BBK leaves that native footer intact and consolidates mode plus worker state into the single widget above it.
 
@@ -52,6 +63,8 @@ assertion-scoped candidate acceptance
 
 Prefer background/non-blocking root jobs so Main remains available to relay user decisions and steering. `/bbk <request>` forwards only the raw directive through `sendUserMessage`; `/bbk` with no arguments and `/bbk:exit` perform only local state/UI work. `/bbk:exit` restores ordinary OMP prompting for later Main turns.
 
+All generated alpha.13.4 OMP BBK agents declare `blocking: false`. With OMP 16.4.8 and `async.enabled=true`, eligible task spawns use managed background jobs whose lifetime is independent of the parent tool call. When the host uses inline task execution, BBK prompt modules sequence human callbacks ahead of decision-dependent specialist dispatch so an immediate response cannot cascade-cancel useful work. See `docs/OMP-CHILD-LIFETIME.md`.
+
 Prompt replacement does not change the parent model, thinking level, active tools, child model routes, filesystem containment, or native host capabilities. It also does not itself exit another OMP mode; leave a conflicting native mode separately when its tool restrictions are inappropriate.
 
 ## Closed role-specific child replacement
@@ -61,7 +74,7 @@ All 19 generated OMP roles carry a deterministic `<bbk-agent-system role="...">`
 When a marked role starts, `before_agent_start` replaces the complete incoming subagent system prompt with one `<bbk-agent-replacement>` block containing:
 
 - the canonical role contract;
-- complete inlined bodies and digests for the role's one-to-three `mandatory_skills`;
+- complete inlined bodies and digests for the role's declared `mandatory_skills`;
 - compact BBK runtime facts;
 - explicit task-call context parsed only from OMP's marker-bearing native child wrapper;
 - an approved `<plan>` and its path when present;
@@ -88,22 +101,39 @@ The OMP target installs:
 - 21 core BBK skills plus an install-bound profile registry;
 - complete mandatory-skill injection for every role;
 - explicit `model` and `thinkingLevel` fields;
-- 26 model-facing tools and 27 UI commands; and
-- the persistent `/bbk`, deterministic `/bbk:status`, and interactive `/bbk:models` surfaces.
+- 28 model-facing tools and 29 UI commands; and
+- the persistent `/bbk`, deterministic `/bbk:status`, scoped `/bbk:models`, hierarchical `/bbk:agents`, and normal `/bbk:beads` surfaces.
 
-The canonical install-time v2 policy gives every role its own OMP route. Packaged starting values currently use `openai-codex/gpt-5.6-sol` for broader judgment-heavy roles, `deepseek/deepseek-v4-pro` for several coordination roles, and `deepseek/deepseek-v4-flash` for bounded leaf roles, all with high OMP thinking; these are duplicated per-role values rather than shared categories. Model choice is an execution preference, not authority or assurance.
+The canonical install-time v2 policy gives every role its own OMP route. Alpha.13.3 preserves the exact reviewed per-role selections from the split-role update: judgment-heavy roles primarily use `openai-codex/gpt-5.6-sol`, Territory Orchestrator uses `openai-codex/gpt-5.6-luna`, and bounded empirical/mechanical roles use `deepseek/deepseek-v4-flash`, with the reviewed role-specific thinking levels. These are duplicated per-role values rather than shared categories. Model choice is an execution preference, not authority or assurance.
 
 ```text
 /bbk:models
 /bbk:models status
-/bbk:models profile testing-flash
-/bbk:models profile deepseek-economy
+/bbk:models project status
+/bbk:models user status
+/bbk:models project profile testing-flash
+/bbk:models user profile default
 /bbk:models set bbk_worker deepseek/deepseek-v4-flash high
 /bbk:models apply /path/to/profile.json
 /bbk:models export /path/to/profile.json profile-id
 ```
 
-Changes apply to future child spawns. `task.agentModelOverrides` and higher-precedence project agent definitions may supersede BBK-managed frontmatter; `/bbk:models status` reports that boundary.
+The default `auto` target resolves the nearest valid project-scoped BBK OMP installation and otherwise the user installation. An expected but invalid project binding fails closed rather than falling through to user-global state. Explicit `project` and `user` targets are available; user-scope mutations require interactive confirmation. Changes apply to future child spawns. `task.agentModelOverrides` and higher-precedence project agent definitions may supersede BBK-managed frontmatter; status reports scope, binding paths, global effect, and that precedence boundary.
+The selected binding is executed with the routing program installed beside that binding. A missing target-bound router fails closed; BBK does not use a router from another scope or package version.
+
+## Normal Beads projection
+
+New BBK projects enable Beads projection, writes, and first-use initialization by default. The external `bd` executable remains a separately installed host capability. BBK records remain semantically authoritative.
+
+```text
+/bbk:beads plan
+/bbk:beads apply
+/bbk:beads handoff --handoff .bbk/handoffs/WU-1/HO-WU-1-1.json
+/bbk:beads handoff-apply --handoff .bbk/handoffs/WU-1/HO-WU-1-1.json
+/bbk:beads handoff-apply --handoff .bbk/handoffs/WU-1/HO-WU-1-1.json --target-bbk-id T-1
+```
+
+The model-facing `bbk_beads_sync` and `bbk_beads_handoff` tools expose the same bounded operations. Worker Orchestrator normally targets the mapped WorkUnit; Root and Territory Orchestrators use `targetBbkId` for the exact mapped project or territory record they own. Explicit targets fail closed when unmapped or when a supplied foreign Beads ID disagrees with the binding. Synchronization is dry-run first, deterministic, idempotent, hierarchy-aware, and foreign-drift safe. It records exact BBK-to-Beads identities and refuses last-write-wins adoption of direct tracker edits. Tracker status, closure, comments, and hierarchy do not accept decisions, prove findings closed, establish validation, or define completion.
 
 ## Slash-command and model-context boundary
 

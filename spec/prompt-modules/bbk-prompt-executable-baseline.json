@@ -1,0 +1,16 @@
+{
+  "schema_version": "bbk.prompt-module.v1",
+  "id": "bbk-prompt-executable-baseline",
+  "title": "Executable command and pre-execution truth",
+  "description": "Verify concrete operational surfaces and preserve a bounded confirmation register before an operating baseline is represented as executable.",
+  "clauses": [
+    {
+      "id": "CLAIM.EXECUTABLE_COMMANDS",
+      "text": "A concrete command, option, API, configuration key, or platform behavior presented as executable is a factual claim. Verify it against an authoritative source, installed-tool help, or a bounded probe before treating it as exact. Otherwise label it illustrative or unverified, identify the required pre-execution confirmation, and bind operating system, implementation, and version dependencies."
+    },
+    {
+      "id": "CLAIM.PREEXEC_CONFIRMATION_REGISTER",
+      "text": "An executable operating baseline must include a bounded pre-execution confirmation register for every material unresolved assumption, including as applicable host operating systems and editions; exact tools, services, runtimes, implementations, and versions; licence, dongle, and session requirements; command compatibility; storage and retention assumptions; network-policy facts; external-owner or user authorization; and the exact owner and confirmation method. This register identifies prerequisites and uncertainty; it does not create a new lifecycle state or silently authorize execution."
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "schema_version": "bbk.prompt-modules.v1",
-  "package_version": "0.1.0-alpha.13.1",
+  "package_version": "0.1.0-alpha.13.5",
   "module_schema": "spec/schemas/bbk-prompt-module-v1.schema.json",
   "catalog_schema": "spec/schemas/bbk-prompt-module-catalog-v1.schema.json",
   "module_entries": [
@@ -35,6 +35,10 @@
     {
       "id": "bbk-prompt-state-claim-truth",
       "file": "spec/prompt-modules/bbk-prompt-state-claim-truth.json"
+    },
+    {
+      "id": "bbk-prompt-executable-baseline",
+      "file": "spec/prompt-modules/bbk-prompt-executable-baseline.json"
     },
     {
       "id": "bbk-prompt-profile-qualification",

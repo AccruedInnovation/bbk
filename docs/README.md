@@ -23,6 +23,7 @@ current, durable documentation.
 ## Host and extension behavior
 
 - [Model routing](MODEL-ROUTING.md)
+- [OMP child lifetime and callback sequencing](OMP-CHILD-LIFETIME.md)
 - [Language and domain profiles](LANGUAGE-PROFILES.md)
 - [Boundaries](BOUNDARIES.md)
 

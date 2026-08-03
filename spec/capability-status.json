@@ -1,6 +1,6 @@
 {
   "schema": "bbk.capability-status-inventory.v1",
-  "package_version": "0.1.0-alpha.13.1",
+  "package_version": "0.1.0-alpha.13.5",
   "status_vocabulary": [
     "IMPLEMENTED_DETERMINISTIC",
     "IMPLEMENTED_BOOTSTRAP",

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Compatibility entry point for ``tools/setup.py``.
 
-Use ``--test``, ``--install``, ``--test-and-install``, ``--update-omp``, or
+Use ``--test-fast``, ``--test``, ``--release-test``, ``--install``,
+``--test-and-install``, ``--release-test-and-install``, ``--update-omp``, or
 ``--test-and-update-omp``. All remaining flags are forwarded unchanged to the
 canonical setup implementation.
 """

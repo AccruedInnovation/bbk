@@ -1,13 +1,54 @@
 # Changelog
 
+## 0.1.0-alpha.13.5 — 2026-08-03
+
+- Correct the OMP project-routing isolation regression test to compare canonical filesystem identity instead of requiring byte-identical path spellings in notifications and JSON results.
+- Add shared test path assertions for physical identity, notification fields, ordered path collections, containment, and deliberate exact serialization, with alias-aware diagnostics.
+- Add a source audit that rejects direct physical-path equality, direct identity-primitive use outside the helper, and interpolated native paths in notification assertions.
+- Cover Windows long-name versus 8.3 temporary-directory aliases and POSIX symlink aliases through the same physical-path assertion path.
+- Preserve alpha.13.4 runtime behavior, verification profiles, language-profile reuse, installer behavior, canonical roles, prompt contracts, and reviewed 19-role model routing unchanged.
+
+## 0.1.0-alpha.13.4 — 2026-08-02
+
+- Add explicit `fast`, `standard`, and `release` verification profiles; make routine setup/testing use standard while release building and publication use exhaustive release qualification.
+- Retain all product/integration/platform tests in standard; move only test-runner self-tests and duplicate optional external-schema cross-checks to release.
+- Remove the exact-eight-test-files organizational assertion and duplicate package-wide drift/sanity invocations from the unittest stage.
+- Replace nested duplicate installation meta-tests with focused hermetic probes, reuse minimal OMP fixtures, use core-only installs where profiles are irrelevant, and reduce oversized output fixtures.
+- Run safe deterministic verifier commands in-process after package trust, retain real processes where semantics require them, and restore all mutable process state after each call.
+- Use measured-duration sharding, six pooled workers on high-core hosts, and package-external timing/cache records; `--jobs` now changes worker count without changing execution mode.
+- Authenticate selected language-profile packages on every install while reusing already-current installed profile files and other byte/mode-identical successor files instead of rewriting them.
+- Preserve normal divergence, backup, `--force`, manifest ownership, uninstall, and routing behavior; unchanged profile reuse is digest- and mode-based rather than version-label-based.
+- Preserve the exact reviewed 19-role model-routing defaults and all alpha.13.3 operational corrections.
+
+## 0.1.0-alpha.13.3 — 2026-08-02
+
+- Make all 19 generated OMP BBK roles explicitly `blocking: false`, using OMP 16.4.8 managed background task jobs when `async.enabled` and the host job manager are available, while retaining callback-safe sequencing when task execution is inline.
+- Add modular interrupt-safe delegation and partial-attempt truth: a user/IRC wake is not cancellation authority, decision-dependent specialists wait for durable response integration, cancelled files remain provisional, and successor attempts record resume/adopt/replace/discard disposition.
+- Force strict UTF-8 across OMP Node-to-Python transport with `-X utf8`, `PYTHONUTF8`, `PYTHONIOENCODING`, fatal decoding, typed transport errors, explicit Python stream/file encoding, and non-ASCII round-trip regressions.
+- Treat an existing empty project root as successful `UNINITIALIZED` status with an explicit next action; separate command health, project state, artifact integrity, semantic readiness, and execution authorization.
+- Centralize `EXAMPLE-*` classification and exclude examples from live counts, automatic question/handoff discovery, default manifests, and candidate inputs while reporting them separately and retaining template access.
+- Compare OMP project routing, bindings, installed paths, manifests, agent directories, and test expectations by physical identity, covering Windows long-name/8.3 aliases without weakening fail-closed cross-project routing.
+- Add proportional research stopping, executable-command verification, a bounded pre-execution confirmation register, and concise transport-versus-integration claim truth through reusable prompt modules.
+- Audit and preserve exact candidate/review binding, specialist ownership, Beads operation, project/user routing isolation, nested-agent visibility, test-runner acceleration, all five language profiles, and the reviewed 19-role default model routes.
+- Explicitly defer deterministic claim-state transitions, automatic review invalidation, filesystem-enforced specialist ownership, and Blueprint lifecycle/release gates.
+
+## 0.1.0-alpha.13.2 — 2026-08-02
+
+- Make Beads the default enabled, write-enabled coordination projection for newly initialized projects, with first-use initialization, dry-run/apply synchronization, exact foreign bindings, idempotence, hierarchy preservation, and direct-drift refusal.
+- Add `bbk-beads` as an on-demand skill to the eight canonical record-owning roles: Root/Territory/Planning/Phase Wayfinders, Questioning Wayfinder, and Root/Territory/Worker Orchestrators.
+- Add model-facing and OMP slash-command Beads synchronization and compact durable-handoff pointer surfaces, including exact mapped project/territory/WorkUnit targets and fail-closed foreign-ID checks, while retaining BBK records as semantic authority.
+- Add project-safe OMP routing target resolution with `auto`, `project`, and `user` scopes, nearest-project selection, exact binding/path reporting, user-global mutation confirmation, and fail-closed behavior when an expected project binding is invalid.
+- Add a complete hierarchical `/bbk:agents` view that recursively consumes live and finalized nested OMP task details, deduplicates direct and nested events, preserves parentage, and retains bounded terminal history.
+- Preserve the reviewed 19-role default model selections from `roles-update.zip`, alpha.13 role/return/execution/prompt contracts, alpha.13.1 standard-library validation, and accelerated test execution.
+- Make full ordered release/CI verification use quiet suite summaries by default instead of forcing per-test verbose output; retain `python tools/run_tests.py --all -v --require-node` for explicit diagnostic detail.
+
 ## 0.1.0-alpha.13.1 — 2026-08-02
 
-- Remove the accidental hard test dependency on `jsonschema`; add a standard-library role-return validator and run the complete contract suite successfully under `python -S`.
-- Retain optional Draft 2020-12 validation through `jsonschema`/`referencing` when installed, while making the standalone full validator report a precise dependency blocker when absent.
-- Restore cached in-process execution for canonical BBK CLI behavior tests and trusted package-local profile fixtures, retaining real subprocesses for operating-system, isolation, timeout, and tamper boundaries.
-- Reduce the default eight-suite wall time from 42.48 seconds to 25.21 seconds on the qualification host while increasing contract coverage.
-- Preserve alpha.13 role, contract, prompt, installer, language-profile, and reviewed per-role model-routing behavior unchanged apart from the package-version binding.
-
+- Remove the undeclared hard import of `jsonschema` from `test_contract_package_v1.py`; deterministic and semantic contract validation remains mandatory on standard-library-only Python, while the seven tests that specifically exercise the optional external Draft 2020-12 engine report `skipped` when it is unavailable.
+- Add `--require-jsonschema` to `tools/validate_contract_package.py` for maintainers who want absence of the optional validator to be blocking.
+- Add `auto`, `batch`, and `isolated` unittest execution modes. Windows `auto` now runs all discovered modules in one bounded Python process; POSIX `auto` retains module-isolated parallelism.
+- Reuse public `main(argv)` entry points for behavior-level install, routing, update, setup, role-assembly, contract, and fixture CLI tests; retain real subprocess coverage for copied launchers, Node integration, interpreter/environment isolation, and process-tree behavior.
+- Preserve alpha.13's role contracts, prompt modules, execution contracts, generated agents, project schemas, install surfaces, bundled profiles, and reviewed default model routing unchanged.
 
 ## 0.1.0-alpha.13 — 2026-08-01
 

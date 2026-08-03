@@ -600,6 +600,7 @@ Keep operational state, role readiness, assertion result, acceptance, and releas
 - `STATE.NO_OVERCLAIM` — Claim only what the exact current subject, method, evidence, authority, and role contract establish. Explicitly identify material claims not established and every scope, fidelity, freshness, exposure, or independence limitation.
 - `STATE.NONPASS` — Skipped, blocked, inconclusive, stale, wrong-subject, unbound, contaminated, incomplete, unavailable, or non-executed evidence is not a pass.
 - `STATE.READINESS_NOT_ACCEPTANCE` — Role readiness means only that the declared parent may consume the return. It does not imply baseline or candidate acceptance, finding closure, completion, residual-risk acceptance, compliance, outcome achievement, deployment, publication, or release.
+- `STATE.TRANSPORT_NOT_INTEGRATION` — Delivered, received, or relayed may be claimed from exact transport evidence. Recorded, integrated, accepted, completed, or decision-applied requires a durable artifact or structured role return bound to the exact subject; a send receipt or wake event alone is not proof of semantic integration.
 
 <!-- End BBK prompt module bbk-prompt-state-claim-truth -->
 

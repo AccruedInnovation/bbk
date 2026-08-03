@@ -1,11 +1,11 @@
 # Blueprint Bootstrap Kit
 
-**Version:** `0.1.0-alpha.13.1`
+**Version:** `0.1.0-alpha.13.5`
 **Status:** package-qualified temporary method harness; live host, model, profile-toolchain, and target-project behavior remain separately qualified
 
 BBK is a lightweight, Blueprint-inspired planning, execution, evidence, and review kit for Codex, Oh My Pi (OMP), Claude Code, and generic agent harnesses. It is external to the real Blueprint product and carries no official Blueprint lifecycle, capability, authorization, readiness, execution, verification, completion, qualification, or release authority.
 
-Alpha.13.1 preserves the alpha.13 role and contract architecture while correcting release verification and test performance. Alpha.13 makes the 19 individual role files the canonical role source, formalizes the four controller-selectable roots and parent-admission modes, publishes exact machine-valid role-return and execution contracts, and compiles shared behavior through 21 reusable prompt modules. It preserves complete OMP prompt replacement, `hub`/IRC communication, live worker/context display, `ask`-backed decisions, bounded verification, harness-scoped updates, and the five bundled language profiles. Its default per-role model routes are the reviewed selections in `spec/model-routing.json`, not broad judgment tiers.
+Alpha.13 makes the 19 individual role files the canonical role source, formalizes the four controller-selectable roots and parent-admission modes, publishes exact machine-valid role-return and execution contracts, and compiles shared behavior through 22 reusable prompt modules. It preserves complete OMP prompt replacement, `hub`/IRC communication, live worker/context display, `ask`-backed decisions, bounded verification, harness-scoped updates, and the five bundled language profiles. Its default per-role model routes are the reviewed selections in `spec/model-routing.json`, not broad judgment tiers.
 
 ## BBK entrypoint
 
@@ -27,6 +27,8 @@ OMP provides a persistent BBK mode:
 /bbk status          deterministic BBK project status; does not enter the mode
 /bbk:status          deterministic BBK project status; does not enter the mode
 ```
+
+An existing empty root returns a successful `UNINITIALIZED` status rather than a tool error. Live counts exclude `EXAMPLE-*` templates, and the successful status variants are published in `spec/schemas/bbk-status-v1.schema.json`.
 
 `/bbk` records a compact `bbk-mode-state` entry with `appendEntry`; that state is not sent to the model. The extension restores the latest state from the active session branch on session start, resume/switch, branch, and tree navigation.
 
@@ -122,15 +124,28 @@ python tools\bbk.py handoff list --root D:\Project `
   --work-unit WU-EXAMPLE --latest
 ```
 
-Beads can carry a compact append-only pointer rather than the full payload:
+Beads is the normal coordination projection for newly initialized BBK projects. New `.bbk/config.json` and `.bbk/mappings/beads.json` files enable projection, writes, and first-use workspace initialization by default; the external `bd` executable must still be installed separately.
+
+Project current role-owned coordination records before or alongside execution:
+
+```powershell
+python tools\bbk.py beads plan --root D:\Project
+python tools\bbk.py beads plan --root D:\Project --apply
+```
+
+The dry run is mandatory workflow: it shows create, inspect, or update operations before mutation. Applied synchronization is deterministic and idempotent, records exact BBK-to-Beads foreign IDs and projection digests, and refuses to overwrite foreign drift. Root/Territory Wayfinders own project, territory, and decision projections; Planning/Phase Wayfinders own capability, phase, and WorkUnit projections; Root/Territory/Worker Orchestrators own execution-state and handoff pointers; Questioning Wayfinder owns question projections.
+
+Beads can also carry a compact append-only handoff pointer rather than the full payload:
 
 ```powershell
 python tools\bbk.py beads handoff-plan `
   --root D:\Project --handoff .bbk\handoffs\WU-EXAMPLE\HO-WU-EXAMPLE-1.json `
-  --bead bd-123
+  --target-bbk-id WU-EXAMPLE --apply
 ```
 
-Add `--apply` only after `.bbk/mappings/beads.json` explicitly enables projection and writes. BBK appends a compact pointer with `bd comments add`; it never treats the bead text as the authoritative payload.
+Worker Orchestrator normally targets the mapped WorkUnit. Root or Territory Orchestrator passes `--target-bbk-id` for the exact mapped project or territory record it owns. An explicit target must already have one unique mapping, and a simultaneously supplied `--bead` must match it. `--bead` without a target is reserved for an explicitly reviewed foreign issue and does not create a mapping.
+
+A project may deliberately set `enabled` or `write_enabled` to `false`. Absence of the separately installed `bd` command is a typed coordination warning rather than a reason to discard otherwise valid BBK work. BBK appends only a verified compact pointer with `bd comments add`; it never translates BBK semantic state into tracker status or treats tracker text, closure, or hierarchy as authoritative.
 
 The BBK file remains authoritative. Configured gate runs follow the same lossless boundary: JSON receipts expose bounded previews, while complete stdout and stderr are stored beside the receipt and bound by project-relative path, byte count, and SHA-256. A PASS receipt is not reusable if either bound stream is missing or changed. See `docs/DURABLE-HANDOFFS.md`.
 
@@ -205,7 +220,7 @@ python tools/model_routing.py --check
 python tools/generate_agents.py --check
 ```
 
-To customize without modifying the qualified package, copy `spec/model-routing.json` outside the extraction, edit exact role entries, retain `package_version: 0.1.0-alpha.13.1`, validate it, and pass it during installation:
+To customize without modifying the qualified package, copy `spec/model-routing.json` outside the extraction, edit exact role entries, retain `package_version: 0.1.0-alpha.13.5`, validate it, and pass it during installation:
 
 ```powershell
 Copy-Item .\spec\model-routing.json D:\Projects\BBK\my-model-routing.json
@@ -230,19 +245,37 @@ Use `testing-flash` to send all 19 BBK sub-agents through DeepSeek V4 Flash for 
 
 ```text
 /bbk:models status
-/bbk:models profile testing-flash
-/bbk:models profile deepseek-economy
+/bbk:models project status
+/bbk:models user status
+/bbk:models project profile testing-flash
+/bbk:models user profile default
 /bbk:models set bbk_worker @task medium
 /bbk:models apply D:\Profiles\bbk-routing.json
 /bbk:models export D:\Profiles\bbk-current.json current-bbk
 ```
 
-OMP rediscovers agent definitions when it spawns a task agent, so already-running sub-agents are not changed. BBK writes its managed route into the installed BBK agent frontmatter and updates the BBK install manifest. An OMP `task.agentModelOverrides` entry or a higher-precedence project agent definition with the same role name can still supersede that frontmatter; `/bbk:models status` reports this precedence boundary.
+The default `auto` target resolves the nearest valid project-scoped BBK installation from the current working directory; if none exists, it uses the loaded user-scoped installation. A project installation that is expected but has a missing or invalid binding fails closed instead of silently changing user-global routing. Explicit `project` and `user` targets are available. User-scope mutations require confirmation in the interactive OMP UI because they affect future BBK spawns in every project using that user installation.
+
+OMP rediscovers agent definitions when it spawns a task agent, so already-running sub-agents are not changed. BBK writes its managed route into the selected installation's BBK agent frontmatter and updates that installation's manifest. An OMP `task.agentModelOverrides` entry or a higher-precedence project agent definition with the same role name can still supersede that frontmatter; `/bbk:models status` reports scope, binding, project root, state and manifest paths, and this precedence boundary.
+The routing program is taken from the selected installation beside its authenticated binding. If it is missing, BBK fails closed rather than using a router from another scope or package version.
+
+### OMP nested-agent view
+
+OMP publishes synchronous descendants inside parent task progress rather than necessarily listing them in detached-only activity surfaces. BBK recursively reconstructs that hierarchy and retains terminal history:
+
+```text
+/bbk:agents
+/bbk:agents active
+/bbk:agents details bbk_architect
+/bbk:agents json
+```
+
+The view reports Main-to-child lineage, depth, active or terminal state, synchronous/detached mode, model, task, current tool, context use, session identity, and task-call identity. Direct lifecycle events and nested snapshots are deduplicated.
 
 
 ### OMP command/context boundary
 
-OMP slash commands such as `/bbk:models`, `/bbk:status`, `/bbk:doctor`, `/bbk:exit`, and every bundled language-profile command are **UI-only**. They show concise results through `ctx.ui.notify`, return no structured command payload, and do not call `sendMessage` or `sendUserMessage`; deterministic JSON therefore does not enter model context. Explicit LLM-callable tools still return structured results because the model deliberately invoked them.
+OMP slash commands such as `/bbk:models`, `/bbk:agents`, `/bbk:beads`, `/bbk:status`, `/bbk:doctor`, `/bbk:exit`, and every bundled language-profile command are **UI-only**. They show concise results through `ctx.ui.notify`, return no structured command payload, and do not call `sendMessage` or `sendUserMessage`; deterministic JSON therefore does not enter model context. Explicit LLM-callable tools still return structured results because the model deliberately invoked them.
 
 Mode state is persisted with `appendEntry`, which OMP does not send to the LLM. While BBK mode is active, `before_agent_start` replaces Main's complete system prompt for each ordinary turn and injects the mandatory controller procedures. For named BBK children, the hook replaces OMP's subagent wrapper while preserving only sanitized invocation data required to do and return the assigned work. `/bbk <request>` is the sole slash-command path that deliberately calls `sendUserMessage`, and it forwards only the user's directive. `/bbk` with no arguments, `/bbk:exit`, `/bbk status`, and all other deterministic commands remain non-agent-facing.
 
@@ -282,7 +315,7 @@ Reusable role instructions do not inject Blueprint product status, target-projec
 
 The canonical `bbk.roles.v4` package is split across `spec/roles/catalog.json` and 19 `spec/roles/bbk_*-role.json` files. `spec/roles.json` is a deterministic generated compatibility projection. Every role declares its scope, focused constitution modules, exact direct-child triggers, escalation routes, human-decision triggers, procedures, prohibitions, mutation authority, allowed parent modes, prompt modules, and exact return contract.
 
-Prompt compilation has four layers: canonical role contract, reusable prompt modules, role-specific mandatory procedures, and host projection instructions. The package currently contains 21 prompt modules and 39 skills. Every current role has one primary mandatory procedure because common behavior is modularized, not because BBK imposes an arbitrary maximum. Additional mandatory procedures require a measured, source-bound catalogue exception proving distinct behavior and no duplicated module body.
+Prompt compilation has four layers: canonical role contract, reusable prompt modules, role-specific mandatory procedures, and host projection instructions. The package currently contains 22 prompt modules and 39 skills. Every current role has one primary mandatory procedure because common behavior is modularized, not because BBK imposes an arbitrary maximum. Additional mandatory procedures require a measured, source-bound catalogue exception proving distinct behavior and no duplicated module body.
 
 The top-level `bbk` skill belongs to the harness-root controller and is not a child skill. Mandatory procedure bodies are embedded in generated roles, so baseline behavior does not depend on OMP `autoloadSkills`, Claude Code skill autoload, or a separate discovery call. Optional focused procedures and language/domain profiles remain available on demand.
 
@@ -313,6 +346,8 @@ python tools\setup.py --test-and-install `
 ```
 
 During installation BBK replaces the package placeholder `bbk-installed-profiles` skill with a compact registry generated from the exact verified profile set. The complete machine-readable inventory is written to `effective-language-profiles.json` and bound into `install-manifest.json`.
+
+Every selected profile package is still authenticated on every install. When an existing profile has the same exact identity, package-root digest, layout, harness set, owned bytes, and executable modes, alpha.13.4 reuses those installed files rather than rewriting them. Changed, missing, mode-divergent, or locally modified files retain the normal repair, refusal, backup, and `--force` behavior.
 
 See `docs/LANGUAGE-PROFILES.md`.
 
@@ -372,7 +407,7 @@ spec/roles/catalog.json                canonical role-package catalogue
 spec/roles/bbk_*-role.json             19 canonical role source files
 spec/roles.json                        generated v4 compatibility projection
 spec/contracts/                        return/execution contract catalogue and registry
-spec/prompt-modules/                   21 reusable prompt modules and compilation policy
+spec/prompt-modules/                   22 reusable prompt modules and compilation policy
 spec/model-routing.json                reviewed per-role OMP/Codex/Claude routing policy
 spec/method-content.json               canonical skills and references
 spec/schemas/                          BBK and role-specific JSON Schemas
@@ -388,7 +423,7 @@ tools/bootstrap.py                     preferred test/install front door
 tools/setup.py                         bootstrap modes and aliases
 tools/update_omp.py                    selective OMP-only updater
 tools/update_codex.py                  selective Codex-agent-only updater
-tools/verify_all.py                    full, quick, OMP, and Codex verification profiles
+tools/verify_all.py                    fast, standard, release, OMP, and Codex verification profiles
 tools/run_tests.py                     PowerShell-safe bounded test runner
 tools/install.py                       unified preflight/install/status/uninstall
 tools/bbk.py                           deterministic BBK CLI
@@ -399,50 +434,51 @@ tests/                                 consolidated responsibility-oriented suit
 
 ## Verify and install
 
-Run every package check in canonical order:
+Run the routine product, integration, and platform verification profile:
 
 ```bash
-python tools/run_tests.py --all --require-node
+python tools/setup.py --test --require-node
 ```
 
-Run all unittest modules. Independent modules run concurrently by default (up to four workers), while each module retains its own process boundary, capture, timeout, and exact failure report:
+Run the compact canonical-contract profile during active development:
 
 ```bash
-python tools/run_tests.py -v
+python tools/setup.py --test-fast
 ```
 
-Suite children run with closed stdin, each consolidated module has a 300-second hard timeout by default, and parallel heartbeats name the latest visible test. For a serial Windows portability diagnostic, run `python tools/run_tests.py -v --jobs 1 -p test_installation_portability.py --suite-timeout 300`.
-
-For a cross-cutting developer smoke check rather than release qualification:
+Run exhaustive release qualification, including test-runner self-tests and duplicate optional external-schema cross-checks:
 
 ```bash
-python tools/verify_all.py --profile quick --require-node
+python tools/setup.py --release-test --require-node
 ```
 
-Ordinary OMP-only and Codex-only successor updates should use the targeted `--test-and-update-omp` or `--test-and-update-codex` commands; they retain package trust and drift checks without rerunning unrelated harness and historical portability suites. Use `--jobs 1` only when serial diagnosis is needed.
-
-Preferred test-then-install command; all five bundled profiles are included automatically:
+The lower-level equivalents are:
 
 ```bash
-python tools/bootstrap.py --test-and-install --scope user --omp --codex --claude
+python tools/verify_all.py --profile fast
+python tools/verify_all.py --profile standard --require-node
+python tools/verify_all.py --profile release --require-node
 ```
 
-Equivalent explicit setup spelling:
+`auto` chooses six workers on hosts with at least 12 logical CPUs, four on medium hosts, and a smaller bound on low-core hosts. Windows groups modules into bounded pooled processes; POSIX retains module-isolated parallelism. Canonical Python CLI assertions and safe deterministic verifier commands run in-process; Node, Git, package trust, interpreter/process-tree, stdin/encoding, and installed-copy boundaries retain real processes. Retained module timings drive later sharding. Reports and the rolling timing cache are written outside the package under `%LOCALAPPDATA%\BBK\test-runs` on Windows or `~/.cache/bbk/test-runs` on POSIX; set `BBK_TEST_CACHE_DIR` to override.
+
+For direct unittest diagnostics:
+
+```bash
+python tools/run_tests.py --profile standard -v
+python tools/run_tests.py --profile release -v --mode pooled --jobs 6
+python tools/run_tests.py --profile release -v --mode isolated --jobs 1 -p test_installation_portability.py
+```
+
+For ordinary installation, use standard verification and write only on PASS. All five bundled profiles remain selected by default:
 
 ```bash
 python tools/setup.py --test-and-install --scope user --omp --codex --claude
 ```
 
-Inspect the complete core-plus-profile plan without creating the installation root or manifest:
+The installer authenticates every selected profile package. A pre-existing profile whose exact identity, package digest, layout, harness set, installed bytes, and modes are current is reused in place rather than recopied. Changed or locally divergent files retain the normal conservative repair and `--force` rules.
 
-```bash
-python tools/install.py install --scope user --omp --codex --claude --dry-run
-```
-
-The installer verifies every selected profile package, validates a bundled release or expanded repository manifest when present, checks compatibility, generates one complete destination plan, rejects unsafe archives and cross-package collisions, and preflights divergence and backup behavior before the first write. Human-mode runs stream verification as it happens and report profile preparation, preflight file counts, write progress, and manifest completion. Core and profile files share one install manifest, status surface, and conservative uninstall path.
-
-Against an existing multi-harness install, `--omp --uninstall-existing` now clean-replaces only OMP and preserves Codex; `--codex --uninstall-existing` does the inverse. Selecting every installed harness still requests a full clean replacement. Unowned files are preserved, modified owned files require `--force`, and unsupported partial combinations fail before removal. See `docs/INSTALL.md` for the exact scope rules.
-
+Release authors can combine exhaustive verification with installation using `--release-test-and-install`. Selective successor updates keep their targeted OMP or Codex trust-gated profiles. A dry run remains available through `python tools/install.py install --scope user --omp --codex --claude --dry-run`.
 
 See `docs/README.md`, `docs/INSTALL.md`, `docs/USAGE.md`, `docs/LANGUAGE-PROFILES.md`, and `docs/DEVELOPMENT.md`.
 

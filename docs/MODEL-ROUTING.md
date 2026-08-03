@@ -1,10 +1,10 @@
 # Sub-agent model routing
 
-BBK `0.1.0-alpha.13.1` separates each role's stable responsibility from the model used to perform it.
+BBK `0.1.0-alpha.13.5` separates each role's stable responsibility from the model used to perform it.
 
 The canonical install-time policy is `spec/model-routing.json`. It uses `"schema_version": "bbk.model-routing.v2"` and contains one complete OMP, Codex, and Claude Code route for every canonical role. Exact coverage is required: a missing role and an unknown role both fail validation.
 
-The alpha.13 defaults are the reviewed selections supplied with the split-role update. They are copied into the canonical policy, generated projections, packaged OMP `default` runtime profile, and a regression fixture. The only change from that reviewed source is advancing `package_version` to `0.1.0-alpha.13.1`.
+The alpha.13 defaults are the reviewed selections supplied with the split-role update. They are copied into the canonical policy, generated projections, packaged OMP `default` runtime profile, and a regression fixture. The only change from that reviewed source is advancing `package_version` to `0.1.0-alpha.13.5`.
 
 ## Default per-role routes
 
@@ -96,7 +96,7 @@ python tools\install.py install --scope user --omp --codex --claude `
   --model-routing D:\Profiles\bbk-model-routing.json
 ```
 
-The external file's `package_version` must be `0.1.0-alpha.13.1`. The installer validates it before writing, renders the selected projections from that policy, copies it to `effective-model-routing.json`, and binds its digest into `install-manifest.json`.
+The external file's `package_version` must be `0.1.0-alpha.13.5`. The installer validates it before writing, renders the selected projections from that policy, copies it to `effective-model-routing.json`, and binds its digest into `install-manifest.json`.
 
 Do not edit generated files under `projections/` directly. Drift checks reject manual changes.
 
@@ -140,7 +140,26 @@ Commands:
 /bbk:models export D:\Profiles\current-omp-routing.json current-bbk
 ```
 
-Runtime changes affect future OMP child spawns only. BBK rewrites managed OMP agent frontmatter, writes `effective-omp-model-routing.json`, and reconciles ownership digests into the install manifest. Already-running children are unaffected.
+Runtime changes affect future OMP child spawns only. BBK rewrites managed OMP agent frontmatter, writes `effective-omp-model-routing.json`, and reconciles ownership digests into the selected installation manifest. Already-running children are unaffected.
+
+### Project and user routing targets
+
+`/bbk:models` accepts an optional target before the operation:
+
+```text
+/bbk:models auto status
+/bbk:models project profile testing-flash
+/bbk:models user profile default
+/bbk:models project set bbk_worker @task medium
+```
+
+`auto` is the default. It walks from the current working directory toward the filesystem root and selects the nearest valid project binding at `.omp/extensions/bbk/bbk-package-root.json`; if no project installation is present, it selects the loaded user installation. A project OMP installation is considered expected when its extension directory, project routing state, or install manifest declares OMP ownership. If that expected binding is missing, invalid, mis-scoped, or names a different project root, BBK fails closed and does not mutate user-global routing.
+
+A project binding records `scope: project` and the exact `project_root`; a user binding records `scope: user` and no project root. `/bbk:models status` reports the selected scope, resolution source, project root, binding path, agent directory, mutable state path, install manifest, and whether the change has global effect. Explicit `project` refuses when no project install exists. Explicit `user` selects only a valid user binding. `BBK_OMP_ROUTING_BINDING` remains an explicit operator override and must match an explicitly requested scope.
+
+The selected installation also supplies the routing program beside its binding. BBK never uses one installation's router to mutate another installation's state; a missing target-bound router fails closed without falling back to a different scope or package version.
+
+User-scope mutations require confirmation when OMP provides an interactive confirmation surface. Without that surface, an interactive user-global mutation is refused. Project-scoped installations are the supported way to run different BBK profiles concurrently in different repositories.
 
 ### OMP precedence boundary
 
@@ -154,4 +173,4 @@ Project agent definitions also precede user definitions. A task override or high
 
 ## Upgrade an external policy
 
-An external policy is bound to one BBK release. Update `package_version` to `0.1.0-alpha.13.1`, compare its role keys and host fields with the new canonical policy, and validate it before installation. Alpha.13 retains the same 19 role names but materially changes the role package, return contracts, prompt composition, and generated projection digests, so installed agents must be regenerated rather than copied from alpha.12.4.
+An external policy is bound to one BBK release. Update `package_version` to `0.1.0-alpha.13.5`, compare its role keys and host fields with the new canonical policy, and validate it before installation. Alpha.13 retains the same 19 role names but materially changes the role package, return contracts, prompt composition, and generated projection digests, so installed agents must be regenerated rather than copied from alpha.12.4.

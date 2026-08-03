@@ -27,6 +27,10 @@
     {
       "id": "STATE.READINESS_NOT_ACCEPTANCE",
       "text": "Role readiness means only that the declared parent may consume the return. It does not imply baseline or candidate acceptance, finding closure, completion, residual-risk acceptance, compliance, outcome achievement, deployment, publication, or release."
+    },
+    {
+      "id": "STATE.TRANSPORT_NOT_INTEGRATION",
+      "text": "Delivered, received, or relayed may be claimed from exact transport evidence. Recorded, integrated, accepted, completed, or decision-applied requires a durable artifact or structured role return bound to the exact subject; a send receipt or wake event alone is not proof of semantic integration."
     }
   ]
 }

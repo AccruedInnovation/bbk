@@ -15,7 +15,6 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-from tests._cli_support import run_cli as test_run_cli
 m1_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(m1_ROOT / 'tools'))
 from contracts import canonical_digest
@@ -48,7 +47,7 @@ class Alpha7ReviewAssuranceTests(unittest.TestCase):
         self.assertIn('intent-outcome', lenses)
         self.assertIn('state-concurrency-effect-recovery', lenses)
         self.assertEqual(len(first['lensAssignments']), 3)
-        self.assertEqual(first['provenance']['bbkVersion'], '0.1.0-alpha.13.1')
+        self.assertEqual(first['provenance']['bbkVersion'], '0.1.0-alpha.13.5')
 
     def test_manifest_rejects_unjustified_assertion_overlap(self):
         value = copy.deepcopy(self.manifest)
@@ -76,6 +75,21 @@ class Alpha7ReviewAssuranceTests(unittest.TestCase):
             blocked = compile_review_context(manifest, root, context_id='RCM-2')
             self.assertEqual(blocked['completeness'], 'BLOCKED_REQUIRED_CONTEXT_MISSING')
             self.assertTrue(blocked['blockers'])
+
+    def test_review_context_excludes_examples_with_shared_non_operational_classification(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / 'EXAMPLE-template.json').write_text('{"example": true}\n', encoding='utf-8')
+            (root / 'real.json').write_text('{"real": true}\n', encoding='utf-8')
+            manifest = copy.deepcopy(self.manifest)
+            manifest['contextPolicy']['requiredPaths'] = []
+            context = compile_review_context(manifest, root, context_id='RCM-EXAMPLES')
+            included = {item['path'] for item in context['includedItems']}
+            omitted = {item['path']: item['reason'] for item in context['omissions']}
+            self.assertEqual(included, {'real.json'})
+            self.assertEqual(omitted.get('EXAMPLE-template.json'), 'non-operational-example')
+            self.assertEqual(context['completeness'], 'COMPLETE_WITH_DECLARED_EXCLUSIONS')
+            self.assertTrue(validate_review_context(context, manifest)['valid'])
 
     def test_cross_shard_assertion_requires_cross_shard_lens_and_attempt(self):
         manifest = copy.deepcopy(self.manifest)
@@ -195,7 +209,7 @@ def m2_load(rel: str):
     return json.loads((m2_ROOT / rel).read_text(encoding='utf-8'))
 
 def m2_run_json(argv, *, cwd=m2_ROOT, env=None, check=True):
-    completed = test_run_cli([str(x) for x in argv], cwd=cwd, env=env, check=check)
+    completed = subprocess.run([str(x) for x in argv], cwd=str(cwd), env=env, text=True, encoding='utf-8', errors='replace', stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=check)
     return (json.loads(completed.stdout), completed)
 
 class Alpha7StateEffectTests(unittest.TestCase):
@@ -284,3 +298,6 @@ class Alpha7StateEffectTests(unittest.TestCase):
             stale, _ = m2_run_json([sys.executable, m2_BBK, '--json', 'candidate', 'check', '--root', project, '--id', 'C-001'])
             self.assertFalse(stale['current'])
             self.assertEqual(stale['comparison']['summary']['bound_dependency_changed'], 1)
+
+# Deterministic fast/standard/release selection used by tools/run_tests.py.
+from tests._test_profiles import load_profiled_tests as load_tests

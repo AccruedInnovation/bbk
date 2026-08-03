@@ -2,31 +2,158 @@
 
 Use a clean extraction for each BBK version. Do not overlay a new release onto an older extracted package.
 
-## Alpha.13.1 corrects verification dependencies and process reuse
+## Upgrade to `0.1.0-alpha.13.5`
 
-`0.1.0-alpha.13.1` is an immutable corrective successor to alpha.13. Use a clean alpha.13.1 extraction; do not overlay it onto the alpha.13 directory.
+`0.1.0-alpha.13.5` is a test-only portability corrective over alpha.13.4. It does not change BBK runtime behavior, project records, role prompts, model selections, or language-profile packages. It corrects a Windows verification assertion that treated long-name and 8.3 spellings of the same physical project path as different strings.
 
-There is no role, prompt, model-routing, installer, language-profile, or `.bbk/` project-record migration from alpha.13. The reviewed per-role routes are unchanged; an external routing policy must update only its `package_version` to `0.1.0-alpha.13.1` and continue to cover the exact 19-role v2 policy shape.
-
-The correction removes the accidental test-module import requirement for `jsonschema`. Ordinary full verification now succeeds on a minimal standard-library Python installation. Install `jsonschema` and `referencing` only when the optional external Draft 2020-12 schema-engine path is required.
-
-Behavior tests again reuse canonical public Python `main(argv)` entry points and trusted local profile fixtures inside each isolated unittest-module process. Real subprocess tests remain for process, platform, import-isolation, timeout, and tamper boundaries. The normal command remains:
-
-```bash
-python tools/run_tests.py -q
-```
-
-Use `--jobs 1` only for serial diagnosis. For a full managed replacement from alpha.13:
+Use a clean extraction. For a complete managed upgrade:
 
 ```bash
 python tools/setup.py --test-and-install --scope user --omp --codex --claude
 ```
 
-No `.bbk/` project-record migration is required solely for alpha.13.1.
+Existing alpha.13.4 installations do not require replacement solely for runtime correctness. Alpha.13.5 is required when using the verification-first setup path on a Windows host affected by the alias spelling mismatch.
+
+No `.bbk/` record migration is required.
+
+## Upgrade to `0.1.0-alpha.13.4`
+
+`0.1.0-alpha.13.4` is a test/verification and install-reconciliation corrective over alpha.13.3. It preserves the alpha.13.3 project/runtime behavior and reviewed model routes.
+
+Use a clean extraction. Do not overlay release package directories. For a complete managed upgrade:
+
+```bash
+python tools/setup.py --test-and-install --scope user --omp --codex --claude
+```
+
+Routine `--test` and `--test-and-install` use the standard product/integration/platform profile. Release authors use:
+
+```bash
+python tools/setup.py --release-test --require-node
+```
+
+All selected bundled or external language-profile packages are still fully authenticated before mutation. When the installed profile identity, package-root digest, layout, harness selection, owned bytes, and modes already match, alpha.13.4 reuses those files in place rather than reinstalling them. Changed or locally divergent files retain the previous conservative refusal/backup/`--force` behavior.
+
+No `.bbk/` record migration is required. Start a fresh Codex session after changing its generated agents and run `/reload-plugins` after changing OMP files.
+
+## Upgrade to `0.1.0-alpha.13.3`
+
+`0.1.0-alpha.13.3` is a bounded corrective over alpha.13.2. It preserves alpha.13.2's Beads defaults, project-scoped OMP routing, nested-agent view, canonical roles, return/execution contracts, prompt modules, language profiles, and reviewed model routes.
+
+Use a clean alpha.13.3 extraction or the supported installer/update entrypoints. Do not copy selected extension, role, skill, routing, or generated-agent files into an older package.
+
+### Managed update
+
+For a full managed update, select the harnesses you use:
+
+```bash
+python tools/setup.py --test-and-install --scope user --omp --codex --claude --generic
+```
+
+For OMP only:
+
+```bash
+python tools/setup.py --test-and-update-omp --scope user
+```
+
+For Codex only:
+
+```bash
+python tools/setup.py --test-and-update-codex --scope user
+```
+
+Reload OMP after updating:
+
+```text
+/reload-plugins
+```
+
+### Child-lifetime behavior
+
+All alpha.13.3 OMP BBK agents explicitly declare `blocking: false`. On OMP 16.4.8, they use managed background jobs when `async.enabled=true` and an `AsyncJobManager` is available. If the host runs task children inline, BBK's shared callback-sequencing rules avoid combining an immediate human response with a cancellation-sensitive child wait.
+
+BBK does not override a user's global OMP asynchronous-execution policy. See `OMP-CHILD-LIFETIME.md` for the exact native and fallback boundaries.
+
+### Existing projects
+
+No `.bbk/` project-record migration is required.
+
+- `EXAMPLE-*` files remain in place but are excluded from live counts, automatic discovery, default project manifests, and candidate inputs.
+- `bbk status --root <existing-empty-directory>` now returns a successful `UNINITIALIZED` result with an explicit `bbk init` next action.
+- Existing Beads mappings are preserved.
+- Existing project/user routing state is preserved and remains separately scoped.
+
+### External model-routing policies
+
+The 19 reviewed default routes are unchanged. An external routing policy remains release-bound: set its `package_version` to `0.1.0-alpha.13.3`, preserve exact role coverage, and validate it before installation:
+
+```bash
+python tools/model_routing.py validate --policy /path/to/model-routing.json
+```
+
+Do not carry an alpha.13.1 or alpha.13.2 generated agent file forward manually. Regenerate/install from alpha.13.3 so prompt-module assignments, OMP `blocking: false`, version bindings, and projection digests remain congruent.
+
+### Unicode and Windows paths
+
+The OMP adapter now forces strict UTF-8 Python transport. The installer and runtime routing resolver compare physical path identity, including long-name/8.3 aliases, rather than requiring identical textual spellings.
+
+A genuine project mismatch still fails closed; these changes do not permit one project's command to mutate another project's routing state.
+
+### Source patch use
+
+The release may provide patches from alpha.13.1 and alpha.13.2 for source review and exact reconstruction. They are not a supported substitute for clean extraction or the managed installer on a live installation.
+
+## Upgrade to `0.1.0-alpha.13.2`
+
+`0.1.0-alpha.13.2` is a corrective OMP and coordination release over alpha.13.1. Use a clean alpha.13.2 extraction or the supported installer/update entrypoints; do not copy selected extension, role, skill, routing, or generated-agent files into an older package.
+
+The release keeps the alpha.13 canonical role, return-contract, execution-contract, and prompt-module packages, and adds three operational changes:
+
+- Beads is enabled as the normal writable coordination projection for newly initialized BBK projects. BBK files remain authoritative, the external `bd` executable is still required for applied projection, and foreign drift fails closed rather than being overwritten. Execution handoffs can target the exact mapped project, territory, or WorkUnit without translating BBK state into tracker status.
+- OMP model-routing commands resolve the nearest valid project-scoped BBK installation by default. Explicit `project` and `user` targets are available; an invalid expected project binding does not silently fall back to user scope.
+- `/bbk:agents` reconstructs and retains the complete nested BBK agent hierarchy from OMP progress and finalized task details, including synchronous descendants that do not appear in detached-only activity lists.
+
+Existing projects are not silently rewritten. To adopt the normal Beads defaults, update `.bbk/config.json` and `.bbk/mappings/beads.json` deliberately or initialize a new project with alpha.13.2. A project may still set `enabled` or `write_enabled` to `false` when tracker projection is inappropriate.
+
+### OMP-only update
+
+A user-scoped OMP installation can be updated without modifying Codex:
+
+```powershell
+python tools\setup.py --test-and-update-omp --scope user
+```
+
+For project-isolated routing, install or update OMP in each project:
+
+```powershell
+python tools\install.py install --scope project --root D:\Projects\ProjectA --omp
+python tools\install.py install --scope project --root D:\Projects\ProjectB --omp
+```
+
+After updating a running OMP session, run `/reload-plugins`. Model-profile changes affect future child spawns only; already-running agents retain the model with which they started.
+
+### External model-routing policies
+
+An external routing policy remains release-bound. Set its `package_version` to `0.1.0-alpha.13.2`, preserve exact coverage of all 19 roles, and validate it before installation:
+
+```powershell
+python tools\model_routing.py --path D:\Profiles\bbk-model-routing.json --check
+```
+
+Alpha.13.2 preserves the reviewed per-role model selections introduced in alpha.13; only release metadata changes.
+
+### Verification
+
+```powershell
+python tools\verify_package.py --strict-mode
+python tools\run_tests.py -q --jobs 0
+```
+
+The default test runner executes the eight consolidated suites in a bounded process pool while ordinary canonical BBK CLI calls run in-process inside each suite. Tests that require interpreter flags, process semantics, Node, Git, stdin, timeouts, or modified scripts retain real subprocess boundaries.
 
 ## Alpha.13 formalizes split roles, returns, execution contracts, and prompt modules
 
-`0.1.0-alpha.13` is a role-package and generated-prompt migration. Use a clean alpha.13 extraction; do not copy selected role or skill files into an alpha.12.4 package.
+`0.1.0-alpha.13.1` is a role-package and generated-prompt migration. Use a clean alpha.13 extraction; do not copy selected role or skill files into an alpha.12.4 package.
 
 The role source of truth changes from one editable `spec/roles.json` file to:
 
@@ -107,7 +234,7 @@ python tools/run_tests.py -v
 Each unittest module now has a 300-second default hard limit, suite and real behavior-test children cannot read the developer console, nested subprocesses have local limits, and a still-running heartbeat names the latest visible test. For a serial diagnostic transcript:
 
 ```bash
-python tools/run_tests.py -v --jobs 1 -p test_installation_portability.py --suite-timeout 300
+python tools/run_tests.py -v --mode isolated --jobs 1 -p test_installation_portability.py --suite-timeout 300
 ```
 
 No `.bbk/` project-record migration is required solely for alpha.12.3.1.
@@ -140,7 +267,7 @@ python tools/setup.py --test-and-update-omp --scope user
 python tools/setup.py --test-and-update-codex --scope user
 ```
 
-Use `python tools/run_tests.py -v --jobs 1` to force serial unittest execution during diagnosis. No `.bbk/` project-record migration is required from alpha.12, alpha.12.1, or alpha.12.2 solely because of this update.
+Use `python tools/run_tests.py -v --mode isolated --jobs 1` to force serial module-isolated execution during diagnosis. No `.bbk/` project-record migration is required from alpha.12, alpha.12.1, or alpha.12.2 solely because of this update.
 
 ## Alpha.12 is a prompt-authority migration
 

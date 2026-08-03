@@ -1,16 +1,25 @@
 #!/usr/bin/env python3
 """Run BBK verification profiles in deterministic order.
 
-The ``full`` profile is the release-author/CI qualification path. Targeted
-``omp`` and ``codex`` profiles retain package trust gates and generated-source
-checks but run only the regressions relevant to a selective harness update.
-``quick`` is a cross-cutting developer smoke profile. Child stderr is merged
-into stdout for PowerShell-safe reporting, and a final summary repeats every
-failed check and its terminal cause.
+The ``release`` profile is the release-author/CI qualification path.
+``standard`` is the routine development and preinstallation path: it preserves
+all product, integration, and platform coverage while omitting test-runner
+self-tests and optional duplicate external-schema cross-checks. ``fast`` runs
+canonical contract and deterministic-transformation checks. Targeted ``omp``
+and ``codex`` profiles retain package trust gates and generated-source checks.
+Legacy ``full`` and ``quick`` spellings remain aliases for ``release`` and
+``fast`` respectively. Unittest checks use
+quiet suite summaries by default; ``--verbose-tests`` restores a complete
+per-test transcript for diagnostics. Child stderr is merged into stdout for
+PowerShell-safe reporting, and a final summary repeats every failed check and
+its terminal cause.
 """
 from __future__ import annotations
 
 import argparse
+import contextlib
+import importlib.util
+import inspect
 import io
 import json
 import os
@@ -34,6 +43,7 @@ class CheckSpec:
     optional_reason: str | None = None
     trust_gate: bool = False
     cwd: Path = ROOT
+    in_process: bool = False
 
 
 @dataclass(frozen=True)
@@ -44,6 +54,7 @@ class CheckResult:
     returncode: int | None
     output: str
     cause: str | None = None
+    execution: str = "subprocess"
 
     @property
     def passed(self) -> bool:
@@ -96,19 +107,34 @@ def _subprocess_environment() -> dict[str, str]:
     return environment
 
 
-VERIFICATION_PROFILES = ("full", "quick", "omp", "codex")
+VERIFICATION_PROFILES = ("fast", "standard", "release", "full", "quick", "omp", "codex")
+TEST_EXECUTION_MODES = ("auto", "pooled", "batch", "isolated")
+
+
+def canonical_profile(profile: str) -> str:
+    """Return the current profile name for legacy public aliases."""
+    aliases = {"full": "release", "quick": "fast"}
+    return aliases.get(profile, profile)
 
 
 def verification_steps(
     *,
-    profile: str = "full",
+    profile: str = "standard",
     require_node: bool = False,
     skip_package_manifest: bool = False,
     jobs: int = 0,
+    test_mode: str = "auto",
+    verbose_tests: bool = False,
+    timing_report: str | None = None,
+    no_timing_report: bool = False,
 ) -> list[CheckSpec]:
     if profile not in VERIFICATION_PROFILES:
         raise ValueError(f"unknown verification profile: {profile}")
+    selected_profile = canonical_profile(profile)
+    if test_mode not in TEST_EXECUTION_MODES:
+        raise ValueError(f"unknown test execution mode: {test_mode}")
     python = sys.executable
+    test_output_flag = "-v" if verbose_tests else "-q"
     steps: list[CheckSpec] = []
     if not skip_package_manifest:
         steps.append(
@@ -120,40 +146,46 @@ def verification_steps(
         )
     steps.extend(
         [
-            CheckSpec("Method-content projection drift", (python, "tools/create_method_content.py", "--check")),
-            CheckSpec("Role-specification projection drift", (python, "tools/create_role_spec.py", "--check")),
-            CheckSpec("Model-routing policy", (python, "tools/model_routing.py", "--check")),
-            CheckSpec("Agent projection drift", (python, "tools/generate_agents.py", "--check")),
-            CheckSpec("Python compilation and JSON parsing", (python, "tools/source_sanity.py")),
+            CheckSpec("Method-content projection drift", (python, "tools/create_method_content.py", "--check"), in_process=True),
+            CheckSpec("Role-specification projection drift", (python, "tools/create_role_spec.py", "--check"), in_process=True),
+            CheckSpec("Model-routing policy", (python, "tools/model_routing.py", "--check"), in_process=True),
+            CheckSpec("Agent projection drift", (python, "tools/generate_agents.py", "--check"), in_process=True),
+            CheckSpec("Python compilation and JSON parsing", (python, "tools/source_sanity.py"), in_process=True),
         ]
     )
 
-    if profile == "full":
-        steps.extend(
-            [
-                CheckSpec("Alpha.7 semantic fixtures", (python, "tools/validate_alpha7_fixtures.py")),
-                CheckSpec(
-                    "All unittest suites",
-                    (python, "tools/run_tests.py", "-v", "--jobs", str(jobs)),
-                ),
-            ]
-        )
-    elif profile == "omp":
-        steps.append(
-            CheckSpec(
-                "OMP-focused unittest suite",
-                (
-                    python,
-                    "tools/run_tests.py",
-                    "-v",
-                    "--pattern",
-                    "test_omp_runtime.py",
-                    "--jobs",
-                    "1",
-                ),
+    if selected_profile in {"fast", "standard", "release"}:
+        if selected_profile in {"standard", "release"}:
+            steps.append(
+                CheckSpec("Alpha.7 semantic fixtures", (python, "tools/validate_alpha7_fixtures.py"), in_process=True)
             )
-        )
-    elif profile == "codex":
+        suite_name = {
+            "fast": "Fast contract unittest suite",
+            "standard": "Standard unittest suite",
+            "release": "Complete release unittest suite",
+        }[selected_profile]
+        test_command = [
+            python, "tools/run_tests.py", test_output_flag,
+            "--profile", selected_profile,
+            "--mode", test_mode, "--jobs", str(jobs),
+        ]
+        if timing_report:
+            test_command.extend(["--timing-report", timing_report])
+        elif no_timing_report:
+            test_command.append("--no-timing-report")
+        steps.append(CheckSpec(suite_name, tuple(test_command)))
+    elif selected_profile == "omp":
+        omp_test_command = [
+            python, "tools/run_tests.py", test_output_flag,
+            "--profile", "standard", "--pattern", "test_omp_runtime.py",
+            "--jobs", "1",
+        ]
+        if timing_report:
+            omp_test_command.extend(["--timing-report", timing_report])
+        elif no_timing_report:
+            omp_test_command.append("--no-timing-report")
+        steps.append(CheckSpec("OMP-focused unittest suite", tuple(omp_test_command)))
+    elif selected_profile == "codex":
         steps.append(
             CheckSpec(
                 "Codex-focused unittest selection",
@@ -168,36 +200,7 @@ def verification_steps(
                 cwd=ROOT,
             )
         )
-    else:  # quick
-        steps.extend(
-            [
-                CheckSpec(
-                    "Core assurance smoke suite",
-                    (
-                        python,
-                        "tools/run_tests.py",
-                        "-v",
-                        "--pattern",
-                        "test_assurance_state.py",
-                        "--jobs",
-                        "1",
-                    ),
-                ),
-                CheckSpec(
-                    "OMP smoke suite",
-                    (
-                        python,
-                        "tools/run_tests.py",
-                        "-v",
-                        "--pattern",
-                        "test_omp_runtime.py",
-                        "--jobs",
-                        "1",
-                    ),
-                ),
-            ]
-        )
-    if profile in {"full", "quick", "omp"}:
+    if selected_profile in {"fast", "standard", "release", "omp"}:
         node = shutil.which("node")
         if node:
             steps.append(CheckSpec("OMP extension JavaScript syntax", (node, "--check", "omp/extension/index.js")))
@@ -238,10 +241,81 @@ def terminal_cause(output: str, returncode: int) -> str:
     return f"process exited with code {returncode} without diagnostic output"
 
 
+def _execute_python_step_in_process(spec: CheckSpec, *, stream: TextIO) -> CheckResult:
+    """Run one trusted package-local Python check without another interpreter.
+
+    The pre-execution package trust gate always remains a subprocess. These
+    checks run only after it passes. Process-global state is restored so one
+    generator or validator cannot influence the next check.
+    """
+    command = list(spec.command)
+    if len(command) < 2 or Path(command[0]).resolve() != Path(sys.executable).resolve():
+        cause = "in-process check is not a package-local Python command"
+        return CheckResult(spec.name, spec.command, "FAIL", 2, "", cause)
+    script = (spec.cwd / command[1]).resolve()
+    try:
+        script.relative_to((ROOT / "tools").resolve())
+    except ValueError:
+        cause = f"in-process check is outside tools/: {script}"
+        return CheckResult(spec.name, spec.command, "FAIL", 2, "", cause)
+
+    saved_cwd = Path.cwd()
+    saved_argv = list(sys.argv)
+    saved_sys_path = list(sys.path)
+    saved_environment = os.environ.copy()
+    output_stream = io.StringIO()
+    returncode = 2
+    module_name = f"_bbk_verify_{script.stem}_{os.getpid()}_{time.monotonic_ns()}"
+    try:
+        os.chdir(spec.cwd)
+        sys.argv = [str(script), *command[2:]]
+        sys.path.insert(0, str(script.parent))
+        module_spec = importlib.util.spec_from_file_location(module_name, script)
+        if module_spec is None or module_spec.loader is None:
+            raise RuntimeError(f"cannot load package-local verifier: {script}")
+        module = importlib.util.module_from_spec(module_spec)
+        sys.modules[module_name] = module
+        module_spec.loader.exec_module(module)
+        main_function = getattr(module, "main", None)
+        if not callable(main_function):
+            raise RuntimeError(f"{script.name} has no callable main")
+        with contextlib.redirect_stdout(output_stream), contextlib.redirect_stderr(output_stream):
+            signature = inspect.signature(main_function)
+            result = main_function() if len(signature.parameters) == 0 else main_function(command[2:])
+        returncode = int(result or 0)
+    except SystemExit as exc:
+        returncode = int(exc.code or 0) if isinstance(exc.code, (int, type(None))) else 2
+    except BaseException as exc:
+        output_stream.write(f"{type(exc).__name__}: {exc}\n")
+        returncode = 2
+    finally:
+        sys.modules.pop(module_name, None)
+        os.chdir(saved_cwd)
+        sys.argv = saved_argv
+        sys.path[:] = saved_sys_path
+        os.environ.clear()
+        os.environ.update(saved_environment)
+
+    output = output_stream.getvalue()
+    if output:
+        _write_text(stream, output, flush=True)
+    return CheckResult(
+        spec.name,
+        spec.command,
+        "PASS" if returncode == 0 else "FAIL",
+        returncode,
+        output,
+        None if returncode == 0 else terminal_cause(output, returncode),
+        "in-process",
+    )
+
+
 def execute_step(spec: CheckSpec, *, stream: TextIO) -> CheckResult:
     if spec.optional_reason is not None:
         _write_text(stream, f"SKIP: {spec.optional_reason}\n", flush=True)
         return CheckResult(spec.name, spec.command, "SKIP", None, "", spec.optional_reason)
+    if spec.in_process:
+        return _execute_python_step_in_process(spec, stream=stream)
     try:
         process = subprocess.Popen(
             list(spec.command),
@@ -281,7 +355,7 @@ def report_dict(
     *,
     expected: int,
     exit_code: int,
-    profile: str = "full",
+    profile: str = "standard",
 ) -> dict[str, object]:
     passed = sum(result.passed for result in results)
     skipped = sum(result.skipped for result in results)
@@ -304,6 +378,7 @@ def report_dict(
                 "status": result.status,
                 "returncode": result.returncode,
                 "cause": result.cause,
+                "execution": result.execution,
             }
             for result in results
         ],
@@ -316,7 +391,7 @@ def print_final_summary(
     expected: int,
     exit_code: int,
     stream: TextIO,
-    profile: str = "full",
+    profile: str = "standard",
 ) -> None:
     report = report_dict(results, expected=expected, exit_code=exit_code, profile=profile)
     _write_text(stream, "\n" + "=" * 70 + "\n")
@@ -353,11 +428,15 @@ def print_final_summary(
 
 def run_all_report(
     *,
-    profile: str = "full",
+    profile: str = "standard",
     failfast: bool = False,
     require_node: bool = False,
     skip_package_manifest: bool = False,
     jobs: int = 0,
+    test_mode: str = "auto",
+    verbose_tests: bool = False,
+    timing_report: str | None = None,
+    no_timing_report: bool = False,
     stream: TextIO | None = None,
     executor: Callable[[CheckSpec], CheckResult] | None = None,
 ) -> tuple[int, list[CheckResult]]:
@@ -367,6 +446,10 @@ def run_all_report(
         require_node=require_node,
         skip_package_manifest=skip_package_manifest,
         jobs=jobs,
+        test_mode=test_mode,
+        verbose_tests=verbose_tests,
+        timing_report=timing_report,
+        no_timing_report=no_timing_report,
     )
     results: list[CheckResult] = []
     total_started = time.monotonic()
@@ -417,15 +500,28 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument(
         "--profile",
         choices=VERIFICATION_PROFILES,
-        default="full",
-        help="verification scope: full release/CI, quick smoke, or harness-focused omp/codex",
+        default="standard",
+        help="verification scope: fast contracts, standard routine checks, complete release qualification, or harness-focused omp/codex",
     )
     parser.add_argument(
         "--jobs",
         type=int,
         default=0,
-        help="parallel unittest modules for the full profile; 0 selects up to four automatically",
+        help="pooled/isolated unittest processes; 0 uses the platform default",
     )
+    parser.add_argument(
+        "--test-mode",
+        choices=TEST_EXECUTION_MODES,
+        default="auto",
+        help="unittest process strategy passed to tools/run_tests.py (default: auto)",
+    )
+    parser.add_argument(
+        "-v", "--verbose-tests",
+        action="store_true",
+        help="show every unittest and disposition; default release verification uses quiet suite summaries",
+    )
+    parser.add_argument("--timing-report", help="write the unittest timing report to this path")
+    parser.add_argument("--no-timing-report", action="store_true", help="disable the default package-external unittest timing report")
     parser.add_argument("--require-node", action="store_true", help="fail if Node.js is unavailable for OMP syntax validation")
     parser.add_argument("--skip-package-manifest", action="store_true", help="source-build mode: skip pre/post immutable package checks")
     parser.add_argument("--list", action="store_true", help="list ordered checks without running them")
@@ -439,6 +535,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.error("--jobs must be zero or positive")
     if args.json and args.report_file:
         parser.error("--json and --report-file are mutually exclusive")
+    if args.timing_report and args.no_timing_report:
+        parser.error("--timing-report and --no-timing-report are mutually exclusive")
     if args.list:
         for index, spec in enumerate(
             verification_steps(
@@ -446,6 +544,10 @@ def main(argv: Sequence[str] | None = None) -> int:
                 require_node=args.require_node,
                 skip_package_manifest=args.skip_package_manifest,
                 jobs=args.jobs,
+                test_mode=args.test_mode,
+                verbose_tests=args.verbose_tests,
+                timing_report=args.timing_report,
+                no_timing_report=args.no_timing_report,
             ), start=1
         ):
             suffix = command_text(spec.command) if spec.command else f"SKIP — {spec.optional_reason}"
@@ -459,6 +561,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             require_node=args.require_node,
             skip_package_manifest=args.skip_package_manifest,
             jobs=args.jobs,
+            test_mode=args.test_mode,
+            verbose_tests=args.verbose_tests,
+            timing_report=args.timing_report,
+            no_timing_report=args.no_timing_report,
             stream=stream,
         )
         value = report_dict(
@@ -469,6 +575,10 @@ def main(argv: Sequence[str] | None = None) -> int:
                     require_node=args.require_node,
                     skip_package_manifest=args.skip_package_manifest,
                     jobs=args.jobs,
+                    test_mode=args.test_mode,
+                    verbose_tests=args.verbose_tests,
+                    timing_report=args.timing_report,
+                    no_timing_report=args.no_timing_report,
                 )
             ),
             exit_code=exit_code,
@@ -483,6 +593,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         require_node=args.require_node,
         skip_package_manifest=args.skip_package_manifest,
         jobs=args.jobs,
+        test_mode=args.test_mode,
+        verbose_tests=args.verbose_tests,
+        timing_report=args.timing_report,
+        no_timing_report=args.no_timing_report,
     )
     if args.report_file:
         destination = Path(args.report_file).expanduser().resolve()
@@ -495,6 +609,10 @@ def main(argv: Sequence[str] | None = None) -> int:
                     require_node=args.require_node,
                     skip_package_manifest=args.skip_package_manifest,
                     jobs=args.jobs,
+                    test_mode=args.test_mode,
+                    verbose_tests=args.verbose_tests,
+                    timing_report=args.timing_report,
+                    no_timing_report=args.no_timing_report,
                 )
             ),
             exit_code=exit_code,

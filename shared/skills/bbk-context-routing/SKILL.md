@@ -44,6 +44,7 @@ Create, transport, bind, and resume one exact human decision, authority, private
 - `HUMAN.REQUEST_RESPONSE` — Treat only an authoritative reply bound to the stable request, exact subject, and reply target as the response. Delivery, silence, timeout, cancellation, a status message, or unrelated prose does not answer or authorize the request.
 - `HUMAN.REQUEST_CONTINUE` — Continue every independent authorized branch after sending. Wait only when the request blocks all remaining valid work; resume the same logical role and request lineage after a valid response rather than restarting or silently changing the question.
 - `HUMAN.REQUEST_FALLBACK` — When live relay is unavailable, return the same request packet through the invocation chain using BLOCKED_DECISION, BLOCKED_AUTHORITY, or the applicable private-context state. Never bypass the harness-root controller.
+- `HUMAN.CALLBACK_SAFE_CHILDREN` — After sending a BBK_USER_REQUEST or equivalent controller callback, do not enter a cancellation-sensitive blocking child wait while an immediate response may arrive. Do not batch the request transport and such a task wait in the same callback window. Dispatch decision-dependent specialists only after the bound response is durably integrated. Continue local analysis or independent work only through a child-lifetime mechanism proven not to cascade-cancel on parent interruption; otherwise sequence safely and defer the child dispatch.
 
 <!-- End BBK prompt module bbk-prompt-human-request -->
 

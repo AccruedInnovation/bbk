@@ -60,13 +60,13 @@ def profile_skills(item: Any) -> list[dict[str, str]]:
         description = ""
         directory = rel.parent.name
         if skill_file.is_file():
-            meta = _frontmatter(skill_file.read_text(encoding="utf-8", errors="replace"))
+            meta = _frontmatter(skill_file.read_text(encoding="utf-8"))
             description = meta.get("description", "")
             directory = skill_file.parent.name
         elif root is not None:
             fallback = root / skill_id / "SKILL.md"
             if fallback.is_file():
-                meta = _frontmatter(fallback.read_text(encoding="utf-8", errors="replace"))
+                meta = _frontmatter(fallback.read_text(encoding="utf-8"))
                 description = meta.get("description", "")
                 directory = fallback.parent.name
         values.append(
@@ -84,7 +84,7 @@ def profile_skills(item: Any) -> list[dict[str, str]]:
         # inventory. Preserve installability while keeping the fallback visibly
         # undesignated in the machine-readable registry.
         for skill_file in sorted(root.glob("*/SKILL.md"), key=lambda path: path.parent.name.casefold()):
-            meta = _frontmatter(skill_file.read_text(encoding="utf-8", errors="replace"))
+            meta = _frontmatter(skill_file.read_text(encoding="utf-8"))
             skill_id = meta.get("name") or skill_file.parent.name
             values.append(
                 {

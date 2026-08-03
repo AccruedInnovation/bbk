@@ -17,7 +17,9 @@ import textwrap
 import tomllib
 import unittest
 from pathlib import Path
+from tests import _cli_support as m1_cli_support
 from tests._cli_support import run_cli as m1_run
+from tests._path_support import assert_exact_path_text, assert_same_path
 m1_ROOT = Path(__file__).resolve().parents[1]
 m1_BBK = m1_ROOT / 'tools' / 'bbk.py'
 m1_INSTALL = m1_ROOT / 'tools' / 'install.py'
@@ -88,7 +90,6 @@ def m1_make_test_profile(base: Path) -> Path:
 class BbkTests(unittest.TestCase):
 
     def test_agent_generation_and_counts(self):
-        m1_run([sys.executable, m1_GENERATOR, '--check'])
         manifest = json.loads((m1_ROOT / 'projections' / 'manifest.json').read_text(encoding='utf-8'))
         self.assertEqual(manifest['role_count'], 19)
         self.assertEqual(manifest['target_count'], 4)
@@ -149,7 +150,7 @@ class BbkTests(unittest.TestCase):
     def test_omp_extension_parses_and_registers(self):
         m1_run(['node', '--check', m1_ROOT / 'omp' / 'extension' / 'index.js'])
         script = m1_ROOT / 'tests' / '.omp-mock.mjs'
-        script.write_text(textwrap.dedent(f"\n            const chain = () => ({{ optional() {{ return this; }} }});\n            const z = {{\n              object: value => value,\n              string: chain,\n              boolean: chain,\n              enum: values => chain(),\n              array: value => chain(),\n            }};\n            const tools = [], commands = [], handlers = [];\n            const pi = {{\n              zod: {{ z }}, setLabel() {{}},\n              registerTool(value) {{ tools.push(value); }},\n              registerCommand(name, value) {{ commands.push([name, value]); }},\n              on(name, value) {{ handlers.push([name, value]); }},\n              sendMessage() {{}},\n            }};\n            const mod = await import({json.dumps((m1_ROOT / 'omp' / 'extension' / 'index.js').as_uri())});\n            mod.default(pi);\n            if (tools.length !== 26) throw new Error(`tools=${{tools.length}}`);\n            if (commands.length !== 27) throw new Error(`commands=${{commands.length}}`);\n            if (!handlers.some(([n]) => n === 'tool_call')) throw new Error('missing tool_call');\n            if (!handlers.some(([n]) => n === 'session_start')) throw new Error('missing session_start');\n            if (!handlers.some(([n]) => n === 'before_agent_start')) throw new Error('missing before_agent_start');\n            console.log(JSON.stringify({{tools: tools.map(x=>x.name), commands: commands.map(x=>x[0])}}));\n        "), encoding='utf-8')
+        script.write_text(textwrap.dedent(f"\n            const chain = () => ({{ optional() {{ return this; }} }});\n            const z = {{\n              object: value => value,\n              string: chain,\n              boolean: chain,\n              enum: values => chain(),\n              array: value => chain(),\n            }};\n            const tools = [], commands = [], handlers = [];\n            const pi = {{\n              zod: {{ z }}, setLabel() {{}},\n              registerTool(value) {{ tools.push(value); }},\n              registerCommand(name, value) {{ commands.push([name, value]); }},\n              on(name, value) {{ handlers.push([name, value]); }},\n              sendMessage() {{}},\n            }};\n            const mod = await import({json.dumps((m1_ROOT / 'omp' / 'extension' / 'index.js').as_uri())});\n            mod.default(pi);\n            if (tools.length !== 28) throw new Error(`tools=${{tools.length}}`);\n            if (commands.length !== 29) throw new Error(`commands=${{commands.length}}`);\n            if (!handlers.some(([n]) => n === 'tool_call')) throw new Error('missing tool_call');\n            if (!handlers.some(([n]) => n === 'session_start')) throw new Error('missing session_start');\n            if (!handlers.some(([n]) => n === 'before_agent_start')) throw new Error('missing before_agent_start');\n            console.log(JSON.stringify({{tools: tools.map(x=>x.name), commands: commands.map(x=>x[0])}}));\n        "), encoding='utf-8')
         try:
             result = m1_run(['node', script])
             value = json.loads(result.stdout)
@@ -170,7 +171,7 @@ class BbkTests(unittest.TestCase):
             env = os.environ.copy()
             env.update({'BBK_HOME': str(home), 'HOME': str(home), 'BBK_INSTALL_ROOT': str(base / 'data'), 'BBK_BIN_DIR': str(base / 'bin')})
             m1_run([sys.executable, m1_BBK, 'init', '--root', project, '--project-id', 'TEST-INSTALLED-OMP'])
-            installed, _ = m1_run_json([sys.executable, m1_INSTALL, '--json', 'install', '--scope', 'user', '--omp'], env=env)
+            installed, _ = m1_run_json([sys.executable, m1_INSTALL, '--json', 'install', '--scope', 'user', '--omp', '--no-language-profiles'], env=env)
             self.assertTrue(installed['omp'])
             extension = home / '.omp' / 'agent' / 'extensions' / 'bbk' / 'index.js'
             self.assertTrue((extension.parent / 'VERSION').is_file())
@@ -259,7 +260,10 @@ class BbkTests(unittest.TestCase):
             (root / '.bbk' / 'map.json').write_text(json.dumps(project_map), encoding='utf-8')
             value, _ = m1_run_json([sys.executable, m1_BBK, '--json', 'beads', 'plan', '--root', root])
             self.assertTrue(value['dry_run'])
-            self.assertFalse(value['write_enabled'])
+            self.assertTrue(value['enabled'])
+            self.assertTrue(value['write_enabled'])
+            self.assertTrue(value['auto_initialize'])
+            self.assertEqual(value['schema'], 'bbk.beads-plan.v2')
             self.assertEqual(len(value['operations']), 3)
 
     def test_user_install_all_targets_and_uninstall(self):
@@ -293,7 +297,7 @@ class BbkTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             project = Path(temp) / 'project'
             project.mkdir()
-            value, _ = m1_run_json([sys.executable, m1_INSTALL, '--json', 'install', '--scope', 'project', '--root', project, '--dry-run'])
+            value, _ = m1_run_json([sys.executable, m1_INSTALL, '--json', 'install', '--scope', 'project', '--root', project, '--no-language-profiles', '--dry-run'])
             self.assertTrue(value['codex'] and value['omp'] and value['claude'] and value['generic'])
             self.assertTrue(any((item['path'].endswith('.omp/extensions/bbk/bbk.py') for item in value['files'])))
             self.assertFalse((project / '.bbk-kit').exists())
@@ -302,7 +306,7 @@ class BbkTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             project = Path(temp) / 'project'
             project.mkdir()
-            installed, _ = m1_run_json([sys.executable, m1_INSTALL, '--json', 'install', '--scope', 'project', '--root', project, '--claude'])
+            installed, _ = m1_run_json([sys.executable, m1_INSTALL, '--json', 'install', '--scope', 'project', '--root', project, '--claude', '--no-language-profiles'])
             self.assertFalse(installed['codex'])
             self.assertFalse(installed['omp'])
             self.assertTrue(installed['claude'])
@@ -333,12 +337,12 @@ class BbkTests(unittest.TestCase):
             m1_run([sys.executable, m1_BBK, 'init', '--root', project, '--project-id', 'TEST-PROFILE'], env=env)
             listed, _ = m1_run_json([sys.executable, m1_BBK, '--json', 'profile', 'list', '--root', project, '--profile-dir', profile_base], env=env)
             self.assertEqual(len(listed['profiles']), 2)
-            self.assertEqual(Path(listed['profiles'][0]['root']), profile_root.resolve())
-            self.assertEqual(Path(listed['profiles'][1]['root']), ambient_profile.resolve())
+            assert_same_path(self, listed['profiles'][0]['root'], profile_root)
+            assert_same_path(self, listed['profiles'][1]['root'], ambient_profile)
             self.assertTrue(all(item['package_verification']['status'] == 'PASS' for item in listed['profiles']))
             inspected, _ = m1_run_json([sys.executable, m1_BBK, '--json', 'profile', 'inspect', '--root', project, '--profile-dir', profile_base, '--id', 'rust'], env=env)
             self.assertEqual(inspected['version'], '0.0.0-test')
-            self.assertEqual(Path(inspected['root']), profile_root.resolve())
+            assert_same_path(self, inspected['root'], profile_root)
             resolved, _ = m1_run_json([sys.executable, m1_BBK, '--json', 'profile', 'resolve', '--root', project, '--source', project, '--profile-dir', profile_base, '--id', 'rust', '--role', 'worker', '--task-profile', 'implementation', '--assurance-tier', 'routine', '--hint', 'public-api', '--path', 'src/lib.rs', '--write-lock'], env=env)
             self.assertEqual(resolved['resolution']['selected_components'][0]['id'], 'test-rust')
             lock = json.loads((project / '.bbk' / 'profile-lock.json').read_text(encoding='utf-8'))
@@ -480,6 +484,27 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
                     self.assertIn('Use only these direct child agents', body, f'{host}:{role_name}')
                 else:
                     self.assertIn('has no child-agent authority', body, f'{host}:{role_name}')
+
+    def test_beads_is_on_demand_for_exact_record_owners(self):
+        expected = {
+            'bbk_root_wayfinder',
+            'bbk_territory_wayfinder',
+            'bbk_planning_wayfinder',
+            'bbk_phase_wayfinder',
+            'bbk_root_orchestrator',
+            'bbk_territory_orchestrator',
+            'bbk_worker_orchestrator',
+            'bbk_questioning_wayfinder',
+        }
+        actual = {
+            name for name, role in self.roles.items()
+            if 'bbk-beads' in role.get('skills', [])
+        }
+        self.assertEqual(actual, expected)
+        for name, role in self.roles.items():
+            self.assertNotIn('bbk-beads', role.get('mandatory_skills', []), name)
+            mentions = [item for item in role.get('responsibilities', []) if '`bbk-beads`' in item]
+            self.assertEqual(len(mentions), 1 if name in expected else 0, name)
 
     def test_omp_spawns_and_prompt_triggers_match_the_canonical_contract(self):
         for role_name, role in self.roles.items():
@@ -784,10 +809,15 @@ import subprocess as a118_subprocess
 import sys as a118_sys
 import tempfile as a118_tempfile
 import unittest as a118_unittest
+from unittest import mock as a118_mock
+from argparse import Namespace as A118Namespace
 from pathlib import Path as A118Path
 
 A118_ROOT = A118Path(__file__).resolve().parents[1]
 A118_BBK = A118_ROOT / "tools" / "bbk.py"
+if str(A118_ROOT / "tools") not in a118_sys.path:
+    a118_sys.path.insert(0, str(A118_ROOT / "tools"))
+import bbk as a118_bbk
 
 
 class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
@@ -919,6 +949,156 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
             self.assertEqual(listed["count"], 1)
             self.assertEqual(listed["questions"][0]["id"], "Q-ARCH")
 
+    def test_beads_is_default_idempotent_hierarchical_and_drift_safe(self) -> None:
+        with a118_tempfile.TemporaryDirectory() as raw:
+            root = A118Path(raw) / "project"
+            self.run_cli("init", "--root", str(root), "--title", "Beads normal operation", "--project-id", "BBK-BEADS-NORMAL")
+
+            config = a118_json.loads((root / ".bbk" / "config.json").read_text(encoding="utf-8"))
+            self.assertEqual(config["beads"], {
+                "enabled": True,
+                "write_enabled": True,
+                "workspace": ".",
+                "auto_initialize": True,
+            })
+            mapping_path = root / ".bbk" / "mappings" / "beads.json"
+            initial_mapping = a118_json.loads(mapping_path.read_text(encoding="utf-8"))
+            self.assertTrue(initial_mapping["enabled"])
+            self.assertTrue(initial_mapping["write_enabled"])
+            self.assertTrue(initial_mapping["auto_initialize"])
+            self.assertEqual(initial_mapping["workspace"], ".")
+
+            project_map_path = root / ".bbk" / "map.json"
+            project_map = a118_json.loads(project_map_path.read_text(encoding="utf-8"))
+            project_map.update({
+                "territories": [{"id": "T-1", "name": "Runtime territory"}],
+                "decisions": [{"id": "D-1", "title": "Select runtime contract", "territory_id": "T-1"}],
+                "questions": [{"id": "Q-1", "root_decision": "Confirm runtime boundary", "territory_id": "T-1"}],
+                "capability_increments": [{"id": "C-1", "name": "Compile runtime", "territory_id": "T-1"}],
+                "phases": [{"id": "P-1", "name": "Implement runtime", "capability_increment_id": "C-1"}],
+            })
+            project_map_path.write_text(a118_json.dumps(project_map, indent=2) + "\n", encoding="utf-8")
+            work_path = root / ".bbk" / "work.json"
+            work = a118_json.loads(work_path.read_text(encoding="utf-8"))
+            work["work_units"] = [{"id": "WU-1", "purpose": "Implement the runtime adapter", "phase_id": "P-1"}]
+            work_path.write_text(a118_json.dumps(work, indent=2) + "\n", encoding="utf-8")
+
+            def args(*, apply: bool = False, kinds: list[str] | None = None) -> A118Namespace:
+                return A118Namespace(
+                    root=str(root), work_unit=None, kind=kinds or [], id=[], output=None,
+                    apply=apply, initialize=False, timeout=10.0,
+                )
+
+            with a118_mock.patch.object(a118_bbk.shutil, "which", return_value=None):
+                dry = a118_bbk.cmd_beads_plan(args())
+            self.assertTrue(dry["dry_run"])
+            self.assertEqual(dry["capability"]["status"], "NOT_INSTALLED")
+            self.assertEqual([item["operation"] for item in dry["operations"]], ["create"] * 7)
+            self.assertTrue(any("canonical BBK work may continue" in warning for warning in dry["warnings"]))
+
+            state: dict[str, object] = {"next": 1, "issues": {}}
+            calls: list[list[str]] = []
+
+            def fake_run(command, cwd, timeout=None, **_kwargs):
+                argv = [str(value) for value in command]
+                calls.append(argv)
+                bd_args = argv[1:]
+                stdout = ""
+                returncode = 0
+                issues = state["issues"]
+                assert isinstance(issues, dict)
+                if bd_args and bd_args[0] == "init":
+                    (A118Path(cwd) / ".beads").mkdir(exist_ok=True)
+                    stdout = a118_json.dumps({"status": "initialized"})
+                elif bd_args and bd_args[0] == "create":
+                    bead_id = f"bd-{state['next']}"
+                    state["next"] = int(state["next"]) + 1
+                    issue = {
+                        "id": bead_id,
+                        "title": bd_args[1],
+                        "description": bd_args[bd_args.index("--description") + 1],
+                        "issue_type": bd_args[bd_args.index("-t") + 1],
+                        "parent_id": bd_args[bd_args.index("--parent") + 1] if "--parent" in bd_args else None,
+                    }
+                    issues[bead_id] = issue
+                    stdout = a118_json.dumps(issue)
+                elif bd_args and bd_args[0] == "show":
+                    issue = issues.get(bd_args[1])
+                    if issue is None:
+                        returncode = 2
+                    else:
+                        stdout = a118_json.dumps(issue)
+                elif bd_args and bd_args[0] == "update":
+                    issue = issues.get(bd_args[1])
+                    if not isinstance(issue, dict):
+                        returncode = 2
+                    else:
+                        issue["title"] = bd_args[bd_args.index("--title") + 1]
+                        issue["description"] = bd_args[bd_args.index("--description") + 1]
+                        stdout = a118_json.dumps(issue)
+                else:
+                    returncode = 3
+                return {
+                    "argv": argv,
+                    "cwd": str(cwd),
+                    "returncode": returncode,
+                    "duration_seconds": 0.001,
+                    "timed_out": False,
+                    "stdout": stdout,
+                    "stderr": "" if returncode == 0 else "fake bd error",
+                }
+
+            patches = (
+                a118_mock.patch.object(a118_bbk.shutil, "which", return_value="/fake/bd"),
+                a118_mock.patch.object(a118_bbk, "run", side_effect=fake_run),
+            )
+            with patches[0], patches[1]:
+                applied = a118_bbk.cmd_beads_plan(args(apply=True))
+                self.assertEqual(applied["status"], "PASS")
+                self.assertTrue(applied["applied"])
+                self.assertTrue(applied["capability"]["initialized"])
+                self.assertEqual([item["operation"] for item in applied["applied_operations"]], ["create"] * 7)
+                self.assertIn(["/fake/bd", "init", "--quiet", "--skip-agents"], calls)
+
+                mapping = a118_json.loads(mapping_path.read_text(encoding="utf-8"))
+                bindings = {item["bbk_id"]: item for item in mapping["objects"]}
+                self.assertEqual(set(bindings), {"BBK-BEADS-NORMAL", "T-1", "D-1", "Q-1", "C-1", "P-1", "WU-1"})
+                self.assertIsNone(bindings["BBK-BEADS-NORMAL"]["parent_bead_id"])
+                self.assertEqual(bindings["T-1"]["parent_bead_id"], bindings["BBK-BEADS-NORMAL"]["bead_id"])
+                self.assertEqual(bindings["C-1"]["parent_bead_id"], bindings["T-1"]["bead_id"])
+                self.assertEqual(bindings["P-1"]["parent_bead_id"], bindings["C-1"]["bead_id"])
+                self.assertEqual(bindings["WU-1"]["parent_bead_id"], bindings["P-1"]["bead_id"])
+
+                repeated = a118_bbk.cmd_beads_plan(args(apply=True))
+                self.assertEqual(repeated["status"], "PASS")
+                self.assertEqual([item["operation"] for item in repeated["applied_operations"]], ["inspect"] * 7)
+                self.assertEqual(state["next"], 8)
+
+                work = a118_json.loads(work_path.read_text(encoding="utf-8"))
+                work["work_units"][0]["purpose"] = "Implement and verify the runtime adapter"
+                work_path.write_text(a118_json.dumps(work, indent=2) + "\n", encoding="utf-8")
+                updated = a118_bbk.cmd_beads_plan(args(apply=True, kinds=["work_unit"]))
+                self.assertEqual(updated["status"], "PASS")
+                self.assertEqual([item["operation"] for item in updated["applied_operations"]], ["update"])
+                self.assertEqual(updated["stale_bindings"], [])
+
+                status = a118_bbk.cmd_status(A118Namespace(root=str(root)))
+                self.assertEqual(status["beads"]["binding_count"], 7)
+                self.assertTrue(status["beads"]["enabled"])
+                self.assertTrue(status["beads"]["write_enabled"])
+                self.assertTrue(status["beads"]["initialized"])
+
+                mapping = a118_json.loads(mapping_path.read_text(encoding="utf-8"))
+                work_binding = next(item for item in mapping["objects"] if item["bbk_id"] == "WU-1")
+                issue = state["issues"][work_binding["bead_id"]]
+                assert isinstance(issue, dict)
+                issue["title"] = "Direct tracker edit"
+                drift = a118_bbk.cmd_beads_plan(args(apply=True, kinds=["work_unit"]))
+                self.assertEqual(drift["status"], "DRIFT")
+                self.assertFalse(drift["applied"])
+                self.assertEqual(drift["drift"][0]["bbk_id"], "WU-1")
+                self.assertEqual(issue["title"], "Direct tracker edit")
+
     def test_durable_handoff_is_lossless_and_beads_projection_is_compact(self) -> None:
         with a118_tempfile.TemporaryDirectory() as raw:
             root = A118Path(raw)
@@ -949,11 +1129,60 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
             listed = self.run_cli("handoff", "list", "--root", str(root), "--work-unit", "WU-HANDOFF", "--latest")
             self.assertEqual(listed["count"], 1)
             self.assertEqual(listed["latest"]["sha256"], created["handoff"]["sha256"])
-            self.assertEqual(listed["latest"]["path"], created["handoff"]["path"])
+            assert_exact_path_text(self, listed["latest"]["path"], created["handoff"]["path"])
             payload.write_text("tampered\n", encoding="utf-8")
             failed = self.run_cli("handoff", "verify", str(handoff), "--root", str(root), check=False)
             self.assertFalse(failed["valid"])
             self.assertTrue(any("mismatch" in error for error in failed["errors"]))
+
+    def test_beads_handoff_targets_exact_mapped_owner_record(self) -> None:
+        with a118_tempfile.TemporaryDirectory() as raw:
+            root = A118Path(raw)
+            self.run_cli("init", "--root", str(root), "--title", "Owned execution target", "--project-id", "BBK-TARGET")
+            mapping_path = root / ".bbk" / "mappings" / "beads.json"
+            mapping = a118_json.loads(mapping_path.read_text(encoding="utf-8"))
+            mapping["objects"] = [
+                {"bbk_id": "BBK-TARGET", "bead_id": "bd-project"},
+                {"bbk_id": "T-EXEC", "bead_id": "bd-territory"},
+                {"bbk_id": "WU-EXEC", "bead_id": "bd-work"},
+            ]
+            mapping_path.write_text(a118_json.dumps(mapping, indent=2) + "\n", encoding="utf-8")
+            created = self.run_cli(
+                "handoff", "create", "--root", str(root), "--work-unit", "WU-EXEC",
+                "--role", "bbk_territory_orchestrator", "--subject-kind", "territory",
+                "--subject-id", "T-EXEC", "--disposition", "PARTIAL",
+                "--summary", "Territory execution state advanced.",
+                "--next-action", "Continue the next admitted territory cohort.",
+            )
+            handoff = root / created["handoff"]["path"]
+            plan = self.run_cli(
+                "beads", "handoff-plan", "--root", str(root), "--handoff", str(handoff),
+                "--target-bbk-id", "T-EXEC",
+            )
+            self.assertEqual(plan["bead_id"], "bd-territory")
+            self.assertEqual(plan["target"], {
+                "bbk_id": "T-EXEC",
+                "bead_id": "bd-territory",
+                "resolution": "MAPPED",
+                "subject_kind": "territory",
+                "subject_id": "T-EXEC",
+                "producer_role": "bbk_territory_orchestrator",
+            })
+            self.assertIn("target=T-EXEC", plan["note"])
+            self.assertIn("subject=territory:T-EXEC", plan["note"])
+            self.assertIn("producer=bbk_territory_orchestrator", plan["note"])
+            mismatch = self.run_cli(
+                "beads", "handoff-plan", "--root", str(root), "--handoff", str(handoff),
+                "--target-bbk-id", "T-EXEC", "--bead", "bd-foreign", check=False,
+            )
+            self.assertEqual(mismatch["status"], "ERROR")
+            self.assertIn("does not match", mismatch["error"])
+            missing = self.run_cli(
+                "beads", "handoff-plan", "--root", str(root), "--handoff", str(handoff),
+                "--target-bbk-id", "T-MISSING", check=False,
+            )
+            self.assertEqual(missing["status"], "ERROR")
+            self.assertIn("project that canonical record", missing["error"])
 
     @a118_unittest.skipIf(a118_os.name == "nt", "mock POSIX bd executable is covered by Windows-safe dry-run tests")
     def test_beads_handoff_apply_is_explicit_compact_and_write_gated(self) -> None:
@@ -969,13 +1198,16 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
                 "--next-action", "Validate the exact result.",
             )
             handoff = root / created["handoff"]["path"]
+            mapping_path = root / ".bbk" / "mappings" / "beads.json"
+            mapping = a118_json.loads(mapping_path.read_text(encoding="utf-8"))
+            mapping["write_enabled"] = False
+            mapping_path.write_text(a118_json.dumps(mapping, indent=2) + "\n", encoding="utf-8")
             blocked = self.run_cli(
                 "beads", "handoff-plan", "--root", str(root), "--handoff", str(handoff),
                 "--bead", "bd-apply", "--apply", check=False,
             )
             self.assertEqual(blocked["status"], "ERROR")
-            mapping_path = root / ".bbk" / "mappings" / "beads.json"
-            mapping = a118_json.loads(mapping_path.read_text(encoding="utf-8"))
+            self.assertIn("write_enabled=true", blocked["error"])
             mapping.update({"enabled": True, "write_enabled": True, "workspace": str(root)})
             mapping_path.write_text(a118_json.dumps(mapping, indent=2) + "\n", encoding="utf-8")
             bindir = A118Path(raw) / "bin"
@@ -984,8 +1216,12 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
             executable = bindir / "bd"
             executable.write_text(
                 "#!/usr/bin/env python3\n"
-                "import os, pathlib, sys\n"
-                "pathlib.Path(os.environ['BBK_TEST_BD_LOG']).write_text('\\n'.join(sys.argv[1:]), encoding='utf-8')\n",
+                "import json, os, pathlib, sys\n"
+                "path = pathlib.Path(os.environ['BBK_TEST_BD_LOG'])\n"
+                "with path.open('a', encoding='utf-8') as stream:\n"
+                "    stream.write('---\\n' + '\\n'.join(sys.argv[1:]) + '\\n')\n"
+                "if len(sys.argv) > 2 and sys.argv[1] == 'show':\n"
+                "    print(json.dumps({'id': sys.argv[2], 'title': 'Bound work unit', 'description': '', 'issue_type': 'task'}))\n",
                 encoding="utf-8",
             )
             executable.chmod(0o755)
@@ -998,14 +1234,20 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
             self.assertFalse(applied["dry_run"])
             recorded = log.read_text(encoding="utf-8")
             self.assertIn("comments\nadd\nbd-apply", recorded)
+            self.assertIn("show\nbd-apply\n--json", recorded)
             self.assertIn(created["handoff"]["sha256"], recorded)
             self.assertLess(len(applied["note"].encode("utf-8")), 4096)
 
     def test_gate_output_is_spooled_losslessly_and_reuse_is_content_bound(self) -> None:
-        with a118_tempfile.TemporaryDirectory() as raw:
+        # Exercise the production spool/reuse path without writing multiple
+        # megabytes on every developer run. The capture ceiling is a process
+        # constant, so the in-process BBK CLI can use a bounded test ceiling.
+        with a118_tempfile.TemporaryDirectory() as raw, a118_mock.patch.object(
+            m1_cli_support.bbk_tool, "MAX_CAPTURE", 64 * 1024
+        ):
             root = A118Path(raw)
             self.run_cli("init", "--root", str(root), "--title", "Gate output", "--project-id", "BBK-GATE-OUTPUT")
-            payload_bytes = (2 * 1024 * 1024) + 257
+            payload_bytes = (64 * 1024) + 257
             command = (
                 "import sys; "
                 f"sys.stdout.buffer.write(b'A'*{payload_bytes} + b'BBK-TAIL'); "
@@ -1127,26 +1369,13 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
         self.assertIn('"bbk_cli"', registry_source)
         self.assertIn("Exact fallback when `bbk` is not on `PATH`", registry_source)
 
-    def test_public_test_suite_is_consolidated(self) -> None:
-        paths = sorted((A118_ROOT / "tests").glob("test*.py"))
-        self.assertEqual([path.name for path in paths], [
-            "test_assurance_state.py",
-            "test_contract_package_v1.py",
-            "test_core_contracts.py",
-            "test_installation_portability.py",
-            "test_omp_runtime.py",
-            "test_prompt_module_package_v1.py",
-            "test_role_package_v4.py",
-            "test_system.py",
-        ])
-        self.assertFalse(any("alpha" in path.name for path in paths))
 
     def test_method_and_schema_surfaces_include_new_contracts(self) -> None:
         methods = a118_json.loads((A118_ROOT / "spec" / "method-content.json").read_text(encoding="utf-8"))
         self.assertEqual(len(methods["skills"]), 39)
         self.assertEqual(len(methods["references"]), 23)
         prompt_catalog = a118_json.loads((A118_ROOT / "spec" / "prompt-modules" / "catalog.json").read_text(encoding="utf-8"))
-        self.assertEqual(len(prompt_catalog["module_entries"]), 21)
+        self.assertEqual(len(prompt_catalog["module_entries"]), 22)
         for name in ("bbk-wayfind", "bbk-grill", "bbk-handoff", "bbk-work-unit-execution", "bbk-assertion-validation"):
             self.assertIn(name, methods["skills"])
         self.assertIn("handoff.md", methods["references"])
@@ -1275,7 +1504,7 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
         top = (A118_ROOT / "RELEASE-NOTES.md").read_text(encoding="utf-8")
         index = (A118_ROOT / "docs" / "README.md").read_text(encoding="utf-8")
         self.assertFalse((A118_ROOT / "docs" / "RELEASE-NOTES.md").exists())
-        for expected in ("Repository-native source", "14 current", "pre-public history", "No `.bbk/` project-record migration"):
+        for expected in ("Repository-native source", "15 current", "pre-public history", "No `.bbk/` project-record migration"):
             self.assertIn(expected, top)
         self.assertIn("[`RELEASE-NOTES.md`](../RELEASE-NOTES.md)", index)
 
@@ -1313,3 +1542,5 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
         ):
             self.assertIn(expected, handoff)
 
+# Deterministic fast/standard/release selection used by tools/run_tests.py.
+from tests._test_profiles import load_profiled_tests as load_tests

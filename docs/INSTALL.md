@@ -1,4 +1,4 @@
-# Install and qualify BBK alpha.13
+# Install and qualify BBK alpha.13.4
 
 Alpha.13 is distributed as one archive containing the BBK core and five independently manifested language profiles: CODESYS `0.1.0-alpha.4`, plus Go, Python, Rust, and TypeScript/JavaScript `0.1.0-alpha.3`. It integrates the canonical split-role v4 package, exact role-return/execution contracts, reusable prompt modules, projection manifest v8, and the reviewed per-role model-routing defaults. It preserves bounded verification, harness-scoped updates, the PowerShell-visible default-Yes prompt, OMP controller/activity/`ask` behavior, and installs all five profiles by default. Use a clean extraction for each release.
 
@@ -23,7 +23,7 @@ This command:
 
 1. verifies the immutable core package before executing package code;
 2. checks method, role, model-routing, and generated-agent projections;
-3. compiles Python, parses JSON, validates semantic/schema fixtures, runs all unittest modules in deterministic order, and validates OMP JavaScript;
+3. compiles Python, parses JSON, validates semantic/schema fixtures, runs the standard product/integration/platform test profile, and validates OMP JavaScript;
 4. verifies the package again after testing;
 5. prepares and independently verifies all five bundled language-profile packages;
 6. computes the complete core-plus-profile destination plan;
@@ -50,49 +50,41 @@ If no harness flag is supplied, Codex, OMP, Claude Code, and generic targets are
 
 ## Verification only
 
-Run the complete ordered sequence:
-
-```bash
-python tools/run_tests.py --all --require-node
-```
-
-Equivalent commands:
+Routine verification uses the standard profile:
 
 ```bash
 python tools/setup.py --test --require-node
 python tools/bootstrap.py --test --require-node
-python tools/install.py verify --require-node
+python tools/install.py verify --verification-profile standard --require-node
 ```
 
-The ordered sequence is:
-
-1. strict package-manifest trust gate;
-2. method-content projection check;
-3. role-specification projection check;
-4. model-routing validation;
-5. agent-projection check;
-6. non-mutating Python compilation and JSON parsing;
-7. alpha.7 semantic and schema fixtures;
-8. alpha.8 typed-profile fixtures;
-9. every `test*.py` module, scheduled concurrently by default and summarized in deterministic filename order;
-10. OMP JavaScript syntax validation;
-11. strict post-test package-manifest check.
-
-`tools/run_tests.py` merges unittest stderr into stdout for PowerShell 5.1 compatibility and always ends with a consolidated summary. Each suite is labelled `[current/total]`, reports elapsed time on completion, and emits a `still running` heartbeat after 15 quiet seconds. Parallel heartbeats include the latest visible unittest line so a stalled run identifies the current test. Suite children have closed stdin, nested behavior-test subprocesses are bounded, and each module has a 300-second hard timeout by default (`--suite-timeout 0` disables it). On failure, test labels and terminal causes are repeated at the end. Native release qualification additionally uses `python tools/windows_compat.py`; see `docs/DEVELOPMENT.md`.
-
-To run all unittest modules (up to four independent module processes concurrently by default):
+Use the fast profile during active contract/prompt work:
 
 ```bash
-python tools/run_tests.py -v
+python tools/setup.py --test-fast
+python tools/verify_all.py --profile fast
 ```
 
-For a developer smoke check, use:
+Release authors must use the exhaustive profile:
 
 ```bash
-python tools/verify_all.py --profile quick --require-node
+python tools/setup.py --release-test --require-node
+python tools/verify_all.py --profile release --require-node
 ```
 
-For ordinary selective successor updates, prefer `python tools/setup.py --test-and-update-omp --scope user` or `--test-and-update-codex`; those commands retain package trust and generated-source checks but do not rerun unrelated harness suites. Full verification remains the release/CI path.
+The standard profile includes all product, integration, installer, Git, Node/OMP, Beads, routing, platform, and user-facing schema-command tests. Release adds test-runner self-tests and duplicate optional external Draft 2020-12 package cross-checks. `tools/build_release.py` selects release explicitly.
+
+The ordered profile runs the applicable strict package-manifest trust gate, canonical projection and routing checks, source sanity, semantic/schema fixtures, selected unittests, OMP JavaScript syntax, and post-test package verification. Safe deterministic Python commands execute in-process after trust; package verification, Node, Git, interpreter/process-tree, stdin/encoding, installed-copy, and unittest-shard boundaries remain real processes.
+
+`auto` uses up to six workers on high-core hosts and four on medium hosts; Windows groups modules into bounded pooled processes while POSIX retains module-isolated parallelism. Retained module timings are used for sharding. Test reports and the duration cache are external to the package (`%LOCALAPPDATA%\BBK\test-runs` on Windows, `~/.cache/bbk/test-runs` on POSIX); use `BBK_TEST_CACHE_DIR` to isolate a benchmark. Direct diagnostics include:
+
+```bash
+python tools/run_tests.py --profile standard -v
+python tools/run_tests.py --profile release -v --mode pooled --jobs 6
+python tools/run_tests.py --profile release -v --mode isolated --jobs 1
+```
+
+For ordinary selective successor updates, prefer `python tools/setup.py --test-and-update-omp --scope user` or `--test-and-update-codex`; those commands retain package trust and generated-source checks without unrelated harness suites.
 
 ## Inspect the full plan
 
@@ -316,7 +308,7 @@ User scope uses the platform data root. On Windows the default is:
   effective-language-profiles.json
   install-manifest.json
   bin\
-  versions\0.1.0-alpha.13.1\
+  versions\0.1.0-alpha.13.5\
   profiles\<profile-id>\0.1.0-alpha.3\
   profiles\<profile-id>\current.json
 ```
@@ -335,18 +327,29 @@ python tools/install.py install --scope user --omp --codex --claude \
   --model-routing /path/to/model-routing.json --dry-run
 ```
 
-The external file's `package_version` must be `0.1.0-alpha.13.1`. The installer validates exact coverage of all 19 roles before writing and records the effective policy and digest.
+The external file's `package_version` must be `0.1.0-alpha.13.5`. The installer validates exact coverage of all 19 roles before writing and records the effective policy and digest.
 
 An OMP installation also writes `effective-omp-model-routing.json` and exposes an interactive runtime menu:
 
 ```text
 /bbk:models
-/bbk:models profile testing-flash
-/bbk:models profile deepseek-economy
 /bbk:models status
+/bbk:models project profile testing-flash
+/bbk:models user profile default
+/bbk:models project status
+/bbk:models user status
 ```
 
-The menu changes the installed BBK OMP agent frontmatter for future spawns and reconciles the changed digests into `install-manifest.json`. It refuses locally divergent or unowned agent files. The compact reusable template is `templates/omp-model-routing-profile.json`. OMP `task.agentModelOverrides` and higher-precedence project agent definitions remain authoritative over agent frontmatter. See `MODEL-ROUTING.md`.
+The default `auto` target resolves the nearest valid project installation and otherwise the loaded user installation. Use a project-scoped OMP install in each repository that needs an independent runtime profile:
+
+```powershell
+python tools\install.py install --scope project --root D:\Projects\ProjectA --omp
+python tools\install.py install --scope project --root D:\Projects\ProjectB --omp
+```
+
+The menu changes the selected installation's BBK OMP agent frontmatter for future spawns and reconciles changed digests into that installation's `install-manifest.json`. An expected but invalid project binding fails closed instead of falling back to the user installation. User-scope mutations require interactive confirmation because they are shared across projects. The menu refuses locally divergent or unowned agent files. The compact reusable template is `templates/omp-model-routing-profile.json`. OMP `task.agentModelOverrides` and higher-precedence project agent definitions remain authoritative over agent frontmatter. See `MODEL-ROUTING.md`.
+
+Newly initialized BBK projects enable writable Beads coordination by default. The external `bd` executable is not bundled; run `bbk beads plan` before `bbk beads plan --apply`. Existing projects retain their current mapping until deliberately migrated.
 
 ## Status and uninstall
 
@@ -357,9 +360,17 @@ python tools/install.py uninstall --scope user
 
 Status compares content digests and, on POSIX, expected executable modes. Uninstall removes only manifest-owned files that remain unchanged. Locally modified bytes or executable modes are preserved and reported unless `--force` is explicit.
 
-## Upgrade to alpha.13
+## Reusing unchanged installed profile files
 
-Do not overlay one extracted release package directory onto another. Extract alpha.13 into a new directory and choose the narrowest appropriate update.
+Every selected bundled or external profile package is prepared and authenticated before the installer mutates a destination. Alpha.13.4 then compares the verified successor package with the existing unified manifest. A profile is reused only when its ID, independently versioned package version, package-root SHA-256, layout version, selected harness set, every owned file digest, and applicable executable mode are exact.
+
+In reconciliation mode, a fully current profile bypasses the profile-copy operation and is adopted into the new manifest. During explicit clean replacement, any byte/mode-identical successor-owned file is retained in place rather than deleted and recopied. Install results report `language_profile_reuse`, per-profile `install_action`, and reused file counts.
+
+This is not a version-label shortcut. Missing, changed, mode-divergent, or locally modified files follow the ordinary refusal, backup, repair, and `--force` rules. Profile packages are never trusted solely because the profile version string has not changed.
+
+## Upgrade to alpha.13.4
+
+Do not overlay one extracted release package directory onto another. Extract alpha.13.4 into a new directory and choose the narrowest appropriate update. See `UPGRADING.md` for the standard/release verification split, duration-aware pooled testing, and authenticated reuse of unchanged installed profile files.
 
 To refresh only OMP while preserving Codex:
 

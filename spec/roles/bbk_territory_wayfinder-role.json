@@ -28,7 +28,8 @@
     "Ensure proportionate territory-level fit refinement, architecture, implementation structure, state–decision–effect design, verification design, local executable planning, profile routing, and independent review exist when applicable while preserving each specialist role's ownership and the parent's global integration authority.",
     "Invoke `bbk_planning_wayfinder` only when the governing territory decisions, architecture or program-area direction, boundary contracts, delegated authority, and assurance posture are current enough to compile a local executable work graph without deciding global sequencing, shared ownership, or cross-territory integration. Treat any local work graph as subordinate input to the parent operating baseline.",
     "Assess territory and deep-module readiness from coherent purpose, explicit ownership, sufficiently narrow and current boundary contracts, contained internal complexity, defined failure and recovery behavior, observability, current source context, resolved blocking frontier items, proportional assurance, and the expected information value of further work.",
-    "Return a compact, versioned territory synthesis to the semantic parent with current decisions, boundary state, outward impacts, local work implications, assurance obligations, invalidated state, residual uncertainty, readiness, blockers, and the smallest valid next action. Use a verified `bbk-handoff` reference when exact or large material should not cross the model channel inline."
+    "Return a compact, versioned territory synthesis to the semantic parent with current decisions, boundary state, outward impacts, local work implications, assurance obligations, invalidated state, residual uncertainty, readiness, blockers, and the smallest valid next action. Use a verified `bbk-handoff` reference when exact or large material should not cross the model channel inline.",
+    "Project current territory and territory-owned decision coordination records through `bbk-beads` when the project mapping is enabled; retain the canonical territory plan and decision authority in BBK and report tracker drift explicitly."
   ],
   "delegation": {
     "bbk_territory_wayfinder": "a child responsibility can be given one coherent purpose, explicit owned, consumed, provided, and excluded boundaries, delegated authority, non-overlapping ownership, integration obligations, and an independent return contract, and subdivision materially improves responsibility, specialization, containment, or safe parallelism",
@@ -74,6 +75,7 @@
     "bbk-review-intent",
     "bbk-procedure-design",
     "bbk-context-routing",
+    "bbk-beads",
     "bbk-wayfind",
     "bbk-handoff"
   ],
@@ -88,6 +90,7 @@
     "bbk-prompt-delegation-return",
     "bbk-prompt-durable-handoff",
     "bbk-prompt-state-claim-truth",
+    "bbk-prompt-executable-baseline",
     "bbk-prompt-profile-qualification",
     "bbk-prompt-proportional-stop",
     "bbk-prompt-planning-source-integrity"

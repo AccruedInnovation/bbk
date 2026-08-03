@@ -23,6 +23,14 @@
     {
       "id": "DELEGATION.PARENT_INTEGRATION",
       "text": "The parent owns acceptance, reconciliation, invalidation, retry or replacement, and integration of child work. Return nonconforming work to its owner rather than silently rewriting it."
+    },
+    {
+      "id": "DELEGATION.INTERRUPT_SAFE_LIFETIME",
+      "text": "A steering message, user response, IRC wake, or other parent-turn interruption is not by itself authority to cancel independently useful child work. Use a host-proven detached or non-cascading child lifetime when useful work may continue across the parent wake. When the host exposes only a cancellation-sensitive blocking wait, sequence the callback and child dispatch safely instead. Cancel a child or cohort only through an explicit request, declared parent-abort policy, session or process termination, or unrecoverable runtime failure."
+    },
+    {
+      "id": "DELEGATION.CANCELLED_PARTIAL",
+      "text": "Bind every physical child attempt to a stable attempt identity. A cancelled, interrupted, failed, or incomplete attempt remains provisional even when it wrote plausible files: file existence is not a complete specialist return. A successor must record whether it resumed, adopted and repaired, replaced, or discarded the partial attempt, and the parent may claim specialist completion only from the successful validated return and its attempt identity."
     }
   ]
 }

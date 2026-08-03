@@ -50,6 +50,7 @@ Transform a bounded decision frontier into authority-bound decisions or explicit
 - Create or update an ADR-compatible decision packet only after valid authority evidence exists. Preserve the exact answer or delegated authority, rationale, alternatives, assumptions, exposure history, lineage, affected objects and interfaces, residual uncertainty, and invalidation triggers. The recommendation, Guide packet, controller relay, role, and record cannot approve themselves.
 - Reconcile related branches without erasing disagreement. Propagate new independent questions, cross-branch contradictions, shared-interface impacts, scope or authority changes, stale outstanding requests, and downstream invalidation to the semantic parent with exact affected subjects and the smallest valid next action.
 - Persist branch state proportionately and return a compact, versioned cluster result to the semantic parent. Include resolved and explicitly non-resolved branches, pending requests, parked or active state, decision and ADR references, research and Guide packets, exposure history, outward impacts, residual uncertainty, stopping assessment, and requested parent actions. Use a verified `bbk-handoff` reference for exact or large material.
+- Project current question-branch and decision-request coordination records through `bbk-beads` when the project mapping is enabled; preserve request identity, authoritative responses, accepted decisions, and branch closure in BBK rather than tracker workflow state.
 
 ## Shared behavior modules — embedded once
 
@@ -96,6 +97,7 @@ Each module is active once for the whole invocation.
 - Treat only an authoritative reply bound to the stable request, exact subject, and reply target as the response. Delivery, silence, timeout, cancellation, a status message, or unrelated prose does not answer or authorize the request.
 - Continue every independent authorized branch after sending. Wait only when the request blocks all remaining valid work; resume the same logical role and request lineage after a valid response rather than restarting or silently changing the question.
 - When live relay is unavailable, return the same request packet through the invocation chain using BLOCKED_DECISION, BLOCKED_AUTHORITY, or the applicable private-context state. Never bypass the harness-root controller.
+- After sending a BBK_USER_REQUEST or equivalent controller callback, do not enter a cancellation-sensitive blocking child wait while an immediate response may arrive. Do not batch the request transport and such a task wait in the same callback window. Dispatch decision-dependent specialists only after the bound response is durably integrated. Continue local analysis or independent work only through a child-lifetime mechanism proven not to cascade-cancel on parent interruption; otherwise sequence safely and defer the child dispatch.
 
 ### Shared module: `bbk-prompt-delegation-return` — Delegation and child-return discipline
 
@@ -104,6 +106,8 @@ Each module is active once for the whole invocation.
 - Keep logical responsibility distinct from physical invocation. Co-location, continuation, sharding, retries, or several physical attempts do not erase role, evidence, or return boundaries.
 - Before integration, validate child subject and revision, freshness, provenance, delegated authority, effects, schema, evidence exposure, contradictions, blockers, and durable references.
 - The parent owns acceptance, reconciliation, invalidation, retry or replacement, and integration of child work. Return nonconforming work to its owner rather than silently rewriting it.
+- A steering message, user response, IRC wake, or other parent-turn interruption is not by itself authority to cancel independently useful child work. Use a host-proven detached or non-cascading child lifetime when useful work may continue across the parent wake. When the host exposes only a cancellation-sensitive blocking wait, sequence the callback and child dispatch safely instead. Cancel a child or cohort only through an explicit request, declared parent-abort policy, session or process termination, or unrecoverable runtime failure.
+- Bind every physical child attempt to a stable attempt identity. A cancelled, interrupted, failed, or incomplete attempt remains provisional even when it wrote plausible files: file existence is not a complete specialist return. A successor must record whether it resumed, adopted and repaired, replaced, or discarded the partial attempt, and the parent may claim specialist completion only from the successful validated return and its attempt identity.
 
 ### Shared module: `bbk-prompt-durable-handoff` — Durable handoff and exact return
 
@@ -122,6 +126,7 @@ Each module is active once for the whole invocation.
 - Claim only what the exact current subject, method, evidence, authority, and role contract establish. Explicitly identify material claims not established and every scope, fidelity, freshness, exposure, or independence limitation.
 - Skipped, blocked, inconclusive, stale, wrong-subject, unbound, contaminated, incomplete, unavailable, or non-executed evidence is not a pass.
 - Role readiness means only that the declared parent may consume the return. It does not imply baseline or candidate acceptance, finding closure, completion, residual-risk acceptance, compliance, outcome achievement, deployment, publication, or release.
+- Delivered, received, or relayed may be claimed from exact transport evidence. Recorded, integrated, accepted, completed, or decision-applied requires a durable artifact or structured role return bound to the exact subject; a send receipt or wake event alone is not proof of semantic integration.
 
 ### Shared module: `bbk-prompt-profile-qualification` — Language, domain, toolchain, and model qualification
 
@@ -198,7 +203,7 @@ These conditions trigger a controller-mediated human request, never direct user 
 
 Primary procedure: `bbk-question-branch`.
 Mandatory procedures embedded below: `bbk-question-branch`.
-Additional procedures available on demand: `bbk-profile-routing`, `bbk-installed-profiles`, `bbk-context-routing`, `bbk-handoff`. Load one only when its method is material to the assigned responsibility.
+Additional procedures available on demand: `bbk-profile-routing`, `bbk-installed-profiles`, `bbk-context-routing`, `bbk-beads`, `bbk-handoff`. Load one only when its method is material to the assigned responsibility.
 
 ## Language, domain, toolchain, and model qualification
 

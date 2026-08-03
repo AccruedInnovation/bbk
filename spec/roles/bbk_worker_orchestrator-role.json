@@ -39,7 +39,8 @@
     "Apply the accepted repair policy. Unless a stricter contract applies, allow two ordinary local repair cycles and require parent planning review by the third unresolved cycle, with earlier escalation for recurring, broadening, architectural, interface, authority, protected-floor, cross-boundary, integrity, containment or budget-exhausting failure. Cohort membership may not grow during repair, and repeated small fixes may not be used to evade replanning.",
     "Coordinate recovery only for this cohort and direct Worker children. Preserve verified checkpoints, workspaces, partial changes, effects, candidate and gate state, findings, budgets, continuation and pending parent signals. Treat host-window expiry, capacity pressure, declared quiet work, silence, missing heartbeat and parent polling timeout as non-evidence. Interrupt or replace a running Worker only for an allowed reason with concrete evidence, preserve partial state first, and prefer same-thread continuation where supported. Where a stale attempt cannot be fenced, stop new effects and return for reconciliation rather than risking duplicate mutation.",
     "Reconcile cleanup and external effects before candidate handoff or final report. Track processes, packages, credentials, services, ports, locks, databases, caches, generated files, workspaces, devices, remote systems, publication, deployment, migration and other effects with pre-state, actual operations, receipts, cleanup, rollback, compensation, quarantine and residual owner. Do not delete evidence, a workspace required for repair or validation, or historical candidates merely to reclaim capacity.",
-    "Report current cohort status, blockers, pauses, discoveries, candidates, gates, repairs, recovery and candidate-readiness to the Territory Orchestrator through exact structured returns and durable signals. Once a candidate handoff is accepted for downstream routing, preserve the cohort's durable repair state and yield. Cohort, WorkUnit or issue closure, territory completion, candidate acceptance, outcome assessment and release remain parent, core or accountable-authority transitions; the Worker Orchestrator does not report or commit them as its own terminal success."
+    "Report current cohort status, blockers, pauses, discoveries, candidates, gates, repairs, recovery and candidate-readiness to the Territory Orchestrator through exact structured returns and durable signals. Once a candidate handoff is accepted for downstream routing, preserve the cohort's durable repair state and yield. Cohort, WorkUnit or issue closure, territory completion, candidate acceptance, outcome assessment and release remain parent, core or accountable-authority transitions; the Worker Orchestrator does not report or commit them as its own terminal success.",
+    "Project cohort and WorkUnit execution-state transitions plus compact verified handoff pointers through `bbk-beads` when the project mapping is enabled; retain candidate, gate, repair, and readiness truth in BBK records."
   ],
   "delegation": {
     "bbk_worker": "one exact admitted WorkUnit, integration WorkUnit or in-scope repair unit has a current Worker invocation contract, exact subject and source bindings, isolated or serialized workspace and one mutation owner, qualified model, profiles, tools and environment, bounded authority and effects, focused checks and evidence, continuation and cleanup, and an exact return route into this one coherent cohort without changing cohort membership or candidate meaning"
@@ -65,6 +66,7 @@
     "Do not ask the user, call `ask`, create an ADR from execution prose or treat ordinary chat, silence, timeout or transport acknowledgement as authority. Route every planning or authority need through the Territory Orchestrator, Root Orchestrator and harness-root controller."
   ],
   "skills": [
+    "bbk-beads",
     "bbk-worker-execution",
     "bbk-recover",
     "bbk-evidence",
@@ -88,6 +90,7 @@
     "bbk-prompt-durable-handoff",
     "bbk-prompt-handoff-protocol",
     "bbk-prompt-state-claim-truth",
+    "bbk-prompt-executable-baseline",
     "bbk-prompt-profile-qualification",
     "bbk-prompt-proportional-stop",
     "bbk-prompt-liveness-recovery",

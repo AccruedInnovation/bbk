@@ -29,7 +29,8 @@
     "Compile the Guide's smallest sufficient context edge and preserve the same logical branch across host pauses or replacement invocations. Validate every Researcher and Guide return for exact subject and revision, freshness, provenance, authority, evidence exposure, response references, root-decision continuity, affected scope, invalidation impact, and return-contract conformance before updating canonical branch state.",
     "Create or update an ADR-compatible decision packet only after valid authority evidence exists. Preserve the exact answer or delegated authority, rationale, alternatives, assumptions, exposure history, lineage, affected objects and interfaces, residual uncertainty, and invalidation triggers. The recommendation, Guide packet, controller relay, role, and record cannot approve themselves.",
     "Reconcile related branches without erasing disagreement. Propagate new independent questions, cross-branch contradictions, shared-interface impacts, scope or authority changes, stale outstanding requests, and downstream invalidation to the semantic parent with exact affected subjects and the smallest valid next action.",
-    "Persist branch state proportionately and return a compact, versioned cluster result to the semantic parent. Include resolved and explicitly non-resolved branches, pending requests, parked or active state, decision and ADR references, research and Guide packets, exposure history, outward impacts, residual uncertainty, stopping assessment, and requested parent actions. Use a verified `bbk-handoff` reference for exact or large material."
+    "Persist branch state proportionately and return a compact, versioned cluster result to the semantic parent. Include resolved and explicitly non-resolved branches, pending requests, parked or active state, decision and ADR references, research and Guide packets, exposure history, outward impacts, residual uncertainty, stopping assessment, and requested parent actions. Use a verified `bbk-handoff` reference for exact or large material.",
+    "Project current question-branch and decision-request coordination records through `bbk-beads` when the project mapping is enabled; preserve request identity, authoritative responses, accepted decisions, and branch closure in BBK rather than tracker workflow state."
   ],
   "delegation": {
     "bbk_question_guide": "one declared root decision remains materially unresolved after proportionate factual work and a genuine recommendation-first attempt because a matching authoritative response rejected or materially contested the recommendation, the user explicitly requested deeper exploration, conflicting human values or assumptions require collaborative examination, or no decision-ready recommendation can responsibly be formed without that examination; the branch has a complete context edge and no other foreground Guide is active",
@@ -68,6 +69,7 @@
     "bbk-profile-routing",
     "bbk-installed-profiles",
     "bbk-context-routing",
+    "bbk-beads",
     "bbk-question-branch",
     "bbk-handoff"
   ],

@@ -23,7 +23,7 @@ if str(TOOLS_DIR) not in sys.path:
 
 from generate_agents import MODEL_ROUTING_PATH, rendered_projections
 from model_routing import ModelRoutingError
-from path_compat import portable_path_key
+from path_compat import canonical_path_text, portable_path_key
 from profile_install import (
     PreparedProfile,
     ProfileInstallError,
@@ -43,6 +43,7 @@ VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 BUNDLED_PROFILES_PATH = ROOT / "bundled-language-profiles"
 SUBPROCESS_OUTPUT_ENCODING = "utf-8"
 SUBPROCESS_OUTPUT_ERRORS = "backslashreplace"
+LANGUAGE_PROFILE_LAYOUT_VERSION = 1
 
 
 class InstallError(RuntimeError):
@@ -175,6 +176,19 @@ def json_path(path: PurePath) -> str:
     return path.as_posix()
 
 
+def canonical_path(path: str | os.PathLike[str] | Path) -> Path:
+    """Return one physical spelling for install ownership and binding records."""
+    return Path(canonical_path_text(path))
+
+
+def selected_project_root(args: argparse.Namespace) -> Path | None:
+    if args.root:
+        return canonical_path(Path(args.root).expanduser())
+    if args.scope == "project":
+        return canonical_path(Path.cwd())
+    return None
+
+
 def user_home() -> Path:
     """Return the installer home before falling back to ``Path.home()``.
 
@@ -183,13 +197,13 @@ def user_home() -> Path:
     """
     for name in ("BBK_HOME", "HOME"):
         if value := os.environ.get(name):
-            return Path(value).expanduser().resolve()
-    return Path.home().resolve()
+            return canonical_path(Path(value).expanduser())
+    return canonical_path(Path.home())
 
 
 def data_root() -> Path:
     if value := os.environ.get("BBK_INSTALL_ROOT"):
-        return Path(value).expanduser().resolve()
+        return canonical_path(Path(value).expanduser())
     if os.name == "nt":
         base = os.environ.get("LOCALAPPDATA") or str(user_home() / "AppData" / "Local")
         return Path(base) / "BBK"
@@ -201,7 +215,7 @@ def data_root() -> Path:
 
 def bin_dir() -> Path:
     if value := os.environ.get("BBK_BIN_DIR"):
-        return Path(value).expanduser().resolve()
+        return canonical_path(Path(value).expanduser())
     if os.name == "nt":
         return data_root() / "bin"
     return user_home() / ".local" / "bin"
@@ -468,9 +482,9 @@ def launcher(package_root: Path) -> tuple[str, bytes]:
     if os.name == "nt":
         return (
             "bbk.cmd",
-            f'@echo off\r\nif defined BBK_PYTHON ("%BBK_PYTHON%" "{script}" %*) else (py -3 "{script}" %*)\r\n'.encode(),
+            f'@echo off\r\nif defined BBK_PYTHON ("%BBK_PYTHON%" -X utf8 "{script}" %*) else (py -3 -X utf8 "{script}" %*)\r\n'.encode(),
         )
-    return "bbk", f'#!/bin/sh\nexec "${{BBK_PYTHON:-python3}}" {json.dumps(str(script))} "$@"\n'.encode()
+    return "bbk", f'#!/bin/sh\nexec "${{BBK_PYTHON:-python3}}" -X utf8 {json.dumps(str(script))} "$@"\n'.encode()
 
 
 def profile_launcher(item: PreparedProfile, package_root: Path) -> tuple[str, bytes]:
@@ -484,9 +498,9 @@ def profile_launcher(item: PreparedProfile, package_root: Path) -> tuple[str, by
     if os.name == "nt":
         return (
             f"{command}.cmd",
-            f'@echo off\r\nif defined BBK_PYTHON ("%BBK_PYTHON%" "{script}" %*) else (py -3 "{script}" %*)\r\n'.encode(),
+            f'@echo off\r\nif defined BBK_PYTHON ("%BBK_PYTHON%" -X utf8 "{script}" %*) else (py -3 -X utf8 "{script}" %*)\r\n'.encode(),
         )
-    return command, f'#!/bin/sh\nexec "${{BBK_PYTHON:-python3}}" {json.dumps(str(script))} "$@"\n'.encode()
+    return command, f'#!/bin/sh\nexec "${{BBK_PYTHON:-python3}}" -X utf8 {json.dumps(str(script))} "$@"\n'.encode()
 
 
 def manifest_path(scope: str, project: Path | None, root: Path) -> Path:
@@ -494,11 +508,7 @@ def manifest_path(scope: str, project: Path | None, root: Path) -> Path:
 
 
 def install_scope_paths(args: argparse.Namespace) -> tuple[Path | None, Path, Path]:
-    project = (
-        Path(args.root).expanduser().resolve()
-        if args.root
-        else (Path.cwd().resolve() if args.scope == "project" else None)
-    )
+    project = selected_project_root(args)
     root = data_root() if args.scope == "user" else project / ".bbk-kit"  # type: ignore[operator]
     return project, root, manifest_path(args.scope, project, root)
 
@@ -568,8 +578,9 @@ def choose_existing_install_action(args: argparse.Namespace, existing: Mapping[s
         question_text = f"Clean-replace the selected {selected_text} harness now? [Y/n]\n"
     else:
         replacement_text = (
-            "A full clean replacement removes every manifest-owned BBK file before "
-            "installing only the harnesses and profiles selected by this command.\n"
+            "A full clean replacement removes obsolete or changed manifest-owned BBK files, "
+            "reuses byte-identical successor files in place, and installs only the harnesses and "
+            "profiles selected by this command.\n"
         )
         question_text = "Uninstall the existing BBK installation first? [Y/n]\n"
     prompt_text = (
@@ -776,13 +787,266 @@ def install_language_profile(
     return result
 
 
+
+
+def _profile_identity(profile_id: str, version: str) -> str:
+    return f"{profile_id}@{version}"
+
+
+def _record_sources(record: Mapping[str, Any]) -> list[str]:
+    values: list[str] = []
+    source = record.get("source")
+    if isinstance(source, str):
+        values.append(source)
+    for value in record.get("also_sources") or []:
+        if isinstance(value, str) and value not in values:
+            values.append(value)
+    return values
+
+
+def _source_belongs_to_profile(source: str, identity: str) -> bool:
+    return (
+        source.startswith(f"profile:{identity}:")
+        or source == f"generated:profile-current:{identity}"
+        or source == f"generated:profile-launcher:{identity}"
+    )
+
+
+def _profile_record_view(record: Mapping[str, Any], identity: str) -> dict[str, Any] | None:
+    sources = [
+        source for source in _record_sources(record)
+        if _source_belongs_to_profile(source, identity)
+    ]
+    if not sources:
+        return None
+    raw_path = record.get("path")
+    digest = record.get("sha256")
+    if not isinstance(raw_path, str) or not isinstance(digest, str):
+        return None
+    value = {
+        "path": raw_path,
+        "sha256": digest,
+        "executable": bool(record.get("executable")),
+        "sources": sources,
+    }
+    return value
+
+
+def _current_file_matches(record: Mapping[str, Any]) -> tuple[bool, str | None]:
+    path = Path(str(record["path"]))
+    if not path.exists():
+        return False, f"missing installed file: {path}"
+    if not path.is_file():
+        return False, f"installed destination is not a file: {path}"
+    try:
+        current = sha256_file(path)
+    except OSError as exc:
+        return False, f"cannot read installed file {path}: {exc}"
+    if current != record.get("sha256"):
+        return False, f"installed file differs: {path}"
+    if os.name != "nt":
+        actual_executable = bool(path.stat().st_mode & 0o111)
+        if actual_executable != bool(record.get("executable")):
+            return False, f"installed file mode differs: {path}"
+    return True, None
+
+
+def language_profile_reuse_plan(
+    existing: Mapping[str, Any] | None,
+    prepared_profiles: Sequence[PreparedProfile],
+    *,
+    args: argparse.Namespace,
+) -> dict[str, Any]:
+    """Return verified unchanged-profile records safe to retain in place.
+
+    Reuse is deliberately conservative. It requires reconciliation mode, the
+    same installed harness set, the same profile identity and package digest,
+    a compatible installation layout, and current bytes/modes for every
+    profile-owned destination. Any uncertainty falls back to the ordinary
+    preflight/install path; it never silently adopts changed local files.
+    """
+    report: dict[str, Any] = {
+        "schema": "bbk.language-profile-reuse.v1",
+        "layout_version": LANGUAGE_PROFILE_LAYOUT_VERSION,
+        "enabled": False,
+        "attempted": False,
+        "reused_profile_count": 0,
+        "reused_file_count": 0,
+        "profiles": {},
+    }
+    if existing is None:
+        report["reason"] = "no pre-existing installation"
+        return report
+    if bool(getattr(args, "uninstall_existing", False)):
+        report["reason"] = "clean replacement requested"
+        return report
+    manifest = existing.get("manifest")
+    if not isinstance(manifest, Mapping):
+        report["reason"] = "existing manifest unavailable"
+        return report
+    layout = int(manifest.get("language_profile_layout_version", 1))
+    if layout != LANGUAGE_PROFILE_LAYOUT_VERSION:
+        report["reason"] = f"layout version {layout} is not reusable"
+        return report
+    selected_harnesses_set = selected_harness_names(args)
+    installed_harnesses_set = {
+        name for name in HARNESS_ORDER if bool(manifest.get(name))
+    }
+    if selected_harnesses_set != installed_harnesses_set:
+        report["reason"] = "selected harness set differs from the installed profile projection"
+        return report
+
+    report["enabled"] = True
+    report["attempted"] = bool(prepared_profiles)
+    old_profiles = {
+        _profile_identity(str(value.get("id")), str(value.get("version"))): value
+        for value in manifest.get("language_profiles", [])
+        if isinstance(value, Mapping) and value.get("id") and value.get("version")
+    }
+    requested_identities = {
+        _profile_identity(item.profile_id, item.version) for item in prepared_profiles
+    }
+    if requested_identities != set(old_profiles):
+        report["reason"] = "selected language-profile set differs from the existing installation"
+        return report
+    manifest_files = [value for value in manifest.get("files", []) if isinstance(value, Mapping)]
+    reusable: dict[str, Any] = {}
+    for item in prepared_profiles:
+        identity = _profile_identity(item.profile_id, item.version)
+        outcome: dict[str, Any] = {
+            "id": item.profile_id,
+            "version": item.version,
+            "root_sha256": item.root_sha256,
+            "reused": False,
+        }
+        previous = old_profiles.get(identity)
+        if previous is None:
+            outcome["reason"] = "profile identity was not previously installed"
+            report["profiles"][identity] = outcome
+            continue
+        if previous.get("root_sha256") != item.root_sha256:
+            outcome["reason"] = "profile package digest changed"
+            report["profiles"][identity] = outcome
+            continue
+        records = [
+            view
+            for record in manifest_files
+            if (view := _profile_record_view(record, identity)) is not None
+        ]
+        if not records:
+            outcome["reason"] = "existing manifest has no profile-owned files"
+            report["profiles"][identity] = outcome
+            continue
+        failure: str | None = None
+        for record in records:
+            matched, reason = _current_file_matches(record)
+            if not matched:
+                failure = reason or "installed profile file could not be verified"
+                break
+        if failure:
+            outcome["reason"] = failure
+            report["profiles"][identity] = outcome
+            continue
+        outcome.update({
+            "reused": True,
+            "file_count": len(records),
+            "reason": "identity, package digest, harness projection, and installed bytes match",
+        })
+        report["profiles"][identity] = outcome
+        reusable[identity] = {"summary": dict(previous), "records": records}
+    report["reused_profile_count"] = len(reusable)
+    report["reused_file_count"] = sum(len(value["records"]) for value in reusable.values())
+    report["reusable"] = reusable
+    return report
+
+
+def _register_reused_record(
+    record: Mapping[str, Any],
+    *,
+    records: list[dict[str, Any]],
+    planned: dict[str, int],
+    progress: InstallProgress | None,
+    verify_current: bool,
+) -> None:
+    if verify_current:
+        matched, reason = _current_file_matches(record)
+        if not matched:
+            raise InstallError(
+                "An unchanged language-profile file changed after reuse preflight: "
+                + str(reason)
+            )
+    destination = Path(str(record["path"]))
+    digest = str(record["sha256"])
+    executable = bool(record.get("executable"))
+    sources = list(record.get("sources") or [])
+    if not sources:
+        raise InstallError(f"Reusable language-profile record has no source provenance: {destination}")
+    key = portable_path_key(destination)
+    prior_index = planned.get(key)
+    if prior_index is not None:
+        prior = records[prior_index]
+        if prior.get("sha256") != digest or bool(prior.get("executable")) != executable:
+            raise InstallError(f"Reusable language-profile collision at {destination}")
+        provenance = [str(prior.get("source"))] + list(prior.get("also_sources") or [])
+        for source in sources:
+            if source not in provenance:
+                prior.setdefault("also_sources", []).append(source)
+                provenance.append(source)
+        return
+    planned[key] = len(records)
+    value: dict[str, Any] = {
+        "path": json_path(destination),
+        "sha256": digest,
+        "action": "reused",
+        "source": sources[0],
+        "backup": None,
+        "executable": executable,
+    }
+    if len(sources) > 1:
+        value["also_sources"] = sources[1:]
+    records.append(value)
+    if progress is not None:
+        progress.advance(destination, "reused")
+
+
+def install_reused_language_profile(
+    item: PreparedProfile,
+    reuse: Mapping[str, Any],
+    *,
+    common: Mapping[str, Any],
+) -> dict[str, Any]:
+    records = common.get("records")
+    planned = common.get("planned")
+    if not isinstance(records, list) or not isinstance(planned, dict):
+        raise InstallError("Language-profile reuse requires installation-plan records")
+    for record in reuse.get("records", []):
+        _register_reused_record(
+            record,
+            records=records,
+            planned=planned,
+            progress=common.get("progress"),
+            verify_current=not bool(common.get("dry_run")),
+        )
+    result = profile_summary(item)
+    result.update(profile_runtime_summary(item))
+    previous = reuse.get("summary") if isinstance(reuse.get("summary"), Mapping) else {}
+    for key in ("package_root", "current", "omp_extension", "launcher"):
+        result[key] = previous.get(key)
+    result["install_action"] = "reused"
+    result["reused_file_count"] = len(reuse.get("records", []))
+    return result
+
+
 def run_verification_gate(
     *,
     failfast: bool,
     require_node: bool,
     echo: bool,
-    profile: str = "full",
+    profile: str = "standard",
     jobs: int = 0,
+    test_mode: str = "auto",
+    timing_report: str | None = None,
+    no_timing_report: bool = False,
 ) -> dict[str, Any]:
     """Run verification in a child process while streaming human progress."""
     with tempfile.TemporaryDirectory(prefix="bbk-verification-report-") as raw_temp:
@@ -796,7 +1060,13 @@ def run_verification_gate(
             profile,
             "--jobs",
             str(jobs),
+            "--test-mode",
+            test_mode,
         ]
+        if timing_report:
+            command.extend(["--timing-report", timing_report])
+        elif no_timing_report:
+            command.append("--no-timing-report")
         if failfast:
             command.append("--failfast")
         if require_node:
@@ -857,8 +1127,11 @@ def verify_command(args: argparse.Namespace) -> dict[str, Any]:
         failfast=bool(args.failfast),
         require_node=bool(args.require_node),
         echo=not args.json,
-        profile="full",
-        jobs=0,
+        profile=str(args.profile),
+        jobs=int(args.test_jobs),
+        test_mode=str(args.test_mode),
+        timing_report=getattr(args, "timing_report", None),
+        no_timing_report=bool(getattr(args, "no_timing_report", False)),
     )
 
 
@@ -868,13 +1141,10 @@ def _perform_install(
     prepared_profiles: Sequence[PreparedProfile],
     verification: dict[str, Any] | None,
     progress: InstallProgress | None = None,
+    profile_reuse: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     codex, omp, claude, generic = selected_harnesses(args)
-    project = (
-        Path(args.root).expanduser().resolve()
-        if args.root
-        else (Path.cwd().resolve() if args.scope == "project" else None)
-    )
+    project = selected_project_root(args)
     root = data_root() if args.scope == "user" else project / ".bbk-kit"  # type: ignore[operator]
     mpath = manifest_path(args.scope, project, root)
     routing_path = (
@@ -950,6 +1220,7 @@ def _perform_install(
             "review_assurance.py",
             "verify_package.py",
             "path_compat.py",
+            "artifact_classification.py",
             "omp_model_routing.py",
         ]:
             install_file(ROOT / "tools" / name, omp_extension / name, **common)
@@ -957,11 +1228,12 @@ def _perform_install(
         install_bytes(
             json_bytes(
                 {
-                    "schema": "bbk.omp-package-binding.v2",
+                    "schema": "bbk.omp-package-binding.v3",
                     "version": VERSION,
                     "path": json_path(package_root),
                     "package_root": json_path(package_root),
                     "scope": args.scope,
+                    "project_root": json_path(project) if project else None,
                     "manifest_path": json_path(mpath),
                     "omp_agents": json_path(targets["omp_agents"]),
                     "state_path": json_path(omp_routing_state),
@@ -1024,19 +1296,29 @@ def _perform_install(
         "script": json_path(package_root / "tools" / "bbk.py"),
     }
 
-    installed_profiles = [
-        install_language_profile(
-            item,
-            root=root,
-            targets=targets,
-            codex=codex,
-            omp=omp,
-            claude=claude,
-            generic=generic,
-            common=common,
-        )
-        for item in prepared_profiles
-    ]
+    reusable = (profile_reuse or {}).get("reusable", {})
+    installed_profiles: list[dict[str, Any]] = []
+    for item in prepared_profiles:
+        identity = _profile_identity(item.profile_id, item.version)
+        reuse = reusable.get(identity) if isinstance(reusable, Mapping) else None
+        if isinstance(reuse, Mapping):
+            installed_profiles.append(
+                install_reused_language_profile(item, reuse, common=common)
+            )
+        else:
+            result = install_language_profile(
+                item,
+                root=root,
+                targets=targets,
+                codex=codex,
+                omp=omp,
+                claude=claude,
+                generic=generic,
+                common=common,
+            )
+            result["install_action"] = "installed"
+            result["reused_file_count"] = 0
+            installed_profiles.append(result)
 
     registry_json = registry_json_bytes(
         prepared_profiles, bbk_version=VERSION, bbk_cli=bbk_cli_binding
@@ -1124,6 +1406,10 @@ def _perform_install(
             else None
         ),
         "language_profiles": installed_profiles,
+        "language_profile_layout_version": LANGUAGE_PROFILE_LAYOUT_VERSION,
+        "language_profile_reuse": {
+            key: value for key, value in (profile_reuse or {}).items() if key != "reusable"
+        },
         "language_profile_source_mode": getattr(args, "language_profile_source_mode", "explicit"),
         "language_profile_registry": {
             "schema": "bbk.installed-profile-registry.v1",
@@ -1170,14 +1456,26 @@ def validate_install_plan(manifest: Mapping[str, Any]) -> None:
         )
 
 
-def _uninstall_args(args: argparse.Namespace, *, force: bool, dry_run: bool) -> argparse.Namespace:
+def _uninstall_args(
+    args: argparse.Namespace,
+    *,
+    force: bool,
+    dry_run: bool,
+    reusable_successor_files: Mapping[str, Mapping[str, Any]] | None = None,
+) -> argparse.Namespace:
     return argparse.Namespace(
         scope=args.scope,
         root=args.root,
         force=force,
         dry_run=dry_run,
         json=bool(getattr(args, "json", False)),
+        reusable_successor_files=dict(reusable_successor_files or {}),
     )
+
+
+def _is_language_profile_source(source: object) -> bool:
+    value = str(source or "")
+    return value.startswith("profile:") or value.startswith("generated:profile-")
 
 
 def _backup_preserved_install_files(
@@ -1234,6 +1532,22 @@ def clean_replace_existing_install(
         for item in old_manifest.get("files", [])
         if isinstance(item, Mapping) and isinstance(item.get("path"), str)
     }
+    reusable_successor_files: dict[str, dict[str, Any]] = {}
+    for item in replacement_plan.get("files", []):
+        if not isinstance(item, Mapping) or item.get("action") != "unchanged":
+            continue
+        raw_path = item.get("path")
+        if not isinstance(raw_path, str):
+            continue
+        key = portable_path_key(Path(raw_path))
+        if key not in old_owned:
+            continue
+        reusable_successor_files[key] = {
+            "path": raw_path,
+            "sha256": item.get("sha256"),
+            "executable": item.get("executable"),
+            "source": item.get("source"),
+        }
     unowned_conflicts = []
     for item in replacement_plan.get("files", []):
         if not isinstance(item, Mapping) or item.get("action") != "replace":
@@ -1252,7 +1566,14 @@ def clean_replace_existing_install(
             + "\n- ".join(unowned_conflicts[:20])
         )
 
-    preview = uninstall(_uninstall_args(args, force=False, dry_run=True))
+    preview = uninstall(
+        _uninstall_args(
+            args,
+            force=False,
+            dry_run=True,
+            reusable_successor_files=reusable_successor_files,
+        )
+    )
     preserved = list(preview.get("preserved", []))
     non_regular = [
         item
@@ -1286,11 +1607,25 @@ def clean_replace_existing_install(
         if len(backups) != len(preserved):
             raise InstallError("could not back up every modified manifest-owned file; nothing was uninstalled")
 
-    removed = uninstall(_uninstall_args(args, force=bool(args.force), dry_run=False))
+    removed = uninstall(
+        _uninstall_args(
+            args,
+            force=bool(args.force),
+            dry_run=False,
+            reusable_successor_files=reusable_successor_files,
+        )
+    )
+    reused = list(removed.get("reused", []))
+    reused_profile_count = sum(
+        1 for item in reused if _is_language_profile_source(item.get("source"))
+    )
     progress_note(
         progress_enabled,
-        f"<== Existing BBK {existing.get('version')} removed: "
-        f"{len(removed.get('removed', [])):,} files; {len(backups):,} modified files backed up.",
+        f"<== Existing BBK {existing.get('version')} replaced: "
+        f"{len(removed.get('removed', [])):,} files removed; "
+        f"{len(reused):,} identical successor files reused "
+        f"({reused_profile_count:,} language-profile files); "
+        f"{len(backups):,} modified files backed up.",
     )
     return {
         "detected": True,
@@ -1301,6 +1636,14 @@ def clean_replace_existing_install(
         "previous_file_count": existing.get("file_count"),
         "uninstalled": True,
         "removed_count": len(removed.get("removed", [])),
+        "reused_identical_count": len(reused),
+        "reused_language_profile_file_count": reused_profile_count,
+        "reused_language_profile_sources": sorted({
+            str(item.get("source"))
+            for item in reused
+            if _is_language_profile_source(item.get("source"))
+        }),
+        "reused_identical_sample": reused[:20],
         "modified_backup_count": len(backups),
         "modified_backup_root": json_path(backup_root) if backup_root else None,
         "modified_backups": backups,
@@ -1442,14 +1785,17 @@ def install(args: argparse.Namespace) -> dict[str, Any]:
     }
     verification = None
     if args.verify:
-        progress_note(progress_enabled, "==> Running complete BBK verification before installation...")
+        progress_note(progress_enabled, f"==> Running {args.verification_profile} BBK verification before installation...")
         _, omp_selected, _, _ = selected_harnesses(args)
         verification = run_verification_gate(
             failfast=bool(args.verification_failfast),
             require_node=bool(args.require_node or omp_selected),
             echo=not args.json,
-            profile="full",
-            jobs=0,
+            profile=str(args.verification_profile),
+            jobs=int(args.test_jobs),
+            test_mode=str(args.test_mode),
+            timing_report=getattr(args, "timing_report", None),
+            no_timing_report=bool(getattr(args, "no_timing_report", False)),
         )
         progress_note(progress_enabled, "<== Verification: PASS; installation preparation may proceed.")
 
@@ -1512,6 +1858,18 @@ def install(args: argparse.Namespace) -> dict[str, Any]:
             progress_enabled,
             f"<== Language profiles verified: {len(prepared)} ({profile_names})",
         )
+        profile_reuse = language_profile_reuse_plan(
+            existing if existing_action != "replace" else None,
+            prepared,
+            args=args,
+        )
+        if profile_reuse.get("reused_profile_count"):
+            progress_note(
+                progress_enabled,
+                "<== Reusing "
+                f"{profile_reuse['reused_profile_count']} unchanged language profiles "
+                f"({profile_reuse['reused_file_count']:,} manifest-owned files).",
+            )
         if args.dry_run:
             planning_args = copy(args)
             if existing_action == "replace":
@@ -1526,6 +1884,7 @@ def install(args: argparse.Namespace) -> dict[str, Any]:
                     prepared_profiles=prepared,
                     verification=verification,
                     progress=dry_progress,
+                    profile_reuse=profile_reuse,
                 )
                 validate_install_plan(plan)
             except Exception:
@@ -1562,6 +1921,7 @@ def install(args: argparse.Namespace) -> dict[str, Any]:
                 prepared_profiles=prepared,
                 verification=verification,
                 progress=preflight_progress,
+                profile_reuse=profile_reuse,
             )
             validate_install_plan(plan)
         except Exception:
@@ -1580,6 +1940,7 @@ def install(args: argparse.Namespace) -> dict[str, Any]:
                 prepared_profiles=prepared,
                 verification=verification,
                 progress=install_progress,
+                profile_reuse=profile_reuse,
             )
             validate_install_plan(result)
         except Exception:
@@ -1611,11 +1972,7 @@ def install(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def status(args: argparse.Namespace) -> dict[str, Any]:
-    project = (
-        Path(args.root).expanduser().resolve()
-        if args.root
-        else (Path.cwd().resolve() if args.scope == "project" else None)
-    )
+    project = selected_project_root(args)
     root = data_root() if args.scope == "user" else project / ".bbk-kit"  # type: ignore[operator]
     mpath = manifest_path(args.scope, project, root)
     result: dict[str, Any] = {
@@ -1693,18 +2050,31 @@ def status(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def uninstall(args: argparse.Namespace) -> dict[str, Any]:
-    project = (
-        Path(args.root).expanduser().resolve()
-        if args.root
-        else (Path.cwd().resolve() if args.scope == "project" else None)
-    )
+    """Plan, then conservatively remove manifest-owned files.
+
+    Clean replacement may provide exact successor records. Files whose current
+    bytes and executable mode already equal the successor are retained in place
+    and adopted by the successor manifest instead of being deleted and copied
+    again. The complete plan is computed before any mutation, preserving the
+    existing conservative behavior for locally modified or non-regular paths.
+    """
+    project = selected_project_root(args)
     root = data_root() if args.scope == "user" else project / ".bbk-kit"  # type: ignore[operator]
     mpath = manifest_path(args.scope, project, root)
     if not mpath.exists():
         raise InstallError(f"No BBK install manifest found: {mpath}")
     manifest = json.loads(mpath.read_text(encoding="utf-8"))
+    reusable_raw = getattr(args, "reusable_successor_files", {}) or {}
+    reusable = {
+        str(key): dict(value)
+        for key, value in reusable_raw.items()
+        if isinstance(key, str) and isinstance(value, Mapping)
+    }
+
+    removals: list[Path] = []
     removed: list[str] = []
     preserved: list[dict[str, Any]] = []
+    reused: list[dict[str, Any]] = []
     for item in reversed(manifest.get("files", [])):
         path = Path(item["path"])
         if not path.exists():
@@ -1714,6 +2084,28 @@ def uninstall(args: argparse.Namespace) -> dict[str, Any]:
             continue
         current = sha256_file(path)
         current_executable = (bool(path.stat().st_mode & 0o111) if os.name != "nt" else None)
+        key = portable_path_key(path)
+        successor = reusable.get(key)
+        if successor is not None:
+            expected_digest = successor.get("sha256")
+            expected_executable = successor.get("executable")
+            successor_mode_matches = (
+                os.name == "nt"
+                or expected_executable is None
+                or current_executable == bool(expected_executable)
+            )
+            if current == expected_digest and successor_mode_matches:
+                reused.append(
+                    {
+                        "path": json_path(path),
+                        "sha256": current,
+                        "source": successor.get("source"),
+                        "reason": "identical successor file reused in place",
+                        "executable": expected_executable,
+                    }
+                )
+                continue
+
         mode_modified = (
             os.name != "nt"
             and "executable" in item
@@ -1731,17 +2123,19 @@ def uninstall(args: argparse.Namespace) -> dict[str, Any]:
                 }
             )
             continue
-        if not args.dry_run:
-            path.unlink()
+        removals.append(path)
         removed.append(json_path(path))
+
     if not args.dry_run:
+        for path in removals:
+            path.unlink()
         mpath.unlink(missing_ok=True)
         stop_dirs = {
             path.resolve()
             for path in (user_home(), project, root.parent)
             if path is not None
         }
-        for raw in sorted({str(Path(path).parent) for path in removed}, key=len, reverse=True):
+        for raw in sorted({str(path.parent) for path in removals}, key=len, reverse=True):
             directory = Path(raw).resolve()
             while directory.exists() and directory.is_dir():
                 if directory in stop_dirs or directory == Path(directory.anchor):
@@ -1757,6 +2151,7 @@ def uninstall(args: argparse.Namespace) -> dict[str, Any]:
         "dry_run": args.dry_run,
         "removed": removed,
         "preserved": preserved,
+        "reused": reused,
         "manifest_path": json_path(mpath),
     }
 
@@ -1877,9 +2272,20 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--json", action="store_true")
     sub = parser.add_subparsers(dest="command", required=True)
 
-    verify = sub.add_parser("verify", help="run all BBK verification checks in canonical order")
+    verify = sub.add_parser("verify", help="run BBK verification checks in canonical order")
     verify.add_argument("--failfast", action="store_true")
     verify.add_argument("--require-node", action="store_true")
+    verify.add_argument(
+        "--profile",
+        choices=["fast", "standard", "release", "full", "quick", "omp", "codex"],
+        default="standard",
+    )
+    verify.add_argument(
+        "--test-mode", choices=["auto", "pooled", "batch", "isolated"], default="auto"
+    )
+    verify.add_argument("--test-jobs", type=int, default=0)
+    verify.add_argument("--timing-report")
+    verify.add_argument("--no-timing-report", action="store_true")
     verify.set_defaults(func=verify_command)
 
     installer = sub.add_parser("install", help="install BBK and optional language profiles")
@@ -1887,8 +2293,20 @@ def build_parser() -> argparse.ArgumentParser:
     installer.add_argument(
         "--verify",
         action="store_true",
-        help="run the complete verification sequence first and install only on PASS",
+        help="run the selected verification profile first and install only on PASS",
     )
+    installer.add_argument(
+        "--verification-profile",
+        choices=["standard", "release"],
+        default="standard",
+        help="with --verify, select routine preinstallation checks or exhaustive release qualification",
+    )
+    installer.add_argument(
+        "--test-mode", choices=["auto", "pooled", "batch", "isolated"], default="auto"
+    )
+    installer.add_argument("--test-jobs", type=int, default=0)
+    installer.add_argument("--timing-report")
+    installer.add_argument("--no-timing-report", action="store_true")
     installer.add_argument(
         "--verification-failfast",
         action="store_true",
@@ -1923,6 +2341,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         normalized.remove("--json")
         normalized.insert(0, "--json")
     args = build_parser().parse_args(normalized)
+    if getattr(args, "test_jobs", 0) < 0:
+        build_parser().error("--test-jobs must be zero or positive")
+    if getattr(args, "timing_report", None) and getattr(args, "no_timing_report", False):
+        build_parser().error("--timing-report and --no-timing-report are mutually exclusive")
     try:
         value = args.func(args)
     except InstallError as exc:

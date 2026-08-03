@@ -27,6 +27,10 @@
     {
       "id": "HUMAN.REQUEST_FALLBACK",
       "text": "When live relay is unavailable, return the same request packet through the invocation chain using BLOCKED_DECISION, BLOCKED_AUTHORITY, or the applicable private-context state. Never bypass the harness-root controller."
+    },
+    {
+      "id": "HUMAN.CALLBACK_SAFE_CHILDREN",
+      "text": "After sending a BBK_USER_REQUEST or equivalent controller callback, do not enter a cancellation-sensitive blocking child wait while an immediate response may arrive. Do not batch the request transport and such a task wait in the same callback window. Dispatch decision-dependent specialists only after the bound response is durably integrated. Continue local analysis or independent work only through a child-lifetime mechanism proven not to cascade-cancel on parent interruption; otherwise sequence safely and defer the child dispatch."
     }
   ]
 }

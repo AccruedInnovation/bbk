@@ -43,6 +43,11 @@ try:
 except ModuleNotFoundError:  # pragma: no cover - package-relative fallback
     from .contracts import canonical_digest  # type: ignore
 
+try:
+    from artifact_classification import is_non_operational_example
+except ModuleNotFoundError:  # pragma: no cover - package-relative fallback
+    from .artifact_classification import is_non_operational_example  # type: ignore
+
 RISK_TIERS = {"routine", "material", "consequential", "critical"}
 APPLICABILITY = {"none", "inline", "manifest"}
 LENSES = {
@@ -407,13 +412,13 @@ def _git_classification(root: Path) -> tuple[set[str], set[str], set[str]]:
     try:
         result = subprocess.run(["git", "-C", str(root), "ls-files", "-z"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, check=False)
         if result.returncode == 0:
-            tracked = {value.decode("utf-8", "replace") for value in result.stdout.split(b"\0") if value}
+            tracked = {value.decode("utf-8", errors="strict") for value in result.stdout.split(b"\0") if value}
         result = subprocess.run(["git", "-C", str(root), "ls-files", "--others", "--exclude-standard", "-z"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, check=False)
         if result.returncode == 0:
-            untracked = {value.decode("utf-8", "replace") for value in result.stdout.split(b"\0") if value}
+            untracked = {value.decode("utf-8", errors="strict") for value in result.stdout.split(b"\0") if value}
         result = subprocess.run(["git", "-C", str(root), "ls-files", "--others", "--ignored", "--exclude-standard", "-z"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, check=False)
         if result.returncode == 0:
-            ignored = {value.decode("utf-8", "replace") for value in result.stdout.split(b"\0") if value}
+            ignored = {value.decode("utf-8", errors="strict") for value in result.stdout.split(b"\0") if value}
     except OSError:
         pass
     return tracked, untracked, ignored
@@ -452,6 +457,9 @@ def compile_review_context(manifest: dict[str, Any], root: Path, *, include_patt
         for name in sorted(filenames):
             path = base / name
             rel = path.relative_to(root).as_posix()
+            if is_non_operational_example(path):
+                omitted.append({"path": rel, "reason": "non-operational-example", "required": False})
+                continue
             if not _matches(rel, includes) or _matches(rel, excludes):
                 omitted.append({"path": rel, "reason": "not-selected", "required": rel in required_paths})
                 continue

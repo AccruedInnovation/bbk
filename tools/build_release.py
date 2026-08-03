@@ -22,7 +22,7 @@ FIXED_TIME = (2026, 8, 2, 0, 0, 0)
 EXCLUDED_PARTS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
 EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
 # Package executability is an explicit release contract, not an accident of the
-# build host checkout. Alpha.13.1 exposes every command through an interpreter, so
+# build host checkout. Alpha.13 exposes every command through an interpreter, so
 # the source archive intentionally has no native executable entrypoints.
 PACKAGE_EXECUTABLES: frozenset[str] = frozenset()
 
@@ -106,7 +106,7 @@ def build_zip(output: Path, manifest: dict[str, Any]) -> None:
 
 def qualification_checks() -> None:
     """Run the same ordered verification surface exposed to package users."""
-    run([sys.executable, "tools/run_tests.py", "--all", "--require-node"])
+    run([sys.executable, "tools/run_tests.py", "--all", "--profile", "release", "--require-node"])
 
 
 def main(argv: Sequence[str] | None = None) -> int:

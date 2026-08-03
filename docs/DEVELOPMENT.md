@@ -48,30 +48,63 @@ archive; BBK does not need to extract it.
 
 ## Verification
 
-Run the complete ordered trust-gated sequence:
+Alpha.13.5 exposes three explicit profiles. Use the smallest profile that matches the decision being made:
 
 ```bash
-python tools/run_tests.py --all --require-node
+# Canonical contracts and deterministic transformations
+python tools/setup.py --test-fast
+
+# Routine product, integration, and platform verification
+python tools/setup.py --test --require-node
+
+# Exhaustive release qualification
+python tools/setup.py --release-test --require-node
 ```
 
-Run all consolidated unittest modules (independent modules run concurrently by default):
+The lower-level ordered verifier accepts `fast`, `standard`, and `release` directly. Historical `quick` and `full` spellings remain aliases for `fast` and `release` where supported:
 
 ```bash
-python tools/run_tests.py -v
+python tools/verify_all.py --profile fast
+python tools/verify_all.py --profile standard --require-node
+python tools/verify_all.py --profile release --require-node
 ```
 
-Run the cross-cutting developer smoke profile when full release qualification is not required:
+The standard profile keeps every product, installer, Git, Node/OMP, Beads, routing, platform, and user-facing schema-command test. Release adds only test-runner self-tests and duplicate optional whole-package Draft 2020-12 cross-checks. Release publication and `tools/build_release.py` always select release explicitly.
+
+The default `auto` strategy uses six workers on hosts with at least 12 logical CPUs, four on medium hosts, and a smaller bound on low-core hosts. Windows groups modules into bounded pooled Python processes; POSIX retains module-isolated parallelism. `--jobs` changes only the worker count. Retained per-module durations drive later shards; source size is used only when no duration exists. For example:
 
 ```bash
-python tools/verify_all.py --profile quick --require-node
+python tools/run_tests.py --profile standard -v
+python tools/run_tests.py --profile release -v --mode pooled --jobs 6
+python tools/run_tests.py --profile release -v --mode isolated --jobs 1 -p test_installation_portability.py --suite-timeout 300
 ```
 
-Use `python tools/run_tests.py -v --jobs 1` to reproduce ordering-sensitive failures serially. To isolate the Windows portability module, use `python tools/run_tests.py -v --jobs 1 -p test_installation_portability.py --suite-timeout 300`. Test children cannot read the developer console, and every module is bounded by the displayed hard timeout. OMP-only and Codex-only tested updates use their corresponding targeted verification profiles; the complete ordered sequence remains mandatory for release publication and CI qualification.
+Canonical BBK CLI assertions and package-local deterministic verifier commands execute in-process after the immutable package trust gate. The adapters restore current directory, `sys.argv`, `sys.path`, environment, and temporary module state. Real process boundaries remain for package trust, Node, Git, interpreter flags, stdin/encoding and process-tree tests, installed copies, and unittest shard isolation.
 
-The ordered sequence verifies package integrity before execution, canonical
-method and role projections, model routing, generated agents, Python and JSON
-sanity, semantic/schema fixtures, typed profile fixtures, all tests, OMP syntax,
-and package integrity after testing.
+Timing reports and the rolling duration cache live outside the package tree so test execution cannot mutate a qualified release. Defaults are `%LOCALAPPDATA%\BBK\test-runs` on Windows and `~/.cache/bbk/test-runs` on POSIX. Set `BBK_TEST_CACHE_DIR` for an isolated benchmark or CI workspace.
+
+The ordered profiles verify the applicable package trust gates, canonical method and role projections, model routing, generated agents, Python and JSON sanity, semantic/schema fixtures, selected unittests, OMP syntax, and post-test package integrity. OMP-only and Codex-only tested updates retain their corresponding targeted profiles.
+
+### Native filesystem path assertions
+
+Tests must distinguish physical filesystem identity from exact serialized spelling. Windows can expose the same object through long and 8.3 names, case variants, junctions, or other aliases; POSIX can do the same through symlinks. Raw `Path` or string equality is therefore incorrect for host paths.
+
+Use `tests/_path_support.py`:
+
+```python
+from tests._path_support import (
+    assert_exact_path_text,
+    assert_labeled_path,
+    assert_no_path_within,
+    assert_same_path,
+    assert_same_path_sequence,
+)
+
+assert_same_path(self, status["project_root"], project)
+assert_labeled_path(self, notifications, "Project", project)
+```
+
+`assert_same_path` prefers `os.path.samefile` when both objects exist and falls back to BBK's canonical physical-path key for planned or missing leaves. Use `assert_exact_path_text` only when slash, case, or relative spelling is itself the public serialization contract. A test-source audit rejects the recurring raw-equality and interpolated-notification patterns.
 
 ## Windows-native compatibility
 
@@ -82,10 +115,15 @@ on Windows:
 
 ```powershell
 python tools/windows_compat.py
-python tools/run_tests.py --all --require-node
+python tools/setup.py --release-test --require-node
 
+chcp 1252
+$env:PYTHONUTF8 = "0"
 $env:PYTHONIOENCODING = "cp1252:strict"
-python tools/run_tests.py -v --jobs 1
+python -m unittest -v `
+  tests.test_core_contracts.Alpha6CongruenceTests.test_unicode_initialization_examples_and_uninitialized_status_are_truthful `
+  tests.test_omp_runtime.Alpha113OmpModelMenuTests.test_installed_omp_tool_transport_round_trips_utf8_strictly
+python tools/run_tests.py --profile release -v --mode isolated --jobs 1
 ```
 
 `tools/windows_compat.py` treats unavailable 8.3 generation or junction
@@ -94,7 +132,8 @@ and produces inconsistent physical-path identity or leaves a capture file
 behind after its exclusive Win32 handle is released.
 
 The repository workflow `.github/workflows/windows-verification.yml` performs
-these checks on `windows-latest` with Python 3.11 and 3.13. Keep that workflow
+these checks on `windows-latest` with Python 3.11 and 3.13, including the
+non-ASCII title `Baffle Connector — Δ測試 — café — 🚧` under code page 1252. Keep that workflow
 blocking for pull requests that change installation, update, subprocess,
 console, temporary-file, path, or manifest code.
 
@@ -124,7 +163,7 @@ with the source tree they describe.
 python tools/build_release.py --output-dir /path/to/output
 ```
 
-The builder writes a deterministic package ZIP, SHA-256 companion, package
+The builder explicitly runs the exhaustive release profile unless `--skip-tests` is supplied after a separately recorded qualification. The builder writes a deterministic package ZIP, SHA-256 companion, package
 manifest copy, and release-notes copy. Release-specific qualification evidence is
 kept outside the repository tree and may be attached to the corresponding GitHub
 release.
