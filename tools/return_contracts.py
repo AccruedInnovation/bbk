@@ -9,6 +9,7 @@ JSON document validation uses jsonschema when requested.
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import re
@@ -21,9 +22,16 @@ ROLE_CATALOG = Path("spec/roles/catalog.json")
 ENVELOPE_PATH = Path("spec/schemas/bbk-role-return-v1.schema.json")
 ENVELOPE_ID = "bbk.role-return.v1"
 ENVELOPE_URI = "https://bbk.local/schemas/bbk-role-return-v1.schema.json"
+V2_ENVELOPE_PATH = Path("spec/schemas/bbk-role-return-v2.schema.json")
+V2_ENVELOPE_ID = "bbk.role-return.v2"
+V2_ENVELOPE_URI = "https://bbk.local/schemas/bbk-role-return-v2.schema.json"
 REGISTRY_PATH = Path("spec/contracts/role-return-registry.json")
 REGISTRY_SCHEMA_PATH = Path("spec/schemas/bbk-role-return-registry-v1.schema.json")
 REGISTRY_SCHEMA_ID = "bbk.role-return-registry.v1"
+V2_REGISTRY_PATH = Path("spec/contracts/role-return-registry-v2.json")
+V2_REGISTRY_SCHEMA_PATH = Path("spec/schemas/bbk-role-return-registry-v2.schema.json")
+V2_REGISTRY_SCHEMA_ID = "bbk.role-return-registry.v2"
+DETAIL_LEVELS = ["COMPACT", "FULL"]
 OPERATIONAL_DISPOSITIONS = [
     "COMPLETE", "PARTIAL", "BLOCKED_TECHNICAL", "BLOCKED_AUTHORITY",
     "BLOCKED_DECISION", "PAUSED_CAPACITY", "PAUSED_HOST_WINDOW",
@@ -41,6 +49,11 @@ COMMON_FIELDS = {
     "semantic_state", "summary", "authority_and_effects_used", "result",
     "durable_handoff_refs", "smallest_valid_next_action",
 }
+V2_COMMON_FIELDS = COMMON_FIELDS | {
+    "executor", "detail_level", "outputs", "checks_and_evidence",
+    "effects_and_cleanup", "blockers_and_residuals", "prohibited_claims",
+}
+
 ROLE_RE = re.compile(r"^bbk_[a-z][a-z0-9_]*$")
 MODE_RE = re.compile(r"^[A-Z][A-Z0-9_]*$")
 FIELD_RE = re.compile(r"^[a-z][a-z0-9_]*$")
@@ -81,6 +94,14 @@ def result_schema_path(role_name: str) -> str:
     return f"spec/schemas/role-results/{role_name.replace('_', '-')}-result-v1.schema.json"
 
 
+def v2_role_schema_path(role_name: str) -> str:
+    return f"spec/schemas/role-returns/{role_name.replace('_', '-')}-return-v2.schema.json"
+
+
+def compact_result_schema_path(role_name: str) -> str:
+    return f"spec/schemas/role-results/{role_name.replace('_', '-')}-compact-result-v2.schema.json"
+
+
 def schema_uri(path: str) -> str:
     return "https://bbk.local/schemas/" + Path(path).name
 
@@ -107,6 +128,8 @@ def validate_metadata(catalog: Mapping[str, Any], roles: Iterable[Mapping[str, A
     seen_paths: set[str] = set()
     required = {
         "contract_id", "envelope_schema", "return_schema", "result_schema",
+        "v2_contract_id", "v2_envelope_schema", "v2_return_schema",
+        "compact_result_schema", "compact_result_fields", "full_detail_triggers",
         "semantic_state_name", "allowed_invocation_modes",
         "allowed_return_kinds", "allowed_operational_dispositions",
         "allowed_semantic_states", "supplemental_enums", "result_fields",
@@ -135,13 +158,24 @@ def validate_metadata(catalog: Mapping[str, Any], roles: Iterable[Mapping[str, A
             seen_contracts.add(contract_id)
         expected_return = role_schema_path(name)
         expected_result = result_schema_path(name)
+        expected_v2_return = v2_role_schema_path(name)
+        expected_compact = compact_result_schema_path(name)
         if c.get("envelope_schema") != ENVELOPE_PATH.as_posix():
             errors.append(f"{label}/envelope_schema: must equal {ENVELOPE_PATH.as_posix()}")
         if c.get("return_schema") != expected_return:
             errors.append(f"{label}/return_schema: must equal {expected_return}")
         if c.get("result_schema") != expected_result:
             errors.append(f"{label}/result_schema: must equal {expected_result}")
-        for path_key in ("return_schema", "result_schema"):
+        expected_v2_contract = c.get("contract_id", "").removesuffix(".v1") + ".v2"
+        if c.get("v2_contract_id") != expected_v2_contract:
+            errors.append(f"{label}/v2_contract_id: must equal {expected_v2_contract!r}")
+        if c.get("v2_envelope_schema") != V2_ENVELOPE_PATH.as_posix():
+            errors.append(f"{label}/v2_envelope_schema: must equal {V2_ENVELOPE_PATH.as_posix()}")
+        if c.get("v2_return_schema") != expected_v2_return:
+            errors.append(f"{label}/v2_return_schema: must equal {expected_v2_return}")
+        if c.get("compact_result_schema") != expected_compact:
+            errors.append(f"{label}/compact_result_schema: must equal {expected_compact}")
+        for path_key in ("return_schema", "result_schema", "v2_return_schema", "compact_result_schema"):
             value = c.get(path_key)
             if isinstance(value, str):
                 if value in seen_paths: errors.append(f"{label}/{path_key}: duplicate {value}")
@@ -199,7 +233,16 @@ def validate_metadata(catalog: Mapping[str, Any], roles: Iterable[Mapping[str, A
                     errors.append(f"{flabel}/nullable: description permits null but nullable is false")
                 if field.get("kind") in {"ENUM", "ENUM_LIST"} and not unique_strings(field.get("enum_values")):
                     errors.append(f"{flabel}/enum_values: invalid")
-        for key in ("requirements",):
+        compact_fields = c.get("compact_result_fields")
+        if not unique_strings(compact_fields):
+            errors.append(f"{label}/compact_result_fields: must be a non-empty unique string list")
+        elif isinstance(fields, dict):
+            unknown = [field for field in compact_fields if field not in fields]
+            if unknown:
+                errors.append(f"{label}/compact_result_fields: unknown result fields {unknown}")
+            if len(compact_fields) > 8:
+                errors.append(f"{label}/compact_result_fields: compact payload may contain at most 8 fields")
+        for key in ("requirements", "full_detail_triggers"):
             if not unique_strings(c.get(key)):
                 errors.append(f"{label}/{key}: must be a non-empty unique string list")
         for key in ("readiness_rule", "authority_boundary"):
@@ -210,17 +253,17 @@ def validate_metadata(catalog: Mapping[str, Any], roles: Iterable[Mapping[str, A
     return errors
 
 
-def field_schema(field: Mapping[str, Any]) -> dict[str, Any]:
+def field_schema(field: Mapping[str, Any], *, envelope_uri: str = ENVELOPE_URI) -> dict[str, Any]:
     kind = field["kind"]
     refs = {
-        "REFERENCE": {"$ref": f"{ENVELOPE_URI}#/$defs/reference"},
-        "REFERENCE_LIST": {"$ref": f"{ENVELOPE_URI}#/$defs/referenceList"},
-        "ARTIFACT_REFERENCE": {"$ref": f"{ENVELOPE_URI}#/$defs/artifactReference"},
-        "ARTIFACT_REFERENCE_LIST": {"$ref": f"{ENVELOPE_URI}#/$defs/artifactReferenceList"},
-        "STRUCTURED": {"$ref": f"{ENVELOPE_URI}#/$defs/structured"},
-        "STRUCTURED_LIST": {"$ref": f"{ENVELOPE_URI}#/$defs/structuredList"},
-        "STRING": {"$ref": f"{ENVELOPE_URI}#/$defs/nonEmptyString"},
-        "STRING_LIST": {"$ref": f"{ENVELOPE_URI}#/$defs/stringList"},
+        "REFERENCE": {"$ref": f"{envelope_uri}#/$defs/reference"},
+        "REFERENCE_LIST": {"$ref": f"{envelope_uri}#/$defs/referenceList"},
+        "ARTIFACT_REFERENCE": {"$ref": f"{envelope_uri}#/$defs/artifactReference"},
+        "ARTIFACT_REFERENCE_LIST": {"$ref": f"{envelope_uri}#/$defs/artifactReferenceList"},
+        "STRUCTURED": {"$ref": f"{envelope_uri}#/$defs/structured"},
+        "STRUCTURED_LIST": {"$ref": f"{envelope_uri}#/$defs/structuredList"},
+        "STRING": {"$ref": f"{envelope_uri}#/$defs/nonEmptyString"},
+        "STRING_LIST": {"$ref": f"{envelope_uri}#/$defs/stringList"},
         "BOOLEAN": {"type": "boolean"},
         "INTEGER": {"type": "integer"},
         "NUMBER": {"type": "number"},
@@ -248,6 +291,157 @@ def build_result_schema(role: Mapping[str, Any]) -> dict[str, Any]:
         "x-bbk-role": role["name"],
         "x-bbk-contract": c["contract_id"],
         "x-bbk-supplemental-enums": c["supplemental_enums"],
+    }
+
+
+def build_v2_envelope(root: Path = ROOT) -> dict[str, Any]:
+    """Project the additive v2 envelope from the stable v1 definitions."""
+    envelope = copy.deepcopy(load_json(root / ENVELOPE_PATH))
+    envelope["$id"] = V2_ENVELOPE_URI
+    envelope["title"] = "BBK canonical role-return envelope v2"
+    envelope["description"] = (
+        "Common machine-valid envelope for COMPACT or FULL canonical BBK role returns. "
+        "V1 remains consume-compatible; v2 adds exact executor identity, proportional detail, "
+        "and concise evidence/effect/next-action truth without creating acceptance authority."
+    )
+    defs = envelope["$defs"]
+    defs["executorReference"] = {
+        "type": "object",
+        "additionalProperties": True,
+        "required": ["role", "invocation_id"],
+        "properties": {
+            "role": {"type": "string", "pattern": "^bbk_[a-z][a-z0-9_]*$"},
+            "invocation_id": {"$ref": "#/$defs/nonEmptyString"},
+            "host_session_id": {"type": ["string", "null"], "minLength": 1},
+            "provider": {"type": ["string", "null"], "minLength": 1},
+            "model": {"type": ["string", "null"], "minLength": 1},
+        },
+    }
+    defs["nonEmptyStructuredList"] = {
+        "type": "array", "minItems": 1, "items": {"$ref": "#/$defs/structured"}
+    }
+    defs["nonEmptyStringList"] = {
+        "type": "array", "minItems": 1,
+        "items": {"$ref": "#/$defs/nonEmptyString"}, "uniqueItems": True,
+    }
+    envelope["required"] = [
+        "schema", "contract", "role", "executor", "invocation_mode", "return_kind",
+        "detail_level", "subject_ref", "parent_ref", "attempt_ref",
+        "operational_disposition", "semantic_state", "summary",
+        "authority_and_effects_used", "result", "smallest_valid_next_action",
+    ]
+    properties = envelope["properties"]
+    properties["schema"] = {"const": V2_ENVELOPE_ID}
+    properties["executor"] = {"$ref": "#/$defs/executorReference"}
+    properties["detail_level"] = {"enum": DETAIL_LEVELS}
+    properties["outputs"] = {
+        "type": "array", "minItems": 1,
+        "items": {"$ref": "#/$defs/reference"},
+        "description": "Material output or sealed-package references; omit when none exist.",
+    }
+    properties["checks_and_evidence"] = {
+        "$ref": "#/$defs/nonEmptyStructuredList",
+        "description": "Material checks and evidence with claim limits; omit when none exist.",
+    }
+    properties["effects_and_cleanup"] = {
+        "$ref": "#/$defs/structured",
+        "description": "Material effects, cleanup, quarantine, or disposition facts; omit when irrelevant.",
+    }
+    properties["blockers_and_residuals"] = {
+        "$ref": "#/$defs/nonEmptyStringList",
+        "description": "Material blockers and residual uncertainty; omit only when none remain.",
+    }
+    properties["prohibited_claims"] = {
+        "$ref": "#/$defs/nonEmptyStringList",
+        "description": "Material claims this return does not establish; omit only when none are material.",
+    }
+    properties["durable_handoff_refs"] = {
+        "type": "array", "minItems": 1,
+        "items": {"$ref": "#/$defs/handoffReference"},
+        "description": "Verified durable handoff references; omit when no separate handoff exists.",
+    }
+    return envelope
+
+
+def build_compact_result_schema(role: Mapping[str, Any]) -> dict[str, Any]:
+    c = role["return_contract"]
+    selected = c["compact_result_fields"]
+    fields = c["result_fields"]
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": schema_uri(c["compact_result_schema"]),
+        "title": f"BBK {role['title']} compact result payload v2",
+        "description": (
+            f"Closed compact role-specific result payload for `{role['name']}`. "
+            "Use FULL when material truth cannot fit these fields."
+        ),
+        "type": "object",
+        "additionalProperties": False,
+        "required": list(selected),
+        "properties": {
+            name: field_schema(fields[name], envelope_uri=V2_ENVELOPE_URI)
+            for name in selected
+        },
+        "x-bbk-role": role["name"],
+        "x-bbk-contract": c["v2_contract_id"],
+        "x-bbk-detail-level": "COMPACT",
+        "x-bbk-full-detail-triggers": c["full_detail_triggers"],
+    }
+
+
+def build_v2_return_schema(role: Mapping[str, Any], entry: Mapping[str, Any]) -> dict[str, Any]:
+    c = role["return_contract"]
+    narrowing = {
+        "type": "object",
+        "properties": {
+            "contract": {"const": c["v2_contract_id"]},
+            "role": {"const": role["name"]},
+            "executor": {
+                "type": "object",
+                "properties": {"role": {"const": role["name"]}},
+                "required": ["role"],
+            },
+            "invocation_mode": {"enum": c["allowed_invocation_modes"]},
+            "return_kind": {"enum": c["allowed_return_kinds"]},
+            "operational_disposition": {"enum": c["allowed_operational_dispositions"]},
+            "semantic_state": {
+                "type": "object", "additionalProperties": False,
+                "required": ["name", "value"],
+                "properties": {
+                    "name": {"const": c["semantic_state_name"]},
+                    "value": {"enum": c["allowed_semantic_states"]},
+                },
+            },
+        },
+        "allOf": [
+            *parent_constraints(entry),
+            {
+                "if": {"properties": {"detail_level": {"const": "COMPACT"}}, "required": ["detail_level"]},
+                "then": {"properties": {"result": {"$ref": schema_uri(c["compact_result_schema"])}}},
+            },
+            {
+                "if": {"properties": {"detail_level": {"const": "FULL"}}, "required": ["detail_level"]},
+                "then": {"properties": {"result": {"$ref": schema_uri(c["result_schema"])}}},
+            },
+        ],
+    }
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": schema_uri(c["v2_return_schema"]),
+        "title": f"BBK {role['title']} return v2",
+        "description": f"Role-specific `{V2_ENVELOPE_ID}` COMPACT/FULL contract for `{role['name']}`.",
+        "allOf": [{"$ref": V2_ENVELOPE_URI}, narrowing],
+        "x-bbk-role": role["name"],
+        "x-bbk-contract": c["v2_contract_id"],
+        "x-bbk-envelope": V2_ENVELOPE_ID,
+        "x-bbk-v1-consume-compatible": True,
+        "x-bbk-full-result-schema": c["result_schema"],
+        "x-bbk-compact-result-schema": c["compact_result_schema"],
+        "x-bbk-full-detail-triggers": c["full_detail_triggers"],
+        "x-bbk-semantic-state-name": c["semantic_state_name"],
+        "x-bbk-requirements": c["requirements"],
+        "x-bbk-readiness-rule": c["readiness_rule"],
+        "x-bbk-authority-boundary": c["authority_boundary"],
     }
 
 
@@ -319,24 +513,52 @@ def build_return_schema(role: Mapping[str, Any], entry: Mapping[str, Any]) -> di
 def expected_outputs(root: Path = ROOT) -> tuple[dict[str, Any], list[dict[str, Any]], dict[Path, bytes]]:
     catalog, roles, entries = load_package(root)
     errors = validate_metadata(catalog, roles, entries)
-    if errors: raise ReturnContractError(errors)
+    if errors:
+        raise ReturnContractError(errors)
     outputs: dict[Path, bytes] = {}
-    registry_entries: list[dict[str, Any]] = []
+    v1_registry_entries: list[dict[str, Any]] = []
+    v2_registry_entries: list[dict[str, Any]] = []
+    outputs[root / V2_ENVELOPE_PATH] = canonical_bytes(build_v2_envelope(root))
     for role in roles:
         c = role["return_contract"]
         result_payload = canonical_bytes(build_result_schema(role))
         return_payload = canonical_bytes(build_return_schema(role, entries[role["name"]]))
+        compact_payload = canonical_bytes(build_compact_result_schema(role))
+        v2_return_payload = canonical_bytes(build_v2_return_schema(role, entries[role["name"]]))
         result_path = root / c["result_schema"]
         return_path = root / c["return_schema"]
+        compact_path = root / c["compact_result_schema"]
+        v2_return_path = root / c["v2_return_schema"]
         outputs[result_path] = result_payload
         outputs[return_path] = return_payload
+        outputs[compact_path] = compact_payload
+        outputs[v2_return_path] = v2_return_payload
         source_path = root / entries[role["name"]]["file"]
-        registry_entries.append({
+        source_record = {
+            "path": entries[role["name"]]["file"],
+            "bytes": source_path.stat().st_size,
+            "sha256": hashlib.sha256(source_path.read_bytes()).hexdigest(),
+        }
+        v1_registry_entries.append({
             "role": role["name"], "contract_id": c["contract_id"],
             "semantic_state_name": c["semantic_state_name"],
             "return_schema": {"path": c["return_schema"], "bytes": len(return_payload), "sha256": sha256(return_payload)},
             "result_schema": {"path": c["result_schema"], "bytes": len(result_payload), "sha256": sha256(result_payload)},
-            "source": {"path": entries[role["name"]]["file"], "bytes": source_path.stat().st_size, "sha256": hashlib.sha256(source_path.read_bytes()).hexdigest()},
+            "source": source_record,
+        })
+        v2_registry_entries.append({
+            "role": role["name"],
+            "contract_id": c["v2_contract_id"],
+            "default_detail_level": "COMPACT",
+            "allowed_detail_levels": DETAIL_LEVELS,
+            "semantic_state_name": c["semantic_state_name"],
+            "return_schema": {"path": c["v2_return_schema"], "bytes": len(v2_return_payload), "sha256": sha256(v2_return_payload)},
+            "compact_result_schema": {"path": c["compact_result_schema"], "bytes": len(compact_payload), "sha256": sha256(compact_payload)},
+            "full_result_schema": {"path": c["result_schema"], "bytes": len(result_payload), "sha256": sha256(result_payload)},
+            "v1_compatibility": {"contract_id": c["contract_id"], "return_schema": c["return_schema"]},
+            "compact_result_fields": c["compact_result_fields"],
+            "full_detail_triggers": c["full_detail_triggers"],
+            "source": source_record,
         })
     registry = {
         "schema": REGISTRY_SCHEMA_ID,
@@ -344,11 +566,25 @@ def expected_outputs(root: Path = ROOT) -> tuple[dict[str, Any], list[dict[str, 
         "source_role_catalog": ROLE_CATALOG.as_posix(),
         "envelope_schema": ENVELOPE_PATH.as_posix(),
         "generator": "tools/return_contracts.py",
-        "role_count": len(registry_entries),
+        "role_count": len(v1_registry_entries),
         "operational_dispositions": OPERATIONAL_DISPOSITIONS,
-        "entries": registry_entries,
+        "entries": v1_registry_entries,
+    }
+    v2_registry = {
+        "schema": V2_REGISTRY_SCHEMA_ID,
+        "package_version": catalog["package_version"],
+        "source_role_catalog": ROLE_CATALOG.as_posix(),
+        "envelope_schema": V2_ENVELOPE_PATH.as_posix(),
+        "v1_registry": REGISTRY_PATH.as_posix(),
+        "generator": "tools/return_contracts.py",
+        "role_count": len(v2_registry_entries),
+        "default_detail_level": "COMPACT",
+        "allowed_detail_levels": DETAIL_LEVELS,
+        "operational_dispositions": OPERATIONAL_DISPOSITIONS,
+        "entries": v2_registry_entries,
     }
     outputs[root / REGISTRY_PATH] = canonical_bytes(registry)
+    outputs[root / V2_REGISTRY_PATH] = canonical_bytes(v2_registry)
     return catalog, roles, outputs
 
 
@@ -375,25 +611,29 @@ def render_return_contract_prompt(role: Mapping[str, Any]) -> str:
     c = role["return_contract"]
     lines = [
         "## Exact role-return contract", "",
-        f"Return one JSON object governed by `{c['return_schema']}`. Its common envelope is `{c['envelope_schema']}` and its closed role payload is `{c['result_schema']}`.", "",
-        "Use these exact discriminators:", "",
-        f"- `schema`: `{ENVELOPE_ID}`",
-        f"- `contract`: `{c['contract_id']}`",
-        f"- `role`: `{role['name']}`",
+        f"Return one JSON object governed by `{c['v2_return_schema']}`. New returns use `{c['v2_envelope_schema']}`; v1 remains consume-compatible through `{c['return_schema']}`.", "",
+        "Use these exact v2 discriminators:", "",
+        f"- `schema`: `{V2_ENVELOPE_ID}`",
+        f"- `contract`: `{c['v2_contract_id']}`",
+        f"- `role` and `executor.role`: `{role['name']}`",
+        "- `detail_level`: `COMPACT` by default; use `FULL` only when a trigger below applies",
         "- `invocation_mode`: " + ", ".join(f"`{x}`" for x in c["allowed_invocation_modes"]),
         "- `return_kind`: " + ", ".join(f"`{x}`" for x in c["allowed_return_kinds"]),
         "- `operational_disposition`: " + ", ".join(f"`{x}`" for x in c["allowed_operational_dispositions"]),
         f"- `semantic_state.name`: `{c['semantic_state_name']}`",
         "- `semantic_state.value`: " + ", ".join(f"`{x}`" for x in c["allowed_semantic_states"]), "",
-        "The envelope also requires `subject_ref`, `parent_ref`, `attempt_ref`, `summary`, `authority_and_effects_used`, `result`, `durable_handoff_refs`, and `smallest_valid_next_action`.", "",
-        "The closed `result` payload requires every field below:", "",
+        "The v2 envelope requires exact subject, parent, attempt, executor, disposition, semantic state, summary, authority/effect truth, result, and smallest valid next action. Include material outputs, checks/evidence, effects/cleanup, blockers/residuals, prohibited claims, and durable handoff references; omit only irrelevant empty sections.", "",
+        f"COMPACT uses `{c['compact_result_schema']}` and requires:", "",
     ]
-    for name, field in c["result_fields"].items():
+    for name in c["compact_result_fields"]:
+        field = c["result_fields"][name]
         details = field["kind"] + ("; nullable" if field["nullable"] else "")
         if field["kind"] in {"ENUM", "ENUM_LIST"}:
             details += "; " + ", ".join(field["enum_values"])
         lines.append(f"- `{name}` ({details}) — {field['description']}")
-    lines += ["", "Readiness rule:", "", c["readiness_rule"], "", "Authority boundary:", "", c["authority_boundary"], "", "Do not emit `READY_FOR_VALIDATION`, `BLOCKED`, or `PAUSED` as current operational dispositions; those values are consume-only legacy `bbk.handoff.v1` inputs."]
+    lines += ["", f"FULL uses the existing complete payload `{c['result_schema']}`. Use FULL when:", ""]
+    lines.extend(f"- {item}" for item in c["full_detail_triggers"])
+    lines += ["", "Readiness rule:", "", c["readiness_rule"], "", "Authority boundary:", "", c["authority_boundary"], "", "Operational completion, role semantic readiness, accountable acceptance, and release remain separate. Do not emit `READY_FOR_VALIDATION`, `BLOCKED`, or `PAUSED` as current operational dispositions."]
     return "\n".join(lines)
 
 
@@ -411,7 +651,15 @@ def validate_document(document: Any, role_name: str, root: Path = ROOT) -> None:
     except ImportError as exc:
         raise ReturnContractError(f"jsonschema is required for document validation: {exc}")
     role = load_role(role_name, root)
-    schemas = [load_json(root / ENVELOPE_PATH), load_json(root / role["return_contract"]["result_schema"]), load_json(root / role["return_contract"]["return_schema"])]
+    c = role["return_contract"]
+    schema_id = document.get("schema") if isinstance(document, dict) else None
+    if schema_id == ENVELOPE_ID:
+        paths = [ENVELOPE_PATH, Path(c["result_schema"]), Path(c["return_schema"])]
+    elif schema_id == V2_ENVELOPE_ID:
+        paths = [ENVELOPE_PATH, V2_ENVELOPE_PATH, Path(c["compact_result_schema"]), Path(c["result_schema"]), Path(c["v2_return_schema"])]
+    else:
+        raise ReturnContractError(f"unsupported role-return schema: {schema_id!r}")
+    schemas = [load_json(root / path) for path in paths]
     registry = Registry()
     for schema in schemas:
         registry = registry.with_resource(schema["$id"], Resource.from_contents(schema))
@@ -438,7 +686,7 @@ def main(argv: list[str] | None = None) -> int:
         if errors: raise ReturnContractError(errors)
         _, roles, _ = load_package(root)
         action = "generated" if args.write else "verified"
-        print(f"OK: {action} {len(roles)} role return schemas, {len(roles)} result schemas, and registry")
+        print(f"OK: {action} {len(roles)} v1 + {len(roles)} v2 role return schemas, {len(roles)} full + {len(roles)} compact result schemas, and two registries")
         return 0
     except (OSError, json.JSONDecodeError, ReturnContractError) as exc:
         print(f"BBK role-return contract error:\n{exc}", file=sys.stderr)

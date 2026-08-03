@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-root-orchestrator-compact-result-v2.schema.json",
+  "title": "BBK BBK Root Orchestrator compact result payload v2",
+  "description": "Closed compact role-specific result payload for `bbk_root_orchestrator`. Use FULL when material truth cannot fit these fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "campaign_state",
+    "candidate_inventory",
+    "completion_assessment",
+    "blockers_and_pauses",
+    "parent_actions_requested",
+    "residuals"
+  ],
+  "properties": {
+    "campaign_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Global capability, phase, boundary, WorkUnit, gate, validation, review, and completion frontier; exact current, ready, running, waiting, blocked, paused, recovering, validating, repairing, and terminal child states; projection watermark and freshness."
+    },
+    "candidate_inventory": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Every exact candidate, base and successor relationship, manifest, owning boundary and cohort, worker-quality attestation, freeze state, repository and external-state closure, invalidation, repair, and current eligibility."
+    },
+    "completion_assessment": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Current evaluation of every baseline completion condition, territory and integration terminal state, deterministic gate, validation, operational observation, review, finding disposition, cleanup, authority accounting, evidence integrity, and invalidation, with explicit unmet conditions. This is a report, not terminal acceptance."
+    },
+    "blockers_and_pauses": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Exact technical, authority and decision blockers kept separate from dependency wait, expected silence, capacity pause, host-window pause, recovery, and scheduling state, with affected scope, evidence, and smallest valid resolution."
+    },
+    "parent_actions_requested": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Exact controller, core, Root Wayfinder, accountable-authority, recovery, qualification, resource, successor-baseline, review, validation, operational-observation, acceptance, or release action requested, with affected objects and whether unaffected work may continue."
+    },
+    "residuals": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Remaining work, findings, risks, debt, unknowns, deferred items, unavailable environments, monitoring needs, accepted or unaccepted residuals, owners, expiry, and reopening triggers."
+    }
+  },
+  "x-bbk-role": "bbk_root_orchestrator",
+  "x-bbk-contract": "bbk.root-orchestrator-return.v2",
+  "x-bbk-detail-level": "COMPACT",
+  "x-bbk-full-detail-triggers": [
+    "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+    "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+    "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+    "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+    "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+    "The parent explicitly requested FULL detail.",
+    "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+  ]
+}

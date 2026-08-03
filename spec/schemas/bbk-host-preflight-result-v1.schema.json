@@ -1,0 +1,161 @@
+{
+  "$defs": {
+    "nonEmpty": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "observation": {
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "kind": {
+          "enum": [
+            "COMMAND",
+            "PATH",
+            "ENVIRONMENT",
+            "LIVE"
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "status": {
+          "enum": [
+            "AVAILABLE",
+            "UNAVAILABLE",
+            "VERSION_MISMATCH",
+            "PERMISSION_BLOCKED",
+            "UNKNOWN",
+            "REQUIRES_LIVE_PROBE"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "required",
+        "status"
+      ],
+      "type": "object"
+    },
+    "sha": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    }
+  },
+  "$id": "https://bbk.local/schemas/bbk-host-preflight-result-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "authorityBoundary": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "cache": {
+      "additionalProperties": false,
+      "properties": {
+        "createdAt": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "freshUntil": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "hit": {
+          "type": "boolean"
+        },
+        "key": {
+          "$ref": "#/$defs/sha"
+        },
+        "path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "hit",
+        "key",
+        "createdAt",
+        "freshUntil",
+        "path"
+      ],
+      "type": "object"
+    },
+    "claimsNotEstablished": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "host": {
+      "additionalProperties": true,
+      "properties": {
+        "digest": {
+          "$ref": "#/$defs/sha"
+        }
+      },
+      "required": [
+        "system",
+        "node",
+        "release",
+        "machine",
+        "pythonVersion",
+        "pythonExecutable",
+        "digest"
+      ],
+      "type": "object"
+    },
+    "observations": {
+      "items": {
+        "$ref": "#/$defs/observation"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "requestId": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "requiredCapabilityBlockers": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "requirementsDigest": {
+      "$ref": "#/$defs/sha"
+    },
+    "schema": {
+      "const": "bbk.host-preflight-result.v1"
+    },
+    "status": {
+      "enum": [
+        "PASS",
+        "BLOCKED"
+      ]
+    },
+    "toolVersions": {
+      "additionalProperties": true,
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "requestId",
+    "status",
+    "host",
+    "requirementsDigest",
+    "toolVersions",
+    "observations",
+    "requiredCapabilityBlockers",
+    "cache",
+    "authorityBoundary",
+    "claimsNotEstablished"
+  ],
+  "title": "BBK host preflight result v1",
+  "type": "object"
+}

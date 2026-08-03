@@ -1,0 +1,224 @@
+{
+  "$defs": {
+    "nonEmpty": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "stringList": {
+      "items": {
+        "$ref": "#/$defs/nonEmpty"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "subject": {
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "kind": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "revision": {
+          "type": [
+            "string",
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://bbk.local/schemas/bbk-prototype-charter-v2.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "detailLevel": {
+            "const": "FULL"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "apparatus",
+          "evaluationCommitment",
+          "runPlan",
+          "confounders"
+        ]
+      }
+    }
+  ],
+  "description": "Bounded COMPACT or FULL experimental charter. It does not authorize production use, acceptance, or release.",
+  "properties": {
+    "apparatus": {
+      "minProperties": 1,
+      "type": "object"
+    },
+    "artifactDisposition": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "authority": {
+      "minProperties": 1,
+      "type": "object"
+    },
+    "authorityBoundary": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "budget": {
+      "additionalProperties": false,
+      "properties": {
+        "effectBudget": {
+          "items": {
+            "$ref": "#/$defs/nonEmpty"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "stopConditions": {
+          "items": {
+            "$ref": "#/$defs/nonEmpty"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "timeSeconds": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "timeSeconds",
+        "effectBudget",
+        "stopConditions"
+      ],
+      "type": "object"
+    },
+    "cleanup": {
+      "additionalProperties": false,
+      "properties": {
+        "disposition": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "residualOwner": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "verification": {
+          "$ref": "#/$defs/nonEmpty"
+        }
+      },
+      "required": [
+        "disposition",
+        "verification",
+        "residualOwner"
+      ],
+      "type": "object"
+    },
+    "confounders": {
+      "$ref": "#/$defs/stringList"
+    },
+    "detailLevel": {
+      "enum": [
+        "COMPACT",
+        "FULL"
+      ]
+    },
+    "evaluationCommitment": {
+      "minProperties": 1,
+      "type": "object"
+    },
+    "evaluationThreshold": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "limitations": {
+          "$ref": "#/$defs/stringList"
+        },
+        "method": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "retention": {
+          "$ref": "#/$defs/nonEmpty"
+        }
+      },
+      "required": [
+        "method",
+        "retention",
+        "limitations"
+      ],
+      "type": "object"
+    },
+    "fallback": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "guaranteed": {
+          "const": true
+        },
+        "trigger": {
+          "$ref": "#/$defs/nonEmpty"
+        }
+      },
+      "required": [
+        "guaranteed",
+        "trigger",
+        "action"
+      ],
+      "type": "object"
+    },
+    "id": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "parentDecision": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "runPlan": {
+      "minItems": 1,
+      "type": "array"
+    },
+    "schema": {
+      "const": "bbk.prototype-charter.v2"
+    },
+    "subject": {
+      "$ref": "#/$defs/subject"
+    },
+    "uncertainty": {
+      "$ref": "#/$defs/nonEmpty"
+    }
+  },
+  "required": [
+    "schema",
+    "id",
+    "detailLevel",
+    "subject",
+    "uncertainty",
+    "parentDecision",
+    "evaluationThreshold",
+    "budget",
+    "fallback",
+    "evidence",
+    "cleanup",
+    "authority",
+    "artifactDisposition",
+    "authorityBoundary"
+  ],
+  "title": "BBK prototype charter v2",
+  "type": "object"
+}

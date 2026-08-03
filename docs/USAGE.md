@@ -1,6 +1,28 @@
-# BBK alpha.13 usage
+# BBK alpha.15 usage
 
-Alpha.13 uses the harness-root session as the sole user-facing controller and exposes four controller-selectable canonical roots. All 19 roles are non-user-facing children compiled from split v4 role sources, selected prompt modules, exact role-specific procedures, and exact return contracts. OMP still replaces Main and child system prompts so conflicting generic or client-specific instructions cannot govern BBK work. The reviewed per-role model policy, persistent mode, activity/context line, `ask` provenance, bounded verification, harness-scoped updates, and project-record formats remain available.
+Alpha.15 uses the harness-root session as the sole user-facing controller and exposes four controller-selectable canonical roots. All 19 roles are non-user-facing children compiled from split v4 role sources, 31 prompt modules, exact role-specific procedures, and generated v2 return contracts. OMP continues to replace Main and child system prompts so conflicting generic or client-specific instructions cannot govern BBK work.
+
+## Alpha.15 operating behavior
+
+Routine work is product-first. Stable-interface capability increments may proceed concurrently when their mutation and evidence scopes are independent. Mechanical defects block only the affected package or exact scope and are repaired locally rather than automatically commissioning architecture, research, review, or user authorization.
+
+Assurance uses `INLINE` by default, `FOCUSED` for an exact material risk or finding-scoped recheck, and `FULL` for consequential boundaries, material effects, complex recovery, authority ambiguity, interrupted attempts, or explicit parent request. Independent review normally targets an integrated candidate.
+
+Generated role returns default to `bbk.role-return.v2`: COMPACT uses role-specific compact schemas, while FULL retains the existing authoritative role result schemas. V1 remains consumable.
+
+Useful deterministic utilities include:
+
+```text
+bbk artifact preflight <draft>
+bbk artifact seal <draft> --output <sealed>
+bbk artifact verify <sealed>
+bbk artifact successor <sealed> --output <draft> --revision <rev> --reason <reason>
+bbk preflight run <request.json> --root <project> --output <result.json>
+bbk context worker --root <project> --work-unit <wu.json> --profile-lock <lock.json> --host-preflight <result.json> --output <package>
+bbk context review --root <project> --candidate <candidate-package> --request <request.json> --output <package>
+```
+
+New constructors use sealed packages. Generated hashes, byte lengths, canonicalization labels, package closure, and receipts are tool-owned. Host-preflight observations are evidence bound to an exact host, not execution authority.
 
 ## Enter BBK
 
@@ -211,7 +233,13 @@ Scriptable forms:
 /bbk:models set bbk_validator @task medium
 /bbk:models apply D:\Profiles\bbk-cheap.json
 /bbk:models export D:\Profiles\bbk-current.json current-bbk
+/bbk:models project create
+/bbk:models project status
+/bbk:models project repair --dry-run
+/bbk:models project repair
 ```
+
+In a user-scoped session, the menu recommends project-local creation instead of only warning about global effect. Creation clones all 19 current effective user OMP routes and calls the exact bound package installer for an OMP-only project install with language profiles disabled. It does not require Git or `.bbk`, and it verifies that the user routing surface remained byte-identical. Divergent project footprints return `REPAIR_REQUIRED`; repair is dry-run first, backup-aware, explicit, and never falls through to user scope. Reload or restart OMP after creation or repair.
 
 The default `auto` target selects the nearest valid project-scoped OMP installation and otherwise the user-scoped installation. Explicit `project` and `user` prefixes remove ambiguity. An expected but invalid project binding fails closed; it does not fall through to the shared user route. User-scope changes require interactive confirmation and affect future spawns in all projects using that user installation. Project-scope installations retain independent profiles.
 
@@ -245,6 +273,21 @@ operational outcome and boundary
                       → completion or successor repair
 ```
 
+
+## User attention, execution autonomy, and example state
+
+Classify unresolved items before asking the user: environment fact, configuration parameter, reversible implementation choice, architectural decision, authority expansion, or user-reserved preference. Inspect, parameterize, safely default, or defer the first three whenever that remains responsible. Batch coherent material requests and return one correlated response packet.
+
+After an accepted baseline and current authority are bound, proceed through routine plan-detail corrections, local sequencing changes, reversible implementation choices, ordinary repairs, compatible substitutions, and a technical blocker with one safe realistic in-authority resolution. Ask only for a genuine consequential branch or authority expansion; do not re-request an existing grant.
+
+New projects store shipped reference artifacts under `.bbk/examples/`, outside operational directories. They do not count as live project state or default manifest/candidate inputs. Omit them entirely when desired:
+
+```bash
+bbk init --root . --project-id PROJECT-1 --title "Project 1" --no-examples
+```
+
+Existing legacy `EXAMPLE-*` files remain recognized as non-operational.
+
 ## Durable question and handoff records
 
 ```bash
@@ -256,7 +299,7 @@ bbk handoff create --root . --work-unit WU-001 --attempt 1 \
   --disposition PARTIAL --summary "Checkpoint" \
   --artifact out/result.json --continuation-state READY \
   --next-action "Resume and validate"
-bbk handoff verify .bbk/handoffs/WU-001/HO-WU-001-1.json --root .
+bbk handoff verify .bbk/handoffs/WU-001/HO-WU-001-1 --root .
 bbk handoff list --root . --work-unit WU-001 --latest
 ```
 
@@ -361,10 +404,24 @@ bbk fit render .bbk/fit/SOF-001.json --output .bbk/reviews/SOF-001.md
 
 `INVESTIGATE` and `UNRESOLVED` block implementation commitment but permit bounded investigation.
 
-## Structure, state/effect design, and slices
+## Structure, schema discovery, state/effect design, and slices
+
+New structure contracts default to v3. Use the compact infrastructure form when software-class structure is not material:
 
 ```bash
-bbk structure new --output .bbk/structures/ISC-001.json
+bbk structure new --version v3 --kind infrastructure --depth compact \
+  --output .bbk/structures/ISC-001.json
+bbk structure validate .bbk/structures/ISC-001.json
+
+bbk schema list
+bbk schema template --kind implementation-structure \
+  --subject-kind network_configuration --depth compact \
+  --output .bbk/structures/NETWORK-001.json
+bbk schema enum --schema implementation-structure \
+  --pointer /contractDepth
+bbk schema explain --schema implementation-structure \
+  --instance .bbk/structures/NETWORK-001.json
+
 bbk state-effect new --output .bbk/state-effects/SDE-001.json
 bbk state-effect validate .bbk/state-effects/SDE-001.json
 bbk trace new --output .bbk/traces/TRACE-001.json
@@ -378,7 +435,7 @@ bbk slice validate .bbk/slices/ES-001.json
 bbk slice check-set .bbk/slices/*.json
 ```
 
-Use `CONTRACT` for material history, concurrency, external effects, ambiguity, recovery, or authority. Use the least sufficient formalization level.
+Use `compact` for a bounded infrastructure, network, deployment, procedure, or document topology when full software-state detail would be artificial. Use `standard` or `full` when material history, concurrency, state/effect transitions, external effects, ambiguity, recovery, migration, or authority demand it. v1/v2 remain valid compatibility inputs.
 
 ## Work units
 
@@ -388,6 +445,17 @@ bbk work-unit validate .bbk/work-units/WU-001.json
 ```
 
 ## Assurance and review
+
+Choose the smallest justified mode: `INLINE`, `FOCUSED`, or `FULL`. For generated candidate-bound review context, prefer:
+
+```bash
+bbk context review --root . \
+  --candidate .bbk/packages/C-001 \
+  --request .bbk/reviews/requests/RQ-001.json \
+  --output .bbk/reviews/contexts/C-001
+```
+
+Legacy assurance/review records remain supported:
 
 ```bash
 bbk assurance new --output .bbk/assurance/AC-001.json
@@ -421,9 +489,26 @@ bbk review run \
 
 A later review's silence never closes a finding.
 
-## Manifests, candidates, and gates
+## Artifact packages, manifests, candidates, and gates
+
+For immutable package publication, use the common transaction:
 
 ```bash
+bbk artifact preflight .bbk/drafts/C-001
+bbk artifact seal .bbk/drafts/C-001 --output .bbk/packages/C-001
+bbk artifact verify .bbk/packages/C-001
+bbk artifact successor .bbk/packages/C-001 --output .bbk/drafts/C-002 \
+  --revision r2 --reason "Focused repair"
+```
+
+For a bounded legacy handoff or review set, the exact artifact-manifest surface remains available:
+
+```bash
+bbk artifact manifest --root . \
+  --path deploy --path .bbk/structures/ISC-001.json \
+  --subject REVIEW-001 --output .bbk/manifests/REVIEW-001.json
+bbk artifact verify .bbk/manifests/REVIEW-001.json --root .
+
 bbk manifest create --output .bbk/baseline-manifest.json
 bbk manifest compare --left .bbk/baseline-manifest.json
 

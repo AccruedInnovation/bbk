@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-territory-wayfinder-compact-result-v2.schema.json",
+  "title": "BBK BBK Territory Wayfinder compact result payload v2",
+  "description": "Closed compact role-specific result payload for `bbk_territory_wayfinder`. Use FULL when material truth cannot fit these fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "territory_synthesis_ref",
+    "local_work_graph_refs",
+    "outward_impacts",
+    "blockers",
+    "parent_actions_requested",
+    "residual_uncertainty"
+  ],
+  "properties": {
+    "territory_synthesis_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/reference",
+      "description": "Territory ID, revision, lifecycle state, durable path, byte count, and SHA-256 when persisted; inline content is permitted for a routine small territory."
+    },
+    "local_work_graph_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/referenceList",
+      "description": "Any current territory-local capability, phase, work-unit, and worker-invocation references, or an explicit not-required or not-ready disposition."
+    },
+    "outward_impacts": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Exact implications for the parent, sibling territories, shared contracts, global work graph, assurance, authority, migration, or baseline."
+    },
+    "blockers": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Exact technical, authority, decision, capacity, host-window, interface, or parent-integration blockers."
+    },
+    "parent_actions_requested": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Exact decisions, interface dispositions, integration actions, resynthesis, or planning actions requested from the semantic parent."
+    },
+    "residual_uncertainty": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Explicit bounded uncertainty retained after economic stopping and its consequence, owner, expiry, or reopening trigger."
+    }
+  },
+  "x-bbk-role": "bbk_territory_wayfinder",
+  "x-bbk-contract": "bbk.territory-wayfinder-return.v2",
+  "x-bbk-detail-level": "COMPACT",
+  "x-bbk-full-detail-triggers": [
+    "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+    "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+    "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+    "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+    "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+    "The parent explicitly requested FULL detail.",
+    "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+  ]
+}

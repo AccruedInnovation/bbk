@@ -1,0 +1,145 @@
+{
+  "$defs": {
+    "nonEmptyString": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "predecessor": {
+      "additionalProperties": false,
+      "properties": {
+        "contentSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "packageId": {
+          "$ref": "#/$defs/safeId"
+        },
+        "revision": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "source": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "packageId",
+        "revision",
+        "contentSha256"
+      ],
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "profileRef": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/safeId"
+        },
+        "version": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ],
+      "type": "object"
+    },
+    "relativePath": {
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+$",
+      "type": "string"
+    },
+    "safeId": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+      "type": "string"
+    },
+    "sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "subject": {
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "kind": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "revision": {
+          "type": [
+            "string",
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://bbk.local/schemas/bbk-artifact-package-seal-receipt-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "authorityBoundary": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "contentSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "manifestSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "packageId": {
+      "$ref": "#/$defs/safeId"
+    },
+    "revision": {
+      "$ref": "#/$defs/nonEmptyString"
+    },
+    "schema": {
+      "const": "bbk.artifact-package-seal-receipt.v1"
+    },
+    "sealedAtUtc": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "tool": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "const": "bbk"
+        },
+        "version": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "packageId",
+    "revision",
+    "contentSha256",
+    "manifestSha256",
+    "sealedAtUtc",
+    "tool",
+    "authorityBoundary"
+  ],
+  "title": "BBK artifact package seal receipt v1",
+  "type": "object"
+}

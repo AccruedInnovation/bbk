@@ -1,4 +1,4 @@
-# BBK alpha.13.4 OMP extension
+# BBK alpha.14 OMP extension
 
 This adapter exposes BBK's deterministic project, fit, structure, State–Decision–Effect, slicing, assurance, candidate, gate, review, evidence, profile, workspace, model-routing, and orchestration-entrypoint surfaces.
 
@@ -63,7 +63,7 @@ assertion-scoped candidate acceptance
 
 Prefer background/non-blocking root jobs so Main remains available to relay user decisions and steering. `/bbk <request>` forwards only the raw directive through `sendUserMessage`; `/bbk` with no arguments and `/bbk:exit` perform only local state/UI work. `/bbk:exit` restores ordinary OMP prompting for later Main turns.
 
-All generated alpha.13.4 OMP BBK agents declare `blocking: false`. With OMP 16.4.8 and `async.enabled=true`, eligible task spawns use managed background jobs whose lifetime is independent of the parent tool call. When the host uses inline task execution, BBK prompt modules sequence human callbacks ahead of decision-dependent specialist dispatch so an immediate response cannot cascade-cancel useful work. See `docs/OMP-CHILD-LIFETIME.md`.
+All generated alpha.14 OMP BBK agents declare `blocking: false`. With OMP 16.4.8 and `async.enabled=true`, eligible task spawns use managed background jobs whose lifetime is independent of the parent tool call. When the host uses inline task execution, BBK prompt modules sequence human callbacks ahead of decision-dependent specialist dispatch so an immediate response cannot cascade-cancel useful work. See `docs/OMP-CHILD-LIFETIME.md`.
 
 Prompt replacement does not change the parent model, thinking level, active tools, child model routes, filesystem containment, or native host capabilities. It also does not itself exit another OMP mode; leave a conflicting native mode separately when its tool restrictions are inappropriate.
 
@@ -87,6 +87,17 @@ The replacement discards conflicting generic OMP workflow rules and Codex/Claude
 
 OMP frontmatter intentionally has no `autoloadSkills`. Mandatory procedures are already in the system prompt, so the model does not waste a skill-read call and correctness does not depend on host autoload behavior. Optional procedures and language/domain profiles remain available on demand.
 
+## Effective prompt receipts
+
+OMP 16.4.8 records a child session's assembled pre-hook prompt before `before_agent_start` replacement. Alpha.14 appends digest-only `bbk.effective-prompt-receipt.v1` entries after replacement and at `before_provider_request` when the host exposes `getSystemPrompt()`.
+
+```text
+/bbk:prompt-status
+/bbk:prompt-status json
+```
+
+The receipt records source/effective lengths and SHA-256 digests, role/package identity, replacement-marker count, generic OMP contamination detection/removal, and provider-bound `VERIFIED`, `MISMATCH`, `UNAVAILABLE`, or `ERROR`. It never duplicates the raw prompt. The surface is observability only and does not abort or create Blueprint-style lifecycle authority.
+
 ## Main-mediated `hub`/IRC communication
 
 Named BBK agents use OMP `hub`/IRC for live communication. They discover exact peer IDs with the roster, send ordinary coordination to their invoking parent, and send a compact `BBK_USER_REQUEST` to Main when they need a material decision, authority grant, private context, protected-floor exception, hard-to-reverse commitment, or explicit acceptance. The request carries a stable ID, the smallest material question, recommendation, alternatives, consequences, residual uncertainty, blocking state, and any durable packet reference.
@@ -98,18 +109,21 @@ Main presents the question only through OMP's native `ask` tool and relays the s
 The OMP target installs:
 
 - 19 role agents with native direct-child `spawns` allowlists;
-- 21 core BBK skills plus an install-bound profile registry;
+- 39 generated BBK skills, including one installation-bound profile registry;
 - complete mandatory-skill injection for every role;
 - explicit `model` and `thinkingLevel` fields;
-- 28 model-facing tools and 29 UI commands; and
-- the persistent `/bbk`, deterministic `/bbk:status`, scoped `/bbk:models`, hierarchical `/bbk:agents`, and normal `/bbk:beads` surfaces.
+- 33 model-facing tools and 36 UI commands; and
+- the persistent `/bbk`, deterministic `/bbk:status`, scoped `/bbk:models`, hierarchical `/bbk:agents`, normal `/bbk:beads`, schema/artifact utilities, and `/bbk:prompt-status` surfaces.
 
-The canonical install-time v2 policy gives every role its own OMP route. Alpha.13.3 preserves the exact reviewed per-role selections from the split-role update: judgment-heavy roles primarily use `openai-codex/gpt-5.6-sol`, Territory Orchestrator uses `openai-codex/gpt-5.6-luna`, and bounded empirical/mechanical roles use `deepseek/deepseek-v4-flash`, with the reviewed role-specific thinking levels. These are duplicated per-role values rather than shared categories. Model choice is an execution preference, not authority or assurance.
+The canonical install-time v2 policy gives every role its own OMP route. Alpha.14 preserves the exact reviewed per-role selections from the split-role update: judgment-heavy roles primarily use `openai-codex/gpt-5.6-sol`, Territory Orchestrator uses `openai-codex/gpt-5.6-luna`, and bounded empirical/mechanical roles use `deepseek/deepseek-v4-flash`, with the reviewed role-specific thinking levels. These are duplicated per-role values rather than shared categories. Model choice is an execution preference, not authority or assurance.
 
 ```text
 /bbk:models
 /bbk:models status
 /bbk:models project status
+/bbk:models project create
+/bbk:models project repair --dry-run
+/bbk:models project repair
 /bbk:models user status
 /bbk:models project profile testing-flash
 /bbk:models user profile default
@@ -117,6 +131,8 @@ The canonical install-time v2 policy gives every role its own OMP route. Alpha.1
 /bbk:models apply /path/to/profile.json
 /bbk:models export /path/to/profile.json profile-id
 ```
+
+From user scope, `project create` clones the exact effective user OMP routes into an authenticated OMP-only project installation with no language profiles and no Git or `.bbk` initialization. A partial or divergent project fails closed. `project repair` is dry-run first, backup-aware, and requires explicit confirmation. Reload OMP after creation or repair.
 
 The default `auto` target resolves the nearest valid project-scoped BBK OMP installation and otherwise the user installation. An expected but invalid project binding fails closed rather than falling through to user-global state. Explicit `project` and `user` targets are available; user-scope mutations require interactive confirmation. Changes apply to future child spawns. `task.agentModelOverrides` and higher-precedence project agent definitions may supersede BBK-managed frontmatter; status reports scope, binding paths, global effect, and that precedence boundary.
 The selected binding is executed with the routing program installed beside that binding. A missing target-bound router fails closed; BBK does not use a router from another scope or package version.

@@ -1,0 +1,248 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-worker-return-v2.schema.json",
+  "title": "BBK BBK Worker return v2",
+  "description": "Role-specific `bbk.role-return.v2` COMPACT/FULL contract for `bbk_worker`.",
+  "allOf": [
+    {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "contract": {
+          "const": "bbk.worker-return.v2"
+        },
+        "role": {
+          "const": "bbk_worker"
+        },
+        "executor": {
+          "type": "object",
+          "properties": {
+            "role": {
+              "const": "bbk_worker"
+            }
+          },
+          "required": [
+            "role"
+          ]
+        },
+        "invocation_mode": {
+          "enum": [
+            "CANDIDATE_PRODUCTION",
+            "PROTOTYPE_SUPPORT"
+          ]
+        },
+        "return_kind": {
+          "enum": [
+            "CHECKPOINT",
+            "WORK_UNIT_RESULT"
+          ]
+        },
+        "operational_disposition": {
+          "enum": [
+            "COMPLETE",
+            "PARTIAL",
+            "BLOCKED_TECHNICAL",
+            "BLOCKED_AUTHORITY",
+            "BLOCKED_DECISION",
+            "PAUSED_CAPACITY",
+            "PAUSED_HOST_WINDOW",
+            "CANCELLED",
+            "INCONCLUSIVE"
+          ]
+        },
+        "semantic_state": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "value"
+          ],
+          "properties": {
+            "name": {
+              "const": "work_unit_execution_state"
+            },
+            "value": {
+              "enum": [
+                "READY",
+                "RUNNING",
+                "CHECKPOINTED",
+                "READY_FOR_PARENT_INTEGRATION",
+                "PARTIAL_WITH_EXPLICIT_GAPS",
+                "DISCOVERY_REQUIRES_PARENT",
+                "NEEDS_INVOCATION_RECOMPILE",
+                "NEEDS_WORK_UNIT_RECHARTER",
+                "NEEDS_PARENT_AUTHORITY",
+                "NEEDS_PARENT_DIRECTION",
+                "BLOCKED",
+                "CANCELLED",
+                "FAILED"
+              ]
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "invocation_mode": {
+                "const": "CANDIDATE_PRODUCTION"
+              }
+            },
+            "required": [
+              "invocation_mode"
+            ]
+          },
+          "then": {
+            "properties": {
+              "parent_ref": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "const": "canonical_role"
+                      },
+                      "id": {
+                        "enum": [
+                          "bbk_worker_orchestrator"
+                        ]
+                      },
+                      "invocation_mode": {
+                        "const": "CANDIDATE_PRODUCTION"
+                      },
+                      "role": {
+                        "enum": [
+                          "bbk_worker_orchestrator"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "id",
+                      "invocation_mode",
+                      "role"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "invocation_mode": {
+                "const": "PROTOTYPE_SUPPORT"
+              }
+            },
+            "required": [
+              "invocation_mode"
+            ]
+          },
+          "then": {
+            "properties": {
+              "parent_ref": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "const": "canonical_role"
+                      },
+                      "id": {
+                        "enum": [
+                          "bbk_prototyper"
+                        ]
+                      },
+                      "invocation_mode": {
+                        "const": "PROTOTYPE_SUPPORT"
+                      },
+                      "role": {
+                        "enum": [
+                          "bbk_prototyper"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "id",
+                      "invocation_mode",
+                      "role"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "detail_level": {
+                "const": "COMPACT"
+              }
+            },
+            "required": [
+              "detail_level"
+            ]
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "$ref": "https://bbk.local/schemas/bbk-worker-compact-result-v2.schema.json"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "detail_level": {
+                "const": "FULL"
+              }
+            },
+            "required": [
+              "detail_level"
+            ]
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "$ref": "https://bbk.local/schemas/bbk-worker-result-v1.schema.json"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "x-bbk-role": "bbk_worker",
+  "x-bbk-contract": "bbk.worker-return.v2",
+  "x-bbk-envelope": "bbk.role-return.v2",
+  "x-bbk-v1-consume-compatible": true,
+  "x-bbk-full-result-schema": "spec/schemas/role-results/bbk-worker-result-v1.schema.json",
+  "x-bbk-compact-result-schema": "spec/schemas/role-results/bbk-worker-compact-result-v2.schema.json",
+  "x-bbk-full-detail-triggers": [
+    "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+    "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+    "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+    "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+    "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+    "The parent explicitly requested FULL detail.",
+    "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+  ],
+  "x-bbk-semantic-state-name": "work_unit_execution_state",
+  "x-bbk-requirements": [
+    "Return one `bbk.role-return.v1` object with `contract` = `bbk.worker-result.v1`, `role` = `bbk_worker`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `work_unit_execution_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
+    "`READY_FOR_PARENT_INTEGRATION` requires current governing sources and invocation; complete assigned outputs; exact in-scope artifact and effect accounting; satisfied or explicitly non-applicable WorkUnit completion checks; no silent substitution, unauthorized effect, ownership collision, unresolved governing decision, required capability gap, ambiguous cleanup, or stale checkpoint; and a verified durable result and handoff. It authorizes only parent inspection and integration of the contribution.",
+    "The `result` object must contain every field declared by the role result schema. Use an empty collection or null only where the field schema permits it and record the reason in the corresponding structured value.",
+    "Bind exact or substantial artifacts and evidence through verified durable references. A conversational summary, transport receipt, confident claim, or host task status is not a substitute for the required result and evidence carriers.",
+    "No Worker return, including operational `COMPLETE` or `READY_FOR_PARENT_INTEGRATION`, can freeze or accept a candidate, conclude a prototype, establish independent assertion satisfaction, close a finding or issue, accept risk, complete a territory or campaign, authorize deployment or publication, or grant release.",
+    "This return is governed by `spec/contracts/catalog.json`, the common `bbk.role-return.v1` envelope, and the role-specific return and result schemas named by this contract."
+  ],
+  "x-bbk-readiness-rule": "`READY_FOR_PARENT_INTEGRATION` requires current governing sources and invocation; complete assigned outputs; exact in-scope artifact and effect accounting; satisfied or explicitly non-applicable WorkUnit completion checks; no silent substitution, unauthorized effect, ownership collision, unresolved governing decision, required capability gap, ambiguous cleanup, or stale checkpoint; and a verified durable result and handoff. It authorizes only parent inspection and integration of the contribution.",
+  "x-bbk-authority-boundary": "No Worker return, including operational `COMPLETE` or `READY_FOR_PARENT_INTEGRATION`, can freeze or accept a candidate, conclude a prototype, establish independent assertion satisfaction, close a finding or issue, accept risk, complete a territory or campaign, authorize deployment or publication, or grant release."
+}

@@ -1,0 +1,24 @@
+{
+  "schema_version": "bbk.prompt-module.v1",
+  "id": "bbk-prompt-baseline-transition",
+  "title": "Planning acceptance and execution handoff ownership",
+  "description": "Keep proposed-baseline integration, accountable acceptance, execution authority, executable work-graph readiness, and execution coordination with their proper owners without adding a deterministic lifecycle runtime.",
+  "clauses": [
+    {
+      "id": "TRANSITION.WAYFINDER_OWNS_INTEGRATION",
+      "text": "The originating Root Wayfinder owns integration of baseline acceptance, execution-authority references, accepted decision responses, and successor planning into the current planning baseline. The harness-root controller relays the authoritative response and resumes that same logical Root Wayfinder whenever possible."
+    },
+    {
+      "id": "TRANSITION.WORK_GRAPH_IS_ARTIFACT",
+      "text": "A phase outline embedded in a map or summary is not an executable work graph. Treat work-graph readiness as established only by an exact current referenced planning artifact that contains the required capability, phase, slice, WorkUnit, dependency, ownership, integration, and assurance bindings for the intended execution scope."
+    },
+    {
+      "id": "TRANSITION.EXECUTION_CONSUMES_REFS",
+      "text": "The Root Orchestrator consumes exact accepted-baseline, acceptance, executable-work-graph, and execution-authority references. It does not author, repair, broaden, or retroactively record the acceptance or authority that made its own campaign eligible."
+    },
+    {
+      "id": "TRANSITION.RETURN_NOT_SELF_ADVANCE",
+      "text": "When acceptance, authority, executable planning, or a governing planning response is absent, stale, conditional, or unresolved, return the exact need through Main to the responsible Root Wayfinder or authority owner. Do not silently advance the campaign or represent a proposed baseline as accepted."
+    }
+  ]
+}

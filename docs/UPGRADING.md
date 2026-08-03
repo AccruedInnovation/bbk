@@ -2,6 +2,33 @@
 
 Use a clean extraction for each BBK version. Do not overlay a new release onto an older extracted package.
 
+## Upgrade to `0.1.0-alpha.15`
+
+`0.1.0-alpha.15` is a product-first workflow and deterministic packaging release over alpha.14. Use a clean extraction and the managed installer or selective updater; do not copy generated roles, skills, extension files, schemas, or routing files into an older extraction.
+
+For a complete managed upgrade:
+
+```bash
+python tools/setup.py --test-and-install --scope user --omp --codex --claude --generic
+```
+
+Reload OMP and start fresh Codex/Claude parent sessions after updating generated prompts. The exact 19 reviewed model routes, `testing-flash`, `deepseek-economy`, install scopes, and bundled language-profile versions are unchanged. Existing user/project routing states remain distinct.
+
+No `.bbk/` project-record migration is required. Existing `bbk.handoff.v1`, `bbk.role-return.v1`, artifact manifests, review records, Beads mappings, and external routing policies remain consumable. New constructors prefer sealed handoff v2, role-return v2, and generated context packages. External routing policies must set `package_version` to `0.1.0-alpha.15` and be revalidated before installation.
+
+Alpha.15 adds:
+
+- product-first proportional workflow and INLINE/FOCUSED/FULL assurance;
+- strict JSON and deterministic sealed artifact packages;
+- project-local OMP routing creation, status, dry-run repair, and profile application;
+- role-return v2 COMPACT/FULL contracts for all 19 roles;
+- generated Worker and candidate-bound review contexts;
+- requirement-scoped host preflight;
+- compact/full prototype charter v2; and
+- sealed handoff v2 with v1 compatibility.
+
+Alpha.15 does **not** add a global deterministic lifecycle, acceptance, authorization, candidate, review-invalidation, release, ACL, or lease engine. Blueprint remains the intended owner of those system-wide responsibilities.
+
 ## Upgrade to `0.1.0-alpha.13.5`
 
 `0.1.0-alpha.13.5` is a test-only portability corrective over alpha.13.4. It does not change BBK runtime behavior, project records, role prompts, model selections, or language-profile packages. It corrects a Windows verification assertion that treated long-name and 8.3 spellings of the same physical project path as different strings.

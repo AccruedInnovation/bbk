@@ -1,0 +1,34 @@
+{
+  "freshnessSeconds": 3600,
+  "requestId": "HP-EXAMPLE",
+  "requirements": [
+    {
+      "command": "python3",
+      "expectedVersionPattern": "Python 3\\.",
+      "id": "python",
+      "kind": "COMMAND",
+      "required": true,
+      "versionArgs": [
+        "--version"
+      ]
+    },
+    {
+      "access": [
+        "READ",
+        "WRITE"
+      ],
+      "expectedKind": "DIRECTORY",
+      "id": "workspace",
+      "kind": "PATH",
+      "path": ".",
+      "required": true
+    },
+    {
+      "description": "Confirm the plan-named device is available before a live run.",
+      "id": "device-window",
+      "kind": "LIVE",
+      "required": false
+    }
+  ],
+  "schema": "bbk.host-preflight-request.v1"
+}

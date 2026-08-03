@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-verification-designer-compact-result-v2.schema.json",
+  "title": "BBK BBK Verification Designer compact result payload v2",
+  "description": "Closed compact role-specific result payload for `bbk_verification_designer`. Use FULL when material truth cannot fit these fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "assurance_contract_ref",
+    "assertion_refs",
+    "method_and_evidence_state",
+    "repair_and_revalidation_policy",
+    "blockers",
+    "parent_actions_requested"
+  ],
+  "properties": {
+    "assurance_contract_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/reference",
+      "description": "Versioned `bbk.assurance-contract.v1` proposal or successor path, byte count, SHA-256, identity, revision, lifecycle, and validation state, or an exact explanation of why it cannot yet be produced."
+    },
+    "assertion_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/referenceList",
+      "description": "Every active assertion with stable identity, subject, source trace, observable statement, falsifier, criteria, applicability, methods, evidence, environment, gate, blocking behavior, independence, exposure, reuse, invalidation, repair, and stated limits."
+    },
+    "method_and_evidence_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Cheapest-sufficient method rationale, required evidence carriers, trust and completeness, criteria application, raw-output retention, reproducibility, redaction, and claims not established."
+    },
+    "repair_and_revalidation_policy": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Successor-subject rules, ordinary and hard repair limits, early escalation, affected assertion and evidence closure, smallest rerun set, targeted closure, blind reassessment, recurrence, residual-risk, waiver, and reopening policy."
+    },
+    "blockers": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Typed claim, source, decision, authority, redesign, research, prototype, capability, work-graph, tool, environment, profile, access, transport, capacity, or host-window blockers with affected assertions and smallest remediation."
+    },
+    "parent_actions_requested": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Exact claim clarification, decision, source repair, architecture or observability redesign, investigation, capability qualification, work-graph binding, review, validation, authority, waiver, or integration actions requested from the semantic parent."
+    }
+  },
+  "x-bbk-role": "bbk_verification_designer",
+  "x-bbk-contract": "bbk.verification-designer-return.v2",
+  "x-bbk-detail-level": "COMPACT",
+  "x-bbk-full-detail-triggers": [
+    "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+    "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+    "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+    "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+    "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+    "The parent explicitly requested FULL detail.",
+    "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+  ]
+}

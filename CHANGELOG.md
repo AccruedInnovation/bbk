@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.1.0-alpha.15 — 2026-08-03
+
+- Add one strict-JSON and deterministic artifact-package engine with BBK-JSON-1 canonicalization, profile preflight, lock-protected staged publication, read-only verification, successor drafts, structured diagnostics, and a thin compatibility wrapper.
+- Add project-local OMP routing creation, status, dry-run repair, profile application, byte-stable user-state isolation, and fail-closed divergent-install handling through `/bbk:models project ...`.
+- Add product-first proportional workflow modules, INLINE/FOCUSED/FULL assurance modes, local mechanical-defect admission, candidate-focused review, finding-scoped rechecks, and stable-interface capability parallelism.
+- Add `bbk.role-return.v2` with generated COMPACT schemas and existing FULL role-specific results for all 19 roles while preserving v1 consumption.
+- Add sealed Worker and review context compilers, exact candidate/focused-recheck packages, requirement-scoped host preflight, and `SPECIALIST_DESIGN_REQUIRED` for incomplete nonstandard Worker semantics.
+- Add COMPACT/FULL `bbk.prototype-charter.v2` and sealed `bbk.handoff.v2` as the default producer while retaining legacy v1 readers and explicit v1 production.
+- Add OMP tools and commands for artifact lifecycle, host preflight, Worker/review context generation, and handoff creation/verification/listing.
+- Preserve the exact reviewed 19-role default routes, `testing-flash`, `deepseek-economy`, all install scopes, language-profile reuse, Windows path handling, Beads compatibility, and the boundary that Blueprint owns global lifecycle enforcement.
+
+## 0.1.0-alpha.14 — 2026-08-03
+
+- Add one canonical execution-autonomy module across Main and relevant planning/execution roles: proceed through routine in-authority changes and single-path technical resolutions; interrupt the user only for genuine material branches, authority expansion, or reserved preference.
+- Add user-attention classification and coherent request/response batching, prompt-level Root-Wayfinder ownership of baseline acceptance and authority integration, node-bound evidence, and explicit specialist-return disposition without adding Blueprint lifecycle gates.
+- Add `bbk.implementation-structure-contract.v3` with compact infrastructure/network/deployment subjects, applicability-aware sections, pre-execution confirmations, and compatibility-preserving v1/v2 validation.
+- Add `bbk schema list/template/enum/explain` and deterministic `bbk artifact manifest/verify` tooling.
+- Initialize reference examples under non-operational `.bbk/examples/` by default; preserve legacy example recognition and `--no-examples` initialization.
+- Add digest-only OMP effective/provider-prompt receipts and `/bbk:prompt-status` as observability-only evidence.
+- Preserve the exact reviewed 19-role model routes, project/user routing isolation, Beads defaults, agent-tree visibility, installer/profile reuse, and alpha.13.5 Windows path handling.
+
 ## 0.1.0-alpha.13.5 — 2026-08-03
 
 - Correct the OMP project-routing isolation regression test to compare canonical filesystem identity instead of requiring byte-identical path spellings in notifications and JSON results.

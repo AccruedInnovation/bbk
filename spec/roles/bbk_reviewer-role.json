@@ -101,7 +101,12 @@
     "bbk-prompt-evidence-lineage",
     "bbk-prompt-evidence-receipts",
     "bbk-prompt-assurance-integrity",
-    "bbk-prompt-finding-lifecycle"
+    "bbk-prompt-finding-lifecycle",
+    "bbk-prompt-evidence-subject-identity",
+    "bbk-prompt-product-first-proportionality",
+    "bbk-prompt-mechanical-admission",
+    "bbk-prompt-assurance-modes",
+    "bbk-prompt-candidate-focused-review"
   ],
   "mutates": false,
   "spawns": [],
@@ -111,6 +116,27 @@
     "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
     "return_schema": "spec/schemas/role-returns/bbk-reviewer-return-v1.schema.json",
     "result_schema": "spec/schemas/role-results/bbk-reviewer-result-v1.schema.json",
+    "v2_contract_id": "bbk.reviewer-return.v2",
+    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+    "v2_return_schema": "spec/schemas/role-returns/bbk-reviewer-return-v2.schema.json",
+    "compact_result_schema": "spec/schemas/role-results/bbk-reviewer-compact-result-v2.schema.json",
+    "compact_result_fields": [
+      "review_assessment",
+      "immutable_findings",
+      "claims_not_established",
+      "recommended_dispositions_and_parent_actions",
+      "failure_and_blocker_classification",
+      "durable_artifact_and_handoff_refs"
+    ],
+    "full_detail_triggers": [
+      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+      "The parent explicitly requested FULL detail.",
+      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+    ],
     "semantic_state_name": "review_state",
     "allowed_invocation_modes": [
       "DIRECT_BOUNDED_REVIEW",

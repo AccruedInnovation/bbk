@@ -12,6 +12,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
@@ -460,3 +461,112 @@ def source_manifest(package: PromptModulePackage) -> dict[str, Any]:
         "package_version": package.catalog["package_version"],
         "sources": records,
     }
+
+
+def prompt_size_report(
+    root: Path = DEFAULT_ROOT,
+    *,
+    baseline_path: Path | None = None,
+) -> dict[str, Any]:
+    """Measure compiled role instructions across every supported host.
+
+    The baseline is a retained measurement fixture, not a size gate.  The
+    report makes aggregate prompt growth visible while the compiler continues
+    to enforce single-source module bodies and compact mandatory-procedure
+    references.
+    """
+    # Lazy imports avoid a module cycle: both generators import this module.
+    from assemble_roles import assemble
+    from generate_agents import instruction_text
+
+    root = root.resolve()
+    baseline_path = baseline_path or (
+        root / "tests" / "fixtures" / "alpha14-prompt-size-baseline.json"
+    )
+    baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
+    package = assemble(root)
+    hosts = tuple(baseline.get("hosts", ("generic", "omp", "codex", "claude")))
+    current_by_role: dict[str, dict[str, int]] = {}
+    per_role: dict[str, dict[str, Any]] = {}
+    for role in package.roles:
+        name = role["name"]
+        current = {
+            host: len(instruction_text(package.projection, role, host=host).encode("utf-8"))
+            for host in hosts
+        }
+        current_by_role[name] = current
+        prior = baseline["role_instruction_bytes"][name]
+        current_total = sum(current.values())
+        baseline_total = sum(int(prior[host]) for host in hosts)
+        per_role[name] = {
+            "baseline_bytes": baseline_total,
+            "current_bytes": current_total,
+            "delta_bytes": current_total - baseline_total,
+            "delta_percent": round(
+                ((current_total - baseline_total) / baseline_total) * 100.0, 3
+            ) if baseline_total else None,
+            "host_bytes": current,
+        }
+    baseline_total = int(baseline["aggregate_role_instruction_bytes"])
+    current_total = sum(sum(value.values()) for value in current_by_role.values())
+    return {
+        "schema": "bbk.prompt-size-report.v1",
+        "baseline_package_version": baseline["package_version"],
+        "current_package_version": package.catalog["package_version"],
+        "measurement": "UTF8_BYTES_OF_COMPILED_ROLE_INSTRUCTIONS_ACROSS_SUPPORTED_HOSTS",
+        "size_policy": "MEASURED_NO_ARBITRARY_CAP",
+        "role_count": len(package.roles),
+        "hosts": list(hosts),
+        "aggregate": {
+            "baseline_bytes": baseline_total,
+            "current_bytes": current_total,
+            "delta_bytes": current_total - baseline_total,
+            "delta_percent": round(
+                ((current_total - baseline_total) / baseline_total) * 100.0, 3
+            ) if baseline_total else None,
+        },
+        "roles": per_role,
+    }
+
+
+def write_prompt_size_report(
+    root: Path = DEFAULT_ROOT,
+    *,
+    output: Path | None = None,
+    baseline_path: Path | None = None,
+) -> Path:
+    root = root.resolve()
+    output = output or (root / "PROMPT-SIZE-REPORT.json")
+    output.write_bytes(canonical_bytes(prompt_size_report(root, baseline_path=baseline_path)))
+    return output
+
+
+def _main(argv: Sequence[str] | None = None) -> int:
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--root", type=Path, default=DEFAULT_ROOT)
+    parser.add_argument("--size-report", action="store_true")
+    parser.add_argument("--check-size-report", action="store_true")
+    parser.add_argument("--output", type=Path)
+    parser.add_argument("--baseline", type=Path)
+    args = parser.parse_args(argv)
+    if not (args.size_report or args.check_size_report):
+        parser.error("choose --size-report or --check-size-report")
+    root = args.root.resolve()
+    output = args.output or (root / "PROMPT-SIZE-REPORT.json")
+    baseline = args.baseline
+    expected = canonical_bytes(prompt_size_report(root, baseline_path=baseline))
+    if args.check_size_report:
+        if not output.is_file() or output.read_bytes() != expected:
+            print(f"prompt-size report drift: {output}", file=sys.stderr)
+            return 1
+        print(f"OK: {output} matches canonical prompt-size measurement")
+        return 0
+    output.write_bytes(expected)
+    print(f"wrote {output}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(_main())

@@ -1,0 +1,28 @@
+{
+  "schema_version": "bbk.prompt-module.v1",
+  "id": "bbk-prompt-mechanical-admission",
+  "title": "Mechanical admission and local repair routing",
+  "description": "Separate deterministic package-admission defects from semantic work and keep single-path repairs local.",
+  "clauses": [
+    {
+      "id": "MECHANICAL.CLASSIFY",
+      "text": "Treat duplicate keys, malformed schemas, invalid vocabulary, unresolved references, identity mismatch, invalid digest or byte count, unsafe path, noncanonical bytes, and package-closure failures as mechanical admission defects when no semantic judgment is required."
+    },
+    {
+      "id": "MECHANICAL.LOCAL_REPAIR",
+      "text": "A mechanical admission defect blocks only the affected package seal or exact affected scope. Route the smallest deterministic repair to the producer or tool owner and rerun the affected gate; do not automatically commission architecture, research, planning, independent review, or user authorization."
+    },
+    {
+      "id": "MECHANICAL.SEMANTIC_OWNER",
+      "text": "Route contradictions of meaning, interface changes, insufficient evidence, governing-policy questions, and authority ambiguity to the semantic owner. An authority expansion must name the exact additional grant required rather than being disguised as a technical repair."
+    },
+    {
+      "id": "MECHANICAL.NO_ARTIFICIAL_BRANCH",
+      "text": "One safe, realistic mechanical repair is not a decision branch. Do not invent alternatives or ask the user to choose merely to transform a deterministic correction into a planning or authorization cycle."
+    },
+    {
+      "id": "MECHANICAL.SCOPED_RECHECK",
+      "text": "After repair, recheck the failed package, reference, or finding scope. Broaden planning or assurance only when the repair materially changes semantics, interfaces, authority, evidence meaning, or protected-floor exposure."
+    }
+  ]
+}

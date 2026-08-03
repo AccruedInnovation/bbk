@@ -1,0 +1,209 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-root-orchestrator-return-v2.schema.json",
+  "title": "BBK BBK Root Orchestrator return v2",
+  "description": "Role-specific `bbk.role-return.v2` COMPACT/FULL contract for `bbk_root_orchestrator`.",
+  "allOf": [
+    {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "contract": {
+          "const": "bbk.root-orchestrator-return.v2"
+        },
+        "role": {
+          "const": "bbk_root_orchestrator"
+        },
+        "executor": {
+          "type": "object",
+          "properties": {
+            "role": {
+              "const": "bbk_root_orchestrator"
+            }
+          },
+          "required": [
+            "role"
+          ]
+        },
+        "invocation_mode": {
+          "enum": [
+            "CONTROLLER_ROOT"
+          ]
+        },
+        "return_kind": {
+          "enum": [
+            "CHECKPOINT",
+            "FINAL_REPORT"
+          ]
+        },
+        "operational_disposition": {
+          "enum": [
+            "COMPLETE",
+            "PARTIAL",
+            "BLOCKED_TECHNICAL",
+            "BLOCKED_AUTHORITY",
+            "BLOCKED_DECISION",
+            "PAUSED_CAPACITY",
+            "PAUSED_HOST_WINDOW",
+            "CANCELLED",
+            "INCONCLUSIVE"
+          ]
+        },
+        "semantic_state": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "value"
+          ],
+          "properties": {
+            "name": {
+              "const": "root_execution_state"
+            },
+            "value": {
+              "enum": [
+                "RUNNING",
+                "WAITING_DEPENDENCY",
+                "WAITING_PLANNING_DIRECTION",
+                "WAITING_AUTHORITY",
+                "WAITING_GLOBAL_REVIEW",
+                "PAUSED",
+                "RECOVERING",
+                "VALIDATING",
+                "REPAIRING",
+                "READY_FOR_CONTROLLER_COMPLETION_ASSESSMENT",
+                "PARTIAL_WITH_EXPLICIT_GAPS",
+                "NEEDS_SUCCESSOR_BASELINE",
+                "BLOCKED",
+                "CANCELLED",
+                "FAILED"
+              ]
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "invocation_mode": {
+                "const": "CONTROLLER_ROOT"
+              }
+            },
+            "required": [
+              "invocation_mode"
+            ]
+          },
+          "then": {
+            "properties": {
+              "parent_ref": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "const": "controller"
+                      },
+                      "id": {
+                        "enum": [
+                          "harness_root_controller"
+                        ]
+                      },
+                      "invocation_mode": {
+                        "const": "CONTROLLER_ROOT"
+                      },
+                      "role": {
+                        "type": "null"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "id",
+                      "invocation_mode"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "detail_level": {
+                "const": "COMPACT"
+              }
+            },
+            "required": [
+              "detail_level"
+            ]
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "$ref": "https://bbk.local/schemas/bbk-root-orchestrator-compact-result-v2.schema.json"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "detail_level": {
+                "const": "FULL"
+              }
+            },
+            "required": [
+              "detail_level"
+            ]
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "$ref": "https://bbk.local/schemas/bbk-root-orchestrator-result-v1.schema.json"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "x-bbk-role": "bbk_root_orchestrator",
+  "x-bbk-contract": "bbk.root-orchestrator-return.v2",
+  "x-bbk-envelope": "bbk.role-return.v2",
+  "x-bbk-v1-consume-compatible": true,
+  "x-bbk-full-result-schema": "spec/schemas/role-results/bbk-root-orchestrator-result-v1.schema.json",
+  "x-bbk-compact-result-schema": "spec/schemas/role-results/bbk-root-orchestrator-compact-result-v2.schema.json",
+  "x-bbk-full-detail-triggers": [
+    "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+    "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+    "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+    "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+    "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+    "The parent explicitly requested FULL detail.",
+    "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+  ],
+  "x-bbk-semantic-state-name": "root_execution_state",
+  "x-bbk-requirements": [
+    "Return one `bbk.role-return.v1` object with `contract` = `bbk.root-orchestrator-return.v1`, `role` = `bbk_root_orchestrator`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `root_execution_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
+    "Keep every required field present. Use null or an empty collection only with an explicit reason where absence is permitted; never omit an inconvenient blocker, failed assertion, stale source, unsupported claim, ambiguous effect, or unresolved finding.",
+    "Use `READY_FOR_CONTROLLER_COMPLETION_ASSESSMENT` only when the exact accepted and authorized baselines remain current; every required TerritoryExecutionBoundary and cross-boundary integration obligation has a current terminal result; deterministic gates, candidate-bound validations, required operational observations and independent reviews are complete or explicitly non-applicable; all failed or inconclusive required assertions block; blocking findings have current evidenced dispositions; cleanup and external effects are reconciled; budgets and authority are accounted; no blocking invalidation, scope drift, ownership collision, untrusted evidence, or unresolved catastrophic-control condition remains; and every exact handoff verifies.",
+    "`READY_FOR_CONTROLLER_COMPLETION_ASSESSMENT` is only a report-readiness state. The Root Orchestrator never commits campaign completion, accepts residual risk, approves the operating baseline, establishes the operational outcome, waives evidence, closes findings without the required disposition, authorizes release, or presents final status directly to the user.",
+    "Bind the operating baseline, execution baseline, execution authorization, root semantic run, physical attempt, and host-exposed lease or fencing state by exact identity and current digest. If any materially change, return the affected blocker or `NEEDS_SUCCESSOR_BASELINE`; do not continue under a conversational approximation.",
+    "Every executable WorkUnit must belong to exactly one current TerritoryExecutionBoundary, every cross-boundary interaction must have an exact binding, dependency, or gate, every mutable region must have one current owner, and every integration obligation must have one accountable execution owner. Root coordination may not substitute for missing ownership.",
+    "For material deviations, stop only affected work when positive dependency, interface, resource, authority, workspace, and evidence-isolation proof permits contained continuation. Absence of known impact is not positive isolation proof, and a local failure does not justify a global stop without an affected-set basis.",
+    "A failed or inconclusive required assertion, digest mismatch, invalid candidate, unclosed protected-floor finding, stale evidence, unauthorized effect, unresolved baseline conflict, or missing required environment prevents completion readiness. Positive results elsewhere may not average it away.",
+    "Keep blockers, dependency waits, expected silence, capacity pauses, host-window pauses, liveness suspicion, useful-progress failure, recovery, and cancellation distinct. Heartbeat presence is not progress evidence; heartbeat absence, elapsed time, context use, and repeated poll timeouts are not interruption or failure evidence.",
+    "A replacement physical attempt may resume the same semantic run only after the prior attempt is terminated or fenced and the immutable instruction, baseline, authority, workspaces, effects, descendants, budgets, signals, candidates, and evidence are reconciled. Changed scope, partitioning, authority, or completion semantics requires a successor semantic run.",
+    "The Root Orchestrator may report outcome-level observations only with exact evidence, environment, horizon, attribution, and limitations. Execution and validation completion do not automatically establish that the user's operational outcome improved.",
+    "All human decisions, authority requests, protected-floor exceptions, risk acceptance, baseline or successor approval, and final user-facing status route through the harness-root controller/Main. The Root Orchestrator never calls `ask` and never treats ordinary prose, silence, or a transport receipt as authority.",
+    "Use durable handoffs for checkpoints, completion, failure, recovery, exact candidates, evidence, findings, signals, and large or authority-bearing state. Verify path, byte count, SHA-256, schema, subject, baseline, campaign, and producer attempt before relying on the content; transport integrity does not prove correctness or acceptance.",
+    "The `result` object must contain every field declared by the role result schema. Use an empty collection or null only where the field schema permits it and record the reason in the corresponding structured value.",
+    "This return is governed by `spec/contracts/catalog.json`, the common `bbk.role-return.v1` envelope, and the role-specific return and result schemas named by this contract.",
+    "Compile and admit each territory only through a schema-valid `bbk.territory-execution-boundary.v1` companion artifact. Root Orchestrator owns boundary compilation and admission; any change to an admitted boundary’s immutable membership, ownership, interface, authority, assurance, recovery, or completion fields requires a successor boundary rather than in-place reinterpretation."
+  ],
+  "x-bbk-readiness-rule": "Use `READY_FOR_CONTROLLER_COMPLETION_ASSESSMENT` only when the exact accepted and authorized baselines remain current; every required TerritoryExecutionBoundary and cross-boundary integration obligation has a current terminal result; deterministic gates, candidate-bound validations, required operational observations and independent reviews are complete or explicitly non-applicable; all failed or inconclusive required assertions block; blocking findings have current evidenced dispositions; cleanup and external effects are reconciled; budgets and authority are accounted; no blocking invalidation, scope drift, ownership collision, untrusted evidence, or unresolved catastrophic-control condition remains; and every exact handoff verifies.",
+  "x-bbk-authority-boundary": "A valid `bbk.root-orchestrator-return.v1` return establishes only the `bbk_root_orchestrator`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect."
+}

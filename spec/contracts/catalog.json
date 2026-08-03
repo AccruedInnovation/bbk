@@ -1,6 +1,6 @@
 {
   "schema": "bbk.contract-catalog.v1",
-  "package_version": "0.1.0-alpha.13.5",
+  "package_version": "0.1.0-alpha.15",
   "source_role_catalog": "spec/roles/catalog.json",
   "capability_status_inventory": "spec/capability-status.json",
   "role_return_package": {
@@ -10,7 +10,12 @@
     "registry_schema": "spec/schemas/bbk-role-return-registry-v1.schema.json",
     "generator": "tools/return_contracts.py",
     "return_schema_directory": "spec/schemas/role-returns",
-    "result_schema_directory": "spec/schemas/role-results"
+    "result_schema_directory": "spec/schemas/role-results",
+    "v2_common_envelope": "spec/schemas/bbk-role-return-v2.schema.json",
+    "v2_generated_registry": "spec/contracts/role-return-registry-v2.json",
+    "v2_registry_schema": "spec/schemas/bbk-role-return-registry-v2.schema.json",
+    "default_producer_version": "v2",
+    "v1_consume_compatibility": true
   },
   "execution_contracts": [
     {
@@ -77,6 +82,31 @@
         "bbk_worker"
       ],
       "authority_boundary": "One permit authorizes one bounded local item under one active envelope. It cannot alter any governing baseline, boundary, cohort meaning, interface, assertion, protected floor, authority, validation meaning, toolchain policy, or external-effect envelope."
+    },
+    {
+      "contract_id": "bbk.assurance-mode.v1",
+      "kind": "POLICY",
+      "status": "ACTIVE_POLICY",
+      "schema": "spec/schemas/bbk-assurance-mode-v1.schema.json",
+      "source": "templates/contracts/assurance-mode.json",
+      "lifecycle_owner": "bbk_planning_wayfinder",
+      "producer_roles": [
+        "bbk_root_wayfinder",
+        "bbk_territory_wayfinder",
+        "bbk_planning_wayfinder",
+        "bbk_phase_wayfinder",
+        "bbk_verification_designer"
+      ],
+      "consumer_roles": [
+        "bbk_reviewer",
+        "bbk_root_orchestrator",
+        "bbk_territory_orchestrator",
+        "bbk_worker_orchestrator",
+        "bbk_validator_orchestrator",
+        "bbk_worker",
+        "bbk_validator"
+      ],
+      "authority_boundary": "The record selects proportional assurance for an exact subject. It does not authorize effects, accept or release a candidate, invalidate prior work automatically, or create lifecycle authority."
     }
   ]
 }

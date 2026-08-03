@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-architect-return-v2.schema.json",
+  "title": "BBK BBK Architect return v2",
+  "description": "Role-specific `bbk.role-return.v2` COMPACT/FULL contract for `bbk_architect`.",
+  "allOf": [
+    {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "contract": {
+          "const": "bbk.architect-return.v2"
+        },
+        "role": {
+          "const": "bbk_architect"
+        },
+        "executor": {
+          "type": "object",
+          "properties": {
+            "role": {
+              "const": "bbk_architect"
+            }
+          },
+          "required": [
+            "role"
+          ]
+        },
+        "invocation_mode": {
+          "enum": [
+            "ARCHITECTURE_CHILD"
+          ]
+        },
+        "return_kind": {
+          "enum": [
+            "CHECKPOINT",
+            "ARCHITECTURE_PROPOSAL"
+          ]
+        },
+        "operational_disposition": {
+          "enum": [
+            "COMPLETE",
+            "PARTIAL",
+            "BLOCKED_TECHNICAL",
+            "BLOCKED_AUTHORITY",
+            "BLOCKED_DECISION",
+            "PAUSED_CAPACITY",
+            "PAUSED_HOST_WINDOW",
+            "CANCELLED",
+            "INCONCLUSIVE"
+          ]
+        },
+        "semantic_state": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "value"
+          ],
+          "properties": {
+            "name": {
+              "const": "architecture_state"
+            },
+            "value": {
+              "enum": [
+                "READY_FOR_PARENT_INTEGRATION",
+                "PARTIAL_WITH_EXPLICIT_GAPS",
+                "NEEDS_SOURCE_RESYNTHESIS",
+                "NEEDS_PARENT_DECISION",
+                "NEEDS_FACTUAL_INVESTIGATION",
+                "NEEDS_EMPIRICAL_INVESTIGATION",
+                "NEEDS_INDEPENDENT_REVIEW",
+                "NEEDS_PARENT_RECHARTER",
+                "BLOCKED"
+              ]
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "invocation_mode": {
+                "const": "ARCHITECTURE_CHILD"
+              }
+            },
+            "required": [
+              "invocation_mode"
+            ]
+          },
+          "then": {
+            "properties": {
+              "parent_ref": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "const": "canonical_role"
+                      },
+                      "id": {
+                        "enum": [
+                          "bbk_root_wayfinder",
+                          "bbk_territory_wayfinder"
+                        ]
+                      },
+                      "invocation_mode": {
+                        "const": "ARCHITECTURE_CHILD"
+                      },
+                      "role": {
+                        "enum": [
+                          "bbk_root_wayfinder",
+                          "bbk_territory_wayfinder"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "id",
+                      "invocation_mode",
+                      "role"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "detail_level": {
+                "const": "COMPACT"
+              }
+            },
+            "required": [
+              "detail_level"
+            ]
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "$ref": "https://bbk.local/schemas/bbk-architect-compact-result-v2.schema.json"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "detail_level": {
+                "const": "FULL"
+              }
+            },
+            "required": [
+              "detail_level"
+            ]
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "$ref": "https://bbk.local/schemas/bbk-architect-result-v1.schema.json"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "x-bbk-role": "bbk_architect",
+  "x-bbk-contract": "bbk.architect-return.v2",
+  "x-bbk-envelope": "bbk.role-return.v2",
+  "x-bbk-v1-consume-compatible": true,
+  "x-bbk-full-result-schema": "spec/schemas/role-results/bbk-architect-result-v1.schema.json",
+  "x-bbk-compact-result-schema": "spec/schemas/role-results/bbk-architect-compact-result-v2.schema.json",
+  "x-bbk-full-detail-triggers": [
+    "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+    "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+    "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+    "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+    "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+    "The parent explicitly requested FULL detail.",
+    "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+  ],
+  "x-bbk-semantic-state-name": "architecture_state",
+  "x-bbk-requirements": [
+    "Return one `bbk.role-return.v1` object with `contract` = `bbk.architect-return.v1`, `role` = `bbk_architect`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `architecture_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
+    "Use `READY_FOR_PARENT_INTEGRATION` only when the exact charter and governing sources are current; the architecture elements, ownership model, canonical interfaces, material scenarios, failure and recovery, quality, deployment, compatibility and evolution, traceability, derived integration obligations, and self-check are complete to the selected depth; required independent review has no blocking undispositioned finding; unresolved items are non-blocking and explicit; and the durable handoff verifies.",
+    "`READY_FOR_PARENT_INTEGRATION` means the proposal is current, coherent, traceable, and suitable for the parent to consider and integrate. It does not mean the architecture is accepted, the operating baseline is approved, execution is authorized, implementation exists, assertions pass, the system is safe or compliant, or release is granted.",
+    "Every material responsibility, state, rule, schema, interface, mutable authority, effect, failure, recovery, migration, and integration obligation must have one canonical accountable owner or an explicit blocking ownership conflict.",
+    "Every material interface must have one canonical shared contract referenced by provider and consumers. Separate local projections cannot become independently authoritative, and structural compatibility cannot substitute for behavioral and operational compatibility.",
+    "Every decomposition must identify the corresponding integration and verification obligations. An architecture element without a defined integration owner and observable success or failure boundary is incomplete when it participates in an integrated capability.",
+    "Keep source-stated decisions, constraint-derived obligations, architecture inferences, and proposal-only choices distinct. The Architect cannot create user approval, ADR acceptance, risk acceptance, or authority from completeness, model judgment, silence, transport, or implementation observation.",
+    "Diagrams and prose are projections over identified architecture objects. Required semantics, ownership, state, interface, failure, and lifecycle behavior cannot exist only in an image or copied narrative.",
+    "The Architect remains a leaf role. If several architecture specialties or systems require separate deep contexts, return `NEEDS_PARENT_RECHARTER`; the semantic parent creates sibling charters and one final integrating Architect with a single canonical interface owner.",
+    "A producer self-check is not independent review. Preserve exact Reviewer findings and dispositions separately, and never attribute a silently repaired defect to the Reviewer or treat agreement as closure.",
+    "When a governing source or subject changes, preserve the prior architecture revision, identify every affected element, interface, scenario, obligation, and downstream consumer, and invalidate only the impacted material before issuing a successor proposal.",
+    "Any accepted decision derived from human input must reference the matching structured authority-bound upstream response. Ordinary prose, delivery receipts, silence, timeout, host navigation, or model inference is non-evidence.",
+    "Use a digest-bound handoff for exact, large, authority-bearing, evidence-bearing, or continuation-critical material and verify it before the parent relies on the proposal.",
+    "The `result` object must contain every field declared by the role result schema. Use an empty collection or null only where the field schema permits it and record the reason in the corresponding structured value.",
+    "This return is governed by `spec/contracts/catalog.json`, the common `bbk.role-return.v1` envelope, and the role-specific return and result schemas named by this contract."
+  ],
+  "x-bbk-readiness-rule": "Use `READY_FOR_PARENT_INTEGRATION` only when the exact charter and governing sources are current; the architecture elements, ownership model, canonical interfaces, material scenarios, failure and recovery, quality, deployment, compatibility and evolution, traceability, derived integration obligations, and self-check are complete to the selected depth; required independent review has no blocking undispositioned finding; unresolved items are non-blocking and explicit; and the durable handoff verifies.",
+  "x-bbk-authority-boundary": "A valid `bbk.architect-return.v1` return establishes only the `bbk_architect`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect."
+}

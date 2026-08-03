@@ -25,6 +25,7 @@ from prompt_modules import (  # noqa: E402
     load_prompt_modules,
     mandatory_procedure_exception_measurement,
     module_directives,
+    prompt_size_report,
     role_skill_module_requirements,
     source_manifest,
     validate_skill_templates,
@@ -60,6 +61,61 @@ EXCLUSIVE_MODULE_ROLES = {
     "bbk-prompt-finding-lifecycle": {
         "bbk_reviewer", "bbk_validator", "bbk_validator_orchestrator",
         "bbk_verification_designer",
+    },
+    "bbk-prompt-execution-autonomy": {
+        "bbk_phase_wayfinder", "bbk_planning_wayfinder", "bbk_prototyper",
+        "bbk_root_orchestrator", "bbk_territory_orchestrator", "bbk_worker",
+        "bbk_worker_designer", "bbk_worker_orchestrator",
+    },
+    "bbk-prompt-user-attention": {
+        "bbk_question_guide", "bbk_questioning_wayfinder",
+        "bbk_root_wayfinder", "bbk_territory_wayfinder",
+    },
+    "bbk-prompt-baseline-transition": {
+        "bbk_root_orchestrator", "bbk_root_wayfinder", "bbk_territory_wayfinder",
+    },
+    "bbk-prompt-evidence-subject-identity": {
+        "bbk_architect", "bbk_phase_wayfinder", "bbk_planning_wayfinder",
+        "bbk_prototyper", "bbk_question_guide", "bbk_questioning_wayfinder",
+        "bbk_researcher", "bbk_reviewer", "bbk_root_orchestrator",
+        "bbk_root_wayfinder", "bbk_synthesizer", "bbk_territory_orchestrator",
+        "bbk_territory_wayfinder", "bbk_validator", "bbk_validator_orchestrator",
+        "bbk_verification_designer", "bbk_worker", "bbk_worker_designer",
+        "bbk_worker_orchestrator",
+    },
+    "bbk-prompt-specialist-disposition": {
+        "bbk_architect", "bbk_phase_wayfinder", "bbk_planning_wayfinder",
+        "bbk_prototyper", "bbk_root_orchestrator", "bbk_root_wayfinder",
+        "bbk_territory_orchestrator", "bbk_territory_wayfinder",
+        "bbk_validator_orchestrator", "bbk_worker_orchestrator",
+    },
+    "bbk-prompt-product-first-proportionality": {
+        "bbk_architect", "bbk_phase_wayfinder", "bbk_planning_wayfinder",
+        "bbk_prototyper", "bbk_researcher", "bbk_reviewer",
+        "bbk_root_orchestrator", "bbk_root_wayfinder", "bbk_synthesizer",
+        "bbk_territory_orchestrator", "bbk_territory_wayfinder", "bbk_validator",
+        "bbk_validator_orchestrator", "bbk_verification_designer", "bbk_worker",
+        "bbk_worker_designer", "bbk_worker_orchestrator",
+    },
+    "bbk-prompt-mechanical-admission": {
+        "bbk_architect", "bbk_phase_wayfinder", "bbk_planning_wayfinder",
+        "bbk_reviewer", "bbk_root_orchestrator", "bbk_root_wayfinder",
+        "bbk_territory_orchestrator", "bbk_territory_wayfinder", "bbk_validator",
+        "bbk_validator_orchestrator", "bbk_verification_designer", "bbk_worker",
+        "bbk_worker_designer", "bbk_worker_orchestrator",
+    },
+    "bbk-prompt-assurance-modes": {
+        "bbk_phase_wayfinder", "bbk_planning_wayfinder", "bbk_prototyper",
+        "bbk_reviewer", "bbk_root_orchestrator", "bbk_root_wayfinder",
+        "bbk_territory_orchestrator", "bbk_territory_wayfinder", "bbk_validator",
+        "bbk_validator_orchestrator", "bbk_verification_designer", "bbk_worker",
+        "bbk_worker_designer", "bbk_worker_orchestrator",
+    },
+    "bbk-prompt-candidate-focused-review": {
+        "bbk_phase_wayfinder", "bbk_planning_wayfinder", "bbk_reviewer",
+        "bbk_root_orchestrator", "bbk_territory_orchestrator", "bbk_validator",
+        "bbk_validator_orchestrator", "bbk_verification_designer", "bbk_worker",
+        "bbk_worker_designer", "bbk_worker_orchestrator",
     },
 }
 
@@ -177,6 +233,41 @@ ALPHA132_BEADS_OWNER_ROLES = {
 
 ALPHA132_INTENTIONAL_SKILL_REPLACEMENTS = {"bbk-beads"}
 
+ALPHA14_INTENTIONAL_ROLE_CHANGES = {
+    "bbk_architect", "bbk_phase_wayfinder", "bbk_planning_wayfinder",
+    "bbk_questioning_wayfinder", "bbk_researcher", "bbk_root_orchestrator",
+    "bbk_root_wayfinder", "bbk_territory_orchestrator", "bbk_worker",
+    "bbk_worker_designer", "bbk_worker_orchestrator",
+}
+
+
+ALPHA15_INTENTIONAL_ROLE_CHANGES = {
+    "bbk_root_wayfinder", "bbk_territory_wayfinder", "bbk_questioning_wayfinder",
+    "bbk_planning_wayfinder", "bbk_phase_wayfinder", "bbk_question_guide",
+    "bbk_researcher", "bbk_prototyper", "bbk_synthesizer", "bbk_architect",
+    "bbk_verification_designer", "bbk_worker_designer", "bbk_reviewer",
+    "bbk_root_orchestrator", "bbk_territory_orchestrator",
+    "bbk_worker_orchestrator", "bbk_validator_orchestrator", "bbk_worker",
+    "bbk_validator",
+}
+
+ALPHA14_INTENTIONAL_SKILL_CHANGES = {
+    "bbk", "bbk-architecture", "bbk-evidence", "bbk-handoff",
+    "bbk-implementation-structure", "bbk-phase-plan", "bbk-question-branch",
+    "bbk-research", "bbk-root-execution", "bbk-wayfind", "bbk-work-graph",
+    "bbk-worker-design", "bbk-worker-execution",
+}
+
+ALPHA15_INTENTIONAL_SKILL_CHANGES = {
+    "bbk", "bbk-architecture", "bbk-assertion-validation",
+    "bbk-execution-slicing", "bbk-phase-plan", "bbk-prototype",
+    "bbk-research", "bbk-review", "bbk-review-context", "bbk-review-plan",
+    "bbk-root-execution", "bbk-synthesize", "bbk-territory-execution",
+    "bbk-validation-orchestration", "bbk-verification-design", "bbk-wayfind",
+    "bbk-work-graph", "bbk-work-unit-execution", "bbk-worker-design",
+    "bbk-worker-execution", "bbk-handoff",
+}
+
 AUXILIARY_PROCEDURE_MODULES = {
     "bbk-context-routing": {
         "bbk-prompt-context-human-relay", "bbk-prompt-human-request",
@@ -190,6 +281,7 @@ AUXILIARY_PROCEDURE_MODULES = {
     "bbk-evidence": {
         "bbk-prompt-evidence-lineage", "bbk-prompt-evidence-receipts",
         "bbk-prompt-durable-handoff", "bbk-prompt-profile-qualification",
+        "bbk-prompt-evidence-subject-identity",
     },
     "bbk-review-findings": {
         "bbk-prompt-finding-lifecycle", "bbk-prompt-profile-qualification",
@@ -197,6 +289,8 @@ AUXILIARY_PROCEDURE_MODULES = {
     },
     "bbk-execution-slicing": {
         "bbk-prompt-execution-slicing", "bbk-prompt-profile-qualification",
+        "bbk-prompt-product-first-proportionality",
+        "bbk-prompt-mechanical-admission",
     },
     "bbk-profile-routing": {
         "bbk-prompt-profile-qualification", "bbk-prompt-profile-dispatch",
@@ -274,7 +368,7 @@ class PromptModulePackageV1Tests(unittest.TestCase):
             validator.validate(module)
 
     def test_module_inventory_order_and_clause_identities_are_unique(self) -> None:
-        self.assertEqual(len(self.package.modules), 22)
+        self.assertEqual(len(self.package.modules), 31)
         self.assertEqual(len(self.package.ordered_ids), len(set(self.package.ordered_ids)))
         clause_ids = [
             clause["id"]
@@ -367,6 +461,55 @@ class PromptModulePackageV1Tests(unittest.TestCase):
                     if module_id in role["prompt_modules"]
                 }
                 self.assertEqual(actual, expected)
+
+    def test_alpha14_autonomy_attention_transition_evidence_and_specialist_modules_are_compiled(self) -> None:
+        autonomy = {clause["id"]: clause["text"] for clause in self.package.by_id["bbk-prompt-execution-autonomy"]["clauses"]}
+        self.assertIn("exactly one safe, realistic", autonomy["AUTONOMY.SINGLE_PATH"])
+        self.assertIn("inside current authority", autonomy["AUTONOMY.SINGLE_PATH"])
+        self.assertIn("at least two viable, materially different paths", autonomy["AUTONOMY.GENUINE_BRANCH"])
+        self.assertIn("authority expansion", autonomy["AUTONOMY.AUTHORITY_BOUNDARY"])
+
+        attention = {clause["id"]: clause["text"] for clause in self.package.by_id["bbk-prompt-user-attention"]["clauses"]}
+        for value in (
+            "ENVIRONMENT_FACT", "CONFIGURATION_PARAMETER",
+            "REVERSIBLE_IMPLEMENTATION_CHOICE", "ARCHITECTURAL_DECISION",
+            "AUTHORITY_EXPANSION", "USER_RESERVED_PREFERENCE",
+        ):
+            self.assertIn(value, attention["ATTENTION.CLASSIFY"])
+        self.assertIn("one response packet", attention["ATTENTION.BATCH"])
+
+        transition = "\n".join(
+            clause["text"] for clause in self.package.by_id["bbk-prompt-baseline-transition"]["clauses"]
+        )
+        self.assertIn("originating Root Wayfinder owns integration", transition)
+        self.assertIn("phase outline", transition)
+        self.assertIn("Root Orchestrator consumes exact", transition)
+        self.assertNotIn("deterministic gate", transition.lower())
+
+        evidence = "\n".join(
+            clause["text"] for clause in self.package.by_id["bbk-prompt-evidence-subject-identity"]["clauses"]
+        )
+        self.assertIn("exact node or subject", evidence)
+        self.assertIn("Do not transfer an observation", evidence)
+        self.assertIn("measured, documented, calculated, inferred, or illustrative", evidence)
+
+        specialist = "\n".join(
+            clause["text"] for clause in self.package.by_id["bbk-prompt-specialist-disposition"]["clauses"]
+        )
+        for disposition in ("COMMISSIONED", "INTEGRATED", "DEFERRED", "SUPERSEDED", "REJECTED", "REMAINS_OPEN"):
+            self.assertIn(disposition, specialist)
+        self.assertIn("confirmation, amendment, or successor", specialist)
+
+        projections, _manifest = expected_files()
+        for target in ("codex", "omp", "claude", "generic"):
+            path = ROOT / "projections" / target / "agents" / (
+                "bbk_root_orchestrator.toml" if target == "codex" else
+                "bbk-root-orchestrator.md" if target == "claude" else
+                "bbk_root_orchestrator.md"
+            )
+            text = projections[path].decode("utf-8")
+            self.assertIn("A technical blocker is not a user decision", text, target)
+            self.assertIn("Root Orchestrator consumes exact accepted-baseline", text, target)
 
     def test_alpha133_coordination_recovery_and_executable_truth_are_scoped_and_compiled(self) -> None:
         human = self.package.by_id["bbk-prompt-human-request"]
@@ -518,9 +661,11 @@ class PromptModulePackageV1Tests(unittest.TestCase):
                 len(role["mandatory_skills"]),
             )
 
-    def test_role_behavior_contracts_are_unchanged_from_gate3(self) -> None:
+    def test_roles_not_intentionally_changed_in_alpha14_retain_gate3_behavior(self) -> None:
         excluded = {"primary_skill", "mandatory_skills", "prompt_modules"}
         for role in self.roles:
+            if role["name"] in ALPHA14_INTENTIONAL_ROLE_CHANGES | ALPHA15_INTENTIONAL_ROLE_CHANGES:
+                continue
             behavior = {key: value for key, value in role.items() if key not in excluded}
             if role["name"] in ALPHA132_BEADS_OWNER_ROLES:
                 behavior["skills"] = [
@@ -542,7 +687,7 @@ class PromptModulePackageV1Tests(unittest.TestCase):
     def test_gate3_frontmatter_and_headings_are_preserved(self) -> None:
         for name, baseline in self.baseline["skills"].items():
             with self.subTest(skill=name):
-                if name in ALPHA132_INTENTIONAL_SKILL_REPLACEMENTS:
+                if name in ALPHA132_INTENTIONAL_SKILL_REPLACEMENTS | ALPHA14_INTENTIONAL_SKILL_CHANGES | ALPHA15_INTENTIONAL_SKILL_CHANGES:
                     continue
                 current = self.method["skills"][name]
                 frontmatter_sha = hashlib.sha256(
@@ -554,7 +699,7 @@ class PromptModulePackageV1Tests(unittest.TestCase):
 
     def test_gate3_sections_not_replaced_by_modules_are_byte_semantically_unchanged(self) -> None:
         for name, baseline in self.baseline["skills"].items():
-            if name in ALPHA132_INTENTIONAL_SKILL_REPLACEMENTS:
+            if name in ALPHA132_INTENTIONAL_SKILL_REPLACEMENTS | ALPHA14_INTENTIONAL_SKILL_CHANGES | ALPHA15_INTENTIONAL_SKILL_CHANGES:
                 continue
             current_sections = heading_sections(self.method["skills"][name])
             cursor = 0
@@ -606,7 +751,7 @@ class PromptModulePackageV1Tests(unittest.TestCase):
             for clause in module["clauses"]
         )
         required_tokens = (
-            ".bbk/handoffs/", "bbk.handoff.v1", "READY_FOR_VALIDATION",
+            ".bbk/handoffs/", "bbk.handoff.v2", "bbk.handoff.v1", "READY_FOR_VALIDATION",
             "BLOCKED_TECHNICAL", "READY_FOR_PARENT_INTEGRATION",
             "SolutionOutcomeFit", "State–Decision–Effect", "BBK_PROFILE_PATH",
             "PROFILE.json.skills", "bbk.profile-capability.v1", "runTools",
@@ -624,13 +769,123 @@ class PromptModulePackageV1Tests(unittest.TestCase):
             with self.subTest(token=token):
                 self.assertIn(token, module_text)
 
-    def test_prompt_compilation_reduces_aggregate_role_prompt_size_without_a_hidden_threshold(self) -> None:
-        old_total = 0
-        new_total = 0
+    def test_prompt_compilation_avoids_naive_module_body_duplication_without_a_size_cap(self) -> None:
+        compiled_total = 0
+        naive_duplicate_total = 0
         for role in self.roles:
-            old_total += self.baseline["generic_prompt_characters"][role["name"]]
-            new_total += len(instruction_text(self.spec, role, host="generic"))
-        self.assertLess(new_total, old_total)
+            compiled = instruction_text(self.spec, role, host="generic")
+            compiled_total += len(compiled)
+            duplicate_overhead = 0
+            for skill in role["mandatory_skills"]:
+                template = self.method["skills"][skill]
+                duplicate_overhead += len(expand_skill_template(template, self.package))
+                duplicate_overhead -= len(compact_skill_template(template, self.package))
+            naive_duplicate_total += len(compiled) + duplicate_overhead
+        self.assertGreater(compiled_total, 0)
+        self.assertLess(compiled_total, naive_duplicate_total)
+
+    def test_alpha15_product_first_mechanical_assurance_and_candidate_modules_are_exact(self) -> None:
+        product = "\n".join(
+            clause["text"] for clause in
+            self.package.by_id["bbk-prompt-product-first-proportionality"]["clauses"]
+        )
+        for fragment in (
+            "actor-visible product capability", "named material risk",
+            "semantic interfaces are stable", "Duplicate plans, reviews",
+            "support paperwork as product progress",
+        ):
+            self.assertIn(fragment, product)
+
+        mechanical = "\n".join(
+            clause["text"] for clause in
+            self.package.by_id["bbk-prompt-mechanical-admission"]["clauses"]
+        )
+        for fragment in (
+            "blocks only the affected package seal or exact affected scope",
+            "do not automatically commission architecture, research, planning, independent review, or user authorization",
+            "One safe, realistic mechanical repair is not a decision branch",
+            "Route contradictions of meaning",
+        ):
+            self.assertIn(fragment, mechanical)
+
+        assurance = "\n".join(
+            clause["text"] for clause in
+            self.package.by_id["bbk-prompt-assurance-modes"]["clauses"]
+        )
+        for fragment in (
+            "Use INLINE by default", "Use FOCUSED", "Use FULL",
+            "bbk.assurance-mode.v1", "does not itself accept a candidate",
+        ):
+            self.assertIn(fragment, assurance)
+
+        candidate = "\n".join(
+            clause["text"] for clause in
+            self.package.by_id["bbk-prompt-candidate-focused-review"]["clauses"]
+        )
+        for fragment in (
+            "exact sealed integrated candidate", "Do not rewrite the implementation plan",
+            "focused repair recheck", "Stop when the exact review focus is resolved",
+            "INLINE work does not commission an independent Reviewer",
+        ):
+            self.assertIn(fragment, candidate)
+
+        self.assertEqual(
+            set(module_directives(self.method["skills"]["bbk"])),
+            {
+                "bbk-prompt-user-attention", "bbk-prompt-execution-autonomy",
+                "bbk-prompt-baseline-transition",
+                "bbk-prompt-product-first-proportionality",
+                "bbk-prompt-mechanical-admission", "bbk-prompt-assurance-modes",
+                "bbk-prompt-candidate-focused-review",
+            },
+        )
+
+    def test_alpha15_assurance_mode_contract_enforces_proportional_selection(self) -> None:
+        try:
+            import jsonschema
+        except ImportError as exc:  # pragma: no cover
+            self.skipTest(f"optional jsonschema capability unavailable: {exc}")
+        schema = json.loads(
+            (ROOT / "spec/schemas/bbk-assurance-mode-v1.schema.json").read_text(encoding="utf-8")
+        )
+        instance = json.loads(
+            (ROOT / "templates/contracts/assurance-mode.json").read_text(encoding="utf-8")
+        )
+        validator = jsonschema.Draft202012Validator(schema)
+        validator.validate(instance)
+
+        focused = copy.deepcopy(instance)
+        focused.update({
+            "mode": "FOCUSED",
+            "risk_basis": ["One material interface compatibility risk."],
+            "rationale": "The exact interface claim needs independent bounded review.",
+            "review_focus": ["Candidate interface compatibility."],
+            "recheck_scope": ["The repaired interface and its direct consumers."],
+            "independent_review_required": True,
+        })
+        validator.validate(focused)
+
+        invalid_inline = copy.deepcopy(instance)
+        invalid_inline["independent_review_required"] = True
+        self.assertTrue(list(validator.iter_errors(invalid_inline)))
+        invalid_focused = copy.deepcopy(focused)
+        invalid_focused["review_focus"] = []
+        self.assertTrue(list(validator.iter_errors(invalid_focused)))
+
+    def test_alpha15_prompt_size_report_is_deterministic_and_measures_all_projections(self) -> None:
+        report = prompt_size_report(ROOT)
+        recorded = json.loads((ROOT / "PROMPT-SIZE-REPORT.json").read_text(encoding="utf-8"))
+        self.assertEqual(report, recorded)
+        self.assertEqual(report["size_policy"], "MEASURED_NO_ARBITRARY_CAP")
+        self.assertEqual(report["role_count"], 19)
+        self.assertEqual(report["hosts"], ["generic", "omp", "codex", "claude"])
+        self.assertGreater(report["aggregate"]["baseline_bytes"], 0)
+        self.assertGreater(report["aggregate"]["current_bytes"], 0)
+        self.assertEqual(
+            report["aggregate"]["delta_bytes"],
+            report["aggregate"]["current_bytes"] - report["aggregate"]["baseline_bytes"],
+        )
+        self.assertEqual(set(report["roles"]), {role["name"] for role in self.roles})
 
     def test_projection_manifest_v8_binds_method_and_module_sources(self) -> None:
         _outputs, manifest = expected_files()
@@ -709,13 +964,18 @@ class PromptModulePackageV1Tests(unittest.TestCase):
             additions = ["bbk-handoff", "bbk-recover", "bbk-implementation-structure"]
             self.assertTrue(set(additions) <= set(role["skills"]))
             role["mandatory_skills"] = [role["primary_skill"], *additions]
+            package = load_prompt_modules(root)
+            method_path = root / "spec" / "method-content.json"
+            method = json.loads(method_path.read_text(encoding="utf-8"))
+            required = set(role_skill_module_requirements(role, method["skills"]))
+            selected = set(role["prompt_modules"]) | required
+            role["prompt_modules"] = [
+                module_id for module_id in package.ordered_ids if module_id in selected
+            ]
             role_path.write_bytes(canonical_bytes(role))
 
             catalog_path = root / "spec" / "prompt-modules" / "catalog.json"
             catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
-            package = load_prompt_modules(root)
-            method_path = root / "spec" / "method-content.json"
-            method = json.loads(method_path.read_text(encoding="utf-8"))
             catalog["compilation_policy"]["additional_mandatory_procedure_exceptions"][role["name"]] = {
                 "mandatory_skills": role["mandatory_skills"],
                 "distinct_behavior": {

@@ -1,0 +1,17 @@
+{
+  "schema": "bbk.review-package-request.v1",
+  "mode": "REVIEW",
+  "assuranceMode": {
+    "schema": "bbk.assurance-mode.v1",
+    "mode": "FOCUSED",
+    "subject_ref": {"id": "replace-with-sealed-candidate-id"},
+    "risk_basis": ["One exact material candidate risk requires independent review."],
+    "rationale": "FOCUSED review is sufficient for the named risk and exact sealed candidate.",
+    "review_focus": ["Replace with the exact material claim, interface, floor, or risk."],
+    "recheck_scope": ["Only the affected finding scope unless semantics materially change."],
+    "independent_review_required": true
+  },
+  "exactFocus": {"claim": "Replace with one exact review focus."},
+  "applicableFloors": [],
+  "priorFindings": []
+}

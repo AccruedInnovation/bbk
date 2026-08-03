@@ -1,0 +1,24 @@
+{
+  "schema_version": "bbk.prompt-module.v1",
+  "id": "bbk-prompt-specialist-disposition",
+  "title": "Specialist-return disposition and conditional-currentness",
+  "description": "Explicitly disposition specialist review requests, unresolved decisions, blockers, and successor requirements before treating integrated planning or execution state as current.",
+  "clauses": [
+    {
+      "id": "SPECIALIST.DISPOSITION",
+      "text": "For every material specialist-requested review, unresolved blocker, open decision, conditional branch, successor requirement, or recommended follow-up, record one explicit disposition: COMMISSIONED with reference, INTEGRATED, DEFERRED with owner and trigger, SUPERSEDED with successor, REJECTED with rationale, or REMAINS_OPEN with impact."
+    },
+    {
+      "id": "SPECIALIST.CONDITIONAL_CURRENTNESS",
+      "text": "Do not describe an artifact or baseline as current, complete, or decision-closed while its producing specialist says it is conditional on an unresolved material decision or successor work. Preserve the conditional state and affected scope."
+    },
+    {
+      "id": "SPECIALIST.RECONFIRM_BRANCH",
+      "text": "When a material decision resolves a branch that was open during specialist work, obtain a bounded confirmation, amendment, or successor from the owning specialist before treating the selected branch as current, unless the original return explicitly delegated that exact integration choice to the parent."
+    },
+    {
+      "id": "SPECIALIST.REVIEW_NOT_SILENTLY_DROPPED",
+      "text": "A specialist request for independent review may be accepted, proportionately deferred, or rejected with rationale, but it must not disappear from the parent result. State the review owner, exact focus, timing trigger, and residual risk."
+    }
+  ]
+}

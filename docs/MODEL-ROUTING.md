@@ -1,10 +1,10 @@
 # Sub-agent model routing
 
-BBK `0.1.0-alpha.13.5` separates each role's stable responsibility from the model used to perform it.
+BBK `0.1.0-alpha.15` separates each role's stable responsibility from the model used to perform it.
 
 The canonical install-time policy is `spec/model-routing.json`. It uses `"schema_version": "bbk.model-routing.v2"` and contains one complete OMP, Codex, and Claude Code route for every canonical role. Exact coverage is required: a missing role and an unknown role both fail validation.
 
-The alpha.13 defaults are the reviewed selections supplied with the split-role update. They are copied into the canonical policy, generated projections, packaged OMP `default` runtime profile, and a regression fixture. The only change from that reviewed source is advancing `package_version` to `0.1.0-alpha.13.5`.
+The alpha.15 defaults preserve the reviewed selections supplied with the split-role update. They are copied into the canonical policy, generated projections, packaged OMP `default` runtime profile, and a regression fixture. The only change from that reviewed source is advancing `package_version` to `0.1.0-alpha.15`.
 
 ## Default per-role routes
 
@@ -96,13 +96,13 @@ python tools\install.py install --scope user --omp --codex --claude `
   --model-routing D:\Profiles\bbk-model-routing.json
 ```
 
-The external file's `package_version` must be `0.1.0-alpha.13.5`. The installer validates it before writing, renders the selected projections from that policy, copies it to `effective-model-routing.json`, and binds its digest into `install-manifest.json`.
+The external file's `package_version` must be `0.1.0-alpha.15`. The installer validates it before writing, renders the selected projections from that policy, copies it to `effective-model-routing.json`, and binds its digest into `install-manifest.json`.
 
 Do not edit generated files under `projections/` directly. Drift checks reject manual changes.
 
 ## Legacy v1 compatibility
 
-`bbk.model-routing.v1` did not reserve the names `judgment`, `coordination`, and `mechanical`; any profile key matching `^[a-z][a-z0-9_-]*$` was valid if every role referenced a defined profile and the rest of the policy validated. Alpha.13 retains read and install-time validation compatibility with v1 policies.
+`bbk.model-routing.v1` did not reserve the names `judgment`, `coordination`, and `mechanical`; any profile key matching `^[a-z][a-z0-9_-]*$` was valid if every role referenced a defined profile and the rest of the policy validated. Alpha.15 retains read and install-time validation compatibility with v1 policies.
 
 V2 remains preferred because it removes profile indirection. A role route can be tuned without inventing a category or moving other roles assigned to it.
 
@@ -125,7 +125,7 @@ Packaged runtime profiles are:
 | Profile | Behavior |
 |---|---|
 | `installation-default` | Restore the exact OMP routes selected at installation, including an external v2 or legacy v1 policy. |
-| `default` | Restore alpha.13's reviewed packaged per-role OMP routes. |
+| `default` | Restore alpha.15's packaged routes, preserving the reviewed per-role selections. |
 | `testing-flash` | Route all 19 BBK OMP children through `deepseek/deepseek-v4-flash` for inexpensive functional testing. |
 | `deepseek-economy` | Use DeepSeek routes for a cost-conscious OMP configuration. |
 
@@ -143,6 +143,22 @@ Commands:
 Runtime changes affect future OMP child spawns only. BBK rewrites managed OMP agent frontmatter, writes `effective-omp-model-routing.json`, and reconciles ownership digests into the selected installation manifest. Already-running children are unaffected.
 
 ### Project and user routing targets
+
+
+Project-local routing can be created directly from a user-scoped session without first initializing Git or `.bbk`:
+
+```text
+/bbk:models project create
+/bbk:models project create D:\Projects\Machine-A
+/bbk:models project status
+/bbk:models project repair --dry-run
+/bbk:models project repair
+/bbk:models project profile testing-flash
+```
+
+`project create` clones the exact current effective user OMP routes into a temporary complete `bbk.model-routing.v2` policy, invokes the authenticated installer from that same bound BBK package with `--scope project --omp --no-language-profiles`, and verifies all 19 project routes. The user routing state, agents, binding, and install manifest are checked byte-for-byte before and after. A current project is a no-op; a partial, modified, mis-scoped, or otherwise divergent project fails closed with `REPAIR_REQUIRED`.
+
+`project repair` always produces and confirms a dry-run plan before applying. The installer backs up modified manifest-owned project files during explicit repair. Neither creation nor repair initializes `.bbk` or Git, and neither falls back to a user-global mutation. Reload or restart OMP in the project after a successful creation or repair so its project extension and agents take precedence.
 
 `/bbk:models` accepts an optional target before the operation:
 
@@ -173,4 +189,4 @@ Project agent definitions also precede user definitions. A task override or high
 
 ## Upgrade an external policy
 
-An external policy is bound to one BBK release. Update `package_version` to `0.1.0-alpha.13.5`, compare its role keys and host fields with the new canonical policy, and validate it before installation. Alpha.13 retains the same 19 role names but materially changes the role package, return contracts, prompt composition, and generated projection digests, so installed agents must be regenerated rather than copied from alpha.12.4.
+An external policy is bound to one BBK release. Update `package_version` to `0.1.0-alpha.15`, compare its role keys and host fields with the new canonical policy, and validate it before installation. Alpha.15 retains the same 19 role names and exact routes while changing return contracts, prompt composition, and generated projection digests. Regenerate installed agents from the alpha.15 package rather than copying files from alpha.14.

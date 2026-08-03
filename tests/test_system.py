@@ -150,7 +150,7 @@ class BbkTests(unittest.TestCase):
     def test_omp_extension_parses_and_registers(self):
         m1_run(['node', '--check', m1_ROOT / 'omp' / 'extension' / 'index.js'])
         script = m1_ROOT / 'tests' / '.omp-mock.mjs'
-        script.write_text(textwrap.dedent(f"\n            const chain = () => ({{ optional() {{ return this; }} }});\n            const z = {{\n              object: value => value,\n              string: chain,\n              boolean: chain,\n              enum: values => chain(),\n              array: value => chain(),\n            }};\n            const tools = [], commands = [], handlers = [];\n            const pi = {{\n              zod: {{ z }}, setLabel() {{}},\n              registerTool(value) {{ tools.push(value); }},\n              registerCommand(name, value) {{ commands.push([name, value]); }},\n              on(name, value) {{ handlers.push([name, value]); }},\n              sendMessage() {{}},\n            }};\n            const mod = await import({json.dumps((m1_ROOT / 'omp' / 'extension' / 'index.js').as_uri())});\n            mod.default(pi);\n            if (tools.length !== 28) throw new Error(`tools=${{tools.length}}`);\n            if (commands.length !== 29) throw new Error(`commands=${{commands.length}}`);\n            if (!handlers.some(([n]) => n === 'tool_call')) throw new Error('missing tool_call');\n            if (!handlers.some(([n]) => n === 'session_start')) throw new Error('missing session_start');\n            if (!handlers.some(([n]) => n === 'before_agent_start')) throw new Error('missing before_agent_start');\n            console.log(JSON.stringify({{tools: tools.map(x=>x.name), commands: commands.map(x=>x[0])}}));\n        "), encoding='utf-8')
+        script.write_text(textwrap.dedent(f"\n            const chain = () => ({{ optional() {{ return this; }} }});\n            const z = {{\n              object: value => value,\n              string: chain,\n              boolean: chain,\n              enum: values => chain(),\n              array: value => chain(),\n            }};\n            const tools = [], commands = [], handlers = [];\n            const pi = {{\n              zod: {{ z }}, setLabel() {{}},\n              registerTool(value) {{ tools.push(value); }},\n              registerCommand(name, value) {{ commands.push([name, value]); }},\n              on(name, value) {{ handlers.push([name, value]); }},\n              sendMessage() {{}},\n            }};\n            const mod = await import({json.dumps((m1_ROOT / 'omp' / 'extension' / 'index.js').as_uri())});\n            mod.default(pi);\n            if (tools.length !== 42) throw new Error(`tools=${{tools.length}}`);\n            if (commands.length !== 45) throw new Error(`commands=${{commands.length}}`);\n            if (!handlers.some(([n]) => n === 'tool_call')) throw new Error('missing tool_call');\n            if (!handlers.some(([n]) => n === 'session_start')) throw new Error('missing session_start');\n            if (!handlers.some(([n]) => n === 'before_agent_start')) throw new Error('missing before_agent_start');\n            console.log(JSON.stringify({{tools: tools.map(x=>x.name), commands: commands.map(x=>x[0])}}));\n        "), encoding='utf-8')
         try:
             result = m1_run(['node', script])
             value = json.loads(result.stdout)
@@ -718,7 +718,8 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
         self.assertIn('hub`/IRC', entry)
         self.assertIn('{ context, tasks: [{ name, agent, task, ... }] }', entry)
         self.assertIn('Do not put the role name only in `name` while omitting `agent`', entry)
-        self.assertLess(len(entry.split()), 1400)
+        self.assertNotIn('{{bbk-module:', entry)
+        self.assertEqual(entry.count('## Shared module:'), 0)
         for role_name, role in self.roles.items():
             self.assertEqual(role['constitution'][0], 'core', role_name)
             self.assertNotIn('bbk', role['skills'], role_name)
@@ -1116,8 +1117,12 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
             )
             self.assertTrue(created["valid"])
             handoff = root / created["handoff"]["path"]
-            self.assertEqual(created["references"][0]["bytes"], payload.stat().st_size)
-            self.assertEqual(created["references"][0]["sha256"], a118_hashlib.sha256(payload.read_bytes()).hexdigest())
+            artifact_ref = next(item for item in created["references"] if item.get("artifactId") == "artifact-001")
+            packaged_payload = handoff / artifact_ref["path"]
+            self.assertEqual(artifact_ref["canonicalization"], "BBK-JSON-1")
+            self.assertEqual(a118_json.loads(packaged_payload.read_text(encoding="utf-8")), a118_json.loads(payload.read_text(encoding="utf-8")))
+            self.assertEqual(artifact_ref["bytes"], packaged_payload.stat().st_size)
+            self.assertEqual(artifact_ref["sha256"], a118_hashlib.sha256(packaged_payload.read_bytes()).hexdigest())
             plan = self.run_cli(
                 "beads", "handoff-plan", "--root", str(root),
                 "--handoff", str(handoff), "--bead", "bd-123",
@@ -1130,7 +1135,9 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
             self.assertEqual(listed["count"], 1)
             self.assertEqual(listed["latest"]["sha256"], created["handoff"]["sha256"])
             assert_exact_path_text(self, listed["latest"]["path"], created["handoff"]["path"])
-            payload.write_text("tampered\n", encoding="utf-8")
+            payload.write_text("tampered source after seal\n", encoding="utf-8")
+            self.assertTrue(self.run_cli("handoff", "verify", str(handoff), "--root", str(root))["valid"])
+            packaged_payload.write_text("tampered sealed copy\n", encoding="utf-8")
             failed = self.run_cli("handoff", "verify", str(handoff), "--root", str(root), check=False)
             self.assertFalse(failed["valid"])
             self.assertTrue(any("mismatch" in error for error in failed["errors"]))
@@ -1375,13 +1382,20 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
         self.assertEqual(len(methods["skills"]), 39)
         self.assertEqual(len(methods["references"]), 23)
         prompt_catalog = a118_json.loads((A118_ROOT / "spec" / "prompt-modules" / "catalog.json").read_text(encoding="utf-8"))
-        self.assertEqual(len(prompt_catalog["module_entries"]), 22)
+        self.assertEqual(len(prompt_catalog["module_entries"]), 31)
         for name in ("bbk-wayfind", "bbk-grill", "bbk-handoff", "bbk-work-unit-execution", "bbk-assertion-validation"):
             self.assertIn(name, methods["skills"])
         self.assertIn("handoff.md", methods["references"])
         self.assertIn("question-branch.md", methods["references"])
         for relative in (
             "spec/schemas/bbk-handoff-v1.schema.json",
+            "spec/schemas/bbk-handoff-v2.schema.json",
+            "spec/schemas/bbk-role-return-v2.schema.json",
+            "spec/schemas/bbk-host-preflight-request-v1.schema.json",
+            "spec/schemas/bbk-host-preflight-result-v1.schema.json",
+            "spec/schemas/bbk-worker-context-package-v1.schema.json",
+            "spec/schemas/bbk-review-package-v2.schema.json",
+            "spec/schemas/bbk-prototype-charter-v2.schema.json",
             "spec/schemas/bbk-question-branch-v1.schema.json",
             "spec/schemas/bbk-role-return-v1.schema.json",
             "spec/schemas/bbk-territory-execution-boundary-v1.schema.json",
@@ -1390,12 +1404,16 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
             "spec/schemas/bbk-local-discovery-permit-v1.schema.json",
             "spec/contracts/catalog.json",
             "spec/contracts/role-return-registry.json",
+            "spec/contracts/role-return-registry-v2.json",
             "templates/handoff.json",
+            "templates/handoff-v2.json",
+            "templates/host-preflight-request.json",
+            "templates/prototype-charter-v2.json",
             "templates/question-branch.json",
         ):
             self.assertTrue((A118_ROOT / relative).is_file(), relative)
-        self.assertEqual(len(list((A118_ROOT / "spec" / "schemas" / "role-returns").glob("*.schema.json"))), 19)
-        self.assertEqual(len(list((A118_ROOT / "spec" / "schemas" / "role-results").glob("*.schema.json"))), 19)
+        self.assertEqual(len(list((A118_ROOT / "spec" / "schemas" / "role-returns").glob("*.schema.json"))), 38)
+        self.assertEqual(len(list((A118_ROOT / "spec" / "schemas" / "role-results").glob("*.schema.json"))), 38)
 
     def test_standing_authority_capability_zones_and_worker_contract_are_projected(self) -> None:
         catalogue = a118_json.loads((A118_ROOT / "spec" / "roles.json").read_text(encoding="utf-8"))
@@ -1483,7 +1501,7 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
                 "--next-action", "Continue the same worker thread.",
             )
             handoff_path = project / paused["handoff"]["path"]
-            value = a118_json.loads(handoff_path.read_text(encoding="utf-8"))
+            value = a118_json.loads((handoff_path / "handoff.json").read_text(encoding="utf-8"))
             self.assertEqual(value["disposition"], "PAUSED_HOST_WINDOW")
             self.assertTrue(value["authority"]["standing"])
             self.assertEqual(value["capability_zones_used"][0]["kind"], "protected-worktree")

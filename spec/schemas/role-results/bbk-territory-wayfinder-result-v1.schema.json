@@ -6,44 +6,36 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "root_outcome_ref",
-    "territory_synthesis_ref",
+    "assurance_refs",
     "authority_state",
-    "decision_refs",
-    "territory_state",
+    "blockers",
     "boundary_interface_state",
     "child_return_refs",
-    "fit_refs",
+    "decision_refs",
     "design_refs",
-    "local_work_graph_refs",
-    "assurance_refs",
-    "outward_impacts",
+    "fit_refs",
     "invalidated_or_superseded_refs",
-    "residual_uncertainty",
+    "local_work_graph_refs",
     "outstanding_question_branch_ids",
-    "blockers",
-    "parent_actions_requested"
+    "outward_impacts",
+    "parent_actions_requested",
+    "residual_uncertainty",
+    "root_outcome_ref",
+    "territory_state",
+    "territory_synthesis_ref"
   ],
   "properties": {
-    "root_outcome_ref": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
-      "description": "Exact root outcome or operating-frame reference and revision that this territory serves."
-    },
-    "territory_synthesis_ref": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
-      "description": "Territory ID, revision, lifecycle state, durable path, byte count, and SHA-256 when persisted; inline content is permitted for a routine small territory."
+    "assurance_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Current territory verification-design and independent-review references, or an explicit not-applicable disposition."
     },
     "authority_state": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
       "description": "Inherited decision posture, delegated authority, authority actually used, excluded powers, and any missing or stale authority."
     },
-    "decision_refs": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
-      "description": "Accepted, delegated, constraint-driven, proposed, reopened, and pending territory decision references with authority and freshness state."
-    },
-    "territory_state": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Current internal responsibility and interface map, completed and active frontier, blockers, residual fog, dependencies, risks, child state, and invalidation links."
+    "blockers": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Exact technical, authority, decision, capacity, host-window, interface, or parent-integration blockers."
     },
     "boundary_interface_state": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
@@ -53,45 +45,53 @@
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
       "description": "Validated current child returns and any rejected, stale, or superseded returns with reasons."
     },
-    "fit_refs": {
+    "decision_refs": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
-      "description": "Inherited or territory-refined SolutionOutcomeFit references, or an explicit not-applicable disposition."
+      "description": "Accepted, delegated, constraint-driven, proposed, reopened, and pending territory decision references with authority and freshness state."
     },
     "design_refs": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
       "description": "Current territory architecture, ImplementationStructureContract, and State–Decision–Effect references, or explicit not-applicable or not-ready dispositions."
     },
-    "local_work_graph_refs": {
+    "fit_refs": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
-      "description": "Any current territory-local capability, phase, work-unit, and worker-invocation references, or an explicit not-required or not-ready disposition."
-    },
-    "assurance_refs": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
-      "description": "Current territory verification-design and independent-review references, or an explicit not-applicable disposition."
-    },
-    "outward_impacts": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Exact implications for the parent, sibling territories, shared contracts, global work graph, assurance, authority, migration, or baseline."
+      "description": "Inherited or territory-refined SolutionOutcomeFit references, or an explicit not-applicable disposition."
     },
     "invalidated_or_superseded_refs": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
       "description": "Territory objects invalidated, reopened, rejected, or superseded during this invocation."
     },
-    "residual_uncertainty": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
-      "description": "Explicit bounded uncertainty retained after economic stopping and its consequence, owner, expiry, or reopening trigger."
+    "local_work_graph_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Any current territory-local capability, phase, work-unit, and worker-invocation references, or an explicit not-required or not-ready disposition."
     },
     "outstanding_question_branch_ids": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
       "description": "Unresolved Questioning Wayfinder branches and controller-mediated request IDs, if any."
     },
-    "blockers": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
-      "description": "Exact technical, authority, decision, capacity, host-window, interface, or parent-integration blockers."
+    "outward_impacts": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Exact implications for the parent, sibling territories, shared contracts, global work graph, assurance, authority, migration, or baseline."
     },
     "parent_actions_requested": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
       "description": "Exact decisions, interface dispositions, integration actions, resynthesis, or planning actions requested from the semantic parent."
+    },
+    "residual_uncertainty": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Explicit bounded uncertainty retained after economic stopping and its consequence, owner, expiry, or reopening trigger."
+    },
+    "root_outcome_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Exact root outcome or operating-frame reference and revision that this territory serves."
+    },
+    "territory_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Current internal responsibility and interface map, completed and active frontier, blockers, residual fog, dependencies, risks, child state, and invalidation links."
+    },
+    "territory_synthesis_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Territory ID, revision, lifecycle state, durable path, byte count, and SHA-256 when persisted; inline content is permitted for a routine small territory."
     }
   },
   "x-bbk-role": "bbk_territory_wayfinder",

@@ -10,11 +10,11 @@
     },
     {
       "id": "HANDOFF.BIND",
-      "text": "Bind every carrier and material referenced artifact by safe project-relative path, byte count, lowercase SHA-256 computed from disk, exact subject and revision, producer attempt, and declared disposition."
+      "text": "Bind every carrier and material referenced artifact by safe project-relative path, exact subject and revision, producer attempt, and declared disposition. Use the BBK package engine to compute byte counts, lowercase SHA-256 values, canonicalization metadata, manifests, and receipts from stored bytes; never hand-author generated identity fields."
     },
     {
       "id": "HANDOFF.VERIFY",
-      "text": "Verify the carrier and every referenced artifact before creation is announced, before consumption or reuse, and after transfer. A locator without matching bytes, digest, subject, and schema is not an exact handoff."
+      "text": "Verify the sealed package and every referenced artifact through the BBK verifier before creation is announced, before consumption or reuse, and after transfer. A locator without matching tool-generated package identity, subject, schema, and reference closure is not an exact handoff."
     },
     {
       "id": "HANDOFF.SEPARATE_STATE",

@@ -1,11 +1,11 @@
 # Blueprint Bootstrap Kit
 
-**Version:** `0.1.0-alpha.13.5`
+**Version:** `0.1.0-alpha.15`
 **Status:** package-qualified temporary method harness; live host, model, profile-toolchain, and target-project behavior remain separately qualified
 
 BBK is a lightweight, Blueprint-inspired planning, execution, evidence, and review kit for Codex, Oh My Pi (OMP), Claude Code, and generic agent harnesses. It is external to the real Blueprint product and carries no official Blueprint lifecycle, capability, authorization, readiness, execution, verification, completion, qualification, or release authority.
 
-Alpha.13 makes the 19 individual role files the canonical role source, formalizes the four controller-selectable roots and parent-admission modes, publishes exact machine-valid role-return and execution contracts, and compiles shared behavior through 22 reusable prompt modules. It preserves complete OMP prompt replacement, `hub`/IRC communication, live worker/context display, `ask`-backed decisions, bounded verification, harness-scoped updates, and the five bundled language profiles. Its default per-role model routes are the reviewed selections in `spec/model-routing.json`, not broad judgment tiers.
+Alpha.15 retains the 19-file canonical role package and exact reviewed model routes while compiling shared behavior through 31 reusable prompt modules. It adds product-first proportional assurance, strict JSON and deterministic sealed artifact packages, project-local OMP routing creation/repair, role-return v2 COMPACT/FULL results, generated Worker/review contexts, requirement-scoped host preflight, compact/full prototype charters, and sealed handoff v2. It deliberately does not recreate Blueprint lifecycle, acceptance, authorization, review-invalidation, or release machinery.
 
 ## BBK entrypoint
 
@@ -34,7 +34,7 @@ An existing empty root returns a successful `UNINITIALIZED` status rather than a
 
 While BBK mode is active, one compact widget appears directly above the editor. It shows `BBK · ready` while no canonical child is active. While children are running, the same line shows the latest active job name and public progress intent/tool/output, plus current context consumption when OMP publishes `contextTokens` and `contextWindow`; up to three other active workers appear as compact context gauges. The widget is rebuilt from the active session on navigation and clears only when BBK mode exits or the session shuts down. Non-BBK tasks are ignored.
 
-The previous `setStatus`-based standalone `BBK` row has been replaced by this single ready/activity widget. Current OMP interactive extensions do not provide a working public footer-replacement surface, so BBK cannot replace the built-in `pi` brand without modifying OMP itself. Alpha.13 preserves the single BBK-owned line rather than adding both a permanent mode row and a separate activity row.
+The previous `setStatus`-based standalone `BBK` row has been replaced by this single ready/activity widget. Current OMP interactive extensions do not provide a working public footer-replacement surface, so BBK cannot replace the built-in `pi` brand without modifying OMP itself. Alpha.15 preserves the single BBK-owned line rather than adding both a permanent mode row and a separate activity row.
 
 On each active Main turn, `before_agent_start` performs a **system-prompt replacement**, not an append or overlay. The replacement excludes OMP's generic planning/delegation workflow and compatibility-discovered `.codex`, `.claude`, `.gemini`, or other client-specific instructions. It provides a controller-only contract and injects the complete `bbk` and `bbk-context-routing` skills directly. Main then selects exactly one named root:
 
@@ -55,6 +55,8 @@ assertion-scoped candidate acceptance
 With OMP's advertised batch task schema, Main dispatches even one root as `{ context, tasks: [{ name, agent, task, ... }] }`: `agent` selects the exact canonical `bbk_*` role, `name` is a stable IRC/job identifier, and `task` is the complete self-contained assignment. When only a flat task form is advertised, Main follows that schema and references reusable shared background through a durable `local://` context file.
 
 Each generated OMP BBK child carries a closed `<bbk-agent-system>` marker. The same hook locates only OMP's marker-bearing native child wrapper, authenticates every non-empty role-contract line against the installed canonical projection while tolerating only line-ending, blank-line, and trailing-horizontal-whitespace normalization, and replaces the child's complete incoming system prompt with that canonical contract, inlined mandatory skills, runtime facts, and explicit task-call data such as assigned context, approved plan, isolated worktree, hub peer identity/roster, and caller yield schema. Conflicting generic OMP workflow text and Codex/Claude/Gemini compatibility context are not retained. Any changed, missing, injected, or reordered non-empty instruction fails closed.
+
+Because OMP persists a child's pre-hook `session_init.systemPrompt`, alpha.15 continues to record digest-only effective-prompt receipts after replacement and, when available, at the provider boundary. `/bbk:prompt-status` shows source/effective digests, generic-prompt removal, and provider-bound verification without duplicating raw prompts. This receipt is observability, not a Blueprint-style lifecycle or authorization gate.
 
 OMP's peer whose `kind` is `main`, normally `Main`, is the sole user-facing endpoint. Named BBK agents use `hub`/IRC to coordinate with parents and send a compact `BBK_USER_REQUEST` to Main when a material decision, authority grant, private context, protected-floor exception, hard-to-reverse commitment, or explicit acceptance is required. Main presents the smallest question through OMP's native `ask` tool and relays the structured answer to the exact waiting peer as a matching `BBK_USER_RESPONSE` with `source: omp.ask`, using `replyTo` where available. A question written only in ordinary assistant prose is informational text—not a pending BBK question—and cannot support an ADR. Main never authors the ADR; the responsible canonical role records an ask-backed accepted decision. A send receipt, timeout, silence, or missing heartbeat is never a user response.
 
@@ -107,7 +109,7 @@ python tools\bbk.py question validate `
 
 BBK treats a host sub-agent turn as one segment of a logical worker lifecycle, not necessarily the entire work unit. New project configuration gives workers an extended logical window, bounded checkpoints, same-thread continuation after infrastructure interruption, and a durable handoff requirement. BBK does not emit an undocumented Codex timeout key.
 
-Exact or large results use an authoritative UTF-8 handoff file with project-relative paths, byte counts, and SHA-256 digests:
+Exact or large results use a sealed `bbk.handoff.v2` package. Semantic fields are authored once; byte counts, digests, canonicalization metadata, and the seal receipt are generated by the package engine:
 
 ```powershell
 python tools\bbk.py handoff create --root D:\Project `
@@ -118,7 +120,7 @@ python tools\bbk.py handoff create --root D:\Project `
   --next-action "Resume the same worker thread and run focused validation."
 
 python tools\bbk.py handoff verify `
-  .bbk\handoffs\WU-EXAMPLE\HO-WU-EXAMPLE-1.json --root D:\Project
+  .bbk\handoffs\WU-EXAMPLE\HO-WU-EXAMPLE-1 --root D:\Project
 
 python tools\bbk.py handoff list --root D:\Project `
   --work-unit WU-EXAMPLE --latest
@@ -139,7 +141,7 @@ Beads can also carry a compact append-only handoff pointer rather than the full 
 
 ```powershell
 python tools\bbk.py beads handoff-plan `
-  --root D:\Project --handoff .bbk\handoffs\WU-EXAMPLE\HO-WU-EXAMPLE-1.json `
+  --root D:\Project --handoff .bbk\handoffs\WU-EXAMPLE\HO-WU-EXAMPLE-1 `
   --target-bbk-id WU-EXAMPLE --apply
 ```
 
@@ -149,6 +151,14 @@ A project may deliberately set `enabled` or `write_enabled` to `false`. Absence 
 
 The BBK file remains authoritative. Configured gate runs follow the same lossless boundary: JSON receipts expose bounded previews, while complete stdout and stderr are stored beside the receipt and bound by project-relative path, byte count, and SHA-256. A PASS receipt is not reusable if either bound stream is missing or changed. See `docs/DURABLE-HANDOFFS.md`.
 
+
+## Execution autonomy and user attention
+
+After an accepted baseline and current authority are bound, BBK roles continue through routine plan-detail corrections, sequencing changes, reversible choices, ordinary repairs, compatible substitutions, and a technical blocker with one safe realistic in-authority resolution. They record the deviation and update the smallest affected planning/assurance scope rather than asking for redundant authorization or inventing artificial alternatives.
+
+A user decision is reserved for a genuine material branch with several viable consequential paths, an authority expansion, or an explicitly user-reserved preference. Environment facts and configuration parameters are first discovered, parameterized, safely defaulted, or placed in the pre-execution confirmation register. Coherent questions and answers are batched while preserving request IDs.
+
+The originating Root Wayfinder integrates baseline acceptance, execution authority, and successor planning. Root Orchestrator consumes those exact references; it does not author the records that make its own campaign eligible. These are prompt/protocol responsibilities, not a new deterministic BBK lifecycle gate.
 
 ## Execution authority and child lifecycle
 
@@ -161,33 +171,62 @@ The existing `bbk manifest` and `bbk candidate` commands are the first-class exa
 
 ## Canonical role, contract, and prompt packages
 
-Alpha.13 separates canonical sources from generated compatibility surfaces:
+Alpha.15 retains the separation between canonical sources and generated compatibility surfaces:
 
 ```text
 spec/roles/catalog.json                 package metadata, roots, parent modes, ordering, topology
 spec/roles/bbk_*-role.json              19 canonical role definitions
 spec/roles.json                         deterministic generated compatibility projection
 spec/contracts/catalog.json             role-return and execution-contract package
-spec/contracts/role-return-registry.json generated digest-bound role-return registry
+spec/contracts/role-return-registry.json v1 compatibility registry
+spec/contracts/role-return-registry-v2.json generated v2 COMPACT/FULL registry
 spec/prompt-modules/catalog.json         reusable prompt-module package and compilation policy
-spec/prompt-modules/modules/*.json       21 canonical shared behavior modules
+spec/prompt-modules/bbk-prompt-*.json   31 canonical shared behavior modules
 spec/method-content.json                 canonical procedure-skill and reference content
 ```
 
 The controller chooses one root according to consequence: `bbk_root_wayfinder` for planning and uncertainty, `bbk_root_orchestrator` for an accepted executable baseline, `bbk_reviewer` for bounded independent review, or `bbk_validator_orchestrator` for candidate-bound assurance. Parent modes, direct-child edges, expected return modes, and human-request originators are explicit in the role catalogue. Generated Codex, OMP, Claude, and generic agents are projections and must not be edited directly.
 
-Every role return uses `bbk.role-return.v1`: operational attempt state is separate from role-specific semantic readiness. Current operational dispositions are `COMPLETE`, `PARTIAL`, `BLOCKED_TECHNICAL`, `BLOCKED_AUTHORITY`, `BLOCKED_DECISION`, `PAUSED_CAPACITY`, `PAUSED_HOST_WINDOW`, `CANCELLED`, and `INCONCLUSIVE`. `READY_FOR_VALIDATION`, `BLOCKED`, and `PAUSED` are consume-only legacy `bbk.handoff.v1` inputs, not values emitted by current role contracts.
+Generated role returns default to `bbk.role-return.v2`. COMPACT uses a generated role-specific compact schema and omits irrelevant empty sections while preserving core truth; FULL uses the existing authoritative role-specific result schema. Operational attempt state remains separate from semantic readiness. `bbk.role-return.v1` remains consumable during the compatibility transition.
 
-Shared prompt behavior is compiled once from reusable modules, then combined with the exact role contract, one or more genuinely role-specific mandatory procedures, and host-specific transport instructions. Alpha.13 imposes no arbitrary mandatory-procedure maximum. Additional procedures require a source-bound measured exception proving distinct behavior and no duplicated prompt-module bodies.
+Shared prompt behavior is compiled once from reusable modules, then combined with the exact role contract, one or more genuinely role-specific mandatory procedures, and host-specific transport instructions. Alpha.15 imposes no arbitrary mandatory-procedure maximum. Additional procedures require a source-bound measured exception proving distinct behavior and no duplicated prompt-module bodies.
 
-## Discoverable schema validation and profile CLI
+## Schema, compact structure, and artifact tooling
 
 ```powershell
-python tools\bbk.py schema status
-python tools\bbk.py schema validate --schema schema.json --instance candidate.json
+python tools\bbk.py schema list
+python tools\bbk.py schema template --kind implementation-structure `
+  --subject-kind infrastructure --depth compact `
+  --output .bbk\structures\transport.json
+python tools\bbk.py schema enum --schema implementation-structure `
+  --pointer /contractDepth
+python tools\bbk.py schema explain --schema implementation-structure `
+  --instance .bbk\structures\transport.json
+
+python tools\bbk.py artifact manifest --root D:\Project `
+  --path deploy --path .bbk\structures\transport.json `
+  --output .bbk\manifests\transport.json
+python tools\bbk.py artifact verify .bbk\manifests\transport.json --root D:\Project
+
+python tools\bbk.py artifact preflight .bbk\drafts\candidate
+python tools\bbk.py artifact seal .bbk\drafts\candidate `
+  --output .bbk\packages\candidate-r1
+python tools\bbk.py artifact verify .bbk\packages\candidate-r1
+python tools\bbk.py artifact successor .bbk\packages\candidate-r1 `
+  --output .bbk\drafts\candidate-r2 --revision r2 --reason "Focused repair"
+
+python tools\bbk.py preflight run .bbk\preflight\request.json `
+  --root D:\Project --output .bbk\preflight\result.json
+python tools\bbk.py context worker --root D:\Project `
+  --work-unit .bbk\work-units\WU-EXAMPLE.json `
+  --profile-lock .bbk\profiles\lock.json `
+  --host-preflight .bbk\preflight\result.json `
+  --output .bbk\contexts\WU-EXAMPLE
 ```
 
-When `python-jsonschema` is missing, the validator reports `BLOCKED` with process exit code 1 and an exact `--ensure` remediation; this is an expected optional-capability status, and it does not silently access the network. The installation-specific `bbk-installed-profiles` skill now records both the preferred launcher path and the exact Python/script fallback, so a missing `bbk` entry in `PATH` or a mise shell does not by itself make profile discovery unavailable. The familiar discovery form remains `bbk --json profile list`.
+The v3 ImplementationStructureContract supports compact infrastructure, network-configuration, and deployment-configuration subjects without weakening v1/v2 compatibility. Schema diagnostics identify exact instance/schema pointers, allowed values, required fields, smallest valid examples, and applicability. Legacy artifact manifests remain available. Sealed packages add strict JSON, profile preflight, BBK-JSON-1 canonical bytes, lock-protected staged publication, read-only verification, and immutable predecessor-bound successors. Worker and review compilers emit sealed contexts only from complete canonical inputs; incomplete nonstandard Worker semantics return `SPECIALIST_DESIGN_REQUIRED`. Host preflight probes only plan-named capabilities and does not grant execution authority.
+
+When `python-jsonschema` is missing, the external Draft 2020-12 validator reports `BLOCKED` with an exact remediation. Core BBK validation and test collection remain standard-library capable. The installation-specific `bbk-installed-profiles` skill records both the preferred launcher path and exact Python/script fallback, so a missing `bbk` entry in `PATH` does not make profile discovery unavailable.
 
 ## Model routing
 
@@ -199,7 +238,7 @@ spec/model-routing.json             exact OMP, Codex, and Claude route for each 
 spec/omp-model-routing-profiles.json OMP runtime profiles generated from the canonical default
 ```
 
-The canonical policy uses `bbk.model-routing.v2`. Every role has an independent host route. Alpha.13 defaults are the exact reviewed selections from the role-update package; they are not derived from three broad tiers. The repeated route shapes are:
+The canonical policy uses `bbk.model-routing.v2`. Every role has an independent host route. Alpha.15 preserves the exact reviewed selections from the role-update package; they are not derived from three broad tiers. The repeated route shapes are:
 
 | Reviewed route shape | OMP | Codex | Claude Code | Roles using it |
 |---|---|---|---|---|
@@ -220,7 +259,7 @@ python tools/model_routing.py --check
 python tools/generate_agents.py --check
 ```
 
-To customize without modifying the qualified package, copy `spec/model-routing.json` outside the extraction, edit exact role entries, retain `package_version: 0.1.0-alpha.13.5`, validate it, and pass it during installation:
+To customize without modifying the qualified package, copy `spec/model-routing.json` outside the extraction, edit exact role entries, retain `package_version: 0.1.0-alpha.15`, validate it, and pass it during installation:
 
 ```powershell
 Copy-Item .\spec\model-routing.json D:\Projects\BBK\my-model-routing.json
@@ -252,7 +291,12 @@ Use `testing-flash` to send all 19 BBK sub-agents through DeepSeek V4 Flash for 
 /bbk:models set bbk_worker @task medium
 /bbk:models apply D:\Profiles\bbk-routing.json
 /bbk:models export D:\Profiles\bbk-current.json current-bbk
+/bbk:models project create
+/bbk:models project repair --dry-run
+/bbk:models project repair
 ```
+
+From a user-scoped session, `project create` clones the exact effective user OMP routes into an authenticated OMP-only project installation with no language profiles. It works in an existing empty directory and does not initialize Git or `.bbk`. User routing is verified byte-for-byte unchanged. Partial or divergent project installs fail closed; `project repair` shows a dry-run plan first and uses the installer’s backup-aware clean replacement only after explicit confirmation. Reload or restart OMP in the project after creation or repair.
 
 The default `auto` target resolves the nearest valid project-scoped BBK installation from the current working directory; if none exists, it uses the loaded user-scoped installation. A project installation that is expected but has a missing or invalid binding fails closed instead of silently changing user-global routing. Explicit `project` and `user` targets are available. User-scope mutations require confirmation in the interactive OMP UI because they affect future BBK spawns in every project using that user installation.
 
@@ -315,7 +359,7 @@ Reusable role instructions do not inject Blueprint product status, target-projec
 
 The canonical `bbk.roles.v4` package is split across `spec/roles/catalog.json` and 19 `spec/roles/bbk_*-role.json` files. `spec/roles.json` is a deterministic generated compatibility projection. Every role declares its scope, focused constitution modules, exact direct-child triggers, escalation routes, human-decision triggers, procedures, prohibitions, mutation authority, allowed parent modes, prompt modules, and exact return contract.
 
-Prompt compilation has four layers: canonical role contract, reusable prompt modules, role-specific mandatory procedures, and host projection instructions. The package currently contains 22 prompt modules and 39 skills. Every current role has one primary mandatory procedure because common behavior is modularized, not because BBK imposes an arbitrary maximum. Additional mandatory procedures require a measured, source-bound catalogue exception proving distinct behavior and no duplicated module body.
+Prompt compilation has four layers: canonical role contract, reusable prompt modules, role-specific mandatory procedures, and host projection instructions. The package currently contains 31 prompt modules and 39 skills. Every current role has one primary mandatory procedure because common behavior is modularized, not because BBK imposes an arbitrary maximum. Additional mandatory procedures require a measured, source-bound catalogue exception proving distinct behavior and no duplicated module body.
 
 The top-level `bbk` skill belongs to the harness-root controller and is not a child skill. Mandatory procedure bodies are embedded in generated roles, so baseline behavior does not depend on OMP `autoloadSkills`, Claude Code skill autoload, or a separate discovery call. Optional focused procedures and language/domain profiles remain available on demand.
 
@@ -323,7 +367,7 @@ OMP keeps native `spawns` as the exact direct-child allowlist and tells each rol
 
 All 19 canonical roles are non-user-facing. Material decision and authority needs travel through the invoking chain to the harness-root controller. In OMP the live transport is `hub`/IRC to the peer whose `kind` is `main`; in Codex and Claude Code the child returns the same structured human-request packet through the parent channel. See `docs/AGENTS.md`.
 
-Every role returns a machine-valid `bbk.role-return.v1` envelope with a closed role-specific result schema. Operational attempt disposition is distinct from semantic readiness. Current operational values are `COMPLETE`, `PARTIAL`, `BLOCKED_TECHNICAL`, `BLOCKED_AUTHORITY`, `BLOCKED_DECISION`, `PAUSED_CAPACITY`, `PAUSED_HOST_WINDOW`, `CANCELLED`, and `INCONCLUSIVE`; legacy `READY_FOR_VALIDATION`, `BLOCKED`, and `PAUSED` are consume-only `bbk.handoff.v1` inputs.
+Every role defaults to a machine-valid `bbk.role-return.v2` envelope. COMPACT results use generated role-specific schemas; FULL results retain the existing authoritative role-specific result schemas. V1 envelopes and legacy handoffs remain readable. Operational attempt disposition is distinct from semantic readiness.
 
 Generated prompt bodies begin with operational content while provenance stays outside the model-facing body. Codex `developer_instructions` contain no BBK XML-like build/provenance tags. OMP retains authenticated markers because its extension verifies canonical child definitions before complete prompt replacement. Role identity, filenames, exact routes, constitution and prompt-module selections, topology, primary/mandatory procedures, return contracts, mutability, and source digests are externalized in `projections/manifest.json` (`bbk.projection-manifest.v8`). Generic installations also write `.agents/bbk/agent-manifest.json`.
 
@@ -407,7 +451,7 @@ spec/roles/catalog.json                canonical role-package catalogue
 spec/roles/bbk_*-role.json             19 canonical role source files
 spec/roles.json                        generated v4 compatibility projection
 spec/contracts/                        return/execution contract catalogue and registry
-spec/prompt-modules/                   22 reusable prompt modules and compilation policy
+spec/prompt-modules/                   27 reusable prompt modules and compilation policy
 spec/model-routing.json                reviewed per-role OMP/Codex/Claude routing policy
 spec/method-content.json               canonical skills and references
 spec/schemas/                          BBK and role-specific JSON Schemas

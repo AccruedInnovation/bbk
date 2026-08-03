@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-architect-compact-result-v2.schema.json",
+  "title": "BBK BBK Architect compact result payload v2",
+  "description": "Closed compact role-specific result payload for `bbk_architect`. Use FULL when material truth cannot fit these fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "architecture_ref",
+    "canonical_interface_contracts",
+    "derived_integration_and_verification_obligations",
+    "residual_uncertainty",
+    "blockers",
+    "architecture_artifact_ref"
+  ],
+  "properties": {
+    "architecture_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/reference",
+      "description": "Stable architecture proposal ID, attempt, revision, lifecycle state, and predecessor or successor relationship."
+    },
+    "canonical_interface_contracts": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Every material interface with stable identity, status, owner and change authority, provider and consumers, logical and binding semantics, operations and information, invariants, outcomes, state and commit semantics, failure and recovery, concurrency and transport behavior, compatibility and migration, security and trust, performance, observability, and verification obligations."
+    },
+    "derived_integration_and_verification_obligations": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Every obligation created by decomposition with source derivation, participating elements, canonical interface, one integration owner, assembly point, earliest coherent exercise, failure and recovery behavior, affected successors, and the exact claim or verification-design need exposed."
+    },
+    "residual_uncertainty": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Accepted unknowns, intentionally deferred detail, evidence limits, assumptions, consequence, owner, expiry or freshness horizon, and reopening trigger."
+    },
+    "blockers": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Typed source, decision, authority, factual, empirical, review, recharter, technical, access, profile, transport, capacity, or host-window blockers with affected objects and smallest remediation."
+    },
+    "architecture_artifact_ref": {
+      "anyOf": [
+        {
+          "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/artifactReference",
+          "description": "Durable architecture proposal and supporting package path, byte count, SHA-256, schema, subject, revision, lifecycle, and content inventory, or null with a proportionate inline-result rationale."
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Durable architecture proposal and supporting package path, byte count, SHA-256, schema, subject, revision, lifecycle, and content inventory, or null with a proportionate inline-result rationale."
+    }
+  },
+  "x-bbk-role": "bbk_architect",
+  "x-bbk-contract": "bbk.architect-return.v2",
+  "x-bbk-detail-level": "COMPACT",
+  "x-bbk-full-detail-triggers": [
+    "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+    "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+    "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+    "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+    "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+    "The parent explicitly requested FULL detail.",
+    "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+  ]
+}

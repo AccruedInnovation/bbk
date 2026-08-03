@@ -33,6 +33,12 @@
         "envelope_schema",
         "return_schema",
         "result_schema",
+        "full_detail_triggers",
+        "compact_result_fields",
+        "compact_result_schema",
+        "v2_return_schema",
+        "v2_envelope_schema",
+        "v2_contract_id",
         "semantic_state_name",
         "allowed_invocation_modes",
         "allowed_return_kinds",
@@ -103,6 +109,34 @@
         },
         "authority_boundary": {
           "$ref": "#/$defs/nonEmptyString"
+        },
+        "v2_contract_id": {
+          "type": "string",
+          "pattern": "^bbk\\.[a-z0-9][a-z0-9.-]*-return\\.v2$"
+        },
+        "v2_envelope_schema": {
+          "const": "spec/schemas/bbk-role-return-v2.schema.json"
+        },
+        "v2_return_schema": {
+          "type": "string",
+          "pattern": "^spec/schemas/role-returns/bbk-[a-z][a-z0-9-]*-return-v2\\.schema\\.json$"
+        },
+        "compact_result_schema": {
+          "type": "string",
+          "pattern": "^spec/schemas/role-results/bbk-[a-z][a-z0-9-]*-compact-result-v2\\.schema\\.json$"
+        },
+        "compact_result_fields": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          }
+        },
+        "full_detail_triggers": {
+          "$ref": "#/$defs/nonEmptyStringList"
         }
       }
     },

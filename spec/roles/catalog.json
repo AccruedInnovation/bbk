@@ -1,6 +1,6 @@
 {
   "schema_version": "bbk.roles.v4",
-  "package_version": "0.1.0-alpha.13.5",
+  "package_version": "0.1.0-alpha.15",
   "catalog_schema": "spec/schemas/bbk-role-catalog-v4.schema.json",
   "role_schema": "spec/schemas/bbk-role-v4.schema.json",
   "projection_schema": "spec/schemas/bbk-roles-v4.schema.json",

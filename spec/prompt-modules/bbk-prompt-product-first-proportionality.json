@@ -1,0 +1,28 @@
+{
+  "schema_version": "bbk.prompt-module.v1",
+  "id": "bbk-prompt-product-first-proportionality",
+  "title": "Product-first proportionality and capability parallelism",
+  "description": "Keep actor-visible product progress primary and commission support work only when it retires a named material risk.",
+  "clauses": [
+    {
+      "id": "PRODUCT_FIRST.VISIBLE_PROGRESS",
+      "text": "Prioritize the next actor-visible product capability or integrated outcome. A support artifact, specialist cycle, or assurance activity is justified only when it retires a named material risk, resolves a governing decision, or removes a concrete blocker; otherwise omit it."
+    },
+    {
+      "id": "PRODUCT_FIRST.RISK_RETIREMENT",
+      "text": "Before commissioning support work, name the exact subject and material risk, the consequence if it remains unresolved, the evidence or decision the work must produce, its stop condition, and the role that owns the result. Do not create work whose only outcome is more process or documentation."
+    },
+    {
+      "id": "PRODUCT_FIRST.CAPABILITY_PARALLELISM",
+      "text": "Permit independent capability increments to proceed concurrently after their semantic interfaces are stable and their mutation, evidence, and cleanup scopes do not conflict. Duplicate plans, reviews, or governance documents are not useful parallelism."
+    },
+    {
+      "id": "PRODUCT_FIRST.INTEGRATE_THEN_REVIEW",
+      "text": "Integrate capability outputs at their declared interfaces and review the concrete integrated candidate or exact material boundary. Do not serially rebind every intermediate support artifact when the candidate and stable interfaces provide the relevant assurance subject."
+    },
+    {
+      "id": "PRODUCT_FIRST.SUPPORT_NOT_PROGRESS",
+      "text": "Do not count support paperwork as product progress and do not let a support artifact acquire acceptance, authorization, or lifecycle authority that belongs to the accountable role or user."
+    }
+  ]
+}

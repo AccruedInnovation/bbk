@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-validator-orchestrator-compact-result-v2.schema.json",
+  "title": "BBK BBK Validator Orchestrator compact result payload v2",
+  "description": "Closed compact role-specific result payload for `bbk_validator_orchestrator`. Use FULL when material truth cannot fit these fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "subject_candidate_and_eligibility",
+    "evidence_and_assertion_evaluation_state",
+    "findings_and_dispositions_state",
+    "aggregate_result",
+    "repair_and_revalidation_scope",
+    "parent_actions_and_recommended_route"
+  ],
+  "properties": {
+    "subject_candidate_and_eligibility": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Exact governed subject, candidate identity, revision and digest, manifest, freeze or immutability receipt, prerequisite worker-quality attestation or explicitly valid alternative or non-applicability record, currentness, identity checks, post-freeze mutation check and eligibility blockers."
+    },
+    "evidence_and_assertion_evaluation_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Every deterministic or interpretive EvidenceReceipt, raw carrier, trust class, tool and environment identity, currentness, reuse decision, AssertionEvaluation, rationale, coverage, limitation, unsupported claim and distinction between observation and inference."
+    },
+    "findings_and_dispositions_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Every immutable ReviewFinding with exact subject, attempt, assertions, evidence, severity, blocking state, reproduction, impact, fingerprint and route; duplicate or contradiction correlation; current externally supplied FindingDisposition and authority when any; findings that remain open; and prohibited self-dispositions."
+    },
+    "aggregate_result": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "PASS",
+            "PASS_ADVISORY",
+            "NEEDS_REVISION",
+            "BLOCKED_INSUFFICIENT_CONTEXT",
+            "BLOCKED_ENVIRONMENT",
+            "INCONCLUSIVE",
+            "ERROR",
+            "ESCALATED",
+            "CANCELLED",
+            "STALE"
+          ],
+          "description": "One centrally derived non-averaging aggregate result, or null before aggregation is valid. This discriminator is distinct from operational disposition and validation-run state."
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "One centrally derived non-averaging aggregate result, or null before aggregation is valid. This discriminator is distinct from operational disposition and validation-run state."
+    },
+    "repair_and_revalidation_scope": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Exact candidate and findings requiring repair, proposed smallest repair owner and scope, invalidated evidence, changed-subject and dependency impact, targeted-closure assertions, blind-reassessment needs, reusable unaffected evidence, required successor candidate and prerequisite attestation, and parent action needed. This is a route proposal, not repair authorization."
+    },
+    "parent_actions_and_recommended_route": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Exact invoking-parent action requested: accept the report for its own assessment, route candidate repair, admit a successor candidate for revalidation, retry or replace an evaluator, rebuild context, qualify a method, profile, tool or environment, obtain assurance redesign or governing decision, apply an authorized finding disposition, recover, pause, cancel, replan or correctly stop. In controller-root mode, include the conditions for Main to choose the next canonical root without making that transition itself."
+    }
+  },
+  "x-bbk-role": "bbk_validator_orchestrator",
+  "x-bbk-contract": "bbk.validator-orchestrator-return.v2",
+  "x-bbk-detail-level": "COMPACT",
+  "x-bbk-full-detail-triggers": [
+    "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+    "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+    "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+    "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+    "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+    "The parent explicitly requested FULL detail.",
+    "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+  ]
+}

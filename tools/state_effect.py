@@ -368,24 +368,133 @@ def validate_transition_trace_set(values: Any, design: dict[str, Any] | None = N
     return {"kind": "state-transition-trace-set", "valid": not errors, "errors": errors, "warnings": warnings, "traceCount": len(traces), "traceClasses": sorted(str(x) for x in classes if x), "digest": canonical_digest(traces)}
 
 
-def _structure_v1_projection(obj: dict[str, Any]) -> dict[str, Any]:
+def _structure_v1_projection(obj: dict[str, Any], *, version: str) -> dict[str, Any]:
     projected = json.loads(json.dumps(obj))
     projected["schema"] = "bbk.implementation-structure-contract.v1"
     projected.pop("stateDecisionEffectDesign", None)
+    if version == "v3":
+        for field in ("contractDepth", "sectionApplicability", "preExecutionConfirmations", "specialistDispositions"):
+            projected.pop(field, None)
+        subject = projected.get("subject")
+        if isinstance(subject, dict) and subject.get("kind") in {
+            "infrastructure", "network_configuration", "deployment_configuration"
+        }:
+            # v1 did not name these domain kinds.  Project them to the
+            # domain-neutral compatibility value while v3 validation retains
+            # and checks the exact subject kind.
+            subject["kind"] = "other"
     return projected
 
 
-def validate_structure_v2(data: Any) -> dict[str, Any]:
-    if not isinstance(data, dict):
-        return {"kind": "implementation-structure-contract", "valid": False, "errors": ["contract must be an object"], "warnings": [], "digest": None}
-    if data.get("schema") == "bbk.implementation-structure-contract.v1":
-        result = validate_structure(data)
-        result["version"] = "v1"
-        result["stateDecisionEffect"] = "not-present-legacy"
-        return result
-    if data.get("schema") != "bbk.implementation-structure-contract.v2":
-        return {"kind": "implementation-structure-contract", "valid": False, "errors": ["contract.schema must be bbk.implementation-structure-contract.v1 or v2"], "warnings": [], "digest": canonical_digest(data)}
-    base = validate_structure(_structure_v1_projection(data))
+def _validate_structure_v3_fields(data: dict[str, Any], errors: list[str], warnings: list[str]) -> dict[str, Any]:
+    depth = data.get("contractDepth")
+    if depth not in {"compact", "standard", "full"}:
+        errors.append("contract.contractDepth must be compact, standard, or full")
+
+    subject = data.get("subject") if isinstance(data.get("subject"), dict) else {}
+    allowed_kinds = {
+        "software", "automation", "hardware", "procedure", "data", "document",
+        "mixed", "other", "infrastructure", "network_configuration", "deployment_configuration",
+    }
+    if subject.get("kind") not in allowed_kinds:
+        errors.append("contract.subject.kind is invalid for v3")
+
+    sections = data.get("sectionApplicability")
+    required_sections = {
+        "stateDecisionEffect", "migration", "failureRecovery", "securityTrust", "preExecutionConfirmation"
+    }
+    if not isinstance(sections, dict):
+        errors.append("contract.sectionApplicability must be an object")
+        sections = {}
+    else:
+        missing = sorted(required_sections - set(sections))
+        if missing:
+            errors.append(f"contract.sectionApplicability is missing required sections: {missing}")
+        extra = sorted(set(sections) - required_sections)
+        if extra:
+            errors.append(f"contract.sectionApplicability contains unknown sections: {extra}")
+    for name in sorted(required_sections & set(sections)):
+        raw = sections.get(name)
+        if not isinstance(raw, dict):
+            errors.append(f"contract.sectionApplicability.{name} must be an object")
+            continue
+        if raw.get("status") not in {"REQUIRED", "APPLICABLE", "NOT_APPLICABLE", "DEFERRED"}:
+            errors.append(f"contract.sectionApplicability.{name}.status is invalid")
+        _text(raw.get("rationale"), f"contract.sectionApplicability.{name}.rationale", errors)
+        trigger = raw.get("trigger")
+        if trigger is not None and not isinstance(trigger, str):
+            errors.append(f"contract.sectionApplicability.{name}.trigger must be string or null")
+
+    sde = data.get("stateDecisionEffectDesign")
+    sde_section = sections.get("stateDecisionEffect") if isinstance(sections, dict) else None
+    sde_status = sde_section.get("status") if isinstance(sde_section, dict) else None
+    if sde_status == "REQUIRED" and sde is None:
+        errors.append("contract.stateDecisionEffectDesign is required by sectionApplicability")
+    if sde_status == "NOT_APPLICABLE" and sde is not None:
+        errors.append("contract.stateDecisionEffectDesign must be absent when marked NOT_APPLICABLE")
+    if sde_status == "APPLICABLE" and sde is None:
+        warnings.append("state/effect design is applicable but not supplied; retain a bounded follow-up or rationale")
+    if depth == "full" and sde_status in {"NOT_APPLICABLE", "DEFERRED"}:
+        warnings.append("full-depth contract omits or defers state/effect design; confirm the depth selection is proportional")
+
+    confirmations = data.get("preExecutionConfirmations")
+    if not isinstance(confirmations, list):
+        errors.append("contract.preExecutionConfirmations must be an array")
+        confirmations = []
+    confirmation_ids = _unique(confirmations, "id", "contract.preExecutionConfirmations", errors)
+    for index, raw in enumerate(confirmations):
+        item = _dict(raw, f"contract.preExecutionConfirmations[{index}]", errors)
+        _required(item, ["id", "subjectRef", "classification", "statement", "owner", "method", "blocking", "status", "evidenceRefs"], f"contract.preExecutionConfirmations[{index}]", errors)
+        for field in ("subjectRef", "statement", "owner", "method"):
+            _text(item.get(field), f"contract.preExecutionConfirmations[{index}].{field}", errors)
+        if item.get("classification") not in {"ENVIRONMENT_FACT", "CONFIGURATION_PARAMETER", "TOOL_COMPATIBILITY", "NETWORK_POLICY", "AUTHORITY", "LICENCE_OR_SESSION", "STORAGE_OR_RETENTION", "OTHER"}:
+            errors.append(f"contract.preExecutionConfirmations[{index}].classification is invalid")
+        if item.get("blocking") not in {"BEFORE_EXECUTION", "BEFORE_EFFECT", "NON_BLOCKING"}:
+            errors.append(f"contract.preExecutionConfirmations[{index}].blocking is invalid")
+        if item.get("status") not in {"OPEN", "CONFIRMED", "NOT_APPLICABLE", "SUPERSEDED"}:
+            errors.append(f"contract.preExecutionConfirmations[{index}].status is invalid")
+        _strings(item.get("evidenceRefs"), f"contract.preExecutionConfirmations[{index}].evidenceRefs", errors)
+        if item.get("status") == "CONFIRMED" and not item.get("evidenceRefs"):
+            warnings.append(f"pre-execution confirmation {item.get('id')} is CONFIRMED without an evidence reference")
+        trigger = item.get("reopenTrigger")
+        if trigger is not None and not isinstance(trigger, str):
+            errors.append(f"contract.preExecutionConfirmations[{index}].reopenTrigger must be string or null")
+
+    confirmation_section = sections.get("preExecutionConfirmation") if isinstance(sections, dict) else None
+    confirmation_status = confirmation_section.get("status") if isinstance(confirmation_section, dict) else None
+    if confirmation_status == "REQUIRED" and not confirmation_ids:
+        errors.append("pre-execution confirmations are required by sectionApplicability")
+    if confirmation_status == "NOT_APPLICABLE" and confirmations:
+        errors.append("preExecutionConfirmations must be empty when marked NOT_APPLICABLE")
+
+    dispositions = data.get("specialistDispositions")
+    if not isinstance(dispositions, list):
+        errors.append("contract.specialistDispositions must be an array")
+        dispositions = []
+    _unique(dispositions, "itemRef", "contract.specialistDispositions", errors)
+    for index, raw in enumerate(dispositions):
+        item = _dict(raw, f"contract.specialistDispositions[{index}]", errors)
+        _required(item, ["itemRef", "kind", "disposition", "owner", "rationale", "residualImpact"], f"contract.specialistDispositions[{index}]", errors)
+        for field in ("owner", "rationale"):
+            _text(item.get(field), f"contract.specialistDispositions[{index}].{field}", errors)
+        if item.get("kind") not in {"REVIEW_REQUEST", "BLOCKER", "OPEN_DECISION", "CONDITIONAL_BRANCH", "SUCCESSOR_REQUIREMENT", "FOLLOW_UP"}:
+            errors.append(f"contract.specialistDispositions[{index}].kind is invalid")
+        if item.get("disposition") not in {"COMMISSIONED", "INTEGRATED", "DEFERRED", "SUPERSEDED", "REJECTED", "REMAINS_OPEN"}:
+            errors.append(f"contract.specialistDispositions[{index}].disposition is invalid")
+        for field in ("trigger", "successorRef"):
+            if item.get(field) is not None and not isinstance(item.get(field), str):
+                errors.append(f"contract.specialistDispositions[{index}].{field} must be string or null")
+        if not isinstance(item.get("residualImpact"), str):
+            errors.append(f"contract.specialistDispositions[{index}].residualImpact must be a string")
+        if item.get("disposition") in {"COMMISSIONED", "SUPERSEDED"} and not item.get("successorRef"):
+            warnings.append(f"specialist disposition {item.get('itemRef')} normally requires successorRef")
+        if item.get("disposition") in {"DEFERRED", "REMAINS_OPEN"} and not item.get("trigger"):
+            warnings.append(f"specialist disposition {item.get('itemRef')} should identify a trigger")
+
+    return {"depth": depth, "sections": sections, "confirmations": len(confirmations), "specialistDispositions": len(dispositions)}
+
+
+def _validate_parent_sde(data: dict[str, Any], base: dict[str, Any], *, version: str) -> dict[str, Any]:
     sde = validate_state_decision_effect(data.get("stateDecisionEffectDesign"))
     errors = list(base["errors"]) + list(sde["errors"])
     warnings = list(base["warnings"]) + list(sde["warnings"])
@@ -397,8 +506,64 @@ def validate_structure_v2(data: Any) -> dict[str, Any]:
     design_scope = set((data.get("stateDecisionEffectDesign") or {}).get("scopeRefs", []))
     if design_scope and subject_refs and not design_scope.issubset(subject_refs):
         warnings.append("state/effect scope includes references outside parent structure subject scope")
-    return {"kind": "implementation-structure-contract", "version": "v2", "valid": not errors, "errors": errors, "warnings": warnings, "digest": canonical_digest(data), "stateDecisionEffect": sde}
+    return {
+        "kind": "implementation-structure-contract", "version": version,
+        "valid": not errors, "errors": errors, "warnings": warnings,
+        "digest": canonical_digest(data), "stateDecisionEffect": sde,
+    }
 
+
+def validate_structure_v2(data: Any) -> dict[str, Any]:
+    """Validate ImplementationStructureContract v1, v2, or v3.
+
+    The function name is retained as a compatibility surface for installed
+    callers.  v3 adds proportional infrastructure/network contracts while v1
+    and v2 semantics remain unchanged.
+    """
+    if not isinstance(data, dict):
+        return {"kind": "implementation-structure-contract", "valid": False, "errors": ["contract must be an object"], "warnings": [], "digest": None}
+    schema = data.get("schema")
+    if schema == "bbk.implementation-structure-contract.v1":
+        result = validate_structure(data)
+        result["version"] = "v1"
+        result["stateDecisionEffect"] = "not-present-legacy"
+        return result
+    if schema == "bbk.implementation-structure-contract.v2":
+        base = validate_structure(_structure_v1_projection(data, version="v2"))
+        return _validate_parent_sde(data, base, version="v2")
+    if schema != "bbk.implementation-structure-contract.v3":
+        return {
+            "kind": "implementation-structure-contract", "valid": False,
+            "errors": ["contract.schema must be bbk.implementation-structure-contract.v1, v2, or v3"],
+            "warnings": [], "digest": canonical_digest(data),
+        }
+
+    base = validate_structure(_structure_v1_projection(data, version="v3"))
+    errors = list(base["errors"])
+    warnings = list(base["warnings"])
+    v3 = _validate_structure_v3_fields(data, errors, warnings)
+    sde_value = data.get("stateDecisionEffectDesign")
+    sde_result: Any = "not-applicable"
+    if sde_value is not None:
+        sde_result = validate_state_decision_effect(sde_value)
+        errors.extend(sde_result["errors"])
+        warnings.extend(sde_result["warnings"])
+        fixed_ids = {item.get("id") for item in (data.get("decisions") or {}).get("fixed", []) if isinstance(item, dict)}
+        missing = [ref for ref in (sde_value or {}).get("fixedDecisionRefs", []) if ref not in fixed_ids]
+        if missing:
+            errors.append(f"state/effect design references fixed decisions absent from parent contract: {missing}")
+        subject_refs = set((data.get("subject") or {}).get("scopeRefs", []))
+        design_scope = set((sde_value or {}).get("scopeRefs", []))
+        if design_scope and subject_refs and not design_scope.issubset(subject_refs):
+            warnings.append("state/effect scope includes references outside parent structure subject scope")
+    return {
+        "kind": "implementation-structure-contract", "version": "v3",
+        "contractDepth": v3.get("depth"), "sectionApplicability": v3.get("sections"),
+        "preExecutionConfirmationCount": v3.get("confirmations"),
+        "specialistDispositionCount": v3.get("specialistDispositions"),
+        "valid": not errors, "errors": errors, "warnings": warnings,
+        "digest": canonical_digest(data), "stateDecisionEffect": sde_result,
+    }
 
 def _slice_v1_projection(obj: dict[str, Any]) -> dict[str, Any]:
     projected = json.loads(json.dumps(obj))

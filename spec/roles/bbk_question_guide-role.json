@@ -83,7 +83,9 @@
     "bbk-prompt-proportional-stop",
     "bbk-prompt-liveness-recovery",
     "bbk-prompt-evidence-lineage",
-    "bbk-prompt-planning-source-integrity"
+    "bbk-prompt-planning-source-integrity",
+    "bbk-prompt-user-attention",
+    "bbk-prompt-evidence-subject-identity"
   ],
   "mutates": false,
   "spawns": [],
@@ -93,6 +95,26 @@
     "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
     "return_schema": "spec/schemas/role-returns/bbk-question-guide-return-v1.schema.json",
     "result_schema": "spec/schemas/role-results/bbk-question-guide-result-v1.schema.json",
+    "v2_contract_id": "bbk.question-guide-return.v2",
+    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+    "v2_return_schema": "spec/schemas/role-returns/bbk-question-guide-return-v2.schema.json",
+    "compact_result_schema": "spec/schemas/role-results/bbk-question-guide-compact-result-v2.schema.json",
+    "compact_result_fields": [
+      "accepted_decision_packet",
+      "non_resolution_packet",
+      "continuation_state",
+      "blockers",
+      "residual_uncertainty"
+    ],
+    "full_detail_triggers": [
+      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+      "The parent explicitly requested FULL detail.",
+      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+    ],
     "semantic_state_name": "guide_branch_state",
     "allowed_invocation_modes": [
       "ESCALATED_DECISION_CHILD"

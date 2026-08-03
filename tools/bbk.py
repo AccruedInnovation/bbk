@@ -137,6 +137,50 @@ except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     from artifact_classification import is_non_operational_example
 
+try:
+    from strict_json import StrictJsonError, load_path as strict_load_path
+    from artifact_packages import (
+        ArtifactPackageError,
+        build_legacy_manifest as artifact_build_legacy_manifest,
+        create_successor as artifact_create_successor,
+        file_reference as artifact_file_reference,
+        preflight_draft as artifact_preflight_draft,
+        seal_draft as artifact_seal_draft,
+        verify_file_reference as artifact_verify_file_reference,
+        verify_legacy_manifest as artifact_verify_legacy_manifest,
+        verify_package as artifact_verify_package,
+    )
+    from handoff_packages import (
+        AUTHORITY_BOUNDARY as HANDOFF_V2_AUTHORITY_BOUNDARY,
+        handoff_value as load_handoff_v2_value,
+        seal_handoff as seal_handoff_v2,
+        verify_handoff_package as verify_handoff_v2_package,
+    )
+    from context_packages import ContextPackageError, compile_review_package, compile_worker_context
+    from host_preflight import HostPreflightError, run_preflight
+except ModuleNotFoundError:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from strict_json import StrictJsonError, load_path as strict_load_path
+    from artifact_packages import (
+        ArtifactPackageError,
+        build_legacy_manifest as artifact_build_legacy_manifest,
+        create_successor as artifact_create_successor,
+        file_reference as artifact_file_reference,
+        preflight_draft as artifact_preflight_draft,
+        seal_draft as artifact_seal_draft,
+        verify_file_reference as artifact_verify_file_reference,
+        verify_legacy_manifest as artifact_verify_legacy_manifest,
+        verify_package as artifact_verify_package,
+    )
+    from handoff_packages import (
+        AUTHORITY_BOUNDARY as HANDOFF_V2_AUTHORITY_BOUNDARY,
+        handoff_value as load_handoff_v2_value,
+        seal_handoff as seal_handoff_v2,
+        verify_handoff_package as verify_handoff_v2_package,
+    )
+    from context_packages import ContextPackageError, compile_review_package, compile_worker_context
+    from host_preflight import HostPreflightError, run_preflight
+
 
 def _read_package_version() -> str:
     script = Path(__file__).resolve()
@@ -181,9 +225,108 @@ PACKAGE_ROOT = package_root()
 TEMPLATE_DIR = PACKAGE_ROOT / "templates"
 SCHEMA_DIR = PACKAGE_ROOT / "spec" / "schemas"
 
+SCHEMA_TEMPLATE_REGISTRY: dict[str, dict[str, str]] = {
+    "solution-outcome-fit": {
+        "template": "solution-outcome-fit.json",
+        "schema": "bbk-solution-outcome-fit-v1.schema.json",
+    },
+    "implementation-structure": {
+        "template": "implementation-structure-contract-v3.json",
+        "schema": "bbk-implementation-structure-contract-v3.schema.json",
+    },
+    "state-decision-effect": {
+        "template": "state-decision-effect-design.json",
+        "schema": "bbk-state-decision-effect-design-v1.schema.json",
+    },
+    "transition-trace": {
+        "template": "state-transition-trace.json",
+        "schema": "bbk-state-transition-trace-v1.schema.json",
+    },
+    "execution-slice": {
+        "template": "execution-slice-v2.json",
+        "schema": "bbk-execution-slice-v2.schema.json",
+    },
+    "work-unit": {
+        "template": "work-unit.json",
+        "schema": "work-unit.schema.json",
+    },
+    "assurance-contract": {
+        "template": "assurance-contract.json",
+        "schema": "bbk-assurance-contract-v1.schema.json",
+    },
+    "evidence-receipt": {
+        "template": "evidence-receipt-v2.json",
+        "schema": "bbk-evidence-receipt-v2.schema.json",
+    },
+    "environment-observation": {
+        "template": "environment-observation-evidence-receipt-v2.json",
+        "schema": "bbk-evidence-receipt-v2.schema.json",
+    },
+    "question-branch": {
+        "template": "question-branch.json",
+        "schema": "bbk-question-branch-v1.schema.json",
+    },
+    "handoff": {
+        "template": "handoff-v2.json",
+        "schema": "bbk-handoff-v2.schema.json",
+    },
+    "handoff-v2": {
+        "template": "handoff-v2.json",
+        "schema": "bbk-handoff-v2.schema.json",
+    },
+    "handoff-v1": {
+        "template": "handoff.json",
+        "schema": "bbk-handoff-v1.schema.json",
+    },
+    "host-preflight-request": {
+        "template": "host-preflight-request.json",
+        "schema": "bbk-host-preflight-request-v1.schema.json",
+    },
+    "review-package-request": {
+        "template": "review-package-request.json",
+        "schema": "bbk-review-package-request-v1.schema.json",
+    },
+    "prototype-charter": {
+        "template": "prototype-charter-v2.json",
+        "schema": "bbk-prototype-charter-v2.schema.json",
+    },
+    "review-manifest": {
+        "template": "review-manifest.json",
+        "schema": "bbk-review-manifest-v1.schema.json",
+    },
+    "review-context": {
+        "template": "review-context-manifest.json",
+        "schema": "bbk-review-context-manifest-v1.schema.json",
+    },
+    "review-attempt": {
+        "template": "review-attempt.json",
+        "schema": "bbk-review-attempt-v1.schema.json",
+    },
+    "review-finding": {
+        "template": "review-finding.json",
+        "schema": "bbk-review-finding-v1.schema.json",
+    },
+    "finding-disposition": {
+        "template": "finding-disposition.json",
+        "schema": "bbk-finding-disposition-v1.schema.json",
+    },
+    "learning-candidate": {
+        "template": "learning-candidate.json",
+        "schema": "bbk-learning-candidate-v1.schema.json",
+    },
+    "artifact-manifest": {
+        "template": "",
+        "schema": "bbk-artifact-manifest-v1.schema.json",
+    },
+}
+
 
 class BbkError(RuntimeError):
-    pass
+    """BBK command error with an optional structured diagnostic payload."""
+
+    def __init__(self, message: str, *, diagnostic: Mapping[str, Any] | None = None):
+        super().__init__(message)
+        self.diagnostic = dict(diagnostic) if diagnostic is not None else None
 
 
 def configure_utf8_standard_streams() -> None:
@@ -255,12 +398,15 @@ def write_json(path: Path, value: Any, mode: int | None = None) -> None:
 
 
 def read_json(path: Path) -> Any:
+    """Read governed JSON through the shared strict-load boundary."""
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except FileNotFoundError as exc:
-        raise BbkError(f"Missing file: {path}") from exc
-    except json.JSONDecodeError as exc:
-        raise BbkError(f"Invalid JSON in {path}: {exc}") from exc
+        return strict_load_path(path)
+    except StrictJsonError as exc:
+        diagnostic = exc.as_dict()
+        raise BbkError(
+            f"Invalid governed JSON in {path}: {diagnostic.get('message')}",
+            diagnostic=diagnostic,
+        ) from exc
 
 
 def validate_id(value: str, label: str = "id") -> str:
@@ -1460,6 +1606,305 @@ def cmd_digest(args: argparse.Namespace) -> dict[str, Any]:
     return {"schema": "bbk.digest.v1", "status": "PASS", "path": str(path), "bytes": path.stat().st_size, "sha256": sha256_file(path)}
 
 
+def _artifact_manifest_candidates(
+    root: Path,
+    raw_paths: Sequence[str],
+    *,
+    includes: Sequence[str],
+    excludes: Sequence[str],
+    include_examples: bool,
+    output: Path | None,
+) -> list[Path]:
+    root = root.resolve()
+    selected: dict[str, Path] = {}
+    output_resolved = output.resolve() if output is not None else None
+
+    def add_file(candidate: Path) -> None:
+        if candidate.is_symlink():
+            raise BbkError(f"Artifact manifests do not follow symlinks: {candidate}")
+        resolved = candidate.resolve(strict=True)
+        try:
+            relative = resolved.relative_to(root).as_posix()
+        except ValueError as exc:
+            raise BbkError(f"Artifact path escapes the declared project root: {candidate}") from exc
+        if output_resolved is not None and resolved == output_resolved:
+            return
+        if not include_examples and is_non_operational_example(resolved):
+            return
+        if includes and not any(fnmatch.fnmatch(relative, pattern) for pattern in includes):
+            return
+        if any(fnmatch.fnmatch(relative, pattern) for pattern in excludes):
+            return
+        selected[relative] = resolved
+
+    for raw in raw_paths:
+        candidate = Path(raw).expanduser()
+        if not candidate.is_absolute():
+            candidate = root / candidate
+        if candidate.is_symlink():
+            raise BbkError(f"Artifact manifests do not follow symlinks: {candidate}")
+        try:
+            resolved = candidate.resolve(strict=True)
+        except FileNotFoundError as exc:
+            raise BbkError(f"Artifact path does not exist: {candidate}") from exc
+        except OSError as exc:
+            raise BbkError(f"Unable to resolve artifact path {candidate}: {exc}") from exc
+        try:
+            resolved.relative_to(root)
+        except ValueError as exc:
+            raise BbkError(f"Artifact path escapes the declared project root: {candidate}") from exc
+        if resolved.is_file():
+            add_file(resolved)
+            continue
+        if not resolved.is_dir():
+            raise BbkError(f"Artifact path is not a regular file or directory: {resolved}")
+        for child in sorted(resolved.rglob("*")):
+            if child.is_symlink():
+                raise BbkError(f"Artifact manifests do not follow symlinks: {child}")
+            if child.is_file():
+                add_file(child)
+    return [selected[key] for key in sorted(selected)]
+
+
+def _artifact_manifest_content(
+    root: Path,
+    paths: Sequence[Path],
+    *,
+    subject: str | None,
+    root_label: str,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    manifest = artifact_build_legacy_manifest(
+        root,
+        paths,
+        subject=subject,
+        root_label=root_label,
+        bbk_version=VERSION,
+    )
+    content = {
+        "schema": "bbk.artifact-manifest-content.v1",
+        "subject": subject,
+        "root_label": root_label,
+        "files": manifest["files"],
+    }
+    return content, manifest
+
+
+def cmd_artifact_manifest(args: argparse.Namespace) -> dict[str, Any]:
+    root = resolve_root(args.root, required=False) or Path.cwd().resolve()
+    if not root.is_dir():
+        raise BbkError(f"Artifact manifest root is not a directory: {root}")
+    raw_paths = list(args.path or []) + list(args.source or [])
+    if not raw_paths:
+        raw_paths = ["."]
+    output: Path | None = None
+    if args.output:
+        output = Path(args.output).expanduser()
+        if not output.is_absolute():
+            output = root / output
+        output = output.resolve()
+    paths = _artifact_manifest_candidates(
+        root,
+        raw_paths,
+        includes=list(args.include or []),
+        excludes=list(args.exclude or []),
+        include_examples=bool(args.include_examples),
+        output=output,
+    )
+    _, manifest = _artifact_manifest_content(
+        root,
+        paths,
+        subject=args.subject,
+        root_label=args.root_label or "project",
+    )
+    if output is not None:
+        write_json(output, manifest)
+        manifest["written_to"] = str(output)
+    manifest["status"] = "PASS"
+    return manifest
+
+
+def cmd_artifact_preflight(args: argparse.Namespace) -> dict[str, Any]:
+    registry = Path(args.registry).expanduser().resolve() if args.registry else None
+    return artifact_preflight_draft(
+        Path(args.draft_root).expanduser(),
+        registry_path=registry,
+        max_depth=int(args.max_depth),
+    )
+
+
+def cmd_artifact_seal(args: argparse.Namespace) -> dict[str, Any]:
+    registry = Path(args.registry).expanduser().resolve() if args.registry else None
+    try:
+        return artifact_seal_draft(
+            Path(args.draft_root).expanduser(),
+            Path(args.output).expanduser(),
+            registry_path=registry,
+            recover_stale_lock=bool(args.recover_stale_lock),
+        )
+    except ArtifactPackageError as exc:
+        return exc.as_dict()
+
+
+def cmd_artifact_successor(args: argparse.Namespace) -> dict[str, Any]:
+    registry = Path(args.registry).expanduser().resolve() if args.registry else None
+    try:
+        return artifact_create_successor(
+            Path(args.sealed_root).expanduser(),
+            Path(args.output).expanduser(),
+            revision=args.revision,
+            reason=args.reason,
+            registry_path=registry,
+            recover_stale_lock=bool(args.recover_stale_lock),
+        )
+    except ArtifactPackageError as exc:
+        return exc.as_dict()
+
+
+def cmd_artifact_verify(args: argparse.Namespace) -> dict[str, Any]:
+    root = resolve_root(args.root, required=False) or Path.cwd().resolve()
+    subject = Path(args.manifest).expanduser()
+    if not subject.is_absolute():
+        subject = root / subject
+    subject = subject.resolve()
+    registry = Path(args.registry).expanduser().resolve() if getattr(args, "registry", None) else None
+    if subject.is_dir():
+        return artifact_verify_package(subject, registry_path=registry)
+    manifest = read_json(subject)
+    if isinstance(manifest, dict) and manifest.get("schema") == "bbk.artifact-package-manifest.v1":
+        return artifact_verify_package(subject.parent, registry_path=registry)
+    if not isinstance(manifest, dict) or manifest.get("schema") != "bbk.artifact-manifest.v1":
+        raise BbkError(f"Not a BBK legacy artifact manifest or sealed package: {subject}")
+    result = artifact_verify_legacy_manifest(manifest, root=root)
+    result.update({"manifest": str(subject), "root": str(root)})
+    return result
+
+
+
+def _resolve_input_path(root: Path, raw: str, *, label: str) -> Path:
+    path = Path(raw).expanduser()
+    if not path.is_absolute():
+        path = root / path
+    try:
+        return path.resolve(strict=True)
+    except FileNotFoundError as exc:
+        raise BbkError(f"{label} does not exist: {path}") from exc
+
+
+def cmd_preflight_run(args: argparse.Namespace) -> dict[str, Any]:
+    root = resolve_root(args.root, required=False) or Path.cwd().resolve()
+    request_path = _resolve_input_path(root, args.request, label="host preflight request")
+    try:
+        request = strict_load_path(request_path)
+        cache_dir = Path(args.cache_dir).expanduser() if args.cache_dir else root / ".bbk" / "cache" / "host-preflight"
+        if not cache_dir.is_absolute():
+            cache_dir = root / cache_dir
+        result = run_preflight(request, cache_dir=cache_dir, use_cache=not args.no_cache, timeout=args.timeout)
+    except (HostPreflightError, StrictJsonError, OSError, ValueError) as exc:
+        raise BbkError(str(exc)) from exc
+    if args.output:
+        output = Path(args.output).expanduser()
+        if not output.is_absolute():
+            output = root / output
+        write_json(output, result)
+        result["writtenTo"] = str(output.resolve())
+    return result
+
+
+def cmd_context_worker(args: argparse.Namespace) -> dict[str, Any]:
+    root = resolve_root(args.root, required=False) or Path.cwd().resolve()
+    try:
+        work_unit = strict_load_path(_resolve_input_path(root, args.work_unit, label="WorkUnit"))
+        profile_lock = strict_load_path(_resolve_input_path(root, args.profile_lock, label="profile lock"))
+        host_preflight = strict_load_path(_resolve_input_path(root, args.host_preflight, label="host preflight"))
+        prototype = strict_load_path(_resolve_input_path(root, args.prototype_charter, label="prototype charter")) if args.prototype_charter else None
+    except (StrictJsonError, OSError, ValueError) as exc:
+        raise BbkError(str(exc)) from exc
+    work_id = work_unit.get("id", "unknown") if isinstance(work_unit, dict) else "unknown"
+    output = Path(args.output).expanduser() if args.output else root / ".bbk" / "contexts" / "workers" / f"WC-{work_id}"
+    if not output.is_absolute():
+        output = root / output
+    try:
+        return compile_worker_context(work_unit, profile_lock, host_preflight, output_root=output, package_id=args.id, revision=args.revision, prototype_charter=prototype)
+    except (ContextPackageError, ArtifactPackageError, OSError, ValueError) as exc:
+        diagnostic = exc.result if isinstance(exc, ArtifactPackageError) else None
+        raise BbkError(str(exc), diagnostic=diagnostic) from exc
+
+
+def cmd_context_review(args: argparse.Namespace) -> dict[str, Any]:
+    root = resolve_root(args.root, required=False) or Path.cwd().resolve()
+    candidate = _resolve_input_path(root, args.candidate, label="sealed candidate")
+    try:
+        request = strict_load_path(_resolve_input_path(root, args.request, label="review package request"))
+    except (StrictJsonError, OSError, ValueError) as exc:
+        raise BbkError(str(exc)) from exc
+    output = Path(args.output).expanduser() if args.output else root / ".bbk" / "reviews" / "packages" / (args.id or f"RP-{candidate.name}")
+    if not output.is_absolute():
+        output = root / output
+    try:
+        return compile_review_package(candidate, request, output_root=output, package_id=args.id, revision=args.revision)
+    except (ContextPackageError, ArtifactPackageError, OSError, ValueError) as exc:
+        diagnostic = exc.result if isinstance(exc, ArtifactPackageError) else None
+        raise BbkError(str(exc), diagnostic=diagnostic) from exc
+
+
+
+def _artifact_identity(value: Mapping[str, Any]) -> dict[str, Any]:
+    fields = (
+        "schema", "id", "contractId", "fitId", "designId", "sliceId", "manifestId",
+        "contextId", "runId", "attemptId", "receiptId", "findingId", "dispositionId",
+        "work_unit_id", "candidate_id", "revision", "status",
+    )
+    return {field: value.get(field) for field in fields if value.get(field) is not None}
+
+
+def cmd_artifact_inspect(args: argparse.Namespace) -> dict[str, Any]:
+    path = Path(args.path).expanduser().resolve()
+    if not path.exists() and not path.is_symlink():
+        raise BbkError(f"Artifact does not exist: {path}")
+    if path.is_dir():
+        manifest = collect_manifest(path, args.exclude, include_examples=bool(args.include_examples))
+        result: dict[str, Any] = {
+            "schema": "bbk.artifact-inspection.v1",
+            "status": "PASS",
+            "kind": "directory",
+            "path": str(path),
+            "content_sha256": manifest.get("content_sha256"),
+            "file_count": len(manifest.get("files", [])),
+            "examples_excluded": manifest.get("examples_excluded", 0),
+            "manifest": manifest if args.verbose else None,
+        }
+    elif path.is_symlink():
+        target = os.readlink(path)
+        result = {
+            "schema": "bbk.artifact-inspection.v1", "status": "PASS", "kind": "symlink",
+            "path": str(path), "target": target, "sha256": sha256_bytes(target.encode("utf-8")),
+        }
+    elif path.is_file():
+        data = path.read_bytes()
+        result = {
+            "schema": "bbk.artifact-inspection.v1", "status": "PASS", "kind": "file",
+            "path": str(path), "bytes": len(data), "sha256": sha256_bytes(data),
+            "executable": bool(path.stat().st_mode & stat.S_IXUSR),
+            "example": is_non_operational_example(path),
+        }
+        try:
+            value = json.loads(data.decode("utf-8"))
+        except (UnicodeDecodeError, json.JSONDecodeError):
+            value = None
+        if isinstance(value, Mapping):
+            result["json"] = {
+                "canonical_sha256": sha256_bytes(canonical_bytes(value)),
+                "identity": _artifact_identity(value),
+            }
+    else:
+        raise BbkError(f"Unsupported artifact type: {path}")
+    if args.output:
+        output = Path(args.output).expanduser().resolve()
+        write_json(output, result)
+        result["output"] = str(output)
+    return result
+
+
 def cmd_fit_validate(args: argparse.Namespace) -> dict[str, Any]:
     path = Path(args.path).expanduser().resolve()
     return _report_status(validate_solution_outcome_fit(read_json(path)))
@@ -1495,7 +1940,7 @@ def cmd_fit_check_chain(args: argparse.Namespace) -> dict[str, Any]:
     chain: dict[str, list[dict[str, Any]]] = {"structures": [], "slices": [], "workUnits": []}
 
     for raw in args.structure or []:
-        path = Path(raw).expanduser().resolve(); data = read_json(path); report = validate_structure(data)
+        path = Path(raw).expanduser().resolve(); data = read_json(path); report = validate_structure_v2(data)
         errors.extend([f"structure {path.name}: {message}" for message in report["errors"]])
         warnings.extend([f"structure {path.name}: {message}" for message in report["warnings"]])
         subject = data.get("subject") if isinstance(data.get("subject"), dict) else {}
@@ -1597,7 +2042,7 @@ def cmd_structure_render(args: argparse.Namespace) -> dict[str, Any]:
     path = Path(args.path).expanduser().resolve(); data = read_json(path); report = validate_structure_v2(data)
     if args.format == "markdown":
         content = markdown_structure(data)
-        if data.get("schema") == "bbk.implementation-structure-contract.v2":
+        if data.get("schema") in {"bbk.implementation-structure-contract.v2", "bbk.implementation-structure-contract.v3"} and data.get("stateDecisionEffectDesign") is not None:
             content += "\n" + markdown_state_decision_effect(data.get("stateDecisionEffectDesign") or {})
     else:
         content = json.dumps(data, indent=2, ensure_ascii=False, sort_keys=True) + "\n"
@@ -1605,19 +2050,34 @@ def cmd_structure_render(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def cmd_structure_new(args: argparse.Namespace) -> dict[str, Any]:
-    template = "implementation-structure-contract-v2.json" if args.version == "v2" else "implementation-structure-contract.json"
+    if args.version == "v1":
+        template = "implementation-structure-contract.json"
+    elif args.version == "v2":
+        template = "implementation-structure-contract-v2.json"
+    elif args.depth == "compact" and args.kind in {"infrastructure", "network_configuration", "deployment_configuration"}:
+        template = "implementation-structure-contract-v3-infrastructure-compact.json"
+    else:
+        template = "implementation-structure-contract-v3.json"
     result = _write_new_from_template(template, args.output, force=args.force)
-    if args.kind != "software":
-        path = Path(args.output).expanduser().resolve(); data = read_json(path)
-        data.setdefault("subject", {})["kind"] = args.kind
-        write_json(path, data); result["sha256"] = sha256_file(path)
+    path = Path(args.output).expanduser().resolve()
+    data = read_json(path)
+    data.setdefault("subject", {})["kind"] = args.kind
+    if args.version == "v3":
+        data["contractDepth"] = args.depth
+        if args.kind in {"infrastructure", "network_configuration", "deployment_configuration"} and args.depth == "compact":
+            data.setdefault("metadata", {})["template"] = "compact-infrastructure"
+    write_json(path, data)
+    result["sha256"] = sha256_file(path)
+    result["version"] = args.version
+    result["subject_kind"] = args.kind
+    result["contract_depth"] = args.depth if args.version == "v3" else "legacy"
     return result
 
 
 def cmd_structure_review(args: argparse.Namespace) -> dict[str, Any]:
     contract_path = Path(args.contract).expanduser().resolve(); contract = read_json(contract_path)
-    if contract.get("schema") != "bbk.implementation-structure-contract.v2":
-        raise BbkError("State–Decision–Effect inventory review requires an ImplementationStructureContract v2")
+    if contract.get("schema") not in {"bbk.implementation-structure-contract.v2", "bbk.implementation-structure-contract.v3"} or contract.get("stateDecisionEffectDesign") is None:
+        raise BbkError("State–Decision–Effect inventory review requires an ImplementationStructureContract v2 or v3 with stateDecisionEffectDesign")
     inventory_path = Path(args.inventory).expanduser().resolve(); inventory = read_json(inventory_path)
     result = compare_state_effect_inventory(contract.get("stateDecisionEffectDesign") or {}, inventory)
     validation = validate_structure_review_v2(result)
@@ -1649,7 +2109,7 @@ def cmd_slice_new(args: argparse.Namespace) -> dict[str, Any]:
 def cmd_slice_check_set(args: argparse.Namespace) -> dict[str, Any]:
     contract_path = Path(args.contract).expanduser().resolve(); contract = read_json(contract_path)
     values = [read_json(Path(raw).expanduser().resolve()) for raw in args.slice]
-    if contract.get("schema") == "bbk.implementation-structure-contract.v2" or any(value.get("schema") == "bbk.execution-slice.v2" for value in values):
+    if contract.get("schema") in {"bbk.implementation-structure-contract.v2", "bbk.implementation-structure-contract.v3"} or any(value.get("schema") == "bbk.execution-slice.v2" for value in values):
         errors: list[str] = []
         warnings: list[str] = []
         contract_report = validate_structure_v2(contract)
@@ -1684,7 +2144,10 @@ def cmd_evidence_validate(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def cmd_evidence_new(args: argparse.Namespace) -> dict[str, Any]:
-    return _write_new_from_template("evidence-receipt-v2.json", args.output, force=args.force)
+    template = "environment-observation-evidence-receipt-v2.json" if args.kind == "environment-observation" else "evidence-receipt-v2.json"
+    result = _write_new_from_template(template, args.output, force=args.force)
+    result["evidence_kind"] = args.kind
+    return result
 
 
 def cmd_review_plan(args: argparse.Namespace) -> dict[str, Any]:
@@ -2011,7 +2474,7 @@ def collect_manifest(
             rel = path.relative_to(source).as_posix()
             if is_excluded(rel, patterns):
                 continue
-            if not include_examples and is_non_operational_example(path):
+            if not include_examples and path.name.casefold().startswith("example-"):
                 excluded_examples.append(rel)
                 continue
             if path.is_symlink():
@@ -2097,7 +2560,7 @@ def compare_manifests(left: dict[str, Any], right: dict[str, Any]) -> dict[str, 
     }
 
 
-def initial_files(title: str, project_id: str) -> dict[str, bytes]:
+def initial_files(title: str, project_id: str, *, examples_enabled: bool = True) -> dict[str, bytes]:
     created = utc_now()
     config = {
         "schema": "bbk.config.v1", "bbk_version": VERSION, "project_id": project_id,
@@ -2117,6 +2580,12 @@ def initial_files(title: str, project_id: str) -> dict[str, bytes]:
         "prevalidation": {"allow_empty": False},
         "beads": {"enabled": True, "write_enabled": True, "workspace": ".", "auto_initialize": True},
         "profiles": {"enabled": True, "lock_file": "profile-lock.json"},
+        "examples": {
+            "enabled": examples_enabled,
+            "root": "examples",
+            "operational": False,
+            "materialization": "isolated" if examples_enabled else "disabled",
+        },
         "planning_artifacts": {
             "solution_outcome_fit": True,
             "implementation_structure": True,
@@ -2166,7 +2635,7 @@ def cmd_init(args: argparse.Namespace) -> dict[str, Any]:
     title = args.title or (existing_config or {}).get("title") or root.name
     project_id = validate_id(args.project_id or (existing_config or {}).get("project_id") or f"BBK-{uuid.uuid4().hex[:12].upper()}", "project id")
     created, preserved = [], []
-    for rel, data in initial_files(title, project_id).items():
+    for rel, data in initial_files(title, project_id, examples_enabled=not args.no_examples).items():
         path = target / rel
         if path.exists():
             preserved.append(portable_relative_path(path, root))
@@ -2175,13 +2644,15 @@ def cmd_init(args: argparse.Namespace) -> dict[str, Any]:
         created.append(portable_relative_path(path, root))
     for name in [
         "candidates", "attestations", "receipts/gates", "questions", "handoffs", "runtime/candidate-state",
-        "runtime", "workspaces", "logs", "fit", "structures", "state-effects", "traces", "slices", "reviews", "reviews/manifests", "reviews/contexts", "reviews/runs", "reviews/findings", "reviews/dispositions", "reviews/learning", "work-units", "profiles",
+        "runtime", "workspaces", "logs", "fit", "structures", "state-effects", "traces", "slices", "reviews", "reviews/manifests", "reviews/contexts", "reviews/runs", "reviews/findings", "reviews/dispositions", "reviews/learning", "work-units", "profiles", "examples",
     ]:
         (target / name).mkdir(parents=True, exist_ok=True)
     examples = {
         "fit/EXAMPLE-solution-outcome-fit.json": "solution-outcome-fit.json",
         "structures/EXAMPLE-implementation-structure-contract.json": "implementation-structure-contract.json",
         "structures/EXAMPLE-implementation-structure-contract-v2.json": "implementation-structure-contract-v2.json",
+        "structures/EXAMPLE-implementation-structure-contract-v3.json": "implementation-structure-contract-v3.json",
+        "structures/EXAMPLE-implementation-structure-contract-v3-infrastructure-compact.json": "implementation-structure-contract-v3-infrastructure-compact.json",
         "state-effects/EXAMPLE-state-decision-effect-design.json": "state-decision-effect-design.json",
         "traces/EXAMPLE-state-transition-trace.json": "state-transition-trace.json",
         "slices/EXAMPLE-execution-slice.json": "execution-slice.json",
@@ -2191,6 +2662,7 @@ def cmd_init(args: argparse.Namespace) -> dict[str, Any]:
         "reviews/EXAMPLE-review-context-manifest.json": "review-context-manifest.json",
         "reviews/EXAMPLE-review-attempt.json": "review-attempt.json",
         "reviews/EXAMPLE-evidence-receipt-v2.json": "evidence-receipt-v2.json",
+        "reviews/EXAMPLE-environment-observation-evidence-receipt-v2.json": "environment-observation-evidence-receipt-v2.json",
         "reviews/EXAMPLE-review-finding.json": "review-finding.json",
         "reviews/EXAMPLE-finding-disposition.json": "finding-disposition.json",
         "reviews/EXAMPLE-learning-candidate.json": "learning-candidate.json",
@@ -2198,18 +2670,35 @@ def cmd_init(args: argparse.Namespace) -> dict[str, Any]:
         "questions/EXAMPLE-question-branch.json": "question-branch.json",
         "handoffs/EXAMPLE-handoff.json": "handoff.json",
     }
-    for rel, template in examples.items():
-        destination = target / rel
-        if destination.exists():
-            preserved.append(portable_relative_path(destination, root))
-            continue
-        source = _template_path(template)
-        atomic_write(destination, source.read_bytes())
-        created.append(portable_relative_path(destination, root))
+    examples_materialized = 0
+    legacy_examples_preserved = 0
+    if not args.no_examples:
+        for legacy_rel, template in examples.items():
+            legacy_destination = target / legacy_rel
+            destination = target / "examples" / legacy_rel
+            # Existing alpha.13.x projects keep their legacy examples in place.
+            # Do not duplicate them into the new isolated template tree.
+            if legacy_destination.exists():
+                preserved.append(portable_relative_path(legacy_destination, root))
+                legacy_examples_preserved += 1
+                continue
+            if destination.exists():
+                preserved.append(portable_relative_path(destination, root))
+                continue
+            source = _template_path(template)
+            atomic_write(destination, source.read_bytes())
+            created.append(portable_relative_path(destination, root))
+            examples_materialized += 1
     return {
         "status": "initialized" if existing_config is None else "updated",
         "root": str(root), "project_id": project_id, "title": title,
         "created": created, "preserved": preserved,
+        "examples": {
+            "enabled": not args.no_examples,
+            "materialized": examples_materialized,
+            "legacy_preserved": legacy_examples_preserved,
+            "root": portable_relative_path(target / "examples", root),
+        },
     }
 
 
@@ -2842,21 +3331,10 @@ def _relative_file_reference(root: Path, raw: str, *, kind: str) -> dict[str, An
     if not candidate.is_absolute():
         candidate = root / candidate
     try:
-        path = candidate.resolve(strict=True)
-    except FileNotFoundError as exc:
-        raise BbkError(f"{kind} file does not exist: {candidate}") from exc
-    try:
-        relative = path.relative_to(root.resolve()).as_posix()
-    except ValueError as exc:
-        raise BbkError(f"{kind} file must be inside the BBK project root: {path}") from exc
-    if not path.is_file():
-        raise BbkError(f"{kind} reference must identify a regular file: {path}")
-    return {
-        "path": relative,
-        "bytes": path.stat().st_size,
-        "sha256": sha256_file(path),
-        "kind": kind,
-    }
+        reference = artifact_file_reference(candidate, root=root)
+    except (FileNotFoundError, OSError, ValueError) as exc:
+        raise BbkError(f"Invalid {kind} file reference {candidate}: {exc}") from exc
+    return {**reference, "kind": kind}
 
 
 def _normalize_project_relative(root: Path, raw: str, *, label: str, require_exists: bool = False) -> str:
@@ -2879,7 +3357,7 @@ def _question_branch_errors(value: Any) -> list[str]:
         "authority", "current_recommendation", "proposal_response", "root_disposition",
         "dependencies", "accepted_related_decisions", "independent_questions",
         "exposure_history", "unresolved_point", "stopping_assessment", "next_action",
-        "updated_at",
+        "updated_at", "need_class", "attention",
     }
     missing = sorted(required - set(value))
     if missing:
@@ -2911,6 +3389,32 @@ def _question_branch_errors(value: Any) -> list[str]:
         "USER_DECIDES", "WAYFINDER_RECOMMENDS", "DELEGATED", "CONSTRAINT_DRIVEN",
     } or not isinstance(authority.get("holder"), str) or not authority.get("holder"):
         errors.append("authority requires a recognized mode and non-empty holder")
+    need_classes = {
+        "ENVIRONMENT_FACT", "CONFIGURATION_PARAMETER", "REVERSIBLE_IMPLEMENTATION_CHOICE",
+        "ARCHITECTURAL_DECISION", "AUTHORITY_EXPANSION", "USER_RESERVED_PREFERENCE",
+    }
+    need_class = value.get("need_class")
+    if need_class not in need_classes:
+        errors.append("need_class is not recognized")
+    attention = value.get("attention")
+    if not isinstance(attention, dict):
+        errors.append("attention must be an object")
+    else:
+        if not isinstance(attention.get("requires_user_attention"), bool):
+            errors.append("attention.requires_user_attention must be boolean")
+        if not isinstance(attention.get("rationale"), str) or not attention.get("rationale", "").strip():
+            errors.append("attention.rationale must be non-empty")
+        if attention.get("discoverability") not in {"DISCOVERABLE_NOW", "DISCOVERABLE_LATER", "NOT_DISCOVERABLE_BY_BBK", "NOT_APPLICABLE"}:
+            errors.append("attention.discoverability is not recognized")
+        if attention.get("safe_default") is not None and not isinstance(attention.get("safe_default"), str):
+            errors.append("attention.safe_default must be a string or null")
+        if not isinstance(attention.get("unaffected_work_may_continue"), bool):
+            errors.append("attention.unaffected_work_may_continue must be boolean")
+        if need_class == "REVERSIBLE_IMPLEMENTATION_CHOICE" and attention.get("requires_user_attention") is True:
+            errors.append("REVERSIBLE_IMPLEMENTATION_CHOICE must not require user attention; resolve it inside delegated freedom or reclassify a genuinely consequential branch")
+        if need_class in {"ENVIRONMENT_FACT", "CONFIGURATION_PARAMETER"} and attention.get("requires_user_attention") is True:
+            if attention.get("discoverability") != "NOT_DISCOVERABLE_BY_BBK" or attention.get("safe_default") is not None:
+                errors.append(f"{need_class} may require user attention only when BBK cannot discover it and no safe default exists")
     for field in ("dependencies", "accepted_related_decisions", "independent_questions", "exposure_history"):
         if not isinstance(value.get(field), list) or not all(isinstance(item, str) for item in value.get(field, [])):
             errors.append(f"{field} must be an array of strings")
@@ -2956,6 +3460,13 @@ def cmd_question_new(args: argparse.Namespace) -> dict[str, Any]:
     if output.exists() and not args.force:
         raise BbkError(f"Refusing to overwrite existing question branch without --force: {output}")
     value = read_json(TEMPLATE_DIR / "question-branch.json")
+    user_attention_classes = {"ARCHITECTURAL_DECISION", "AUTHORITY_EXPANSION", "USER_RESERVED_PREFERENCE"}
+    unavailable_fact_requires_attention = (
+        args.need_class in {"ENVIRONMENT_FACT", "CONFIGURATION_PARAMETER"}
+        and args.discoverability == "NOT_DISCOVERABLE_BY_BBK"
+        and args.safe_default is None
+    )
+    requires_user_attention = args.need_class in user_attention_classes or unavailable_fact_requires_attention
     value.update({
         "bbk_version": VERSION,
         "id": question_id,
@@ -2963,6 +3474,20 @@ def cmd_question_new(args: argparse.Namespace) -> dict[str, Any]:
         "owner_role": args.owner_role,
         "parent_scope": args.parent_scope,
         "authority": {"mode": args.authority_mode, "holder": args.authority_holder},
+        "need_class": args.need_class,
+        "attention": {
+            "requires_user_attention": requires_user_attention,
+            "rationale": args.attention_rationale or (
+                "Several materially different consequential paths require accountable user disposition."
+                if args.need_class == "ARCHITECTURAL_DECISION"
+                else "The exact fact is unavailable to BBK and no safe default exists."
+                if unavailable_fact_requires_attention
+                else "The unresolved item is classified for bounded handling without manufacturing a user decision."
+            ),
+            "discoverability": args.discoverability,
+            "safe_default": args.safe_default,
+            "unaffected_work_may_continue": not args.blocks_unaffected_work,
+        },
         "next_action": args.next_action,
         "updated_at": utc_now(),
     })
@@ -2998,6 +3523,8 @@ def cmd_question_list(args: argparse.Namespace) -> dict[str, Any]:
                 "status": value.get("status"),
                 "proposal_response": value.get("proposal_response"),
                 "root_disposition": value.get("root_disposition"),
+                "need_class": value.get("need_class"),
+                "requires_user_attention": (value.get("attention") or {}).get("requires_user_attention"),
                 "next_action": value.get("next_action"),
                 "updated_at": value.get("updated_at"),
                 "path": _normalize_project_relative(root, str(path), label="question", require_exists=True),
@@ -3100,7 +3627,7 @@ def _handoff_shape_errors(value: Any) -> list[str]:
     return errors
 
 
-def verify_handoff(path: Path, *, root: Path) -> dict[str, Any]:
+def verify_handoff_v1(path: Path, *, root: Path) -> dict[str, Any]:
     value = read_json(path)
     errors = _handoff_shape_errors(value)
     observations: list[dict[str, Any]] = []
@@ -3112,32 +3639,14 @@ def verify_handoff(path: Path, *, root: Path) -> dict[str, Any]:
             if not isinstance(ref, dict) or not isinstance(ref.get("path"), str):
                 continue
             raw = ref["path"]
-            candidate = Path(raw)
-            if candidate.is_absolute() or candidate.drive or ".." in candidate.parts:
-                errors.append(f"{field}[{index}].path must be a safe project-relative path: {raw}")
-                continue
-            actual = (root / candidate).resolve()
-            try:
-                actual.relative_to(root.resolve())
-            except ValueError:
-                errors.append(f"{field}[{index}].path escapes the project root: {raw}")
-                continue
             observed: dict[str, Any] = {"field": field, "index": index, "path": raw}
-            if not actual.is_file():
-                errors.append(f"{field}[{index}] is missing: {raw}")
+            reference_errors = artifact_verify_file_reference(ref, root=root)
+            errors.extend(f"{field}[{index}] {item}" for item in reference_errors)
+            try:
+                actual = artifact_file_reference(root / raw, root=root)
+                observed.update({"status": "PASS" if not reference_errors else "FAIL", **actual})
+            except (FileNotFoundError, OSError, ValueError):
                 observed["status"] = "MISSING"
-            else:
-                observed.update({
-                    "status": "PASS",
-                    "bytes": actual.stat().st_size,
-                    "sha256": sha256_file(actual),
-                })
-                if observed["bytes"] != ref.get("bytes"):
-                    errors.append(f"{field}[{index}] byte count mismatch for {raw}: expected {ref.get('bytes')}, observed {observed['bytes']}")
-                    observed["status"] = "FAIL"
-                if observed["sha256"] != ref.get("sha256"):
-                    errors.append(f"{field}[{index}] SHA-256 mismatch for {raw}")
-                    observed["status"] = "FAIL"
             observations.append(observed)
     return {
         "schema": "bbk.handoff-verification.v1",
@@ -3157,7 +3666,7 @@ def verify_handoff(path: Path, *, root: Path) -> dict[str, Any]:
     }
 
 
-def cmd_handoff_create(args: argparse.Namespace) -> dict[str, Any]:
+def _cmd_handoff_create_v1(args: argparse.Namespace) -> dict[str, Any]:
     root = resolve_root(args.root, required=True)
     assert root is not None
     if args.disposition in {"READY_FOR_VALIDATION", "BLOCKED", "PAUSED"}:
@@ -3260,8 +3769,127 @@ def cmd_handoff_create(args: argparse.Namespace) -> dict[str, Any]:
     if errors:
         raise BbkError("Invalid handoff: " + "; ".join(errors))
     write_json(output, value)
+    result = verify_handoff_v1(output, root=root)
+    result["created"] = True
+    return result
+
+
+def verify_handoff(path: Path, *, root: Path) -> dict[str, Any]:
+    """Verify sealed v2 handoffs while retaining read compatibility for v1 files."""
+    if path.is_dir():
+        try:
+            result = verify_handoff_v2_package(path)
+        except (OSError, ValueError, ArtifactPackageError) as exc:
+            diagnostic = exc.result if isinstance(exc, ArtifactPackageError) else None
+            return {
+                "schema": "bbk.handoff-verification.v2", "status": "FAIL", "valid": False,
+                "handoff": {"path": str(path), "id": None, "work_unit_id": None, "disposition": None},
+                "references": [], "errors": [str(exc)], "diagnostic": diagnostic,
+            }
+        try:
+            result["handoff"]["path"] = _normalize_project_relative(root, str(path), label="handoff", require_exists=True)
+        except BbkError:
+            result["handoff"]["path"] = str(path)
+        return result
+    return verify_handoff_v1(path, root=root)
+
+
+def _handoff_v2_source_items(root: Path, values: Sequence[str], *, field: str) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    sources: list[dict[str, Any]] = []
+    semantic_refs: list[dict[str, Any]] = []
+    folder = "artifacts" if field == "artifact" else "evidence"
+    role = "result" if field == "artifact" else "evidence"
+    for index, raw in enumerate(values, 1):
+        relative = _normalize_project_relative(root, raw, label=field, require_exists=True)
+        source = (root / relative).resolve(strict=True)
+        if not source.is_file():
+            raise BbkError(f"{field} must be a regular file: {relative}")
+        safe_name = re.sub(r"[^A-Za-z0-9._-]+", "-", source.name).strip(".-") or "file"
+        artifact_id = f"{field}-{index:03d}"
+        package_path = f"{folder}/{index:03d}-{safe_name}"
+        sources.append({
+            "artifactId": artifact_id, "sourcePath": str(source), "packagePath": package_path,
+            "role": role, "mediaType": "application/json" if source.suffix.lower() == ".json" else None,
+        })
+        semantic_refs.append({"artifactId": artifact_id, "path": package_path, "kind": field})
+    return sources, semantic_refs
+
+
+def cmd_handoff_create(args: argparse.Namespace) -> dict[str, Any]:
+    if getattr(args, "legacy_v1", False):
+        return _cmd_handoff_create_v1(args)
+    if args.force:
+        raise BbkError("sealed bbk.handoff.v2 packages are immutable and never overwritten; omit --force and choose a new ID or output")
+    root = resolve_root(args.root, required=True)
+    assert root is not None
+    config = load_config(root)
+    work_unit = validate_id(args.work_unit, "work-unit id")
+    attempt = int(args.attempt)
+    handoff_id = validate_id(args.id or f"HO-{work_unit}-{attempt}", "handoff id")
+    output = Path(args.output).expanduser() if args.output else root / ".bbk" / "handoffs" / work_unit / handoff_id
+    if not output.is_absolute():
+        output = root / output
+    output = output.absolute()
+    _normalize_project_relative(root, str(output), label="handoff output")
+
+    artifact_sources, artifact_refs = _handoff_v2_source_items(root, args.artifact or [], field="artifact")
+    evidence_sources, evidence_refs = _handoff_v2_source_items(root, args.evidence or [], field="evidence")
+    changed = [_normalize_project_relative(root, raw, label="changed path") for raw in (args.changed_path or [])]
+    checkpoint = _normalize_project_relative(root, args.checkpoint, label="checkpoint", require_exists=True) if args.checkpoint else None
+    zones: list[dict[str, Any]] = []
+    for raw in args.capability_zone or []:
+        if "=" not in raw:
+            raise BbkError("--capability-zone must use KIND=PATH")
+        kind, raw_path = raw.split("=", 1)
+        if kind not in {"disposable-candidate-root", "protected-worktree", "sealed-evidence"}:
+            raise BbkError(f"unrecognized capability-zone kind: {kind}")
+        zones.append({"kind": kind, "path": _normalize_project_relative(root, raw_path, label="capability zone"), "operations": []})
+    if args.interrupt_reason and not args.interrupt_evidence:
+        raise BbkError("--interrupt-reason requires at least one --interrupt-evidence")
+    if args.interrupt_evidence and not args.interrupt_reason:
+        raise BbkError("--interrupt-evidence requires --interrupt-reason")
+    partial_work_location = _normalize_project_relative(root, args.partial_work_location, label="partial work location") if args.partial_work_location else None
+    authority = None
+    if args.authority_source or args.authority_scope:
+        authority = {"source": args.authority_source, "scope": list(args.authority_scope or []), "standing": not args.authority_not_standing}
+    interrupt = None
+    if args.interrupt_reason:
+        interrupt = {"reason": args.interrupt_reason, "evidence": list(args.interrupt_evidence or []), "partial_work_location": partial_work_location}
+    prohibited = list(dict.fromkeys([
+        *(args.prohibited_claim or []),
+        "independent validation", "parent integration", "finding closure", "acceptance", "deployment authorization", "release",
+    ]))
+    semantic = {
+        "schema": "bbk.handoff.v2", "bbk_version": VERSION, "id": handoff_id,
+        "project_id": config.get("project_id"), "work_unit_id": work_unit, "attempt": attempt,
+        "producer": {"role": args.role, "invocation_id": args.invocation_id, "thread_id": args.thread_id},
+        "subject": {"kind": args.subject_kind, "id": args.subject_id or work_unit, "revision": args.subject_revision},
+        "authority": authority, "capability_zones_used": zones, "interrupt": interrupt,
+        "disposition": args.disposition, "summary": args.summary,
+        "work_performed": list(args.work_performed or []), "changed_paths": changed,
+        "commands": list(args.command_run or []), "checks": list(args.check or []),
+        "findings": list(args.finding or []), "discoveries": list(args.discovery or []),
+        "residual_uncertainty": list(args.residual or []), "blockers": list(args.blocker or []),
+        "artifacts": artifact_refs, "evidence": evidence_refs,
+        "effects_and_cleanup": {
+            "state": args.cleanup_state, "actions": list(args.cleanup_action or []),
+            "residuals": list(args.residual or []),
+        },
+        "continuation": {
+            "state": args.continuation_state, "checkpoint": checkpoint,
+            "resume_same_thread": not args.no_resume_same_thread,
+            "completed_step": args.completed_step, "next_step": args.next_step,
+        },
+        "prohibited_claims": prohibited, "smallest_next_action": args.next_action,
+        "created_at": utc_now(), "authority_boundary": HANDOFF_V2_AUTHORITY_BOUNDARY,
+    }
+    try:
+        sealed = seal_handoff_v2(semantic, [*artifact_sources, *evidence_sources], output_root=output, revision=str(attempt))
+    except ArtifactPackageError as exc:
+        raise BbkError(str(exc), diagnostic=exc.result) from exc
     result = verify_handoff(output, root=root)
     result["created"] = True
+    result["seal"] = {key: sealed.get(key) for key in ("packageId", "revision", "contentSha256", "manifestSha256", "authorityBoundary")}
     return result
 
 
@@ -3280,49 +3908,52 @@ def cmd_handoff_list(args: argparse.Namespace) -> dict[str, Any]:
     base = root / ".bbk" / "handoffs"
     items: list[dict[str, Any]] = []
     if base.is_dir():
-        for path in operational_json_paths(base, recursive=True):
+        package_roots = sorted({path.parent for path in base.rglob("bbk-package.json")})
+        for package_path in package_roots:
             try:
-                value = read_json(path)
+                value = load_handoff_v2_value(package_path)
                 if args.work_unit and value.get("work_unit_id") != args.work_unit:
                     continue
-                verification = verify_handoff(path, root=root)
-                item = {
-                    **verification["handoff"],
-                    "attempt": value.get("attempt"),
-                    "created_at": value.get("created_at"),
-                    "producer_role": (value.get("producer") or {}).get("role"),
-                    "continuation": value.get("continuation"),
-                    "valid": verification["valid"],
-                    "errors": verification["errors"],
-                }
-            except (BbkError, OSError, json.JSONDecodeError) as exc:
-                item = {
+                verification = verify_handoff(package_path, root=root)
+                items.append({**verification["handoff"], "valid": verification["valid"], "errors": verification["errors"]})
+            except (BbkError, OSError, ValueError, StrictJsonError, ArtifactPackageError) as exc:
+                items.append({
+                    "path": _normalize_project_relative(root, str(package_path), label="handoff", require_exists=True),
+                    "format": "SEALED_V2", "valid": False, "errors": [str(exc)],
+                    "created_at": None, "attempt": None,
+                })
+        package_roots_resolved = [path.resolve() for path in package_roots]
+        for path in operational_json_paths(base, recursive=True):
+            resolved = path.resolve()
+            if any(package_root == resolved or package_root in resolved.parents for package_root in package_roots_resolved):
+                continue
+            try:
+                value = read_json(path)
+                if value.get("schema") != "bbk.handoff.v1":
+                    continue
+                if args.work_unit and value.get("work_unit_id") != args.work_unit:
+                    continue
+                verification = verify_handoff_v1(path, root=root)
+                items.append({
+                    **verification["handoff"], "attempt": value.get("attempt"),
+                    "created_at": value.get("created_at"), "producer_role": (value.get("producer") or {}).get("role"),
+                    "continuation": value.get("continuation"), "format": "LEGACY_V1",
+                    "valid": verification["valid"], "errors": verification["errors"],
+                })
+            except (BbkError, OSError, json.JSONDecodeError, StrictJsonError) as exc:
+                items.append({
                     "path": _normalize_project_relative(root, str(path), label="handoff", require_exists=True),
-                    "valid": False,
-                    "errors": [str(exc)],
-                    "created_at": None,
-                    "attempt": None,
-                }
-            items.append(item)
-    items.sort(
-        key=lambda item: (
-            str(item.get("created_at") or ""),
-            int(item.get("attempt") or 0),
-            str(item.get("path") or ""),
-        ),
-        reverse=True,
-    )
+                    "format": "LEGACY_V1", "valid": False, "errors": [str(exc)],
+                    "created_at": None, "attempt": None,
+                })
+    items.sort(key=lambda item: (str(item.get("created_at") or ""), int(item.get("attempt") or 0), str(item.get("path") or "")), reverse=True)
     latest = items[0] if items else None
     if args.latest and latest is not None:
         items = [latest]
     return {
-        "schema": "bbk.handoff-list.v1",
-        "status": "PASS",
-        "root": str(root),
-        "work_unit_id": args.work_unit,
-        "count": len(items),
-        "latest": latest,
-        "handoffs": items,
+        "schema": "bbk.handoff-list.v2", "status": "PASS", "root": str(root),
+        "work_unit_id": args.work_unit, "count": len(items), "latest": latest, "handoffs": items,
+        "compatibility": {"defaultProducer": "bbk.handoff.v2", "legacyV1Readable": True},
     }
 
 
@@ -3352,6 +3983,33 @@ def _jsonschema_runtime() -> tuple[Any | None, str | None]:
         return None, None
 
 
+
+def _schema_error_detail(error: Any) -> dict[str, Any]:
+    pointer = "/" + "/".join(str(part).replace("~", "~0").replace("/", "~1") for part in error.absolute_path) if error.absolute_path else ""
+    schema_pointer = "/" + "/".join(str(part).replace("~", "~0").replace("/", "~1") for part in error.absolute_schema_path) if error.absolute_schema_path else ""
+    detail: dict[str, Any] = {
+        "pointer": pointer,
+        "schema_pointer": schema_pointer,
+        "message": error.message,
+        "validator": error.validator,
+        "supplied_value": error.instance,
+    }
+    if error.validator == "enum":
+        detail["allowed_values"] = error.validator_value
+    elif error.validator == "const":
+        detail["allowed_values"] = [error.validator_value]
+    elif error.validator == "type":
+        detail["expected_type"] = error.validator_value
+    elif error.validator == "required":
+        detail["required_fields"] = error.validator_value
+    if isinstance(error.schema, Mapping):
+        detail["smallest_valid_example"] = _smallest_schema_example(error.schema)
+        if error.schema.get("description"):
+            detail["description"] = error.schema.get("description")
+    return detail
+
+
+
 def cmd_schema_status(args: argparse.Namespace) -> dict[str, Any]:
     root = resolve_root(args.root, required=False)
     package, version = _jsonschema_runtime()
@@ -3372,6 +4030,305 @@ def cmd_schema_status(args: argparse.Namespace) -> dict[str, Any]:
             "available": tool_python.is_file(),
         },
         "ensure_command": f'bbk schema validate --ensure --schema <schema.json> --instance <instance.json>',
+    }
+
+
+def _resolve_schema_path(raw: str) -> Path:
+    entry = SCHEMA_TEMPLATE_REGISTRY.get(raw)
+    path = SCHEMA_DIR / entry["schema"] if entry else Path(raw).expanduser()
+    path = path.resolve()
+    if not path.is_file():
+        raise BbkError(f"Schema is unavailable: {path}")
+    return path
+
+
+def _decode_json_pointer(pointer: str) -> list[str]:
+    if pointer in {"", "/"}:
+        return []
+    if not pointer.startswith("/"):
+        raise BbkError(f"JSON pointer must be empty or start with '/': {pointer}")
+    return [part.replace("~1", "/").replace("~0", "~") for part in pointer[1:].split("/")]
+
+
+def _pointer_value(value: Any, pointer: str) -> Any:
+    current = value
+    for part in _decode_json_pointer(pointer):
+        if isinstance(current, dict) and part in current:
+            current = current[part]
+        elif isinstance(current, list) and part.isdigit() and int(part) < len(current):
+            current = current[int(part)]
+        else:
+            raise BbkError(f"JSON pointer does not exist in instance: {pointer}")
+    return current
+
+
+def _resolve_schema_ref(document: dict[str, Any], document_path: Path, ref: str) -> tuple[dict[str, Any], Path, Any]:
+    file_part, _, fragment = ref.partition("#")
+    if file_part:
+        candidate = (document_path.parent / file_part).resolve()
+        if not candidate.is_file():
+            candidate = (SCHEMA_DIR / file_part).resolve()
+        target_document = read_json(candidate)
+        target_path = candidate
+    else:
+        target_document = document
+        target_path = document_path
+    node: Any = target_document
+    if fragment:
+        node = _pointer_value(target_document, fragment if fragment.startswith("/") else "/" + fragment)
+    return target_document, target_path, node
+
+
+def _schema_node_for_instance_pointer(schema_path: Path, pointer: str) -> tuple[dict[str, Any], Path, dict[str, Any]]:
+    document = read_json(schema_path)
+    if not isinstance(document, dict):
+        raise BbkError(f"Schema root must be an object: {schema_path}")
+    current_document = document
+    current_path = schema_path
+    node: Any = document
+    for segment in _decode_json_pointer(pointer):
+        while isinstance(node, dict) and isinstance(node.get("$ref"), str):
+            current_document, current_path, node = _resolve_schema_ref(current_document, current_path, node["$ref"])
+        if not isinstance(node, dict):
+            raise BbkError(f"Schema has no object node for instance pointer {pointer}")
+        properties = node.get("properties")
+        if isinstance(properties, dict) and segment in properties:
+            node = properties[segment]
+            continue
+        if node.get("type") == "array" or "items" in node:
+            node = node.get("items", {})
+            continue
+        additional = node.get("additionalProperties")
+        if isinstance(additional, dict):
+            node = additional
+            continue
+        raise BbkError(f"Schema does not describe instance pointer {pointer} at segment {segment!r}")
+    while isinstance(node, dict) and isinstance(node.get("$ref"), str):
+        current_document, current_path, node = _resolve_schema_ref(current_document, current_path, node["$ref"])
+    if not isinstance(node, dict):
+        raise BbkError(f"Schema node for {pointer} is not an object")
+    return current_document, current_path, node
+
+
+def _smallest_schema_example(node: Any) -> Any:
+    if not isinstance(node, dict):
+        return None
+    if "const" in node:
+        return node["const"]
+    if isinstance(node.get("examples"), list) and node["examples"]:
+        return node["examples"][0]
+    if "default" in node:
+        return node["default"]
+    if isinstance(node.get("enum"), list) and node["enum"]:
+        return node["enum"][0]
+    if isinstance(node.get("oneOf"), list) and node["oneOf"]:
+        return _smallest_schema_example(node["oneOf"][0])
+    if isinstance(node.get("anyOf"), list) and node["anyOf"]:
+        return _smallest_schema_example(node["anyOf"][0])
+    kind = node.get("type")
+    if isinstance(kind, list):
+        if "null" in kind:
+            return None
+        kind = kind[0] if kind else None
+    if kind == "object" or isinstance(node.get("properties"), dict):
+        properties = node.get("properties") or {}
+        return {name: _smallest_schema_example(properties.get(name, {})) for name in node.get("required", [])}
+    if kind == "array":
+        count = int(node.get("minItems", 0) or 0)
+        return [_smallest_schema_example(node.get("items", {})) for _ in range(count)]
+    if kind == "string":
+        return "value"
+    if kind == "integer":
+        return int(node.get("minimum", 0) or 0)
+    if kind == "number":
+        return float(node.get("minimum", 0) or 0)
+    if kind == "boolean":
+        return False
+    return None
+
+
+def _jsonschema_validator(schema_path: Path) -> tuple[Any | None, str | None, str | None]:
+    package, version = _jsonschema_runtime()
+    if package is None:
+        return None, None, "The Python jsonschema package is not available."
+    schema_value = read_json(schema_path)
+    try:
+        from referencing import Registry, Resource  # type: ignore
+
+        registry = Registry()
+        for candidate in sorted(SCHEMA_DIR.glob("*.json")):
+            value = read_json(candidate)
+            if not isinstance(value, dict):
+                continue
+            resource = Resource.from_contents(value)
+            if isinstance(value.get("$id"), str):
+                registry = registry.with_resource(value["$id"], resource)
+            registry = registry.with_resource(candidate.resolve().as_uri(), resource)
+        validator = package.Draft202012Validator(schema_value, registry=registry)
+    except Exception as exc:
+        return None, version, f"Could not initialize Draft 2020-12 registry: {exc}"
+    return validator, version, None
+
+
+def _builtin_schema_report(instance: Any) -> dict[str, Any] | None:
+    if not isinstance(instance, dict):
+        return None
+    schema_name = instance.get("schema")
+    validators: dict[str, Any] = {
+        "bbk.solution-outcome-fit.v1": validate_solution_outcome_fit,
+        "bbk.implementation-structure-contract.v1": validate_structure_v2,
+        "bbk.implementation-structure-contract.v2": validate_structure_v2,
+        "bbk.implementation-structure-contract.v3": validate_structure_v2,
+        "bbk.execution-slice.v1": validate_slice_v2,
+        "bbk.execution-slice.v2": validate_slice_v2,
+        "bbk.state-decision-effect-design.v1": validate_state_decision_effect,
+        "bbk.state-transition-trace.v1": validate_transition_trace,
+        "bbk.assurance-contract.v1": validate_assurance_contract,
+        "bbk.evidence-receipt.v2": validate_evidence_receipt,
+    }
+    if schema_name == "bbk.question-branch.v1":
+        errors = _question_branch_errors(instance)
+        return {"valid": not errors, "errors": errors, "warnings": []}
+    if schema_name == "bbk.artifact-manifest.v1":
+        errors: list[str] = []
+        for field in ("bbk_version", "root_label", "content_sha256", "files"):
+            if field not in instance:
+                errors.append(f"missing required field: {field}")
+        return {"valid": not errors, "errors": errors, "warnings": []}
+    validator = validators.get(str(schema_name))
+    if validator is None and {"id", "taskKind", "instructionPackage"}.issubset(instance):
+        validator = validate_work_unit
+    return validator(instance) if validator else None
+
+
+def cmd_schema_list(args: argparse.Namespace) -> dict[str, Any]:
+    items = []
+    for kind, entry in sorted(SCHEMA_TEMPLATE_REGISTRY.items()):
+        items.append({
+            "kind": kind,
+            "schema": str((SCHEMA_DIR / entry["schema"]).resolve()),
+            "template": str((TEMPLATE_DIR / entry["template"]).resolve()) if entry.get("template") else None,
+        })
+    return {
+        "schema": "bbk.schema-catalog.v1",
+        "status": "PASS",
+        "count": len(items),
+        "items": items,
+        "implementation_structure": {
+            "versions": ["v1", "v2", "v3"],
+            "depths": ["compact", "standard", "full"],
+            "subject_kinds": ["software", "automation", "hardware", "procedure", "data", "document", "infrastructure", "network_configuration", "deployment_configuration", "mixed", "other"],
+        },
+    }
+
+
+def cmd_schema_template(args: argparse.Namespace) -> dict[str, Any]:
+    if args.kind not in SCHEMA_TEMPLATE_REGISTRY:
+        raise BbkError(f"Unknown template kind {args.kind!r}; use `bbk schema list`")
+    output = Path(args.output).expanduser().resolve()
+    if output.exists() and not args.force:
+        raise BbkError(f"Refusing to overwrite {output}; pass --force to replace it")
+    if args.kind == "artifact-manifest":
+        value = {
+            "schema": "bbk.artifact-manifest.v1", "bbk_version": VERSION,
+            "subject": None, "root_label": "project", "content_sha256": sha256_bytes(canonical_bytes({"schema": "bbk.artifact-manifest-content.v1", "subject": None, "root_label": "project", "files": []})),
+            "file_count": 0, "total_bytes": 0, "files": [],
+        }
+        write_json(output, value)
+        template_name = "generated-empty-artifact-manifest"
+    else:
+        entry = SCHEMA_TEMPLATE_REGISTRY[args.kind]
+        template_name = entry["template"]
+        if args.kind == "implementation-structure":
+            subject_kind = args.subject_kind or "software"
+            depth = args.depth or "standard"
+            if depth == "compact" and subject_kind in {"infrastructure", "network_configuration", "deployment_configuration"}:
+                template_name = "implementation-structure-contract-v3-infrastructure-compact.json"
+        source = _template_path(template_name)
+        atomic_write(output, source.read_bytes())
+        value = read_json(output)
+        if args.kind == "implementation-structure":
+            value.setdefault("subject", {})["kind"] = args.subject_kind or "software"
+            value["contractDepth"] = args.depth or "standard"
+            write_json(output, value)
+    return {
+        "schema": "bbk.schema-template-created.v1",
+        "status": "PASS",
+        "kind": args.kind,
+        "template": template_name,
+        "output": str(output),
+        "bytes": output.stat().st_size,
+        "sha256": sha256_file(output),
+    }
+
+
+def cmd_schema_enum(args: argparse.Namespace) -> dict[str, Any]:
+    schema_path = _resolve_schema_path(args.schema)
+    _, _, node = _schema_node_for_instance_pointer(schema_path, args.pointer)
+    return {
+        "schema": "bbk.schema-node.v1",
+        "status": "PASS",
+        "schema_path": str(schema_path),
+        "pointer": args.pointer,
+        "type": node.get("type"),
+        "enum": node.get("enum"),
+        "const": node.get("const"),
+        "description": node.get("description"),
+        "smallest_valid_example": _smallest_schema_example(node),
+        "node": node,
+    }
+
+
+def cmd_schema_explain(args: argparse.Namespace) -> dict[str, Any]:
+    schema_path = _resolve_schema_path(args.schema)
+    instance_path = Path(args.instance).expanduser().resolve()
+    instance = read_json(instance_path)
+    external_errors: list[dict[str, Any]] = []
+    validator, version, external_blocker = _jsonschema_validator(schema_path)
+    if validator is not None:
+        for error in sorted(validator.iter_errors(instance), key=lambda item: list(item.absolute_path)):
+            pointer = "/" + "/".join(str(part).replace("~", "~0").replace("/", "~1") for part in error.absolute_path) if error.absolute_path else ""
+            external_errors.append({"pointer": pointer, "message": error.message, "validator": error.validator})
+    builtin = _builtin_schema_report(instance)
+    target_pointer = args.pointer
+    if target_pointer is None and external_errors:
+        target_pointer = external_errors[0]["pointer"]
+    supplied = None
+    node: dict[str, Any] | None = None
+    node_error = None
+    if target_pointer is not None:
+        try:
+            supplied = _pointer_value(instance, target_pointer)
+        except BbkError:
+            supplied = None
+        try:
+            _, _, node = _schema_node_for_instance_pointer(schema_path, target_pointer)
+        except BbkError as exc:
+            node_error = str(exc)
+    valid = not external_errors if validator is not None else bool(builtin and builtin.get("valid"))
+    return {
+        "schema": "bbk.schema-explanation.v1",
+        "status": "PASS" if valid else ("BLOCKED" if validator is None and builtin is None else "FAIL"),
+        "valid": valid,
+        "schema_path": str(schema_path),
+        "instance_path": str(instance_path),
+        "draft": "2020-12",
+        "external_validator": {
+            "available": validator is not None,
+            "version": version,
+            "blocker": external_blocker,
+            "errors": external_errors,
+        },
+        "builtin_validator": builtin,
+        "focus": {
+            "pointer": target_pointer,
+            "supplied_value": supplied,
+            "schema_node": node,
+            "node_error": node_error,
+            "allowed_values": (node or {}).get("enum"),
+            "smallest_valid_example": _smallest_schema_example(node or {}),
+            "applicability": (node or {}).get("description"),
+        },
     }
 
 
@@ -3427,7 +4384,7 @@ def cmd_schema_validate(args: argparse.Namespace) -> dict[str, Any]:
             "remediation": "Re-run with --ensure to create an isolated jsonschema 4.25.1 environment, or provide that package in the active interpreter.",
             "managed_environment": str(tool_root),
         }
-    schema_path = Path(args.schema).expanduser().resolve()
+    schema_path = _resolve_schema_path(args.schema)
     schema_value = read_json(schema_path)
     try:
         package.Draft202012Validator.check_schema(schema_value)
@@ -3442,17 +4399,27 @@ def cmd_schema_validate(args: argparse.Namespace) -> dict[str, Any]:
             "schema_errors": [str(exc)],
             "instances": [],
         }
-    validator = package.Draft202012Validator(schema_value)
+    try:
+        from referencing import Registry, Resource  # type: ignore
+        registry = Registry()
+        for candidate in sorted(SCHEMA_DIR.glob("*.json")):
+            candidate_value = read_json(candidate)
+            identifier = candidate_value.get("$id") if isinstance(candidate_value, dict) else None
+            if isinstance(identifier, str) and identifier:
+                registry = registry.with_resource(identifier, Resource.from_contents(candidate_value))
+        identifier = schema_value.get("$id") if isinstance(schema_value, dict) else None
+        if isinstance(identifier, str) and identifier:
+            registry = registry.with_resource(identifier, Resource.from_contents(schema_value))
+        validator = package.Draft202012Validator(schema_value, registry=registry)
+    except (ImportError, TypeError):
+        validator = package.Draft202012Validator(schema_value)
     instances: list[dict[str, Any]] = []
     valid = True
     for raw in args.instance:
         path = Path(raw).expanduser().resolve()
         instance = read_json(path)
         errors = sorted(validator.iter_errors(instance), key=lambda item: list(item.absolute_path))
-        rendered = []
-        for error in errors:
-            pointer = "/" + "/".join(str(part).replace("~", "~0").replace("/", "~1") for part in error.absolute_path) if error.absolute_path else ""
-            rendered.append({"pointer": pointer, "message": error.message, "validator": error.validator})
+        rendered = [_schema_error_detail(error) for error in errors]
         if rendered:
             valid = False
         instances.append({"path": str(path), "valid": not rendered, "errors": rendered})
@@ -3845,7 +4812,7 @@ def cmd_beads_handoff_plan(args: argparse.Namespace) -> dict[str, Any]:
     verification = verify_handoff(path, root=root)
     if not verification["valid"]:
         raise BbkError("Cannot project an invalid handoff into Beads: " + "; ".join(verification["errors"]))
-    item = read_json(path)
+    item = load_handoff_v2_value(path) if path.is_dir() else read_json(path)
     handoff = verification["handoff"]
     mapping_path, mapping = _beads_mapping(root)
     explicit_target = getattr(args, "target_bbk_id", None)
@@ -4242,6 +5209,18 @@ def cmd_status(args: argparse.Namespace) -> dict[str, Any]:
         "handoffs": len(example_paths(root / ".bbk" / "handoffs", recursive=True)),
         "reviews": len(example_paths(root / ".bbk" / "reviews", recursive=True)),
     })
+    isolated_examples = example_paths(root / ".bbk" / "examples", recursive=True)
+    isolated_category_map = {
+        "fit": "fit", "structures": "structures", "slices": "slices", "work-units": "work_units",
+        "state-effects": "state_effects", "traces": "traces", "questions": "questions",
+        "handoffs": "handoffs", "reviews": "reviews",
+    }
+    for path in isolated_examples:
+        with contextlib.suppress(ValueError, IndexError):
+            category = path.relative_to(root / ".bbk" / "examples").parts[0]
+            key = isolated_category_map.get(category)
+            if key:
+                example_counts[key] = example_counts.get(key, 0) + 1
     example_counts["total"] = sum(example_counts.values())
     beads_path, beads_mapping = _beads_mapping(root)
     beads_workspace = _beads_workspace(root, beads_mapping)
@@ -4386,7 +5365,7 @@ def human(value: Any) -> str:
             for item in value.get("questions", [])
         ]
         return "\n".join(lines)
-    if value.get("schema") == "bbk.handoff-list.v1":
+    if value.get("schema") in {"bbk.handoff-list.v1", "bbk.handoff-list.v2"}:
         lines = [f"Handoffs: {value.get('count', 0)}"]
         lines += [
             f"- {item.get('work_unit_id')} attempt {item.get('attempt')}: {item.get('disposition')} "
@@ -4406,10 +5385,25 @@ def parser() -> argparse.ArgumentParser:
     sub = p.add_subparsers(dest="command", required=True)
 
     sub.add_parser("version", help="print the BBK package version")
-    x = sub.add_parser("init"); x.add_argument("--root"); x.add_argument("--title"); x.add_argument("--project-id"); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_init)
+    x = sub.add_parser("init"); x.add_argument("--root"); x.add_argument("--title"); x.add_argument("--project-id"); x.add_argument("--force", action="store_true"); x.add_argument("--no-examples", action="store_true", help="initialize operational BBK state without materializing reference templates"); x.set_defaults(func=cmd_init)
     x = sub.add_parser("status"); x.add_argument("--root"); x.set_defaults(func=cmd_status)
     x = sub.add_parser("doctor"); x.add_argument("--root"); x.set_defaults(func=cmd_doctor)
     x = sub.add_parser("digest"); x.add_argument("path"); x.set_defaults(func=cmd_digest)
+
+    artifact = sub.add_parser("artifact").add_subparsers(dest="artifact_command", required=True)
+    x = artifact.add_parser("inspect"); x.add_argument("path"); x.add_argument("--exclude", action="append"); x.add_argument("--include-examples", action="store_true"); x.add_argument("--verbose", action="store_true"); x.add_argument("--output"); x.set_defaults(func=cmd_artifact_inspect)
+    x = artifact.add_parser("manifest"); x.add_argument("--root"); x.add_argument("--path", action="append"); x.add_argument("--source", action="append"); x.add_argument("--include", action="append"); x.add_argument("--exclude", action="append"); x.add_argument("--include-examples", action="store_true"); x.add_argument("--subject"); x.add_argument("--root-label"); x.add_argument("--output"); x.set_defaults(func=cmd_artifact_manifest)
+    x = artifact.add_parser("preflight"); x.add_argument("draft_root"); x.add_argument("--registry"); x.add_argument("--max-depth", type=int, default=128); x.set_defaults(func=cmd_artifact_preflight)
+    x = artifact.add_parser("seal"); x.add_argument("draft_root"); x.add_argument("--output", required=True); x.add_argument("--registry"); x.add_argument("--recover-stale-lock", action="store_true"); x.set_defaults(func=cmd_artifact_seal)
+    x = artifact.add_parser("verify"); x.add_argument("manifest"); x.add_argument("--root"); x.add_argument("--registry"); x.set_defaults(func=cmd_artifact_verify)
+    x = artifact.add_parser("successor"); x.add_argument("sealed_root"); x.add_argument("--output", required=True); x.add_argument("--revision", required=True); x.add_argument("--reason", required=True); x.add_argument("--registry"); x.add_argument("--recover-stale-lock", action="store_true"); x.set_defaults(func=cmd_artifact_successor)
+
+    preflight = sub.add_parser("preflight").add_subparsers(dest="preflight_command", required=True)
+    x = preflight.add_parser("run"); x.add_argument("request"); x.add_argument("--root"); x.add_argument("--output"); x.add_argument("--cache-dir"); x.add_argument("--no-cache", action="store_true"); x.add_argument("--timeout", type=float, default=5.0); x.set_defaults(func=cmd_preflight_run)
+
+    context = sub.add_parser("context").add_subparsers(dest="context_command", required=True)
+    x = context.add_parser("worker"); x.add_argument("--root"); x.add_argument("--work-unit", required=True); x.add_argument("--profile-lock", required=True); x.add_argument("--host-preflight", required=True); x.add_argument("--prototype-charter"); x.add_argument("--output"); x.add_argument("--id"); x.add_argument("--revision", default="1"); x.set_defaults(func=cmd_context_worker)
+    x = context.add_parser("review"); x.add_argument("--root"); x.add_argument("--candidate", required=True); x.add_argument("--request", required=True); x.add_argument("--output"); x.add_argument("--id"); x.add_argument("--revision", default="1"); x.set_defaults(func=cmd_context_review)
 
     fit = sub.add_parser("fit").add_subparsers(dest="fit_command", required=True)
     x = fit.add_parser("validate"); x.add_argument("path"); x.set_defaults(func=cmd_fit_validate)
@@ -4434,7 +5428,7 @@ def parser() -> argparse.ArgumentParser:
     structure = sub.add_parser("structure").add_subparsers(dest="structure_command", required=True)
     x = structure.add_parser("validate"); x.add_argument("path"); x.set_defaults(func=cmd_structure_validate)
     x = structure.add_parser("render"); x.add_argument("path"); x.add_argument("--format", choices=["markdown", "json"], default="markdown"); x.add_argument("--output"); x.set_defaults(func=cmd_structure_render)
-    x = structure.add_parser("new"); x.add_argument("--output", required=True); x.add_argument("--version", choices=["v1", "v2"], default="v2"); x.add_argument("--kind", choices=["software", "automation", "hardware", "procedure", "data", "document", "mixed", "other"], default="software"); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_structure_new)
+    x = structure.add_parser("new"); x.add_argument("--output", required=True); x.add_argument("--version", choices=["v1", "v2", "v3"], default="v3"); x.add_argument("--kind", choices=["software", "automation", "hardware", "procedure", "data", "document", "infrastructure", "network_configuration", "deployment_configuration", "mixed", "other"], default="software"); x.add_argument("--depth", choices=["compact", "standard", "full"], default="standard"); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_structure_new)
     x = structure.add_parser("review"); x.add_argument("--contract", required=True); x.add_argument("--inventory", required=True); x.add_argument("--output"); x.set_defaults(func=cmd_structure_review)
 
     slices = sub.add_parser("slice").add_subparsers(dest="slice_command", required=True)
@@ -4449,7 +5443,7 @@ def parser() -> argparse.ArgumentParser:
 
     evidence = sub.add_parser("evidence").add_subparsers(dest="evidence_command", required=True)
     x = evidence.add_parser("validate"); x.add_argument("path"); x.set_defaults(func=cmd_evidence_validate)
-    x = evidence.add_parser("new"); x.add_argument("--output", required=True); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_evidence_new)
+    x = evidence.add_parser("new"); x.add_argument("--output", required=True); x.add_argument("--kind", choices=["generic", "environment-observation"], default="generic"); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_evidence_new)
 
     review = sub.add_parser("review").add_subparsers(dest="review_command", required=True)
     x = review.add_parser("plan"); x.add_argument("--assurance", required=True); x.add_argument("--id", required=True); x.add_argument("--purpose", required=True); x.add_argument("--subject"); x.add_argument("--subject-ref"); x.add_argument("--subject-kind"); x.add_argument("--subject-revision"); x.add_argument("--capability", action="append"); x.add_argument("--output"); x.set_defaults(func=cmd_review_plan)
@@ -4500,7 +5494,7 @@ def parser() -> argparse.ArgumentParser:
 
     question = sub.add_parser("question").add_subparsers(dest="question_command", required=True)
     x = question.add_parser("validate"); x.add_argument("path"); x.set_defaults(func=cmd_question_validate)
-    x = question.add_parser("new"); x.add_argument("--root"); x.add_argument("--id", required=True); x.add_argument("--root-decision", required=True); x.add_argument("--owner-role", default="bbk_questioning_wayfinder"); x.add_argument("--parent-scope"); x.add_argument("--authority-mode", choices=["USER_DECIDES", "WAYFINDER_RECOMMENDS", "DELEGATED", "CONSTRAINT_DRIVEN"], default="WAYFINDER_RECOMMENDS"); x.add_argument("--authority-holder", default="user"); x.add_argument("--next-action", default="Prepare and present a decision-ready recommendation."); x.add_argument("--output"); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_question_new)
+    x = question.add_parser("new"); x.add_argument("--root"); x.add_argument("--id", required=True); x.add_argument("--root-decision", required=True); x.add_argument("--owner-role", default="bbk_questioning_wayfinder"); x.add_argument("--parent-scope"); x.add_argument("--authority-mode", choices=["USER_DECIDES", "WAYFINDER_RECOMMENDS", "DELEGATED", "CONSTRAINT_DRIVEN"], default="WAYFINDER_RECOMMENDS"); x.add_argument("--authority-holder", default="user"); x.add_argument("--need-class", choices=["ENVIRONMENT_FACT", "CONFIGURATION_PARAMETER", "REVERSIBLE_IMPLEMENTATION_CHOICE", "ARCHITECTURAL_DECISION", "AUTHORITY_EXPANSION", "USER_RESERVED_PREFERENCE"], default="ARCHITECTURAL_DECISION"); x.add_argument("--attention-rationale"); x.add_argument("--discoverability", choices=["DISCOVERABLE_NOW", "DISCOVERABLE_LATER", "NOT_DISCOVERABLE_BY_BBK", "NOT_APPLICABLE"], default="NOT_DISCOVERABLE_BY_BBK"); x.add_argument("--safe-default"); x.add_argument("--blocks-unaffected-work", action="store_true"); x.add_argument("--next-action", default="Prepare and present a decision-ready recommendation."); x.add_argument("--output"); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_question_new)
     x = question.add_parser("list"); x.add_argument("--root"); x.add_argument("--status"); x.set_defaults(func=cmd_question_list)
 
     handoff = sub.add_parser("handoff").add_subparsers(dest="handoff_command", required=True)
@@ -4547,6 +5541,10 @@ def parser() -> argparse.ArgumentParser:
     x.add_argument("--completed-step")
     x.add_argument("--next-step")
     x.add_argument("--next-action", required=True)
+    x.add_argument("--cleanup-state", choices=["NOT_REQUIRED", "COMPLETE", "PARTIAL", "BLOCKED", "QUARANTINED"], default="NOT_REQUIRED")
+    x.add_argument("--cleanup-action", action="append")
+    x.add_argument("--prohibited-claim", action="append")
+    x.add_argument("--legacy-v1", action="store_true", help="explicitly create the legacy standalone bbk.handoff.v1 JSON record")
     x.add_argument("--output")
     x.add_argument("--force", action="store_true")
     x.set_defaults(func=cmd_handoff_create)
@@ -4554,8 +5552,12 @@ def parser() -> argparse.ArgumentParser:
     x = handoff.add_parser("list"); x.add_argument("--root"); x.add_argument("--work-unit"); x.add_argument("--latest", action="store_true"); x.set_defaults(func=cmd_handoff_list)
 
     schema = sub.add_parser("schema").add_subparsers(dest="schema_command", required=True)
+    x = schema.add_parser("list"); x.set_defaults(func=cmd_schema_list)
+    x = schema.add_parser("template"); x.add_argument("--kind", required=True, choices=sorted(SCHEMA_TEMPLATE_REGISTRY)); x.add_argument("--output", required=True); x.add_argument("--subject-kind", choices=["software", "automation", "hardware", "procedure", "data", "document", "infrastructure", "network_configuration", "deployment_configuration", "mixed", "other"]); x.add_argument("--depth", choices=["compact", "standard", "full"]); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_schema_template)
+    x = schema.add_parser("enum"); x.add_argument("--schema", required=True); x.add_argument("--pointer", required=True); x.set_defaults(func=cmd_schema_enum)
+    x = schema.add_parser("explain"); x.add_argument("--schema", required=True); x.add_argument("--instance", required=True); x.add_argument("--pointer"); x.set_defaults(func=cmd_schema_explain)
+    x = schema.add_parser("validate"); x.add_argument("--schema", required=True); x.add_argument("--instance", action="append", required=True); x.add_argument("--root"); x.add_argument("--tool-dir"); x.add_argument("--ensure", action="store_true"); x.add_argument("--wheelhouse"); x.add_argument("--timeout", type=float, default=120.0); x.set_defaults(func=cmd_schema_validate)
     x = schema.add_parser("status"); x.add_argument("--root"); x.add_argument("--tool-dir"); x.set_defaults(func=cmd_schema_status)
-    x = schema.add_parser("validate"); x.add_argument("--schema", required=True); x.add_argument("--instance", action="append", required=True); x.add_argument("--root"); x.add_argument("--ensure", action="store_true"); x.add_argument("--tool-dir"); x.add_argument("--wheelhouse"); x.add_argument("--timeout", type=float, default=900.0); x.set_defaults(func=cmd_schema_validate)
 
     b = sub.add_parser("beads").add_subparsers(dest="beads_command", required=True)
     x = b.add_parser("plan"); x.add_argument("--root"); x.add_argument("--work-unit"); x.add_argument("--kind", action="append", choices=sorted(BEADS_OBJECT_KINDS)); x.add_argument("--id", action="append"); x.add_argument("--output"); x.add_argument("--apply", action="store_true"); x.add_argument("--initialize", action="store_true"); x.add_argument("--timeout", type=float, default=60.0); x.set_defaults(func=cmd_beads_plan)
@@ -4576,12 +5578,15 @@ def main(argv: Sequence[str] | None = None) -> int:
         value = args.func(args)
     except BbkError as exc:
         if args.json:
-            print(json.dumps({"status": "ERROR", "error": str(exc)}, ensure_ascii=False))
+            payload: dict[str, Any] = {"status": "ERROR", "error": str(exc)}
+            if exc.diagnostic is not None:
+                payload["diagnostic"] = exc.diagnostic
+            print(json.dumps(payload, ensure_ascii=False, sort_keys=True))
         else:
             print(f"bbk: error: {exc}", file=sys.stderr)
         return 2
     print(json.dumps(value, indent=2, ensure_ascii=False, sort_keys=True) if args.json else human(value))
-    if isinstance(value, dict) and (value.get("status") in {"FAIL", "BLOCKED", "ERROR", "DRIFT"} or value.get("valid") is False):
+    if isinstance(value, dict) and (value.get("status") in {"FAIL", "BLOCKED", "ERROR", "DRIFT", "REJECTED"} or value.get("valid") is False):
         return 1
     return 0
 

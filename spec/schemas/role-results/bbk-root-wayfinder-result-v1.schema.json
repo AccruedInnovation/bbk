@@ -6,22 +6,42 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "baseline_ref",
     "acceptance_ref",
-    "execution_authority_ref",
-    "decision_refs",
-    "planning_state",
-    "fit_refs",
     "architecture_refs",
-    "work_graph_refs",
     "assurance_refs",
-    "invalidated_or_superseded_refs",
-    "residual_uncertainty",
-    "outstanding_user_request_ids",
+    "baseline_ref",
     "blockers",
-    "recommended_next_root"
+    "decision_refs",
+    "execution_authority_ref",
+    "fit_refs",
+    "invalidated_or_superseded_refs",
+    "outstanding_user_request_ids",
+    "planning_state",
+    "recommended_next_root",
+    "residual_uncertainty",
+    "work_graph_refs"
   ],
   "properties": {
+    "acceptance_ref": {
+      "anyOf": [
+        {
+          "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+          "description": "Exact ask-backed or otherwise authority-bound acceptance reference; null when not accepted."
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Exact ask-backed or otherwise authority-bound acceptance reference; null when not accepted."
+    },
+    "architecture_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Current architecture and material-interface references or an explicit not-applicable disposition."
+    },
+    "assurance_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Current verification, evidence, and independent-review design references or an explicit not-applicable disposition."
+    },
     "baseline_ref": {
       "anyOf": [
         {
@@ -34,17 +54,13 @@
       ],
       "description": "Baseline ID, revision, digest, lifecycle state, and durable path; null with a reason when no baseline exists yet."
     },
-    "acceptance_ref": {
-      "anyOf": [
-        {
-          "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
-          "description": "Exact ask-backed or otherwise authority-bound acceptance reference; null when not accepted."
-        },
-        {
-          "type": "null"
-        }
-      ],
-      "description": "Exact ask-backed or otherwise authority-bound acceptance reference; null when not accepted."
+    "blockers": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Exact technical, authority, decision, capacity, or host-window blockers."
+    },
+    "decision_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Accepted, proposed, reopened, and pending decision references with authority and freshness state."
     },
     "execution_authority_ref": {
       "anyOf": [
@@ -58,45 +74,21 @@
       ],
       "description": "Exact standing or explicit execution-authority reference and covered effect classes; null when not authorized."
     },
-    "decision_refs": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
-      "description": "Accepted, proposed, reopened, and pending decision references with authority and freshness state."
-    },
-    "planning_state": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Current territory/interface map, completed and active frontier, blockers, residual fog, dependencies, and invalidation state."
-    },
     "fit_refs": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
       "description": "Current SolutionOutcomeFit references or an explicit not-applicable disposition."
-    },
-    "architecture_refs": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
-      "description": "Current architecture and material-interface references or an explicit not-applicable disposition."
-    },
-    "work_graph_refs": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
-      "description": "Current capability, phase, work-unit, and worker-invocation references or an explicit not-ready disposition."
-    },
-    "assurance_refs": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
-      "description": "Current verification, evidence, and independent-review design references or an explicit not-applicable disposition."
     },
     "invalidated_or_superseded_refs": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
       "description": "Planning objects invalidated, reopened, or superseded during this invocation."
     },
-    "residual_uncertainty": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
-      "description": "Explicit bounded uncertainty that remains after economic stopping."
-    },
     "outstanding_user_request_ids": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
       "description": "Unresolved controller-mediated request IDs, if any."
     },
-    "blockers": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
-      "description": "Exact technical, authority, decision, capacity, or host-window blockers."
+    "planning_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Current territory/interface map, completed and active frontier, blockers, residual fog, dependencies, and invalidation state."
     },
     "recommended_next_root": {
       "anyOf": [
@@ -109,6 +101,14 @@
         }
       ],
       "description": "The canonical next root for the harness-root controller, or null when no root transition is valid."
+    },
+    "residual_uncertainty": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Explicit bounded uncertainty that remains after economic stopping."
+    },
+    "work_graph_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Current capability, phase, work-unit, and worker-invocation references or an explicit not-ready disposition."
     }
   },
   "x-bbk-role": "bbk_root_wayfinder",

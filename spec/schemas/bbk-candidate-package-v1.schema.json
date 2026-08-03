@@ -1,0 +1,64 @@
+{
+  "$defs": {
+    "nonEmpty": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "$id": "https://bbk.local/schemas/bbk-candidate-package-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "authorityBoundary": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "governingReferences": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "id": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "includedArtifacts": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "schema": {
+      "const": "bbk.candidate-package.v1"
+    },
+    "subject": {
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "kind": {
+          "$ref": "#/$defs/nonEmpty"
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ],
+      "type": "object"
+    },
+    "summary": {
+      "$ref": "#/$defs/nonEmpty"
+    }
+  },
+  "required": [
+    "schema",
+    "id",
+    "subject",
+    "summary",
+    "governingReferences",
+    "includedArtifacts",
+    "authorityBoundary"
+  ],
+  "title": "BBK integrated candidate package v1",
+  "type": "object"
+}

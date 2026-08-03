@@ -47,7 +47,7 @@ class Alpha7ReviewAssuranceTests(unittest.TestCase):
         self.assertIn('intent-outcome', lenses)
         self.assertIn('state-concurrency-effect-recovery', lenses)
         self.assertEqual(len(first['lensAssignments']), 3)
-        self.assertEqual(first['provenance']['bbkVersion'], '0.1.0-alpha.13.5')
+        self.assertEqual(first['provenance']['bbkVersion'], '0.1.0-alpha.15')
 
     def test_manifest_rejects_unjustified_assertion_overlap(self):
         value = copy.deepcopy(self.manifest)

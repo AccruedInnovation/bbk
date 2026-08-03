@@ -18,7 +18,7 @@ from typing import Any, Iterable, Sequence
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 TOP = f"bbk-{VERSION}"
-FIXED_TIME = (2026, 8, 2, 0, 0, 0)
+FIXED_TIME = (2026, 8, 3, 0, 0, 0)
 EXCLUDED_PARTS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
 EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
 # Package executability is an explicit release contract, not an accident of the
@@ -68,7 +68,7 @@ def build_manifest() -> dict[str, Any]:
     projection = json.loads((ROOT / "projections" / "manifest.json").read_text(encoding="utf-8"))
     return {
         "schema": "bbk.package-manifest.v1", "name": "Blueprint Bootstrap Kit", "version": VERSION,
-        "created_at": "2026-08-02T00:00:00Z", "file_count": len(files), "files": files,
+        "created_at": "2026-08-03T00:00:00Z", "file_count": len(files), "files": files,
         "root_sha256": hashlib.sha256(canonical(payload)).hexdigest(),
         "targets": projection.get("targets", []), "role_count": projection.get("role_count"),
         "projection_count": projection.get("projection_count"), "projection_source_sha256": projection.get("source_sha256"),
@@ -106,7 +106,10 @@ def build_zip(output: Path, manifest: dict[str, Any]) -> None:
 
 def qualification_checks() -> None:
     """Run the same ordered verification surface exposed to package users."""
-    run([sys.executable, "tools/run_tests.py", "--all", "--profile", "release", "--require-node"])
+    run([
+        sys.executable, "tools/run_tests.py", "--all", "--profile", "release",
+        "--require-node", "--mode", "pooled", "--jobs", "0",
+    ])
 
 
 def main(argv: Sequence[str] | None = None) -> int:

@@ -1,0 +1,212 @@
+{
+  "$defs": {
+    "nonEmptyString": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "predecessor": {
+      "additionalProperties": false,
+      "properties": {
+        "contentSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "packageId": {
+          "$ref": "#/$defs/safeId"
+        },
+        "revision": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "source": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "packageId",
+        "revision",
+        "contentSha256"
+      ],
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "profileRef": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/safeId"
+        },
+        "version": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ],
+      "type": "object"
+    },
+    "relativePath": {
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+$",
+      "type": "string"
+    },
+    "safeId": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+      "type": "string"
+    },
+    "sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "subject": {
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "kind": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "revision": {
+          "type": [
+            "string",
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://bbk.local/schemas/bbk-artifact-package-preflight-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "claims_not_established": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "draftRoot": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "findings": {
+      "items": {
+        "additionalProperties": true,
+        "properties": {
+          "classification": {
+            "enum": [
+              "MECHANICAL",
+              "SEMANTIC_OWNER_REQUIRED",
+              "AUTHORITY_REQUIRED"
+            ]
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "pointer": {
+            "type": "string"
+          },
+          "remediation": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "classification",
+          "message",
+          "pointer",
+          "remediation"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "package": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "profile": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "schema": {
+      "const": "bbk.artifact-package-preflight.v1"
+    },
+    "smallest_next_action": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "PASS",
+        "REJECTED"
+      ]
+    },
+    "summary": {
+      "additionalProperties": false,
+      "properties": {
+        "artifacts": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "errors": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "references": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "warnings": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "errors",
+        "warnings",
+        "artifacts",
+        "references"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "draftRoot",
+    "profile",
+    "package",
+    "findings",
+    "summary",
+    "claims_not_established",
+    "smallest_next_action"
+  ],
+  "title": "BBK artifact package preflight result v1",
+  "type": "object"
+}

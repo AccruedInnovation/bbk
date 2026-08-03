@@ -145,7 +145,7 @@
         "id": "bbk",
         "command": "bbk",
         "versionCommand": "bbk version",
-        "expectedVersion": "0.1.0-alpha.13.5",
+        "expectedVersion": "0.1.0-alpha.15",
         "fallbackCommand": "<python> <installed-bbk-root>/tools/bbk.py version"
       },
       {
@@ -164,7 +164,7 @@
     "silentTruncationAllowed": false
   },
   "returnContract": {
-    "schema": "bbk.handoff.v1",
+    "schema": "bbk.handoff.v2",
     "requiredFields": [
       "disposition",
       "subject",
@@ -176,7 +176,9 @@
       "checks",
       "residual_uncertainty",
       "continuation",
-      "smallest_next_action"
+      "smallest_next_action",
+      "authority_boundary",
+      "prohibited_claims"
     ],
     "operationalDispositions": [
       "COMPLETE",

@@ -10,7 +10,16 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+from pathlib import Path
 from typing import Any, Iterable
+
+try:
+    from strict_json import StrictJsonError, load_path as strict_load_path
+except ModuleNotFoundError:
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from strict_json import StrictJsonError, load_path as strict_load_path
 
 RISK_ORDER = {"routine": 0, "material": 1, "consequential": 2, "critical": 3}
 
@@ -20,6 +29,10 @@ def canonical_bytes(value: Any) -> bytes:
 
 def canonical_digest(value: Any) -> str:
     return hashlib.sha256(canonical_bytes(value)).hexdigest()
+
+def load_contract_json(path: Path | str) -> Any:
+    """Load an identity-bearing contract through BBK's strict JSON boundary."""
+    return strict_load_path(Path(path))
 
 def require_dict(value: Any, where: str, errors: list[str]) -> dict[str, Any]:
     if not isinstance(value, dict):
@@ -345,7 +358,7 @@ def validate_structure(data: Any) -> dict[str, Any]:
     subject = require_dict(obj.get("subject"), "contract.subject", errors)
     check_required(subject, ["purpose", "kind", "baselineRefs", "scopeRefs"], "contract.subject", errors)
     require_text(subject.get("purpose"), "contract.subject.purpose", errors)
-    if subject.get("kind") not in {"software", "automation", "hardware", "procedure", "data", "document", "mixed", "other"}:
+    if subject.get("kind") not in {"software", "automation", "hardware", "procedure", "data", "document", "infrastructure", "network_configuration", "deployment_configuration", "mixed", "other"}:
         errors.append("contract.subject.kind is invalid")
     for field in ("baselineRefs", "scopeRefs"):
         values = require_list(subject.get(field), f"contract.subject.{field}", errors)
@@ -1087,7 +1100,8 @@ def markdown_structure(data: dict[str, Any]) -> str:
         f"**Contract:** `{data.get('contractId')}` revision `{data.get('revision')}`  ",
         f"**Status:** `{data.get('status')}`  ",
         f"**Subject kind:** `{subject.get('kind')}`  ",
-        f"**Applicability:** `{applicability.get('level')}`", "",
+        f"**Applicability:** `{applicability.get('level')}`  ",
+        f"**Contract depth:** `{data.get('contractDepth', 'legacy')}`", "",
         "## Purpose", "", str(subject.get("purpose", "")), "",
         "## Scope and basis", "",
         f"- Baselines: {', '.join(f'`{x}`' for x in subject.get('baselineRefs', [])) or '—'}",
@@ -1097,8 +1111,15 @@ def markdown_structure(data: dict[str, Any]) -> str:
         f"- Capabilities: {', '.join(f'`{x}`' for x in subject.get('capabilityRefs', [])) or '—'}",
         f"- Interfaces: {', '.join(f'`{x}`' for x in subject.get('interfaceRefs', [])) or '—'}", "",
         "## Applicability rationale", "", str(applicability.get("rationale", "")), "",
-        "## Artifact or object topology", "",
     ]
+    sections = data.get("sectionApplicability") if isinstance(data.get("sectionApplicability"), dict) else {}
+    if sections:
+        lines += ["## Section applicability", "", "| Section | Status | Rationale | Trigger |", "|---|---|---|---|"]
+        for name, item in sections.items():
+            item = item if isinstance(item, dict) else {}
+            lines.append(f"| `{name}` | `{item.get('status')}` | {item.get('rationale', '')} | {item.get('trigger') or '—'} |")
+        lines.append("")
+    lines += ["## Artifact or object topology", ""]
     artifacts = structure.get("artifactTopology", [])
     if artifacts:
         lines += ["| ID | Action | Kind | Logical path | Responsibility | Owner |", "|---|---|---|---|---|---|"]
@@ -1142,6 +1163,27 @@ def markdown_structure(data: dict[str, Any]) -> str:
     if not decisions.get("delegated"):
         lines.append("—")
     lines += ["", "## Prohibited shortcuts", ""] + ([f"- {x}" for x in decisions.get("prohibited", [])] or ["—"])
+    confirmations = data.get("preExecutionConfirmations") if isinstance(data.get("preExecutionConfirmations"), list) else []
+    if "preExecutionConfirmations" in data:
+        lines += ["", "## Pre-execution confirmations", ""]
+        if confirmations:
+            lines += ["| ID | Classification | Status | Blocking | Subject | Owner | Confirmation | Method |", "|---|---|---|---|---|---|---|---|"]
+            for item in confirmations:
+                item = item if isinstance(item, dict) else {}
+                lines.append(f"| `{item.get('id')}` | `{item.get('classification')}` | `{item.get('status')}` | `{item.get('blocking')}` | `{item.get('subjectRef')}` | {item.get('owner')} | {item.get('statement')} | {item.get('method')} |")
+        else:
+            lines.append("—")
+    dispositions = data.get("specialistDispositions") if isinstance(data.get("specialistDispositions"), list) else []
+    if "specialistDispositions" in data:
+        lines += ["", "## Specialist-request dispositions", ""]
+        if dispositions:
+            lines += ["| Item | Kind | Disposition | Owner | Rationale | Trigger / successor | Residual impact |", "|---|---|---|---|---|---|---|"]
+            for item in dispositions:
+                item = item if isinstance(item, dict) else {}
+                trigger = item.get("trigger") or item.get("successorRef") or "—"
+                lines.append(f"| `{item.get('itemRef')}` | `{item.get('kind')}` | `{item.get('disposition')}` | {item.get('owner')} | {item.get('rationale')} | {trigger} | {item.get('residualImpact')} |")
+        else:
+            lines.append("—")
     lines += ["", "## Review", "", f"Assurance: `{review.get('assuranceTier')}`", "", "Acceptance criteria:"] + ([f"- {x}" for x in review.get("acceptanceCriteria", [])] or ["- —"])
     return "\n".join(lines).rstrip() + "\n"
 

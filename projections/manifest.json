@@ -25,23 +25,27 @@
       "human_decision_triggers": [],
       "inlined_skills": [
         {
-          "bytes": 25267,
+          "bytes": 25895,
           "name": "bbk-architecture",
           "path": "shared/skills/bbk-architecture/SKILL.md",
           "prompt_modules": [
             "bbk-prompt-invocation-binding",
             "bbk-prompt-planning-source-integrity",
+            "bbk-prompt-evidence-subject-identity",
+            "bbk-prompt-specialist-disposition",
             "bbk-prompt-role-boundary",
             "bbk-prompt-durable-handoff",
             "bbk-prompt-handoff-protocol",
             "bbk-prompt-state-claim-truth",
             "bbk-prompt-proportional-stop",
-            "bbk-prompt-profile-qualification"
+            "bbk-prompt-profile-qualification",
+            "bbk-prompt-product-first-proportionality",
+            "bbk-prompt-mechanical-admission"
           ],
-          "sha256": "4098849100869adbcf9432217169700f970feefbf2fb7ccf73269493d7d35ac8",
+          "sha256": "fef49bfb262fbb6d208b5e573eb062d31f35e7a5c78bd171be41b02691d5fa4b",
           "source": "spec/method-content.json#skills/bbk-architecture",
-          "template_bytes": 25424,
-          "template_sha256": "400dd2289cc5dc19b9f8db33e8ec6886fc4f9ea5542c62e77ef292b24f992844"
+          "template_bytes": 25935,
+          "template_sha256": "2c94ef5f2538d9660798bcefe947ee5faace56170115d2c7024d71ebedfc95a9"
         }
       ],
       "mandatory_skills": [
@@ -76,7 +80,11 @@
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
         "bbk-prompt-evidence-lineage",
-        "bbk-prompt-planning-source-integrity"
+        "bbk-prompt-planning-source-integrity",
+        "bbk-prompt-evidence-subject-identity",
+        "bbk-prompt-specialist-disposition",
+        "bbk-prompt-product-first-proportionality",
+        "bbk-prompt-mechanical-admission"
       ],
       "return_contract": {
         "allowed_invocation_modes": [
@@ -109,8 +117,26 @@
           "BLOCKED"
         ],
         "authority_boundary": "A valid `bbk.architect-return.v1` return establishes only the `bbk_architect`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+        "compact_result_fields": [
+          "architecture_ref",
+          "canonical_interface_contracts",
+          "derived_integration_and_verification_obligations",
+          "residual_uncertainty",
+          "blockers",
+          "architecture_artifact_ref"
+        ],
+        "compact_result_schema": "spec/schemas/role-results/bbk-architect-compact-result-v2.schema.json",
         "contract_id": "bbk.architect-return.v1",
         "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+        "full_detail_triggers": [
+          "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+          "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+          "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+          "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+          "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+          "The parent explicitly requested FULL detail.",
+          "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+        ],
         "readiness_rule": "Use `READY_FOR_PARENT_INTEGRATION` only when the exact charter and governing sources are current; the architecture elements, ownership model, canonical interfaces, material scenarios, failure and recovery, quality, deployment, compatibility and evolution, traceability, derived integration obligations, and self-check are complete to the selected depth; required independent review has no blocking undispositioned finding; unresolved items are non-blocking and explicit; and the durable handoff verifies.",
         "requirements": [
           "Return one `bbk.role-return.v1` object with `contract` = `bbk.architect-return.v1`, `role` = `bbk_architect`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `architecture_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -264,7 +290,10 @@
         "result_schema": "spec/schemas/role-results/bbk-architect-result-v1.schema.json",
         "return_schema": "spec/schemas/role-returns/bbk-architect-return-v1.schema.json",
         "semantic_state_name": "architecture_state",
-        "supplemental_enums": {}
+        "supplemental_enums": {},
+        "v2_contract_id": "bbk.architect-return.v2",
+        "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+        "v2_return_schema": "spec/schemas/role-returns/bbk-architect-return-v2.schema.json"
       },
       "scope": [
         "Own one exact architecture charter and the versioned proposal derived from it, including source and decision qualification, system context, architecture elements, responsibility and authority allocation, canonical interfaces and interactions, state and information ownership, failure and recovery, security and trust, quality scenarios, deployment and operations, compatibility and evolution, derived integration and verification obligations, traceability, self-check, invalidation, and exact return to the invoking semantic parent.",
@@ -314,10 +343,11 @@
       "human_decision_triggers": [],
       "inlined_skills": [
         {
-          "bytes": 18409,
+          "bytes": 18840,
           "name": "bbk-phase-plan",
           "path": "shared/skills/bbk-phase-plan/SKILL.md",
           "prompt_modules": [
+            "bbk-prompt-execution-autonomy",
             "bbk-prompt-invocation-binding",
             "bbk-prompt-planning-source-integrity",
             "bbk-prompt-execution-slicing",
@@ -326,12 +356,16 @@
             "bbk-prompt-durable-handoff",
             "bbk-prompt-handoff-protocol",
             "bbk-prompt-state-claim-truth",
-            "bbk-prompt-profile-qualification"
+            "bbk-prompt-profile-qualification",
+            "bbk-prompt-product-first-proportionality",
+            "bbk-prompt-mechanical-admission",
+            "bbk-prompt-assurance-modes",
+            "bbk-prompt-candidate-focused-review"
           ],
-          "sha256": "2019a87d8c673137b3247d29e16a7cd9f76e981c256a3ae22cb5a945c85e280d",
+          "sha256": "e28ba1ebd325d403e72c2ba3e81255685c26e02633519294e1e60394ef84558e",
           "source": "spec/method-content.json#skills/bbk-phase-plan",
-          "template_bytes": 18470,
-          "template_sha256": "93ab5b9601edd4a6aae4c3e6dca7bbd060664f5987943f3641b6ce9306b34ab0"
+          "template_bytes": 18755,
+          "template_sha256": "7ac3a383a84c519e074f33bd561cadb54d0f547d561eebdeff774ae6b05588d0"
         }
       ],
       "mandatory_skills": [
@@ -367,7 +401,14 @@
         "bbk-prompt-profile-qualification",
         "bbk-prompt-execution-slicing",
         "bbk-prompt-proportional-stop",
-        "bbk-prompt-planning-source-integrity"
+        "bbk-prompt-planning-source-integrity",
+        "bbk-prompt-execution-autonomy",
+        "bbk-prompt-evidence-subject-identity",
+        "bbk-prompt-specialist-disposition",
+        "bbk-prompt-product-first-proportionality",
+        "bbk-prompt-mechanical-admission",
+        "bbk-prompt-assurance-modes",
+        "bbk-prompt-candidate-focused-review"
       ],
       "return_contract": {
         "allowed_invocation_modes": [
@@ -400,8 +441,26 @@
           "BLOCKED"
         ],
         "authority_boundary": "A valid `bbk.phase-wayfinder-return.v1` return establishes only the `bbk_phase_wayfinder`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+        "compact_result_fields": [
+          "phase_plan_ref",
+          "work_unit_refs",
+          "execution_slice_refs",
+          "dependency_and_parallelism_state",
+          "blockers",
+          "parent_actions_requested"
+        ],
+        "compact_result_schema": "spec/schemas/role-results/bbk-phase-wayfinder-compact-result-v2.schema.json",
         "contract_id": "bbk.phase-wayfinder-return.v1",
         "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+        "full_detail_triggers": [
+          "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+          "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+          "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+          "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+          "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+          "The parent explicitly requested FULL detail.",
+          "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+        ],
         "readiness_rule": "Use `READY_FOR_PARENT_INTEGRATION` only when the phase charter and governing sources are current; every required slice and leaf work unit is bounded and traceable; dependencies, mutation ownership, workspaces, and integration obligations are closed; every active assertion has exactly one completing leaf work unit and sufficient evidence design; every executable work unit has a current Worker Designer contract; required authority, profiles, tools, and environments are feasible; required review findings are dispositioned; no blocking invalidation remains; and the exact handoff verifies.",
         "requirements": [
           "Return one `bbk.role-return.v1` object with `contract` = `bbk.phase-wayfinder-return.v1`, `role` = `bbk_phase_wayfinder`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `phase_plan_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -558,7 +617,10 @@
         "result_schema": "spec/schemas/role-results/bbk-phase-wayfinder-result-v1.schema.json",
         "return_schema": "spec/schemas/role-returns/bbk-phase-wayfinder-return-v1.schema.json",
         "semantic_state_name": "phase_plan_state",
-        "supplemental_enums": {}
+        "supplemental_enums": {},
+        "v2_contract_id": "bbk.phase-wayfinder-return.v2",
+        "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+        "v2_return_schema": "spec/schemas/role-returns/bbk-phase-wayfinder-return-v2.schema.json"
       },
       "scope": [
         "Own the current phase charter's local decomposition: execution slices, leaf work units, internal dependencies and ordering, mutation and workspace ownership, phase-local integration obligations, assertion-to-work-unit coverage, concrete worker-contract coverage, phase gates, continuation and handoffs, invalidation state, readiness assessment, and exact return to the Planning Wayfinder.",
@@ -614,10 +676,11 @@
       "human_decision_triggers": [],
       "inlined_skills": [
         {
-          "bytes": 12974,
+          "bytes": 13405,
           "name": "bbk-work-graph",
           "path": "shared/skills/bbk-work-graph/SKILL.md",
           "prompt_modules": [
+            "bbk-prompt-execution-autonomy",
             "bbk-prompt-invocation-binding",
             "bbk-prompt-planning-source-integrity",
             "bbk-prompt-execution-slicing",
@@ -626,12 +689,16 @@
             "bbk-prompt-durable-handoff",
             "bbk-prompt-handoff-protocol",
             "bbk-prompt-state-claim-truth",
-            "bbk-prompt-profile-qualification"
+            "bbk-prompt-profile-qualification",
+            "bbk-prompt-product-first-proportionality",
+            "bbk-prompt-mechanical-admission",
+            "bbk-prompt-assurance-modes",
+            "bbk-prompt-candidate-focused-review"
           ],
-          "sha256": "7b2c71a10071464671528251fde7f5f2df589f556a73018ef021a93a7c862bab",
+          "sha256": "91a3f7e31cf60b217313625306f8c8a3b94d94fccbf83cacfaded9fdfe7e9913",
           "source": "spec/method-content.json#skills/bbk-work-graph",
-          "template_bytes": 13027,
-          "template_sha256": "b6149bd41c789f874894a34d85f8a1d9a0c180e63461079b5a45ee04e12a44ad"
+          "template_bytes": 13312,
+          "template_sha256": "f1eb360d216f9152b9e991a55437750c29dd84b503b79ea0c0bd5911168cae82"
         }
       ],
       "mandatory_skills": [
@@ -667,7 +734,14 @@
         "bbk-prompt-profile-qualification",
         "bbk-prompt-execution-slicing",
         "bbk-prompt-proportional-stop",
-        "bbk-prompt-planning-source-integrity"
+        "bbk-prompt-planning-source-integrity",
+        "bbk-prompt-execution-autonomy",
+        "bbk-prompt-evidence-subject-identity",
+        "bbk-prompt-specialist-disposition",
+        "bbk-prompt-product-first-proportionality",
+        "bbk-prompt-mechanical-admission",
+        "bbk-prompt-assurance-modes",
+        "bbk-prompt-candidate-focused-review"
       ],
       "return_contract": {
         "allowed_invocation_modes": [
@@ -699,8 +773,26 @@
           "BLOCKED"
         ],
         "authority_boundary": "A valid `bbk.planning-wayfinder-return.v1` return establishes only the `bbk_planning_wayfinder`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+        "compact_result_fields": [
+          "work_graph_ref",
+          "work_unit_refs",
+          "dependency_and_parallelism_state",
+          "interface_readiness_state",
+          "blockers",
+          "parent_actions_requested"
+        ],
+        "compact_result_schema": "spec/schemas/role-results/bbk-planning-wayfinder-compact-result-v2.schema.json",
         "contract_id": "bbk.planning-wayfinder-return.v1",
         "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+        "full_detail_triggers": [
+          "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+          "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+          "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+          "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+          "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+          "The parent explicitly requested FULL detail.",
+          "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+        ],
         "readiness_rule": "Use `READY_FOR_PARENT_INTEGRATION` only when all required source bindings and child returns are current, capability and phase graphs are dependency-valid, every material decomposition has an owned integration obligation, every active assertion has exactly one completing leaf work unit and sufficient evidence design, every executable work unit has a current invocation contract, required authority and environments are feasible, and no blocking finding or invalidation remains.",
         "requirements": [
           "Return one `bbk.role-return.v1` object with `contract` = `bbk.planning-wayfinder-return.v1`, `role` = `bbk_planning_wayfinder`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `work_graph_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -829,7 +921,10 @@
         "result_schema": "spec/schemas/role-results/bbk-planning-wayfinder-result-v1.schema.json",
         "return_schema": "spec/schemas/role-returns/bbk-planning-wayfinder-return-v1.schema.json",
         "semantic_state_name": "work_graph_state",
-        "supplemental_enums": {}
+        "supplemental_enums": {},
+        "v2_contract_id": "bbk.planning-wayfinder-return.v2",
+        "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+        "v2_return_schema": "spec/schemas/role-returns/bbk-planning-wayfinder-return-v2.schema.json"
       },
       "scope": [
         "Own the current planning subject's capability-increment graph, phase charters and ordering, cross-phase dependencies and integration obligations, compiled work-unit index, assertion and worker-contract coverage, execution-control requirements, invalidation state, readiness assessment, and exact parent handoff.",
@@ -886,7 +981,7 @@
       "human_decision_triggers": [],
       "inlined_skills": [
         {
-          "bytes": 20451,
+          "bytes": 21701,
           "name": "bbk-prototype",
           "path": "shared/skills/bbk-prototype/SKILL.md",
           "prompt_modules": [
@@ -902,12 +997,14 @@
             "bbk-prompt-state-claim-truth",
             "bbk-prompt-role-boundary",
             "bbk-prompt-context-human-relay",
-            "bbk-prompt-profile-qualification"
+            "bbk-prompt-profile-qualification",
+            "bbk-prompt-product-first-proportionality",
+            "bbk-prompt-assurance-modes"
           ],
-          "sha256": "062abac4892c76e73ead4c3800d96251c07032bf24a4e94df3a2ee63646369fb",
+          "sha256": "d41ff1d8b853ab480f2513ee2641fdb1dce88fcf1e30f8df026280a707750484",
           "source": "spec/method-content.json#skills/bbk-prototype",
-          "template_bytes": 20436,
-          "template_sha256": "d7612f12ebc1aaa416212fb3b0c0fd1a3cb9451fc3a728001432dce6dcf3148b"
+          "template_bytes": 21627,
+          "template_sha256": "452f3e68241b46d8c481317ba86582683ecd4ebfca4f1ef5c6b64f96459b5507"
         }
       ],
       "mandatory_skills": [
@@ -945,7 +1042,12 @@
         "bbk-prompt-liveness-recovery",
         "bbk-prompt-effects-cleanup",
         "bbk-prompt-evidence-lineage",
-        "bbk-prompt-host-capability-truth"
+        "bbk-prompt-host-capability-truth",
+        "bbk-prompt-execution-autonomy",
+        "bbk-prompt-evidence-subject-identity",
+        "bbk-prompt-specialist-disposition",
+        "bbk-prompt-product-first-proportionality",
+        "bbk-prompt-assurance-modes"
       ],
       "return_contract": {
         "allowed_invocation_modes": [
@@ -977,11 +1079,30 @@
           "BLOCKED"
         ],
         "authority_boundary": "A valid `bbk.prototyper-return.v1` return establishes only the `bbk_prototyper`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+        "compact_result_fields": [
+          "hypothesis_and_alternatives",
+          "discrimination_assessment",
+          "observations_and_inferences",
+          "cleanup_and_residuals",
+          "blockers",
+          "experiment_artifact_ref"
+        ],
+        "compact_result_schema": "spec/schemas/role-results/bbk-prototyper-compact-result-v2.schema.json",
         "contract_id": "bbk.prototyper-return.v1",
         "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+        "full_detail_triggers": [
+          "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+          "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+          "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+          "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+          "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+          "The parent explicitly requested FULL detail.",
+          "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+        ],
         "readiness_rule": "Use `SUPPORTED_WITHIN_BOUNDARY`, `FALSIFIED_WITHIN_BOUNDARY`, or `ALTERNATIVES_DISCRIMINATED` only when the relevant run is valid, the declared criteria are met, and the evidence is bound to the exact subject, method, and environment. These states remain bounded experimental evidence and do not establish production readiness or acceptance.",
         "requirements": [
           "Return one `bbk.role-return.v1` object with `contract` = `bbk.prototyper-return.v1`, `role` = `bbk_prototyper`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `experiment_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
+          "The active experiment uses `bbk.prototype-charter.v2`; COMPACT contains the exact bounded minimum and FULL retains the complete apparatus/evaluation commitment. A host preflight result is capability evidence only and never authority.",
           "The Prototyper may invoke only `bbk_worker_designer` and `bbk_worker` under the current charter's fixed logical-child, concurrent-attempt, and retry or continuation limits. Worker Designer owns every new or materially changed child invocation contract; each Worker receives one exact experimental WorkUnit, may not delegate, and returns only to the Prototyper. The Prototyper remains the sole logical experiment owner. Exceeding or changing those limits, adding a child-role type, or requiring nested coordination yields `NEEDS_PARENT_RECHARTER`. Every other logical role need returns to the invoking semantic parent.",
           "The evaluation commitment must be fixed before outcome-bearing evidence is observed. A changed criterion or method becomes a recorded deviation or successor attempt; it does not silently replace the original charter.",
           "Use `SUPPORTED_WITHIN_BOUNDARY`, `FALSIFIED_WITHIN_BOUNDARY`, or `ALTERNATIVES_DISCRIMINATED` only when the relevant run is valid, the declared criteria are met, and the evidence is bound to the exact subject, method, and environment. These states remain bounded experimental evidence and do not establish production readiness or acceptance.",
@@ -1122,7 +1243,10 @@
             "CLEANUP_BLOCKED",
             "NOT_APPLICABLE"
           ]
-        }
+        },
+        "v2_contract_id": "bbk.prototyper-return.v2",
+        "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+        "v2_return_schema": "spec/schemas/role-returns/bbk-prototyper-return-v2.schema.json"
       },
       "scope": [
         "Own one current experiment charter and one logical prototype-attempt lineage: the exact uncertainty and parent decision informed, hypothesis and alternatives, preregistered discrimination or falsification criteria, authorized apparatus and mutation zones, fixtures and instrumentation, optional bounded child topology, fixed logical-child, concurrent-attempt, and retry or continuation limits, experimental WorkUnits, run inventory, evidence and interpretation, cleanup, artifact disposition, limitations, invalidation, and exact return.",
@@ -1226,7 +1350,9 @@
         "bbk-prompt-proportional-stop",
         "bbk-prompt-liveness-recovery",
         "bbk-prompt-evidence-lineage",
-        "bbk-prompt-planning-source-integrity"
+        "bbk-prompt-planning-source-integrity",
+        "bbk-prompt-user-attention",
+        "bbk-prompt-evidence-subject-identity"
       ],
       "return_contract": {
         "allowed_invocation_modes": [
@@ -1256,8 +1382,25 @@
           "BLOCKED"
         ],
         "authority_boundary": "A valid `bbk.question-guide-return.v1` return establishes only the `bbk_question_guide`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+        "compact_result_fields": [
+          "accepted_decision_packet",
+          "non_resolution_packet",
+          "continuation_state",
+          "blockers",
+          "residual_uncertainty"
+        ],
+        "compact_result_schema": "spec/schemas/role-results/bbk-question-guide-compact-result-v2.schema.json",
         "contract_id": "bbk.question-guide-return.v1",
         "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+        "full_detail_triggers": [
+          "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+          "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+          "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+          "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+          "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+          "The parent explicitly requested FULL detail.",
+          "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+        ],
         "readiness_rule": "`READY_FOR_QUESTIONING_WAYFINDER_VALIDATION` may be returned only when every current input, required role-owned output, blocking dependency, evidence carrier, cleanup obligation, invalidation condition, and durable handoff required by this contract has been reconciled. The state authorizes only the next parent integration or assessment step named by the role contract.",
         "requirements": [
           "Return one `bbk.role-return.v1` object with `contract` = `bbk.question-guide-return.v1`, `role` = `bbk_question_guide`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `guide_branch_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -1422,7 +1565,10 @@
             "CANCELLED",
             "SUPERSEDED"
           ]
-        }
+        },
+        "v2_contract_id": "bbk.question-guide-return.v2",
+        "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+        "v2_return_schema": "spec/schemas/role-returns/bbk-question-guide-return-v2.schema.json"
       },
       "scope": [
         "Own the attempt-local deep-exploration state for one exact logical Question Guide branch: the current decision frame, recommendation and proposal history, one-at-a-time controller requests, structured-response interpretation, exposure history, proportional pressure testing, stopping assessment, resumable checkpoint, and final result packet.",
@@ -1473,12 +1619,13 @@
       ],
       "inlined_skills": [
         {
-          "bytes": 8934,
+          "bytes": 9309,
           "name": "bbk-question-branch",
           "path": "shared/skills/bbk-question-branch/SKILL.md",
           "prompt_modules": [
             "bbk-prompt-invocation-binding",
             "bbk-prompt-planning-source-integrity",
+            "bbk-prompt-user-attention",
             "bbk-prompt-context-human-relay",
             "bbk-prompt-delegation-return",
             "bbk-prompt-durable-handoff",
@@ -1486,10 +1633,10 @@
             "bbk-prompt-state-claim-truth",
             "bbk-prompt-profile-qualification"
           ],
-          "sha256": "463d860c8a6cab873d439d07d5f68059c7060d211881396aa3e44f46ffc85e3f",
+          "sha256": "2f8b803ec58170ffdce1a2af38919233b5158c463c823c2cd792a35187aabcab",
           "source": "spec/method-content.json#skills/bbk-question-branch",
-          "template_bytes": 8996,
-          "template_sha256": "1a5339a2de7617c48f7a14e4888ba4ce98697fca09b6b4944e226da31cded75a"
+          "template_bytes": 9342,
+          "template_sha256": "508f0fd646a0a664e21b73d6f33024538261c812aa8e622824fce6c4ff8dabf2"
         }
       ],
       "mandatory_skills": [
@@ -1524,7 +1671,9 @@
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
         "bbk-prompt-liveness-recovery",
-        "bbk-prompt-planning-source-integrity"
+        "bbk-prompt-planning-source-integrity",
+        "bbk-prompt-user-attention",
+        "bbk-prompt-evidence-subject-identity"
       ],
       "return_contract": {
         "allowed_invocation_modes": [
@@ -1556,8 +1705,26 @@
           "BLOCKED"
         ],
         "authority_boundary": "A valid `bbk.questioning-wayfinder-return.v1` return establishes only the `bbk_questioning_wayfinder`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+        "compact_result_fields": [
+          "accepted_decision_refs",
+          "continuation_state",
+          "user_request_response_refs",
+          "blockers",
+          "requested_parent_actions",
+          "residual_uncertainty"
+        ],
+        "compact_result_schema": "spec/schemas/role-results/bbk-questioning-wayfinder-compact-result-v2.schema.json",
         "contract_id": "bbk.questioning-wayfinder-return.v1",
         "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+        "full_detail_triggers": [
+          "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+          "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+          "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+          "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+          "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+          "The parent explicitly requested FULL detail.",
+          "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+        ],
         "readiness_rule": "Use `READY_FOR_PARENT_INTEGRATION` only when every in-scope branch is resolved or explicitly non-resolved, accepted decisions have current authority and provenance, outstanding requests are closed or explicitly retained, invalidation is processed, and outward impacts are explicit.",
         "requirements": [
           "Return one `bbk.role-return.v1` object with `contract` = `bbk.questioning-wayfinder-return.v1`, `role` = `bbk_questioning_wayfinder`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `decision_cluster_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -1674,7 +1841,10 @@
         "result_schema": "spec/schemas/role-results/bbk-questioning-wayfinder-result-v1.schema.json",
         "return_schema": "spec/schemas/role-returns/bbk-questioning-wayfinder-return-v1.schema.json",
         "semantic_state_name": "decision_cluster_state",
-        "supplemental_enums": {}
+        "supplemental_enums": {},
+        "v2_contract_id": "bbk.questioning-wayfinder-return.v2",
+        "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+        "v2_return_schema": "spec/schemas/role-returns/bbk-questioning-wayfinder-return-v2.schema.json"
       },
       "scope": [
         "Own one exact semantic-parent decision cluster, including branch identity, priority, dependencies, authority mode, current recommendation, structured controller-request and response state, optional Question Guide lifecycle, invalidation, stopping assessment, and final decision or non-resolution packets.",
@@ -1719,22 +1889,24 @@
       "human_decision_triggers": [],
       "inlined_skills": [
         {
-          "bytes": 11828,
+          "bytes": 12036,
           "name": "bbk-research",
           "path": "shared/skills/bbk-research/SKILL.md",
           "prompt_modules": [
+            "bbk-prompt-evidence-subject-identity",
             "bbk-prompt-invocation-binding",
             "bbk-prompt-evidence-lineage",
             "bbk-prompt-proportional-stop",
             "bbk-prompt-durable-handoff",
             "bbk-prompt-state-claim-truth",
             "bbk-prompt-role-boundary",
-            "bbk-prompt-profile-qualification"
+            "bbk-prompt-profile-qualification",
+            "bbk-prompt-product-first-proportionality"
           ],
-          "sha256": "103bbc32379c9cd0738b243a062580427276bf9cbc222f3385a546010911f7cf",
+          "sha256": "a5ec90384bd82beb615280292d62c1efa165731bfeae490590fa96f5398e8584",
           "source": "spec/method-content.json#skills/bbk-research",
-          "template_bytes": 11972,
-          "template_sha256": "b87e7c97115021b2053368413bb5b0fd1291d69685d1eac15ec99b14180bb984"
+          "template_bytes": 12121,
+          "template_sha256": "08cedbf8e401c5edd49fb7bf9d6f84311b0a39a6afc945a93abc8a1998ad1fcb"
         }
       ],
       "mandatory_skills": [
@@ -1766,7 +1938,9 @@
         "bbk-prompt-state-claim-truth",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
-        "bbk-prompt-evidence-lineage"
+        "bbk-prompt-evidence-lineage",
+        "bbk-prompt-evidence-subject-identity",
+        "bbk-prompt-product-first-proportionality"
       ],
       "return_contract": {
         "allowed_invocation_modes": [
@@ -1797,8 +1971,26 @@
           "BLOCKED"
         ],
         "authority_boundary": "A valid `bbk.researcher-return.v1` return establishes only the `bbk_researcher`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+        "compact_result_fields": [
+          "answer_summary",
+          "claim_results",
+          "conflicts",
+          "unknowns_and_omissions",
+          "blockers",
+          "research_artifact_ref"
+        ],
+        "compact_result_schema": "spec/schemas/role-results/bbk-researcher-compact-result-v2.schema.json",
         "contract_id": "bbk.researcher-return.v1",
         "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+        "full_detail_triggers": [
+          "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+          "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+          "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+          "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+          "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+          "The parent explicitly requested FULL detail.",
+          "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+        ],
         "readiness_rule": "`ANSWERED` requires the declared decision-relevant evidence threshold to be met for every blocking claim. A successful search, a plausible inference, or one source does not establish `ANSWERED` by itself.",
         "requirements": [
           "Return one `bbk.role-return.v1` object with `contract` = `bbk.researcher-return.v1`, `role` = `bbk_researcher`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `research_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -1901,7 +2093,10 @@
             "UNKNOWN",
             "NOT_APPLICABLE"
           ]
-        }
+        },
+        "v2_contract_id": "bbk.researcher-return.v2",
+        "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+        "v2_return_schema": "spec/schemas/role-returns/bbk-researcher-return-v2.schema.json"
       },
       "scope": [
         "Own one exact root factual question and only the bounded subordinate factual claims needed to answer it, including the source strategy, query and exposure log, source inventory, claim-evidence mapping, temporal/version/jurisdiction boundaries, conflict and freshness state, unknowns and omissions, stopping assessment, and exact evidence return.",
@@ -1940,7 +2135,7 @@
       "human_decision_triggers": [],
       "inlined_skills": [
         {
-          "bytes": 12346,
+          "bytes": 12702,
           "name": "bbk-review",
           "path": "shared/skills/bbk-review/SKILL.md",
           "prompt_modules": [
@@ -1956,12 +2151,16 @@
             "bbk-prompt-durable-handoff",
             "bbk-prompt-handoff-protocol",
             "bbk-prompt-state-claim-truth",
-            "bbk-prompt-proportional-stop"
+            "bbk-prompt-proportional-stop",
+            "bbk-prompt-product-first-proportionality",
+            "bbk-prompt-mechanical-admission",
+            "bbk-prompt-assurance-modes",
+            "bbk-prompt-candidate-focused-review"
           ],
-          "sha256": "53072cd8301a1faa027b2bc7c94135311b7b7f5b55e9902cce067ad60c2b30bd",
+          "sha256": "1bba0801365b7d508317969ec7e15032fccd9f3422c8dcc34b78853be1bfc33e",
           "source": "spec/method-content.json#skills/bbk-review",
-          "template_bytes": 12153,
-          "template_sha256": "cdf2bc7115831b44991287429add431cfe4bfd240e33db8dd71aa7b7f2178cf6"
+          "template_bytes": 12392,
+          "template_sha256": "055d45cd76ba4555395895214c678a05387f835726f125c08cb043e612bc45c3"
         }
       ],
       "mandatory_skills": [
@@ -2000,7 +2199,12 @@
         "bbk-prompt-evidence-lineage",
         "bbk-prompt-evidence-receipts",
         "bbk-prompt-assurance-integrity",
-        "bbk-prompt-finding-lifecycle"
+        "bbk-prompt-finding-lifecycle",
+        "bbk-prompt-evidence-subject-identity",
+        "bbk-prompt-product-first-proportionality",
+        "bbk-prompt-mechanical-admission",
+        "bbk-prompt-assurance-modes",
+        "bbk-prompt-candidate-focused-review"
       ],
       "return_contract": {
         "allowed_invocation_modes": [
@@ -2041,8 +2245,26 @@
           "FAILED"
         ],
         "authority_boundary": "No Reviewer report, operational `COMPLETE`, `READY_FOR_PARENT_INTEGRATION`, `PASS`, `PASS_ADVISORY`, finding, disposition recommendation or verified handoff can mutate or repair the subject, author a binding FindingDisposition, waive an assertion, accept risk, approve a plan, architecture or candidate, establish campaign or territory completion, prove operational outcome achievement or grant release.",
+        "compact_result_fields": [
+          "review_assessment",
+          "immutable_findings",
+          "claims_not_established",
+          "recommended_dispositions_and_parent_actions",
+          "failure_and_blocker_classification",
+          "durable_artifact_and_handoff_refs"
+        ],
+        "compact_result_schema": "spec/schemas/role-results/bbk-reviewer-compact-result-v2.schema.json",
         "contract_id": "bbk.reviewer-return.v1",
         "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+        "full_detail_triggers": [
+          "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+          "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+          "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+          "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+          "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+          "The parent explicitly requested FULL detail.",
+          "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+        ],
         "readiness_rule": "Use `READY_FOR_PARENT_INTEGRATION` only when the exact subject and charter remain current; the review context is sufficient for every claimed conclusion; criteria and evidence exposure are fixed and recorded; every required in-scope question is evaluated or validly non-applicable; evidence carriers verify; independence facts and limitations are explicit; immutable findings and out-of-scope concerns are preserved; failure states are classified; cleanup is sufficient; and the exact report handoff verifies.",
         "requirements": [
           "Return one `bbk.role-return.v1` object with `contract` = `bbk.reviewer-return.v1`, `role` = `bbk_reviewer`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `review_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -2170,7 +2392,10 @@
             "ERROR",
             "STALE"
           ]
-        }
+        },
+        "v2_contract_id": "bbk.reviewer-return.v2",
+        "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+        "v2_return_schema": "spec/schemas/role-returns/bbk-reviewer-return-v2.schema.json"
       },
       "scope": [
         "Operate in one declared invocation mode. `DIRECT_BOUNDED_REVIEW` is invoked by the harness-root controller/Main or by an authorized Wayfinder, Planning Wayfinder, Phase Wayfinder, Root Orchestrator or Territory Orchestrator for one exact bounded judgment. `MANIFEST_ATTEMPT` is invoked by `bbk_validator_orchestrator` for one exact ReviewManifest assignment and ReviewContextManifest. Never silently switch mode or semantic parent.",
@@ -2226,27 +2451,34 @@
       "human_decision_triggers": [],
       "inlined_skills": [
         {
-          "bytes": 21463,
+          "bytes": 22049,
           "name": "bbk-root-execution",
           "path": "shared/skills/bbk-root-execution/SKILL.md",
           "prompt_modules": [
+            "bbk-prompt-execution-autonomy",
+            "bbk-prompt-baseline-transition",
             "bbk-prompt-role-boundary",
             "bbk-prompt-invocation-binding",
             "bbk-prompt-liveness-recovery",
             "bbk-prompt-host-capability-truth",
             "bbk-prompt-delegation-return",
+            "bbk-prompt-specialist-disposition",
             "bbk-prompt-candidate-integrity",
             "bbk-prompt-evidence-lineage",
             "bbk-prompt-state-claim-truth",
             "bbk-prompt-effects-cleanup",
             "bbk-prompt-durable-handoff",
             "bbk-prompt-handoff-protocol",
-            "bbk-prompt-proportional-stop"
+            "bbk-prompt-proportional-stop",
+            "bbk-prompt-product-first-proportionality",
+            "bbk-prompt-mechanical-admission",
+            "bbk-prompt-assurance-modes",
+            "bbk-prompt-candidate-focused-review"
           ],
-          "sha256": "7138d42c64bda7469282f07d288dd4d52e6a5057f4d560d36575c53502bd2ded",
+          "sha256": "ad1a036504a1245cacf97b608303934ca737ec9e319d3046d16598a1273dff0e",
           "source": "spec/method-content.json#skills/bbk-root-execution",
-          "template_bytes": 21249,
-          "template_sha256": "64b3f0c288a80da625f94fd3a14b78541263d462b39c6a986793bb6fe79d0b94"
+          "template_bytes": 21631,
+          "template_sha256": "4796e9c19bc9d01191d29712ff22e1f6ea752c90006bbad4369b8d0e55fd5449"
         }
       ],
       "mandatory_skills": [
@@ -2285,7 +2517,15 @@
         "bbk-prompt-effects-cleanup",
         "bbk-prompt-evidence-lineage",
         "bbk-prompt-candidate-integrity",
-        "bbk-prompt-host-capability-truth"
+        "bbk-prompt-host-capability-truth",
+        "bbk-prompt-execution-autonomy",
+        "bbk-prompt-baseline-transition",
+        "bbk-prompt-evidence-subject-identity",
+        "bbk-prompt-specialist-disposition",
+        "bbk-prompt-product-first-proportionality",
+        "bbk-prompt-mechanical-admission",
+        "bbk-prompt-assurance-modes",
+        "bbk-prompt-candidate-focused-review"
       ],
       "return_contract": {
         "allowed_invocation_modes": [
@@ -2324,8 +2564,26 @@
           "FAILED"
         ],
         "authority_boundary": "A valid `bbk.root-orchestrator-return.v1` return establishes only the `bbk_root_orchestrator`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+        "compact_result_fields": [
+          "campaign_state",
+          "candidate_inventory",
+          "completion_assessment",
+          "blockers_and_pauses",
+          "parent_actions_requested",
+          "residuals"
+        ],
+        "compact_result_schema": "spec/schemas/role-results/bbk-root-orchestrator-compact-result-v2.schema.json",
         "contract_id": "bbk.root-orchestrator-return.v1",
         "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+        "full_detail_triggers": [
+          "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+          "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+          "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+          "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+          "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+          "The parent explicitly requested FULL detail.",
+          "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+        ],
         "readiness_rule": "Use `READY_FOR_CONTROLLER_COMPLETION_ASSESSMENT` only when the exact accepted and authorized baselines remain current; every required TerritoryExecutionBoundary and cross-boundary integration obligation has a current terminal result; deterministic gates, candidate-bound validations, required operational observations and independent reviews are complete or explicitly non-applicable; all failed or inconclusive required assertions block; blocking findings have current evidenced dispositions; cleanup and external effects are reconciled; budgets and authority are accounted; no blocking invalidation, scope drift, ownership collision, untrusted evidence, or unresolved catastrophic-control condition remains; and every exact handoff verifies.",
         "requirements": [
           "Return one `bbk.role-return.v1` object with `contract` = `bbk.root-orchestrator-return.v1`, `role` = `bbk_root_orchestrator`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `root_execution_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -2480,7 +2738,10 @@
         "result_schema": "spec/schemas/role-results/bbk-root-orchestrator-result-v1.schema.json",
         "return_schema": "spec/schemas/role-returns/bbk-root-orchestrator-return-v1.schema.json",
         "semantic_state_name": "root_execution_state",
-        "supplemental_enums": {}
+        "supplemental_enums": {},
+        "v2_contract_id": "bbk.root-orchestrator-return.v2",
+        "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+        "v2_return_schema": "spec/schemas/role-returns/bbk-root-orchestrator-return-v2.schema.json"
       },
       "scope": [
         "Own the active root execution-campaign coordination state for one exact accepted operating baseline, compiled execution baseline, execution authorization, and canonical root semantic run. This includes TerritoryExecutionBoundary admission, global dependency and integration state, shared-resource and budget arbitration, authority and scope-fence propagation, direct-child coordination, durable execution signals, campaign-level candidate/evidence/finding lineage, recovery, and completion-readiness reporting.",
@@ -2546,24 +2807,31 @@
       ],
       "inlined_skills": [
         {
-          "bytes": 3849,
+          "bytes": 4432,
           "name": "bbk-wayfind",
           "path": "shared/skills/bbk-wayfind/SKILL.md",
           "prompt_modules": [
             "bbk-prompt-invocation-binding",
             "bbk-prompt-planning-source-integrity",
+            "bbk-prompt-user-attention",
+            "bbk-prompt-evidence-subject-identity",
             "bbk-prompt-delegation-return",
             "bbk-prompt-role-boundary",
             "bbk-prompt-proportional-stop",
+            "bbk-prompt-specialist-disposition",
+            "bbk-prompt-baseline-transition",
             "bbk-prompt-durable-handoff",
             "bbk-prompt-state-claim-truth",
             "bbk-prompt-profile-qualification",
-            "bbk-prompt-context-human-relay"
+            "bbk-prompt-context-human-relay",
+            "bbk-prompt-product-first-proportionality",
+            "bbk-prompt-mechanical-admission",
+            "bbk-prompt-assurance-modes"
           ],
-          "sha256": "8a127313323a4cb310e5e6aa474f35dbd3bd2129a8a7b05f2756e32928d4918d",
+          "sha256": "c3db435fe5c59b700d2255657da7e493d9c90419dbbff7b7a0cf3b1d217f0135",
           "source": "spec/method-content.json#skills/bbk-wayfind",
-          "template_bytes": 3882,
-          "template_sha256": "3e4c7374f60f5b9414685495cae78fd02222a416183b70102f587a676f796f6c"
+          "template_bytes": 4261,
+          "template_sha256": "ce4093e2ca37ba75bda496f27099301641e54e22a5d7810364d07201970b6289"
         }
       ],
       "mandatory_skills": [
@@ -2598,7 +2866,14 @@
         "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
-        "bbk-prompt-planning-source-integrity"
+        "bbk-prompt-planning-source-integrity",
+        "bbk-prompt-user-attention",
+        "bbk-prompt-baseline-transition",
+        "bbk-prompt-evidence-subject-identity",
+        "bbk-prompt-specialist-disposition",
+        "bbk-prompt-product-first-proportionality",
+        "bbk-prompt-mechanical-admission",
+        "bbk-prompt-assurance-modes"
       ],
       "return_contract": {
         "allowed_invocation_modes": [
@@ -2627,8 +2902,26 @@
           "BLOCKED"
         ],
         "authority_boundary": "A valid `bbk.root-wayfinder-return.v1` return establishes only the `bbk_root_wayfinder`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+        "compact_result_fields": [
+          "baseline_ref",
+          "work_graph_refs",
+          "blockers",
+          "outstanding_user_request_ids",
+          "recommended_next_root",
+          "residual_uncertainty"
+        ],
+        "compact_result_schema": "spec/schemas/role-results/bbk-root-wayfinder-compact-result-v2.schema.json",
         "contract_id": "bbk.root-wayfinder-return.v1",
         "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+        "full_detail_triggers": [
+          "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+          "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+          "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+          "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+          "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+          "The parent explicitly requested FULL detail.",
+          "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+        ],
         "readiness_rule": "`READY_TO_EXECUTE` may be returned only when every current input, required role-owned output, blocking dependency, evidence carrier, cleanup obligation, invalidation condition, and durable handoff required by this contract has been reconciled. The state authorizes only the next parent integration or assessment step named by the role contract.",
         "requirements": [
           "Return one `bbk.role-return.v1` object with `contract` = `bbk.root-wayfinder-return.v1`, `role` = `bbk_root_wayfinder`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `planning_readiness` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -2714,7 +3007,10 @@
         "result_schema": "spec/schemas/role-results/bbk-root-wayfinder-result-v1.schema.json",
         "return_schema": "spec/schemas/role-returns/bbk-root-wayfinder-return-v1.schema.json",
         "semantic_state_name": "planning_readiness",
-        "supplemental_enums": {}
+        "supplemental_enums": {},
+        "v2_contract_id": "bbk.root-wayfinder-return.v2",
+        "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+        "v2_return_schema": "spec/schemas/role-returns/bbk-root-wayfinder-return-v2.schema.json"
       },
       "scope": [
         "Own the root planning state, cross-territory boundaries and interfaces, decision posture, planning-artifact integration, baseline lifecycle, and final planning handoff from uncertain intent through controller-mediated acceptance of an executable operating baseline.",
@@ -2775,7 +3071,7 @@
       "human_decision_triggers": [],
       "inlined_skills": [
         {
-          "bytes": 13908,
+          "bytes": 14034,
           "name": "bbk-synthesize",
           "path": "shared/skills/bbk-synthesize/SKILL.md",
           "prompt_modules": [
@@ -2787,12 +3083,13 @@
             "bbk-prompt-role-boundary",
             "bbk-prompt-durable-handoff",
             "bbk-prompt-handoff-protocol",
-            "bbk-prompt-proportional-stop"
+            "bbk-prompt-proportional-stop",
+            "bbk-prompt-product-first-proportionality"
           ],
-          "sha256": "56d685b03cf22f1bc1024deec26b406ed5c1dfbb41b31b6d6f54157df8701016",
+          "sha256": "c2037ee08692e818fd229e74a57e00b1c481e704c426fba1bc80fc0cc87bf889",
           "source": "spec/method-content.json#skills/bbk-synthesize",
-          "template_bytes": 13896,
-          "template_sha256": "352f9f3f9047efb8e1d7d94b2efa2619064bec1185bb9a8908e772db460dae9e"
+          "template_bytes": 13992,
+          "template_sha256": "70828d8ca169f8f2440497796592b7eef680f34200fe6c20603f9bab6adcf0f4"
         }
       ],
       "mandatory_skills": [
@@ -2826,7 +3123,9 @@
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
         "bbk-prompt-evidence-lineage",
-        "bbk-prompt-planning-source-integrity"
+        "bbk-prompt-planning-source-integrity",
+        "bbk-prompt-evidence-subject-identity",
+        "bbk-prompt-product-first-proportionality"
       ],
       "return_contract": {
         "allowed_invocation_modes": [
@@ -2856,8 +3155,25 @@
           "BLOCKED"
         ],
         "authority_boundary": "A valid `bbk.synthesizer-return.v1` return establishes only the `bbk_synthesizer`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+        "compact_result_fields": [
+          "synthesis_packet",
+          "reconciliation_results",
+          "dissent_findings_and_uncertainty",
+          "blockers",
+          "synthesis_artifact_ref"
+        ],
+        "compact_result_schema": "spec/schemas/role-results/bbk-synthesizer-compact-result-v2.schema.json",
         "contract_id": "bbk.synthesizer-return.v1",
         "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+        "full_detail_triggers": [
+          "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+          "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+          "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+          "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+          "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+          "The parent explicitly requested FULL detail.",
+          "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+        ],
         "readiness_rule": "`READY_FOR_PARENT_INTEGRATION` may be returned only when every current input, required role-owned output, blocking dependency, evidence carrier, cleanup obligation, invalidation condition, and durable handoff required by this contract has been reconciled. The state authorizes only the next parent integration or assessment step named by the role contract.",
         "requirements": [
           "Return one `bbk.role-return.v1` object with `contract` = `bbk.synthesizer-return.v1`, `role` = `bbk_synthesizer`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `synthesis_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -2962,7 +3278,10 @@
         "result_schema": "spec/schemas/role-results/bbk-synthesizer-result-v1.schema.json",
         "return_schema": "spec/schemas/role-returns/bbk-synthesizer-return-v1.schema.json",
         "semantic_state_name": "synthesis_state",
-        "supplemental_enums": {}
+        "supplemental_enums": {},
+        "v2_contract_id": "bbk.synthesizer-return.v2",
+        "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+        "v2_return_schema": "spec/schemas/role-returns/bbk-synthesizer-return-v2.schema.json"
       },
       "scope": [
         "Own one exact synthesis charter and its declared source manifest, including source qualification, lifecycle and authority classification, normalization, duplicate and lineage reconciliation, contradiction exposure, bidirectional traceability, synthesis-artifact production, invalidation state, fidelity self-check, and exact return to the invoking semantic parent.",
@@ -3015,7 +3334,7 @@
       "human_decision_triggers": [],
       "inlined_skills": [
         {
-          "bytes": 25842,
+          "bytes": 26198,
           "name": "bbk-territory-execution",
           "path": "shared/skills/bbk-territory-execution/SKILL.md",
           "prompt_modules": [
@@ -3028,12 +3347,16 @@
             "bbk-prompt-candidate-integrity",
             "bbk-prompt-durable-handoff",
             "bbk-prompt-handoff-protocol",
-            "bbk-prompt-proportional-stop"
+            "bbk-prompt-proportional-stop",
+            "bbk-prompt-product-first-proportionality",
+            "bbk-prompt-mechanical-admission",
+            "bbk-prompt-assurance-modes",
+            "bbk-prompt-candidate-focused-review"
           ],
-          "sha256": "2d43d957b4b7902553957141e370f4c05a640f34441945735ebb69b18f5095d7",
+          "sha256": "0a8ae56e21c5a695de59883ca63cc787ae8261a2994f9ec36ca7ed8334c51bf8",
           "source": "spec/method-content.json#skills/bbk-territory-execution",
-          "template_bytes": 25757,
-          "template_sha256": "3b7f844a43908be14f4a57d5304b2492084fd6656598f73e497bc8ab646e6358"
+          "template_bytes": 25996,
+          "template_sha256": "04852670621f8f5adef5a5a2d12b8abaf4f057282d681f13f050c33cf4de0d31"
         }
       ],
       "mandatory_skills": [
@@ -3072,7 +3395,14 @@
         "bbk-prompt-effects-cleanup",
         "bbk-prompt-evidence-lineage",
         "bbk-prompt-candidate-integrity",
-        "bbk-prompt-host-capability-truth"
+        "bbk-prompt-host-capability-truth",
+        "bbk-prompt-execution-autonomy",
+        "bbk-prompt-evidence-subject-identity",
+        "bbk-prompt-specialist-disposition",
+        "bbk-prompt-product-first-proportionality",
+        "bbk-prompt-mechanical-admission",
+        "bbk-prompt-assurance-modes",
+        "bbk-prompt-candidate-focused-review"
       ],
       "return_contract": {
         "allowed_invocation_modes": [
@@ -3111,8 +3441,26 @@
           "FAILED"
         ],
         "authority_boundary": "A valid `bbk.territory-orchestrator-return.v1` return establishes only the `bbk_territory_orchestrator`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+        "compact_result_fields": [
+          "boundary_execution_state",
+          "candidate_and_quality_state",
+          "integration_state",
+          "residuals_and_blockers",
+          "parent_actions_requested",
+          "review_state"
+        ],
+        "compact_result_schema": "spec/schemas/role-results/bbk-territory-orchestrator-compact-result-v2.schema.json",
         "contract_id": "bbk.territory-orchestrator-return.v1",
         "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+        "full_detail_triggers": [
+          "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+          "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+          "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+          "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+          "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+          "The parent explicitly requested FULL detail.",
+          "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+        ],
         "readiness_rule": "Use `READY_FOR_ROOT_COMPLETION_ASSESSMENT` only when the exact boundary and governing sources remain current; every required WorkUnit and worker cohort has a qualified terminal result; local integration obligations are satisfied; required worker-quality gates, candidate-bound validations and independent reviews are complete or explicitly non-applicable; all blocking findings have evidenced dispositions; cleanup and external effects are reconciled; no blocking invalidation, ownership collision, scope drift, unauthorized effect, unresolved repair or catastrophic-control condition remains; and every exact handoff verifies.",
         "requirements": [
           "Return one `bbk.role-return.v1` object with `contract` = `bbk.territory-orchestrator-return.v1`, `role` = `bbk_territory_orchestrator`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `territory_execution_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -3247,7 +3595,10 @@
         "result_schema": "spec/schemas/role-results/bbk-territory-orchestrator-result-v1.schema.json",
         "return_schema": "spec/schemas/role-returns/bbk-territory-orchestrator-return-v1.schema.json",
         "semantic_state_name": "territory_execution_state",
-        "supplemental_enums": {}
+        "supplemental_enums": {},
+        "v2_contract_id": "bbk.territory-orchestrator-return.v2",
+        "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+        "v2_return_schema": "spec/schemas/role-returns/bbk-territory-orchestrator-return-v2.schema.json"
       },
       "scope": [
         "Own the active coordination state for one exact current `TerritoryExecutionBoundary`, which may map to one planning territory, several tightly coupled planning objects, or a dedicated integration responsibility. This includes boundary entry and resume eligibility, local WorkUnit and dependency state, Worker and Validator Orchestrator admission and sequencing, local workspace and resource arbitration, within-boundary integration obligations, candidate and validation lineage, findings and repair routing, bounded discovered work, direct-child recovery, cleanup and external-effect reconciliation, durable signals, and boundary completion-readiness reporting.",
@@ -3309,24 +3660,31 @@
       "human_decision_triggers": [],
       "inlined_skills": [
         {
-          "bytes": 3849,
+          "bytes": 4432,
           "name": "bbk-wayfind",
           "path": "shared/skills/bbk-wayfind/SKILL.md",
           "prompt_modules": [
             "bbk-prompt-invocation-binding",
             "bbk-prompt-planning-source-integrity",
+            "bbk-prompt-user-attention",
+            "bbk-prompt-evidence-subject-identity",
             "bbk-prompt-delegation-return",
             "bbk-prompt-role-boundary",
             "bbk-prompt-proportional-stop",
+            "bbk-prompt-specialist-disposition",
+            "bbk-prompt-baseline-transition",
             "bbk-prompt-durable-handoff",
             "bbk-prompt-state-claim-truth",
             "bbk-prompt-profile-qualification",
-            "bbk-prompt-context-human-relay"
+            "bbk-prompt-context-human-relay",
+            "bbk-prompt-product-first-proportionality",
+            "bbk-prompt-mechanical-admission",
+            "bbk-prompt-assurance-modes"
           ],
-          "sha256": "8a127313323a4cb310e5e6aa474f35dbd3bd2129a8a7b05f2756e32928d4918d",
+          "sha256": "c3db435fe5c59b700d2255657da7e493d9c90419dbbff7b7a0cf3b1d217f0135",
           "source": "spec/method-content.json#skills/bbk-wayfind",
-          "template_bytes": 3882,
-          "template_sha256": "3e4c7374f60f5b9414685495cae78fd02222a416183b70102f587a676f796f6c"
+          "template_bytes": 4261,
+          "template_sha256": "ce4093e2ca37ba75bda496f27099301641e54e22a5d7810364d07201970b6289"
         }
       ],
       "mandatory_skills": [
@@ -3360,7 +3718,14 @@
         "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
-        "bbk-prompt-planning-source-integrity"
+        "bbk-prompt-planning-source-integrity",
+        "bbk-prompt-user-attention",
+        "bbk-prompt-baseline-transition",
+        "bbk-prompt-evidence-subject-identity",
+        "bbk-prompt-specialist-disposition",
+        "bbk-prompt-product-first-proportionality",
+        "bbk-prompt-mechanical-admission",
+        "bbk-prompt-assurance-modes"
       ],
       "return_contract": {
         "allowed_invocation_modes": [
@@ -3390,8 +3755,26 @@
           "BLOCKED"
         ],
         "authority_boundary": "A valid `bbk.territory-wayfinder-return.v1` return establishes only the `bbk_territory_wayfinder`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+        "compact_result_fields": [
+          "territory_synthesis_ref",
+          "local_work_graph_refs",
+          "outward_impacts",
+          "blockers",
+          "parent_actions_requested",
+          "residual_uncertainty"
+        ],
+        "compact_result_schema": "spec/schemas/role-results/bbk-territory-wayfinder-compact-result-v2.schema.json",
         "contract_id": "bbk.territory-wayfinder-return.v1",
         "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+        "full_detail_triggers": [
+          "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+          "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+          "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+          "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+          "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+          "The parent explicitly requested FULL detail.",
+          "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+        ],
         "readiness_rule": "Use `READY_FOR_PARENT_INTEGRATION` only when no blocking internal frontier item remains, required child returns and governing sources are current, invalidation is resolved, boundary proposals and outward impacts are explicit, and residual uncertainty is proportionate.",
         "requirements": [
           "Return one `bbk.role-return.v1` object with `contract` = `bbk.territory-wayfinder-return.v1`, `role` = `bbk_territory_wayfinder`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `territory_readiness` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -3497,7 +3880,10 @@
         "result_schema": "spec/schemas/role-results/bbk-territory-wayfinder-result-v1.schema.json",
         "return_schema": "spec/schemas/role-returns/bbk-territory-wayfinder-return-v1.schema.json",
         "semantic_state_name": "territory_readiness",
-        "supplemental_enums": {}
+        "supplemental_enums": {},
+        "v2_contract_id": "bbk.territory-wayfinder-return.v2",
+        "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+        "v2_return_schema": "spec/schemas/role-returns/bbk-territory-wayfinder-return-v2.schema.json"
       },
       "scope": [
         "Own the current planning state and recursive subtree for one exact delegated territory, including its purpose, internal responsibilities and interfaces, inherited boundary contracts, proposed boundary changes, local decisions, dependencies, actionable frontier, blockers, residual fog, risks, invalidation state, and territory synthesis.",
@@ -3557,7 +3943,7 @@
       "human_decision_triggers": [],
       "inlined_skills": [
         {
-          "bytes": 13142,
+          "bytes": 13412,
           "name": "bbk-assertion-validation",
           "path": "shared/skills/bbk-assertion-validation/SKILL.md",
           "prompt_modules": [
@@ -3575,12 +3961,15 @@
             "bbk-prompt-handoff-protocol",
             "bbk-prompt-state-claim-truth",
             "bbk-prompt-host-capability-truth",
-            "bbk-prompt-proportional-stop"
+            "bbk-prompt-proportional-stop",
+            "bbk-prompt-mechanical-admission",
+            "bbk-prompt-assurance-modes",
+            "bbk-prompt-candidate-focused-review"
           ],
-          "sha256": "e7fbcaed68dcfb8a0acb28a59aeeffadfb03b715f62677d7c700252adc08b767",
+          "sha256": "2c35f109b4e3cac9861a9f9c6f5af5cd8a8668eb824e9dca9d4c205de533b890",
           "source": "spec/method-content.json#skills/bbk-assertion-validation",
-          "template_bytes": 12889,
-          "template_sha256": "3923e5ff5f1ebbfe0d061635c4e01ed61ba078e9cb0ab24dc8b2ddb53663522d"
+          "template_bytes": 13071,
+          "template_sha256": "a39c5f967d4ab5d0a5b102497545a7052f31bc4d437d03010157582f77ce660c"
         }
       ],
       "mandatory_skills": [
@@ -3620,7 +4009,12 @@
         "bbk-prompt-assurance-integrity",
         "bbk-prompt-finding-lifecycle",
         "bbk-prompt-candidate-integrity",
-        "bbk-prompt-host-capability-truth"
+        "bbk-prompt-host-capability-truth",
+        "bbk-prompt-evidence-subject-identity",
+        "bbk-prompt-product-first-proportionality",
+        "bbk-prompt-mechanical-admission",
+        "bbk-prompt-assurance-modes",
+        "bbk-prompt-candidate-focused-review"
       ],
       "return_contract": {
         "allowed_invocation_modes": [
@@ -3659,8 +4053,26 @@
           "FAILED"
         ],
         "authority_boundary": "No Validator return, including operational `COMPLETE`, assertion `PASS`, or `READY_FOR_ORCHESTRATOR_INTEGRATION`, can derive the complete ReviewAggregate, close or waive a finding, authorize repair, accept a candidate or residual risk, close an issue, complete a territory or campaign, establish outcome achievement, declare compliance, safety or security, or grant release.",
+        "compact_result_fields": [
+          "subject_candidate_and_immutability",
+          "assertion_evaluations",
+          "findings_and_nonfinding_states",
+          "claims_established_and_not_established",
+          "attempt_completion_state",
+          "durable_artifacts_and_handoff"
+        ],
+        "compact_result_schema": "spec/schemas/role-results/bbk-validator-compact-result-v2.schema.json",
         "contract_id": "bbk.validator-return.v1",
         "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+        "full_detail_triggers": [
+          "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+          "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+          "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+          "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+          "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+          "The parent explicitly requested FULL detail.",
+          "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+        ],
         "readiness_rule": "`READY_FOR_ORCHESTRATOR_INTEGRATION` requires an exact current candidate and assignment; verified immutable subject and context; every assigned assertion represented by a current schema-valid status; required evidence and raw carriers bound or explicit non-evidence states recorded; actual independence and exposure reported; candidate defects represented by immutable findings and infrastructure failures kept separate; no unauthorized candidate mutation, hidden scope expansion, silent method substitution, unresolved identity or integrity ambiguity, or unaccounted external effect; cleanup sufficiently reconciled; and a verified durable result and handoff. It authorizes only Validator-Orchestrator integration of this one attempt.",
         "requirements": [
           "Return one `bbk.role-return.v1` object with `contract` = `bbk.validator-return.v1`, `role` = `bbk_validator`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `validator_attempt_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -3819,7 +4231,10 @@
             "FULL",
             "NOT_APPLICABLE"
           ]
-        }
+        },
+        "v2_contract_id": "bbk.validator-return.v2",
+        "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+        "v2_return_schema": "spec/schemas/role-returns/bbk-validator-return-v2.schema.json"
       },
       "scope": [
         "Own one exact Validator attempt under one current `bbk_validator_orchestrator` assignment: one immutable candidate, one bounded non-overlapping assertion set, one declared method and environment envelope, one exact context pack, one criteria-and-exposure state, and one structured attempt result. The Validator Orchestrator remains the semantic parent and owns candidate admission, assignment partition, deterministic context compilation, evaluator coordination, retry or replacement, central non-averaging aggregation, repair and revalidation routing, and final assurance reporting.",
@@ -3874,7 +4289,7 @@
       "human_decision_triggers": [],
       "inlined_skills": [
         {
-          "bytes": 20928,
+          "bytes": 21198,
           "name": "bbk-validation-orchestration",
           "path": "shared/skills/bbk-validation-orchestration/SKILL.md",
           "prompt_modules": [
@@ -3894,12 +4309,15 @@
             "bbk-prompt-effects-cleanup",
             "bbk-prompt-durable-handoff",
             "bbk-prompt-handoff-protocol",
-            "bbk-prompt-proportional-stop"
+            "bbk-prompt-proportional-stop",
+            "bbk-prompt-mechanical-admission",
+            "bbk-prompt-assurance-modes",
+            "bbk-prompt-candidate-focused-review"
           ],
-          "sha256": "981774f4752835f4aef16ed6b5e4385ac8a1469845116ba98659dba169582ebd",
+          "sha256": "6560ecbfcd466c74061554d0ca72b7e2026a329b37c5347824fab9e731c8d900",
           "source": "spec/method-content.json#skills/bbk-validation-orchestration",
-          "template_bytes": 20497,
-          "template_sha256": "1f1b1473d5159fb5aa84be81200f931a7035e9d22f2a9e18a028c47297bea47b"
+          "template_bytes": 20679,
+          "template_sha256": "5879caf2c928a40c76903b72897598b119e87488d9eed00e36a76664dc093343"
         }
       ],
       "mandatory_skills": [
@@ -3940,7 +4358,13 @@
         "bbk-prompt-assurance-integrity",
         "bbk-prompt-finding-lifecycle",
         "bbk-prompt-candidate-integrity",
-        "bbk-prompt-host-capability-truth"
+        "bbk-prompt-host-capability-truth",
+        "bbk-prompt-evidence-subject-identity",
+        "bbk-prompt-specialist-disposition",
+        "bbk-prompt-product-first-proportionality",
+        "bbk-prompt-mechanical-admission",
+        "bbk-prompt-assurance-modes",
+        "bbk-prompt-candidate-focused-review"
       ],
       "return_contract": {
         "allowed_invocation_modes": [
@@ -3987,8 +4411,26 @@
           "FAILED"
         ],
         "authority_boundary": "A valid `bbk.validator-orchestrator-return.v1` return establishes only the `bbk_validator_orchestrator`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+        "compact_result_fields": [
+          "subject_candidate_and_eligibility",
+          "evidence_and_assertion_evaluation_state",
+          "findings_and_dispositions_state",
+          "aggregate_result",
+          "repair_and_revalidation_scope",
+          "parent_actions_and_recommended_route"
+        ],
+        "compact_result_schema": "spec/schemas/role-results/bbk-validator-orchestrator-compact-result-v2.schema.json",
         "contract_id": "bbk.validator-orchestrator-return.v1",
         "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+        "full_detail_triggers": [
+          "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+          "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+          "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+          "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+          "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+          "The parent explicitly requested FULL detail.",
+          "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+        ],
         "readiness_rule": "Use `READY_FOR_PARENT_ASSURANCE_ASSESSMENT` only when the exact candidate and manifest remain current and verified; required prerequisite eligibility evidence is current; the AssuranceContract, ReviewManifest and ReviewContextManifest are current; every required primary assignment and required complementary assignment is completed or explicitly and validly non-applicable; every evidence carrier verifies; infrastructure and context states are classified; immutable findings and current external dispositions are preserved; the central non-averaging aggregate verifies; repair and revalidation implications are explicit; and the exact assurance-report handoff verifies.",
         "requirements": [
           "Return one `bbk.role-return.v1` object with `contract` = `bbk.validator-orchestrator-return.v1`, `role` = `bbk_validator_orchestrator`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `validation_run_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -4125,7 +4567,10 @@
             "CANCELLED",
             "STALE"
           ]
-        }
+        },
+        "v2_contract_id": "bbk.validator-orchestrator-return.v2",
+        "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+        "v2_return_schema": "spec/schemas/role-returns/bbk-validator-orchestrator-return-v2.schema.json"
       },
       "scope": [
         "Own one exact candidate-bound assurance program in one declared invocation mode. In `TERRITORY_BOUND` mode, `bbk_territory_orchestrator` is the semantic parent and owns candidate admission, repair routing and territory completion assessment. In `CONTROLLER_ROOT` mode, the harness-root controller/Main invokes this role directly for a bounded assertion-scoped candidate-assurance request and receives the report; absent campaign, boundary or Worker-cohort objects are explicitly not applicable rather than fabricated, and Main selects any later planning or execution root.",
@@ -4182,7 +4627,7 @@
       "human_decision_triggers": [],
       "inlined_skills": [
         {
-          "bytes": 19883,
+          "bytes": 20239,
           "name": "bbk-verification-design",
           "path": "shared/skills/bbk-verification-design/SKILL.md",
           "prompt_modules": [
@@ -4199,12 +4644,16 @@
             "bbk-prompt-proportional-stop",
             "bbk-prompt-durable-handoff",
             "bbk-prompt-handoff-protocol",
-            "bbk-prompt-state-claim-truth"
+            "bbk-prompt-state-claim-truth",
+            "bbk-prompt-product-first-proportionality",
+            "bbk-prompt-mechanical-admission",
+            "bbk-prompt-assurance-modes",
+            "bbk-prompt-candidate-focused-review"
           ],
-          "sha256": "a8698f3a59c6605a653b897b247be23908af885bc3b013fe8a2a837332d3ffed",
+          "sha256": "2c750951c3f5766e34b8364d806bfa577dc667edbe29cd146c9ddfdbf6c144a8",
           "source": "spec/method-content.json#skills/bbk-verification-design",
-          "template_bytes": 19825,
-          "template_sha256": "29d6fdaec53f848f856510955cb6c3bf6fbb8b1370ddaffe629a2fc703b7d713"
+          "template_bytes": 20064,
+          "template_sha256": "ee218a5667b16905b69c52d79f7210a9aa56a36b955bd95ed7b405d028569eec"
         }
       ],
       "mandatory_skills": [
@@ -4244,7 +4693,12 @@
         "bbk-prompt-finding-lifecycle",
         "bbk-prompt-candidate-integrity",
         "bbk-prompt-planning-source-integrity",
-        "bbk-prompt-host-capability-truth"
+        "bbk-prompt-host-capability-truth",
+        "bbk-prompt-evidence-subject-identity",
+        "bbk-prompt-product-first-proportionality",
+        "bbk-prompt-mechanical-admission",
+        "bbk-prompt-assurance-modes",
+        "bbk-prompt-candidate-focused-review"
       ],
       "return_contract": {
         "allowed_invocation_modes": [
@@ -4280,8 +4734,26 @@
           "BLOCKED"
         ],
         "authority_boundary": "A valid `bbk.verification-designer-return.v1` return establishes only the `bbk_verification_designer`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+        "compact_result_fields": [
+          "assurance_contract_ref",
+          "assertion_refs",
+          "method_and_evidence_state",
+          "repair_and_revalidation_policy",
+          "blockers",
+          "parent_actions_requested"
+        ],
+        "compact_result_schema": "spec/schemas/role-results/bbk-verification-designer-compact-result-v2.schema.json",
         "contract_id": "bbk.verification-designer-return.v1",
         "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+        "full_detail_triggers": [
+          "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+          "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+          "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+          "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+          "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+          "The parent explicitly requested FULL detail.",
+          "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+        ],
         "readiness_rule": "Use `READY_FOR_PARENT_INTEGRATION` only when the current charter and governing sources support a coherent, traceable, proportional AssuranceContract; all material claims have observable assertions or explicit dispositions; methods, evidence, environments, gates, protected floors, independence, reuse, repair, and invalidation are explicit; current schema limits are preserved; required parent-owned work-graph bindings are either current or clearly declared as the next integration obligation; and exact durable artifacts verify.",
         "requirements": [
           "Return one `bbk.role-return.v1` object with `contract` = `bbk.verification-designer-return.v1`, `role` = `bbk_verification_designer`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `assurance_design_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -4445,7 +4917,10 @@
         "result_schema": "spec/schemas/role-results/bbk-verification-designer-result-v1.schema.json",
         "return_schema": "spec/schemas/role-returns/bbk-verification-designer-return-v1.schema.json",
         "semantic_state_name": "assurance_design_state",
-        "supplemental_enums": {}
+        "supplemental_enums": {},
+        "v2_contract_id": "bbk.verification-designer-return.v2",
+        "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+        "v2_return_schema": "spec/schemas/role-returns/bbk-verification-designer-return-v2.schema.json"
       },
       "scope": [
         "Own one exact verification charter and its versioned AssuranceContract proposal or successor, including governing-source qualification, claim inventory, risk and protected-floor treatment, assertions, methods, evidence requirements, environments, gate placement, subject and candidate binding, independence and exposure, evidence reuse, repair and revalidation, traceability, self-check, invalidation, and exact return to the invoking semantic parent.",
@@ -4493,7 +4968,7 @@
       "human_decision_triggers": [],
       "inlined_skills": [
         {
-          "bytes": 15086,
+          "bytes": 15442,
           "name": "bbk-work-unit-execution",
           "path": "shared/skills/bbk-work-unit-execution/SKILL.md",
           "prompt_modules": [
@@ -4506,12 +4981,16 @@
             "bbk-prompt-durable-handoff",
             "bbk-prompt-handoff-protocol",
             "bbk-prompt-state-claim-truth",
-            "bbk-prompt-proportional-stop"
+            "bbk-prompt-proportional-stop",
+            "bbk-prompt-product-first-proportionality",
+            "bbk-prompt-mechanical-admission",
+            "bbk-prompt-assurance-modes",
+            "bbk-prompt-candidate-focused-review"
           ],
-          "sha256": "ada691ce5cfff19aa710788ba74641c084fb0678fd602aada91b89346d6be51a",
+          "sha256": "3b3ff8fd6dc9b401d9955e6751777e954c649ef3f8c959f59ffdfa8a143688bc",
           "source": "spec/method-content.json#skills/bbk-work-unit-execution",
-          "template_bytes": 15117,
-          "template_sha256": "53d21a1898fe5fef732b601ac74eed8f6c08f3ff00cd16cf68a99574e1280cf2"
+          "template_bytes": 15356,
+          "template_sha256": "592da40d9b67a0f547321a6f416a04f3b77129612d781a870002cfa20c911170"
         }
       ],
       "mandatory_skills": [
@@ -4549,7 +5028,13 @@
         "bbk-prompt-effects-cleanup",
         "bbk-prompt-evidence-lineage",
         "bbk-prompt-candidate-integrity",
-        "bbk-prompt-host-capability-truth"
+        "bbk-prompt-host-capability-truth",
+        "bbk-prompt-execution-autonomy",
+        "bbk-prompt-evidence-subject-identity",
+        "bbk-prompt-product-first-proportionality",
+        "bbk-prompt-mechanical-admission",
+        "bbk-prompt-assurance-modes",
+        "bbk-prompt-candidate-focused-review"
       ],
       "return_contract": {
         "allowed_invocation_modes": [
@@ -4587,8 +5072,26 @@
           "FAILED"
         ],
         "authority_boundary": "No Worker return, including operational `COMPLETE` or `READY_FOR_PARENT_INTEGRATION`, can freeze or accept a candidate, conclude a prototype, establish independent assertion satisfaction, close a finding or issue, accept risk, complete a territory or campaign, authorize deployment or publication, or grant release.",
+        "compact_result_fields": [
+          "work_unit_ref",
+          "changed_artifacts",
+          "checks_and_evidence",
+          "claims_established_and_not_established",
+          "cleanup_and_residuals",
+          "blockers"
+        ],
+        "compact_result_schema": "spec/schemas/role-results/bbk-worker-compact-result-v2.schema.json",
         "contract_id": "bbk.worker-return.v1",
         "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+        "full_detail_triggers": [
+          "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+          "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+          "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+          "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+          "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+          "The parent explicitly requested FULL detail.",
+          "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+        ],
         "readiness_rule": "`READY_FOR_PARENT_INTEGRATION` requires current governing sources and invocation; complete assigned outputs; exact in-scope artifact and effect accounting; satisfied or explicitly non-applicable WorkUnit completion checks; no silent substitution, unauthorized effect, ownership collision, unresolved governing decision, required capability gap, ambiguous cleanup, or stale checkpoint; and a verified durable result and handoff. It authorizes only parent inspection and integration of the contribution.",
         "requirements": [
           "Return one `bbk.role-return.v1` object with `contract` = `bbk.worker-result.v1`, `role` = `bbk_worker`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `work_unit_execution_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -4697,7 +5200,10 @@
             "CLEANUP_BLOCKED",
             "NOT_APPLICABLE"
           ]
-        }
+        },
+        "v2_contract_id": "bbk.worker-return.v2",
+        "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+        "v2_return_schema": "spec/schemas/role-returns/bbk-worker-return-v2.schema.json"
       },
       "scope": [
         "Own one exact WorkUnit execution attempt and only the subject, fixed decisions, delegated implementation freedom, workspace, mutation and external-effect surfaces, profiles, procedures, tools, focused checks, continuation, cleanup, result, and handoff bound by its current Worker invocation contract.",
@@ -4745,10 +5251,11 @@
       "human_decision_triggers": [],
       "inlined_skills": [
         {
-          "bytes": 17708,
+          "bytes": 18139,
           "name": "bbk-worker-design",
           "path": "shared/skills/bbk-worker-design/SKILL.md",
           "prompt_modules": [
+            "bbk-prompt-execution-autonomy",
             "bbk-prompt-role-boundary",
             "bbk-prompt-invocation-binding",
             "bbk-prompt-planning-source-integrity",
@@ -4762,12 +5269,16 @@
             "bbk-prompt-handoff-protocol",
             "bbk-prompt-host-capability-truth",
             "bbk-prompt-proportional-stop",
-            "bbk-prompt-state-claim-truth"
+            "bbk-prompt-state-claim-truth",
+            "bbk-prompt-product-first-proportionality",
+            "bbk-prompt-mechanical-admission",
+            "bbk-prompt-assurance-modes",
+            "bbk-prompt-candidate-focused-review"
           ],
-          "sha256": "0e46b1df88bb71dcfe21660ea0285c556e6ff0f457939812320ca0a6edf5d327",
+          "sha256": "62e4ea0d871853446401eb61c6c62a9c3eb1dd890781d06726e536df4d4dc103",
           "source": "spec/method-content.json#skills/bbk-worker-design",
-          "template_bytes": 17506,
-          "template_sha256": "b8f56a1d8e4e492346c88557c272f99648ccecc52be7afc436313630eed4719a"
+          "template_bytes": 17791,
+          "template_sha256": "1b302aaf4a26bb9fef0b450f3f6e0b2ddb60a2036585640405c591dadc5224af"
         }
       ],
       "mandatory_skills": [
@@ -4806,7 +5317,13 @@
         "bbk-prompt-effects-cleanup",
         "bbk-prompt-assurance-integrity",
         "bbk-prompt-planning-source-integrity",
-        "bbk-prompt-host-capability-truth"
+        "bbk-prompt-host-capability-truth",
+        "bbk-prompt-execution-autonomy",
+        "bbk-prompt-evidence-subject-identity",
+        "bbk-prompt-product-first-proportionality",
+        "bbk-prompt-mechanical-admission",
+        "bbk-prompt-assurance-modes",
+        "bbk-prompt-candidate-focused-review"
       ],
       "return_contract": {
         "allowed_invocation_modes": [
@@ -4841,8 +5358,26 @@
           "BLOCKED"
         ],
         "authority_boundary": "A valid `bbk.worker-designer-return.v1` return establishes only the `bbk_worker_designer`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+        "compact_result_fields": [
+          "worker_invocation_contract_ref",
+          "context_manifest_ref",
+          "effective_capability_envelope",
+          "preflight_and_qualification",
+          "blockers",
+          "parent_actions_requested"
+        ],
+        "compact_result_schema": "spec/schemas/role-results/bbk-worker-designer-compact-result-v2.schema.json",
         "contract_id": "bbk.worker-designer-return.v1",
         "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+        "full_detail_triggers": [
+          "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+          "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+          "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+          "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+          "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+          "The parent explicitly requested FULL detail.",
+          "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+        ],
         "readiness_rule": "`READY_FOR_PARENT_INTEGRATION` may be returned only when every current input, required role-owned output, blocking dependency, evidence carrier, cleanup obligation, invalidation condition, and durable handoff required by this contract has been reconciled. The state authorizes only the next parent integration or assessment step named by the role contract.",
         "requirements": [
           "Return one `bbk.role-return.v1` object with `contract` = `bbk.worker-designer-return.v1`, `role` = `bbk_worker_designer`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `invocation_design_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -5028,7 +5563,10 @@
         "result_schema": "spec/schemas/role-results/bbk-worker-designer-result-v1.schema.json",
         "return_schema": "spec/schemas/role-returns/bbk-worker-designer-return-v1.schema.json",
         "semantic_state_name": "invocation_design_state",
-        "supplemental_enums": {}
+        "supplemental_enums": {},
+        "v2_contract_id": "bbk.worker-designer-return.v2",
+        "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+        "v2_return_schema": "spec/schemas/role-returns/bbk-worker-designer-return-v2.schema.json"
       },
       "scope": [
         "Own one exact Worker Designer charter and its host-neutral effective Worker invocation contract or explicitly requested reusable template, including semantic-input qualification, logical-role binding, model routing and qualification, task and domain profile resolution, instruction and skill composition, context manifest, authority intersection, capability envelope, workspace and isolation requirements, tool and environment manifest, assurance and gate bindings, runtime and continuation policy, result and cleanup contract, host-projection requirements, static preflight, invalidation, and exact return to the invoking semantic parent.",
@@ -5076,10 +5614,11 @@
       "human_decision_triggers": [],
       "inlined_skills": [
         {
-          "bytes": 18335,
+          "bytes": 18766,
           "name": "bbk-worker-execution",
           "path": "shared/skills/bbk-worker-execution/SKILL.md",
           "prompt_modules": [
+            "bbk-prompt-execution-autonomy",
             "bbk-prompt-role-boundary",
             "bbk-prompt-invocation-binding",
             "bbk-prompt-liveness-recovery",
@@ -5092,12 +5631,16 @@
             "bbk-prompt-assurance-integrity",
             "bbk-prompt-effects-cleanup",
             "bbk-prompt-state-claim-truth",
-            "bbk-prompt-proportional-stop"
+            "bbk-prompt-proportional-stop",
+            "bbk-prompt-product-first-proportionality",
+            "bbk-prompt-mechanical-admission",
+            "bbk-prompt-assurance-modes",
+            "bbk-prompt-candidate-focused-review"
           ],
-          "sha256": "515a88280679f9a5ac1506ff35bfb85260ba5741fb57440bbb4f3829c5018354",
+          "sha256": "8f669223feaea5e92cfa38b44b17c9c70a4e0f6ddd0c1bfd108eba8d7097cbdb",
           "source": "spec/method-content.json#skills/bbk-worker-execution",
-          "template_bytes": 18225,
-          "template_sha256": "7e927c16a681dbc8afb06f2ea619bd6a484330608d1dcd060023f7006b2d6057"
+          "template_bytes": 18510,
+          "template_sha256": "6c7eb96a44d1b746d1f8ceae46b265b2c6ac65406b40ef8c660b1a15f1605346"
         }
       ],
       "mandatory_skills": [
@@ -5137,7 +5680,14 @@
         "bbk-prompt-evidence-lineage",
         "bbk-prompt-assurance-integrity",
         "bbk-prompt-candidate-integrity",
-        "bbk-prompt-host-capability-truth"
+        "bbk-prompt-host-capability-truth",
+        "bbk-prompt-execution-autonomy",
+        "bbk-prompt-evidence-subject-identity",
+        "bbk-prompt-specialist-disposition",
+        "bbk-prompt-product-first-proportionality",
+        "bbk-prompt-mechanical-admission",
+        "bbk-prompt-assurance-modes",
+        "bbk-prompt-candidate-focused-review"
       ],
       "return_contract": {
         "allowed_invocation_modes": [
@@ -5182,8 +5732,26 @@
           "FAILED"
         ],
         "authority_boundary": "A valid `bbk.worker-orchestrator-return.v1` return establishes only the `bbk_worker_orchestrator`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+        "compact_result_fields": [
+          "work_unit_and_batch_state",
+          "candidate_lineage",
+          "quality_gate_and_attestation_state",
+          "residuals_and_blockers",
+          "parent_actions_requested",
+          "repair_and_revalidation_state"
+        ],
+        "compact_result_schema": "spec/schemas/role-results/bbk-worker-orchestrator-compact-result-v2.schema.json",
         "contract_id": "bbk.worker-orchestrator-return.v1",
         "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+        "full_detail_triggers": [
+          "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+          "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+          "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+          "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+          "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+          "The parent explicitly requested FULL detail.",
+          "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+        ],
         "readiness_rule": "Use `READY_FOR_TERRITORY_VALIDATION_ADMISSION` only when cohort membership and validation meaning remain current; every admitted WorkUnit has a qualified result or explicit non-blocking disposition; draft reconciliation and integration are complete; no ordinary mutation remains expected; the exact candidate and manifest verify; all applicable blocking final worker-quality gates ran check-only and passed; the current candidate-bound attestation and every evidence carrier verify; cleanup and external effects are sufficiently reconciled for validation; and the exact handoff verifies.",
         "requirements": [
           "Return one `bbk.role-return.v1` object with `contract` = `bbk.worker-orchestrator-return.v1`, `role` = `bbk_worker_orchestrator`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `worker_cohort_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -5299,7 +5867,10 @@
         "result_schema": "spec/schemas/role-results/bbk-worker-orchestrator-result-v1.schema.json",
         "return_schema": "spec/schemas/role-returns/bbk-worker-orchestrator-return-v1.schema.json",
         "semantic_state_name": "worker_cohort_state",
-        "supplemental_enums": {}
+        "supplemental_enums": {},
+        "v2_contract_id": "bbk.worker-orchestrator-return.v2",
+        "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+        "v2_return_schema": "spec/schemas/role-returns/bbk-worker-orchestrator-return-v2.schema.json"
       },
       "scope": [
         "Own one exact current candidate-producing Worker cohort—or the Worker-production portion of a `candidate-producing Worker cohort`—admitted by `bbk_territory_orchestrator`, including cohort entry and resume eligibility, fixed WorkUnit membership, direct Worker admission and supervision, cohort-local workspaces and mutation ownership within the granted territory envelope, draft reconciliation, focused iterative checks, bounded local-discovery handling, exact candidate freeze, candidate manifest, candidate-bound worker-quality gate execution and attestation, scoped repair, successor-candidate lineage, cleanup, recovery, and exact return to the Territory Orchestrator.",
@@ -5326,85 +5897,86 @@
     }
   },
   "contract_package": "spec/contracts/catalog.json",
+  "default_role_return_version": "v2",
   "files": {
-    "projections/claude/agents/bbk-architect.md": "0bdf0b6a29b26992765840e82fba8949f450d961b238fc4980fba04fb271e710",
-    "projections/claude/agents/bbk-phase-wayfinder.md": "0b5de34d5e9528eab007fdce502bcfa57fd8eadf0e757c080ab8e078212da9ac",
-    "projections/claude/agents/bbk-planning-wayfinder.md": "73aa4cbea118f6ec75c873ed7b1fa4fea047e32d64898cba6be2ba2d52727df0",
-    "projections/claude/agents/bbk-prototyper.md": "1ef2cfc44afdc536dc4929bae74f48285e7209554f2a12a79be7e8ee7f8f38c1",
-    "projections/claude/agents/bbk-question-guide.md": "f6424b0b775e7d7760d55ef661a48c252d36a5a098d953ae1d232f9bff3ab199",
-    "projections/claude/agents/bbk-questioning-wayfinder.md": "80640c0770d838001a1ab6c5df4f99a07377497332f705945781ce7c9ce91f0e",
-    "projections/claude/agents/bbk-researcher.md": "437b310493430bdbb95034d4acc70784d5371de254114275b3670737c37efa4e",
-    "projections/claude/agents/bbk-reviewer.md": "3b8389628472813474dcd0d770f83792d156c4f935a87228c601a5c3c557cd8a",
-    "projections/claude/agents/bbk-root-orchestrator.md": "e6b6360eae5ecf32e29750b508d1b6af3549cb23d30eedefb63dce7f25eea0ae",
-    "projections/claude/agents/bbk-root-wayfinder.md": "033becfe5d492083ad9c9843a235369f9edab757d921487e224ab70bd2f7f192",
-    "projections/claude/agents/bbk-synthesizer.md": "53f732376dc4f46e9e6ce6ec6a138c32d07e68928c475601705e22b8fd52fdf3",
-    "projections/claude/agents/bbk-territory-orchestrator.md": "d203514ff1f2e875019332f79445daaa9dc068e9837d8117952d66bb3fd3cd69",
-    "projections/claude/agents/bbk-territory-wayfinder.md": "16be596dbed5fbb217a8754e1e2ea69e623675ea7e6b6672a12ce02dabc1ff36",
-    "projections/claude/agents/bbk-validator-orchestrator.md": "4d18174d7f79f8eb06bb68edb6c4e502f6b1f754a3700a69fb91f08c205bfc31",
-    "projections/claude/agents/bbk-validator.md": "8fff37214d393be5138478d86643ee88c2192c319f3e41e05d1fb0f7ae494f0f",
-    "projections/claude/agents/bbk-verification-designer.md": "e6e2056828c6171ea77618f42a2ba1368ed641f971869a1a89507acfe39f7163",
-    "projections/claude/agents/bbk-worker-designer.md": "833497bc6cbb496eba3ef2245e582472692b149f15f809b317b7832c555b514a",
-    "projections/claude/agents/bbk-worker-orchestrator.md": "03de3874e73e9f52289048205b22c9d8276d58119fd80395162f8852bd78bae3",
-    "projections/claude/agents/bbk-worker.md": "77ae5514da2db0eceb071f6b1e2f760fbac6c946507fc7e8a4299ec55c8b9b4c",
-    "projections/codex/agents/bbk_architect.toml": "014c8f293bfa12e0198485fad93dae20a8e98b98d99c7da7572280b1c6b1e0e6",
-    "projections/codex/agents/bbk_phase_wayfinder.toml": "fde718dce6860b65e2c4d1a4cedab991587f289be618edce462532cbb0ee31c3",
-    "projections/codex/agents/bbk_planning_wayfinder.toml": "46b3be05551a72208f12d5d2395f306f972e8937bc619a197599e85e7dfcb052",
-    "projections/codex/agents/bbk_prototyper.toml": "a8f13552f850c64f2674be52090a1e512f32bc799bb3e7a75fde0d7e28e62dc9",
-    "projections/codex/agents/bbk_question_guide.toml": "acc43fe82ab65a3fdf9fb89016213882bb59b417ba405b633c2fb52f5c0287de",
-    "projections/codex/agents/bbk_questioning_wayfinder.toml": "8a4db398fd6be5949cdef7cfeeb0375462491f00e708cb1a0d9ba96ecca513dc",
-    "projections/codex/agents/bbk_researcher.toml": "b5724558bb0570f2d64053ee4a97da82c7c0aec519b6373b69224ba8e2abdfc0",
-    "projections/codex/agents/bbk_reviewer.toml": "17bc7426edee2eb4060f49c9d22de7f0038441860c91f5027d17d423a0f3ce04",
-    "projections/codex/agents/bbk_root_orchestrator.toml": "3fa719fb2846507cccec965892f045e74f001b8bd19760a1ee05b63b2193b4d6",
-    "projections/codex/agents/bbk_root_wayfinder.toml": "bd393845b28194d61b0fadd819d07e00d4cb715985a2872d1fec334b46dd9e6b",
-    "projections/codex/agents/bbk_synthesizer.toml": "4412252239722ef2bd311450a1efcb5df335eebbeb19c97a83c12adb8e2b857a",
-    "projections/codex/agents/bbk_territory_orchestrator.toml": "6a8fb8abfe2ba13bc292952e86e0e31e83bb5653bcb4146fb1ada38738e7889d",
-    "projections/codex/agents/bbk_territory_wayfinder.toml": "0f204f5f8b3527b3704448fff00a1fddffee54c465ac4a4884e8d751bad873cb",
-    "projections/codex/agents/bbk_validator.toml": "214ba5fb612067f6a91615b6037673c6d8706ba2855341c2877e335cc1f4ed77",
-    "projections/codex/agents/bbk_validator_orchestrator.toml": "3036a72403ba48c22962ebed1a9882de25f193586ee41ef8408a13a59c9a6a06",
-    "projections/codex/agents/bbk_verification_designer.toml": "4f3fa517ea7cdef75b8b2d72cf2dd421bd065993d4f4ce3a90fd572a0946cda0",
-    "projections/codex/agents/bbk_worker.toml": "f37a0490659d788307329980a9da59485572c715e15f786dbe7cc46ea769c264",
-    "projections/codex/agents/bbk_worker_designer.toml": "bba7b378afc4f4f96b29ef79b04bab5f04bf66ee9b0b85222e284f0d620d7be6",
-    "projections/codex/agents/bbk_worker_orchestrator.toml": "c1993679a8e4ef00f3b9efb81dca44f4c8faae9b64fed21c1d59365f25369f9e",
-    "projections/generic/agents/bbk_architect.md": "f240c95b7ba6755a33e77a414a4234a04307231e2b9276b13eb5ec25ca3195db",
-    "projections/generic/agents/bbk_phase_wayfinder.md": "811a6aea0621e10c742f58f2704639f088ca068191ba04aac989ccebc262d006",
-    "projections/generic/agents/bbk_planning_wayfinder.md": "511f02f98b8ef4857b0d8fbb3ba00c46252385c1d37615c225f24d620dbec1c1",
-    "projections/generic/agents/bbk_prototyper.md": "a29befcebf17e2319a09a17dd96c52d620cb0a11cc18bcfee2de10f9970c0942",
-    "projections/generic/agents/bbk_question_guide.md": "fc51e1629bf0afb1dd959c8e6a8aa6a2f719b76be02c69c050e9c02fed36ae6e",
-    "projections/generic/agents/bbk_questioning_wayfinder.md": "86e0bdcbfcef2b0068a1e801153d299f7abd07f41ef3a7d578312b5f469d0787",
-    "projections/generic/agents/bbk_researcher.md": "81ee9307b0b34c2cd0c502bdeb7d2d7eed176a4896586fa462c5c3e9953d36c0",
-    "projections/generic/agents/bbk_reviewer.md": "df67c8af810c93ffd7dd166070a1c48906e47573858031b512803cf780aa7bec",
-    "projections/generic/agents/bbk_root_orchestrator.md": "f29c83239ffca984fe998b7e40e45934402ae2f59988d1b93c2f0d737bc21c00",
-    "projections/generic/agents/bbk_root_wayfinder.md": "52297a4b332890129218c1461fc4fd1c0a35971efed02e0e61662ce24988e516",
-    "projections/generic/agents/bbk_synthesizer.md": "ea0c1b89fbdf6da68b8716894e7860d0a5b6217cd083bc156e0a3d6e6bedbd82",
-    "projections/generic/agents/bbk_territory_orchestrator.md": "b03d8de6e91ff1d09d9b2a9cce965710750d058475e0393edb85c962dabdbf9a",
-    "projections/generic/agents/bbk_territory_wayfinder.md": "1dc081065e8579e536f22da126828cc4f9ad3a75dbae61b68ff8aefd8009d866",
-    "projections/generic/agents/bbk_validator.md": "6b498ee58fda3c5f7dfdff4c4a89fffb3fa63396dc7f703b2944c60fbde551d0",
-    "projections/generic/agents/bbk_validator_orchestrator.md": "0811559e758ab066454c2ae649890611d5c1d832f44a697b395a12f0183756ee",
-    "projections/generic/agents/bbk_verification_designer.md": "27a77390ea5589749aebb2bb3290d9a46ac4460f8bc100b7ac6ff4d0e61a904a",
-    "projections/generic/agents/bbk_worker.md": "f137e4cd70bd8c001c347a411d03c90e2a8c62a00f1fdfadb44db2a72d4da65c",
-    "projections/generic/agents/bbk_worker_designer.md": "50b8a5221e42e1ba019dd8389db2af8c939e10cf84921cc321c5f6ef23f0eb01",
-    "projections/generic/agents/bbk_worker_orchestrator.md": "44adfd0bd275f9b8c0ae0a807b4c6438450d838a8d0fab78a30a3a9d367cad8f",
-    "projections/omp/agents/bbk_architect.md": "c56afd08df8fd57c623bd54cbdeee7cdf1a41fd916a17a65e0bb1e48611dcd14",
-    "projections/omp/agents/bbk_phase_wayfinder.md": "69f0fc4e3ec71b54e634ae69a0d9755d760474ca88609086f10ddfa1b426b385",
-    "projections/omp/agents/bbk_planning_wayfinder.md": "b95d4bc6dcfac413af8163db853ff7d8f8747466713d0deefd6b261531bcba54",
-    "projections/omp/agents/bbk_prototyper.md": "eff137dd49ab7f5573c63159cd25b429d4c039f1c8d5d923bfe6d0136c7adb61",
-    "projections/omp/agents/bbk_question_guide.md": "5add582fc950b2cda7140ba047c00a0aab2e230fd15878779bf027533cea1c38",
-    "projections/omp/agents/bbk_questioning_wayfinder.md": "846437e46c58d167bbf691a556bccd7a61224d886bbe5f4323d969ad9273ba9d",
-    "projections/omp/agents/bbk_researcher.md": "19fc44ca53e632445f9de862d686d9694976e01670d8da4db8f25a563de4d9ee",
-    "projections/omp/agents/bbk_reviewer.md": "4f0c82b58cd7e560f1962a3be85c320e87790c3a0c842cdbc85919e82d82c982",
-    "projections/omp/agents/bbk_root_orchestrator.md": "6a7bf35435648ab821c47c019857ee5fa7f667d1107464f0f19f16089dfd2997",
-    "projections/omp/agents/bbk_root_wayfinder.md": "3c748d526c5e2815d9c7020fa2800c75d36009b50153229e42a879f8d88856ae",
-    "projections/omp/agents/bbk_synthesizer.md": "1094b32e21a5d4f9872410183a10a608057d276074ab86e8b8f63b3e80807945",
-    "projections/omp/agents/bbk_territory_orchestrator.md": "433a69605bc239005d4557261333b5caaaf17be5b005f7aecbfc20d26e1b1821",
-    "projections/omp/agents/bbk_territory_wayfinder.md": "c15d5b55d91ceadf678198d11dd1efa6a034c8917dd0a73ebbb5a0cbc2a7e23d",
-    "projections/omp/agents/bbk_validator.md": "a250af2bf4b8d36ef037d8981b010e9d16d53b160b992997709114c552d66d8c",
-    "projections/omp/agents/bbk_validator_orchestrator.md": "1a155c8c0138274f371d730e958f7cf8cea91d694d6a916bc55540999f5a4cd8",
-    "projections/omp/agents/bbk_verification_designer.md": "2e610b08a3328b5a11aff67ddf56a7c6a5743ce672cd1e7dda9118198fe92122",
-    "projections/omp/agents/bbk_worker.md": "8672b51c00a59668e04a9b23529c0eb660c3938092ed1aecd5d171dcf47eb6ab",
-    "projections/omp/agents/bbk_worker_designer.md": "144c60441f556bb93a2effaf2453c21d679a23aed1421a49cd3730f665ce2794",
-    "projections/omp/agents/bbk_worker_orchestrator.md": "01f9efe43543802265c29bb133acf15be3730257c142056ef18ec0e2883ceda4"
+    "projections/claude/agents/bbk-architect.md": "c79d914c4238f373006b3679555247b62e06131539e257667b03a91045f119ab",
+    "projections/claude/agents/bbk-phase-wayfinder.md": "b60ad67dffbea2f22bfad1516d7427cec517923aee049f0a4381329ee3fac70d",
+    "projections/claude/agents/bbk-planning-wayfinder.md": "e7f069c78afcf3fe556a9b28390f76a8c0f71defae8daa56a9eaf7e4c3c6d202",
+    "projections/claude/agents/bbk-prototyper.md": "97eb11e54f3d8e6649d6fc4e49626eb86a04f4f094a42978f3f2ece7db38f510",
+    "projections/claude/agents/bbk-question-guide.md": "0911f1e58dd449c73fe03e2b239e67726f7cc25f8b84e074ca1be33c79ec337e",
+    "projections/claude/agents/bbk-questioning-wayfinder.md": "e43369b0da694e0b66c287a69b5ba289a5178c2a183b75d830bb3c615666f0c4",
+    "projections/claude/agents/bbk-researcher.md": "b866d625daa0e80fb4efae003e0e713b087679c137df6096087cad362d2389e9",
+    "projections/claude/agents/bbk-reviewer.md": "d8550f9ad88463ec4e699ce3d6e878508afabdba0cf31e1b60ada0ceeaa5b694",
+    "projections/claude/agents/bbk-root-orchestrator.md": "ccdb938bec1da245c2f621aae1b350197e303e1310be759990b1e774f7348a76",
+    "projections/claude/agents/bbk-root-wayfinder.md": "c832148c898800c011ad6eb00d9e9a4414bc3f90a6c94e31b849902ac6a148d5",
+    "projections/claude/agents/bbk-synthesizer.md": "6aa9f14a9d196b3ff39ba6d8bd824f76968257ac814ce7fc4d9adc49d83ce6a8",
+    "projections/claude/agents/bbk-territory-orchestrator.md": "1538d34d565afcd30ecd9588b26c5fae3f0030e2822d4f1a9f40468b3525ef25",
+    "projections/claude/agents/bbk-territory-wayfinder.md": "e461dff566a867734a8d6750128f1914bdd017c754d974b84c4aaf2df3964145",
+    "projections/claude/agents/bbk-validator-orchestrator.md": "1e7e238a9816e0ece893341c6589deefa839a0966b1b740f0a556fe3af22b337",
+    "projections/claude/agents/bbk-validator.md": "564ad5dab58834699f8e98205489a04baa57b936c0972edc13daa4ae6362687a",
+    "projections/claude/agents/bbk-verification-designer.md": "9312afe43bc6fa2389bd6383f882610a8cdf6c4d78dcf678152be04626077130",
+    "projections/claude/agents/bbk-worker-designer.md": "142c750214a2a6a36a16171ade1aad4dbbea38cb9f9031ccd173f5f4fce08f63",
+    "projections/claude/agents/bbk-worker-orchestrator.md": "0f9017e0ce0144b1558cc6d4e0ae5263dbf86c00205045dbb71724afc351d29c",
+    "projections/claude/agents/bbk-worker.md": "b642786450df99d579fbae52889de68a691be29e65e4e2e3f158603afb5b66a3",
+    "projections/codex/agents/bbk_architect.toml": "d2fa01b8a7095ba1e64aa8ff8e95e7696d9a4e717764c3b2d2d589b032445364",
+    "projections/codex/agents/bbk_phase_wayfinder.toml": "2be497d8852c2c075d34d2e803b8d1969e9ba672473b5410014b2c9f784b961c",
+    "projections/codex/agents/bbk_planning_wayfinder.toml": "fa4851ce8453b642eb3db1a98f40e97589d349cb29ece64847157cce835b2639",
+    "projections/codex/agents/bbk_prototyper.toml": "69f714ed4e0d82bd03019c92f8bc9e83bd058a1db119ec2a9b8ea7c5433c8671",
+    "projections/codex/agents/bbk_question_guide.toml": "294744c0f61872c1f19f31ad169736b705bcb7b22dec6589efe59a2e6ef75bd4",
+    "projections/codex/agents/bbk_questioning_wayfinder.toml": "d13f557af096d8388290ae6fcdd43374059bd69e2ebee0f670bd31bd43cc1d00",
+    "projections/codex/agents/bbk_researcher.toml": "0495657a5b7c0d1d23855a3ff3818be421252b289f9ad6d7c06d7154275ee133",
+    "projections/codex/agents/bbk_reviewer.toml": "90ba16c8a92ebc8fcaa43df107d707ca696f0e2eaf23205742a86d07a9de91a6",
+    "projections/codex/agents/bbk_root_orchestrator.toml": "521ea244bd634c6c7372b13514c07829659fe8e7ac7e1cc559a0b02772ae7fee",
+    "projections/codex/agents/bbk_root_wayfinder.toml": "56fb3d763c46368f2c19b3bc2460e06b8e1d3a867960308218799db00a2b689c",
+    "projections/codex/agents/bbk_synthesizer.toml": "5ebe8b744cc323a42f2dc63345883a9ed0699b483fe11c6fc72ad7251302323c",
+    "projections/codex/agents/bbk_territory_orchestrator.toml": "32c28445ffcd523c33ab974671740f2ee3fc26fd17eb1dd43fa718e5cc460be0",
+    "projections/codex/agents/bbk_territory_wayfinder.toml": "d728364117d3ba3c665db5c49a8d8136f591a40d6515273dbdc233c9af8b96df",
+    "projections/codex/agents/bbk_validator.toml": "f7d50a957e9197e5e60cf9d177f378cb165b2fa729a50141e76777e2d128b87b",
+    "projections/codex/agents/bbk_validator_orchestrator.toml": "41808f1ffab49005f627a70e7a0ce6ca8c5c0217815de092589df4132b8e9a17",
+    "projections/codex/agents/bbk_verification_designer.toml": "e4ec963191fec5ecb7d11f7e822beda78665cc3322defdc441838d0c2b07c54e",
+    "projections/codex/agents/bbk_worker.toml": "049f757dd70a60b78918d6c06f47f626c30698ea5dcdd431b4c00615d9e69b81",
+    "projections/codex/agents/bbk_worker_designer.toml": "ee41468ff1b44b0045f215f096ee60be8bd13dde4c8d96c0c2c3713c8a58c8fa",
+    "projections/codex/agents/bbk_worker_orchestrator.toml": "02c2f411e11eadce85e38b8fb7c2dd3596b7e79fe24d21b66b30bdb974cef37e",
+    "projections/generic/agents/bbk_architect.md": "591e5d464834a1c8f60fb5d202a649ca356801cc04f87d89027269aac53f8bfe",
+    "projections/generic/agents/bbk_phase_wayfinder.md": "d135f78fe619e48f88b57b959353728ae09e31b88cd8407a487525e27e3c04d0",
+    "projections/generic/agents/bbk_planning_wayfinder.md": "0fc2ca9195a9639275adb067884830807f7951441284877479805fc4aad19060",
+    "projections/generic/agents/bbk_prototyper.md": "a37c464484a763e782739e1aed34722b758300a99679639965a0c34d899cf9f7",
+    "projections/generic/agents/bbk_question_guide.md": "ad0d48d054cd9b257396bbacf2ebb9ec384373fd58732bd741bba373958db2de",
+    "projections/generic/agents/bbk_questioning_wayfinder.md": "c9be2fc0bac56f4d76276bab82571732cdfaef7d4c798c9b5e92ed95fc8d8624",
+    "projections/generic/agents/bbk_researcher.md": "647d81c117eec96d2e2bcc942c94e7101653575c9418322bf4a3b5caa2302600",
+    "projections/generic/agents/bbk_reviewer.md": "3f824518489f5df6f28af2f0214f5d3613026141631ebbd03234a5af6eb76fd0",
+    "projections/generic/agents/bbk_root_orchestrator.md": "f4691640e86a322c174865f48eccb14b7b9e370e2d94cdbd0bd3e55b062006b1",
+    "projections/generic/agents/bbk_root_wayfinder.md": "15d3a84956fff19b234bceab89b343db898778030eeb868f2346db2655279e77",
+    "projections/generic/agents/bbk_synthesizer.md": "7d70c82193f0f33ad6965ec2d337c70b717608383422ab5c0945826943c62ba7",
+    "projections/generic/agents/bbk_territory_orchestrator.md": "61bf596d38f660d23bf1255b7d657559c0f4f8d1d550d504d91153c632c56a75",
+    "projections/generic/agents/bbk_territory_wayfinder.md": "d63c569ad598cb8e8e230e3dbb1108dfd7907eb14d62b34d56cd6df8b5dfe9bb",
+    "projections/generic/agents/bbk_validator.md": "01ecdf90455ec5606640ccb89bdca96fb5406f5298a9421bfb4bb628c3feef26",
+    "projections/generic/agents/bbk_validator_orchestrator.md": "0e0dd11f083dd11fe5223000baf6f991220e477e4a0aca32869808fae353a5d0",
+    "projections/generic/agents/bbk_verification_designer.md": "68c6c2c3cd31f45c594f2656feec4d97d9669fd114e2a079062f79940110cc53",
+    "projections/generic/agents/bbk_worker.md": "459d78caa9d5a9e905b4e1cc1b8fb5ef5d08f56e36eb7f96f1050c8e9bbed537",
+    "projections/generic/agents/bbk_worker_designer.md": "897c464667bbc03e8f9e3040c6a6d3fa88309ff6d224a7853322e6c9c2ed39eb",
+    "projections/generic/agents/bbk_worker_orchestrator.md": "fa8228a4a6d41447188c098fe3b34e8935bf06b7081743baecf5753b664dd619",
+    "projections/omp/agents/bbk_architect.md": "9e87190c7a4345e9a0536b29c74e80a0f67b73d0215dffdf0fd9117836251578",
+    "projections/omp/agents/bbk_phase_wayfinder.md": "f849ab7b51a2ee7d2ca0de5147ef7bbed6df4fb9d4bed9549920b1374875eef6",
+    "projections/omp/agents/bbk_planning_wayfinder.md": "a685e7cafa45035662230c7c9d9805675f8753b5457cadcb681832e4fb5a2ab8",
+    "projections/omp/agents/bbk_prototyper.md": "960ea9815ef41a54fcba9ab0f82c022dcd7cbb00b0692b3e647fe91e20e939f1",
+    "projections/omp/agents/bbk_question_guide.md": "4e173b25e28cd44863fd3fe010cf3520dfc870e08eae9621bc1fd8239ece771a",
+    "projections/omp/agents/bbk_questioning_wayfinder.md": "49579f58115bb8a8bcb120fd04ac4047a1edc083fc4a38bb8bab7dd63dbd52b4",
+    "projections/omp/agents/bbk_researcher.md": "8736bfc32be87e4daf8676ec802b7212ad3e51f957644dc1b2d51b7ef1eaa5eb",
+    "projections/omp/agents/bbk_reviewer.md": "c44d3cb2cfb39fb839f92ca86360b43d41eb9f6ac0a1530a8b721a28d9ab7517",
+    "projections/omp/agents/bbk_root_orchestrator.md": "67c689cd45ae881803b500da75b675fe19beb40f4d816bf4bad00f352c155855",
+    "projections/omp/agents/bbk_root_wayfinder.md": "41cde3d3264880ca1aec638127505e0bee81b4d8ca94c78a824ecf21d531a783",
+    "projections/omp/agents/bbk_synthesizer.md": "4c2e0279f6701dcd3b174966e41d07c80cdbbc7a9ea4ad926a95b79e94ddfbca",
+    "projections/omp/agents/bbk_territory_orchestrator.md": "ad5960c62e5cdba0477443a017fe4eaf40c3874978e9134678e3e926d1a86097",
+    "projections/omp/agents/bbk_territory_wayfinder.md": "3ad065cb7478650740b38795b7e61f5fb75d3497dc502724e40f3026ef165aae",
+    "projections/omp/agents/bbk_validator.md": "fdc44c39ae33fe1b9dd78e337dc3ff3744bd249d583cdfc67d9b39bc4a248457",
+    "projections/omp/agents/bbk_validator_orchestrator.md": "d91b307ac06f4d02627f572442e39f1bd533d60491a4c0cc03198faa526eb42b",
+    "projections/omp/agents/bbk_verification_designer.md": "6ba6e85c9ca831f911dfa0fd87dfc0a044c143701a4a997159282eff46deaed3",
+    "projections/omp/agents/bbk_worker.md": "68aceda5ff0881f241891051599a1265aa277e37677ae5a24b6280c54f915ed9",
+    "projections/omp/agents/bbk_worker_designer.md": "052cd1a6d6858517292aed59d37621880d5c172f29f636ca6cfc5fa14b7b8455",
+    "projections/omp/agents/bbk_worker_orchestrator.md": "10ad80418036a3f681deaf36bfb964ca3d16e741a091ef2ef7ab80c051b75078"
   },
-  "mandatory_skill_source_sha256": "5f279551a610d9f8516e1dd3d4e4f63ea738f910219eaaaefe4dea253ed1f705",
+  "mandatory_skill_source_sha256": "f9f2eac7efc16afb5f1d5e683b02f2b2ed45546e7052af3129dcb2cde9faebe1",
   "mandatory_skill_sources": [
     "bbk-architecture",
     "bbk-assertion-validation",
@@ -5426,21 +5998,21 @@
     "bbk-worker-execution"
   ],
   "method_content_source": "spec/method-content.json",
-  "method_content_source_sha256": "70e0fb26d6f08058c1933257b21be1ee24cddace1adaa7b749bc0557b31b07bc",
+  "method_content_source_sha256": "4f611d29f4500c867d04cb0419f3f3eec6a3fc9fe3267a1a9c4b076c8e1006dc",
   "model_route_count": 19,
   "model_routing_mode": "per-role",
   "model_routing_schema": "bbk.model-routing.v2",
   "model_routing_source": "spec/model-routing.json",
-  "model_routing_source_sha256": "fb1f1b60568208f5e419db19d779b372fb0a253154dd8c5fd4002560b01ae42c",
-  "package_version": "0.1.0-alpha.13.5",
+  "model_routing_source_sha256": "b33048e9ea34e35ab1b6a8cc733b9d8bca39e1ce0bb880b2a2dc066fa14ca89b",
+  "package_version": "0.1.0-alpha.15",
   "projection_count": 76,
   "prompt_module_package": "spec/prompt-modules/catalog.json",
-  "prompt_module_source_sha256": "f78f1dd77a5411cfa7b931291fbc0a4dc3a38aa4d81bdc628490bbb7d8b32814",
+  "prompt_module_source_sha256": "692b3f1317da5457298075e849e89a774870175c3276e32173d2abcac82db8bd",
   "prompt_module_sources": [
     {
-      "bytes": 3686,
+      "bytes": 4893,
       "path": "spec/prompt-modules/catalog.json",
-      "sha256": "918043f975db4a48a371f139abd6f40c08d693cb0d842550c1f55248a93adb4c"
+      "sha256": "2a92568bdd225cfacbee08130c65ef18aeb3351bf61924931e9279f84e58060c"
     },
     {
       "bytes": 1149,
@@ -5468,14 +6040,14 @@
       "sha256": "c60f1038876350be3b7fd7112272054aad8bff06b670c7a54596e50492af542f"
     },
     {
-      "bytes": 1893,
+      "bytes": 2104,
       "path": "spec/prompt-modules/bbk-prompt-durable-handoff.json",
-      "sha256": "12bf914b2e51e83028c9a3f5d2ae8755ed8b835ba68af8468f6558d2f3cfa422"
+      "sha256": "e5fc81944d4ad0f34366af337db4fe07222c04169e441d20130f0f316ec58da1"
     },
     {
-      "bytes": 3537,
+      "bytes": 4104,
       "path": "spec/prompt-modules/bbk-prompt-handoff-protocol.json",
-      "sha256": "37a2acd52ec79135ebfc23669274e407eabcdb68f31cfc0943bf895f642f892e"
+      "sha256": "695e559569b618fb40f918fc91c3a20cd15a138ef7bada7130f91c10e5452f9f"
     },
     {
       "bytes": 2569,
@@ -5551,14 +6123,60 @@
       "bytes": 1266,
       "path": "spec/prompt-modules/bbk-prompt-host-capability-truth.json",
       "sha256": "19897885f830f966e3c39cda2702b5243cab20247539da5dc67d23176f5ab8db"
+    },
+    {
+      "bytes": 2330,
+      "path": "spec/prompt-modules/bbk-prompt-execution-autonomy.json",
+      "sha256": "822eaf252318c992272caf4a589cfdf8cc843f987d492cbc7e39c66584cd71d7"
+    },
+    {
+      "bytes": 2525,
+      "path": "spec/prompt-modules/bbk-prompt-user-attention.json",
+      "sha256": "b38ebef10f212d1b1bc90b03199638b1d1ac7ed4e80cefcc72b071b8aa33954f"
+    },
+    {
+      "bytes": 1929,
+      "path": "spec/prompt-modules/bbk-prompt-baseline-transition.json",
+      "sha256": "d8b9f5c3781cde3651a3b2ee462283a39d9d49a012ae242d189bf502650e0c79"
+    },
+    {
+      "bytes": 1391,
+      "path": "spec/prompt-modules/bbk-prompt-evidence-subject-identity.json",
+      "sha256": "0411ae44e718501066eddd3fb508d21e80e387f5ebbc03d148e64a11362da5dc"
+    },
+    {
+      "bytes": 1802,
+      "path": "spec/prompt-modules/bbk-prompt-specialist-disposition.json",
+      "sha256": "59dc88b58d9c087092997c7738e6cb27097ef9a1f2b0aa5e768466b4f2ddb00a"
+    },
+    {
+      "bytes": 1994,
+      "path": "spec/prompt-modules/bbk-prompt-product-first-proportionality.json",
+      "sha256": "d88dc3c35598dec2dda32aeff5951273eafeac76ba538e42d9196c73583a91c3"
+    },
+    {
+      "bytes": 1904,
+      "path": "spec/prompt-modules/bbk-prompt-mechanical-admission.json",
+      "sha256": "675de365a90a4da70ae47fe2c6bc7cbd1a2a26902b94430e62a0eeeebb004391"
+    },
+    {
+      "bytes": 1947,
+      "path": "spec/prompt-modules/bbk-prompt-assurance-modes.json",
+      "sha256": "23f2bd55cc657819bb14944d6db3989709a7aba78b7214c105c7f548e69caa80"
+    },
+    {
+      "bytes": 1790,
+      "path": "spec/prompt-modules/bbk-prompt-candidate-focused-review.json",
+      "sha256": "7c60116ad5fff6b3f28dc70dfe3600d9af4e7fdc962207c4914bd33733a25755"
     }
   ],
   "role_count": 19,
   "role_return_registry": "spec/contracts/role-return-registry.json",
-  "role_source_sha256": "fe2bd6208c8c30ae6ccf74fb6c5d5cf92f9f97682d8c13fcddca14003441f255",
+  "role_return_registry_v2": "spec/contracts/role-return-registry-v2.json",
+  "role_source_sha256": "ce412ceae3db2d9f3191607900cd25c0e5f87f25608bbee74b8d617f6c420d1b",
   "schema": "bbk.projection-manifest.v8",
   "source": "spec/roles.json",
-  "source_sha256": "0101880f54b82eb5b43fc2deded291f5f1dde14413ead2c9d1baf7475bb8f01e",
+  "source_sha256": "a932efe8e6818db81999b9f593917c82adc68f19af51918bf96c3d375ad7ca8d",
   "target_count": 4,
   "targets": [
     "claude",

@@ -1,0 +1,56 @@
+{
+  "artifacts": [],
+  "attempt": 1,
+  "authority": null,
+  "authority_boundary": "A sealed handoff proves exact package bytes and reference closure only.",
+  "bbk_version": "0.1.0-alpha.15",
+  "blockers": [],
+  "capability_zones_used": [],
+  "changed_paths": [],
+  "checks": [],
+  "commands": [],
+  "continuation": {
+    "checkpoint": null,
+    "completed_step": null,
+    "next_step": null,
+    "resume_same_thread": true,
+    "state": "NOT_REQUIRED"
+  },
+  "created_at": "replace-at-construction",
+  "discoveries": [],
+  "disposition": "COMPLETE",
+  "effects_and_cleanup": {
+    "actions": [],
+    "residuals": [],
+    "state": "NOT_REQUIRED"
+  },
+  "evidence": [],
+  "findings": [],
+  "id": "HO-WU-EXAMPLE-1",
+  "interrupt": null,
+  "producer": {
+    "invocation_id": null,
+    "role": "bbk_worker",
+    "thread_id": null
+  },
+  "prohibited_claims": [
+    "independent validation",
+    "parent integration",
+    "finding closure",
+    "acceptance",
+    "deployment authorization",
+    "release"
+  ],
+  "project_id": null,
+  "residual_uncertainty": [],
+  "schema": "bbk.handoff.v2",
+  "smallest_next_action": "Parent inspects and integrates the exact sealed package.",
+  "subject": {
+    "id": "WU-EXAMPLE",
+    "kind": "work-unit",
+    "revision": null
+  },
+  "summary": "Bounded result summary.",
+  "work_performed": [],
+  "work_unit_id": "WU-EXAMPLE"
+}

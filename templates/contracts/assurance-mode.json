@@ -1,0 +1,16 @@
+{
+  "schema": "bbk.assurance-mode.v1",
+  "mode": "INLINE",
+  "subject_ref": {
+    "id": "replace-with-exact-subject-id"
+  },
+  "risk_basis": [
+    "Routine, reversible, profile-covered work."
+  ],
+  "rationale": "INLINE is sufficient because the named work is reversible, profile-covered, and has no identified material assurance risk.",
+  "review_focus": [],
+  "recheck_scope": [
+    "Affected WorkUnit and applicable deterministic gates."
+  ],
+  "independent_review_required": false
+}

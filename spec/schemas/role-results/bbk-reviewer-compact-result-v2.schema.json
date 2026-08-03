@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-reviewer-compact-result-v2.schema.json",
+  "title": "BBK BBK Reviewer compact result payload v2",
+  "description": "Closed compact role-specific result payload for `bbk_reviewer`. Use FULL when material truth cannot fit these fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "review_assessment",
+    "immutable_findings",
+    "claims_not_established",
+    "recommended_dispositions_and_parent_actions",
+    "failure_and_blocker_classification",
+    "durable_artifact_and_handoff_refs"
+  ],
+  "properties": {
+    "review_assessment": {
+      "type": "string",
+      "enum": [
+        "NOT_DERIVED",
+        "PASS",
+        "PASS_ADVISORY",
+        "NEEDS_REVISION",
+        "BLOCKED_INSUFFICIENT_CONTEXT",
+        "BLOCKED_ENVIRONMENT",
+        "INCONCLUSIVE",
+        "ERROR",
+        "STALE"
+      ],
+      "description": "One allowed non-authoritative assessment. Use `NOT_DERIVED` for a checkpoint before a responsible assessment exists. In manifest mode this is one attempt input to the parent aggregate, not the aggregate itself."
+    },
+    "immutable_findings": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Every new or referenced immutable finding with exact subject, attempt, assertions, expected and observed conditions, evidence, reproduction or inspection route, classification, severity, blocking state, confidence or uncertainty, scope, impact, affected objects, fingerprint and recommended route. Preserve contradictory and unfavorable findings."
+    },
+    "claims_not_established": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Material claims explicitly outside the review or not established by the evidence, including repair correctness, finding disposition, candidate or plan acceptance, residual-risk acceptance, completion, operational outcome achievement and release."
+    },
+    "recommended_dispositions_and_parent_actions": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Smallest responsible non-authoritative recommendation for subject repair, source or assurance revision, context rebuild, capability qualification, targeted closure, blind reassessment, finding disposition, accountable decision, residual-risk consideration, recharter, pause, recovery or no action. Recommendations do not create authority-bearing dispositions."
+    },
+    "failure_and_blocker_classification": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Subject, contract, evidence, context, evaluator, tool, profile, environment, consumer, device, host, authority, decision, integrity, capacity, host-window and transport states with evidence, affected scope and smallest responsible route."
+    },
+    "durable_artifact_and_handoff_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/artifactReferenceList",
+      "description": "Verified Reviewer report, ReviewAttempt when applicable, EvidenceReceipt, assertion-evaluation, finding, context, checkpoint and `bbk-handoff` identities with schema, subject, path, byte count, SHA-256, producer and attempt."
+    }
+  },
+  "x-bbk-role": "bbk_reviewer",
+  "x-bbk-contract": "bbk.reviewer-return.v2",
+  "x-bbk-detail-level": "COMPACT",
+  "x-bbk-full-detail-triggers": [
+    "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+    "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+    "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+    "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+    "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+    "The parent explicitly requested FULL detail.",
+    "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+  ]
+}

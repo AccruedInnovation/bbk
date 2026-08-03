@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-validator-compact-result-v2.schema.json",
+  "title": "BBK BBK Validator compact result payload v2",
+  "description": "Closed compact role-specific result payload for `bbk_validator`. Use FULL when material truth cannot fit these fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "subject_candidate_and_immutability",
+    "assertion_evaluations",
+    "findings_and_nonfinding_states",
+    "claims_established_and_not_established",
+    "attempt_completion_state",
+    "durable_artifacts_and_handoff"
+  ],
+  "properties": {
+    "subject_candidate_and_immutability": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Exact governed subject and candidate identity, revision and digest, candidate manifest and content root, freeze or immutability receipt, predecessor and successor lineage, verified handoff, post-freeze mutation check, candidate read-only fence and any identity, integrity or staleness blocker."
+    },
+    "assertion_evaluations": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "One schema-valid evaluation for every assigned assertion using an allowed assertion status, exact evidence references, rationale, applicability, criterion, coverage and limitations. Preserve partial success without deriving the complete ReviewAggregate."
+    },
+    "findings_and_nonfinding_states": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Every immutable candidate or contract finding with exact source attempt, subject digest, affected assertions and objects, classification, severity, blocking state, expected and observed condition, reproduction, evidence, scope, probable impact, route, fingerprint and lifecycle; plus context, evidence, evaluator, tool, environment, authority, capacity and integrity states explicitly not represented as candidate findings."
+    },
+    "claims_established_and_not_established": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Exact bounded claims supported by current assertion evaluations, material limitations and claims explicitly not established. State that this attempt does not derive the central aggregate, close findings, accept the candidate or risk, establish campaign or outcome completion, or grant release."
+    },
+    "attempt_completion_state": {
+      "type": "string",
+      "enum": [
+        "COMPLETED",
+        "CANCELLED",
+        "BLOCKED_ENVIRONMENT",
+        "BLOCKED_CONTEXT",
+        "ERROR",
+        "STALE"
+      ],
+      "description": "One completion state compatible with `bbk.review-attempt.v1`, with infrastructure and context blockers kept distinct from candidate assertion results."
+    },
+    "durable_artifacts_and_handoff": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Structured Validator result, ReviewAttempt-compatible record, EvidenceReceipts, findings, raw carriers, checkpoint and `bbk-handoff` references with exact subject, path, byte count, SHA-256, producer, attempt, creation time, verification and discovery path."
+    }
+  },
+  "x-bbk-role": "bbk_validator",
+  "x-bbk-contract": "bbk.validator-return.v2",
+  "x-bbk-detail-level": "COMPACT",
+  "x-bbk-full-detail-triggers": [
+    "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+    "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+    "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+    "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+    "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+    "The parent explicitly requested FULL detail.",
+    "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+  ]
+}

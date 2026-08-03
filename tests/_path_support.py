@@ -235,6 +235,30 @@ def assert_exact_path_text(
     case.assertEqual(_path_text(actual), _path_text(expected), msg)
 
 
+def create_symlink_or_skip(
+    case: unittest.TestCase,
+    link: Path,
+    target: Path,
+    *,
+    target_is_directory: bool = False,
+) -> None:
+    """Create a real symlink for an integration test or skip it cleanly.
+
+    ``os.symlink`` can be present while the current Windows process still lacks
+    ``SeCreateSymbolicLinkPrivilege`` (WinError 1314).  Filesystems and sandbox
+    policies can also reject links even on otherwise supported hosts.  Tests
+    that specifically require a real filesystem link must therefore probe the
+    operation rather than treating API presence as capability.
+
+    Deterministic unit coverage of BBK's link-rejection logic should not depend
+    on this helper; use it only for the additional host integration check.
+    """
+    try:
+        link.symlink_to(target, target_is_directory=target_is_directory)
+    except (NotImplementedError, OSError) as exc:
+        case.skipTest(f"symbolic links unavailable to this test process: {exc}")
+
+
 def _subscript_key(node: ast.AST) -> str | None:
     if not isinstance(node, ast.Subscript):
         return None
@@ -335,4 +359,82 @@ def find_unsafe_path_assertions(path: Path) -> list[str]:
             findings.append(
                 f"{path.name}:{node.lineno}: {assertion} performs raw physical-path/text comparison"
             )
+    return findings
+
+
+def _caught_exception_names(handler: ast.ExceptHandler) -> set[str]:
+    value = handler.type
+    if value is None:
+        return {"BaseException"}
+    if isinstance(value, ast.Name):
+        return {value.id}
+    if isinstance(value, ast.Attribute):
+        return {value.attr}
+    if isinstance(value, ast.Tuple):
+        result: set[str] = set()
+        for item in value.elts:
+            if isinstance(item, ast.Name):
+                result.add(item.id)
+            elif isinstance(item, ast.Attribute):
+                result.add(item.attr)
+        return result
+    return set()
+
+
+def _is_symlink_creation_call(node: ast.Call) -> bool:
+    function = node.func
+    if not isinstance(function, ast.Attribute):
+        return False
+    if function.attr == "symlink_to":
+        return True
+    return (
+        function.attr == "symlink"
+        and isinstance(function.value, ast.Name)
+        and function.value.id == "os"
+    )
+
+
+def find_unguarded_symlink_creations(path: Path) -> list[str]:
+    """Find test symlink creation that assumes API presence implies capability.
+
+    Windows exposes ``os.symlink`` even when the current process lacks the
+    privilege needed to call it.  Real-link integration fixtures must therefore
+    be inside a capability guard that catches ``OSError`` (or a broader
+    exception), or go through :func:`create_symlink_or_skip`.
+    """
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    findings: list[str] = []
+    capability_exceptions = {
+        "BaseException",
+        "Exception",
+        "NotImplementedError",
+        "OSError",
+        "PermissionError",
+    }
+
+    def visit(node: ast.AST, *, guarded: bool = False) -> None:
+        if isinstance(node, ast.Try):
+            catches_capability_error = any(
+                _caught_exception_names(handler) & capability_exceptions
+                for handler in node.handlers
+            )
+            for child in node.body:
+                visit(child, guarded=guarded or catches_capability_error)
+            for handler in node.handlers:
+                for child in handler.body:
+                    visit(child, guarded=guarded)
+            for child in node.orelse:
+                visit(child, guarded=guarded)
+            for child in node.finalbody:
+                visit(child, guarded=guarded)
+            return
+        if isinstance(node, ast.Call) and _is_symlink_creation_call(node) and not guarded:
+            findings.append(
+                f"{path.name}:{node.lineno}: symlink fixture creation is not capability-guarded; "
+                "use create_symlink_or_skip or catch OSError"
+            )
+        for child in ast.iter_child_nodes(node):
+            visit(child, guarded=guarded)
+
+    visit(tree)
     return findings

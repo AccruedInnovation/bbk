@@ -1,6 +1,6 @@
 {
   "schema_version": "bbk.prompt-modules.v1",
-  "package_version": "0.1.0-alpha.13.5",
+  "package_version": "0.1.0-alpha.15",
   "module_schema": "spec/schemas/bbk-prompt-module-v1.schema.json",
   "catalog_schema": "spec/schemas/bbk-prompt-module-catalog-v1.schema.json",
   "module_entries": [
@@ -91,6 +91,42 @@
     {
       "id": "bbk-prompt-host-capability-truth",
       "file": "spec/prompt-modules/bbk-prompt-host-capability-truth.json"
+    },
+    {
+      "id": "bbk-prompt-execution-autonomy",
+      "file": "spec/prompt-modules/bbk-prompt-execution-autonomy.json"
+    },
+    {
+      "id": "bbk-prompt-user-attention",
+      "file": "spec/prompt-modules/bbk-prompt-user-attention.json"
+    },
+    {
+      "id": "bbk-prompt-baseline-transition",
+      "file": "spec/prompt-modules/bbk-prompt-baseline-transition.json"
+    },
+    {
+      "id": "bbk-prompt-evidence-subject-identity",
+      "file": "spec/prompt-modules/bbk-prompt-evidence-subject-identity.json"
+    },
+    {
+      "id": "bbk-prompt-specialist-disposition",
+      "file": "spec/prompt-modules/bbk-prompt-specialist-disposition.json"
+    },
+    {
+      "id": "bbk-prompt-product-first-proportionality",
+      "file": "spec/prompt-modules/bbk-prompt-product-first-proportionality.json"
+    },
+    {
+      "id": "bbk-prompt-mechanical-admission",
+      "file": "spec/prompt-modules/bbk-prompt-mechanical-admission.json"
+    },
+    {
+      "id": "bbk-prompt-assurance-modes",
+      "file": "spec/prompt-modules/bbk-prompt-assurance-modes.json"
+    },
+    {
+      "id": "bbk-prompt-candidate-focused-review",
+      "file": "spec/prompt-modules/bbk-prompt-candidate-focused-review.json"
     }
   ],
   "compilation_policy": {

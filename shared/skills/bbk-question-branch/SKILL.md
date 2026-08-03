@@ -39,6 +39,21 @@ Preserve accepted decisions and exact source lineage while planning, decomposing
 
 <!-- End BBK prompt module bbk-prompt-planning-source-integrity -->
 
+<!-- BBK prompt module bbk-prompt-user-attention: expanded from canonical source -->
+
+### User-attention threshold and coherent request batching
+
+Reserve user interruption for genuine material decisions or authority while discovering, parameterizing, defaulting, or deferring ordinary facts and reversible choices.
+
+- `ATTENTION.CLASSIFY` — Before creating a human request, classify the unresolved item as ENVIRONMENT_FACT, CONFIGURATION_PARAMETER, REVERSIBLE_IMPLEMENTATION_CHOICE, ARCHITECTURAL_DECISION, AUTHORITY_EXPANSION, or USER_RESERVED_PREFERENCE. Record the classification and why it matters to the current subject.
+- `ATTENTION.FACTS_FIRST` — For an ENVIRONMENT_FACT or CONFIGURATION_PARAMETER, first use authorized inspection, existing records, a bounded probe, a clearly labelled safe default, parameterization, or a pre-execution confirmation entry. Do not convert a discoverable fact or ordinary parameter into a user decision merely because it is currently unknown.
+- `ATTENTION.ROUTINE_CHOICES` — Resolve a REVERSIBLE_IMPLEMENTATION_CHOICE inside delegated freedom when one conventional, scope-preserving option is responsibly inferable. Record the choice and reopening trigger; do not interrupt the user for ordinary implementation taste.
+- `ATTENTION.MATERIAL_TRIGGER` — Prompt the user for an ENVIRONMENT_FACT or CONFIGURATION_PARAMETER only when BBK cannot discover it, no safe default or parameterized deferral exists, and the fact is needed now. Reserve user decision and authorization requests for a material ARCHITECTURAL_DECISION with several viable consequential alternatives, an AUTHORITY_EXPANSION, or a USER_RESERVED_PREFERENCE.
+- `ATTENTION.RECOMMENDATION_FIRST` — Every material request must state the smallest exact question, current recommendation, credible materially different alternatives, consequences, safe default if one exists, affected and unaffected work, and the condition under which the request becomes blocking.
+- `ATTENTION.BATCH` — Batch coherent requests into the smallest adequate interaction and return coherent answers in one response packet while preserving every stable request ID, subject binding, and answer. Do not generate one interrupt per field when one packet can be integrated atomically.
+
+<!-- End BBK prompt module bbk-prompt-user-attention -->
+
 Bind the exact decision cluster, subject and revision, semantic parent, root outcome, inherited decisions and authority, question dependencies, recommendation posture, excluded decisions, user-attention budget, and exact return before preparing any request.
 
 ## 2. Normalize the branch program
@@ -144,7 +159,7 @@ Compile explicit least-privilege context edges, preserve logical-role boundaries
 
 <!-- End BBK prompt module bbk-prompt-context-human-relay -->
 
-Send only one current recommendation-first `BBK_USER_REQUEST` at a time for the cluster unless the controller explicitly supports a coherent grouped decision. Bind the response to the exact request and branch; ordinary prose or transport state does not establish an accepted decision.
+Send only one current recommendation-first `BBK_USER_REQUEST` at a time for the cluster unless several independent, decision-ready requests form one coherent packet. The controller may batch that packet into one user interaction and must return one coherent `BBK_USER_RESPONSE_BATCH` preserving every stable request ID, subject, answer, authority receipt, and unresolved field. Integrate the packet atomically before dispatching decision-dependent specialists. Bind every response to the exact request and branch; ordinary prose or transport state does not establish an accepted decision.
 
 ## 7. Interpret proposal response separately from root disposition
 
@@ -196,8 +211,8 @@ Validate Question Guide and Researcher returns against their exact branch identi
 Preserve exact or consequential state across role, invocation, host-window, and recovery boundaries without treating a chat channel as the authoritative carrier.
 
 - `HANDOFF.CARRIER` — Store exact, consequential, generated, evidence-heavy, binary, large, or truncation-sensitive material in an authorized durable carrier. A small inline result is acceptable only when no exact state could be lost.
-- `HANDOFF.BIND` — Bind every carrier and material referenced artifact by safe project-relative path, byte count, lowercase SHA-256 computed from disk, exact subject and revision, producer attempt, and declared disposition.
-- `HANDOFF.VERIFY` — Verify the carrier and every referenced artifact before creation is announced, before consumption or reuse, and after transfer. A locator without matching bytes, digest, subject, and schema is not an exact handoff.
+- `HANDOFF.BIND` — Bind every carrier and material referenced artifact by safe project-relative path, exact subject and revision, producer attempt, and declared disposition. Use the BBK package engine to compute byte counts, lowercase SHA-256 values, canonicalization metadata, manifests, and receipts from stored bytes; never hand-author generated identity fields.
+- `HANDOFF.VERIFY` — Verify the sealed package and every referenced artifact through the BBK verifier before creation is announced, before consumption or reuse, and after transfer. A locator without matching tool-generated package identity, subject, schema, and reference closure is not an exact handoff.
 - `HANDOFF.SEPARATE_STATE` — Keep physical-attempt disposition, role-specific semantic readiness, accountable acceptance, finding closure, completion, and release as separate fields and authorities.
 - `HANDOFF.HISTORY` — Preserve partial, failed, blocked, cancelled, stale, superseded, and predecessor state. Never overwrite a published record to make a successor appear originally successful.
 - `HANDOFF.CHANNEL_LIMIT` — Use live inter-agent messages only for concise coordination and verified references. Chat, task results, tracker comments, patches, and IRC do not replace the governed final return channel or durable domain object.

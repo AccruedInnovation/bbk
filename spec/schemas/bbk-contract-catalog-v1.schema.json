@@ -58,7 +58,12 @@
         "registry_schema",
         "generator",
         "return_schema_directory",
-        "result_schema_directory"
+        "result_schema_directory",
+        "v2_common_envelope",
+        "v2_generated_registry",
+        "v2_registry_schema",
+        "default_producer_version",
+        "v1_consume_compatibility"
       ],
       "properties": {
         "source_of_truth": {
@@ -82,6 +87,21 @@
         },
         "result_schema_directory": {
           "$ref": "#/$defs/relativePath"
+        },
+        "v2_common_envelope": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "v2_generated_registry": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "v2_registry_schema": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "default_producer_version": {
+          "const": "v2"
+        },
+        "v1_consume_compatibility": {
+          "const": true
         }
       }
     },

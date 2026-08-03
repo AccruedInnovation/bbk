@@ -5,6 +5,18 @@ description: Conduct one bounded, evidence-grade factual investigation using aut
 
 # BBK Research
 
+<!-- BBK prompt module bbk-prompt-evidence-subject-identity: expanded from canonical source -->
+
+### Evidence subject and environment identity
+
+Bind observations and quantitative claims to the exact node, environment, source, time, and method so evidence is not transferred between superficially similar systems.
+
+- `EVIDENCE.NODE_BINDING` — Every material environment observation must identify the exact node or subject, node_id when available, hostname or stable system identity, environment and location, observation source, observation time or as-of boundary, method and command or API, scope, authority, and confidence or limitation.
+- `EVIDENCE.NO_TRANSFERENCE` — Do not transfer an observation from one machine, account, network, repository, version, jurisdiction, or environment to another merely because they share an operating system or role. Unknown target-node state remains unknown until established or explicitly assumed.
+- `EVIDENCE.ESTIMATE_TRUTH` — Bind every quantitative estimate to its source, assumptions, units, environment, uncertainty, and intended use. Label an estimate as measured, documented, calculated, inferred, or illustrative; do not present an unmeasured planning estimate as observed performance.
+
+<!-- End BBK prompt module bbk-prompt-evidence-subject-identity -->
+
 Research is a bounded evidence responsibility. It answers one exact factual question well enough for another role to make or integrate a decision. It does not select the product direction, approve an architecture, validate a candidate, close a finding, authorize an effect, or substitute source collection for judgment owned elsewhere.
 
 A Researcher may reconcile several sources inside one factual charter. Broader reconciliation of planning artifacts, decisions, interfaces, and territory results remains Synthesizer work. New experiments, active compatibility trials, load tests, interaction trials, or measurements created to discriminate alternatives remain Prototyper work.
@@ -218,8 +230,8 @@ Stop when each material claim is responsibly supported, contradicted, bounded as
 Preserve exact or consequential state across role, invocation, host-window, and recovery boundaries without treating a chat channel as the authoritative carrier.
 
 - `HANDOFF.CARRIER` — Store exact, consequential, generated, evidence-heavy, binary, large, or truncation-sensitive material in an authorized durable carrier. A small inline result is acceptable only when no exact state could be lost.
-- `HANDOFF.BIND` — Bind every carrier and material referenced artifact by safe project-relative path, byte count, lowercase SHA-256 computed from disk, exact subject and revision, producer attempt, and declared disposition.
-- `HANDOFF.VERIFY` — Verify the carrier and every referenced artifact before creation is announced, before consumption or reuse, and after transfer. A locator without matching bytes, digest, subject, and schema is not an exact handoff.
+- `HANDOFF.BIND` — Bind every carrier and material referenced artifact by safe project-relative path, exact subject and revision, producer attempt, and declared disposition. Use the BBK package engine to compute byte counts, lowercase SHA-256 values, canonicalization metadata, manifests, and receipts from stored bytes; never hand-author generated identity fields.
+- `HANDOFF.VERIFY` — Verify the sealed package and every referenced artifact through the BBK verifier before creation is announced, before consumption or reuse, and after transfer. A locator without matching tool-generated package identity, subject, schema, and reference closure is not an exact handoff.
 - `HANDOFF.SEPARATE_STATE` — Keep physical-attempt disposition, role-specific semantic readiness, accountable acceptance, finding closure, completion, and release as separate fields and authorities.
 - `HANDOFF.HISTORY` — Preserve partial, failed, blocked, cancelled, stale, superseded, and predecessor state. Never overwrite a published record to make a successor appear originally successful.
 - `HANDOFF.CHANNEL_LIMIT` — Use live inter-agent messages only for concise coordination and verified references. Chat, task results, tracker comments, patches, and IRC do not replace the governed final return channel or durable domain object.
@@ -277,3 +289,18 @@ Select only applicable installed profiles and focused procedures without allowin
 
 <!-- End BBK prompt module bbk-prompt-profile-qualification -->
 
+## Product-first proportional workflow
+
+<!-- BBK prompt module bbk-prompt-product-first-proportionality: expanded from canonical source -->
+
+### Product-first proportionality and capability parallelism
+
+Keep actor-visible product progress primary and commission support work only when it retires a named material risk.
+
+- `PRODUCT_FIRST.VISIBLE_PROGRESS` — Prioritize the next actor-visible product capability or integrated outcome. A support artifact, specialist cycle, or assurance activity is justified only when it retires a named material risk, resolves a governing decision, or removes a concrete blocker; otherwise omit it.
+- `PRODUCT_FIRST.RISK_RETIREMENT` — Before commissioning support work, name the exact subject and material risk, the consequence if it remains unresolved, the evidence or decision the work must produce, its stop condition, and the role that owns the result. Do not create work whose only outcome is more process or documentation.
+- `PRODUCT_FIRST.CAPABILITY_PARALLELISM` — Permit independent capability increments to proceed concurrently after their semantic interfaces are stable and their mutation, evidence, and cleanup scopes do not conflict. Duplicate plans, reviews, or governance documents are not useful parallelism.
+- `PRODUCT_FIRST.INTEGRATE_THEN_REVIEW` — Integrate capability outputs at their declared interfaces and review the concrete integrated candidate or exact material boundary. Do not serially rebind every intermediate support artifact when the candidate and stable interfaces provide the relevant assurance subject.
+- `PRODUCT_FIRST.SUPPORT_NOT_PROGRESS` — Do not count support paperwork as product progress and do not let a support artifact acquire acceptance, authorization, or lifecycle authority that belongs to the accountable role or user.
+
+<!-- End BBK prompt module bbk-prompt-product-first-proportionality -->

@@ -24,7 +24,7 @@ const versionPath = (() => {
   try { readFileSync(path.join(extensionDir, "VERSION")); return path.join(extensionDir, "VERSION"); }
   catch { return path.join(sourceRoot, "VERSION"); }
 })();
-let version = "0.1.0-alpha.13.5";
+let version = "0.1.0-alpha.15";
 try { version = readFileSync(versionPath, "utf8").trim() || version; } catch {}
 
 function normalizedFsPath(value) {
@@ -423,6 +423,8 @@ function registerCommand(pi, name, description, baseArgv, { requireArgs = false 
 }
 const BBK_MODE_ENTRY_TYPE = "bbk-mode-state";
 const BBK_MODE_SCHEMA = "bbk.omp-mode-state.v2";
+const BBK_PROMPT_RECEIPT_ENTRY_TYPE = "bbk-effective-prompt-receipt";
+const BBK_PROMPT_RECEIPT_SCHEMA = "bbk.effective-prompt-receipt.v1";
 const BBK_ACTIVITY_WIDGET_KEY = "bbk-worker-activity";
 const TASK_SUBAGENT_PROGRESS_CHANNEL = "task:subagent:progress";
 const TASK_SUBAGENT_LIFECYCLE_CHANNEL = "task:subagent:lifecycle";
@@ -545,6 +547,8 @@ function validateRoleReturnContract(role, catalogueEntry) {
   const contract = role?.return_contract;
   const required = [
     "contract_id", "envelope_schema", "return_schema", "result_schema",
+    "v2_contract_id", "v2_envelope_schema", "v2_return_schema",
+    "compact_result_schema", "compact_result_fields", "full_detail_triggers",
     "semantic_state_name", "allowed_invocation_modes", "allowed_return_kinds",
     "allowed_operational_dispositions", "allowed_semantic_states",
     "supplemental_enums", "result_fields", "requirements",
@@ -553,27 +557,41 @@ function validateRoleReturnContract(role, catalogueEntry) {
   if (!contract || typeof contract !== "object" || Array.isArray(contract)) {
     throw new Error(`BBK role ${role?.name || "<unknown>"} has no exact return contract`);
   }
-  const keys = Object.keys(contract).sort();
-  if (keys.join("\n") !== [...required].sort().join("\n")) {
+  if (Object.keys(contract).sort().join("\n") !== [...required].sort().join("\n")) {
     throw new Error(`BBK role ${role.name} return contract fields are malformed`);
   }
-  for (const key of ["contract_id", "envelope_schema", "return_schema", "result_schema", "semantic_state_name", "readiness_rule", "authority_boundary"]) {
+  for (const key of [
+    "contract_id", "envelope_schema", "return_schema", "result_schema",
+    "v2_contract_id", "v2_envelope_schema", "v2_return_schema", "compact_result_schema",
+    "semantic_state_name", "readiness_rule", "authority_boundary",
+  ]) {
     if (!isNonEmptyString(contract[key])) throw new Error(`BBK role ${role.name} return contract ${key} is invalid`);
   }
   const slug = role.name.replace(/^bbk_/, "").replaceAll("_", "-");
   if (!ROLE_RETURN_CONTRACT_RE.test(contract.contract_id)
-    || contract.contract_id !== `bbk.${slug}-return.v1`) {
-    throw new Error(`BBK role ${role.name} return contract ID is invalid`);
+    || contract.contract_id !== `bbk.${slug}-return.v1`
+    || contract.v2_contract_id !== `bbk.${slug}-return.v2`) {
+    throw new Error(`BBK role ${role.name} return contract IDs are invalid`);
   }
-  if (contract.envelope_schema !== "spec/schemas/bbk-role-return-v1.schema.json") {
-    throw new Error(`BBK role ${role.name} does not use the current common return envelope`);
+  if (contract.envelope_schema !== "spec/schemas/bbk-role-return-v1.schema.json"
+    || contract.v2_envelope_schema !== "spec/schemas/bbk-role-return-v2.schema.json") {
+    throw new Error(`BBK role ${role.name} does not use the canonical v1/v2 return envelopes`);
   }
-  if (contract.return_schema !== `spec/schemas/role-returns/${role.name.replaceAll("_", "-")}-return-v1.schema.json`
-    || contract.result_schema !== `spec/schemas/role-results/${role.name.replaceAll("_", "-")}-result-v1.schema.json`) {
+  const stem = role.name.replaceAll("_", "-");
+  if (contract.return_schema !== `spec/schemas/role-returns/${stem}-return-v1.schema.json`
+    || contract.result_schema !== `spec/schemas/role-results/${stem}-result-v1.schema.json`
+    || contract.v2_return_schema !== `spec/schemas/role-returns/${stem}-return-v2.schema.json`
+    || contract.compact_result_schema !== `spec/schemas/role-results/${stem}-compact-result-v2.schema.json`) {
     throw new Error(`BBK role ${role.name} return schema paths are invalid`);
   }
-  for (const key of ["allowed_invocation_modes", "allowed_return_kinds", "allowed_operational_dispositions", "allowed_semantic_states", "requirements"]) {
+  for (const key of [
+    "allowed_invocation_modes", "allowed_return_kinds", "allowed_operational_dispositions",
+    "allowed_semantic_states", "requirements", "compact_result_fields", "full_detail_triggers",
+  ]) {
     if (!isUniqueStringArray(contract[key])) throw new Error(`BBK role ${role.name} return contract ${key} is invalid`);
+  }
+  if (contract.compact_result_fields.length > 8) {
+    throw new Error(`BBK role ${role.name} compact result contains too many fields`);
   }
   if (!catalogueEntry || catalogueEntry.name !== role.name || !Array.isArray(catalogueEntry.allowed_parent_modes)) {
     throw new Error(`BBK role ${role.name} has no matching catalogue parent-mode entry`);
@@ -615,31 +633,44 @@ function validateRoleReturnContract(role, catalogueEntry) {
       throw new Error(`BBK role ${role.name} result field ${name} describes null but rejects it`);
     }
   }
+  for (const fieldName of contract.compact_result_fields) {
+    if (!Object.hasOwn(contract.result_fields, fieldName)) {
+      throw new Error(`BBK role ${role.name} compact result field ${fieldName} is not in the full result schema`);
+    }
+  }
   return contract;
 }
 function exactRoleReturnContractBlock(role, catalogueEntry) {
   const contract = validateRoleReturnContract(role, catalogueEntry);
-  const fieldLines = Object.entries(contract.result_fields).map(([name, field]) => {
+  const fieldLines = contract.compact_result_fields.map(name => {
+    const field = contract.result_fields[name];
     const enumPart = Array.isArray(field.enum_values) ? `; enum=${field.enum_values.join("|")}` : "";
     return `- ${name}: kind=${field.kind}; nullable=${field.nullable}${enumPart}; ${field.description}`;
   });
   return [
     `<bbk-exact-role-return-contract role="${role.name}">`,
-    "Return one JSON object. The full role schema is controlling; conversational prose is not a substitute.",
-    `schema: bbk.role-return.v1`,
-    `contract: ${contract.contract_id}`,
-    `envelope_schema: ${contract.envelope_schema}`,
-    `return_schema: ${contract.return_schema}`,
-    `result_schema: ${contract.result_schema}`,
+    "Return one JSON object. New returns use v2 COMPACT by default; conversational prose is not a substitute.",
+    "schema: bbk.role-return.v2",
+    `contract: ${contract.v2_contract_id}`,
+    `envelope_schema: ${contract.v2_envelope_schema}`,
+    `return_schema: ${contract.v2_return_schema}`,
+    `compact_result_schema: ${contract.compact_result_schema}`,
+    `full_result_schema: ${contract.result_schema}`,
+    `v1_consume_compatibility: ${contract.return_schema}`,
     `role: ${role.name}`,
+    `executor.role: ${role.name}`,
+    "detail_level: COMPACT | FULL (COMPACT is the routine default)",
     `invocation_mode: ${contract.allowed_invocation_modes.join(" | ")}`,
     `return_kind: ${contract.allowed_return_kinds.join(" | ")}`,
     `operational_disposition: ${contract.allowed_operational_dispositions.join(" | ")}`,
     `semantic_state.name: ${contract.semantic_state_name}`,
     `semantic_state.value: ${contract.allowed_semantic_states.join(" | ")}`,
-    "required_envelope_fields: schema, contract, role, invocation_mode, return_kind, subject_ref, parent_ref, attempt_ref, operational_disposition, semantic_state, summary, authority_and_effects_used, result, durable_handoff_refs, smallest_valid_next_action",
-    "required_result_fields:",
+    "required_v2_envelope_fields: schema, contract, role, executor, invocation_mode, return_kind, detail_level, subject_ref, parent_ref, attempt_ref, operational_disposition, semantic_state, summary, authority_and_effects_used, result, smallest_valid_next_action",
+    "Include material outputs, checks_and_evidence, effects_and_cleanup, blockers_and_residuals, prohibited_claims, and durable_handoff_refs; omit only irrelevant empty sections.",
+    "compact_result_fields:",
     ...fieldLines,
+    "full_detail_triggers:",
+    ...contract.full_detail_triggers.map(item => `- ${item}`),
     "requirements:",
     ...contract.requirements.map(item => `- ${item}`),
     `readiness_rule: ${contract.readiness_rule}`,
@@ -904,6 +935,37 @@ function systemPromptBlocks(event) {
 function systemPromptText(event) {
   return systemPromptBlocks(event).join("\n\n");
 }
+function promptBlocksFromValue(value) {
+  if (Array.isArray(value)) return value.map(item => String(item || ""));
+  if (value == null) return [];
+  return [String(value || "")];
+}
+function promptReceiptSummary(blocks) {
+  const normalized = promptBlocksFromValue(blocks);
+  const text = normalized.join("\n\n");
+  return {
+    block_count: normalized.length,
+    length: text.length,
+    sha256: createHash("sha256").update(text, "utf8").digest("hex"),
+  };
+}
+function promptOuterIdentity(text) {
+  const value = String(text || "");
+  const child = value.match(/^\s*<bbk-agent-replacement\b[^>]*\brole="([^"]+)"/i);
+  if (child) return { kind: "agent", role: child[1] };
+  if (/^\s*<bbk-controller-system\b/i.test(value)) return { kind: "controller", role: "Main" };
+  if (/^\s*<bbk-prompt-assembly-failure\b/i.test(value)) return { kind: "assembly-failure", role: null };
+  return { kind: "unknown", role: null };
+}
+function sourceHasGenericPromptMaterial(blocks) {
+  const values = promptBlocksFromValue(blocks);
+  if (values.length > 1) return true;
+  const text = values.join("\n\n");
+  const markers = ["<bbk-agent-system", "<bbk-controller-system", "<bbk-agent-replacement"];
+  const positions = markers.map(marker => text.indexOf(marker)).filter(index => index >= 0);
+  if (!positions.length) return Boolean(text.trim());
+  return Boolean(text.slice(0, Math.min(...positions)).trim());
+}
 function parseOmpPromptSections(text) {
   const normalized = String(text || "").replace(/\r\n?/g, "\n");
   const lines = normalized.split("\n");
@@ -1077,20 +1139,26 @@ function buildControllerSystemPrompt(ctx) {
     "## Turn procedure",
     "",
     "1. Inspect live `hub` messages, the roster/jobs, and current `.bbk` state before creating a new root child.",
-    "2. If the user message answers, corrects, steers, cancels, or authorizes an existing BBK request, relay it through `hub` to the exact requesting peer or active logical root, preserving the request/message ID with `replyTo` when available. Do not launch a duplicate root.",
-    "3. Otherwise select exactly one canonical root: no accepted baseline, planning, architecture, design, ambiguity, or material uncertainty -> `bbk_root_wayfinder`; accepted-baseline execution or recovery -> `bbk_root_orchestrator`; bounded independent review -> `bbk_reviewer`; assertion-scoped candidate acceptance -> `bbk_validator_orchestrator`.",
+    "2. If the user message answers, corrects, steers, cancels, or authorizes an existing BBK request, collect coherent answers into one response packet and relay it through `hub` to the exact requesting peer or active logical root, preserving every request/message ID and using `replyTo` when available. For baseline acceptance, execution authority, or accepted planning decisions, resume the originating Root Wayfinder so it can integrate the response; do not launch a duplicate or successor root from the raw user answer.",
+    "3. Otherwise select exactly one canonical root: no accepted baseline, planning, architecture, design, ambiguity, or material uncertainty -> `bbk_root_wayfinder`; execution or recovery -> `bbk_root_orchestrator` only after the responsible Root Wayfinder has integrated accountable acceptance and current execution authority and returned `READY_TO_EXECUTE` with an exact executable work-graph reference; bounded independent review -> `bbk_reviewer`; assertion-scoped candidate acceptance -> `bbk_validator_orchestrator`. When planning readiness is proposed, missing, stale, or conditional, resume `bbk_root_wayfinder` instead.",
     "4. Invoke that named agent with OMP `task`, preferably as a background/non-blocking job so Main remains available for user relay. When OMP advertises the batch form, use `{ context, tasks: [{ name, agent, task, ... }] }` even for one root: `agent` is the exact canonical `bbk_*` role, `name` is a stable IRC/job identifier, and `task` is the complete self-contained assignment. Never put the role name only in `name` while omitting `agent`. If OMP advertises only a flat form, follow that schema and carry reusable shared background through a durable `local://` context file. Supply exact subject, desired result, bounded context, authority and standing approvals, allowed effects, capability zones, assurance obligations, stopping conditions, logical parent, Main peer ID, branch/request IDs, and return envelope.",
     "5. Before dispatch, perform only bounded controller operations required to recover state and compile the invocation. Do not select architecture, write the operating plan, edit subject files, execute product work, review, validate, or certify in Main.",
     "6. Supervise through task state and `hub`. Continue useful controller work and wait only when no other valid action remains. Resume or message the same logical child when possible instead of restarting discovery.",
     "",
     "## Human-request relay",
     "",
-    "- A child needing a material decision, authority grant, private context, protected-floor exception, hard-to-reverse commitment, or explicit acceptance sends Main one compact `BBK_USER_REQUEST` over `hub`/IRC. It must include a stable request ID, the smallest material question, recommendation, credible alternatives, consequences, residual uncertainty, blocking state, and durable packet reference.",
+    "- A child first classifies an unresolved item as ENVIRONMENT_FACT, CONFIGURATION_PARAMETER, REVERSIBLE_IMPLEMENTATION_CHOICE, ARCHITECTURAL_DECISION, AUTHORITY_EXPANSION, or USER_RESERVED_PREFERENCE. Only a material architectural branch with several viable consequential alternatives, an authority expansion, a user-reserved preference, protected-floor exception, hard-to-reverse commitment, private-context need, or accountable acceptance normally warrants `BBK_USER_REQUEST`. Discover, parameterize, safely default, or defer ordinary facts and reversible choices.",
+    "- A child needing such input sends Main one compact `BBK_USER_REQUEST` packet over `hub`/IRC. It must include stable request IDs, exact subjects, classification, smallest material questions, recommendations, credible materially different alternatives, consequences, residual uncertainty, blocking state, unaffected work, and durable packet references.",
     "- Use OMP's native `ask` tool for every user-facing question or decision request. Do not put a question in ordinary assistant prose and wait for an answer. Anything phrased as a question outside an `ask` tool call is informational text only: it is not a pending BBK question, does not establish a decision surface, and must not be treated as answered.",
-    "- Translate the child's packet into the smallest adequate `ask` interaction, preserving its request ID and recommendation. Do not answer on the user's behalf or substitute your own design judgment.",
-    "- Only a structured answer returned by `ask` is eligible to become an ADR-compatible accepted decision. Relay it immediately to the exact requesting peer as `BBK_USER_RESPONSE`, with the matching request ID and `source: omp.ask`, and notify its integrating parent when required. Main never authors the ADR; the responsible canonical role records the decision and continues its branch.",
-    "- Ordinary user prose may steer, correct, cancel, or grant operational authority, but it is not an answer to an unissued prose question and must not be converted into an ADR. When durable decision authority is required, obtain or confirm it through `ask` first. Silence, timeout, cancellation, `Chat about this`, a send receipt, or anticipated answers are not acceptance.",
+    "- Translate coherent child requests into the smallest adequate single `ask` interaction, preserving every request ID and recommendation. Do not answer on the user's behalf or substitute your own design judgment.",
+    "- Only a structured answer returned by `ask` is eligible to become an ADR-compatible accepted decision. Relay coherent answers in one `BBK_USER_RESPONSE_BATCH` packet to the exact requesting logical role, with every matching request ID and `source: omp.ask`, and notify its integrating parent when required. Main never authors the ADR, baseline acceptance, or execution-authorization record; the responsible canonical role records and integrates the response and continues its branch.",
+    "- Ordinary user prose may steer, correct, cancel, or grant operational authority, but it is not an answer to an unissued prose question and must not be converted into an ADR. When durable decision authority is required, obtain or confirm it through `ask` first. Silence, timeout, cancellation, `Chat about this`, a send receipt, or anticipated answers are not acceptance. Baseline acceptance and execution authority return to the originating Root Wayfinder for durable integration before execution routing.",
     "- Keep IRC concise and plain prose. Large or authority-bearing material belongs in a durable handoff; relay path, bytes, SHA-256, disposition, and smallest next action.",
+    "",
+    "## Execution autonomy",
+    "",
+    "- Once an accepted baseline and execution authority are bound, do not interrupt the user for routine plan-detail corrections, local sequencing, reversible implementation choices, ordinary repairs, compatible dependency substitutions, or a technical blocker with one safe realistic scope-preserving resolution inside current authority. Route the work to the responsible role, record the deviation and rationale, and continue.",
+    "- Request a user decision only for a genuine material branch with at least two viable consequential paths, an explicitly user-reserved preference, or an authority expansion. A sole path outside current authority still requires the smallest exact additional grant; pause only the affected scope.",
     "",
     "## Non-bypass rule",
     "",
@@ -1622,6 +1690,95 @@ function registerBeadsCommand(pi) {
 function createBbkModeController(pi, onStateChange = () => {}) {
   let enabled = false;
   let loaded = false;
+  let latestExpectedPrompt = null;
+  const recordedReplacementDigests = new Set();
+  const recordedProviderDigests = new Set();
+
+  function appendPromptReceipt(data) {
+    if (typeof pi.appendEntry !== "function") return;
+    pi.appendEntry(BBK_PROMPT_RECEIPT_ENTRY_TYPE, {
+      schema: BBK_PROMPT_RECEIPT_SCHEMA,
+      package_version: version,
+      observed_at: new Date().toISOString(),
+      ...data,
+    });
+  }
+  function recordReplacement(sourceBlocks, effectiveBlocks, status, ctx) {
+    const source = promptReceiptSummary(sourceBlocks);
+    const effective = promptReceiptSummary(effectiveBlocks);
+    const identity = promptOuterIdentity(promptBlocksFromValue(effectiveBlocks).join("\n\n"));
+    const key = `${status}:${identity.role || identity.kind}:${effective.sha256}`;
+    latestExpectedPrompt = { ...effective, role: identity.role, prompt_kind: identity.kind };
+    if (recordedReplacementDigests.has(key)) return;
+    recordedReplacementDigests.add(key);
+    const genericDetected = sourceHasGenericPromptMaterial(sourceBlocks);
+    appendPromptReceipt({
+      phase: "before_agent_start",
+      status,
+      prompt_kind: identity.kind,
+      role: identity.role,
+      cwd: String(ctx?.cwd || process.cwd()),
+      source,
+      effective,
+      generic_omp_contamination_detected: genericDetected,
+      generic_omp_contamination_removed: genericDetected && ["agent", "controller"].includes(identity.kind),
+      raw_prompt_persisted: false,
+    });
+  }
+  async function verifyProviderPrompt(_event, ctx) {
+    if (!latestExpectedPrompt) return;
+    let observedValue;
+    let availability = "AVAILABLE";
+    try {
+      if (typeof ctx?.getSystemPrompt !== "function") availability = "UNAVAILABLE";
+      else observedValue = await Promise.resolve(ctx.getSystemPrompt());
+    } catch (error) {
+      availability = "ERROR";
+      observedValue = null;
+    }
+    const observed = availability === "AVAILABLE" ? promptReceiptSummary(observedValue) : null;
+    const status = availability === "AVAILABLE"
+      ? observed.sha256 === latestExpectedPrompt.sha256 ? "VERIFIED" : "MISMATCH"
+      : availability;
+    const key = `${status}:${latestExpectedPrompt.sha256}:${observed?.sha256 || "none"}`;
+    if (recordedProviderDigests.has(key)) return;
+    recordedProviderDigests.add(key);
+    appendPromptReceipt({
+      phase: "before_provider_request",
+      status,
+      prompt_kind: latestExpectedPrompt.prompt_kind,
+      role: latestExpectedPrompt.role,
+      cwd: String(ctx?.cwd || process.cwd()),
+      expected: {
+        block_count: latestExpectedPrompt.block_count,
+        length: latestExpectedPrompt.length,
+        sha256: latestExpectedPrompt.sha256,
+      },
+      observed,
+      provider_bound_verification: status,
+      enforcement: "OBSERVABILITY_ONLY",
+      raw_prompt_persisted: false,
+    });
+  }
+  function promptStatus(ctx) {
+    let branch = [];
+    try { branch = ctx?.sessionManager?.getBranch?.() || []; } catch {}
+    const receipts = (Array.isArray(branch) ? branch : [])
+      .filter(entry => entry?.type === "custom" && entry?.customType === BBK_PROMPT_RECEIPT_ENTRY_TYPE)
+      .map(entry => entry.data)
+      .filter(value => value?.schema === BBK_PROMPT_RECEIPT_SCHEMA);
+    const latestByKey = new Map();
+    for (const receipt of receipts) {
+      const key = `${receipt.role || receipt.prompt_kind || "unknown"}:${receipt.phase}`;
+      latestByKey.set(key, receipt);
+    }
+    return {
+      schema: "bbk.prompt-status.v1",
+      package_version: version,
+      receipt_count: receipts.length,
+      latest: [...latestByKey.values()],
+    };
+  }
 
   function publishState(ctx) {
     try { onStateChange(enabled, ctx); } catch {}
@@ -1666,18 +1823,33 @@ function createBbkModeController(pi, onStateChange = () => {}) {
   function enter(ctx) { return persist(true, ctx); }
   function exit(ctx) { return persist(false, ctx); }
   function promptReplacement(event, ctx) {
+    const sourceBlocks = systemPromptBlocks(event);
     try {
       const extracted = extractBbkAgentBlock(event);
-      if (extracted?.alreadyReplaced) return { systemPrompt: systemPromptBlocks(event) };
-      if (extracted) return { systemPrompt: [buildAgentSystemPrompt(extracted, ctx)] };
+      if (extracted?.alreadyReplaced) {
+        recordReplacement(sourceBlocks, sourceBlocks, "ALREADY_REPLACED", ctx);
+        return { systemPrompt: sourceBlocks };
+      }
+      if (extracted) {
+        const effective = [buildAgentSystemPrompt(extracted, ctx)];
+        recordReplacement(sourceBlocks, effective, "REPLACED", ctx);
+        return { systemPrompt: effective };
+      }
       ensure(ctx);
       if (!enabled) return undefined;
-      return { systemPrompt: [buildControllerSystemPrompt(ctx)] };
+      const effective = [buildControllerSystemPrompt(ctx)];
+      recordReplacement(sourceBlocks, effective, "REPLACED", ctx);
+      return { systemPrompt: effective };
     } catch (error) {
-      return { systemPrompt: [failClosedSystemPrompt(error, ctx)] };
+      const effective = [failClosedSystemPrompt(error, ctx)];
+      recordReplacement(sourceBlocks, effective, "FAIL_CLOSED", ctx);
+      return { systemPrompt: effective };
     }
   }
-  return { enter, exit, restore, ensure, promptReplacement, isEnabled: () => enabled };
+  return {
+    enter, exit, restore, ensure, promptReplacement, verifyProviderPrompt, promptStatus,
+    isEnabled: () => enabled,
+  };
 }
 
 function registerBbkEntrypoint(pi, mode) {
@@ -1719,6 +1891,22 @@ function registerBbkEntrypoint(pi, mode) {
     handler: async (first, second) => {
       const { ctx } = commandInvocation(first, second);
       return exitMode(ctx);
+    },
+  });
+
+  pi.registerCommand("bbk:prompt-status", {
+    description: "show effective BBK prompt replacement and provider-bound verification receipts",
+    handler: async (first, second) => {
+      const { args, ctx } = commandInvocation(first, second);
+      const result = mode.promptStatus(ctx);
+      const jsonMode = String(args || "").trim().toLowerCase() === "json";
+      const text = jsonMode
+        ? JSON.stringify(result, null, 2)
+        : result.latest.length
+          ? result.latest.map(item => `${item.role || item.prompt_kind || "unknown"} · ${item.phase} · ${item.status} · ${item.observed?.sha256 || item.effective?.sha256 || item.expected?.sha256 || "no-digest"}`).join("\n")
+          : "No BBK prompt receipts are recorded in the current branch.";
+      ctx?.ui?.notify?.(text, "info");
+      return undefined;
     },
   });
 }
@@ -1792,6 +1980,14 @@ async function publishRoutingResult(_pi, ctx, value, label) {
     let text;
     if (details.status === "EXPORTED") {
       text = `${label}: EXPORTED${details.path ? `\npath: ${details.path}` : ""}\nScope: ${routingScope(details)}${details.project_root ? `\nProject: ${details.project_root}` : ""}`;
+    } else if (["bbk.omp-project-routing-status.v1", "bbk.omp-project-routing-localization.v1", "bbk.omp-project-routing-repair.v1"].includes(details.schema)) {
+      text = [
+        `${label}: ${details.status || "UNKNOWN"}`,
+        `Project: ${details.project_root || "unknown"}`,
+        `User routing unchanged: ${details.user_state_unchanged === false ? "no" : "yes"}`,
+        details.reload_required ? "Reload required: yes" : "Reload required: no",
+        details.smallest_next_action ? `Next: ${details.smallest_next_action}` : null,
+      ].filter(Boolean).join("\n");
     } else if (details.roles || details.summary) {
       text = routeSummaryText(details);
       if (typeof details.changed_role_count === "number") {
@@ -1851,6 +2047,58 @@ function routingTargetFromLabel(label) {
   if (String(label || "").startsWith("Automatic")) return "auto";
   return null;
 }
+
+function projectLocalizationRoot(ctx, details = {}) {
+  return path.resolve(details.project_root || details.resolved_project_root || ctx?.cwd || process.cwd());
+}
+async function executeProjectLocalization(pi, ctx, action, projectRoot, { dryRunOnly = false } = {}) {
+  const cwd = ctx?.cwd || process.cwd();
+  const root = path.resolve(projectRoot || cwd);
+  if (action === "status") {
+    return publishRoutingResult(
+      pi,
+      ctx,
+      await runRouting(["project-status", "--project-root", root], cwd, undefined, "user"),
+      "bbk:models project-status",
+    );
+  }
+  const planArgs = action === "create"
+    ? ["create-project", "--project-root", root, "--dry-run"]
+    : ["repair-project", "--project-root", root];
+  const plan = await runRouting(planArgs, cwd, undefined, "user");
+  if (plan.code !== 0) return publishRoutingResult(pi, ctx, plan, `bbk:models ${action}-project`);
+  if (dryRunOnly) return publishRoutingResult(pi, ctx, plan, `bbk:models ${action}-project dry-run`);
+  const details = plan.details || {};
+  const planSummary = details.installer_result?.summary
+    ? JSON.stringify(details.installer_result.summary)
+    : `${details.installer_result?.file_count || details.installer_result?.files?.length || "unknown"} planned files`;
+  let confirmed = true;
+  if (typeof ctx?.ui?.confirm === "function") {
+    confirmed = Boolean(await ctx.ui.confirm(
+      action === "create" ? "Create project-local BBK routing?" : "Repair project-local BBK routing?",
+      [
+        `Project: ${root}`,
+        `Plan: ${planSummary}`,
+        "Source: exact effective authenticated user OMP routes",
+        "Effect: project-scoped OMP-only BBK installation; user routing remains unchanged",
+        action === "repair" ? "Modified manifest-owned files are backed up by the installer before replacement." : null,
+      ].filter(Boolean).join("\n"),
+    ));
+  } else if (!ctx?.hasUI) {
+    ctx?.ui?.notify?.("A UI confirmation is required for project routing creation or repair. Use the Python router with explicit arguments for headless automation.", "warning");
+    return undefined;
+  }
+  if (!confirmed) return undefined;
+  const applyArgs = action === "create"
+    ? ["create-project", "--project-root", root]
+    : ["repair-project", "--project-root", root, "--apply"];
+  const applied = await runRouting(applyArgs, cwd, undefined, "user");
+  const result = await publishRoutingResult(pi, ctx, applied, `bbk:models ${action}-project`);
+  if (applied.code === 0 && applied.details?.reload_required) {
+    ctx?.ui?.notify?.(`Project-local BBK routing is installed at ${root}. Reload or restart OMP in this project before spawning new BBK agents.`, "info");
+  }
+  return result;
+}
 async function interactiveRoutingMenu(pi, ctx, requestedScope = "auto") {
   if (!ctx?.hasUI || typeof ctx?.ui?.select !== "function") {
     return publishRoutingResult(pi, ctx, await runRouting(["status"], ctx?.cwd || process.cwd(), undefined, requestedScope), "bbk:models status");
@@ -1858,7 +2106,11 @@ async function interactiveRoutingMenu(pi, ctx, requestedScope = "auto") {
   const initial = await runRouting(["status"], ctx.cwd || process.cwd(), undefined, requestedScope);
   if (initial.code !== 0) return publishRoutingResult(pi, ctx, initial, "bbk:models status");
   const scopeLabel = `${routingScope(initial.details)}${initial.details.project_root ? ` · ${initial.details.project_root}` : ""}`;
+  const projectAction = routingScope(initial.details) === "user"
+    ? "Create project-local routing for this directory"
+    : "Inspect or repair this project-local routing";
   const action = await ctx.ui.select(`BBK OMP sub-agent model routing [${scopeLabel}]`, [
+    projectAction,
     "Apply a routing profile",
     "Edit one sub-agent",
     "View current routing",
@@ -1868,6 +2120,16 @@ async function interactiveRoutingMenu(pi, ctx, requestedScope = "auto") {
     "Cancel",
   ]);
   if (!action || action === "Cancel") return;
+  if (action === "Create project-local routing for this directory") {
+    return executeProjectLocalization(pi, ctx, "create", projectLocalizationRoot(ctx));
+  }
+  if (action === "Inspect or repair this project-local routing") {
+    const projectRoot = projectLocalizationRoot(ctx, initial.details);
+    const choice = await ctx.ui.select("Project-local routing", ["View project routing status", "Dry-run repair", "Apply repair", "Cancel"]);
+    if (!choice || choice === "Cancel") return;
+    if (choice === "View project routing status") return executeProjectLocalization(pi, ctx, "status", projectRoot);
+    return executeProjectLocalization(pi, ctx, "repair", projectRoot, { dryRunOnly: choice === "Dry-run repair" });
+  }
   if (action === "Choose routing target") {
     const selected = await ctx.ui.select("Routing target", routingTargetLabels());
     const nextScope = routingTargetFromLabel(selected);
@@ -1965,6 +2227,15 @@ function registerModelRoutingCommand(pi) {
       const { args, ctx } = commandInvocation(first, second);
       const tokens = splitArgs(args);
       if (!tokens.length) return interactiveRoutingMenu(pi, ctx, "auto");
+      if (tokens[0] === "project" && ["create", "repair", "status"].includes(tokens[1])) {
+        const projectAction = tokens[1];
+        const remainder = tokens.slice(2);
+        const dryRunOnly = remainder.includes("--dry-run");
+        const explicitPath = remainder.find(value => value !== "--dry-run" && value !== "--apply");
+        const projectRoot = path.resolve(explicitPath || ctx?.cwd || process.cwd());
+        if (projectAction === "status") return executeProjectLocalization(pi, ctx, "status", projectRoot);
+        return executeProjectLocalization(pi, ctx, projectAction, projectRoot, { dryRunOnly });
+      }
       let requestedScope = "auto";
       if (tokens[0] === "--scope" && ["auto", "project", "user"].includes(tokens[1])) {
         tokens.shift();
@@ -1973,6 +2244,14 @@ function registerModelRoutingCommand(pi) {
         requestedScope = tokens.shift();
       }
       const [action, ...rest] = tokens;
+      if (["project-status", "create-project", "repair-project"].includes(action)) {
+        const dryRunOnly = rest.includes("--dry-run");
+        const explicitPath = rest.find(value => value !== "--dry-run" && value !== "--apply");
+        const projectRoot = path.resolve(explicitPath || ctx?.cwd || process.cwd());
+        if (action === "project-status") return executeProjectLocalization(pi, ctx, "status", projectRoot);
+        if (action === "create-project") return executeProjectLocalization(pi, ctx, "create", projectRoot, { dryRunOnly });
+        return executeProjectLocalization(pi, ctx, "repair", projectRoot, { dryRunOnly });
+      }
       let argv;
       let mutating = false;
       if (!action || ["status", "profiles", "list"].includes(action)) argv = ["status"];
@@ -1981,7 +2260,7 @@ function registerModelRoutingCommand(pi) {
       else if (["apply", "apply-file"].includes(action) && rest.length === 1) { argv = ["apply-file", rest[0]]; mutating = true; }
       else if (action === "export" && rest.length >= 1) argv = ["export", rest[0], ...(rest[1] ? ["--id", rest[1]] : [])];
       else {
-        ctx?.ui?.notify?.("Usage: /bbk:models [auto|project|user] [status | profile <id> | set <role> <model> <thinking> | apply <file> | export <file> [id]]", "warning");
+        ctx?.ui?.notify?.("Usage: /bbk:models project [create|repair|status] [path] [--dry-run]; /bbk:models project profile <id>; or /bbk:models [auto|project|user] [status | profile <id> | set <role> <model> <thinking> | apply <file> | export <file> [id]]", "warning");
         return;
       }
       if (mutating) {
@@ -2037,8 +2316,8 @@ export default function bbkExtension(pi) {
 
   registerCliTool(pi, {
     name: "bbk_init", label: "BBK Initialize", description: "Initialize or add missing .bbk project records without overwriting existing records.",
-    parameters: z.object({ root: text(), title: text(), projectId: text() }),
-    argv: p => ["init", ...rootArgs(p.root), ...(p.title ? ["--title", p.title] : []), ...(p.projectId ? ["--project-id", p.projectId] : [])],
+    parameters: z.object({ root: text(), title: text(), projectId: text(), noExamples: bool() }),
+    argv: p => ["init", ...rootArgs(p.root), ...(p.title ? ["--title", p.title] : []), ...(p.projectId ? ["--project-id", p.projectId] : []), ...(p.noExamples ? ["--no-examples"] : [])],
   });
   registerCliTool(pi, {
     name: "bbk_status", label: "BBK Status", description: "Read package/project, candidate, workspace, profile and gate status.",
@@ -2090,6 +2369,96 @@ export default function bbkExtension(pi) {
   registerCliTool(pi, {
     name: "bbk_structure_validate", label: "BBK Structure", description: "Validate a domain-neutral ImplementationStructureContract.",
     parameters: z.object({ path: z.string() }), argv: p => ["structure", "validate", p.path],
+  });
+  registerCliTool(pi, {
+    name: "bbk_schema_template", label: "BBK Schema Template", description: "Create a canonical BBK template, including compact infrastructure and network contracts.",
+    parameters: z.object({ kind: z.string(), output: z.string(), subjectKind: text(), depth: text(), force: bool() }),
+    argv: p => ["schema", "template", "--kind", p.kind, "--output", p.output,
+      ...(p.subjectKind ? ["--subject-kind", p.subjectKind] : []), ...(p.depth ? ["--depth", p.depth] : []), ...(p.force ? ["--force"] : [])],
+  });
+  registerCliTool(pi, {
+    name: "bbk_schema_enum", label: "BBK Schema Enum", description: "Inspect the schema node, allowed values, description, and smallest valid example for an instance pointer.",
+    parameters: z.object({ schema: z.string(), pointer: z.string() }),
+    argv: p => ["schema", "enum", "--schema", p.schema, "--pointer", p.pointer],
+  });
+  registerCliTool(pi, {
+    name: "bbk_schema_explain", label: "BBK Schema Explain", description: "Explain validation failures and applicability using built-in validation plus an optional Draft 2020-12 cross-check.",
+    parameters: z.object({ schema: z.string(), instance: z.string(), pointer: text() }),
+    argv: p => ["schema", "explain", "--schema", p.schema, "--instance", p.instance, ...(p.pointer ? ["--pointer", p.pointer] : [])],
+  });
+  registerCliTool(pi, {
+    name: "bbk_artifact_manifest", label: "BBK Artifact Manifest", description: "Create a deterministic, content-addressed manifest for an exact artifact set without ad hoc hashing scripts.",
+    parameters: z.object({ root: text(), paths: texts(), includes: texts(), excludes: texts(), includeExamples: bool(), subject: text(), rootLabel: text(), output: text() }),
+    argv: p => ["artifact", "manifest", ...rootArgs(p.root), ...repeated("--path", p.paths), ...repeated("--include", p.includes),
+      ...repeated("--exclude", p.excludes), ...(p.includeExamples ? ["--include-examples"] : []), ...(p.subject ? ["--subject", p.subject] : []),
+      ...(p.rootLabel ? ["--root-label", p.rootLabel] : []), ...(p.output ? ["--output", p.output] : [])],
+  });
+  registerCliTool(pi, {
+    name: "bbk_artifact_preflight", label: "BBK Artifact Package Preflight", description: "Run strict JSON, profile, identity, reference, and package-closure checks against an artifact-package draft before review or sealing.",
+    parameters: z.object({ draftRoot: z.string(), registry: text(), maxDepth: text() }),
+    argv: p => ["artifact", "preflight", p.draftRoot, ...(p.registry ? ["--registry", p.registry] : []), ...(p.maxDepth ? ["--max-depth", String(p.maxDepth)] : [])],
+  });
+  registerCliTool(pi, {
+    name: "bbk_artifact_seal", label: "BBK Artifact Package Seal", description: "Preflight, canonicalize, stage, verify, and atomically publish a new immutable artifact package.",
+    parameters: z.object({ draftRoot: z.string(), output: z.string(), registry: text(), recoverStaleLock: bool() }),
+    argv: p => ["artifact", "seal", p.draftRoot, "--output", p.output, ...(p.registry ? ["--registry", p.registry] : []), ...(p.recoverStaleLock ? ["--recover-stale-lock"] : [])],
+  });
+  registerCliTool(pi, {
+    name: "bbk_artifact_verify", label: "BBK Artifact Verify", description: "Read-only verify either a sealed artifact package or a legacy artifact manifest against exact stored bytes.",
+    parameters: z.object({ manifest: z.string(), root: text(), registry: text() }),
+    argv: p => ["artifact", "verify", p.manifest, ...rootArgs(p.root), ...(p.registry ? ["--registry", p.registry] : [])],
+  });
+  registerCliTool(pi, {
+    name: "bbk_artifact_successor", label: "BBK Artifact Package Successor", description: "Create a new editable draft bound to an exact immutable predecessor package without modifying the predecessor.",
+    parameters: z.object({ sealedRoot: z.string(), output: z.string(), revision: z.string(), reason: z.string(), registry: text(), recoverStaleLock: bool() }),
+    argv: p => ["artifact", "successor", p.sealedRoot, "--output", p.output, "--revision", p.revision, "--reason", p.reason,
+      ...(p.registry ? ["--registry", p.registry] : []), ...(p.recoverStaleLock ? ["--recover-stale-lock"] : [])],
+  });
+  registerCliTool(pi, {
+    name: "bbk_host_preflight", label: "BBK Host Preflight", description: "Run bounded read-only probes for only the capabilities named by an exact host-preflight request, with host-bound cache evidence.",
+    parameters: z.object({ request: z.string(), root: text(), output: text(), cacheDir: text(), noCache: bool(), timeout: text() }),
+    argv: p => ["preflight", "run", p.request, ...rootArgs(p.root), ...(p.output ? ["--output", p.output] : []),
+      ...(p.cacheDir ? ["--cache-dir", p.cacheDir] : []), ...(p.noCache ? ["--no-cache"] : []), ...(p.timeout ? ["--timeout", String(p.timeout)] : [])],
+  });
+  registerCliTool(pi, {
+    name: "bbk_context_worker", label: "BBK Worker Context Package", description: "Generate and seal a standard Worker context from a complete WorkUnit, profile lock, host preflight, governing references, and optional prototype charter.",
+    parameters: z.object({ root: text(), workUnit: z.string(), profileLock: z.string(), hostPreflight: z.string(), prototypeCharter: text(), output: text(), id: text(), revision: text() }),
+    argv: p => ["context", "worker", ...rootArgs(p.root), "--work-unit", p.workUnit, "--profile-lock", p.profileLock, "--host-preflight", p.hostPreflight,
+      ...(p.prototypeCharter ? ["--prototype-charter", p.prototypeCharter] : []), ...(p.output ? ["--output", p.output] : []),
+      ...(p.id ? ["--id", p.id] : []), ...(p.revision ? ["--revision", p.revision] : [])],
+  });
+  registerCliTool(pi, {
+    name: "bbk_context_review", label: "BBK Review Context Package", description: "Generate and seal a candidate-bound review or focused-recheck package from exact review focus, floors, findings, evidence, and assurance mode.",
+    parameters: z.object({ root: text(), candidate: z.string(), request: z.string(), output: text(), id: text(), revision: text() }),
+    argv: p => ["context", "review", ...rootArgs(p.root), "--candidate", p.candidate, "--request", p.request,
+      ...(p.output ? ["--output", p.output] : []), ...(p.id ? ["--id", p.id] : []), ...(p.revision ? ["--revision", p.revision] : [])],
+  });
+  registerCliTool(pi, {
+    name: "bbk_handoff_create", label: "BBK Sealed Handoff", description: "Create a new immutable bbk.handoff.v2 package; use legacyV1 only for an explicit compatibility record.",
+    parameters: z.object({ root: text(), id: text(), workUnit: z.string(), attempt: text(), role: text(), invocationId: text(), threadId: text(), subjectKind: text(), subjectId: text(), subjectRevision: text(), authoritySource: text(), authorityScopes: texts(), authorityNotStanding: bool(), capabilityZones: texts(), interruptReason: text(), interruptEvidence: texts(), partialWorkLocation: text(), disposition: z.string(), summary: z.string(), workPerformed: texts(), changedPaths: texts(), commandsRun: texts(), checks: texts(), findings: texts(), discoveries: texts(), residuals: texts(), blockers: texts(), artifacts: texts(), evidence: texts(), continuationState: text(), checkpoint: text(), noResumeSameThread: bool(), completedStep: text(), nextStep: text(), nextAction: z.string(), cleanupState: text(), cleanupActions: texts(), prohibitedClaims: texts(), legacyV1: bool(), output: text(), force: bool() }),
+    argv: p => ["handoff", "create", ...rootArgs(p.root), ...(p.id ? ["--id", p.id] : []), "--work-unit", p.workUnit,
+      ...(p.attempt ? ["--attempt", String(p.attempt)] : []), ...(p.role ? ["--role", p.role] : []), ...(p.invocationId ? ["--invocation-id", p.invocationId] : []),
+      ...(p.threadId ? ["--thread-id", p.threadId] : []), ...(p.subjectKind ? ["--subject-kind", p.subjectKind] : []), ...(p.subjectId ? ["--subject-id", p.subjectId] : []),
+      ...(p.subjectRevision ? ["--subject-revision", p.subjectRevision] : []), ...(p.authoritySource ? ["--authority-source", p.authoritySource] : []),
+      ...repeated("--authority-scope", p.authorityScopes), ...(p.authorityNotStanding ? ["--authority-not-standing"] : []), ...repeated("--capability-zone", p.capabilityZones),
+      ...(p.interruptReason ? ["--interrupt-reason", p.interruptReason] : []), ...repeated("--interrupt-evidence", p.interruptEvidence),
+      ...(p.partialWorkLocation ? ["--partial-work-location", p.partialWorkLocation] : []), "--disposition", p.disposition, "--summary", p.summary,
+      ...repeated("--work-performed", p.workPerformed), ...repeated("--changed-path", p.changedPaths), ...repeated("--command-run", p.commandsRun),
+      ...repeated("--check", p.checks), ...repeated("--finding", p.findings), ...repeated("--discovery", p.discoveries), ...repeated("--residual", p.residuals),
+      ...repeated("--blocker", p.blockers), ...repeated("--artifact", p.artifacts), ...repeated("--evidence", p.evidence),
+      ...(p.continuationState ? ["--continuation-state", p.continuationState] : []), ...(p.checkpoint ? ["--checkpoint", p.checkpoint] : []),
+      ...(p.noResumeSameThread ? ["--no-resume-same-thread"] : []), ...(p.completedStep ? ["--completed-step", p.completedStep] : []), ...(p.nextStep ? ["--next-step", p.nextStep] : []),
+      "--next-action", p.nextAction, ...(p.cleanupState ? ["--cleanup-state", p.cleanupState] : []), ...repeated("--cleanup-action", p.cleanupActions),
+      ...repeated("--prohibited-claim", p.prohibitedClaims), ...(p.legacyV1 ? ["--legacy-v1"] : []), ...(p.output ? ["--output", p.output] : []), ...(p.force ? ["--force"] : [])],
+  });
+  registerCliTool(pi, {
+    name: "bbk_handoff_verify", label: "BBK Handoff Verify", description: "Verify a sealed bbk.handoff.v2 package or consume-compatible bbk.handoff.v1 record.",
+    parameters: z.object({ path: z.string(), root: text() }), argv: p => ["handoff", "verify", p.path, ...rootArgs(p.root)],
+  });
+  registerCliTool(pi, {
+    name: "bbk_handoff_list", label: "BBK Handoff List", description: "List sealed v2 handoffs and legacy v1 handoffs without treating package internals as independent records.",
+    parameters: z.object({ root: text(), workUnit: text(), latest: bool() }),
+    argv: p => ["handoff", "list", ...rootArgs(p.root), ...(p.workUnit ? ["--work-unit", p.workUnit] : []), ...(p.latest ? ["--latest"] : [])],
   });
   registerCliTool(pi, {
     name: "bbk_slice_validate", label: "BBK Execution Slice", description: "Validate a domain-neutral execution slice.",
@@ -2218,6 +2587,21 @@ export default function bbkExtension(pi) {
   registerCommand(pi, "bbk:fit:validate", "<fit-path>", ["fit", "validate"], { requireArgs: true });
   registerCommand(pi, "bbk:fit:check", "--fit <path> [--structure/--slice/--work-unit <path>]", ["fit", "check-chain"], { requireArgs: true });
   registerCommand(pi, "bbk:structure:validate", "<contract-path>", ["structure", "validate"], { requireArgs: true });
+  registerCommand(pi, "bbk:schema:list", "list known BBK schema and template kinds", ["schema", "list"]);
+  registerCommand(pi, "bbk:schema:template", "--kind <kind> --output <path> [--subject-kind <kind> --depth compact|standard|full]", ["schema", "template"], { requireArgs: true });
+  registerCommand(pi, "bbk:schema:enum", "--schema <kind-or-path> --pointer </json/pointer>", ["schema", "enum"], { requireArgs: true });
+  registerCommand(pi, "bbk:schema:explain", "--schema <kind-or-path> --instance <path> [--pointer </json/pointer>]", ["schema", "explain"], { requireArgs: true });
+  registerCommand(pi, "bbk:artifact:manifest", "[--root <path>] [--path <path>...] [--output <path>]", ["artifact", "manifest"]);
+  registerCommand(pi, "bbk:artifact:preflight", "<draft-root> [--registry <path>] [--max-depth <n>]", ["artifact", "preflight"], { requireArgs: true });
+  registerCommand(pi, "bbk:artifact:seal", "<draft-root> --output <new-package-dir> [--registry <path>]", ["artifact", "seal"], { requireArgs: true });
+  registerCommand(pi, "bbk:artifact:verify", "<manifest-path> [--root <path>]", ["artifact", "verify"], { requireArgs: true });
+  registerCommand(pi, "bbk:artifact:successor", "<sealed-package-dir> --output <draft-dir> --revision <revision> --reason <reason>", ["artifact", "successor"], { requireArgs: true });
+  registerCommand(pi, "bbk:preflight", "<request-path> [--output <path>] [--no-cache]", ["preflight", "run"], { requireArgs: true });
+  registerCommand(pi, "bbk:context:worker", "--work-unit <path> --profile-lock <path> --host-preflight <path> [options]", ["context", "worker"], { requireArgs: true });
+  registerCommand(pi, "bbk:context:review", "--candidate <sealed-dir> --request <path> [options]", ["context", "review"], { requireArgs: true });
+  registerCommand(pi, "bbk:handoff:create", "--work-unit <id> --disposition <value> --summary <text> --next-action <text> [options]", ["handoff", "create"], { requireArgs: true });
+  registerCommand(pi, "bbk:handoff:verify", "<path> [--root <path>]", ["handoff", "verify"], { requireArgs: true });
+  registerCommand(pi, "bbk:handoff:list", "[--work-unit <id>] [--latest]", ["handoff", "list"]);
   registerCommand(pi, "bbk:slice:validate", "<slice-path>", ["slice", "validate"], { requireArgs: true });
   registerCommand(pi, "bbk:work-unit:validate", "<work-unit-path>", ["work-unit", "validate"], { requireArgs: true });
   registerCommand(pi, "bbk:profile:resolve", "--id <profile> [resolver options]", ["profile", "resolve"], { requireArgs: true });
@@ -2236,6 +2620,7 @@ export default function bbkExtension(pi) {
   registerCommand(pi, "bbk:review-learn", "--id <id> --type <type> --lesson <text> --scope <scope> --confidence <value> --uncertainty <text> --action <text> --output <path>", ["review", "learn"], { requireArgs: true });
 
   pi.on?.("before_agent_start", async (event, ctx) => bbkMode.promptReplacement(event, ctx));
+  pi.on?.("before_provider_request", async (event, ctx) => bbkMode.verifyProviderPrompt(event, ctx));
   const restoreBbkMode = async (_event, ctx) => {
     bbkActivity.reset(ctx);
     const active = bbkMode.restore(ctx);

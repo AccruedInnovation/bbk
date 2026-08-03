@@ -1,0 +1,208 @@
+{
+  "schema": "bbk.implementation-structure-contract.v3",
+  "contractId": "STRUCT-INFRA-001",
+  "revision": "r1",
+  "title": "Compact infrastructure or network structure",
+  "status": "draft",
+  "contractDepth": "compact",
+  "subject": {
+    "purpose": "Define the minimum topology, interfaces, trust boundaries, operational checks, and pre-execution confirmations for one bounded infrastructure or network change.",
+    "kind": "infrastructure",
+    "baselineRefs": [
+      "BASELINE-TBD"
+    ],
+    "scopeRefs": [
+      "SCOPE-INFRASTRUCTURE"
+    ],
+    "solutionOutcomeFitRefs": [],
+    "outcomeRefs": [],
+    "requirementRefs": [],
+    "architectureRefs": [],
+    "capabilityRefs": [],
+    "interfaceRefs": [],
+    "assumptionRefs": []
+  },
+  "applicability": {
+    "level": "contract",
+    "triggers": [
+      "multiple nodes or environments",
+      "network or trust boundary",
+      "configuration with operational effects"
+    ],
+    "rationale": "A compact contract is sufficient when topology, interfaces, authority, recovery, and verification matter but a full software State–Decision–Effect model does not."
+  },
+  "sectionApplicability": {
+    "stateDecisionEffect": {
+      "status": "NOT_APPLICABLE",
+      "rationale": "No independently evolving semantic product state is introduced by this bounded configuration contract.",
+      "trigger": "Reassess if retries, ambiguous acknowledgement, concurrent mutation, or durable semantic state becomes material."
+    },
+    "migration": {
+      "status": "APPLICABLE",
+      "rationale": "Configuration replacement and rollback touchpoints must be named.",
+      "trigger": null
+    },
+    "failureRecovery": {
+      "status": "REQUIRED",
+      "rationale": "Connectivity and configuration changes require containment and rollback.",
+      "trigger": null
+    },
+    "securityTrust": {
+      "status": "REQUIRED",
+      "rationale": "The contract crosses a network or trust boundary.",
+      "trigger": null
+    },
+    "preExecutionConfirmation": {
+      "status": "REQUIRED",
+      "rationale": "Exact node, platform, policy, and tool facts must be confirmed before effects.",
+      "trigger": null
+    }
+  },
+  "structure": {
+    "artifactTopology": [
+      {
+        "id": "ART-CONFIG-SET",
+        "action": "create",
+        "kind": "configuration-set",
+        "logicalPath": "deploy/<node-or-service>/",
+        "responsibility": "Hold parameterized configuration and rollback material for the bounded infrastructure change.",
+        "owner": "execution owner",
+        "notes": "Replace placeholders before execution."
+      }
+    ],
+    "keyContracts": [
+      {
+        "id": "KC-NETWORK-BOUNDARY",
+        "kind": "network-interface",
+        "name": "Bounded connectivity contract",
+        "shape": "source, destination, transport, authorization, expected observation, failure behavior",
+        "responsibility": "Define the exact permitted communication path and prevent implicit broad exposure.",
+        "visibility": "shared",
+        "invariants": [
+          "Only declared peers and routes are permitted."
+        ],
+        "failureSemantics": [
+          "A failed or ambiguous connection does not broaden routing or authority."
+        ]
+      }
+    ],
+    "behaviorPaths": [
+      {
+        "id": "BP-APPLY-VERIFY-ROLLBACK",
+        "name": "Apply, verify, and safely reverse configuration",
+        "trigger": "Authorized execution of this bounded configuration",
+        "steps": [
+          {
+            "from": "prepared configuration",
+            "to": "applied configuration",
+            "interaction": "Apply through the declared owner and effect boundary.",
+            "contractRef": "KC-NETWORK-BOUNDARY"
+          },
+          {
+            "from": "applied configuration",
+            "to": "verified or rolled back state",
+            "interaction": "Observe exact success criteria; roll back on failed or ambiguous results.",
+            "contractRef": "KC-NETWORK-BOUNDARY"
+          }
+        ],
+        "success": "Required connectivity and isolation observations are established.",
+        "failureAndRecovery": [
+          "Preserve prior configuration, stop affected traffic, and restore the last known-good state."
+        ]
+      }
+    ],
+    "stateOwnership": [],
+    "effectBoundaries": [
+      {
+        "effect": "Apply infrastructure or network configuration",
+        "owner": "execution owner",
+        "authorization": "Exact effect grant for the named node or service",
+        "idempotency": "Use compare-before-write or a documented safe replay strategy.",
+        "failure": "Partial or ambiguous application may disrupt connectivity.",
+        "recovery": "Restore the captured pre-state or execute the bound rollback procedure."
+      }
+    ],
+    "testSeams": [
+      {
+        "id": "TS-CONNECTIVITY",
+        "statement": "Verify declared reachability and explicit denial from the exact affected nodes."
+      }
+    ],
+    "observabilityPoints": [
+      {
+        "id": "OBS-CONFIG",
+        "statement": "Record active configuration, service health, route or policy state, and endpoint observations."
+      }
+    ],
+    "migrationTouchpoints": [
+      {
+        "id": "MIG-ROLLBACK",
+        "statement": "Capture pre-state and define a tested rollback or successor configuration path."
+      }
+    ]
+  },
+  "decisions": {
+    "fixed": [
+      {
+        "id": "FD-BOUNDARY",
+        "statement": "Only explicitly declared nodes, routes, interfaces, and effects are in scope.",
+        "rationale": "Prevents a compact infrastructure contract from becoming a flat implicit network grant.",
+        "changeRoute": "Return material topology, trust-boundary, or authority changes to the responsible planning owner."
+      }
+    ],
+    "delegated": [
+      {
+        "area": "Private configuration syntax and local sequencing",
+        "bounds": "May vary when it preserves the declared topology, interfaces, trust boundaries, effects, checks, and rollback."
+      }
+    ],
+    "prohibited": [
+      "Do not broaden network exposure, credentials, effects, or authority through an implementation convenience."
+    ]
+  },
+  "preExecutionConfirmations": [
+    {
+      "id": "CONF-NODES",
+      "subjectRef": "SCOPE-INFRASTRUCTURE",
+      "classification": "ENVIRONMENT_FACT",
+      "statement": "Confirm exact node identities, operating systems or firmware, interfaces, addresses, and administrative owners.",
+      "owner": "planning or execution owner",
+      "method": "Authenticated inventory or bounded read-only inspection of every target node",
+      "blocking": "BEFORE_EXECUTION",
+      "status": "OPEN",
+      "evidenceRefs": [],
+      "reopenTrigger": "Any node, interface, or platform changes."
+    },
+    {
+      "id": "CONF-POLICY",
+      "subjectRef": "SCOPE-INFRASTRUCTURE",
+      "classification": "NETWORK_POLICY",
+      "statement": "Confirm applicable egress, ingress, firewall, certificate, credential, and external-owner restrictions.",
+      "owner": "planning or execution owner",
+      "method": "Authoritative policy source or bounded endpoint probe",
+      "blocking": "BEFORE_EFFECT",
+      "status": "OPEN",
+      "evidenceRefs": [],
+      "reopenTrigger": "Policy, network, certificate, or endpoint changes."
+    }
+  ],
+  "specialistDispositions": [],
+  "review": {
+    "assuranceTier": "material",
+    "requiredReviewers": [],
+    "acceptanceCriteria": [
+      "Topology, interfaces, trust boundaries, effects, and rollback are explicit.",
+      "Pre-execution confirmations identify every material unknown and owner.",
+      "No unverified command or platform behavior is represented as exact."
+    ],
+    "acceptedBy": [],
+    "reviewRefs": []
+  },
+  "executionSliceRefs": [],
+  "profileProjections": {},
+  "uncertainties": [],
+  "metadata": {
+    "template": "compact-infrastructure",
+    "notes": "Use `bbk schema template --kind implementation-structure --subject-kind infrastructure --depth compact` to regenerate this skeleton."
+  }
+}

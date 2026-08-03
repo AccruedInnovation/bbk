@@ -1,0 +1,246 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-territory-wayfinder-return-v2.schema.json",
+  "title": "BBK BBK Territory Wayfinder return v2",
+  "description": "Role-specific `bbk.role-return.v2` COMPACT/FULL contract for `bbk_territory_wayfinder`.",
+  "allOf": [
+    {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "contract": {
+          "const": "bbk.territory-wayfinder-return.v2"
+        },
+        "role": {
+          "const": "bbk_territory_wayfinder"
+        },
+        "executor": {
+          "type": "object",
+          "properties": {
+            "role": {
+              "const": "bbk_territory_wayfinder"
+            }
+          },
+          "required": [
+            "role"
+          ]
+        },
+        "invocation_mode": {
+          "enum": [
+            "ROOT_TERRITORY_CHILD",
+            "TERRITORY_RECURSION"
+          ]
+        },
+        "return_kind": {
+          "enum": [
+            "CHECKPOINT",
+            "TERRITORY_PLANNING_REPORT"
+          ]
+        },
+        "operational_disposition": {
+          "enum": [
+            "COMPLETE",
+            "PARTIAL",
+            "BLOCKED_TECHNICAL",
+            "BLOCKED_AUTHORITY",
+            "BLOCKED_DECISION",
+            "PAUSED_CAPACITY",
+            "PAUSED_HOST_WINDOW",
+            "CANCELLED",
+            "INCONCLUSIVE"
+          ]
+        },
+        "semantic_state": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "value"
+          ],
+          "properties": {
+            "name": {
+              "const": "territory_readiness"
+            },
+            "value": {
+              "enum": [
+                "READY_FOR_PARENT_INTEGRATION",
+                "READY_TO_PLAN",
+                "NEEDS_DECISION",
+                "NEEDS_INVESTIGATION",
+                "BLOCKED"
+              ]
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "invocation_mode": {
+                "const": "ROOT_TERRITORY_CHILD"
+              }
+            },
+            "required": [
+              "invocation_mode"
+            ]
+          },
+          "then": {
+            "properties": {
+              "parent_ref": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "const": "canonical_role"
+                      },
+                      "id": {
+                        "enum": [
+                          "bbk_root_wayfinder"
+                        ]
+                      },
+                      "invocation_mode": {
+                        "const": "ROOT_TERRITORY_CHILD"
+                      },
+                      "role": {
+                        "enum": [
+                          "bbk_root_wayfinder"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "id",
+                      "invocation_mode",
+                      "role"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "invocation_mode": {
+                "const": "TERRITORY_RECURSION"
+              }
+            },
+            "required": [
+              "invocation_mode"
+            ]
+          },
+          "then": {
+            "properties": {
+              "parent_ref": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "const": "canonical_role"
+                      },
+                      "id": {
+                        "enum": [
+                          "bbk_territory_wayfinder"
+                        ]
+                      },
+                      "invocation_mode": {
+                        "const": "TERRITORY_RECURSION"
+                      },
+                      "role": {
+                        "enum": [
+                          "bbk_territory_wayfinder"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "id",
+                      "invocation_mode",
+                      "role"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "detail_level": {
+                "const": "COMPACT"
+              }
+            },
+            "required": [
+              "detail_level"
+            ]
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "$ref": "https://bbk.local/schemas/bbk-territory-wayfinder-compact-result-v2.schema.json"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "detail_level": {
+                "const": "FULL"
+              }
+            },
+            "required": [
+              "detail_level"
+            ]
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "$ref": "https://bbk.local/schemas/bbk-territory-wayfinder-result-v1.schema.json"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "x-bbk-role": "bbk_territory_wayfinder",
+  "x-bbk-contract": "bbk.territory-wayfinder-return.v2",
+  "x-bbk-envelope": "bbk.role-return.v2",
+  "x-bbk-v1-consume-compatible": true,
+  "x-bbk-full-result-schema": "spec/schemas/role-results/bbk-territory-wayfinder-result-v1.schema.json",
+  "x-bbk-compact-result-schema": "spec/schemas/role-results/bbk-territory-wayfinder-compact-result-v2.schema.json",
+  "x-bbk-full-detail-triggers": [
+    "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+    "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+    "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+    "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+    "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+    "The parent explicitly requested FULL detail.",
+    "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+  ],
+  "x-bbk-semantic-state-name": "territory_readiness",
+  "x-bbk-requirements": [
+    "Return one `bbk.role-return.v1` object with `contract` = `bbk.territory-wayfinder-return.v1`, `role` = `bbk_territory_wayfinder`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `territory_readiness` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
+    "Keep every required field present. Use null or an empty collection only with an explicit reason where the contract permits absence.",
+    "Use `READY_TO_PLAN` only when governing territory decisions and architecture direction are accepted under current authority, boundary contracts are current enough for decomposition, and no missing outcome, interface, authority, risk-acceptance, or verification decision must be invented by the Planning Wayfinder.",
+    "Use `READY_FOR_PARENT_INTEGRATION` only when no blocking internal frontier item remains, required child returns and governing sources are current, invalidation is resolved, boundary proposals and outward impacts are explicit, and residual uncertainty is proportionate.",
+    "Never return `READY_TO_EXECUTE`. Only the Root Wayfinder can establish global execution readiness after parent integration, accountable baseline acceptance, and covered execution authority.",
+    "Treat every shared or cross-territory interface change as a proposal until accepted by the named parent or root authority. Territory-local interface decisions are valid only inside explicitly delegated authority.",
+    "Treat every local work graph as subordinate input to the parent operating baseline; it grants no execution authority and does not settle global sequencing or cross-territory integration.",
+    "Bind exact, large, evidence-bearing, or authority-bearing artifacts through a verified `bbk-handoff` path, byte count, and SHA-256 rather than relying on conversational copying.",
+    "Decision references that depend on human input must identify the matching structured, authority-bound response. Ordinary prose, delivery receipts, silence, and timeouts are non-evidence.",
+    "When an upstream fact, decision, interface, authority grant, or subject revision changes, identify every affected local object and outward dependency; do not preserve stale work because it was costly.",
+    "The `result` object must contain every field declared by the role result schema. Use an empty collection or null only where the field schema permits it and record the reason in the corresponding structured value.",
+    "This return is governed by `spec/contracts/catalog.json`, the common `bbk.role-return.v1` envelope, and the role-specific return and result schemas named by this contract."
+  ],
+  "x-bbk-readiness-rule": "Use `READY_FOR_PARENT_INTEGRATION` only when no blocking internal frontier item remains, required child returns and governing sources are current, invalidation is resolved, boundary proposals and outward impacts are explicit, and residual uncertainty is proportionate.",
+  "x-bbk-authority-boundary": "A valid `bbk.territory-wayfinder-return.v1` return establishes only the `bbk_territory_wayfinder`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect."
+}

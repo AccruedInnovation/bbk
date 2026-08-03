@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-question-guide-compact-result-v2.schema.json",
+  "title": "BBK BBK Question Guide compact result payload v2",
+  "description": "Closed compact role-specific result payload for `bbk_question_guide`. Use FULL when material truth cannot fit these fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "accepted_decision_packet",
+    "non_resolution_packet",
+    "continuation_state",
+    "blockers",
+    "residual_uncertainty"
+  ],
+  "properties": {
+    "accepted_decision_packet": {
+      "anyOf": [
+        {
+          "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+          "description": "ADR-ready root-decision packet with exact authority evidence, rationale, alternatives, consequences, exposure history, affected objects, residual uncertainty, and invalidation triggers; null with a reason when unresolved or explicitly non-resolved."
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "ADR-ready root-decision packet with exact authority evidence, rationale, alternatives, consequences, exposure history, affected objects, residual uncertainty, and invalidation triggers; null with a reason when unresolved or explicitly non-resolved."
+    },
+    "non_resolution_packet": {
+      "anyOf": [
+        {
+          "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+          "description": "Explicit deferred, parked, blocked, insufficient-evidence, out-of-scope, cancelled, or superseded disposition with authority or governing rationale; null with a reason when resolved or still unresolved."
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Explicit deferred, parked, blocked, insufficient-evidence, out-of-scope, cancelled, or superseded disposition with authority or governing rationale; null with a reason when resolved or still unresolved."
+    },
+    "continuation_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Pending request or parent dependency, logical branch and physical invocation mapping, resumable checkpoint, exact resumption handle, stale-response fence, and next permitted interaction."
+    },
+    "blockers": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Typed context, factual, technical, authority, decision, controller-relay, host, evidence, or parent-action blockers and the smallest sufficient resolution path."
+    },
+    "residual_uncertainty": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Known uncertainty, accepted unknowns, consequence, owner, confidence limits, expiry, monitoring need, and reopening triggers."
+    }
+  },
+  "x-bbk-role": "bbk_question_guide",
+  "x-bbk-contract": "bbk.question-guide-return.v2",
+  "x-bbk-detail-level": "COMPACT",
+  "x-bbk-full-detail-triggers": [
+    "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+    "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+    "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+    "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+    "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+    "The parent explicitly requested FULL detail.",
+    "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+  ]
+}

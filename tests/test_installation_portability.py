@@ -240,6 +240,7 @@ m4_ROOT = Path(__file__).resolve().parents[1]
 m4_TOOLS = m4_ROOT / 'tools'
 if str(m4_TOOLS) not in sys.path:
     sys.path.insert(0, str(m4_TOOLS))
+import create_method_content
 import install as install_tool
 import install_profiles
 import profile_install
@@ -254,6 +255,8 @@ from tests._path_support import (
     assert_no_path_within,
     assert_same_path,
     assert_same_path_sequence,
+    create_symlink_or_skip,
+    find_unguarded_symlink_creations,
     find_unsafe_path_assertions,
     path_identity_key,
 )
@@ -312,7 +315,7 @@ class Alpha101EntrySetupTests(unittest.TestCase):
 
     def test_version_and_canonical_inputs_agree(self):
         version = (m4_ROOT / 'VERSION').read_text(encoding='utf-8').strip()
-        self.assertEqual(version, '0.1.0-alpha.13.5')
+        self.assertEqual(version, '0.1.0-alpha.15')
         self.assertEqual(json.loads((m4_ROOT / 'spec' / 'roles.json').read_text(encoding='utf-8'))['package_version'], version)
         self.assertEqual(json.loads((m4_ROOT / 'spec' / 'model-routing.json').read_text(encoding='utf-8'))['package_version'], version)
         self.assertEqual(json.loads((m4_ROOT / 'spec' / 'method-content.json').read_text(encoding='utf-8'))['version'], version)
@@ -326,9 +329,13 @@ class Alpha101EntrySetupTests(unittest.TestCase):
         self.assertIn('No language or domain profile is managed', rendered)
 
     def test_baseline_skill_is_the_harness_root_controller_without_recursive_rerouting(self):
-        canonical = json.loads((m4_ROOT / 'spec' / 'method-content.json').read_text(encoding='utf-8'))['skills']['bbk']
+        method = json.loads((m4_ROOT / 'spec' / 'method-content.json').read_text(encoding='utf-8'))
         rendered = (m4_ROOT / 'shared' / 'skills' / 'bbk' / 'SKILL.md').read_text(encoding='utf-8')
-        self.assertEqual(canonical, rendered)
+        expected = create_method_content.expected(allow_staged=True)[
+            m4_ROOT / 'shared' / 'skills' / 'bbk' / 'SKILL.md'
+        ].decode('utf-8')
+        self.assertEqual(expected, rendered)
+        self.assertNotIn('{{bbk-module:', rendered)
         self.assertEqual(rendered.count('# BBK harness-root controller'), 1)
         self.assertEqual(rendered.count('## Select one canonical root'), 1)
         for value in ('visible top-level harness session', 'bbk_root_wayfinder', 'bbk_root_orchestrator', 'bbk_reviewer', 'bbk_validator_orchestrator', 'Invoke the named canonical agent', 'must not perform, abbreviate, or imitate'):
@@ -362,7 +369,7 @@ class Alpha101EntrySetupTests(unittest.TestCase):
                 }};
                 const mod = await import({json.dumps((m4_ROOT / 'omp' / 'extension' / 'index.js').as_uri())});
                 mod.default(pi);
-                if (commands.size !== 29) throw new Error(`commands=${{commands.size}}`);
+                if (commands.size !== 45) throw new Error(`commands=${{commands.size}}`);
                 if (!commands.has('bbk') || !commands.has('bbk:status') || !commands.has('bbk:exit')) throw new Error('missing BBK commands');
                 const entered = await commands.get('bbk').handler('', ctx);
                 if (entered !== undefined) throw new Error(`unexpected command payload: ${{JSON.stringify(entered)}}`);
@@ -383,6 +390,7 @@ class Alpha101EntrySetupTests(unittest.TestCase):
                 for (const excluded of ['OMP DEFAULT', '.codex/AGENTS.md', 'one-liner solutions']) {{
                   if (joined.includes(excluded)) throw new Error(`retained ${{excluded}}`);
                 }}
+                if (entries.length !== 2 || entries[1][0] !== 'bbk-effective-prompt-receipt' || entries[1][1].status !== 'REPLACED') throw new Error('effective prompt receipt missing');
                 await commands.get('bbk').handler('Implement the accepted baseline', ctx);
                 if (messages.length !== 1 || messages[0][0] !== 'Implement the accepted baseline') throw new Error('request was not forwarded verbatim');
                 if (messages[0][0].includes('bbk_root_wayfinder')) throw new Error('mode prompt leaked into user message');
@@ -391,9 +399,9 @@ class Alpha101EntrySetupTests(unittest.TestCase):
             result = subprocess.run([shutil.which('node') or 'node', script], cwd=m4_ROOT, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8', errors='replace', check=False, timeout=30)
             self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
             value = json.loads(result.stdout)
-            self.assertEqual(value['commands'], 29)
+            self.assertEqual(value['commands'], 45)
             self.assertEqual(value['messages'], 1)
-            self.assertEqual(value['entries'], 1)
+            self.assertEqual(value['entries'], 2)
 
     def test_run_tests_all_delegates_to_the_ordered_verification_pipeline(self):
         calls: list[dict[str, object]] = []
@@ -1300,7 +1308,7 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
         cls._prepared_temp.cleanup()
 
     def test_current_successor_is_repository_native_and_self_contained(self):
-        self.assertEqual((m5_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.13.5')
+        self.assertEqual((m5_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.15')
         self.assertTrue((m5_ROOT / 'docs' / 'README.md').is_file())
         self.assertTrue((m5_ROOT / 'docs' / 'DEVELOPMENT.md').is_file())
         self.assertTrue((m5_ROOT / 'bundled-language-profiles' / 'packages').is_dir())
@@ -1380,7 +1388,7 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         self.assertFalse(module.version_supports_structure_contract('0.1.0-alpha.3'))
-        for version in ('0.1.0-alpha.4', '0.1.0-alpha.8', '0.1.0-alpha.11.11', '0.1.0-alpha.11.12', '0.1.0-alpha.12', '0.1.0-alpha.12.2', '0.1.0-alpha.12.4', '0.1.0-alpha.13.1', '0.1.0-alpha.13.2', '0.1.0-alpha.13.3', '0.1.0-alpha.13.4', '0.1.0-alpha.13.5', '0.1.0', '0.2.0-alpha.1'):
+        for version in ('0.1.0-alpha.4', '0.1.0-alpha.8', '0.1.0-alpha.11.11', '0.1.0-alpha.11.12', '0.1.0-alpha.12', '0.1.0-alpha.12.2', '0.1.0-alpha.12.4', '0.1.0-alpha.13.1', '0.1.0-alpha.13.2', '0.1.0-alpha.13.3', '0.1.0-alpha.13.4', '0.1.0-alpha.13.5', '0.1.0-alpha.14', '0.1.0-alpha.15', '0.1.0', '0.2.0-alpha.1'):
             with self.subTest(version=version):
                 self.assertTrue(module.version_supports_structure_contract(version))
         gates = json.loads((item.root / 'gates' / 'python-gates.json').read_text(encoding='utf-8'))
@@ -1473,7 +1481,7 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
 
     def test_current_documentation_states_the_default_and_single_archive_contract(self):
         combined = '\n'.join(((m5_ROOT / relative).read_text(encoding='utf-8') for relative in ('README.md', 'docs/INSTALL.md', 'docs/LANGUAGE-PROFILES.md', 'RELEASE-NOTES.md')))
-        for expected in ('0.1.0-alpha.13.5', 'installed by default', '--no-language-profiles', '--profile-id', 'bundled-language-profiles', 'TypeScript/JavaScript'):
+        for expected in ('0.1.0-alpha.15', 'installed by default', '--no-language-profiles', '--profile-id', 'bundled-language-profiles', 'TypeScript/JavaScript'):
             self.assertIn(expected, combined)
 
 # ---------------------------------------------------------------------------
@@ -1496,7 +1504,7 @@ class Alpha112WindowsUtf8Tests(unittest.TestCase):
 
     def test_current_version_and_utf8_canonical_input_are_read_explicitly(self):
         version = (m6_ROOT / 'VERSION').read_text(encoding='utf-8').strip()
-        self.assertEqual(version, '0.1.0-alpha.13.5')
+        self.assertEqual(version, '0.1.0-alpha.15')
         method_content = json.loads((m6_ROOT / 'spec' / 'method-content.json').read_text(encoding='utf-8'))
         self.assertEqual(method_content['version'], version)
 
@@ -1585,7 +1593,7 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
         cls.by_name = {item['name']: item for item in cls.roles}
 
     def test_current_version_matches_release(self) -> None:
-        self.assertEqual(m7_VERSION, '0.1.0-alpha.13.5')
+        self.assertEqual(m7_VERSION, '0.1.0-alpha.15')
 
     def test_all_codex_agents_inherit_parent_sandbox(self) -> None:
         files = sorted(m7_CODEX_AGENTS.glob('*.toml'))
@@ -1749,6 +1757,10 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
             "--profile",
             "release",
             "--require-node",
+            "--mode",
+            "pooled",
+            "--jobs",
+            "0",
         ])
 
     def _expanded_profiles(self, destination: Path, *, count: int | None=None) -> list[Path]:
@@ -2339,3 +2351,20 @@ class SharedPathAssertionSupportTests(unittest.TestCase):
             for finding in find_unsafe_path_assertions(path)
         ]
         self.assertEqual(violations, [], '\n'.join(violations))
+
+    def test_symlink_fixtures_are_capability_guarded(self):
+        """Prevent API-presence checks from standing in for host capability."""
+        tests_root = Path(__file__).resolve().parent
+        violations = [
+            finding
+            for path in sorted(tests_root.glob('test_*.py'))
+            for finding in find_unguarded_symlink_creations(path)
+        ]
+        self.assertEqual(violations, [], '\n'.join(violations))
+
+    def test_symlink_helper_converts_permission_denial_to_skip(self):
+        with tempfile.TemporaryDirectory() as raw_root:
+            root = Path(raw_root)
+            with mock.patch.object(Path, 'symlink_to', side_effect=PermissionError('privilege unavailable')):
+                with self.assertRaises(unittest.SkipTest):
+                    create_symlink_or_skip(self, root / 'link', root / 'target')

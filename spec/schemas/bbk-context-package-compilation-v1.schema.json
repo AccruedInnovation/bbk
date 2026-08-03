@@ -1,0 +1,23 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-context-package-compilation-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "schema": {
+      "const": "bbk.context-package-compilation.v1"
+    },
+    "status": {
+      "enum": [
+        "COMPILED",
+        "SPECIALIST_DESIGN_REQUIRED",
+        "REJECTED"
+      ]
+    }
+  },
+  "required": [
+    "schema",
+    "status"
+  ],
+  "title": "BBK context package compilation result v1",
+  "type": "object"
+}

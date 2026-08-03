@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-researcher-compact-result-v2.schema.json",
+  "title": "BBK BBK Researcher compact result payload v2",
+  "description": "Closed compact role-specific result payload for `bbk_researcher`. Use FULL when material truth cannot fit these fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "answer_summary",
+    "claim_results",
+    "conflicts",
+    "unknowns_and_omissions",
+    "blockers",
+    "research_artifact_ref"
+  ],
+  "properties": {
+    "answer_summary": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/nonEmptyString",
+      "description": "Concise answer or honest non-answer, the threshold applied, and the material applicability boundary. It must not imply a product decision, review verdict, candidate pass, acceptance, or release."
+    },
+    "claim_results": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Every decision-relevant claim with stable ID, exact proposition, one allowed claim state, `OBSERVED`/`REPORTED`/`INFERRED` classification, supporting and contrary evidence refs, assumptions, applicability, qualitative confidence and basis, unresolved gaps, and invalidation trigger."
+    },
+    "conflicts": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Exact source or claim conflicts, reconciliation tests performed, surviving dissent, affected parent objects, and whether bounded research, empirical work, or an authority decision is needed."
+    },
+    "unknowns_and_omissions": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Facts still unknown, unavailable or inaccessible sources, search boundaries, evidence of absence versus absence of evidence, and residual uncertainty."
+    },
+    "blockers": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Exact technical, authority, decision, source-access, profile, environment, or parent-rescoping blockers and the least costly valid remediation."
+    },
+    "research_artifact_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/artifactReference",
+      "description": "Durable structured research-result path, byte count, and SHA-256 when persisted; inline content is permitted only for a routine small result whose exact state cannot be lost."
+    }
+  },
+  "x-bbk-role": "bbk_researcher",
+  "x-bbk-contract": "bbk.researcher-return.v2",
+  "x-bbk-detail-level": "COMPACT",
+  "x-bbk-full-detail-triggers": [
+    "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+    "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+    "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+    "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+    "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+    "The parent explicitly requested FULL detail.",
+    "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+  ]
+}

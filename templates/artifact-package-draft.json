@@ -1,0 +1,27 @@
+{
+  "artifacts": [
+    {
+      "artifactId": "primary",
+      "path": "primary.json",
+      "references": [],
+      "role": "semantic",
+      "schema": "replace.me.v1"
+    }
+  ],
+  "metadata": {
+    "authorityBoundary": "A seal proves exact bytes and declared local reference closure only."
+  },
+  "packageId": "replace-me",
+  "predecessor": null,
+  "profile": {
+    "id": "generic",
+    "version": "1"
+  },
+  "revision": "1",
+  "schema": "bbk.artifact-package-draft.v1",
+  "subject": {
+    "id": "replace-me",
+    "kind": "replace-me",
+    "revision": null
+  }
+}

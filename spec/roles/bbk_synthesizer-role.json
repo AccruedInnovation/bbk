@@ -83,7 +83,9 @@
     "bbk-prompt-profile-qualification",
     "bbk-prompt-proportional-stop",
     "bbk-prompt-evidence-lineage",
-    "bbk-prompt-planning-source-integrity"
+    "bbk-prompt-planning-source-integrity",
+    "bbk-prompt-evidence-subject-identity",
+    "bbk-prompt-product-first-proportionality"
   ],
   "mutates": false,
   "spawns": [],
@@ -93,6 +95,26 @@
     "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
     "return_schema": "spec/schemas/role-returns/bbk-synthesizer-return-v1.schema.json",
     "result_schema": "spec/schemas/role-results/bbk-synthesizer-result-v1.schema.json",
+    "v2_contract_id": "bbk.synthesizer-return.v2",
+    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+    "v2_return_schema": "spec/schemas/role-returns/bbk-synthesizer-return-v2.schema.json",
+    "compact_result_schema": "spec/schemas/role-results/bbk-synthesizer-compact-result-v2.schema.json",
+    "compact_result_fields": [
+      "synthesis_packet",
+      "reconciliation_results",
+      "dissent_findings_and_uncertainty",
+      "blockers",
+      "synthesis_artifact_ref"
+    ],
+    "full_detail_triggers": [
+      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+      "The parent explicitly requested FULL detail.",
+      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+    ],
     "semantic_state_name": "synthesis_state",
     "allowed_invocation_modes": [
       "SYNTHESIS_CHILD"

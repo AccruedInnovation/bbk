@@ -109,7 +109,9 @@ The five constitution modules remain:
 | `execution` | effectful and execution-contract roles | standing authority, capability zones, checkpoints, candidate identity, durable handoffs |
 | `assurance` | evidence, review, synthesis, and acceptance roles | proportional proof, exposure history, stage separation, non-pass dispositions |
 
-Alpha.13 also has 21 reusable `bbk.prompt-module.v1` modules under `spec/prompt-modules/`. They carry materially identical behavior—role boundary, invocation binding, human relay, delegation/return, durable handoffs, state-claim truth, profile qualification, liveness/recovery, effects/cleanup, evidence lineage and receipts, finding lifecycle, candidate integrity, and related concerns—without duplicating the body in every procedure.
+Alpha.15 has 31 reusable `bbk.prompt-module.v1` modules under `spec/prompt-modules/`. They carry materially identical behavior—role boundary, invocation binding, human relay, delegation/return, durable handoffs, state-claim truth, profile qualification, liveness/recovery, effects/cleanup, evidence lineage and receipts, finding lifecycle, candidate integrity, execution autonomy, user-attention threshold, planning-to-execution ownership, node-bound evidence, specialist-return disposition, and related concerns—without duplicating the body in every procedure.
+
+Alpha.15 retains the five alpha.14 modules and adds four focused modules for product-first proportionality, mechanical admission, explicit assurance modes, and candidate-focused review. They are guidance and prompt/protocol contracts. They do not create deterministic baseline-acceptance, authority, record-mutation, or release gates; those remain outside BBK's bounded bootstrap role.
 
 Each selected module is embedded once in a compiled role prompt. A primary procedure references the already embedded module instead of restating it.
 
@@ -162,6 +164,8 @@ Reviewer owns bounded qualitative or interpretive judgment under an exact charte
 ## OMP prompt boundary
 
 Main receives a complete controller system-prompt replacement while persistent BBK mode is active. A marked BBK child receives a complete role-specific replacement after the extension authenticates the installed canonical projection. Compatibility-discovered `.codex`, `.claude`, `.gemini`, and other unrelated workflow instructions are excluded unless explicitly supplied as governed project data.
+
+OMP may persist the pre-hook child prompt in `session_init` before extension replacement. Alpha.15 therefore records digest-only `bbk.effective-prompt-receipt.v1` entries after replacement and, when `getSystemPrompt()` is exposed, at `before_provider_request`. `/bbk:prompt-status` reports effective/provider-bound identity and generic-prompt removal. This is observability only and does not add an independent enforcement runtime.
 
 OMP markers remain model-visible because the runtime uses them for prompt authentication. Codex does not need this mechanism, so its `developer_instructions` use ordinary Markdown and contain no BBK XML-like build/provenance envelopes.
 

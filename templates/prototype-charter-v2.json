@@ -1,0 +1,45 @@
+{
+  "artifactDisposition": "EXPERIMENTAL_ONLY",
+  "authority": {
+    "scope": [
+      "replace-with-bounded-experimental-scope"
+    ],
+    "source": "replace-with-exact-authority"
+  },
+  "authorityBoundary": "This charter authorizes no production promotion, acceptance, deployment, publication, or release.",
+  "budget": {
+    "effectBudget": [
+      "Disposable local files only."
+    ],
+    "stopConditions": [
+      "Stop when the threshold is observed or the time/effect budget is exhausted."
+    ],
+    "timeSeconds": 3600
+  },
+  "cleanup": {
+    "disposition": "Remove disposable apparatus and retain only declared evidence.",
+    "residualOwner": null,
+    "verification": "Verify processes, files, credentials, services, and external effects are settled."
+  },
+  "detailLevel": "COMPACT",
+  "evaluationThreshold": "State the observable threshold that distinguishes the alternatives.",
+  "evidence": {
+    "limitations": [],
+    "method": "Record exact inputs, observations, tool versions, and run receipts.",
+    "retention": "Seal evidence with the experiment result."
+  },
+  "fallback": {
+    "action": "Preserve evidence, clean the apparatus, and return INCONCLUSIVE without production promotion.",
+    "guaranteed": true,
+    "trigger": "Threshold is not reached, evidence is invalid, or a stop condition occurs."
+  },
+  "id": "PROTO-EXAMPLE",
+  "parentDecision": "State the one parent decision this evidence informs.",
+  "schema": "bbk.prototype-charter.v2",
+  "subject": {
+    "id": "UNC-EXAMPLE",
+    "kind": "uncertainty",
+    "revision": null
+  },
+  "uncertainty": "State the one uncertainty this experiment will discriminate."
+}

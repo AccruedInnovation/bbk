@@ -19,6 +19,7 @@
   ],
   "responsibilities": [
     "Bind the exact experiment ID, attempt ID, governed subject and revision, semantic parent and return route, root uncertainty, decision or plan object informed, hypothesis, credible alternatives, included and excluded scope, applicable profiles, evidence threshold, budget, stopping rules, fixed logical-child limits by permitted role type, maximum concurrent physical child attempts, retry and continuation limits, invalidation conditions, cleanup obligations, and required result schema before effects.",
+    "Select and bind one `bbk.prototype-charter.v2` detail level before effects. Default to COMPACT and preserve its one uncertainty, one parent decision, threshold, bounded time/effect budget, guaranteed fallback, evidence, and cleanup/disposition; use FULL for consequential, materially effectful, complex, authority-ambiguous, or explicitly requested experiments.",
     "Confirm that a prototype is the correct responsibility. Return documentary or already-recorded factual uncertainty for Researcher routing, accepted production work for Worker routing, exact candidate assertions for Validator routing, independent judgment for Reviewer routing, and unresolved architecture, product, authority, or risk choices to the semantic parent.",
     "Freeze an evaluation commitment before observing outcome-bearing results: question, candidate conditions or alternatives, discrimination and falsification criteria, fixtures, controls, variables, instrumentation, evidence format, expected resource use, permitted deviations, and stop rules. Preserve any later deviation with its timing, reason, authority, and impact instead of rewriting the original criteria.",
     "Establish the environment and effect boundary before mutation: pre-state and rollback point, isolation mechanism, writable and readable surfaces, shared-resource locks, network and external-effect targets, data classification, credential lifecycle, privacy and legal constraints, capability-zone classification, cleanup owner, and containment or abort conditions.",
@@ -103,7 +104,12 @@
     "bbk-prompt-liveness-recovery",
     "bbk-prompt-effects-cleanup",
     "bbk-prompt-evidence-lineage",
-    "bbk-prompt-host-capability-truth"
+    "bbk-prompt-host-capability-truth",
+    "bbk-prompt-execution-autonomy",
+    "bbk-prompt-evidence-subject-identity",
+    "bbk-prompt-specialist-disposition",
+    "bbk-prompt-product-first-proportionality",
+    "bbk-prompt-assurance-modes"
   ],
   "mutates": true,
   "spawns": [
@@ -116,6 +122,27 @@
     "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
     "return_schema": "spec/schemas/role-returns/bbk-prototyper-return-v1.schema.json",
     "result_schema": "spec/schemas/role-results/bbk-prototyper-result-v1.schema.json",
+    "v2_contract_id": "bbk.prototyper-return.v2",
+    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+    "v2_return_schema": "spec/schemas/role-returns/bbk-prototyper-return-v2.schema.json",
+    "compact_result_schema": "spec/schemas/role-results/bbk-prototyper-compact-result-v2.schema.json",
+    "compact_result_fields": [
+      "hypothesis_and_alternatives",
+      "discrimination_assessment",
+      "observations_and_inferences",
+      "cleanup_and_residuals",
+      "blockers",
+      "experiment_artifact_ref"
+    ],
+    "full_detail_triggers": [
+      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+      "The parent explicitly requested FULL detail.",
+      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+    ],
     "semantic_state_name": "experiment_state",
     "allowed_invocation_modes": [
       "EXPERIMENT_CHILD"
@@ -271,6 +298,7 @@
     },
     "requirements": [
       "Return one `bbk.role-return.v1` object with `contract` = `bbk.prototyper-return.v1`, `role` = `bbk_prototyper`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `experiment_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
+      "The active experiment uses `bbk.prototype-charter.v2`; COMPACT contains the exact bounded minimum and FULL retains the complete apparatus/evaluation commitment. A host preflight result is capability evidence only and never authority.",
       "The Prototyper may invoke only `bbk_worker_designer` and `bbk_worker` under the current charter's fixed logical-child, concurrent-attempt, and retry or continuation limits. Worker Designer owns every new or materially changed child invocation contract; each Worker receives one exact experimental WorkUnit, may not delegate, and returns only to the Prototyper. The Prototyper remains the sole logical experiment owner. Exceeding or changing those limits, adding a child-role type, or requiring nested coordination yields `NEEDS_PARENT_RECHARTER`. Every other logical role need returns to the invoking semantic parent.",
       "The evaluation commitment must be fixed before outcome-bearing evidence is observed. A changed criterion or method becomes a recorded deviation or successor attempt; it does not silently replace the original charter.",
       "Use `SUPPORTED_WITHIN_BOUNDARY`, `FALSIFIED_WITHIN_BOUNDARY`, or `ALTERNATIVES_DISCRIMINATED` only when the relevant run is valid, the declared criteria are met, and the evidence is bound to the exact subject, method, and environment. These states remain bounded experimental evidence and do not establish production readiness or acceptance.",

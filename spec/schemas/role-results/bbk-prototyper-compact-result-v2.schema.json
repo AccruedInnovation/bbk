@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-prototyper-compact-result-v2.schema.json",
+  "title": "BBK BBK Prototyper compact result payload v2",
+  "description": "Closed compact role-specific result payload for `bbk_prototyper`. Use FULL when material truth cannot fit these fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "hypothesis_and_alternatives",
+    "discrimination_assessment",
+    "observations_and_inferences",
+    "cleanup_and_residuals",
+    "blockers",
+    "experiment_artifact_ref"
+  ],
+  "properties": {
+    "hypothesis_and_alternatives": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Exact empirical or experiential uncertainty, causal or structural hypothesis, credible alternatives or comparison conditions, and the named parent decision or assumption the result can change."
+    },
+    "discrimination_assessment": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "How the preregistered criteria were applied; which hypotheses or alternatives were supported, falsified, distinguished, not distinguished, or left unresolved; and why the selected experiment state follows without making the parent decision."
+    },
+    "observations_and_inferences": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Direct observations, source-reported facts, calculations, and inferences kept distinct, with exact evidence references, assumptions, contrary observations, qualitative confidence and basis, and no unsupported extrapolation."
+    },
+    "cleanup_and_residuals": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "One allowed cleanup state, cleanup actions and receipts, terminated processes, closed resources, revoked credentials, disposed data and workspaces, rollback or uninstall verification, quarantined artifacts, residual external state, unresolved ambiguity, owner, containment, and follow-up obligation."
+    },
+    "blockers": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Exact technical, authority, decision, profile, environment, data, credential, effect, budget, cleanup, recovery, or parent-recharter blockers and the least costly valid remediation."
+    },
+    "experiment_artifact_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/artifactReference",
+      "description": "Durable structured experiment-result path, byte count, and SHA-256 when persisted, including the evaluation commitment, run inventory, evidence, interpretation, cleanup, and artifact-disposition records."
+    }
+  },
+  "x-bbk-role": "bbk_prototyper",
+  "x-bbk-contract": "bbk.prototyper-return.v2",
+  "x-bbk-detail-level": "COMPACT",
+  "x-bbk-full-detail-triggers": [
+    "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+    "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+    "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+    "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+    "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+    "The parent explicitly requested FULL detail.",
+    "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+  ]
+}

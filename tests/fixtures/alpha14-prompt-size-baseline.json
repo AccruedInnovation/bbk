@@ -1,0 +1,128 @@
+{
+  "schema": "bbk.prompt-size-baseline.v1",
+  "package_version": "0.1.0-alpha.14",
+  "role_count": 19,
+  "hosts": [
+    "generic",
+    "omp",
+    "codex",
+    "claude"
+  ],
+  "role_instruction_bytes": {
+    "bbk_root_wayfinder": {
+      "generic": 46853,
+      "omp": 44225,
+      "codex": 46113,
+      "claude": 47421
+    },
+    "bbk_territory_wayfinder": {
+      "generic": 47454,
+      "omp": 43850,
+      "codex": 46867,
+      "claude": 48072
+    },
+    "bbk_questioning_wayfinder": {
+      "generic": 54908,
+      "omp": 50625,
+      "codex": 54312,
+      "claude": 55240
+    },
+    "bbk_planning_wayfinder": {
+      "generic": 63175,
+      "omp": 57978,
+      "codex": 62510,
+      "claude": 63630
+    },
+    "bbk_phase_wayfinder": {
+      "generic": 73115,
+      "omp": 66247,
+      "codex": 72453,
+      "claude": 73536
+    },
+    "bbk_question_guide": {
+      "generic": 56604,
+      "omp": 50498,
+      "codex": 55921,
+      "claude": 56874
+    },
+    "bbk_researcher": {
+      "generic": 47563,
+      "omp": 43098,
+      "codex": 47190,
+      "claude": 47883
+    },
+    "bbk_prototyper": {
+      "generic": 79535,
+      "omp": 72463,
+      "codex": 78765,
+      "claude": 79914
+    },
+    "bbk_synthesizer": {
+      "generic": 53997,
+      "omp": 49478,
+      "codex": 53464,
+      "claude": 54317
+    },
+    "bbk_architect": {
+      "generic": 82854,
+      "omp": 73169,
+      "codex": 82164,
+      "claude": 83174
+    },
+    "bbk_verification_designer": {
+      "generic": 76162,
+      "omp": 67548,
+      "codex": 75150,
+      "claude": 76482
+    },
+    "bbk_worker_designer": {
+      "generic": 80942,
+      "omp": 71250,
+      "codex": 79945,
+      "claude": 81262
+    },
+    "bbk_reviewer": {
+      "generic": 69540,
+      "omp": 62923,
+      "codex": 68645,
+      "claude": 69860
+    },
+    "bbk_root_orchestrator": {
+      "generic": 85546,
+      "omp": 76506,
+      "codex": 84581,
+      "claude": 85934
+    },
+    "bbk_territory_orchestrator": {
+      "generic": 90787,
+      "omp": 82895,
+      "codex": 89889,
+      "claude": 91213
+    },
+    "bbk_worker_orchestrator": {
+      "generic": 82720,
+      "omp": 75353,
+      "codex": 81751,
+      "claude": 83065
+    },
+    "bbk_validator_orchestrator": {
+      "generic": 89280,
+      "omp": 81444,
+      "codex": 88303,
+      "claude": 89655
+    },
+    "bbk_worker": {
+      "generic": 69819,
+      "omp": 62942,
+      "codex": 68937,
+      "claude": 70139
+    },
+    "bbk_validator": {
+      "generic": 72206,
+      "omp": 64189,
+      "codex": 71217,
+      "claude": 72526
+    }
+  },
+  "aggregate_role_instruction_bytes": 5158115
+}

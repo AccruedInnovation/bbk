@@ -1,0 +1,160 @@
+{
+  "$defs": {
+    "nonEmpty": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "requirement": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "COMMAND"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "command"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "PATH"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "path"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "ENVIRONMENT"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "name"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "LIVE"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "description"
+            ]
+          }
+        }
+      ],
+      "properties": {
+        "access": {
+          "items": {
+            "enum": [
+              "READ",
+              "WRITE",
+              "EXECUTE"
+            ]
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "command": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "description": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "expectedKind": {
+          "enum": [
+            "ANY",
+            "FILE",
+            "DIRECTORY"
+          ]
+        },
+        "expectedVersionPattern": {
+          "type": "string"
+        },
+        "id": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "kind": {
+          "enum": [
+            "COMMAND",
+            "PATH",
+            "ENVIRONMENT",
+            "LIVE"
+          ]
+        },
+        "name": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "path": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "versionArgs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "required"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://bbk.local/schemas/bbk-host-preflight-request-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "freshnessSeconds": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "requestId": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "requirements": {
+      "items": {
+        "$ref": "#/$defs/requirement"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "schema": {
+      "const": "bbk.host-preflight-request.v1"
+    }
+  },
+  "required": [
+    "schema",
+    "requestId",
+    "freshnessSeconds",
+    "requirements"
+  ],
+  "title": "BBK requirement-scoped host preflight request v1",
+  "type": "object"
+}

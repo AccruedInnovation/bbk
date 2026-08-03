@@ -8,10 +8,13 @@ import hashlib
 import json
 import os
 import re
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from strict_json import StrictJsonError, load_path as strict_load_path, loads_bytes as strict_loads_bytes, loads_text as strict_loads_text
 from path_compat import canonical_path_text, path_key
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -62,8 +65,8 @@ def canonical_path(path: str | os.PathLike[str] | Path) -> Path:
 
 def load_json(path: Path, label: str) -> dict[str, Any]:
     try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
+        value = strict_load_path(path)
+    except (OSError, StrictJsonError) as exc:
         raise RoutingError(f"Cannot read {label} {path}: {exc}") from exc
     if not isinstance(value, dict):
         raise RoutingError(f"{label} must be a JSON object: {path}")
@@ -351,8 +354,8 @@ def load_context(binding_path: Path) -> dict[str, Any]:
         raise RoutingError(f"Install manifest does not own OMP routing state {state_path}")
     state_bytes = require_current(state_path, state_record, "OMP routing state")
     try:
-        state = json.loads(state_bytes.decode("utf-8"))
-    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        state = strict_loads_bytes(state_bytes, source=str(state_path))
+    except StrictJsonError as exc:
         raise RoutingError(f"OMP routing state is invalid: {exc}") from exc
     if not isinstance(state, dict) or state.get("schema") != "bbk.omp-model-routing-state.v1":
         raise RoutingError("Unsupported OMP routing state schema")
@@ -641,6 +644,395 @@ def export_profile(context: Mapping[str, Any], path: Path, profile_id: str, desc
     }
 
 
+
+def _context_snapshot(context: Mapping[str, Any]) -> dict[str, str]:
+    """Return exact immutable evidence for the user routing surface."""
+    files = {
+        "binding": Path(context["binding_path"]),
+        "manifest": Path(context["manifest_path"]),
+        "state": Path(context["state_path"]),
+        **{f"agent:{name}": path for name, path in context["agent_files"].items()},
+    }
+    return {name: sha256_file(path) for name, path in sorted(files.items())}
+
+
+def _authenticated_installer(context: Mapping[str, Any]) -> Path:
+    installer = canonical_path(Path(context["package_root"]) / "tools" / "install.py")
+    record = context["records"].get(normalized_path(installer))
+    if record is None:
+        raise RoutingError(
+            f"The bound BBK package manifest does not own its sibling installer: {installer}; "
+            "project routing was not created or repaired."
+        )
+    require_current(installer, record, "BBK sibling installer")
+    return installer
+
+
+def _project_root(value: str | os.PathLike[str] | Path) -> Path:
+    project = canonical_path(Path(value).expanduser())
+    if not project.exists():
+        raise RoutingError(f"Project root does not exist: {project}")
+    if not project.is_dir():
+        raise RoutingError(f"Project root is not a directory: {project}")
+    return project
+
+
+def _project_binding_path(project: Path) -> Path:
+    return project / ".omp" / "extensions" / "bbk" / "bbk-package-root.json"
+
+
+def _project_manifest_path(project: Path) -> Path:
+    return project / ".bbk-kit-install.json"
+
+
+def _routing_policy_from_effective_user(context: Mapping[str, Any]) -> dict[str, Any]:
+    if context.get("scope") != "user":
+        raise RoutingError(
+            "Project routing localization must use an authenticated user-scoped BBK routing binding "
+            "as its source; no project or user routing was changed."
+        )
+    canonical = load_json(Path(context["package_root"]) / "spec" / "model-routing.json", "canonical model routing")
+    if canonical.get("schema_version") != "bbk.model-routing.v2":
+        raise RoutingError("Project routing localization requires canonical bbk.model-routing.v2")
+    roles = canonical.get("roles")
+    if not isinstance(roles, dict) or set(roles) != set(context["roles"]):
+        raise RoutingError("Canonical model routing does not cover the authenticated role catalogue exactly")
+    for role in context["roles"]:
+        entry = roles.get(role)
+        if not isinstance(entry, dict):
+            raise RoutingError(f"Canonical model route is invalid for {role}")
+        entry["omp"] = dict(context["actual_routes"][role])
+    canonical["description"] = (
+        "Project-local alpha.15 routing cloned from the exact effective authenticated user OMP routes; "
+        "non-OMP host routes remain the bound package defaults."
+    )
+    return canonical
+
+
+def _run_installer(
+    context: Mapping[str, Any],
+    project: Path,
+    *,
+    replace: bool,
+    dry_run: bool,
+) -> dict[str, Any]:
+    installer = _authenticated_installer(context)
+    policy = _routing_policy_from_effective_user(context)
+    with tempfile.TemporaryDirectory(prefix="bbk-project-routing-") as temp:
+        policy_path = Path(temp) / "effective-user-routes.json"
+        policy_path.write_bytes(pretty_json_bytes(policy))
+        command = [
+            sys.executable,
+            "-X",
+            "utf8",
+            str(installer),
+            "--json",
+            "install",
+            "--scope",
+            "project",
+            "--root",
+            str(project),
+            "--omp",
+            "--no-language-profiles",
+            "--model-routing",
+            str(policy_path),
+        ]
+        if replace:
+            command.extend(["--uninstall-existing", "--force"])
+        if dry_run:
+            command.append("--dry-run")
+        env = os.environ.copy()
+        env.update({"PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"})
+        completed = subprocess.run(
+            command,
+            cwd=project,
+            env=env,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+        )
+    try:
+        stdout = completed.stdout.decode("utf-8", errors="strict")
+        stderr = completed.stderr.decode("utf-8", errors="strict")
+    except UnicodeDecodeError as exc:
+        raise RoutingError(f"Project installer returned invalid UTF-8: {exc}") from exc
+    details: Any = None
+    if stdout.strip():
+        try:
+            details = strict_loads_text(stdout, source="project installer stdout")
+        except StrictJsonError as exc:
+            raise RoutingError(
+                f"Project installer did not return strict JSON (exit {completed.returncode}): {exc}; "
+                f"stderr={stderr.strip()!r}"
+            ) from exc
+    if completed.returncode != 0:
+        if isinstance(details, dict):
+            message = str(details.get("error") or details.get("message") or details)
+        else:
+            message = stderr.strip() or stdout.strip() or f"exit {completed.returncode}"
+        raise RoutingError(f"Project installer refused the requested routing operation: {message}")
+    if not isinstance(details, dict):
+        raise RoutingError("Project installer returned no result object")
+    return {
+        "command_contract": {
+            "installer": json_path(installer),
+            "scope": "project",
+            "omp_only": True,
+            "no_language_profiles": True,
+            "replacement": replace,
+            "dry_run": dry_run,
+        },
+        "policy_sha256": sha256_bytes(canonical_json_bytes(policy)),
+        "installer_result": details,
+    }
+
+
+def inspect_project_localization(context: Mapping[str, Any], project_value: str | Path) -> dict[str, Any]:
+    project = _project_root(project_value)
+    if context.get("scope") != "user":
+        raise RoutingError("Project routing status must be derived from a user-scoped source binding")
+    binding_path = _project_binding_path(project)
+    manifest_path = _project_manifest_path(project)
+    footprints = [
+        path
+        for path in (
+            binding_path,
+            manifest_path,
+            project / ".bbk-kit" / "effective-omp-model-routing.json",
+            project / ".omp" / "extensions" / "bbk",
+        )
+        if path.exists()
+    ]
+    base: dict[str, Any] = {
+        "schema": "bbk.omp-project-routing-status.v1",
+        "project_root": json_path(project),
+        "source_scope": "user",
+        "source_binding_path": json_path(context["binding_path"]),
+        "source_routes_sha256": sha256_bytes(canonical_json_bytes(context["actual_routes"])),
+        "project_binding_path": json_path(binding_path),
+        "project_manifest_path": json_path(manifest_path),
+        "footprints": [json_path(path) for path in footprints],
+        "user_state_unchanged": True,
+    }
+    if not footprints:
+        return {
+            **base,
+            "status": "ABSENT",
+            "current": False,
+            "repair_required": False,
+            "smallest_next_action": "Create the OMP-only project installation from the effective user routes.",
+        }
+    if not binding_path.is_file() or not manifest_path.is_file():
+        return {
+            **base,
+            "status": "BROKEN",
+            "current": False,
+            "repair_required": True,
+            "errors": ["Project routing footprints exist but the binding or install manifest is missing."],
+            "smallest_next_action": "Run a dry-run project routing repair; do not fall back to user routing for this project.",
+        }
+    errors: list[str] = []
+    project_context: dict[str, Any] | None = None
+    try:
+        project_context = load_context(binding_path)
+    except RoutingError as exc:
+        errors.append(str(exc))
+    if project_context is not None:
+        if project_context.get("scope") != "project":
+            errors.append("Project binding does not declare project scope")
+        if not isinstance(project_context.get("project_root"), Path) or normalized_path(project_context["project_root"]) != normalized_path(project):
+            errors.append("Project binding declares a different physical project root")
+        if project_context.get("version") != context.get("version"):
+            errors.append(
+                f"Project package version {project_context.get('version')!r} differs from source {context.get('version')!r}"
+            )
+        if project_context.get("actual_routes") != context.get("actual_routes"):
+            errors.append("Project OMP routes differ from the current effective user routes")
+    installer_status: dict[str, Any] | None = None
+    try:
+        installer = _authenticated_installer(context)
+        command = [
+            sys.executable,
+            "-X",
+            "utf8",
+            str(installer),
+            "--json",
+            "status",
+            "--scope",
+            "project",
+            "--root",
+            str(project),
+        ]
+        completed = subprocess.run(
+            command,
+            cwd=project,
+            env={**os.environ, "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"},
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+        )
+        if completed.returncode == 0:
+            parsed = strict_loads_bytes(completed.stdout, source="project installer status stdout")
+            if isinstance(parsed, dict):
+                installer_status = parsed
+                summary = parsed.get("summary") if isinstance(parsed.get("summary"), dict) else {}
+                noncurrent = {key: value for key, value in summary.items() if key != "current" and int(value or 0) > 0}
+                if noncurrent:
+                    errors.append(f"Project install manifest reports non-current files: {noncurrent}")
+                if parsed.get("manifest_error"):
+                    errors.append(f"Project install manifest error: {parsed['manifest_error']}")
+        else:
+            errors.append("Authenticated installer could not inspect the project installation")
+    except (RoutingError, StrictJsonError, OSError, ValueError) as exc:
+        errors.append(f"Project install status failed: {exc}")
+    if errors:
+        status = "DIVERGENT" if project_context is not None else "BROKEN"
+        return {
+            **base,
+            "status": status,
+            "current": False,
+            "repair_required": True,
+            "errors": errors,
+            "installer_status": installer_status,
+            "smallest_next_action": "Run project routing repair in dry-run mode, inspect the exact plan, then apply it explicitly.",
+        }
+    assert project_context is not None
+    return {
+        **base,
+        "status": "CURRENT",
+        "current": True,
+        "repair_required": False,
+        "project_routes_sha256": project_context["state"].get("routes_sha256"),
+        "role_count": len(project_context["roles"]),
+        "installer_status": installer_status,
+        "smallest_next_action": "Reload OMP only if this installation was created or repaired in the current session.",
+    }
+
+
+def create_project_localization(
+    context: Mapping[str, Any],
+    project_value: str | Path,
+    *,
+    dry_run: bool,
+) -> dict[str, Any]:
+    before = _context_snapshot(context)
+    inspection = inspect_project_localization(context, project_value)
+    project = Path(inspection["project_root"])
+    if inspection["status"] == "CURRENT":
+        return {
+            "schema": "bbk.omp-project-routing-localization.v1",
+            "status": "CURRENT",
+            "project_root": inspection["project_root"],
+            "created": False,
+            "repaired": False,
+            "user_state_unchanged": True,
+            "inspection": inspection,
+            "reload_required": False,
+            "smallest_next_action": inspection["smallest_next_action"],
+        }
+    if inspection["status"] != "ABSENT":
+        return {
+            "schema": "bbk.omp-project-routing-localization.v1",
+            "status": "REPAIR_REQUIRED",
+            "project_root": inspection["project_root"],
+            "created": False,
+            "repaired": False,
+            "user_state_unchanged": True,
+            "inspection": inspection,
+            "reload_required": False,
+            "smallest_next_action": inspection["smallest_next_action"],
+        }
+    install = _run_installer(context, project, replace=False, dry_run=dry_run)
+    after_context = load_context(Path(context["binding_path"]))
+    after = _context_snapshot(after_context)
+    if before != after:
+        raise RoutingError("User-scoped routing changed during project localization; project result is not trusted")
+    if dry_run:
+        return {
+            "schema": "bbk.omp-project-routing-localization.v1",
+            "status": "DRY-RUN",
+            "project_root": json_path(project),
+            "created": False,
+            "repaired": False,
+            "user_state_unchanged": True,
+            "source_routes_sha256": inspection["source_routes_sha256"],
+            **install,
+            "reload_required": False,
+            "smallest_next_action": "Confirm the dry-run plan, then run create-project without --dry-run.",
+        }
+    verified = inspect_project_localization(after_context, project)
+    if verified["status"] != "CURRENT":
+        raise RoutingError(f"Created project routing did not verify as current: {verified.get('errors')}")
+    return {
+        "schema": "bbk.omp-project-routing-localization.v1",
+        "status": "CREATED",
+        "project_root": json_path(project),
+        "created": True,
+        "repaired": False,
+        "user_state_unchanged": True,
+        "source_routes_sha256": inspection["source_routes_sha256"],
+        "verification": verified,
+        **install,
+        "reload_required": True,
+        "smallest_next_action": "Reload or restart OMP in this project so the project-scoped extension and agents take precedence.",
+    }
+
+
+def repair_project_localization(
+    context: Mapping[str, Any],
+    project_value: str | Path,
+    *,
+    apply: bool,
+) -> dict[str, Any]:
+    before = _context_snapshot(context)
+    inspection = inspect_project_localization(context, project_value)
+    project = Path(inspection["project_root"])
+    if inspection["status"] == "CURRENT":
+        return {
+            "schema": "bbk.omp-project-routing-repair.v1",
+            "status": "CURRENT",
+            "project_root": inspection["project_root"],
+            "repaired": False,
+            "user_state_unchanged": True,
+            "inspection": inspection,
+            "reload_required": False,
+            "smallest_next_action": inspection["smallest_next_action"],
+        }
+    replace = inspection["status"] != "ABSENT"
+    install = _run_installer(context, project, replace=replace, dry_run=not apply)
+    after_context = load_context(Path(context["binding_path"]))
+    after = _context_snapshot(after_context)
+    if before != after:
+        raise RoutingError("User-scoped routing changed during project repair; project result is not trusted")
+    if not apply:
+        return {
+            "schema": "bbk.omp-project-routing-repair.v1",
+            "status": "DRY-RUN",
+            "project_root": json_path(project),
+            "repaired": False,
+            "user_state_unchanged": True,
+            "inspection": inspection,
+            **install,
+            "reload_required": False,
+            "smallest_next_action": "Inspect the replacement and backup plan, then rerun repair-project with --apply.",
+        }
+    verified = inspect_project_localization(after_context, project)
+    if verified["status"] != "CURRENT":
+        raise RoutingError(f"Repaired project routing did not verify as current: {verified.get('errors')}")
+    return {
+        "schema": "bbk.omp-project-routing-repair.v1",
+        "status": "CREATED" if inspection["status"] == "ABSENT" else "REPAIRED",
+        "project_root": json_path(project),
+        "repaired": inspection["status"] != "ABSENT",
+        "created": inspection["status"] == "ABSENT",
+        "user_state_unchanged": True,
+        "inspection_before": inspection,
+        "verification": verified,
+        **install,
+        "reload_required": True,
+        "smallest_next_action": "Reload or restart OMP in this project so the repaired project-scoped routing is active.",
+    }
+
 def human(value: Mapping[str, Any]) -> str:
     schema = value.get("schema")
     if schema == "bbk.omp-model-routing-status.v1":
@@ -673,6 +1065,13 @@ def human(value: Mapping[str, Any]) -> str:
         )
     if schema == "bbk.omp-model-routing-export.v1":
         return f"BBK OMP routing profile exported: {value.get('path')}"
+    if schema in {"bbk.omp-project-routing-status.v1", "bbk.omp-project-routing-localization.v1", "bbk.omp-project-routing-repair.v1"}:
+        return (
+            f"BBK project routing: {value.get('status')}\n"
+            f"Project: {value.get('project_root')}\n"
+            f"User routing unchanged: {value.get('user_state_unchanged', True)}\n"
+            f"Next: {value.get('smallest_next_action', '')}"
+        )
     return json.dumps(value, indent=2, ensure_ascii=False, sort_keys=True)
 
 
@@ -694,6 +1093,14 @@ def parser() -> argparse.ArgumentParser:
     export_parser.add_argument("path")
     export_parser.add_argument("--id", default="exported-profile")
     export_parser.add_argument("--description", default="Exported BBK OMP routing profile.")
+    project_status = sub.add_parser("project-status", help="inspect project-local routing relative to effective user routes")
+    project_status.add_argument("--project-root", required=True)
+    project_create = sub.add_parser("create-project", help="create an OMP-only project install from effective user routes")
+    project_create.add_argument("--project-root", required=True)
+    project_create.add_argument("--dry-run", action="store_true")
+    project_repair = sub.add_parser("repair-project", help="dry-run or apply a project-local routing repair")
+    project_repair.add_argument("--project-root", required=True)
+    project_repair.add_argument("--apply", action="store_true")
     return result
 
 
@@ -711,6 +1118,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             value = apply_file(context, Path(args.path).expanduser())
         elif args.command == "export":
             value = export_profile(context, Path(args.path), args.id, args.description)
+        elif args.command == "project-status":
+            value = inspect_project_localization(context, args.project_root)
+        elif args.command == "create-project":
+            value = create_project_localization(context, args.project_root, dry_run=bool(args.dry_run))
+        elif args.command == "repair-project":
+            value = repair_project_localization(context, args.project_root, apply=bool(args.apply))
         else:
             raise RoutingError(f"Unsupported command: {args.command}")
     except RoutingError as exc:
@@ -724,6 +1137,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(json.dumps(value, indent=2, ensure_ascii=False, sort_keys=True))
     else:
         print(human(value))
+    if isinstance(value, Mapping) and value.get("status") in {"REPAIR_REQUIRED", "BLOCKED", "ERROR"}:
+        return 1
     return 0
 
 

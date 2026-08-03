@@ -6,69 +6,65 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "root_outcome_and_capability_refs",
-    "phase_charter_ref",
     "accepted_source_refs",
-    "phase_plan_ref",
-    "phase_entry_exit_contract",
-    "execution_slice_refs",
-    "work_unit_refs",
+    "assurance_refs",
+    "authority_and_capability_state",
+    "blockers",
+    "child_return_refs",
+    "continuation_and_handoff_state",
     "dependency_and_parallelism_state",
-    "mutation_and_workspace_state",
+    "execution_slice_refs",
     "integration_obligation_refs",
     "interface_readiness_state",
-    "requirement_and_assertion_coverage",
-    "assurance_refs",
-    "worker_invocation_refs",
-    "authority_and_capability_state",
-    "tool_profile_environment_state",
-    "state_decision_effect_state",
-    "scaffolding_and_cleanup_state",
-    "continuation_and_handoff_state",
-    "child_return_refs",
-    "review_state",
     "invalidated_or_superseded_refs",
+    "mutation_and_workspace_state",
     "outward_impacts",
+    "parent_actions_requested",
+    "phase_charter_ref",
+    "phase_entry_exit_contract",
+    "phase_plan_ref",
+    "requirement_and_assertion_coverage",
     "residual_uncertainty",
-    "blockers",
-    "parent_actions_requested"
+    "review_state",
+    "root_outcome_and_capability_refs",
+    "scaffolding_and_cleanup_state",
+    "state_decision_effect_state",
+    "tool_profile_environment_state",
+    "work_unit_refs",
+    "worker_invocation_refs"
   ],
   "properties": {
-    "root_outcome_and_capability_refs": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
-      "description": "Current root outcome and capability-increment references preserved through the phase decomposition."
-    },
-    "phase_charter_ref": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
-      "description": "Current phase purpose, entry conditions, exit behavior, predecessor and successor obligations, participating territories and interfaces, and parent-level gates."
-    },
     "accepted_source_refs": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
       "description": "Current accepted architecture, structure, slice, interface, requirement, decision, authority, assurance, profile, environment, and procedure references, including explicit not-applicable dispositions."
     },
-    "phase_plan_ref": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
-      "description": "Versioned canonical phase-plan artifact or exact structured result reference."
+    "assurance_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Current AssuranceContract, Verification Designer, deterministic-gate, review-manifest, evidence-design, independence, and evidence-reuse references or exact blockers."
     },
-    "phase_entry_exit_contract": {
+    "authority_and_capability_state": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Exact entry preconditions, integrated exit behavior, planned phase gates, rollback or recovery implications, and invalidation conditions."
+      "description": "Standing-authority sources, per-work-unit effect requirements, capability-zone assignments, safeguards, exclusions, expiry or revocation, and unresolved authority blockers."
     },
-    "execution_slice_refs": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
-      "description": "Current supplied, refined, or delegated phase-local ExecutionSlice identities, outcome and capability traceability, touchpoints, flow, work-unit sets, integration owners, assertions, scaffolding, entry and exit conditions, parent-graph relationship, and any proposed change that requires Planning Wayfinder disposition."
+    "blockers": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Exact recharter, decision, resynthesis, authority, technical, interface, dependency, integration, ownership, evidence, child-return, capacity, or host-window blockers and affected objects."
     },
-    "work_unit_refs": {
+    "child_return_refs": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
-      "description": "Leaf WorkUnit identities and contracts, including exact responsibility, scope, preconditions, inputs, outputs, dependencies, affected surfaces, expected behavior, checks, rollback, profiles, scaffolding, and handoffs."
+      "description": "Validated Verification Designer, Worker Designer, and Reviewer returns with subject, revision, freshness, authority, and schema state."
+    },
+    "continuation_and_handoff_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Bounded or extended execution classifications, logical checkpoints, continuation identity, same-thread preference, durable state, interruption semantics, and work-unit handoff schemas."
     },
     "dependency_and_parallelism_state": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
       "description": "Phase-local execution order, dependency closure, safe parallelism, serialization, barriers, bounded iteration or repair loops, recovery loops, and unresolved cycles."
     },
-    "mutation_and_workspace_state": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "One-owner mapping for mutable surfaces, workspace isolation, capability zones, shared resources, collision controls, and unresolved ownership conflicts."
+    "execution_slice_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Current supplied, refined, or delegated phase-local ExecutionSlice identities, outcome and capability traceability, touchpoints, flow, work-unit sets, integration owners, assertions, scaffolding, entry and exit conditions, parent-graph relationship, and any proposed change that requires Planning Wayfinder disposition."
     },
     "integration_obligation_refs": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
@@ -78,65 +74,69 @@
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
       "description": "Current accepted, internal-local, prototype-only, exception-bound, proposed-change, stale, or blocking state for every interface used by independent work."
     },
-    "requirement_and_assertion_coverage": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Traceability and coverage state, including exactly one completing leaf work unit per active assertion and the distinction among integration, requirement verification, operational validation, outcome evidence, and review."
-    },
-    "assurance_refs": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
-      "description": "Current AssuranceContract, Verification Designer, deterministic-gate, review-manifest, evidence-design, independence, and evidence-reuse references or exact blockers."
-    },
-    "worker_invocation_refs": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
-      "description": "Current Worker Designer contracts for every executable phase-local work unit, or an explicit not-ready or blocked disposition for each missing contract."
-    },
-    "authority_and_capability_state": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Standing-authority sources, per-work-unit effect requirements, capability-zone assignments, safeguards, exclusions, expiry or revocation, and unresolved authority blockers."
-    },
-    "tool_profile_environment_state": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Applicable profile locks and phase-level tool, runtime, compiler, inspection, environment, credential-availability, fallback, payload, runtime, cost, and continuation requirements, with exact host-specific details bound through Worker Designer returns."
-    },
-    "state_decision_effect_state": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Applicability and current references for state ownership, decision rules, effect authority, transitions, observations, acknowledgements, recovery, trace fixtures, and formalization."
-    },
-    "scaffolding_and_cleanup_state": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Temporary scaffolding by slice or work unit, owner, containment, permitted lifetime, removal or promotion gate, and evidence of required disposition."
-    },
-    "continuation_and_handoff_state": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Bounded or extended execution classifications, logical checkpoints, continuation identity, same-thread preference, durable state, interruption semantics, and work-unit handoff schemas."
-    },
-    "child_return_refs": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
-      "description": "Validated Verification Designer, Worker Designer, and Reviewer returns with subject, revision, freshness, authority, and schema state."
-    },
-    "review_state": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Review applicability, exact completed or pending charters, findings, dispositions, independence rationale, and unresolved coverage."
-    },
     "invalidated_or_superseded_refs": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
       "description": "Prior slices, work units, worker contracts, assertions, evidence, or phase-plan revisions invalidated, reopened, rejected, or superseded during this invocation."
+    },
+    "mutation_and_workspace_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "One-owner mapping for mutable surfaces, workspace isolation, capability zones, shared resources, collision controls, and unresolved ownership conflicts."
     },
     "outward_impacts": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
       "description": "Exact effects on parent graph nodes, sibling phases, cross-phase dependencies, shared interfaces, global assertions, authority, environments, candidate planning, and downstream orchestration assumptions."
     },
+    "parent_actions_requested": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Exact rechartering, upstream decisions, resynthesis, authority grants, shared-interface dispositions, assertion-policy actions, or global integration actions requested from the Planning Wayfinder."
+    },
+    "phase_charter_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Current phase purpose, entry conditions, exit behavior, predecessor and successor obligations, participating territories and interfaces, and parent-level gates."
+    },
+    "phase_entry_exit_contract": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Exact entry preconditions, integrated exit behavior, planned phase gates, rollback or recovery implications, and invalidation conditions."
+    },
+    "phase_plan_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Versioned canonical phase-plan artifact or exact structured result reference."
+    },
+    "requirement_and_assertion_coverage": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Traceability and coverage state, including exactly one completing leaf work unit per active assertion and the distinction among integration, requirement verification, operational validation, outcome evidence, and review."
+    },
     "residual_uncertainty": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
       "description": "Bounded uncertainty retained after proportional stopping, with consequence, owner, expiry, and reopening trigger."
     },
-    "blockers": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
-      "description": "Exact recharter, decision, resynthesis, authority, technical, interface, dependency, integration, ownership, evidence, child-return, capacity, or host-window blockers and affected objects."
+    "review_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Review applicability, exact completed or pending charters, findings, dispositions, independence rationale, and unresolved coverage."
     },
-    "parent_actions_requested": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
-      "description": "Exact rechartering, upstream decisions, resynthesis, authority grants, shared-interface dispositions, assertion-policy actions, or global integration actions requested from the Planning Wayfinder."
+    "root_outcome_and_capability_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Current root outcome and capability-increment references preserved through the phase decomposition."
+    },
+    "scaffolding_and_cleanup_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Temporary scaffolding by slice or work unit, owner, containment, permitted lifetime, removal or promotion gate, and evidence of required disposition."
+    },
+    "state_decision_effect_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Applicability and current references for state ownership, decision rules, effect authority, transitions, observations, acknowledgements, recovery, trace fixtures, and formalization."
+    },
+    "tool_profile_environment_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Applicable profile locks and phase-level tool, runtime, compiler, inspection, environment, credential-availability, fallback, payload, runtime, cost, and continuation requirements, with exact host-specific details bound through Worker Designer returns."
+    },
+    "work_unit_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Leaf WorkUnit identities and contracts, including exact responsibility, scope, preconditions, inputs, outputs, dependencies, affected surfaces, expected behavior, checks, rollback, profiles, scaffolding, and handoffs."
+    },
+    "worker_invocation_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Current Worker Designer contracts for every executable phase-local work unit, or an explicit not-ready or blocked disposition for each missing contract."
     }
   },
   "x-bbk-role": "bbk_phase_wayfinder",

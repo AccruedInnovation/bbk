@@ -92,6 +92,34 @@ EXPECTED_EXCLUSIVE_PROMPT_MODULE_ROLES = {
         "bbk_validator_orchestrator",
         "bbk_verification_designer",
     },
+    "bbk-prompt-product-first-proportionality": {
+        "bbk_architect", "bbk_phase_wayfinder", "bbk_planning_wayfinder",
+        "bbk_prototyper", "bbk_researcher", "bbk_reviewer",
+        "bbk_root_orchestrator", "bbk_root_wayfinder", "bbk_synthesizer",
+        "bbk_territory_orchestrator", "bbk_territory_wayfinder", "bbk_validator",
+        "bbk_validator_orchestrator", "bbk_verification_designer", "bbk_worker",
+        "bbk_worker_designer", "bbk_worker_orchestrator",
+    },
+    "bbk-prompt-mechanical-admission": {
+        "bbk_architect", "bbk_phase_wayfinder", "bbk_planning_wayfinder",
+        "bbk_reviewer", "bbk_root_orchestrator", "bbk_root_wayfinder",
+        "bbk_territory_orchestrator", "bbk_territory_wayfinder", "bbk_validator",
+        "bbk_validator_orchestrator", "bbk_verification_designer", "bbk_worker",
+        "bbk_worker_designer", "bbk_worker_orchestrator",
+    },
+    "bbk-prompt-assurance-modes": {
+        "bbk_phase_wayfinder", "bbk_planning_wayfinder", "bbk_prototyper",
+        "bbk_reviewer", "bbk_root_orchestrator", "bbk_root_wayfinder",
+        "bbk_territory_orchestrator", "bbk_territory_wayfinder", "bbk_validator",
+        "bbk_validator_orchestrator", "bbk_verification_designer", "bbk_worker",
+        "bbk_worker_designer", "bbk_worker_orchestrator",
+    },
+    "bbk-prompt-candidate-focused-review": {
+        "bbk_phase_wayfinder", "bbk_planning_wayfinder", "bbk_reviewer",
+        "bbk_root_orchestrator", "bbk_territory_orchestrator", "bbk_validator",
+        "bbk_validator_orchestrator", "bbk_verification_designer", "bbk_worker",
+        "bbk_worker_designer", "bbk_worker_orchestrator",
+    },
 }
 
 
@@ -258,6 +286,8 @@ def _check_string_list(
 def _validate_return_contract(instance: Any, label: str, errors: list[str]) -> None:
     required = {
         "contract_id", "envelope_schema", "return_schema", "result_schema",
+        "v2_contract_id", "v2_envelope_schema", "v2_return_schema",
+        "compact_result_schema", "compact_result_fields", "full_detail_triggers",
         "semantic_state_name", "allowed_invocation_modes", "allowed_return_kinds",
         "allowed_operational_dispositions", "allowed_semantic_states",
         "supplemental_enums", "result_fields", "requirements",
@@ -272,10 +302,21 @@ def _validate_return_contract(instance: Any, label: str, errors: list[str]) -> N
     ):
         errors.append(f"{label}/contract_id: invalid role-return contract ID")
     if instance.get("envelope_schema") != "spec/schemas/bbk-role-return-v1.schema.json":
-        errors.append(f"{label}/envelope_schema: invalid common envelope path")
+        errors.append(f"{label}/envelope_schema: invalid v1 common envelope path")
+    if instance.get("v2_envelope_schema") != "spec/schemas/bbk-role-return-v2.schema.json":
+        errors.append(f"{label}/v2_envelope_schema: invalid v2 common envelope path")
+    v2_contract_id = instance.get("v2_contract_id")
+    if not _is_non_empty_string(v2_contract_id) or not re.fullmatch(
+        r"bbk\.[a-z0-9][a-z0-9.-]*-return\.v2", v2_contract_id
+    ):
+        errors.append(f"{label}/v2_contract_id: invalid v2 role-return contract ID")
+    elif isinstance(contract_id, str) and v2_contract_id != contract_id.removesuffix(".v1") + ".v2":
+        errors.append(f"{label}/v2_contract_id: must be the v2 successor of contract_id")
     for key, pattern in (
-        ("return_schema", r"spec/schemas/role-returns/bbk-[a-z][a-z0-9-]*-return-v[0-9]+\.schema\.json"),
-        ("result_schema", r"spec/schemas/role-results/bbk-[a-z][a-z0-9-]*-result-v[0-9]+\.schema\.json"),
+        ("return_schema", r"spec/schemas/role-returns/bbk-[a-z][a-z0-9-]*-return-v1\.schema\.json"),
+        ("result_schema", r"spec/schemas/role-results/bbk-[a-z][a-z0-9-]*-result-v1\.schema\.json"),
+        ("v2_return_schema", r"spec/schemas/role-returns/bbk-[a-z][a-z0-9-]*-return-v2\.schema\.json"),
+        ("compact_result_schema", r"spec/schemas/role-results/bbk-[a-z][a-z0-9-]*-compact-result-v2\.schema\.json"),
     ):
         value = instance.get(key)
         if not _is_non_empty_string(value) or not re.fullmatch(pattern, value):
@@ -332,6 +373,17 @@ def _validate_return_contract(instance: Any, label: str, errors: list[str]) -> N
                 errors.append(f"{field_label}/description: must be non-empty text")
             if "enum_values" in expected:
                 _check_string_list(field.get("enum_values"), f"{field_label}/enum_values", errors, non_empty=True)
+    compact_fields = _check_string_list(
+        instance.get("compact_result_fields"), f"{label}/compact_result_fields", errors,
+        non_empty=True, pattern=ROLE_ID_PATTERN,
+    )
+    if len(compact_fields) > 8:
+        errors.append(f"{label}/compact_result_fields: may contain at most 8 fields")
+    if isinstance(fields, dict):
+        unknown = sorted(set(compact_fields) - set(fields))
+        if unknown:
+            errors.append(f"{label}/compact_result_fields: unknown result fields {unknown}")
+    _check_string_list(instance.get("full_detail_triggers"), f"{label}/full_detail_triggers", errors, non_empty=True)
     _check_string_list(instance.get("requirements"), f"{label}/requirements", errors, non_empty=True)
     for key in ("readiness_rule", "authority_boundary"):
         if not _is_non_empty_string(instance.get(key)):

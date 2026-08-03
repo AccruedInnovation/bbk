@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-questioning-wayfinder-compact-result-v2.schema.json",
+  "title": "BBK BBK Questioning Wayfinder compact result payload v2",
+  "description": "Closed compact role-specific result payload for `bbk_questioning_wayfinder`. Use FULL when material truth cannot fit these fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "accepted_decision_refs",
+    "continuation_state",
+    "user_request_response_refs",
+    "blockers",
+    "requested_parent_actions",
+    "residual_uncertainty"
+  ],
+  "properties": {
+    "accepted_decision_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/referenceList",
+      "description": "Authority-bound root and related decision or ADR-compatible references with their response, delegated-authority, or constraint source, lineage, affected objects, and invalidation triggers."
+    },
+    "continuation_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Pending request IDs, active and parked branches, waiting peer or job IDs, resumption handles, invalidation conditions, and independent work still possible."
+    },
+    "user_request_response_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/referenceList",
+      "description": "Every controller request and matching authoritative response reference; pending, cancelled, expired, superseded, or invalid requests remain explicit."
+    },
+    "blockers": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Typed technical, authority, decision, context, controller-relay, host, evidence, or parent-action blockers and the smallest sufficient resolution path."
+    },
+    "requested_parent_actions": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Exact scope, interface, architecture, investigation, authority, integration, invalidation, or successor-routing actions requested from the semantic parent."
+    },
+    "residual_uncertainty": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Known residual uncertainty, assumptions, accepted unknowns, consequence, owner, expiry, confidence limits, and reopening triggers."
+    }
+  },
+  "x-bbk-role": "bbk_questioning_wayfinder",
+  "x-bbk-contract": "bbk.questioning-wayfinder-return.v2",
+  "x-bbk-detail-level": "COMPACT",
+  "x-bbk-full-detail-triggers": [
+    "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+    "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+    "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+    "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+    "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+    "The parent explicitly requested FULL detail.",
+    "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+  ]
+}

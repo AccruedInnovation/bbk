@@ -47,7 +47,7 @@ A schema-valid return does not establish parent acceptance, outcome satisfaction
 
 ## Execution companion objects
 
-`catalog.json` declares four active Gate 3 execution contracts:
+`catalog.json` declares four active execution contracts:
 
 - `bbk.territory-execution-boundary.v1` — compiled and admitted by Root Orchestrator; operated within and completion-reported by Territory Orchestrator; immutable after admission except through a successor boundary.
 - `bbk.local-discovery-policy.v1` — zero-default policy and budget ceiling owned by Territory Orchestrator.
@@ -58,7 +58,7 @@ A schema-valid return does not establish parent acceptance, outcome satisfaction
 
 `spec/capability-status.json` distinguishes deterministic implementation, bootstrap implementation, schema-defined companion contracts, optional host capabilities, target-only capabilities, and retired concepts. Prose or model confidence is not an equivalent implementation state.
 
-## Gate 3 validation
+## Contract-package validation
 
 Run the source-level contract checks with:
 
@@ -67,4 +67,4 @@ python tools/validate_contract_package.py --check
 python -m unittest discover -s tests -p 'test_contract_package_v1.py' -v
 ```
 
-Gate 3 does not regenerate shared skills, generated host agents, installers, release manifests, checksums, public release documentation, or the complete alpha.13 archive. Those remain Gate 5 work.
+Contract-package validation checks canonical contract sources and examples. Complete release qualification additionally regenerates host projections, verifies installers and manifests, and tests clean extracted archives.

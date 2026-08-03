@@ -1,0 +1,76 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-strict-json-diagnostic-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "claims_not_established": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "classification": {
+      "const": "MECHANICAL"
+    },
+    "code": {
+      "pattern": "^JSON_[A-Z0-9_]+$",
+      "type": "string"
+    },
+    "column": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "duplicate_key": {
+      "type": "string"
+    },
+    "line": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "message": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "offset": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "pointer": {
+      "type": "string"
+    },
+    "remediation": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.strict-json-diagnostic.v1"
+    },
+    "smallest_next_action": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "source": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "status": {
+      "const": "REJECTED"
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "code",
+    "classification",
+    "source",
+    "pointer",
+    "message",
+    "remediation",
+    "smallest_next_action",
+    "claims_not_established"
+  ],
+  "title": "BBK strict JSON diagnostic v1",
+  "type": "object"
+}

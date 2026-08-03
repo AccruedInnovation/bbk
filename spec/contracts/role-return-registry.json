@@ -1,6 +1,6 @@
 {
   "schema": "bbk.role-return-registry.v1",
-  "package_version": "0.1.0-alpha.13.5",
+  "package_version": "0.1.0-alpha.15",
   "source_role_catalog": "spec/roles/catalog.json",
   "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
   "generator": "tools/return_contracts.py",
@@ -29,12 +29,12 @@
       "result_schema": {
         "path": "spec/schemas/role-results/bbk-root-wayfinder-result-v1.schema.json",
         "bytes": 5188,
-        "sha256": "52f3000af5cede3893434d06b12166d129904a8e207009106cc6c820b3b7e654"
+        "sha256": "9af3705f8bfbaf1ab9041f24ac89f12a7d2daeb9c7ceb35d96a7b78bad5669ce"
       },
       "source": {
         "path": "spec/roles/bbk_root_wayfinder-role.json",
-        "bytes": 17941,
-        "sha256": "5fa7ea98f460c93ad04730c8417e44e7987adee3ce7ca9c9c7e9014b4210dff6"
+        "bytes": 20680,
+        "sha256": "73d89ada1ee70c86d5fc958586a957cf5032bd29e7c7d1d20a181dbee65867cf"
       }
     },
     {
@@ -49,12 +49,12 @@
       "result_schema": {
         "path": "spec/schemas/role-results/bbk-territory-wayfinder-result-v1.schema.json",
         "bytes": 5723,
-        "sha256": "bd566fb21f626ccd4589421d2e7264d5754cfec30efcc3f1524501feac03a4a5"
+        "sha256": "f1be658ccaf04081a7c21ef2f543ab95d3a9485a739c543d896ef7e22356af27"
       },
       "source": {
         "path": "spec/roles/bbk_territory_wayfinder-role.json",
-        "bytes": 23543,
-        "sha256": "16f2d26a804590dc9175dcac76904e69b2b516cdb0014965258a1dd099e797f9"
+        "bytes": 25188,
+        "sha256": "4c3716020936a85b71083935a915b0a3afb069d3f5a9eaa45a5a82ad1d5a9ba5"
       }
     },
     {
@@ -69,12 +69,12 @@
       "result_schema": {
         "path": "spec/schemas/role-results/bbk-questioning-wayfinder-result-v1.schema.json",
         "bytes": 6785,
-        "sha256": "9423043d1d52ba56731ca342ec894a6522234b0e1d7ba09fca6760d51f662638"
+        "sha256": "bcbf94959715a96780dd12587480c3b73754b76b6831baf03589ffe747e6c74f"
       },
       "source": {
         "path": "spec/roles/bbk_questioning_wayfinder-role.json",
-        "bytes": 26819,
-        "sha256": "a0efe302fb596b8dfdbb43eb4f9db6dbd073dd04658195eb66381c2dca89bb60"
+        "bytes": 28892,
+        "sha256": "3ad7c6de233c375bad47509236507c81169f57199a935e5eb193b0e112134925"
       }
     },
     {
@@ -89,12 +89,12 @@
       "result_schema": {
         "path": "spec/schemas/role-results/bbk-planning-wayfinder-result-v1.schema.json",
         "bytes": 7671,
-        "sha256": "d271e21920b8fb0bc8e820823e59c6651fce58e97b9e419a95cb8e00fef41e0f"
+        "sha256": "6475f36af8ab4a8f5353a4f63d99f885e5bd3136b1b6bf2dfb56eb42147e8b86"
       },
       "source": {
         "path": "spec/roles/bbk_planning_wayfinder-role.json",
-        "bytes": 28942,
-        "sha256": "eb54f78e09650a11db7affffaae4bfd4daed4efc33249c2a13963bd1d465f4af"
+        "bytes": 30908,
+        "sha256": "6e23bf1841f0bc28dad36577c7fa2c4e3dc816da60d95f08a487f4d8d091fe94"
       }
     },
     {
@@ -109,12 +109,12 @@
       "result_schema": {
         "path": "spec/schemas/role-results/bbk-phase-wayfinder-result-v1.schema.json",
         "bytes": 9929,
-        "sha256": "c3e6a6cad3a688ff6114f1d6c92a51d063c7e0fb457f16d3767b4f2ee3a2f4fb"
+        "sha256": "c9b589310f19e71015520b500d2166be36dd50a7f85b3322c530845a345f0e52"
       },
       "source": {
         "path": "spec/roles/bbk_phase_wayfinder-role.json",
-        "bytes": 35269,
-        "sha256": "2bd5c596b45179ec07ebbd6aaf94feb6179acb95a8a35b0a7e5f13abe4e259b9"
+        "bytes": 37221,
+        "sha256": "c1f96cc096484eb4f7a3b89a296a172b6a6fd7a504df9ecf5c8d1e533489f260"
       }
     },
     {
@@ -133,8 +133,8 @@
       },
       "source": {
         "path": "spec/roles/bbk_question_guide-role.json",
-        "bytes": 29293,
-        "sha256": "955ae77637a897cc4ccd6c7dddda97dc94cfc10947d65138e37d7c87f6307b1c"
+        "bytes": 30693,
+        "sha256": "665c2e2411533cf6d624d503c19a395cbf52b1fa0a156d11dcec307e6a69ce2d"
       }
     },
     {
@@ -149,12 +149,12 @@
       "result_schema": {
         "path": "spec/schemas/role-results/bbk-researcher-result-v1.schema.json",
         "bytes": 6178,
-        "sha256": "0ac122810939483cf93f0e5c7bdeaa7d4ea52e36948e47120157808d3737aa4c"
+        "sha256": "645110807ac3136342116d92411ef898dc4d9778f0ebb5547943ba03143d2a4e"
       },
       "source": {
         "path": "spec/roles/bbk_researcher-role.json",
-        "bytes": 23497,
-        "sha256": "59fd69df170af2864881437df6d2f025f3305c873f37438c7a63c5d7f574b1cb"
+        "bytes": 25200,
+        "sha256": "fd294a654b9c4d9c90f3a6971bb1b31277e0127e80d4a0e3fc98f549f86ace0f"
       }
     },
     {
@@ -163,8 +163,8 @@
       "semantic_state_name": "experiment_state",
       "return_schema": {
         "path": "spec/schemas/role-returns/bbk-prototyper-return-v1.schema.json",
-        "bytes": 8825,
-        "sha256": "32a068d8183a852b75eb611f8d0ce7a1bb13a629d1bd490b390c7c616791d2d4"
+        "bytes": 9066,
+        "sha256": "52c4cd1f1773ac87decce68f98c3882b41f50cb96e2997b7fd04d1df1b3e5afe"
       },
       "result_schema": {
         "path": "spec/schemas/role-results/bbk-prototyper-result-v1.schema.json",
@@ -173,8 +173,8 @@
       },
       "source": {
         "path": "spec/roles/bbk_prototyper-role.json",
-        "bytes": 36294,
-        "sha256": "68427471fdc486dda3c8747df6e4f359896208eed874c08906b0aafa4e220b4c"
+        "bytes": 38471,
+        "sha256": "930af67ce460a8c52c845811b833e14ca619304c7f621b0f051d0ac5d5aa77ca"
       }
     },
     {
@@ -193,8 +193,8 @@
       },
       "source": {
         "path": "spec/roles/bbk_synthesizer-role.json",
-        "bytes": 23588,
-        "sha256": "b03687f08f9a69aa3cf90ba8d987835d6d0351636eb6d0159bbf9e6de3c2085e"
+        "bytes": 25003,
+        "sha256": "7735e2c3ce8cb6c1fec414272f88085054689f9307697d27691e122bce66a662"
       }
     },
     {
@@ -209,12 +209,12 @@
       "result_schema": {
         "path": "spec/schemas/role-results/bbk-architect-result-v1.schema.json",
         "bytes": 12964,
-        "sha256": "a18348859148ad1b40e0541ddebdd3daa5bb6dde650f4fae83359c588f6deadd"
+        "sha256": "7e9b0fac1371a22afb518082e6fe617080c133c9194bff9376c93d3581e313c5"
       },
       "source": {
         "path": "spec/roles/bbk_architect-role.json",
-        "bytes": 40684,
-        "sha256": "32ccbe4eb2e41ea4d8970635957ffb8a1c837d151a83cfbcc29980cf2e270bfa"
+        "bytes": 43113,
+        "sha256": "71c46282e2341b411d9a60e796302255cbded1478267b6be397dd9160eaa5552"
       }
     },
     {
@@ -233,8 +233,8 @@
       },
       "source": {
         "path": "spec/roles/bbk_verification_designer-role.json",
-        "bytes": 34290,
-        "sha256": "45c5b619ab61d693fbc88afb2486743be1c4c2afe3b0ef112d109748196c118f"
+        "bytes": 35884,
+        "sha256": "6ee29244d446b64bb94678cead7b841506b23dbda1ee9df5657c263961a80273"
       }
     },
     {
@@ -249,12 +249,12 @@
       "result_schema": {
         "path": "spec/schemas/role-results/bbk-worker-designer-result-v1.schema.json",
         "bytes": 14249,
-        "sha256": "617f8c3dce28aacedcca6d0eb01b78693598bac561e63469b14d412346c2ac4b"
+        "sha256": "0666ba1111de97f0faff69a512b2e9d1b1380c2480ff2aafdee32002b0dbbecf"
       },
       "source": {
         "path": "spec/roles/bbk_worker_designer-role.json",
-        "bytes": 40388,
-        "sha256": "3dd55dc77ac5c6492cdaa8006b9b2546094a417759a4d9c458f5bb3471d20e3a"
+        "bytes": 42325,
+        "sha256": "43931cf5bb73f5a8f957bb957295bed69336731ce75b994d2b320e639145bb8f"
       }
     },
     {
@@ -273,8 +273,8 @@
       },
       "source": {
         "path": "spec/roles/bbk_reviewer-role.json",
-        "bytes": 36728,
-        "sha256": "fd2f7f5a7c191995995d6d3e721baa3c012dd1cd724ff0fce418e111eb1a4c16"
+        "bytes": 38327,
+        "sha256": "7a06ea32a3d621186393b2dd1a80efca7411ca2fddded3597a2b925290af7047"
       }
     },
     {
@@ -289,12 +289,12 @@
       "result_schema": {
         "path": "spec/schemas/role-results/bbk-root-orchestrator-result-v1.schema.json",
         "bytes": 11954,
-        "sha256": "8c44a346365be29aed318f9bfd5d43a54dac0148cd12539e6ffadd8f7e42ce4d"
+        "sha256": "93b5d7903edd7e8a4350a338de8c4a82a5180bbeaaaabd254debbf728beb3e18"
       },
       "source": {
         "path": "spec/roles/bbk_root_orchestrator-role.json",
-        "bytes": 39441,
-        "sha256": "eb4d98ad5d360320a799248ab3219bbc12d20000dc002ea2faeb3ae0c523ae42"
+        "bytes": 41791,
+        "sha256": "ba060ed338cc331436ccf88e98fddfa321c7af2190df3e479fdd33d8d7ef797a"
       }
     },
     {
@@ -309,12 +309,12 @@
       "result_schema": {
         "path": "spec/schemas/role-results/bbk-territory-orchestrator-result-v1.schema.json",
         "bytes": 10348,
-        "sha256": "b18a7b068e7cd6415aefb671d19f0f8a4a7d4f7cec6a71eb66eb1a6d8ed26802"
+        "sha256": "9ab64d417eb0a0f228ee516a017d04839b66e63ad09ce023674a740b75bfa45a"
       },
       "source": {
         "path": "spec/roles/bbk_territory_orchestrator-role.json",
-        "bytes": 42093,
-        "sha256": "d84b89cc8d4dd3410e8f9ba8a8a8c03835d1f16563585f6998f3515b66b158b3"
+        "bytes": 44080,
+        "sha256": "98c08b6f87958991f711f076081c8243dc4d0cf28a8e9da251a7e630faed54fd"
       }
     },
     {
@@ -329,12 +329,12 @@
       "result_schema": {
         "path": "spec/schemas/role-results/bbk-worker-orchestrator-result-v1.schema.json",
         "bytes": 9624,
-        "sha256": "3a69d0335b6eaca6b9f32a0f3c0943d08d8eefcfac0f4699c38286d83d6a7b45"
+        "sha256": "52fe5a3fd9ca1666d3269e2e8bee9ec52da39185944cc7eef922986992ec13a8"
       },
       "source": {
         "path": "spec/roles/bbk_worker_orchestrator-role.json",
-        "bytes": 40769,
-        "sha256": "1df80f1fd282b7fdde23bff87879fee52f70af9bb489284c53e49c64855bf451"
+        "bytes": 42772,
+        "sha256": "2a22ab27544f040668be66189326310a318e2af629a0d2b7c156eceee75fb57d"
       }
     },
     {
@@ -353,8 +353,8 @@
       },
       "source": {
         "path": "spec/roles/bbk_validator_orchestrator-role.json",
-        "bytes": 44389,
-        "sha256": "b2bf5f3d564e4c75b9b0ce879495482afb5e56836a0043d93d32b6c3624a18a0"
+        "bytes": 46088,
+        "sha256": "0d2f91d504a3f62a8561e092f11b8dfa2e9ce8828548b328011792cf3024568f"
       }
     },
     {
@@ -369,12 +369,12 @@
       "result_schema": {
         "path": "spec/schemas/role-results/bbk-worker-result-v1.schema.json",
         "bytes": 8748,
-        "sha256": "9918ce4c46fe8d958b8815cad9df4381df4778df7b8ae1e7234a7bba7dd72e63"
+        "sha256": "9f65f1844411fd4601913764aad5f189b2766f500a45f51c591bbebc9589f5d2"
       },
       "source": {
         "path": "spec/roles/bbk_worker-role.json",
-        "bytes": 32487,
-        "sha256": "c9842baa9a6e6fd919378b06daea4ee747e9fe65a6c8aa58d2e6ef572585ce35"
+        "bytes": 34375,
+        "sha256": "f629ce1a36010aab5c72b792071b501f6738a1fa0358350edc3b3c2c215a0bc8"
       }
     },
     {
@@ -393,8 +393,8 @@
       },
       "source": {
         "path": "spec/roles/bbk_validator-role.json",
-        "bytes": 35087,
-        "sha256": "557853ac0f18be2b8d5be5c086da6b9afc7193e7cc22b74ab96dbbf3a404af8a"
+        "bytes": 36698,
+        "sha256": "e3cdc2ab0be3d96750cd3417d8e6547ef058e0e277635e4bfde43818e52458c7"
       }
     }
   ]

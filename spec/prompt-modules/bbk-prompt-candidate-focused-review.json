@@ -1,0 +1,28 @@
+{
+  "schema_version": "bbk.prompt-module.v1",
+  "id": "bbk-prompt-candidate-focused-review",
+  "title": "Candidate-focused review and delta recheck",
+  "description": "Review the exact integrated candidate or material boundary and return bounded findings instead of rewriting the plan.",
+  "clauses": [
+    {
+      "id": "CANDIDATE_REVIEW.EXACT_SUBJECT",
+      "text": "Independent review normally targets an exact sealed integrated candidate or one exact material risk or interface boundary. Do not default to reviewing an abstract plan or every intermediate artifact when those are not the assurance subject."
+    },
+    {
+      "id": "CANDIDATE_REVIEW.DELTA_OUTPUT",
+      "text": "Return findings, evidence gaps, concrete deltas, affected scope, reopening triggers, and the smallest valid next action. Do not rewrite the implementation plan or restate unaffected context as the review product."
+    },
+    {
+      "id": "CANDIDATE_REVIEW.FINDING_SCOPED_RECHECK",
+      "text": "A focused repair recheck consumes the finding, successor candidate, affected scope, relevant evidence, and reopening triggers. Reopen broader review only when the repair materially changes semantics, interfaces, authority, protected floors, or evidence meaning."
+    },
+    {
+      "id": "CANDIDATE_REVIEW.STOP_RULE",
+      "text": "Stop when the exact review focus is resolved and its required evidence is adequate. Do not expand a bounded review into a general audit, duplicate prior assurance, or continue after the named risk has been retired."
+    },
+    {
+      "id": "CANDIDATE_REVIEW.INLINE_BOUNDARY",
+      "text": "INLINE work does not commission an independent Reviewer. Apply normal worker self-checks and deterministic gates unless a named material risk changes the assurance mode."
+    }
+  ]
+}

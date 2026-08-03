@@ -1,79 +1,372 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://bbk.local/schemas/bbk-question-branch-v1.schema.json",
-  "title": "BBK durable question branch",
-  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
-  "required": [
-    "schema", "bbk_version", "id", "root_decision", "status", "owner_role",
-    "authority", "current_recommendation", "proposal_response", "root_disposition",
-    "dependencies", "accepted_related_decisions", "independent_questions",
-    "exposure_history", "unresolved_point", "stopping_assessment", "next_action",
-    "updated_at"
-  ],
-  "properties": {
-    "schema": {"const": "bbk.question-branch.v1"},
-    "bbk_version": {"type": "string", "minLength": 1},
-    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
-    "root_decision": {"type": "string", "minLength": 1},
-    "status": {
-      "enum": [
-        "ACTIVE", "WAITING_FOR_USER", "RESEARCH_BLOCKED", "PARKED", "INVALIDATED",
-        "ORPHANED", "RESOLVED", "DEFERRED", "BLOCKED", "CANCELLED", "SUPERSEDED"
-      ]
-    },
-    "owner_role": {"type": "string", "minLength": 1},
-    "parent_scope": {"type": ["string", "null"]},
-    "authority": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["mode", "holder"],
-      "properties": {
-        "mode": {"enum": ["USER_DECIDES", "WAYFINDER_RECOMMENDS", "DELEGATED", "CONSTRAINT_DRIVEN"]},
-        "holder": {"type": "string", "minLength": 1}
-      }
-    },
-    "context_digest": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
-    "current_recommendation": {"type": ["string", "null"]},
-    "proposal_response": {"enum": [null, "APPROVE", "REJECT", "REVISE"]},
-    "root_disposition": {
-      "enum": [null, "RESOLVED", "DEFERRED", "PARKED", "BLOCKED", "INSUFFICIENT_EVIDENCE", "OUT_OF_SCOPE", "CANCELLED", "SUPERSEDED"]
-    },
-    "accepted_decision": {"type": ["string", "null"]},
-    "accepted_related_decisions": {"type": "array", "items": {"type": "string"}},
-    "independent_questions": {"type": "array", "items": {"type": "string"}},
-    "dependencies": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
-    "invalidated_by": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
-    "exposure_history": {"type": "array", "items": {"type": "string"}},
-    "unresolved_point": {"type": ["string", "null"]},
-    "stopping_assessment": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["decision_ready", "reason"],
-      "properties": {
-        "decision_ready": {"type": "boolean"},
-        "reason": {"type": "string"},
-        "remaining_information_value": {"type": ["string", "null"]},
-        "attention_state": {"type": ["string", "null"]}
-      }
-    },
-    "next_action": {"type": "string", "minLength": 1},
-    "updated_at": {"type": "string", "format": "date-time"}
-  },
   "allOf": [
     {
-      "if": {"properties": {"root_disposition": {"const": "RESOLVED"}}, "required": ["root_disposition"]},
+      "if": {
+        "properties": {
+          "root_disposition": {
+            "const": "RESOLVED"
+          }
+        },
+        "required": [
+          "root_disposition"
+        ]
+      },
       "then": {
         "properties": {
-          "status": {"const": "RESOLVED"},
-          "proposal_response": {"const": "APPROVE"},
-          "accepted_decision": {"type": "string", "minLength": 1}
+          "accepted_decision": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "proposal_response": {
+            "const": "APPROVE"
+          },
+          "status": {
+            "const": "RESOLVED"
+          }
         }
       }
     },
     {
-      "if": {"properties": {"proposal_response": {"enum": ["REJECT", "REVISE"]}}, "required": ["proposal_response"]},
-      "then": {"not": {"properties": {"root_disposition": {"const": "RESOLVED"}}, "required": ["root_disposition"]}}
+      "if": {
+        "properties": {
+          "proposal_response": {
+            "enum": [
+              "REJECT",
+              "REVISE"
+            ]
+          }
+        },
+        "required": [
+          "proposal_response"
+        ]
+      },
+      "then": {
+        "not": {
+          "properties": {
+            "root_disposition": {
+              "const": "RESOLVED"
+            }
+          },
+          "required": [
+            "root_disposition"
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "need_class": {
+            "const": "REVERSIBLE_IMPLEMENTATION_CHOICE"
+          }
+        },
+        "required": [
+          "need_class"
+        ]
+      },
+      "then": {
+        "properties": {
+          "attention": {
+            "properties": {
+              "requires_user_attention": {
+                "const": false
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "attention": {
+            "properties": {
+              "requires_user_attention": {
+                "const": true
+              }
+            },
+            "required": [
+              "requires_user_attention"
+            ]
+          },
+          "need_class": {
+            "enum": [
+              "ENVIRONMENT_FACT",
+              "CONFIGURATION_PARAMETER"
+            ]
+          }
+        },
+        "required": [
+          "need_class",
+          "attention"
+        ]
+      },
+      "then": {
+        "properties": {
+          "attention": {
+            "properties": {
+              "discoverability": {
+                "const": "NOT_DISCOVERABLE_BY_BBK"
+              },
+              "safe_default": {
+                "const": null
+              }
+            }
+          }
+        }
+      }
     }
-  ]
+  ],
+  "properties": {
+    "accepted_decision": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "accepted_related_decisions": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "attention": {
+      "additionalProperties": false,
+      "properties": {
+        "discoverability": {
+          "enum": [
+            "DISCOVERABLE_NOW",
+            "DISCOVERABLE_LATER",
+            "NOT_DISCOVERABLE_BY_BBK",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "rationale": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "requires_user_attention": {
+          "type": "boolean"
+        },
+        "safe_default": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "unaffected_work_may_continue": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "requires_user_attention",
+        "rationale",
+        "discoverability",
+        "safe_default",
+        "unaffected_work_may_continue"
+      ],
+      "type": "object"
+    },
+    "authority": {
+      "additionalProperties": false,
+      "properties": {
+        "holder": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "USER_DECIDES",
+            "WAYFINDER_RECOMMENDS",
+            "DELEGATED",
+            "CONSTRAINT_DRIVEN"
+          ]
+        }
+      },
+      "required": [
+        "mode",
+        "holder"
+      ],
+      "type": "object"
+    },
+    "bbk_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "context_digest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "current_recommendation": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "dependencies": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "exposure_history": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+      "type": "string"
+    },
+    "independent_questions": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "invalidated_by": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "need_class": {
+      "enum": [
+        "ENVIRONMENT_FACT",
+        "CONFIGURATION_PARAMETER",
+        "REVERSIBLE_IMPLEMENTATION_CHOICE",
+        "ARCHITECTURAL_DECISION",
+        "AUTHORITY_EXPANSION",
+        "USER_RESERVED_PREFERENCE"
+      ]
+    },
+    "next_action": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "owner_role": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "parent_scope": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "proposal_response": {
+      "enum": [
+        null,
+        "APPROVE",
+        "REJECT",
+        "REVISE"
+      ]
+    },
+    "root_decision": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "root_disposition": {
+      "enum": [
+        null,
+        "RESOLVED",
+        "DEFERRED",
+        "PARKED",
+        "BLOCKED",
+        "INSUFFICIENT_EVIDENCE",
+        "OUT_OF_SCOPE",
+        "CANCELLED",
+        "SUPERSEDED"
+      ]
+    },
+    "schema": {
+      "const": "bbk.question-branch.v1"
+    },
+    "status": {
+      "enum": [
+        "ACTIVE",
+        "WAITING_FOR_USER",
+        "RESEARCH_BLOCKED",
+        "PARKED",
+        "INVALIDATED",
+        "ORPHANED",
+        "RESOLVED",
+        "DEFERRED",
+        "BLOCKED",
+        "CANCELLED",
+        "SUPERSEDED"
+      ]
+    },
+    "stopping_assessment": {
+      "additionalProperties": false,
+      "properties": {
+        "attention_state": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "decision_ready": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "remaining_information_value": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "decision_ready",
+        "reason"
+      ],
+      "type": "object"
+    },
+    "unresolved_point": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "updated_at": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "bbk_version",
+    "id",
+    "root_decision",
+    "status",
+    "owner_role",
+    "authority",
+    "current_recommendation",
+    "proposal_response",
+    "root_disposition",
+    "dependencies",
+    "accepted_related_decisions",
+    "independent_questions",
+    "exposure_history",
+    "unresolved_point",
+    "stopping_assessment",
+    "next_action",
+    "updated_at",
+    "need_class",
+    "attention"
+  ],
+  "title": "BBK durable question branch",
+  "type": "object"
 }

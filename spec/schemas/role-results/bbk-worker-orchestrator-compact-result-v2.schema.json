@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-worker-orchestrator-compact-result-v2.schema.json",
+  "title": "BBK BBK Worker Orchestrator compact result payload v2",
+  "description": "Closed compact role-specific result payload for `bbk_worker_orchestrator`. Use FULL when material truth cannot fit these fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "work_unit_and_batch_state",
+    "candidate_lineage",
+    "quality_gate_and_attestation_state",
+    "residuals_and_blockers",
+    "parent_actions_requested",
+    "repair_and_revalidation_state"
+  ],
+  "properties": {
+    "work_unit_and_batch_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Every admitted WorkUnit or issue with exact revision, purpose, dependency, invocation contract, owning Worker, eligibility, current result, integration responsibility, completing and contributing assertions, local discovery, invalidation and closure condition."
+    },
+    "candidate_lineage": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Every draft, frozen, failed, invalidated and successor candidate with identity, subject, source roots, base revisions, manifest path and digest, contributing WorkUnits and Workers, changed and deleted artifacts, local permits, structure or State-Decision-Effect references, external effects, producer run and supersession links."
+    },
+    "quality_gate_and_attestation_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Quality-gate manifest and digest, resolved DAG, applicability, commands, tools, environments, complete receipts and stream carriers, reuse basis, blocking results, exact candidate binding, worker-quality attestation, authority disclaimer, currentness, coverage gaps and validation eligibility."
+    },
+    "residuals_and_blockers": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Residual uncertainty, failed or unavailable gates, stale sources, invalid handoffs, workspace or ownership conflicts, technical, authority and decision blockers, dependency waits, capacity and host-window pauses, cleanup residuals, repeated-repair concerns and smallest valid resolution for each."
+    },
+    "parent_actions_requested": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Exact Territory Orchestrator action requested: continue, wait, bind runtime state, recompile a Worker invocation, qualify a profile or tool, assess candidate admission to validation, route repair, resolve integration, grant or withdraw authority, replan, create a successor cohort or baseline, recover, cancel or correctly stop."
+    },
+    "repair_and_revalidation_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Repair-cycle count, exact findings and candidate addressed, repair WorkUnit and Worker, unchanged or changed cohort assumptions, successor candidate and attestation, invalidated receipts, smallest revalidation scope, repeated-failure classification and escalation threshold."
+    }
+  },
+  "x-bbk-role": "bbk_worker_orchestrator",
+  "x-bbk-contract": "bbk.worker-orchestrator-return.v2",
+  "x-bbk-detail-level": "COMPACT",
+  "x-bbk-full-detail-triggers": [
+    "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+    "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+    "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+    "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+    "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+    "The parent explicitly requested FULL detail.",
+    "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+  ]
+}

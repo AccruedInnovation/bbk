@@ -152,9 +152,9 @@ class Alpha6CongruenceTests(unittest.TestCase):
             first = json.loads(self.cli('--json', 'init', '--root', tmp, '--project-id', 'TEST-A6').stdout)
             self.assertIn(first['status'], {'PASS', 'initialized'})
             root = Path(tmp) / '.bbk'
-            self.assertTrue((root / 'fit' / 'EXAMPLE-solution-outcome-fit.json').is_file())
-            self.assertTrue((root / 'structures' / 'EXAMPLE-implementation-structure-contract.json').is_file())
-            self.assertTrue((root / 'slices' / 'EXAMPLE-execution-slice.json').is_file())
+            self.assertTrue((root / 'examples' / 'fit' / 'EXAMPLE-solution-outcome-fit.json').is_file())
+            self.assertTrue((root / 'examples' / 'structures' / 'EXAMPLE-implementation-structure-contract.json').is_file())
+            self.assertTrue((root / 'examples' / 'slices' / 'EXAMPLE-execution-slice.json').is_file())
             marker = root / 'project.md'
             marker.write_text('preserve me\n', encoding='utf-8')
             second = json.loads(self.cli('--json', 'init', '--root', tmp).stdout)
@@ -305,7 +305,7 @@ class Alpha6CongruenceTests(unittest.TestCase):
             ).stdout)
             self.assertTrue(cancelled['valid'])
             first_path = root / cancelled['handoff']['path']
-            first = json.loads(first_path.read_text(encoding='utf-8'))
+            first = json.loads((first_path / 'handoff.json').read_text(encoding='utf-8'))
             self.assertEqual(first['attempt'], 1)
             self.assertEqual(first['disposition'], 'CANCELLED')
             self.assertEqual(first['interrupt']['partial_work_location'], 'partial-architecture.md')
@@ -322,7 +322,8 @@ class Alpha6CongruenceTests(unittest.TestCase):
                 '--next-action', 'Parent validates and integrates successful attempt 2 only.',
             ).stdout)
             self.assertTrue(successor['valid'])
-            second = json.loads((root / successor['handoff']['path']).read_text(encoding='utf-8'))
+            second_path = root / successor['handoff']['path']
+            second = json.loads((second_path / 'handoff.json').read_text(encoding='utf-8'))
             self.assertEqual(second['attempt'], 2)
             self.assertEqual(second['disposition'], 'COMPLETE')
             self.assertIn('replaced cancelled attempt 1', second['summary'].lower())
@@ -395,7 +396,7 @@ m2_BBK = m2_ROOT / 'tools' / 'bbk.py'
 class Alpha7CongruenceTests(unittest.TestCase):
 
     def test_release_is_additive_over_alpha6(self):
-        self.assertEqual((m2_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.13.5')
+        self.assertEqual((m2_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.15')
         help_text = test_run_cli([sys.executable, m2_BBK, '--help'], cwd=m2_ROOT).stdout
         for command in ('fit', 'structure', 'slice', 'profile', 'manifest', 'candidate', 'gate', 'workspace', 'worktree', 'package'):
             self.assertIn(command, help_text)
@@ -433,9 +434,15 @@ class Alpha7CongruenceTests(unittest.TestCase):
         tools = re.findall('name: "(bbk_[^"]+)"', source)
         commands = re.findall('registerCommand\\(pi, "(bbk(?::[^"]*)?)"', source)
         commands += re.findall('pi\\.registerCommand\\("(bbk(?::[^"]*)?)"', source)
-        self.assertEqual(len(tools), 28)
-        self.assertEqual(len(commands), 29)
-        for name in ('bbk_manifest', 'bbk_candidate', 'bbk_gate', 'bbk_workspace', 'bbk_review_plan', 'bbk_review_run', 'bbk_state_effect_validate'):
+        self.assertEqual(len(tools), 42)
+        self.assertEqual(len(commands), 45)
+        for name in (
+            'bbk_manifest', 'bbk_candidate', 'bbk_gate', 'bbk_workspace',
+            'bbk_review_plan', 'bbk_review_run', 'bbk_state_effect_validate',
+            'bbk_artifact_preflight', 'bbk_artifact_seal', 'bbk_artifact_successor',
+            'bbk_host_preflight', 'bbk_context_worker', 'bbk_context_review',
+            'bbk_handoff_create', 'bbk_handoff_verify', 'bbk_handoff_list',
+        ):
             self.assertIn(name, tools)
 
     def test_installer_copies_alpha7_cli_modules(self):
@@ -612,7 +619,7 @@ class Alpha8ProfileDispatchTests(unittest.TestCase):
             self.assertEqual(lock['effective_sha256'], value['effective_sha256'])
 
     def test_alpha8_package_surface_is_present(self):
-        self.assertEqual((m3_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.13.5')
+        self.assertEqual((m3_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.15')
         for rel in ['docs/LANGUAGE-PROFILES.md', 'spec/schemas/bbk-profile-capability-request-v1.schema.json', 'spec/schemas/bbk-profile-capability-result-v1.schema.json', 'spec/schemas/bbk-profile-dispatch-v1.schema.json', 'templates/profile-capability-request.json']:
             self.assertTrue((m3_ROOT / rel).is_file(), rel)
 
@@ -668,7 +675,7 @@ class PublicRepositoryBoundaryTests(unittest.TestCase):
 
     def test_context_and_procedure_methods_are_canonical_and_projected(self):
         method = m4_load('spec/method-content.json')
-        self.assertEqual(method['version'], '0.1.0-alpha.13.5')
+        self.assertEqual(method['version'], '0.1.0-alpha.15')
         self.assertIn('bbk-context-routing', method['skills'])
         self.assertIn('bbk-procedure-design', method['skills'])
         self.assertIn('context-routing.md', method['references'])
@@ -790,13 +797,13 @@ class Alpha10ModelRoutingTests(unittest.TestCase):
 
     def test_alpha13_defaults_match_the_reviewed_per_role_routing_selection(self):
         reviewed = json.loads(
-            (m5_ROOT / 'tests' / 'fixtures' / 'alpha13-default-model-routing.json').read_text(
+            (m5_ROOT / 'tests' / 'fixtures' / 'alpha14-default-model-routing.json').read_text(
                 encoding='utf-8'
             )
         )
-        self.assertEqual(reviewed['package_version'], '0.1.0-alpha.13.5')
+        self.assertEqual(reviewed['package_version'], '0.1.0-alpha.14')
         self.assertEqual(set(reviewed['roles']), self.role_names)
-        self.assertEqual(self.routing, reviewed)
+        self.assertEqual(self.routing['roles'], reviewed['roles'])
 
         profiles = json.loads(
             (m5_ROOT / 'spec' / 'omp-model-routing-profiles.json').read_text(encoding='utf-8')
@@ -978,6 +985,228 @@ class Alpha10ModelRoutingTests(unittest.TestCase):
         self.assertIn('19 roles have individual model routes', checked.stdout)
         generated = m5_run([sys.executable, m5_GENERATOR, '--check'])
         self.assertIn('19 roles, 19 direct model routes, 4 targets, and 76 projections', generated.stdout)
+
+
+
+class Alpha14BoundedPlanningAndToolingTests(unittest.TestCase):
+    """Regression coverage for alpha.14 prompt/tooling improvements.
+
+    These checks deliberately validate schemas, command behavior, and prompt
+    compilation. They do not create Blueprint-style lifecycle transition gates.
+    """
+
+    def cli(self, *args: str, check: bool = True):
+        return test_run_cli(
+            [sys.executable, '-B', str(m1_BBK), *args],
+            cwd=m1_ROOT,
+            check=check,
+            env={**os.environ, 'PYTHONDONTWRITEBYTECODE': '1'},
+        )
+
+    def test_structure_v3_supports_compact_infrastructure_without_fake_state_machine(self):
+        compact = json.loads(
+            (m1_ROOT / 'templates' / 'implementation-structure-contract-v3-infrastructure-compact.json')
+            .read_text(encoding='utf-8')
+        )
+        report = m1_bbk.validate_structure_v2(compact)
+        self.assertTrue(report['valid'], report)
+        self.assertEqual(report['version'], 'v3')
+        self.assertEqual(report['contractDepth'], 'compact')
+        self.assertEqual(report['stateDecisionEffect'], 'not-applicable')
+        self.assertNotIn('stateDecisionEffectDesign', compact)
+        self.assertTrue(compact['preExecutionConfirmations'])
+
+        invalid = json.loads(json.dumps(compact))
+        invalid['sectionApplicability']['stateDecisionEffect']['status'] = 'REQUIRED'
+        invalid_report = m1_bbk.validate_structure_v2(invalid)
+        self.assertFalse(invalid_report['valid'])
+        self.assertTrue(any('stateDecisionEffectDesign is required' in item for item in invalid_report['errors']))
+
+        standard = json.loads(
+            (m1_ROOT / 'templates' / 'implementation-structure-contract-v3.json')
+            .read_text(encoding='utf-8')
+        )
+        self.assertTrue(m1_bbk.validate_structure_v2(standard)['valid'])
+        self.assertIn('stateDecisionEffectDesign', standard)
+
+    def test_schema_catalog_template_enum_and_explanation_are_actionable(self):
+        catalog = json.loads(self.cli('--json', 'schema', 'list').stdout)
+        self.assertEqual(catalog['status'], 'PASS')
+        self.assertIn('implementation-structure', {item['kind'] for item in catalog['items']})
+        self.assertEqual(catalog['implementation_structure']['versions'], ['v1', 'v2', 'v3'])
+
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / 'infra.json'
+            created = json.loads(self.cli(
+                '--json', 'schema', 'template', '--kind', 'implementation-structure',
+                '--subject-kind', 'infrastructure', '--depth', 'compact', '--output', str(output),
+            ).stdout)
+            self.assertEqual(created['template'], 'implementation-structure-contract-v3-infrastructure-compact.json')
+            self.assertTrue(output.is_file())
+            self.assertTrue(json.loads(self.cli('--json', 'structure', 'validate', str(output)).stdout)['valid'])
+
+            enum = json.loads(self.cli(
+                '--json', 'schema', 'enum', '--schema', 'implementation-structure',
+                '--pointer', '/contractDepth',
+            ).stdout)
+            self.assertEqual(enum['enum'], ['compact', 'standard', 'full'])
+            self.assertEqual(enum['smallest_valid_example'], 'compact')
+
+            value = json.loads(output.read_text(encoding='utf-8'))
+            value['contractDepth'] = 'gigantic'
+            output.write_text(json.dumps(value, indent=2) + '\n', encoding='utf-8')
+            explained = self.cli(
+                '--json', 'schema', 'explain', '--schema', 'implementation-structure',
+                '--instance', str(output), '--pointer', '/contractDepth', check=False,
+            )
+            self.assertEqual(explained.returncode, 1)
+            payload = json.loads(explained.stdout)
+            self.assertEqual(payload['focus']['supplied_value'], 'gigantic')
+            self.assertEqual(payload['focus']['allowed_values'], ['compact', 'standard', 'full'])
+            self.assertEqual(payload['focus']['smallest_valid_example'], 'compact')
+
+            without_site_packages = test_run_cli(
+                [
+                    sys.executable, '-S', str(m1_BBK), '--json', 'schema', 'explain',
+                    '--schema', 'implementation-structure', '--instance', str(output),
+                    '--pointer', '/contractDepth',
+                ],
+                cwd=m1_ROOT,
+                check=False,
+                env={**os.environ, 'PYTHONDONTWRITEBYTECODE': '1'},
+                force_subprocess=True,
+            )
+            self.assertEqual(without_site_packages.returncode, 1)
+            no_site_payload = json.loads(without_site_packages.stdout)
+            self.assertFalse(no_site_payload['external_validator']['available'])
+            self.assertEqual(no_site_payload['focus']['allowed_values'], ['compact', 'standard', 'full'])
+            self.assertIn('contractDepth must be compact, standard, or full', no_site_payload['builtin_validator']['errors'][0])
+
+    def test_artifact_manifest_is_deterministic_excludes_examples_and_detects_tamper(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / 'sub').mkdir()
+            (root / '.bbk' / 'examples').mkdir(parents=True)
+            (root / 'a.txt').write_text('alpha\n', encoding='utf-8')
+            (root / 'sub' / 'b.txt').write_text('beta\n', encoding='utf-8')
+            (root / '.bbk' / 'examples' / 'EXAMPLE-ignore.json').write_text('{}\n', encoding='utf-8')
+            manifest_path = root / 'artifact-manifest.json'
+            first = json.loads(self.cli(
+                '--json', 'artifact', 'manifest', '--root', str(root), '--path', '.',
+                '--output', str(manifest_path), '--subject', 'bounded-review-package',
+            ).stdout)
+            self.assertEqual(first['file_count'], 2)
+            self.assertEqual([item['path'] for item in first['files']], ['a.txt', 'sub/b.txt'])
+            digest = first['content_sha256']
+            second = json.loads(self.cli(
+                '--json', 'artifact', 'manifest', '--root', str(root), '--path', '.',
+                '--output', str(manifest_path), '--subject', 'bounded-review-package',
+            ).stdout)
+            self.assertEqual(second['content_sha256'], digest)
+            verified = json.loads(self.cli(
+                '--json', 'artifact', 'verify', 'artifact-manifest.json', '--root', str(root),
+            ).stdout)
+            self.assertTrue(verified['valid'])
+            assert_same_path(self, verified['manifest'], manifest_path)
+            (root / 'sub' / 'b.txt').write_text('changed\n', encoding='utf-8')
+            failed = self.cli(
+                '--json', 'artifact', 'verify', str(manifest_path), '--root', str(root), check=False,
+            )
+            self.assertEqual(failed.returncode, 1)
+            self.assertTrue(any('digest changed' in item for item in json.loads(failed.stdout)['errors']))
+
+    def test_init_isolates_examples_and_can_omit_them(self):
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            project = base / 'with-examples'
+            project.mkdir()
+            initialized = json.loads(self.cli(
+                '--json', 'init', '--root', str(project), '--title', 'Alpha 14', '--project-id', 'A14',
+            ).stdout)
+            self.assertGreaterEqual(initialized['examples']['materialized'], 20)
+            self.assertTrue((project / '.bbk' / 'examples' / 'structures' / 'EXAMPLE-implementation-structure-contract-v3-infrastructure-compact.json').is_file())
+            self.assertFalse(any((project / '.bbk' / 'structures').glob('EXAMPLE-*')))
+            status = json.loads(self.cli('--json', 'status', '--root', str(project)).stdout)
+            self.assertEqual(status['planning_artifacts'], {'fit': 0, 'slices': 0, 'structures': 0, 'work_units': 0})
+            self.assertGreater(status['examples_available']['total'], 0)
+            config = json.loads((project / '.bbk' / 'config.json').read_text(encoding='utf-8'))
+            self.assertEqual(config['examples']['materialization'], 'isolated')
+            self.assertFalse(config['examples']['operational'])
+
+            no_examples = base / 'without-examples'
+            no_examples.mkdir()
+            self.cli(
+                '--json', 'init', '--root', str(no_examples), '--title', 'No examples',
+                '--project-id', 'A14-NO-EXAMPLES', '--no-examples',
+            )
+            self.assertEqual(list((no_examples / '.bbk' / 'examples').rglob('*')), [])
+            no_config = json.loads((no_examples / '.bbk' / 'config.json').read_text(encoding='utf-8'))
+            self.assertEqual(no_config['examples']['materialization'], 'disabled')
+
+    def test_question_attention_and_environment_observation_are_machine_explicit(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            self.cli('--json', 'init', '--root', str(root), '--project-id', 'A14-Q', '--no-examples')
+            ordinary = self.cli(
+                '--json', 'question', 'new', '--root', str(root), '--id', 'Q-FACT',
+                '--root-decision', 'Determine the exact host name', '--need-class', 'ENVIRONMENT_FACT',
+                '--discoverability', 'DISCOVERABLE_NOW', '--safe-default', 'leave parameterized',
+            )
+            ordinary_value = json.loads(ordinary.stdout)
+            question = json.loads((root / ordinary_value['path']).read_text(encoding='utf-8'))
+            self.assertEqual(question['need_class'], 'ENVIRONMENT_FACT')
+            self.assertFalse(question['attention']['requires_user_attention'])
+
+            blocking_fact = json.loads(self.cli(
+                '--json', 'question', 'new', '--root', str(root), '--id', 'Q-BLOCKING-FACT',
+                '--root-decision', 'Discover the one fact required by all remaining work',
+                '--need-class', 'ENVIRONMENT_FACT', '--discoverability', 'DISCOVERABLE_NOW',
+                '--blocks-unaffected-work',
+            ).stdout)
+            blocking_question = json.loads((root / blocking_fact['path']).read_text(encoding='utf-8'))
+            self.assertFalse(blocking_question['attention']['requires_user_attention'])
+            self.assertFalse(blocking_question['attention']['unaffected_work_may_continue'])
+
+            unavailable = json.loads(self.cli(
+                '--json', 'question', 'new', '--root', str(root), '--id', 'Q-UNAVAILABLE-FACT',
+                '--root-decision', 'Obtain the exact externally owned account identifier',
+                '--need-class', 'CONFIGURATION_PARAMETER',
+                '--discoverability', 'NOT_DISCOVERABLE_BY_BBK',
+            ).stdout)
+            unavailable_question = json.loads((root / unavailable['path']).read_text(encoding='utf-8'))
+            self.assertTrue(unavailable_question['attention']['requires_user_attention'])
+            self.assertIn('no safe default', unavailable_question['attention']['rationale'])
+
+            reversible = json.loads(self.cli(
+                '--json', 'question', 'new', '--root', str(root), '--id', 'Q-REVERSIBLE',
+                '--root-decision', 'Choose a conventional local filename',
+                '--need-class', 'REVERSIBLE_IMPLEMENTATION_CHOICE',
+                '--discoverability', 'NOT_APPLICABLE',
+            ).stdout)
+            reversible_question = json.loads((root / reversible['path']).read_text(encoding='utf-8'))
+            self.assertFalse(reversible_question['attention']['requires_user_attention'])
+
+            architectural = json.loads(self.cli(
+                '--json', 'question', 'new', '--root', str(root), '--id', 'Q-ARCHITECTURE',
+                '--root-decision', 'Choose between two materially different deployment boundaries',
+                '--need-class', 'ARCHITECTURAL_DECISION',
+                '--discoverability', 'NOT_APPLICABLE',
+            ).stdout)
+            architectural_question = json.loads((root / architectural['path']).read_text(encoding='utf-8'))
+            self.assertTrue(architectural_question['attention']['requires_user_attention'])
+
+            evidence_path = Path(temp) / 'environment.json'
+            created = json.loads(self.cli(
+                '--json', 'evidence', 'new', '--kind', 'environment-observation',
+                '--output', str(evidence_path), '--force',
+            ).stdout)
+            self.assertEqual(created['status'], 'PASS')
+            evidence = json.loads(evidence_path.read_text(encoding='utf-8'))
+            subject = evidence['environmentIdentity']
+            for field in ('node_id', 'hostname', 'location_scope', 'observed_at', 'observation_source', 'method', 'scope', 'confidence', 'transferability'):
+                self.assertIn(field, subject)
+            self.assertTrue(json.loads(self.cli('--json', 'evidence', 'validate', str(evidence_path)).stdout)['valid'])
+
 
 # Deterministic fast/standard/release selection used by tools/run_tests.py.
 from tests._test_profiles import load_profiled_tests as load_tests

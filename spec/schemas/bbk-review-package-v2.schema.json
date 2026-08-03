@@ -1,0 +1,169 @@
+{
+  "$defs": {
+    "candidate": {
+      "additionalProperties": false,
+      "properties": {
+        "contentSha256": {
+          "$ref": "#/$defs/sha"
+        },
+        "packageId": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "revision": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "subject": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "packageId",
+        "revision",
+        "contentSha256",
+        "subject"
+      ],
+      "type": "object"
+    },
+    "nonEmpty": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "sha": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    }
+  },
+  "$id": "https://bbk.local/schemas/bbk-review-package-v2.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "FOCUSED_RECHECK"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "recheck"
+        ]
+      }
+    }
+  ],
+  "properties": {
+    "applicableFloors": {
+      "type": "array"
+    },
+    "assuranceMode": {
+      "type": "object"
+    },
+    "authorityBoundary": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "candidate": {
+      "$ref": "#/$defs/candidate"
+    },
+    "exactFocus": {
+      "minProperties": 1,
+      "type": "object"
+    },
+    "id": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "mode": {
+      "enum": [
+        "REVIEW",
+        "FOCUSED_RECHECK"
+      ]
+    },
+    "priorFindings": {
+      "type": "array"
+    },
+    "recheck": {
+      "additionalProperties": false,
+      "properties": {
+        "affectedScope": {
+          "minItems": 1,
+          "type": "array"
+        },
+        "broaderReviewContext": {
+          "type": "object"
+        },
+        "finding": {
+          "minProperties": 1,
+          "type": "object"
+        },
+        "relevantEvidence": {
+          "minItems": 1,
+          "type": "array"
+        },
+        "reopeningTriggers": {
+          "minItems": 1,
+          "type": "array"
+        },
+        "semanticChange": {
+          "type": "boolean"
+        },
+        "successorCandidate": {
+          "$ref": "#/$defs/candidate"
+        }
+      },
+      "required": [
+        "finding",
+        "successorCandidate",
+        "affectedScope",
+        "relevantEvidence",
+        "reopeningTriggers",
+        "semanticChange"
+      ],
+      "type": "object"
+    },
+    "relevantEvidence": {
+      "type": "array"
+    },
+    "reviewerOutputContract": {
+      "additionalProperties": false,
+      "properties": {
+        "produce": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "prohibited": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "produce",
+        "prohibited"
+      ],
+      "type": "object"
+    },
+    "schema": {
+      "const": "bbk.review-package.v2"
+    }
+  },
+  "required": [
+    "schema",
+    "id",
+    "mode",
+    "candidate",
+    "assuranceMode",
+    "exactFocus",
+    "applicableFloors",
+    "priorFindings",
+    "relevantEvidence",
+    "reviewerOutputContract",
+    "authorityBoundary"
+  ],
+  "title": "BBK generated review and focused-recheck package v2",
+  "type": "object"
+}

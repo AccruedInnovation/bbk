@@ -1,0 +1,164 @@
+{
+  "$defs": {
+    "nonEmpty": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "sha": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "subject": {
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "kind": {
+          "$ref": "#/$defs/nonEmpty"
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://bbk.local/schemas/bbk-worker-context-package-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "admission": {
+      "additionalProperties": false,
+      "properties": {
+        "blockers": {
+          "type": "array"
+        },
+        "liveConfirmationItems": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "ELIGIBLE",
+            "BLOCKED_BY_HOST_PREFLIGHT"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "blockers",
+        "liveConfirmationItems"
+      ],
+      "type": "object"
+    },
+    "authority": {
+      "type": "object"
+    },
+    "authorityBoundary": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "capabilityZones": {
+      "minItems": 1,
+      "type": "array"
+    },
+    "checks": {
+      "minItems": 1,
+      "type": "array"
+    },
+    "cleanup": {
+      "type": "object"
+    },
+    "compiledFrom": {
+      "additionalProperties": false,
+      "properties": {
+        "workUnitDigest": {
+          "$ref": "#/$defs/sha"
+        },
+        "workUnitId": {
+          "$ref": "#/$defs/nonEmpty"
+        }
+      },
+      "required": [
+        "workUnitId",
+        "workUnitDigest"
+      ],
+      "type": "object"
+    },
+    "executionBudget": {
+      "type": "object"
+    },
+    "governingReferences": {
+      "additionalProperties": true,
+      "minProperties": 1,
+      "type": "object"
+    },
+    "hostPreflight": {
+      "type": "object"
+    },
+    "id": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "interruptPolicy": {
+      "type": "object"
+    },
+    "outputs": {
+      "type": "object"
+    },
+    "payloadLimits": {
+      "type": "object"
+    },
+    "profileLock": {
+      "type": "object"
+    },
+    "prototypeCharter": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "schema": {
+      "const": "bbk.worker-context-package.v1"
+    },
+    "smallestValidNextAction": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "subject": {
+      "$ref": "#/$defs/subject"
+    },
+    "tools": {
+      "type": "object"
+    },
+    "workUnit": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "id",
+    "subject",
+    "compiledFrom",
+    "workUnit",
+    "governingReferences",
+    "authority",
+    "capabilityZones",
+    "profileLock",
+    "hostPreflight",
+    "admission",
+    "tools",
+    "outputs",
+    "checks",
+    "cleanup",
+    "payloadLimits",
+    "interruptPolicy",
+    "executionBudget",
+    "prototypeCharter",
+    "authorityBoundary",
+    "smallestValidNextAction"
+  ],
+  "title": "BBK standard Worker context package v1",
+  "type": "object"
+}

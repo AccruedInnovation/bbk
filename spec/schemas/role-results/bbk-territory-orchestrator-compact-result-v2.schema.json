@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-territory-orchestrator-compact-result-v2.schema.json",
+  "title": "BBK BBK Territory Orchestrator compact result payload v2",
+  "description": "Closed compact role-specific result payload for `bbk_territory_orchestrator`. Use FULL when material truth cannot fit these fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "boundary_execution_state",
+    "candidate_and_quality_state",
+    "integration_state",
+    "residuals_and_blockers",
+    "parent_actions_requested",
+    "review_state"
+  ],
+  "properties": {
+    "boundary_execution_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Current local capability, phase, WorkUnit, cohort, integration, gate, validation, repair, review and completion frontier, with projection watermark and freshness."
+    },
+    "candidate_and_quality_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Every current or historical worker cohort, draft and frozen candidate, manifest, worker-quality attestation, successor or invalidated candidate, contributing WorkUnits, local-discovery additions, changed artifacts, external effects, quality results and exact handoff."
+    },
+    "integration_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Every within-boundary and relevant cross-boundary integration obligation with participants, owner, interface and revision, assembly point, prerequisites, normal and failure semantics, recovery, gate, linked assertion and evidence, impact set, invalidation and unresolved work."
+    },
+    "residuals_and_blockers": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Residual uncertainty, stale or invalid objects, failed or inconclusive assertions, open findings, technical, authority and decision blockers, dependency waits, capacity and host-window pauses, expected silence, cleanup residuals and smallest valid resolution for each."
+    },
+    "parent_actions_requested": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Exact Root Orchestrator, core, planning, authority, resource, qualification, recovery, successor-boundary, successor-baseline, review, validation, operational-observation, completion-assessment or release action requested, with affected objects and whether positively isolated work may continue."
+    },
+    "review_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Every territory-level Reviewer charter, context and exposure policy, run, evidence, findings, disposition route, applicability and claim not established."
+    }
+  },
+  "x-bbk-role": "bbk_territory_orchestrator",
+  "x-bbk-contract": "bbk.territory-orchestrator-return.v2",
+  "x-bbk-detail-level": "COMPACT",
+  "x-bbk-full-detail-triggers": [
+    "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+    "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+    "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+    "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+    "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+    "The parent explicitly requested FULL detail.",
+    "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+  ]
+}

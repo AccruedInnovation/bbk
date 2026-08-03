@@ -229,7 +229,8 @@ def instruction_text(
             lines.append("Use only these direct child agents, and only for their declared trigger:")
         lines.append("")
         role_index = {item["name"]: item for item in spec["roles"]}
-        for child_name, trigger in delegation.items():
+        for child_name in role.get("spawns", []):
+            trigger = delegation[child_name]
             child = role_index[child_name]
             if host == "claude":
                 label = f"`{claude_name(child)}` (canonical `{child_name}`)"
@@ -566,6 +567,8 @@ def rendered_projections(
         "package_version": spec["package_version"],
         "contract_package": spec.get("contract_package"),
         "role_return_registry": "spec/contracts/role-return-registry.json",
+        "role_return_registry_v2": "spec/contracts/role-return-registry-v2.json",
+        "default_role_return_version": "v2",
         "method_content_source": portable_relative_path(METHOD_CONTENT_PATH, ROOT),
         "prompt_module_package": spec.get("prompt_module_package"),
         "source_sha256": source_digest,
@@ -608,6 +611,8 @@ def expected_files() -> tuple[dict[Path, bytes], dict[str, Any]]:
         "package_version": metadata["package_version"],
         "contract_package": metadata["contract_package"],
         "role_return_registry": metadata["role_return_registry"],
+        "role_return_registry_v2": metadata["role_return_registry_v2"],
+        "default_role_return_version": metadata["default_role_return_version"],
         "source": portable_relative_path(SPEC_PATH, ROOT),
         "model_routing_source": portable_relative_path(MODEL_ROUTING_PATH, ROOT),
         "method_content_source": metadata["method_content_source"],

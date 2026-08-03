@@ -7,7 +7,7 @@ or generated `bbk/` staging directory is required.
 
 ## Canonical generation graph
 
-Alpha.13 uses a one-way generation graph:
+Alpha.15 uses a one-way generation graph:
 
 ```text
 spec/roles/catalog.json + spec/roles/bbk_*-role.json
@@ -48,7 +48,7 @@ archive; BBK does not need to extract it.
 
 ## Verification
 
-Alpha.13.5 exposes three explicit profiles. Use the smallest profile that matches the decision being made:
+Alpha.15 exposes three explicit profiles. Use the smallest profile that matches the decision being made:
 
 ```bash
 # Canonical contracts and deterministic transformations
@@ -98,6 +98,7 @@ from tests._path_support import (
     assert_no_path_within,
     assert_same_path,
     assert_same_path_sequence,
+    create_symlink_or_skip,
 )
 
 assert_same_path(self, status["project_root"], project)
@@ -105,6 +106,8 @@ assert_labeled_path(self, notifications, "Project", project)
 ```
 
 `assert_same_path` prefers `os.path.samefile` when both objects exist and falls back to BBK's canonical physical-path key for planned or missing leaves. Use `assert_exact_path_text` only when slash, case, or relative spelling is itself the public serialization contract. A test-source audit rejects the recurring raw-equality and interpolated-notification patterns.
+
+The presence of `os.symlink` does not prove that the current Windows process can create a link. Non-elevated sessions can receive WinError 1314 when Developer Mode or `SeCreateSymbolicLinkPrivilege` is unavailable. Security behavior that rejects symlinks must therefore have a deterministic privilege-independent unit test, with a separate real-filesystem integration probe using `create_symlink_or_skip`. A source audit rejects unguarded `os.symlink(...)` and `Path.symlink_to(...)` fixtures so this platform assumption cannot silently return.
 
 ## Windows-native compatibility
 

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-phase-wayfinder-compact-result-v2.schema.json",
+  "title": "BBK BBK Phase Wayfinder compact result payload v2",
+  "description": "Closed compact role-specific result payload for `bbk_phase_wayfinder`. Use FULL when material truth cannot fit these fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "phase_plan_ref",
+    "work_unit_refs",
+    "execution_slice_refs",
+    "dependency_and_parallelism_state",
+    "blockers",
+    "parent_actions_requested"
+  ],
+  "properties": {
+    "phase_plan_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/reference",
+      "description": "Versioned canonical phase-plan artifact or exact structured result reference."
+    },
+    "work_unit_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/referenceList",
+      "description": "Leaf WorkUnit identities and contracts, including exact responsibility, scope, preconditions, inputs, outputs, dependencies, affected surfaces, expected behavior, checks, rollback, profiles, scaffolding, and handoffs."
+    },
+    "execution_slice_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/referenceList",
+      "description": "Current supplied, refined, or delegated phase-local ExecutionSlice identities, outcome and capability traceability, touchpoints, flow, work-unit sets, integration owners, assertions, scaffolding, entry and exit conditions, parent-graph relationship, and any proposed change that requires Planning Wayfinder disposition."
+    },
+    "dependency_and_parallelism_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Phase-local execution order, dependency closure, safe parallelism, serialization, barriers, bounded iteration or repair loops, recovery loops, and unresolved cycles."
+    },
+    "blockers": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Exact recharter, decision, resynthesis, authority, technical, interface, dependency, integration, ownership, evidence, child-return, capacity, or host-window blockers and affected objects."
+    },
+    "parent_actions_requested": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Exact rechartering, upstream decisions, resynthesis, authority grants, shared-interface dispositions, assertion-policy actions, or global integration actions requested from the Planning Wayfinder."
+    }
+  },
+  "x-bbk-role": "bbk_phase_wayfinder",
+  "x-bbk-contract": "bbk.phase-wayfinder-return.v2",
+  "x-bbk-detail-level": "COMPACT",
+  "x-bbk-full-detail-triggers": [
+    "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+    "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+    "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+    "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+    "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+    "The parent explicitly requested FULL detail.",
+    "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+  ]
+}

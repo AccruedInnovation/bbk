@@ -45,6 +45,7 @@ from validate_contract_package import (  # noqa: E402
     POLICY,
     field_example,
     representative_role_return,
+    representative_role_return_v2,
     schema_registry,
     validate_boundary,
     validate_local_discovery,
@@ -89,6 +90,8 @@ class ContractPackageV1Tests(unittest.TestCase):
     def test_all_nineteen_roles_have_one_normalized_contract(self) -> None:
         expected_keys = {
             "contract_id", "envelope_schema", "return_schema", "result_schema",
+            "v2_contract_id", "v2_envelope_schema", "v2_return_schema",
+            "compact_result_schema", "compact_result_fields", "full_detail_triggers",
             "semantic_state_name", "allowed_invocation_modes",
             "allowed_return_kinds", "allowed_operational_dispositions",
             "allowed_semantic_states", "supplemental_enums", "result_fields",
@@ -112,9 +115,15 @@ class ContractPackageV1Tests(unittest.TestCase):
                 )
                 self.assertTrue(set(contract["result_fields"]).isdisjoint(COMMON_FIELDS))
                 contract_ids.add(contract["contract_id"])
-                schema_paths.update([contract["return_schema"], contract["result_schema"]])
+                self.assertEqual(contract["v2_contract_id"], contract["contract_id"].removesuffix(".v1") + ".v2")
+                self.assertTrue(set(contract["compact_result_fields"]) <= set(contract["result_fields"]))
+                self.assertTrue(contract["full_detail_triggers"])
+                schema_paths.update([
+                    contract["return_schema"], contract["result_schema"],
+                    contract["v2_return_schema"], contract["compact_result_schema"],
+                ])
         self.assertEqual(len(contract_ids), 19)
-        self.assertEqual(len(schema_paths), 38)
+        self.assertEqual(len(schema_paths), 76)
 
     def test_role_field_kind_vocabulary_is_consistent_across_generator_schema_and_assembler(self) -> None:
         role_schema = json.loads(
@@ -145,35 +154,50 @@ class ContractPackageV1Tests(unittest.TestCase):
 
     def test_generated_return_and_result_schemas_are_deterministic_and_current(self) -> None:
         catalog, roles, outputs = expected_outputs(ROOT)
-        self.assertEqual(catalog["package_version"], "0.1.0-alpha.13.5")
+        self.assertEqual(catalog["package_version"], (ROOT / "VERSION").read_text(encoding="utf-8").strip())
         self.assertEqual(len(roles), 19)
-        self.assertEqual(len(outputs), 39)
+        self.assertEqual(len(outputs), 79)
         self.assertEqual(check_or_write(ROOT, write=False), [])
         for path, expected in outputs.items():
             with self.subTest(path=path.relative_to(ROOT).as_posix()):
                 self.assertEqual(path.read_bytes(), expected)
 
     def test_registry_binds_all_role_sources_and_generated_schemas(self) -> None:
-        registry = json.loads(
-            (ROOT / "spec" / "contracts" / "role-return-registry.json").read_text(encoding="utf-8")
-        )
-        self.assertEqual(registry["schema"], "bbk.role-return-registry.v1")
-        self.assertEqual(registry["role_count"], 19)
-        self.assertEqual(registry["operational_dispositions"], OPERATIONAL_DISPOSITIONS)
-        self.assertEqual({entry["role"] for entry in registry["entries"]}, set(self.by_name))
-        for entry in registry["entries"]:
-            for key in ("source", "return_schema", "result_schema"):
-                record = entry[key]
-                payload = (ROOT / record["path"]).read_bytes()
-                import hashlib
-                self.assertEqual(record["bytes"], len(payload))
-                self.assertEqual(record["sha256"], hashlib.sha256(payload).hexdigest())
+        import hashlib
+
+        registries = [
+            ("role-return-registry.json", "bbk.role-return-registry.v1", ("source", "return_schema", "result_schema")),
+            ("role-return-registry-v2.json", "bbk.role-return-registry.v2", ("source", "return_schema", "compact_result_schema", "full_result_schema")),
+        ]
+        for filename, schema, record_keys in registries:
+            with self.subTest(registry=filename):
+                registry = json.loads((ROOT / "spec" / "contracts" / filename).read_text(encoding="utf-8"))
+                self.assertEqual(registry["schema"], schema)
+                self.assertEqual(registry["role_count"], 19)
+                self.assertEqual(registry["operational_dispositions"], OPERATIONAL_DISPOSITIONS)
+                self.assertEqual({entry["role"] for entry in registry["entries"]}, set(self.by_name))
+                if schema.endswith(".v2"):
+                    self.assertEqual(registry["default_detail_level"], "COMPACT")
+                    self.assertEqual(registry["allowed_detail_levels"], ["COMPACT", "FULL"])
+                for entry in registry["entries"]:
+                    for key in record_keys:
+                        record = entry[key]
+                        payload = (ROOT / record["path"]).read_bytes()
+                        self.assertEqual(record["bytes"], len(payload))
+                        self.assertEqual(record["sha256"], hashlib.sha256(payload).hexdigest())
 
     @unittest.skipUnless(jsonschema is not None, "optional jsonschema/referencing capability is unavailable")
     def test_representative_return_for_every_role_validates(self) -> None:
         for role in self.roles:
-            with self.subTest(role=role["name"]):
-                validate_document(self._representative(role["name"]), role["name"], ROOT)
+            entry = self.entries[role["name"]]
+            documents = [
+                self._representative(role["name"]),
+                representative_role_return_v2(role, entry, detail_level="COMPACT"),
+                representative_role_return_v2(role, entry, detail_level="FULL"),
+            ]
+            for document in documents:
+                with self.subTest(role=role["name"], schema=document["schema"], detail=document.get("detail_level")):
+                    validate_document(document, role["name"], ROOT)
 
     @unittest.skipUnless(jsonschema is not None, "optional jsonschema/referencing capability is unavailable")
     def test_exact_role_contract_discriminators_reject_drift_for_every_role(self) -> None:
@@ -254,14 +278,18 @@ class ContractPackageV1Tests(unittest.TestCase):
         role = self.by_name["bbk_worker"]
         rendered = render_return_contract_prompt(role)
         contract = role["return_contract"]
-        self.assertIn(contract["contract_id"], rendered)
-        self.assertIn(contract["return_schema"], rendered)
+        self.assertIn(contract["v2_contract_id"], rendered)
+        self.assertIn(contract["v2_return_schema"], rendered)
+        self.assertIn(contract["compact_result_schema"], rendered)
         self.assertIn(contract["result_schema"], rendered)
+        self.assertIn(contract["return_schema"], rendered)
         self.assertIn("`CANDIDATE_PRODUCTION`", rendered)
         self.assertIn("`PROTOTYPE_SUPPORT`", rendered)
-        for field_name in contract["result_fields"]:
+        for field_name in contract["compact_result_fields"]:
             self.assertIn(f"`{field_name}`", rendered)
-        self.assertIn("consume-only legacy", rendered)
+        self.assertIn("v1 remains consume-compatible", rendered)
+        self.assertIn("COMPACT", rendered)
+        self.assertIn("FULL", rendered)
 
     def test_generic_and_omp_prompt_sources_use_the_correct_projection_strategy(self) -> None:
         role = copy.deepcopy(next(item for item in self.spec["roles"] if item["name"] == "bbk_worker"))
@@ -272,7 +300,8 @@ class ContractPackageV1Tests(unittest.TestCase):
         generic = instruction_text(self.spec, role, host="generic")
         omp = instruction_text(self.spec, role, host="omp")
         self.assertIn("## Exact role-return contract", generic)
-        self.assertIn("bbk.worker-return.v1", generic)
+        self.assertIn("bbk.worker-return.v2", generic)
+        self.assertIn("COMPACT", generic)
         self.assertNotIn("## Exact role-return contract", omp)
         self.assertIn("injects the exact role-specific return contract", omp)
 
@@ -289,6 +318,8 @@ class ContractPackageV1Tests(unittest.TestCase):
         self.assertIn("BBK_ALLOW_STAGED_ROLE_PACKAGE", omp)
         self.assertIn('"return_contract": role.get("return_contract", {})', generator)
         self.assertIn('"role_return_registry": "spec/contracts/role-return-registry.json"', generator)
+        self.assertIn('"role_return_registry_v2": "spec/contracts/role-return-registry-v2.json"', generator)
+        self.assertIn('"default_role_return_version": "v2"', generator)
         self.assertIn("return_contract", installer)
         self.assertIn("role_return_registry", installer)
 
@@ -301,6 +332,7 @@ class ContractPackageV1Tests(unittest.TestCase):
                 "bbk.local-discovery-policy.v1",
                 "bbk.local-discovery-envelope.v1",
                 "bbk.local-discovery-permit.v1",
+                "bbk.assurance-mode.v1",
             },
         )
         self.assertEqual(records["bbk.territory-execution-boundary.v1"]["lifecycle_owner"], "bbk_root_orchestrator")
@@ -310,6 +342,7 @@ class ContractPackageV1Tests(unittest.TestCase):
             "bbk.local-discovery-permit.v1",
         ):
             self.assertEqual(records[contract_id]["lifecycle_owner"], "bbk_territory_orchestrator")
+        self.assertEqual(records["bbk.assurance-mode.v1"]["lifecycle_owner"], "bbk_planning_wayfinder")
 
     @unittest.skipUnless(jsonschema is not None, "optional jsonschema/referencing capability is unavailable")
     def test_execution_contract_examples_validate_against_published_schemas(self) -> None:
@@ -318,6 +351,7 @@ class ContractPackageV1Tests(unittest.TestCase):
             ("spec/policies/local-discovery-v1.json", "spec/schemas/bbk-local-discovery-policy-v1.schema.json"),
             ("templates/contracts/local-discovery-envelope.json", "spec/schemas/bbk-local-discovery-envelope-v1.schema.json"),
             ("templates/contracts/local-discovery-permit.json", "spec/schemas/bbk-local-discovery-permit-v1.schema.json"),
+            ("templates/contracts/assurance-mode.json", "spec/schemas/bbk-assurance-mode-v1.schema.json"),
         ]
         for instance_path, schema_path in pairs:
             with self.subTest(instance=instance_path):

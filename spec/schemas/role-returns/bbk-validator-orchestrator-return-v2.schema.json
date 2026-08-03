@@ -1,0 +1,266 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-validator-orchestrator-return-v2.schema.json",
+  "title": "BBK BBK Validator Orchestrator return v2",
+  "description": "Role-specific `bbk.role-return.v2` COMPACT/FULL contract for `bbk_validator_orchestrator`.",
+  "allOf": [
+    {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "contract": {
+          "const": "bbk.validator-orchestrator-return.v2"
+        },
+        "role": {
+          "const": "bbk_validator_orchestrator"
+        },
+        "executor": {
+          "type": "object",
+          "properties": {
+            "role": {
+              "const": "bbk_validator_orchestrator"
+            }
+          },
+          "required": [
+            "role"
+          ]
+        },
+        "invocation_mode": {
+          "enum": [
+            "TERRITORY_BOUND",
+            "CONTROLLER_ROOT"
+          ]
+        },
+        "return_kind": {
+          "enum": [
+            "CHECKPOINT",
+            "ASSURANCE_REPORT"
+          ]
+        },
+        "operational_disposition": {
+          "enum": [
+            "COMPLETE",
+            "PARTIAL",
+            "BLOCKED_TECHNICAL",
+            "BLOCKED_AUTHORITY",
+            "BLOCKED_DECISION",
+            "PAUSED_CAPACITY",
+            "PAUSED_HOST_WINDOW",
+            "CANCELLED",
+            "INCONCLUSIVE"
+          ]
+        },
+        "semantic_state": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "value"
+          ],
+          "properties": {
+            "name": {
+              "const": "validation_run_state"
+            },
+            "value": {
+              "enum": [
+                "READY",
+                "COMPILING_RUN",
+                "COMPILING_CONTEXT",
+                "RUNNING",
+                "WAITING_ATTEMPT",
+                "AGGREGATING",
+                "WAITING_RETRY",
+                "PAUSED",
+                "RECOVERING",
+                "READY_FOR_PARENT_ASSURANCE_ASSESSMENT",
+                "NEEDS_CANDIDATE_REPAIR",
+                "NEEDS_VALIDATOR_RETRY",
+                "NEEDS_CONTEXT_REBUILD",
+                "NEEDS_CAPABILITY_QUALIFICATION",
+                "NEEDS_ASSURANCE_RECHARTER",
+                "NEEDS_PARENT_DECISION",
+                "NEEDS_SUCCESSOR_CANDIDATE_OR_BASELINE",
+                "PARTIAL_WITH_EXPLICIT_GAPS",
+                "STALE",
+                "BLOCKED",
+                "CANCELLED",
+                "FAILED"
+              ]
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "invocation_mode": {
+                "const": "TERRITORY_BOUND"
+              }
+            },
+            "required": [
+              "invocation_mode"
+            ]
+          },
+          "then": {
+            "properties": {
+              "parent_ref": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "const": "canonical_role"
+                      },
+                      "id": {
+                        "enum": [
+                          "bbk_territory_orchestrator"
+                        ]
+                      },
+                      "invocation_mode": {
+                        "const": "TERRITORY_BOUND"
+                      },
+                      "role": {
+                        "enum": [
+                          "bbk_territory_orchestrator"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "id",
+                      "invocation_mode",
+                      "role"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "invocation_mode": {
+                "const": "CONTROLLER_ROOT"
+              }
+            },
+            "required": [
+              "invocation_mode"
+            ]
+          },
+          "then": {
+            "properties": {
+              "parent_ref": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "const": "controller"
+                      },
+                      "id": {
+                        "enum": [
+                          "harness_root_controller"
+                        ]
+                      },
+                      "invocation_mode": {
+                        "const": "CONTROLLER_ROOT"
+                      },
+                      "role": {
+                        "type": "null"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "id",
+                      "invocation_mode"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "detail_level": {
+                "const": "COMPACT"
+              }
+            },
+            "required": [
+              "detail_level"
+            ]
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "$ref": "https://bbk.local/schemas/bbk-validator-orchestrator-compact-result-v2.schema.json"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "detail_level": {
+                "const": "FULL"
+              }
+            },
+            "required": [
+              "detail_level"
+            ]
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "$ref": "https://bbk.local/schemas/bbk-validator-orchestrator-result-v1.schema.json"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "x-bbk-role": "bbk_validator_orchestrator",
+  "x-bbk-contract": "bbk.validator-orchestrator-return.v2",
+  "x-bbk-envelope": "bbk.role-return.v2",
+  "x-bbk-v1-consume-compatible": true,
+  "x-bbk-full-result-schema": "spec/schemas/role-results/bbk-validator-orchestrator-result-v1.schema.json",
+  "x-bbk-compact-result-schema": "spec/schemas/role-results/bbk-validator-orchestrator-compact-result-v2.schema.json",
+  "x-bbk-full-detail-triggers": [
+    "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+    "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+    "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+    "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+    "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+    "The parent explicitly requested FULL detail.",
+    "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+  ],
+  "x-bbk-semantic-state-name": "validation_run_state",
+  "x-bbk-requirements": [
+    "Return one `bbk.role-return.v1` object with `contract` = `bbk.validator-orchestrator-return.v1`, `role` = `bbk_validator_orchestrator`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `validation_run_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
+    "Return `invocation_mode`, `return_kind`, `operational_disposition`, `validation_run_state` and `aggregate_result` separately. A completed physical invocation, complete context pack, successful child task, EvidenceReceipt, passing assertion, central aggregate or clean report is not by itself candidate acceptance, cohort or territory closure, operational outcome proof, risk acceptance or release.",
+    "Use `READY_FOR_PARENT_ASSURANCE_ASSESSMENT` only when the exact candidate and manifest remain current and verified; required prerequisite eligibility evidence is current; the AssuranceContract, ReviewManifest and ReviewContextManifest are current; every required primary assignment and required complementary assignment is completed or explicitly and validly non-applicable; every evidence carrier verifies; infrastructure and context states are classified; immutable findings and current external dispositions are preserved; the central non-averaging aggregate verifies; repair and revalidation implications are explicit; and the exact assurance-report handoff verifies.",
+    "A `PASS` aggregate requires every applicable blocking assertion to pass against current sufficient evidence, complete required context and environment, satisfied independence requirements, and no blocking open finding, protected-floor breach, stale dependency or required infrastructure gap. `PASS_ADVISORY` may contain only explicit non-blocking advisories. No unrelated pass or majority can compensate for a failed, blocked, inconclusive, error, not-run or unjustified not-applicable required assertion.",
+    "The Validator Orchestrator compiles one candidate-bound ReviewManifest and evaluator partition from the AssuranceContract but never creates or weakens the governing assertions. Missing claim meaning, criteria, method sufficiency, independence, applicability, protected-floor or acceptance-policy decisions require parent rechartering.",
+    "Use `bbk_validator` for exact bounded assertion evaluation and `bbk_reviewer` only for an explicitly justified candidate-bound qualitative or cross-cutting charter with a distinct assurance property. In Territory-bound mode, territory-level integration, recovery, proportionality and completion review remains on the Territory Orchestrator's Reviewer edge.",
+    "Keep deterministic evidence generation, EvidenceReceipt, AssertionEvaluation, immutable ReviewFinding, FindingDisposition and ReviewAggregate distinct. Transport integrity does not prove evidence sufficiency; an assertion pass does not dispose a finding; a disposition does not alter the original finding; and an aggregate does not accept the candidate.",
+    "Every candidate defect or failed candidate assertion returns through the declared parent. The Validator Orchestrator never mutates the candidate, launches Workers, authorizes repair or remains in a live repair-wait loop. After the exact report, yield and resume only from a verified successor-candidate or recovery charter.",
+    "Every content-changing repair requires a successor candidate, manifest and applicable prerequisite attestation. Compile the smallest revalidation scope from changed-subject identity, dependency closure, prior findings and invalidated evidence. Use targeted closure and blind reassessment as separate attempt purposes when both are required, and preserve all predecessor candidates, findings, evidence and exposure history.",
+    "Evaluator, tool, context, environment and infrastructure failures are not candidate findings. Candidate failures are not fixed by retrying infrastructure. Retry or replace only within an unchanged exact charter and preserve every attempt; otherwise return the exact blocker or successor need.",
+    "Never claim independence, blindness, replication or confirmation beyond the recorded facts. Criteria chosen or changed after exposure remain exploratory or otherwise post-exposure and cannot be retroactively promoted to independent confirmation against the same evidence.",
+    "Profiles and evidence adapters may supply qualified methods and tools but cannot redefine aggregate blocking, close findings or grant authority. Preserve the stable core dispatch result and every unhandled mandatory assignment.",
+    "A physical replacement may continue the same semantic assurance run only when the candidate, AssuranceContract, ReviewManifest, context policy, criteria, independence, exposure, authority, budgets and result contract are unchanged and the prior attempt is terminated or fenced where supported. Any governing change creates a successor run.",
+    "In `TERRITORY_BOUND` mode, all decisions and reports return through the Territory Orchestrator and Root Orchestrator. In `CONTROLLER_ROOT` mode, all reports and typed decision or authority needs return to Main, which uses the host-native `ask` surface or selects another canonical root as appropriate. This role never calls `ask` and never treats ordinary prose, silence, timeout or transport receipt as authority.",
+    "Use durable handoffs for exact contexts, attempts, evidence, findings, dispositions, aggregates, revalidation scopes, checkpoints and reports. Verify path, byte count, SHA-256, schema, subject, candidate, run, manifest and producer attempt before relying on content; a verified handoff proves transport integrity, not correctness, validation, disposition or acceptance.",
+    "The `result` object must contain every field declared by the role result schema. Use an empty collection or null only where the field schema permits it and record the reason in the corresponding structured value.",
+    "This return is governed by `spec/contracts/catalog.json`, the common `bbk.role-return.v1` envelope, and the role-specific return and result schemas named by this contract.",
+    "Bind candidate assurance to the exact candidate identity and applicable `bbk.territory-execution-boundary.v1`; do not treat a candidate-producing cohort as the assurance run. The retired legacy shared-batch concept has no active contract or lifecycle."
+  ],
+  "x-bbk-readiness-rule": "Use `READY_FOR_PARENT_ASSURANCE_ASSESSMENT` only when the exact candidate and manifest remain current and verified; required prerequisite eligibility evidence is current; the AssuranceContract, ReviewManifest and ReviewContextManifest are current; every required primary assignment and required complementary assignment is completed or explicitly and validly non-applicable; every evidence carrier verifies; infrastructure and context states are classified; immutable findings and current external dispositions are preserved; the central non-averaging aggregate verifies; repair and revalidation implications are explicit; and the exact assurance-report handoff verifies.",
+  "x-bbk-authority-boundary": "A valid `bbk.validator-orchestrator-return.v1` return establishes only the `bbk_validator_orchestrator`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect."
+}

@@ -68,14 +68,14 @@ def m1_write_minimal_routing_install(*, base: Path, home: Path, scope: str, proj
         agents = home / '.omp' / 'agent' / 'agents'
         state_path = base / 'data' / 'effective-omp-model-routing.json'
         manifest_path = base / 'data' / 'install-manifest.json'
-        package_root = base / 'data' / '0.1.0-alpha.13.5'
+        package_root = base / 'data' / '0.1.0-alpha.15'
     else:
         assert project is not None
         extension = project / '.omp' / 'extensions' / 'bbk'
         agents = project / '.omp' / 'agents'
         state_path = project / '.bbk-kit' / 'effective-omp-model-routing.json'
         manifest_path = project / '.bbk-kit-install.json'
-        package_root = project / '.bbk-kit' / '0.1.0-alpha.13.5'
+        package_root = project / '.bbk-kit' / '0.1.0-alpha.15'
     extension.mkdir(parents=True, exist_ok=True)
     agents.mkdir(parents=True, exist_ok=True)
     state_path.parent.mkdir(parents=True, exist_ok=True)
@@ -88,7 +88,7 @@ def m1_write_minimal_routing_install(*, base: Path, home: Path, scope: str, proj
     )
     for name in ('index.js', 'package.json'):
         shutil.copy2(m1_ROOT / 'omp' / 'extension' / name, extension / name)
-    for name in ('omp_model_routing.py', 'path_compat.py'):
+    for name in ('omp_model_routing.py', 'path_compat.py', 'strict_json.py'):
         shutil.copy2(m1_ROOT / 'tools' / name, extension / name)
     shutil.copy2(m1_ROOT / 'VERSION', extension / 'VERSION')
 
@@ -99,7 +99,7 @@ def m1_write_minimal_routing_install(*, base: Path, home: Path, scope: str, proj
     canonical_routes = json.dumps(routes, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode('utf-8')
     state = {
         'schema': 'bbk.omp-model-routing-state.v1',
-        'package_version': '0.1.0-alpha.13.5',
+        'package_version': '0.1.0-alpha.15',
         'active_profile': 'installation-default',
         'source': 'minimal-routing-test-fixture',
         'description': 'Canonical installation-default routing for an isolated OMP scope test.',
@@ -122,7 +122,7 @@ def m1_write_minimal_routing_install(*, base: Path, home: Path, scope: str, proj
     ]
     manifest = {
         'schema': 'bbk.install-manifest.v1',
-        'version': '0.1.0-alpha.13.5',
+        'version': '0.1.0-alpha.15',
         'scope': scope,
         'project_root': str(project.resolve()) if project else None,
         'omp': True,
@@ -132,7 +132,7 @@ def m1_write_minimal_routing_install(*, base: Path, home: Path, scope: str, proj
     manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
     binding = {
         'schema': 'bbk.omp-package-binding.v3',
-        'version': '0.1.0-alpha.13.5',
+        'version': '0.1.0-alpha.15',
         'path': str(package_root.resolve()),
         'package_root': str(package_root.resolve()),
         'scope': scope,
@@ -157,7 +157,7 @@ class Alpha113OmpModelMenuTests(unittest.TestCase):
         value = json.loads(m1_PROFILES.read_text(encoding='utf-8'))
         roles = {item['name'] for item in json.loads((m1_ROOT / 'spec' / 'roles.json').read_text(encoding='utf-8'))['roles']}
         self.assertEqual(value['schema_version'], 'bbk.omp-model-routing-profiles.v1')
-        self.assertEqual(value['package_version'], '0.1.0-alpha.13.5')
+        self.assertEqual(value['package_version'], '0.1.0-alpha.15')
         self.assertEqual(set(value['profiles']), {'default', 'testing-flash', 'deepseek-economy'})
         for profile in value['profiles'].values():
             self.assertEqual(set(profile['roles']), roles)
@@ -367,7 +367,7 @@ class Alpha113OmpModelMenuTests(unittest.TestCase):
     def test_template_is_compact_and_valid_for_runtime_application(self):
         value = json.loads(m1_TEMPLATE.read_text(encoding='utf-8'))
         self.assertEqual(value['schema_version'], 'bbk.omp-model-routing-profile.v1')
-        self.assertEqual(value['package_version'], '0.1.0-alpha.13.5')
+        self.assertEqual(value['package_version'], '0.1.0-alpha.15')
         self.assertEqual(set(value['default']), {'model', 'thinkingLevel'})
         canonical = {item['name'] for item in json.loads((m1_ROOT / 'spec' / 'roles.json').read_text(encoding='utf-8'))['roles']}
         self.assertLessEqual(set(value['roles']), canonical)
@@ -455,7 +455,7 @@ class Alpha113OmpModelMenuTests(unittest.TestCase):
 
     def test_version_and_extension_metadata_agree(self):
         version = (m1_ROOT / 'VERSION').read_text(encoding='utf-8').strip()
-        self.assertEqual(version, '0.1.0-alpha.13.5')
+        self.assertEqual(version, '0.1.0-alpha.15')
         self.assertEqual(json.loads((m1_ROOT / 'omp' / 'extension' / 'package.json').read_text(encoding='utf-8'))['version'], version)
         self.assertEqual(json.loads(m1_PROFILES.read_text(encoding='utf-8'))['package_version'], version)
 
@@ -524,9 +524,16 @@ class Alpha114OmpContextAndUpdateTests(unittest.TestCase):
             script.write_text(textwrap.dedent(f"\n                    const chain = () => ({{ optional() {{ return this; }} }});\n                    const z = {{ object: value => value, string: chain, boolean: chain,\n                      enum: values => chain(), array: value => chain() }};\n                    const commands = new Map(), handlers = new Map();\n                    const messages = [], userMessages = [], notifications = [], entries = [], statuses = [];\n                    const branch = [];\n                    const pi = {{\n                      zod: {{ z }}, setLabel() {{}}, registerTool() {{}},\n                      on(name, value) {{ if (!handlers.has(name)) handlers.set(name, []); handlers.get(name).push(value); }},\n                      registerCommand(name, value) {{ commands.set(name, value); }},\n                      sendMessage(value, options) {{ messages.push({{value, options}}); }},\n                      async sendUserMessage(value, options) {{ userMessages.push({{value, options}}); }},\n                      appendEntry(customType, data) {{ entries.push({{customType, data}}); branch.push({{type:'custom', customType, data}}); }},\n                    }};\n                    const mod = await import({json.dumps(extension.as_uri())});\n                    mod.default(pi);\n                    const ctx = {{\n                      cwd: {json.dumps(str(base))}, hasUI: true,\n                      isIdle() {{ return true; }},\n                      sessionManager: {{ getBranch() {{ return branch; }} }},\n                      models: {{ list() {{ return []; }}, resolve() {{ return true; }} }},\n                      ui: {{\n                        notify(message, level) {{ notifications.push({{message, level}}); }},\n                        setStatus(key, value) {{ statuses.push({{key, value: value ?? null}}); }},\n                        async select() {{ throw new Error('unexpected interactive menu'); }},\n                      }},\n                    }};\n                    const results = [];\n                    const commandNames = [...commands.keys()].sort();\n                    for (const name of commandNames) {{\n                      if (name === 'bbk') {{\n                        results.push(await commands.get(name).handler('status', ctx));\n                      }} else if (name === 'bbk:models') {{\n                        results.push(await commands.get(name).handler('status', ctx));\n                      }} else {{\n                        results.push(await commands.get(name).handler('', ctx));\n                      }}\n                    }}\n                    const beforeMode = {{ messages: messages.length, userMessages: userMessages.length, entries: entries.length }};\n                    results.push(await commands.get('bbk').handler('', ctx));\n                    const afterEnter = {{ messages: messages.length, userMessages: userMessages.length, entries: entries.length }};\n                    const beforeAgent = handlers.get('before_agent_start')?.[0];\n                    if (!beforeAgent) throw new Error('missing before_agent_start');\n                    const activeOverlay = await beforeAgent({{systemPrompt:['<<OMP-INHERITED-CONTAMINATION>>']}}, ctx);\n                    results.push(await commands.get('bbk').handler('Plan the sample system', ctx));\n                    results.push(await commands.get('bbk:exit').handler('', ctx));\n                    const inactiveOverlay = await beforeAgent({{systemPrompt:['<<OMP-INHERITED-CONTAMINATION>>']}}, ctx);\n                    console.log(JSON.stringify({{\n                      allUndefined: results.every(value => value === undefined),\n                      commandNames,\n                      messages: messages.length,\n                      userMessages: userMessages.length,\n                      beforeMode,\n                      afterEnter,\n                      entries,\n                      statuses,\n                      notifications: notifications.length,\n                      prompt: userMessages[0]?.value || '',\n                      activeOverlay: activeOverlay?.systemPrompt?.join(String.fromCharCode(10)) || '',\n                      inactiveOverlay: inactiveOverlay ?? null,\n                    }}));\n                    "), encoding='utf-8')
             value = json.loads(m2_run([shutil.which('node') or 'node', script], env=env).stdout)
             self.assertTrue(value['allUndefined'])
-            self.assertEqual(len(value['commandNames']), 29)
+            self.assertEqual(len(value['commandNames']), 45)
             self.assertIn('bbk:agents', value['commandNames'])
             self.assertIn('bbk:exit', value['commandNames'])
+            for command in (
+                'bbk:artifact:preflight', 'bbk:artifact:seal',
+                'bbk:artifact:successor', 'bbk:preflight',
+                'bbk:context:worker', 'bbk:context:review',
+                'bbk:handoff:create', 'bbk:handoff:verify', 'bbk:handoff:list',
+            ):
+                self.assertIn(command, value['commandNames'])
             self.assertEqual(value['messages'], 0)
             self.assertEqual(value['beforeMode'], {'messages': 0, 'userMessages': 0, 'entries': 0})
             self.assertEqual(value['afterEnter'], {'messages': 0, 'userMessages': 0, 'entries': 1})
@@ -542,7 +549,7 @@ class Alpha114OmpContextAndUpdateTests(unittest.TestCase):
             self.assertNotIn('OMP DEFAULT', value['activeOverlay'])
             self.assertNotIn('.codex/AGENTS.md', value['activeOverlay'])
             self.assertIsNone(value['inactiveOverlay'])
-            self.assertEqual([entry['data']['enabled'] for entry in value['entries']], [True, False])
+            self.assertEqual([entry['data']['enabled'] for entry in value['entries'] if entry['customType'] == 'bbk-mode-state'], [True, False])
             self.assertEqual(value['statuses'], [])
 
     def test_every_bundled_profile_extension_is_ui_only_but_tools_remain_model_facing(self):
@@ -701,6 +708,9 @@ class Alpha12OmpPromptBoundaryTests(unittest.TestCase):
         self.assertIn('const BBK_MODE_ENTRY_TYPE = "bbk-mode-state"', source)
         self.assertIn('const BBK_MODE_SCHEMA = "bbk.omp-mode-state.v2"', source)
         self.assertIn('"before_agent_start"', source)
+        self.assertIn('"before_provider_request"', source)
+        self.assertIn('bbk-effective-prompt-receipt', source)
+        self.assertIn('"bbk:prompt-status"', source)
         self.assertIn('promptReplacement', source)
         self.assertIn('buildControllerSystemPrompt', source)
         self.assertIn('buildAgentSystemPrompt', source)
@@ -768,7 +778,7 @@ class Alpha12OmpPromptBoundaryTests(unittest.TestCase):
                   notifications: notificationsFor(),
                 }}));
         '''))
-        self.assertEqual(value['commands'], 29)
+        self.assertEqual(value['commands'], 45)
         self.assertIsNone(value['inactive'])
         self.assertTrue(value['enterUndefined'])
         self.assertTrue(value['exitUndefined'])
@@ -777,9 +787,10 @@ class Alpha12OmpPromptBoundaryTests(unittest.TestCase):
         self.assertEqual(len(value['userMessages']), 1)
         self.assertEqual(value['userMessages'][0]['value'], 'Implement the accepted baseline without restarting planning')
         self.assertNotIn('bbk_root_wayfinder', value['userMessages'][0]['value'])
-        self.assertEqual([entry['data']['enabled'] for entry in value['entries']], [True, False])
-        self.assertEqual(value['entries'][0]['data']['schema'], 'bbk.omp-mode-state.v2')
-        self.assertEqual(value['entries'][0]['data']['package_version'], m3_VERSION)
+        self.assertEqual([entry['data']['enabled'] for entry in value['entries'] if entry['customType'] == 'bbk-mode-state'], [True, False])
+        mode_entries = [entry for entry in value['entries'] if entry['customType'] == 'bbk-mode-state']
+        self.assertEqual(mode_entries[0]['data']['schema'], 'bbk.omp-mode-state.v2')
+        self.assertEqual(mode_entries[0]['data']['package_version'], m3_VERSION)
         self.assertEqual(value['activeBlocks'], 1)
         for expected in (
             '<bbk-controller-system ', 'BBK OMP harness-root controller', 'bbk_root_wayfinder',
@@ -801,6 +812,55 @@ class Alpha12OmpPromptBoundaryTests(unittest.TestCase):
         self.assertEqual(value['markerCount'], 1)
         self.assertIsNone(value['afterExit'])
         self.assertEqual(value['statuses'], [])
+
+    def test_prompt_receipts_bind_effective_and_provider_prompts_without_enforcement(self):
+        worker = (m3_ROOT / 'projections' / 'omp' / 'agents' / 'bbk_worker.md').read_text(encoding='utf-8')
+        value = m3_run_node(textwrap.dedent(f'''\
+                {m3_MOCK_PREFIX}
+                let providerPrompt = [];
+                const promptCtx = {{...ctx, getSystemPrompt() {{ return providerPrompt; }}}};
+                const mod = await import({json.dumps(m3_EXTENSION.as_uri())});
+                mod.default(pi);
+                const before = handlers.get("before_agent_start")?.[0];
+                const provider = handlers.get("before_provider_request")?.[0];
+                if (!before || !provider) throw new Error("prompt hooks missing");
+
+                await commands.get("bbk").handler("", promptCtx);
+                const mainReplacement = await before({{systemPrompt:["OMP DEFAULT", "compatibility context"]}}, promptCtx);
+                providerPrompt = mainReplacement.systemPrompt;
+                await provider({{request:{{}}}}, promptCtx);
+
+                const childReplacement = await before({{
+                  systemPrompt:["OMP DEFAULT child workflow", {json.dumps(worker)}],
+                }}, promptCtx);
+                providerPrompt = childReplacement.systemPrompt;
+                await provider({{request:{{}}}}, promptCtx);
+                providerPrompt = ["OMP DEFAULT leaked provider prompt"];
+                await provider({{request:{{}}}}, promptCtx);
+                await commands.get("bbk:prompt-status").handler("json", promptCtx);
+
+                console.log(JSON.stringify({{
+                  entries,
+                  notifications: notificationsFor(),
+                  mainText: mainReplacement.systemPrompt.join("\\n"),
+                  childText: childReplacement.systemPrompt.join("\\n"),
+                }}));
+        '''))
+        receipts = [entry['data'] for entry in value['entries'] if entry['customType'] == 'bbk-effective-prompt-receipt']
+        self.assertGreaterEqual(len(receipts), 5)
+        self.assertTrue(all(item['schema'] == 'bbk.effective-prompt-receipt.v1' for item in receipts))
+        self.assertTrue(all(item['raw_prompt_persisted'] is False for item in receipts))
+        replacements = [item for item in receipts if item['phase'] == 'before_agent_start']
+        self.assertEqual({item['role'] for item in replacements}, {'Main', 'bbk_worker'})
+        self.assertTrue(all(item['generic_omp_contamination_detected'] for item in replacements))
+        self.assertTrue(all(item['generic_omp_contamination_removed'] for item in replacements))
+        provider_receipts = [item for item in receipts if item['phase'] == 'before_provider_request']
+        self.assertIn('VERIFIED', {item['status'] for item in provider_receipts})
+        self.assertIn('MISMATCH', {item['status'] for item in provider_receipts})
+        self.assertTrue(all(item['enforcement'] == 'OBSERVABILITY_ONLY' for item in provider_receipts))
+        self.assertNotIn('OMP DEFAULT', value['mainText'])
+        self.assertNotIn('OMP DEFAULT', value['childText'])
+        self.assertTrue(any('bbk.prompt-status.v1' in item for item in value['notifications']))
 
     def test_every_generated_bbk_agent_gets_a_closed_role_specific_replacement(self):
         spec = json.loads((m3_ROOT / 'spec' / 'roles.json').read_text(encoding='utf-8'))
@@ -1470,7 +1530,7 @@ You NEVER give up due to uncertainty. You MUST keep going until this ticket is c
                 await commands.get("bbk").handler("off", ctx);
                 console.log(JSON.stringify({{entries, userMessages, customMessages, notifications:notificationsFor()}}));
         '''))
-        self.assertEqual([entry['data']['enabled'] for entry in value['entries']], [True, False])
+        self.assertEqual([entry['data']['enabled'] for entry in value['entries'] if entry['customType'] == 'bbk-mode-state'], [True, False])
         self.assertEqual(value['userMessages'], [])
         self.assertEqual(value['customMessages'], [])
         self.assertIn('BBK mode is already active', value['notifications'])

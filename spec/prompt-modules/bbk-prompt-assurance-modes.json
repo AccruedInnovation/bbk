@@ -1,0 +1,28 @@
+{
+  "schema_version": "bbk.prompt-module.v1",
+  "id": "bbk-prompt-assurance-modes",
+  "title": "Proportional assurance modes",
+  "description": "Select INLINE, FOCUSED, or FULL assurance from the exact subject and material risk without creating a global lifecycle gate.",
+  "clauses": [
+    {
+      "id": "ASSURANCE_MODE.INLINE",
+      "text": "Use INLINE by default for routine, reversible, profile-covered work. Worker self-checks and applicable deterministic gates are sufficient; do not commission an independent Reviewer or manually authored review manifest solely because work occurred."
+    },
+    {
+      "id": "ASSURANCE_MODE.FOCUSED",
+      "text": "Use FOCUSED for one exact material risk, interface, finding, or candidate claim. Record the exact subject and risk rationale, generate the bounded context, commission only the necessary independent focus, and recheck the affected scope after repair."
+    },
+    {
+      "id": "ASSURANCE_MODE.FULL",
+      "text": "Use FULL for safety or security exposure, irreversible migration, consequential shared interfaces, contractual or compliance obligations, novel high-risk mechanisms, or explicit user request. Broader assertion design and candidate-bound evidence are warranted only to the extent required by those risks."
+    },
+    {
+      "id": "ASSURANCE_MODE.RECORD",
+      "text": "Represent the selection with `bbk.assurance-mode.v1`: mode, exact subject reference, risk basis, rationale, review focus, recheck scope, and whether independent review is required. FOCUSED and FULL require an explicit material-risk rationale; INLINE must state its routine basis."
+    },
+    {
+      "id": "ASSURANCE_MODE.NO_LIFECYCLE_ENGINE",
+      "text": "The assurance-mode record guides proportional work and context generation. It does not itself accept a candidate, authorize effects, invalidate prior work automatically, or introduce a global deterministic lifecycle state machine."
+    }
+  ]
+}

@@ -1,6 +1,6 @@
-# Install and qualify BBK alpha.13.4
+# Install and qualify BBK alpha.15
 
-Alpha.13 is distributed as one archive containing the BBK core and five independently manifested language profiles: CODESYS `0.1.0-alpha.4`, plus Go, Python, Rust, and TypeScript/JavaScript `0.1.0-alpha.3`. It integrates the canonical split-role v4 package, exact role-return/execution contracts, reusable prompt modules, projection manifest v8, and the reviewed per-role model-routing defaults. It preserves bounded verification, harness-scoped updates, the PowerShell-visible default-Yes prompt, OMP controller/activity/`ask` behavior, and installs all five profiles by default. Use a clean extraction for each release.
+Alpha.15 is distributed as one archive containing the BBK core and five independently manifested language profiles: CODESYS `0.1.0-alpha.4`, plus Go, Python, Rust, and TypeScript/JavaScript `0.1.0-alpha.3`. It integrates the canonical split-role v4 package, exact role-return/execution contracts, 31 reusable prompt modules, compact infrastructure/schema/artifact tooling, projection manifest v8, and the reviewed per-role model-routing defaults. It preserves bounded verification, harness-scoped updates, the PowerShell-visible default-Yes prompt, OMP controller/activity/`ask` behavior, and installs all five profiles by default. Use a clean extraction for each release.
 
 ## Prerequisites
 
@@ -308,7 +308,7 @@ User scope uses the platform data root. On Windows the default is:
   effective-language-profiles.json
   install-manifest.json
   bin\
-  versions\0.1.0-alpha.13.5\
+  versions\0.1.0-alpha.15\
   profiles\<profile-id>\0.1.0-alpha.3\
   profiles\<profile-id>\current.json
 ```
@@ -327,7 +327,7 @@ python tools/install.py install --scope user --omp --codex --claude \
   --model-routing /path/to/model-routing.json --dry-run
 ```
 
-The external file's `package_version` must be `0.1.0-alpha.13.5`. The installer validates exact coverage of all 19 roles before writing and records the effective policy and digest.
+The external file's `package_version` must be `0.1.0-alpha.15`. The installer validates exact coverage of all 19 roles before writing and records the effective policy and digest.
 
 An OMP installation also writes `effective-omp-model-routing.json` and exposes an interactive runtime menu:
 
@@ -368,9 +368,11 @@ In reconciliation mode, a fully current profile bypasses the profile-copy operat
 
 This is not a version-label shortcut. Missing, changed, mode-divergent, or locally modified files follow the ordinary refusal, backup, repair, and `--force` rules. Profile packages are never trusted solely because the profile version string has not changed.
 
-## Upgrade to alpha.13.4
+## Upgrade to alpha.15
 
-Do not overlay one extracted release package directory onto another. Extract alpha.13.4 into a new directory and choose the narrowest appropriate update. See `UPGRADING.md` for the standard/release verification split, duration-aware pooled testing, and authenticated reuse of unchanged installed profile files.
+Do not overlay one extracted release package directory onto another. Extract alpha.15 into a new directory and choose the narrowest appropriate update. See `UPGRADING.md` for the standard/release verification split, duration-aware pooled testing, and authenticated reuse of unchanged installed profile files.
+
+Alpha.15 adds product-first proportional assurance, strict JSON and sealed artifact packages, project-local OMP routing creation/repair, role-return v2, generated Worker/review contexts, requirement-scoped host preflight, prototype charter v2, and sealed handoff v2. It does not add Blueprint lifecycle gates or automatically rewrite accepted-baseline, authority, Markdown, or Beads records. Existing projects and installed language profiles do not require content migration; unchanged authenticated profile packages remain eligible for in-place reuse.
 
 To refresh only OMP while preserving Codex:
 
@@ -386,9 +388,9 @@ python tools/setup.py --test-and-update-codex --scope user
 
 For a full managed upgrade, select every installed harness and accept the full clean-replacement prompt, or pass `--uninstall-existing` explicitly in automation. A command selecting only `--omp` or only `--codex` now performs a harness-scoped clean replacement and preserves the other installed harness rather than removing it.
 
-Alpha.13 advances the canonical role package to split `bbk.roles.v4`, the generated projection manifest to v8, and the default `bbk.model-routing.v2` policy to the exact reviewed per-role selections. It adds generated role-return/result schemas and contract registries while preserving the existing install destinations. Start a fresh Codex session after updating its agents. Reload OMP plugins with `/reload-plugins` after an OMP update.
+Alpha.15 retains the canonical split role package to split `bbk.roles.v4`, the generated projection manifest to v8, and the default `bbk.model-routing.v2` policy to the exact reviewed per-role selections. It adds generated role-return/result schemas and contract registries while preserving the existing install destinations. Start a fresh Codex session after updating its agents. Reload OMP plugins with `/reload-plugins` after an OMP update.
 
-No `.bbk` project-record migration is required solely for alpha.13.
+No `.bbk` project-record migration is required solely for alpha.15. New initializations place reference templates under `.bbk/examples/`; existing legacy examples remain supported and non-operational.
 
 ## Live qualification
 

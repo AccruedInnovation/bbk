@@ -16,6 +16,16 @@ AssuranceContract
 ```
 
 
+## Proportional assurance modes
+
+Alpha.15 uses three explicit modes. `INLINE` is the routine default. `FOCUSED` requires an exact material risk, candidate scope, or finding-scoped recheck. `FULL` is reserved for consequential assurance, material external effects, complex cleanup/recovery, authority ambiguity, interrupted attempts, candidate/release boundaries, or explicit parent request. FOCUSED and FULL record their risk rationale; the presence of a mechanical defect alone is not sufficient.
+
+Independent review normally targets an integrated candidate or an exact material risk. A repair recheck contains only the finding, successor candidate, affected scope, relevant evidence, and reopening triggers unless semantics changed materially.
+
+## Generated review packages
+
+`bbk context review` compiles and seals a `bbk.review-package.v2` from an exact verified candidate, review request, applicable floors, prior findings, and assurance mode. The Reviewer consumes this mechanical context and does not author the manifest that admits its own subject. Legacy ReviewManifest and ReviewContextManifest commands remain available.
+
 ## Role-return boundary
 
 Reviewer and Validator results use different exact schemas. A Validator evaluates fixed candidate-bound assertions through fixed methods and returns assertion results to Validator Orchestrator. A Reviewer performs bounded qualitative, cross-cutting, conformance, proportionality, readiness, or evidence-sufficiency judgment. Missing assertion, criteria, evidence-method, or revalidation design returns to Verification Designer. Operational `COMPLETE` means the attempt completed; it does not itself mean the candidate passed, findings are closed, or release is authorized.

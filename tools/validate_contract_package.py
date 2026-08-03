@@ -19,6 +19,8 @@ from typing import Any, Iterable, Mapping, Sequence
 from return_contracts import (
     ENVELOPE_PATH,
     REGISTRY_PATH,
+    V2_ENVELOPE_PATH,
+    V2_REGISTRY_PATH,
     check_or_write as check_role_return_outputs,
     load_package as load_role_package,
 )
@@ -29,6 +31,7 @@ CONTRACT_CATALOG_SCHEMA = Path("spec/schemas/bbk-contract-catalog-v1.schema.json
 CAPABILITY_INVENTORY = Path("spec/capability-status.json")
 CAPABILITY_SCHEMA = Path("spec/schemas/bbk-capability-status-inventory-v1.schema.json")
 ROLE_RETURN_REGISTRY_SCHEMA = Path("spec/schemas/bbk-role-return-registry-v1.schema.json")
+V2_ROLE_RETURN_REGISTRY_SCHEMA = Path("spec/schemas/bbk-role-return-registry-v2.schema.json")
 POLICY = Path("spec/policies/local-discovery-v1.json")
 POLICY_SCHEMA = Path("spec/schemas/bbk-local-discovery-policy-v1.schema.json")
 BOUNDARY_TEMPLATE = Path("templates/contracts/territory-execution-boundary.json")
@@ -60,6 +63,9 @@ EXPECTED_EXECUTION_CONTRACTS = {
     ),
     "bbk.local-discovery-permit.v1": (
         "AUTHORITY_PERMIT", "SCHEMA_DEFINED_COMPANION", "bbk_territory_orchestrator"
+    ),
+    "bbk.assurance-mode.v1": (
+        "POLICY", "ACTIVE_POLICY", "bbk_planning_wayfinder"
     ),
 }
 EXPECTED_PROHIBITED_CHANGES = [
@@ -246,6 +252,54 @@ def representative_role_return(role: Mapping[str, Any], entry: Mapping[str, Any]
     }
 
 
+def representative_role_return_v2(
+    role: Mapping[str, Any], entry: Mapping[str, Any], *, detail_level: str = "COMPACT"
+) -> dict[str, Any]:
+    contract = role["return_contract"]
+    mode = entry["allowed_parent_modes"][0]
+    parent = mode["parents"][0]
+    parent_ref: dict[str, Any] = {
+        "kind": mode["parent_kind"], "id": parent, "invocation_mode": mode["mode"],
+        "role": parent if mode["parent_kind"] == "canonical_role" else None,
+    }
+    fields = (
+        contract["compact_result_fields"]
+        if detail_level == "COMPACT"
+        else list(contract["result_fields"])
+    )
+    return {
+        "schema": "bbk.role-return.v2",
+        "contract": contract["v2_contract_id"],
+        "role": role["name"],
+        "executor": {"role": role["name"], "invocation_id": "INVOCATION-EXAMPLE"},
+        "invocation_mode": mode["mode"],
+        "return_kind": contract["allowed_return_kinds"][0],
+        "detail_level": detail_level,
+        "subject_ref": {"id": "SUBJECT-EXAMPLE", "revision": "1"},
+        "parent_ref": parent_ref,
+        "attempt_ref": {
+            "semantic_run_id": "RUN-EXAMPLE", "physical_attempt_id": "ATTEMPT-EXAMPLE",
+            "host_session_id": None, "continuation_of": None, "replacement_of": None,
+        },
+        "operational_disposition": contract["allowed_operational_dispositions"][0],
+        "semantic_state": {
+            "name": contract["semantic_state_name"],
+            "value": contract["allowed_semantic_states"][0],
+        },
+        "summary": "Representative schema-valid v2 role return.",
+        "authority_and_effects_used": {
+            "authority_refs": [], "allowed_effect_classes": [], "effects_used": [],
+            "denied_or_uncovered_effects": [], "violations_or_ambiguities": [],
+        },
+        "result": {name: field_example(contract["result_fields"][name]) for name in fields},
+        "smallest_valid_next_action": {
+            "action": "RETURN_TO_PARENT", "owner": parent,
+            "reason": "Representative contract validation.",
+            "affected_refs": [], "unaffected_work_may_continue": False,
+        },
+    }
+
+
 def validate_role_returns(root: Path, registry: Any | None, errors: list[str]) -> None:
     try:
         drift = check_role_return_outputs(root, write=False)
@@ -255,7 +309,11 @@ def validate_role_returns(root: Path, registry: Any | None, errors: list[str]) -
     errors.extend(drift)
     catalog, roles, entries = load_role_package(root)
     registry_doc = load_json(root, REGISTRY_PATH)
+    v2_registry_doc = load_json(root, V2_REGISTRY_PATH)
     add_error(errors, registry_doc.get("role_count") == 19, "role-return registry must contain 19 roles")
+    add_error(errors, v2_registry_doc.get("role_count") == 19, "role-return v2 registry must contain 19 roles")
+    add_error(errors, v2_registry_doc.get("default_detail_level") == "COMPACT", "role-return v2 default must be COMPACT")
+    add_error(errors, v2_registry_doc.get("allowed_detail_levels") == ["COMPACT", "FULL"], "role-return v2 detail vocabulary drifted")
     add_error(errors, len(registry_doc.get("entries", [])) == 19, "role-return registry entry count must be 19")
     add_error(errors, registry_doc.get("operational_dispositions") == EXPECTED_DISPOSITIONS,
               "role-return registry disposition vocabulary drifted")
@@ -263,11 +321,16 @@ def validate_role_returns(root: Path, registry: Any | None, errors: list[str]) -
         try:
             import jsonschema
             for role in roles:
-                document = representative_role_return(role, entries[role["name"]])
-                schema = load_json(root, Path(role["return_contract"]["return_schema"]))
-                jsonschema.Draft202012Validator(
-                    schema, registry=registry, format_checker=jsonschema.FormatChecker()
-                ).validate(document)
+                entry = entries[role["name"]]
+                for document, schema_key in (
+                    (representative_role_return(role, entry), "return_schema"),
+                    (representative_role_return_v2(role, entry, detail_level="COMPACT"), "v2_return_schema"),
+                    (representative_role_return_v2(role, entry, detail_level="FULL"), "v2_return_schema"),
+                ):
+                    schema = load_json(root, Path(role["return_contract"][schema_key]))
+                    jsonschema.Draft202012Validator(
+                        schema, registry=registry, format_checker=jsonschema.FormatChecker()
+                    ).validate(document)
         except Exception as exc:
             errors.append(f"representative role-return validation failed: {exc}")
     add_error(errors, catalog.get("contract_package") == CONTRACT_CATALOG.as_posix(),
@@ -286,11 +349,20 @@ def validate_contract_catalog(root: Path, roles: set[str], errors: list[str]) ->
         "generator": "tools/return_contracts.py",
         "return_schema_directory": "spec/schemas/role-returns",
         "result_schema_directory": "spec/schemas/role-results",
+        "v2_common_envelope": V2_ENVELOPE_PATH.as_posix(),
+        "v2_generated_registry": V2_REGISTRY_PATH.as_posix(),
+        "v2_registry_schema": V2_ROLE_RETURN_REGISTRY_SCHEMA.as_posix(),
+        "default_producer_version": "v2",
+        "v1_consume_compatibility": True,
     }
     for key, expected in expected_paths.items():
         add_error(errors, package.get(key) == expected,
                   f"contract catalog role_return_package.{key} must equal {expected}")
-    for raw in [catalog.get("capability_status_inventory"), *expected_paths.values()]:
+    path_values = [
+        catalog.get("capability_status_inventory"),
+        *[value for key, value in expected_paths.items() if key not in {"default_producer_version", "v1_consume_compatibility"}],
+    ]
+    for raw in path_values:
         if isinstance(raw, str):
             add_error(errors, (root / raw).exists(), f"contract package path does not exist: {raw}")
     entries = catalog.get("execution_contracts") or []

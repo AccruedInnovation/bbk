@@ -1220,6 +1220,12 @@ def _perform_install(
             "review_assurance.py",
             "verify_package.py",
             "path_compat.py",
+            "strict_json.py",
+            "artifact_packages.py",
+            "bbk_artifact.py",
+            "context_packages.py",
+            "host_preflight.py",
+            "handoff_packages.py",
             "artifact_classification.py",
             "omp_model_routing.py",
         ]:

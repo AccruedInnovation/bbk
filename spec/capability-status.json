@@ -1,6 +1,6 @@
 {
   "schema": "bbk.capability-status-inventory.v1",
-  "package_version": "0.1.0-alpha.13.5",
+  "package_version": "0.1.0-alpha.15",
   "status_vocabulary": [
     "IMPLEMENTED_DETERMINISTIC",
     "IMPLEMENTED_BOOTSTRAP",
@@ -22,7 +22,8 @@
       "consumer_roles": [],
       "enforcement": "Deterministic schema generation, source drift checking, and optional Draft 2020-12 document validation.",
       "limitations": [
-        "Gate 3 does not yet regenerate every host projection or make host transport enforce schema acceptance; that remains Gate 5 work."
+        "Schema-valid returns establish contract shape and source congruence, not factual correctness, semantic acceptance, authority, completion, or release.",
+        "Host transports may report or store return envelopes without providing Blueprint-grade lifecycle enforcement."
       ]
     },
     {

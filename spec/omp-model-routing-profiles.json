@@ -1,6 +1,6 @@
 {
   "description": "Bundled OMP runtime routing profiles for BBK sub-agents. These profiles affect future OMP spawns only and do not change role authority or assurance obligations.",
-  "package_version": "0.1.0-alpha.13.5",
+  "package_version": "0.1.0-alpha.15",
   "profiles": {
     "deepseek-economy": {
       "description": "DeepSeek-only economy profile: V4 Pro for broader and coordination-heavy roles, V4 Flash for bounded leaf roles.",
@@ -84,7 +84,7 @@
       }
     },
     "default": {
-      "description": "Packaged alpha.13 OMP defaults, exactly matching the OMP route selected for every role in spec/model-routing.json.",
+      "description": "Packaged alpha.14 OMP defaults preserving the reviewed selections, exactly matching the OMP route selected for every role in spec/model-routing.json.",
       "roles": {
         "bbk_architect": {
           "model": "openai-codex/gpt-5.6-sol",

@@ -1,0 +1,75 @@
+{
+  "assertionRefs": [],
+  "completedAt": "1970-01-01T00:00:00Z",
+  "completionStatus": "INCONCLUSIVE",
+  "coverage": {
+    "claimsNotEstablished": [
+      "No target-node fact is established by this template."
+    ],
+    "complete": false,
+    "observedFacts": []
+  },
+  "dependencyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "environmentIdentity": {
+    "confidence": "UNCONFIRMED",
+    "hostname": "unknown",
+    "limitations": [
+      "Template only; no observation has been performed."
+    ],
+    "location_scope": "unknown",
+    "method": "replace-with-exact-command-api-or-inspection-method",
+    "node_id": "NODE-001",
+    "observation_source": "direct-node-observation",
+    "observed_at": "1970-01-01T00:00:00Z",
+    "observed_from_node_id": "NODE-001",
+    "platform": "unknown",
+    "scope": "replace-with-the-exact-observed-surface",
+    "transferability": "SAME_NODE_ONLY"
+  },
+  "freshness": {
+    "dependencyKeys": [
+      "subject",
+      "node",
+      "tool",
+      "time"
+    ],
+    "stale": false,
+    "validUntil": null
+  },
+  "kind": "environment-observation",
+  "operation": {
+    "argv": [
+      "replace-with-exact-command-or-api"
+    ],
+    "externalEffects": false,
+    "network": false,
+    "sanitized": true,
+    "workingDirectory": "replace-with-exact-node-path-or-not-applicable"
+  },
+  "outputs": {
+    "artifactRefs": [],
+    "exitCode": null,
+    "reportRefs": [],
+    "stderrDigest": null,
+    "stdoutDigest": null,
+    "traceRefs": []
+  },
+  "producer": "bbk_researcher",
+  "rawEvidenceRef": null,
+  "receiptId": "ER-ENVIRONMENT-001",
+  "redaction": {
+    "classification": "none",
+    "rawDigestBeforeRedaction": null
+  },
+  "schema": "bbk.evidence-receipt.v2",
+  "startedAt": "1970-01-01T00:00:00Z",
+  "subject": {
+    "digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ref": "NODE-001"
+  },
+  "toolIdentity": {
+    "name": "replace-with-exact-tool",
+    "version": "unknown"
+  },
+  "trustClass": "OPERATIONAL_OBSERVATION"
+}
