@@ -15,6 +15,10 @@ procedures, context packages, or role co-location cannot broaden runtime
 permissions. A BBK candidate, receipt, review, or status record proves only the
 exact assertion and subject recorded by that object.
 
+`WORKSPACE_IMPLEMENTATION` and `EXTERNAL_EXECUTION` are separate authority classes. The former permits requested implementation artifacts and local checks inside the exact authorized workspace. The latter is required for effects on real hosts, remote systems, credentials, deployment targets, network/service/firewall state, publication, release, or migration. `PRODUCE_ONLY` grants workspace implementation and withholds external execution.
+
+Completion claims are likewise independent. `PLANNING_COMPLETE`, `IMPLEMENTATION_ARTIFACTS_COMPLETE`, `BYTE_INTEGRITY_VERIFIED`, `SEMANTIC_REVIEW_COMPLETE`, `DEPLOYMENT_AUTHORIZED`, `DEPLOYMENT_PERFORMED`, and `LIVE_ACCEPTANCE_VERIFIED` may be stated only when each exact claim is established.
+
 Configured model and effort values are execution defaults, not capability proofs
 or authority grants. Material downgrades, unavailable routes, missing tools, and
 host limitations must be surfaced rather than silently represented as equivalent.

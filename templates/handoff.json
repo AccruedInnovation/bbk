@@ -1,6 +1,6 @@
 {
   "schema": "bbk.handoff.v1",
-  "bbk_version": "0.1.0-alpha.15",
+  "bbk_version": "0.1.0-alpha.16.1",
   "id": "HO-WORK-ATTEMPT-1",
   "project_id": "BBK-PROJECT",
   "work_unit_id": "WU-WORK",

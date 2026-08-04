@@ -396,7 +396,7 @@ m2_BBK = m2_ROOT / 'tools' / 'bbk.py'
 class Alpha7CongruenceTests(unittest.TestCase):
 
     def test_release_is_additive_over_alpha6(self):
-        self.assertEqual((m2_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.15')
+        self.assertEqual((m2_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.16.1')
         help_text = test_run_cli([sys.executable, m2_BBK, '--help'], cwd=m2_ROOT).stdout
         for command in ('fit', 'structure', 'slice', 'profile', 'manifest', 'candidate', 'gate', 'workspace', 'worktree', 'package'):
             self.assertIn(command, help_text)
@@ -410,8 +410,8 @@ class Alpha7CongruenceTests(unittest.TestCase):
         method = json.loads((m2_ROOT / 'spec' / 'method-content.json').read_text(encoding='utf-8'))
         skills = {path.parent.name for path in (m2_ROOT / 'shared' / 'skills').glob('*/SKILL.md')}
         self.assertEqual(skills, set(method['skills']))
-        self.assertEqual(len(skills), 39)
-        for name in ('bbk-state-decision-effect-design', 'bbk-review-plan', 'bbk-review-context', 'bbk-review-run', 'bbk-review-findings', 'bbk-review-intent', 'bbk-review-learn', 'bbk-context-routing', 'bbk-procedure-design'):
+        self.assertEqual(len(skills), 40)
+        for name in ('bbk-artifact', 'bbk-state-decision-effect-design', 'bbk-review-plan', 'bbk-review-context', 'bbk-review-run', 'bbk-review-findings', 'bbk-review-intent', 'bbk-review-learn', 'bbk-context-routing', 'bbk-procedure-design'):
             self.assertIn(name, skills)
         self.assertEqual(len(list((m2_ROOT / 'shared' / 'references').glob('*.md'))), 23)
         self.assertTrue((m2_ROOT / 'shared' / 'references' / 'omp.md').is_file())
@@ -429,21 +429,94 @@ class Alpha7CongruenceTests(unittest.TestCase):
         self.assertIn('bbk-review-findings', validator['skills'])
         self.assertIn('bbk-state-decision-effect-design', validator['skills'])
 
+    def test_alpha16_authority_completion_vocabulary_is_canonical_and_projected(self):
+        module_id = 'bbk-prompt-authority-completion-vocabulary'
+        module = json.loads(
+            (m2_ROOT / 'spec' / 'prompt-modules' / f'{module_id}.json').read_text(encoding='utf-8')
+        )
+        self.assertEqual(module['id'], module_id)
+        clauses = {item['id']: item['text'] for item in module['clauses']}
+        self.assertEqual(
+            set(clauses),
+            {
+                'AUTHORITY.WORKSPACE_IMPLEMENTATION',
+                'AUTHORITY.EXTERNAL_EXECUTION',
+                'AUTHORITY.PRODUCE_ONLY',
+                'AUTHORITY.EXACT_NEXT_EFFECT',
+                'COMPLETION.EXACT_CLAIMS',
+                'COMPLETION.NO_COLLAPSE',
+                'COMPLETION.EVIDENCE_DERIVED',
+                'COMPLETION.BYTE_INTEGRITY_CURRENT',
+            },
+        )
+        self.assertIn('grants WORKSPACE_IMPLEMENTATION', clauses['AUTHORITY.PRODUCE_ONLY'])
+        self.assertIn('withholding EXTERNAL_EXECUTION', clauses['AUTHORITY.PRODUCE_ONLY'])
+        self.assertIn('may not reinterpret a deterministic failure as a pass', clauses['COMPLETION.EVIDENCE_DERIVED'])
+        self.assertIn('bbk artifact freshness', clauses['COMPLETION.BYTE_INTEGRITY_CURRENT'])
+        for claim in (
+            'PLANNING_COMPLETE', 'IMPLEMENTATION_ARTIFACTS_COMPLETE',
+            'BYTE_INTEGRITY_VERIFIED', 'SEMANTIC_REVIEW_COMPLETE',
+            'DEPLOYMENT_AUTHORIZED', 'DEPLOYMENT_PERFORMED',
+            'LIVE_ACCEPTANCE_VERIFIED',
+        ):
+            self.assertIn(claim, clauses['COMPLETION.EXACT_CLAIMS'])
+
+        catalog = json.loads(
+            (m2_ROOT / 'spec' / 'prompt-modules' / 'catalog.json').read_text(encoding='utf-8')
+        )
+        self.assertIn(module_id, {item['id'] for item in catalog['module_entries']})
+        roles = json.loads((m2_ROOT / 'spec' / 'roles.json').read_text(encoding='utf-8'))['roles']
+        self.assertEqual(len(roles), 19)
+        self.assertTrue(all(module_id in role['prompt_modules'] for role in roles))
+
+        expected = (
+            'WORKSPACE_IMPLEMENTATION', 'EXTERNAL_EXECUTION', 'PRODUCE_ONLY',
+            'IMPLEMENTATION_ARTIFACTS_COMPLETE', 'LIVE_ACCEPTANCE_VERIFIED',
+        )
+        for role in roles:
+            role_name = role['name']
+            paths = (
+                m2_ROOT / 'projections' / 'codex' / 'agents' / f'{role_name}.toml',
+                m2_ROOT / 'projections' / 'omp' / 'agents' / f'{role_name}.md',
+                m2_ROOT / 'projections' / 'generic' / 'agents' / f'{role_name}.md',
+                m2_ROOT / 'projections' / 'claude' / 'agents' / f"{role_name.replace('_', '-')}.md",
+            )
+            for path in paths:
+                text = path.read_text(encoding='utf-8')
+                if path.suffix == '.toml':
+                    self.assertIn(
+                        f'### Shared module: `{module_id}` — {module["title"]}',
+                        text,
+                        str(path),
+                    )
+                    self.assertNotIn('<bbk-prompt-module', text, str(path))
+                else:
+                    self.assertIn(f'<bbk-prompt-module id="{module_id}">', text, str(path))
+                for token in expected:
+                    self.assertIn(token, text, str(path))
+
+        omp_source = (m2_ROOT / 'omp' / 'extension' / 'index.js').read_text(encoding='utf-8')
+        for token in expected:
+            self.assertIn(token, omp_source)
+
     def test_omp_surface_is_additive(self):
         source = (m2_ROOT / 'omp' / 'extension' / 'index.js').read_text(encoding='utf-8')
         tools = re.findall('name: "(bbk_[^"]+)"', source)
         commands = re.findall('registerCommand\\(pi, "(bbk(?::[^"]*)?)"', source)
         commands += re.findall('pi\\.registerCommand\\("(bbk(?::[^"]*)?)"', source)
-        self.assertEqual(len(tools), 42)
-        self.assertEqual(len(commands), 45)
+        self.assertEqual(len(tools), 44)
+        self.assertEqual(len(commands), 48)
         for name in (
             'bbk_manifest', 'bbk_candidate', 'bbk_gate', 'bbk_workspace',
             'bbk_review_plan', 'bbk_review_run', 'bbk_state_effect_validate',
-            'bbk_artifact_preflight', 'bbk_artifact_seal', 'bbk_artifact_successor',
+            'bbk_artifact_preflight', 'bbk_artifact_seal', 'bbk_artifact_finalize', 'bbk_artifact_successor',
             'bbk_host_preflight', 'bbk_context_worker', 'bbk_context_review',
             'bbk_handoff_create', 'bbk_handoff_verify', 'bbk_handoff_list',
         ):
             self.assertIn(name, tools)
+        self.assertIn('bbk:artifact:finalize', commands)
+        self.assertIn('bbk:timing', commands)
+        self.assertIn('bbk:prompt-status', commands)
 
     def test_installer_copies_alpha7_cli_modules(self):
         source = (m2_ROOT / 'tools' / 'install.py').read_text(encoding='utf-8')
@@ -619,7 +692,7 @@ class Alpha8ProfileDispatchTests(unittest.TestCase):
             self.assertEqual(lock['effective_sha256'], value['effective_sha256'])
 
     def test_alpha8_package_surface_is_present(self):
-        self.assertEqual((m3_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.15')
+        self.assertEqual((m3_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.16.1')
         for rel in ['docs/LANGUAGE-PROFILES.md', 'spec/schemas/bbk-profile-capability-request-v1.schema.json', 'spec/schemas/bbk-profile-capability-result-v1.schema.json', 'spec/schemas/bbk-profile-dispatch-v1.schema.json', 'templates/profile-capability-request.json']:
             self.assertTrue((m3_ROOT / rel).is_file(), rel)
 
@@ -675,7 +748,7 @@ class PublicRepositoryBoundaryTests(unittest.TestCase):
 
     def test_context_and_procedure_methods_are_canonical_and_projected(self):
         method = m4_load('spec/method-content.json')
-        self.assertEqual(method['version'], '0.1.0-alpha.15')
+        self.assertEqual(method['version'], '0.1.0-alpha.16.1')
         self.assertIn('bbk-context-routing', method['skills'])
         self.assertIn('bbk-procedure-design', method['skills'])
         self.assertIn('context-routing.md', method['references'])

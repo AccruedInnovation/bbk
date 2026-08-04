@@ -12,7 +12,7 @@
     "holder": "user",
     "mode": "WAYFINDER_RECOMMENDS"
   },
-  "bbk_version": "0.1.0-alpha.15",
+  "bbk_version": "0.1.0-alpha.16.1",
   "context_digest": null,
   "current_recommendation": null,
   "dependencies": [],

@@ -222,6 +222,7 @@ class Alpha93VerificationReportingTests(unittest.TestCase):
 # Historical source: test_alpha10_1_entry_setup.py
 # ---------------------------------------------------------------------------
 import hashlib
+import ast
 import io
 import json
 import os
@@ -315,7 +316,7 @@ class Alpha101EntrySetupTests(unittest.TestCase):
 
     def test_version_and_canonical_inputs_agree(self):
         version = (m4_ROOT / 'VERSION').read_text(encoding='utf-8').strip()
-        self.assertEqual(version, '0.1.0-alpha.15')
+        self.assertEqual(version, '0.1.0-alpha.16.1')
         self.assertEqual(json.loads((m4_ROOT / 'spec' / 'roles.json').read_text(encoding='utf-8'))['package_version'], version)
         self.assertEqual(json.loads((m4_ROOT / 'spec' / 'model-routing.json').read_text(encoding='utf-8'))['package_version'], version)
         self.assertEqual(json.loads((m4_ROOT / 'spec' / 'method-content.json').read_text(encoding='utf-8'))['version'], version)
@@ -369,7 +370,7 @@ class Alpha101EntrySetupTests(unittest.TestCase):
                 }};
                 const mod = await import({json.dumps((m4_ROOT / 'omp' / 'extension' / 'index.js').as_uri())});
                 mod.default(pi);
-                if (commands.size !== 45) throw new Error(`commands=${{commands.size}}`);
+                if (commands.size !== 48) throw new Error(`commands=${{commands.size}}`);
                 if (!commands.has('bbk') || !commands.has('bbk:status') || !commands.has('bbk:exit')) throw new Error('missing BBK commands');
                 const entered = await commands.get('bbk').handler('', ctx);
                 if (entered !== undefined) throw new Error(`unexpected command payload: ${{JSON.stringify(entered)}}`);
@@ -399,7 +400,7 @@ class Alpha101EntrySetupTests(unittest.TestCase):
             result = subprocess.run([shutil.which('node') or 'node', script], cwd=m4_ROOT, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8', errors='replace', check=False, timeout=30)
             self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
             value = json.loads(result.stdout)
-            self.assertEqual(value['commands'], 45)
+            self.assertEqual(value['commands'], 48)
             self.assertEqual(value['messages'], 1)
             self.assertEqual(value['entries'], 2)
 
@@ -1308,7 +1309,7 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
         cls._prepared_temp.cleanup()
 
     def test_current_successor_is_repository_native_and_self_contained(self):
-        self.assertEqual((m5_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.15')
+        self.assertEqual((m5_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.16.1')
         self.assertTrue((m5_ROOT / 'docs' / 'README.md').is_file())
         self.assertTrue((m5_ROOT / 'docs' / 'DEVELOPMENT.md').is_file())
         self.assertTrue((m5_ROOT / 'bundled-language-profiles' / 'packages').is_dir())
@@ -1388,7 +1389,7 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         self.assertFalse(module.version_supports_structure_contract('0.1.0-alpha.3'))
-        for version in ('0.1.0-alpha.4', '0.1.0-alpha.8', '0.1.0-alpha.11.11', '0.1.0-alpha.11.12', '0.1.0-alpha.12', '0.1.0-alpha.12.2', '0.1.0-alpha.12.4', '0.1.0-alpha.13.1', '0.1.0-alpha.13.2', '0.1.0-alpha.13.3', '0.1.0-alpha.13.4', '0.1.0-alpha.13.5', '0.1.0-alpha.14', '0.1.0-alpha.15', '0.1.0', '0.2.0-alpha.1'):
+        for version in ('0.1.0-alpha.4', '0.1.0-alpha.8', '0.1.0-alpha.11.11', '0.1.0-alpha.11.12', '0.1.0-alpha.12', '0.1.0-alpha.12.2', '0.1.0-alpha.12.4', '0.1.0-alpha.13.1', '0.1.0-alpha.13.2', '0.1.0-alpha.13.3', '0.1.0-alpha.13.4', '0.1.0-alpha.13.5', '0.1.0-alpha.14', '0.1.0-alpha.16', '0.1.0-alpha.16.1', '0.1.0', '0.2.0-alpha.1'):
             with self.subTest(version=version):
                 self.assertTrue(module.version_supports_structure_contract(version))
         gates = json.loads((item.root / 'gates' / 'python-gates.json').read_text(encoding='utf-8'))
@@ -1481,7 +1482,7 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
 
     def test_current_documentation_states_the_default_and_single_archive_contract(self):
         combined = '\n'.join(((m5_ROOT / relative).read_text(encoding='utf-8') for relative in ('README.md', 'docs/INSTALL.md', 'docs/LANGUAGE-PROFILES.md', 'RELEASE-NOTES.md')))
-        for expected in ('0.1.0-alpha.15', 'installed by default', '--no-language-profiles', '--profile-id', 'bundled-language-profiles', 'TypeScript/JavaScript'):
+        for expected in ('0.1.0-alpha.16.1', 'installed by default', '--no-language-profiles', '--profile-id', 'bundled-language-profiles', 'TypeScript/JavaScript'):
             self.assertIn(expected, combined)
 
 # ---------------------------------------------------------------------------
@@ -1504,7 +1505,7 @@ class Alpha112WindowsUtf8Tests(unittest.TestCase):
 
     def test_current_version_and_utf8_canonical_input_are_read_explicitly(self):
         version = (m6_ROOT / 'VERSION').read_text(encoding='utf-8').strip()
-        self.assertEqual(version, '0.1.0-alpha.15')
+        self.assertEqual(version, '0.1.0-alpha.16.1')
         method_content = json.loads((m6_ROOT / 'spec' / 'method-content.json').read_text(encoding='utf-8'))
         self.assertEqual(method_content['version'], version)
 
@@ -1593,7 +1594,7 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
         cls.by_name = {item['name']: item for item in cls.roles}
 
     def test_current_version_matches_release(self) -> None:
-        self.assertEqual(m7_VERSION, '0.1.0-alpha.15')
+        self.assertEqual(m7_VERSION, '0.1.0-alpha.16.1')
 
     def test_all_codex_agents_inherit_parent_sandbox(self) -> None:
         files = sorted(m7_CODEX_AGENTS.glob('*.toml'))
@@ -1661,6 +1662,23 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
             initial_version = manifest['version']
             records = {path_identity_key(item['path']): item for item in manifest['files']}
             codex_root = home / '.codex' / 'agents'
+            artifact_skill_root = home / '.agents' / 'skills' / 'bbk-artifact'
+            artifact_skill_files = sorted(path for path in artifact_skill_root.rglob('*') if path.is_file())
+            self.assertEqual(len(artifact_skill_files), 7)
+            # Simulate an alpha.15 installation: the shared artifact skill did
+            # not exist yet, while Codex and OMP were already installed.
+            artifact_skill_keys = {path_identity_key(path) for path in artifact_skill_files}
+            for path in artifact_skill_files:
+                path.unlink()
+            for directory in sorted(artifact_skill_root.rglob('*'), reverse=True):
+                if directory.is_dir():
+                    directory.rmdir()
+            artifact_skill_root.rmdir()
+            manifest['files'] = [
+                item for item in manifest['files']
+                if path_identity_key(item['path']) not in artifact_skill_keys
+            ]
+            records = {path_identity_key(item['path']): item for item in manifest['files']}
             for path in sorted(codex_root.glob('bbk_*.toml')):
                 text = path.read_text(encoding='utf-8')
                 self.assertNotIn('\nsandbox_mode = "read-only"\n', text)
@@ -1686,12 +1704,15 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
             self.assertEqual(updated['from_version'], '0.1.0-alpha.11.5')
             self.assertEqual(updated['to_version'], m7_VERSION)
             self.assertEqual(updated['codex_agent_count'], 19)
-            self.assertEqual(updated['actions'], {'replace': 19})
+            self.assertEqual(updated['codex_skill_file_count'], 7)
+            self.assertEqual(updated['actions'], {'create': 7, 'replace': 19})
             self.assertFalse(updated['shared_package_updated'])
             self.assertFalse(updated['effective_model_routing_updated'])
             self.assertEqual(updated['omp_files_touched'], 0)
             self.assertIn('omp', updated['untouched_harnesses'])
-            self.assertTrue(all(('/.codex/agents/bbk_' in item['path'].replace('\\', '/') for item in updated['files'])))
+            updated_paths = [item['path'].replace('\\', '/') for item in updated['files']]
+            self.assertEqual(sum('/.codex/agents/bbk_' in item for item in updated_paths), 19)
+            self.assertEqual(sum('/.agents/skills/bbk-artifact/' in item for item in updated_paths), 7)
             self.assertEqual(omp_before, m7_snapshot(omp_root))
             self.assertEqual(package_before, m7_snapshot(package_root))
             self.assertEqual(launcher_before, m7_snapshot(launcher_root))
@@ -1703,6 +1724,20 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
             for path in sorted(codex_root.glob('bbk_*.toml')):
                 value = tomllib.loads(path.read_text(encoding='utf-8'))
                 self.assertNotIn('sandbox_mode', value)
+            restored_skill_files = sorted(path for path in artifact_skill_root.rglob('*') if path.is_file())
+            self.assertEqual(len(restored_skill_files), 7)
+            self.assertEqual(
+                {path.relative_to(artifact_skill_root).as_posix() for path in restored_skill_files},
+                {
+                    'SKILL.md',
+                    'agents/openai.yaml',
+                    'assets/bbk-package-draft.generic.json',
+                    'references/artifact-package-reference.md',
+                    'scripts/bbk-artifact.cmd',
+                    'scripts/bbk-artifact.sh',
+                    'scripts/bbk_artifact.py',
+                },
+            )
             current = json.loads(manifest_path.read_text(encoding='utf-8'))
             self.assertEqual(current['version'], initial_version)
             assert_same_path(self, current['package_root'], manifest['package_root'])
@@ -1710,6 +1745,8 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
             self.assertEqual(current['harness_versions']['omp'], initial_version)
             self.assertEqual(current['last_codex_update']['kind'], 'codex-only')
             self.assertFalse(current['last_codex_update']['shared_package_updated'])
+            current_records = {path_identity_key(item['path']): item for item in current['files']}
+            self.assertTrue(all(path_identity_key(path) in current_records for path in restored_skill_files))
             status, _ = m7_run_json([sys.executable, m7_INSTALL, '--json', 'status', '--scope', 'user'], env=env)
             self.assertEqual(status['summary'], {'current': len(status['files'])})
 
@@ -2054,14 +2091,19 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
                     verbose=True,
                     stream=stream,
                     heartbeat_seconds=0.05,
-                    suite_timeout=5,
+                    # Process startup can exceed five seconds on a saturated
+                    # Windows or CI host even though the fixture itself sleeps
+                    # for only 250 ms. Keep this runner self-test deterministic
+                    # under release-suite contention without weakening the
+                    # heartbeat assertion.
+                    suite_timeout=15,
                     jobs=2,
                 )
             output = stream.getvalue()
         self.assertEqual(code, 0, output)
         self.assertIn('test_visible_slow.py', output)
         self.assertIn('test_current_operation_is_visible', output)
-        self.assertIn('hard timeout 5s', output)
+        self.assertIn('hard timeout 15s', output)
 
     def test_suite_children_cannot_read_the_developer_console(self):
         with tempfile.TemporaryDirectory() as raw_root:
@@ -2368,3 +2410,168 @@ class SharedPathAssertionSupportTests(unittest.TestCase):
             with mock.patch.object(Path, 'symlink_to', side_effect=PermissionError('privilege unavailable')):
                 with self.assertRaises(unittest.SkipTest):
                     create_symlink_or_skip(self, root / 'link', root / 'target')
+
+
+class Alpha161SelectiveOmpInstallerTests(unittest.TestCase):
+    """Regression coverage for the alpha.16 selective OMP replacement defect."""
+
+    def test_canonical_omp_runtime_inventory_covers_local_python_import_closure(self):
+        tools = {
+            path.stem: path
+            for path in (m4_ROOT / 'tools').glob('*.py')
+            if path.is_file()
+        }
+        pending = ['bbk', 'omp_model_routing']
+        visited: set[str] = set()
+        while pending:
+            name = pending.pop()
+            if name in visited:
+                continue
+            visited.add(name)
+            tree = ast.parse(tools[name].read_text(encoding='utf-8'), filename=str(tools[name]))
+            imported: set[str] = set()
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    imported.update(alias.name.split('.', 1)[0] for alias in node.names)
+                elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+                    imported.add(node.module.split('.', 1)[0])
+            pending.extend(sorted(imported & tools.keys() - visited))
+
+        required = {f'{name}.py' for name in visited}
+        installed = set(install_tool.OMP_EXTENSION_RUNTIME_FILES)
+        self.assertTrue(
+            required <= installed,
+            f'OMP runtime inventory is missing local import dependencies: {sorted(required - installed)}',
+        )
+
+    def test_harness_scoped_replacement_and_update_keep_complete_runtime_and_refresh_routing_metadata(self):
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            home = base / 'home'
+            home.mkdir()
+            env = os.environ.copy()
+            env.update({
+                'BBK_HOME': str(home),
+                'HOME': str(home),
+                'BBK_INSTALL_ROOT': str(base / 'data'),
+                'BBK_BIN_DIR': str(base / 'bin'),
+            })
+            install_base = [
+                sys.executable,
+                str(m4_ROOT / 'tools' / 'install.py'),
+                '--json',
+                'install',
+                '--scope', 'user',
+            ]
+            first = test_run_cli(
+                [*install_base, '--omp', '--codex', '--no-language-profiles'],
+                cwd=m4_ROOT,
+                env=env,
+                check=False,
+                timeout=240,
+            )
+            self.assertEqual(first.returncode, 0, first.stderr or first.stdout)
+            installed = json.loads(first.stdout)
+            manifest_path = Path(installed['manifest_path'])
+            manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+            manifest['model_routing'].update({
+                'custom': False,
+                'source': 'D:/Projects/BBK/bbk-0.1.0-alpha.15/spec/model-routing.json',
+                'package_version': '0.1.0-alpha.15',
+            })
+            manifest_path.write_text(
+                json.dumps(manifest, indent=2, ensure_ascii=False, sort_keys=True) + '\n',
+                encoding='utf-8',
+            )
+
+            # Exact user regression shape: an installation owns Codex and OMP,
+            # then only OMP is selected for a clean harness-scoped replacement.
+            replaced = test_run_cli(
+                [
+                    sys.executable,
+                    str(m4_ROOT / 'tools' / 'setup.py'),
+                    '--install',
+                    '--scope', 'user',
+                    '--omp',
+                    '--uninstall-existing',
+                    '--json',
+                ],
+                cwd=m4_ROOT,
+                env=env,
+                check=False,
+                timeout=240,
+            )
+            self.assertEqual(replaced.returncode, 0, replaced.stderr or replaced.stdout)
+            replacement = json.loads(replaced.stdout)
+            self.assertEqual(replacement['preexisting_install']['decision'], 'replace-selected')
+            self.assertEqual(replacement['preexisting_install']['selected_harnesses'], ['omp'])
+            self.assertEqual(replacement['preexisting_install']['preserved_harnesses'], ['codex'])
+
+            extension = home / '.omp' / 'agent' / 'extensions' / 'bbk'
+
+            def assert_runtime_and_router_pass() -> None:
+                current_manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+                owned = {
+                    install_tool.portable_path_key(item['path'])
+                    for item in current_manifest['files']
+                }
+                for name in install_tool.OMP_EXTENSION_RUNTIME_FILES:
+                    path = extension / name
+                    self.assertTrue(path.is_file(), f'missing installed OMP runtime module: {name}')
+                    self.assertIn(install_tool.portable_path_key(path), owned, f'unowned OMP runtime module: {name}')
+                router = test_run_cli(
+                    [
+                        sys.executable,
+                        str(extension / 'omp_model_routing.py'),
+                        '--binding', str(extension / 'bbk-package-root.json'),
+                        '--json', 'status',
+                    ],
+                    cwd=base,
+                    env=env,
+                    check=False,
+                    timeout=120,
+                )
+                self.assertEqual(router.returncode, 0, router.stderr or router.stdout)
+                self.assertEqual(json.loads(router.stdout)['status'], 'PASS')
+                routing = current_manifest['model_routing']
+                self.assertFalse(routing['custom'])
+                self.assertNotIn('0.1.0-alpha.15', str(routing))
+                assert_same_path(self, routing['source'], m4_ROOT / 'spec' / 'model-routing.json')
+
+            assert_runtime_and_router_pass()
+
+            # The dedicated selective updater must use the same canonical
+            # runtime inventory and refresh the same packaged-default metadata.
+            manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+            manifest['model_routing'].update({
+                'custom': False,
+                'source': 'D:/Projects/BBK/bbk-0.1.0-alpha.15/spec/model-routing.json',
+                'package_version': '0.1.0-alpha.15',
+            })
+            manifest_path.write_text(
+                json.dumps(manifest, indent=2, ensure_ascii=False, sort_keys=True) + '\n',
+                encoding='utf-8',
+            )
+            updated = test_run_cli(
+                [
+                    sys.executable,
+                    str(m4_ROOT / 'tools' / 'update_omp.py'),
+                    '--scope', 'user',
+                    '--clean',
+                    '--json',
+                ],
+                cwd=m4_ROOT,
+                env=env,
+                check=False,
+                timeout=240,
+            )
+            self.assertEqual(updated.returncode, 0, updated.stderr or updated.stdout)
+            update_result = json.loads(updated.stdout)
+            self.assertEqual(update_result['status'], 'PASS')
+            self.assertEqual(update_result['runtime_inventory']['status'], 'PASS')
+            self.assertEqual(update_result['runtime_inventory']['file_count'], len(install_tool.OMP_EXTENSION_RUNTIME_FILES))
+            self.assertEqual(update_result['runtime_smoke']['status'], 'PASS')
+            self.assertEqual(update_result['runtime_smoke']['import_closure'], 'PASS')
+            self.assertEqual(update_result['runtime_smoke']['routing_status'], 'PASS')
+            self.assertGreater(update_result['runtime_smoke']['schema_catalogue_count'], 0)
+            assert_runtime_and_router_pass()

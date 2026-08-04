@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.1.0-alpha.16.1 — 2026-08-04
+
+- Repair harness-scoped OMP clean replacement and the dedicated OMP updater by sharing one canonical adjacent Python runtime inventory with the full installer, proving manifest ownership, smoke-running the installed import/routing/schema surfaces, and rolling back targeted files plus the prior manifest on post-install failure.
+- Refresh packaged-default model-routing source/effective-copy metadata to the current release during selective OMP updates while preserving explicit custom policy ownership and active OMP routes.
+- Add one-shot software `bbk artifact finalize` mode over ordinary project files and directories, with deterministic exclusions, include/exclude selectors, symlink rejection, ephemeral generic draft construction, immutable publication, and external source binding.
+- Add `bbk artifact freshness`, the OMP `bbk_artifact_freshness` tool, and `/bbk:artifact:freshness` to verify the sealed package and detect added, removed, changed, or missing files in a source-bound implementation selection.
+- Prevent OMP completion-bearing relays from substituting a handoff, passing tests, raw directory, or stale publication when the user explicitly required artifact finalization; also freshness-check voluntarily observed finalizations before completion claims.
+- Preserve alpha.16 provider-prompt enforcement, authority/timing/CLI behavior, canonical roles, and exact reviewed per-role model routes.
+
+## 0.1.0-alpha.16 — 2026-08-04
+
+- Enforce the exact session-bound Main or child prompt at OMP's actual `before_provider_request` payload. Verify exact supported payloads, repair recognized generic/developer contamination, block unsupported or failed repairs through host abort plus a user-content-free sentinel, and retain ordinary non-BBK OMP pass-through.
+- Add per-request digest-only `bbk.effective-prompt-receipt.v2`, persistent unresolved prompt-integrity status, adapter/provider/model and request-sequence evidence, exact IRC-wake contamination regression coverage, and `/bbk:prompt-status` verified/repaired/blocked counts. Disclose that later extension handlers can still rewrite because OMP exposes no post-chain finalizer.
+- Add `bbk artifact finalize`, `bbk_artifact_finalize`, and `/bbk:artifact:finalize`: strict preflight, default rejection of mutable coordination records, project-local `.bbk/artifacts/sealed/<package-id>-<revision>` publication, external immutable publication receipts, mutable current pointers, post-publication drift verification, package-ID locking, and rollback of incomplete external metadata.
+- Add the canonical WORKSPACE_IMPLEMENTATION / EXTERNAL_EXECUTION / PRODUCE_ONLY authority split and exact independent completion claims across all 19 roles and the OMP controller, preventing both unauthorized external effects and premature planning-only termination when local implementation artifacts are authorized.
+- Add `/bbk:timing` and controller timing in `/bbk:agents`, separating explicit native-`ask` user wait from session elapsed while reporting provider, tool, sub-agent, overlap-aware wall, prompt-block, and unattributed intervals without labelling elapsed-minus-wait as model compute.
+- Replace uncontrolled argparse failures with `bbk.cli-error.v1` diagnostics containing exact field, received value, permitted values, required fields, corrected example, help command, and smallest next action; retain concise human errors and exit status 2.
+- Extend the managed Codex/Claude `bbk-artifact` skill with one-shot finalization and publication metadata guidance. Preserve alpha.15.1 revived-agent reconciliation, PATH-independent bindings, exact 19-role model routes, install scopes, language profiles, handoff/context/package compatibility, and the boundary that Blueprint owns global deterministic lifecycle and model-suitability governance.
+
+## 0.1.0-alpha.15.1 — 2026-08-03
+
+- Reconcile `/bbk:agents` against both OMP task lifecycle/progress and later live coordination evidence. Successful `injected`, `woken`, or `revived` hub/IRC receipts, authoritative peer rosters, and legacy running-agent reports can make a completed task session active again; newer lifecycle or roster evidence supersedes older observations.
+- Preserve one deduplicated Main-to-descendant tree across task IDs and hub/IRC/job peer IDs, discover role-bearing live peers, expose task status, peer status, effective status source, and current wake outcome in JSON/details output, and keep failed send receipts non-activating.
+- Add the canonical `bbk-artifact` skill to all 19 roles as an on-demand procedure and install it automatically for Codex and Claude Code. Its project/user-scope wrapper resolves the exact BBK install manifest and invokes the recorded Python plus `tools/bbk.py`, so the short `bbk` command is not required on `PATH`; the Codex-only successor updater also adds or refreshes the skill without rebinding the shared package.
+- Qualify Codex and Claude skill installation, install-manifest ownership, archive-safe wrapper invocation, uninstall, PATH-independent binding, and real artifact preflight/seal/verify behavior. Preserve the boundary that package integrity does not establish semantic acceptance, authorization, validation, deployment readiness, or release authority.
+- Retain the corrected alpha.15 Windows symlink-fixture portability behavior, exact 19-role model routes, all package/profile/context/handoff features, install scopes, language-profile reuse, Beads compatibility, and Blueprint lifecycle boundary.
+
 ## 0.1.0-alpha.15 — 2026-08-03
 
 - Add one strict-JSON and deterministic artifact-package engine with BBK-JSON-1 canonicalization, profile preflight, lock-protected staged publication, read-only verification, successor drafts, structured diagnostics, and a thin compatibility wrapper.

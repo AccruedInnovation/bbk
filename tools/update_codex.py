@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Update only BBK's Codex custom-agent surface.
+"""Update BBK's Codex custom-agent and Codex-facing skill surface.
 
-This command is intended for an existing BBK installation. It updates only
-BBK's installed Codex custom-agent definitions and the unified installation
-manifest. It deliberately preserves the installed package copy, current
-pointer, launcher, effective model-routing file, OMP, Claude Code, generic agent
-files, language-profile packages, and OMP runtime model-routing state.
+This command is intended for an existing BBK installation. It updates BBK's
+installed Codex custom-agent definitions, the canonical ``bbk-artifact`` skill
+under Codex's shared skill root, and the unified installation manifest. It
+deliberately preserves the installed package copy, current pointer, launcher,
+effective model-routing file, OMP agent/extension state, Claude Code, generic
+agent files, language-profile packages, and OMP runtime model-routing state.
 """
 from __future__ import annotations
 
@@ -208,6 +209,22 @@ def make_desired_files(
             codex_agents / filename,
             data,
             source=f"generated:codex-agent:update:{filename}",
+        )
+
+    agent_skills = targets.get("agent_skills")
+    if agent_skills is None:
+        raise CodexUpdateError("Cannot resolve Codex skill installation target")
+    skill_source = ROOT / "shared" / "skills" / "bbk-artifact"
+    if not skill_source.is_dir():
+        raise CodexUpdateError(f"Canonical bbk-artifact skill is missing: {skill_source}")
+    for source_path in install_tool.source_files(skill_source):
+        relative = source_path.relative_to(skill_source)
+        add_desired(
+            desired,
+            agent_skills / "bbk-artifact" / relative,
+            source_path.read_bytes(),
+            source=install_tool.json_path(source_path),
+            is_executable=bool(source_path.stat().st_mode & 0o111),
         )
     return desired, projection_meta, effective_path
 
@@ -569,6 +586,10 @@ def update_codex(args: argparse.Namespace) -> dict[str, Any]:
         "clean_replacement": bool(getattr(args, "clean", False)),
         "actions": actions,
         "codex_agent_count": len(projection_meta.get("agents", {})),
+        "codex_skill_file_count": sum(
+            1 for item in update_records
+            if "/.agents/skills/bbk-artifact/" in str(item.get("path", "")).replace("\\", "/")
+        ),
         "untouched_harnesses": untouched,
         "omp_files_touched": 0,
         "claude_files_touched": 0,
@@ -583,11 +604,12 @@ def human(value: Mapping[str, Any]) -> str:
         f"Version: {value.get('from_version')} -> {value.get('to_version')}\n"
         f"Files: {value.get('actions')}\n"
         f"Codex agents: {value.get('codex_agent_count')}\n"
+        f"Codex artifact skill files: {value.get('codex_skill_file_count')}\n"
         f"Stale Codex files removed: {value.get('removed_stale_count', 0)}\n"
         f"Untouched harnesses: {', '.join(value.get('untouched_harnesses') or []) or 'none'}\n"
         f"Manifest: {value.get('manifest_path')}\n"
-        "The update changes only BBK's Codex agent files and manifest metadata; it does not modify the shared package, launcher, model-routing file, OMP, Claude Code, or generic agent files. "
-        "Start a fresh Codex turn or session if the running host has cached custom-agent definitions."
+        "The update changes BBK's Codex agent files, the canonical bbk-artifact skill under Codex's shared skill root, and manifest metadata. It does not modify the shared package, launcher, model-routing file, OMP agent/extension state, Claude Code, or generic agent files. "
+        "Start a fresh Codex turn or session if the running host has cached custom-agent definitions or skills."
     )
 
 

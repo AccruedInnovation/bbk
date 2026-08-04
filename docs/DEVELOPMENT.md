@@ -7,7 +7,7 @@ or generated `bbk/` staging directory is required.
 
 ## Canonical generation graph
 
-Alpha.15 uses a one-way generation graph:
+Alpha.16.1 uses a one-way generation graph:
 
 ```text
 spec/roles/catalog.json + spec/roles/bbk_*-role.json
@@ -20,10 +20,19 @@ canonical role return metadata
 
 spec/method-content.json + spec/prompt-modules/ + spec/model-routing.json + generated roles.json
   → tools/generate_agents.py
-  → shared skills + Codex/OMP/Claude/generic projections + projections/manifest.json
+  → shared SKILL.md files + Codex/OMP/Claude/generic projections + projections/manifest.json
+
+shared/skills/bbk-artifact/{agents,assets,references,scripts}
+  → source-owned auxiliary skill package installed beside its generated SKILL.md
 ```
 
-Edit only canonical inputs. Every generator has a drift-check mode and the release gate runs all of them before packaging.
+Provider-bound prompt integrity is qualified against the actual object returned by `before_provider_request`, not `ctx.getSystemPrompt()` or the earlier `before_agent_start` value. Tests must cover ordinary non-BBK pass-through, controller and child prompts, the IRC-wake contamination regression, every supported provider adapter, unsupported payload blocking, absent/failed host abort behavior, per-request receipts, session recovery, and the documented extension-order finality boundary. Raw prompt and provider payload content must not be persisted in receipts.
+
+Artifact publication tests must prefer `artifact finalize` for the standard immutable path and verify that publication/current metadata remains outside the sealed tree, mutable coordination files are rejected by default, pre/post publication verification passes, and external metadata is rolled back after a failed publication transaction.
+
+Structured CLI parse failures must be tested under `--json` for invalid choices and missing required arguments without relying on `SystemExit`.
+
+Edit only canonical inputs for generated outputs. `spec/method-content.json#skills/bbk-artifact` is the canonical prompt body for `shared/skills/bbk-artifact/SKILL.md`; its host metadata, draft template, reference, and wrappers are source-owned auxiliary files and must be reviewed and tested directly. Every generator has a drift-check mode and the release gate runs all of them before packaging.
 
 ## Normal update workflow
 
@@ -48,7 +57,7 @@ archive; BBK does not need to extract it.
 
 ## Verification
 
-Alpha.15 exposes three explicit profiles. Use the smallest profile that matches the decision being made:
+Alpha.16.1 exposes three explicit profiles. Use the smallest profile that matches the decision being made:
 
 ```bash
 # Canonical contracts and deterministic transformations
@@ -84,6 +93,19 @@ Canonical BBK CLI assertions and package-local deterministic verifier commands e
 Timing reports and the rolling duration cache live outside the package tree so test execution cannot mutate a qualified release. Defaults are `%LOCALAPPDATA%\BBK\test-runs` on Windows and `~/.cache/bbk/test-runs` on POSIX. Set `BBK_TEST_CACHE_DIR` for an isolated benchmark or CI workspace.
 
 The ordered profiles verify the applicable package trust gates, canonical method and role projections, model routing, generated agents, Python and JSON sanity, semantic/schema fixtures, selected unittests, OMP syntax, and post-test package integrity. OMP-only and Codex-only tested updates retain their corresponding targeted profiles.
+
+Alpha.16.1 has eight release-specific regression boundaries:
+
+- `tests/test_omp_runtime.py` mirrors the exact IRC-wake contamination path, verifies/reconstructs every supported provider payload adapter, blocks unsupported shapes without retaining user content, records one v2 receipt per request, and exposes the extension-order finality boundary.
+- `tests/test_omp_runtime.py` also separates native-`ask` wait from elapsed time and carries the current `WAITING_ON_USER` state into `/bbk:agents` while preserving independent child visibility.
+- `tests/test_omp_runtime.py` retains the observed post-completion wake and five-peer roster shapes. Successful `injected`, `woken`, and `revived` receipts or newer live rosters reactivate a completed peer without duplicate identities; later task/roster evidence and failed receipts remain authoritative.
+- `tests/test_artifact_packages_v1.py` proves draft-mode finalization, default project-local sealed output, external publication/current metadata, mutable-coordination rejection, post-publication verification, and rollback after an injected publication failure.
+- `tests/test_artifact_packages_v1.py` additionally proves one-shot Python/HTML software publication without package internals, deterministic exclusions and symlink rejection, ephemeral-draft removal, exact source binding, current-pointer resolution, and freshness rejection after source mutation.
+- `tests/test_omp_runtime.py` proves that an explicit finalization requirement cannot be satisfied by a handoff, a fresh publication permits completion, a later source mutation blocks it, and a voluntarily observed finalization receives the same freshness check.
+- `tests/test_installation_portability.py` reproduces the alpha.16 OMP-only clean-replacement failure, proves the canonical adjacent import closure is installed and manifest-owned, refreshes predecessor packaged-default routing metadata, executes installed `/bbk:models` status and schema surfaces, and repeats the checks through the dedicated updater.
+- prompt-module/generated-projection and CLI tests prove the WORKSPACE_IMPLEMENTATION / EXTERNAL_EXECUTION / PRODUCE_ONLY split, exact independent completion vocabulary, and machine-readable `bbk.cli-error.v1` diagnostics without uncontrolled argparse output.
+
+`tests/test_artifact_skill.py` continues to verify the seven-file canonical skill package, all role/projection references, real Codex and Claude installation, install-manifest ownership, executable modes, wrapper binding without `bbk` on `PATH`, package preflight/finalize/verify, and uninstall. The Codex selective-update test separately proves that an older managed installation acquires the skill without rebinding the shared package or changing OMP agent/extension files.
 
 ### Native filesystem path assertions
 
@@ -151,14 +173,28 @@ Do not edit generated agent projections directly. Update the canonical sources
 and regenerate:
 
 ```bash
+python tools/assemble_roles.py
 python tools/create_method_content.py
-python tools/create_role_spec.py
 python tools/generate_agents.py
 ```
+
+Then prove drift-free generation:
+
+```bash
+python tools/assemble_roles.py --check
+python tools/create_method_content.py --check
+python tools/generate_agents.py --check
+```
+
+`create_method_content.py` owns generated `SKILL.md` files and shared method references only. It deliberately does not delete or regenerate the auxiliary files under `shared/skills/bbk-artifact/`; those files are covered by the artifact-skill contract test and package manifest.
 
 Then rerun the complete verification sequence. `projections/manifest.json` and
 `PACKAGE-MANIFEST.json` are generated integrity records and should change only
 with the source tree they describe.
+
+## Release archive executable policy
+
+BBK release ZIP entries remain mode-normalized to `0644`; host-facing scripts are interpreter-invoked rather than native executable entrypoints. In particular, invoke the POSIX artifact-skill wrapper as `sh scripts/bbk-artifact.sh ...`; its Python implementation is invoked by that wrapper. Tests must not depend on source-checkout executable bits because those bits are deliberately absent after clean extraction.
 
 ## Building a release
 

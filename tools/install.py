@@ -45,6 +45,27 @@ SUBPROCESS_OUTPUT_ENCODING = "utf-8"
 SUBPROCESS_OUTPUT_ERRORS = "backslashreplace"
 LANGUAGE_PROFILE_LAYOUT_VERSION = 1
 
+# Canonical adjacent Python runtime installed beside the OMP extension.  Both
+# the full installer and the harness-scoped OMP updater must consume this exact
+# inventory.  Keeping one owner prevents selective clean replacement from
+# deleting a transitive runtime dependency that the full installer provided.
+OMP_EXTENSION_RUNTIME_FILES: tuple[str, ...] = (
+    "bbk.py",
+    "contracts.py",
+    "state_effect.py",
+    "review_assurance.py",
+    "verify_package.py",
+    "path_compat.py",
+    "strict_json.py",
+    "artifact_packages.py",
+    "bbk_artifact.py",
+    "context_packages.py",
+    "host_preflight.py",
+    "handoff_packages.py",
+    "artifact_classification.py",
+    "omp_model_routing.py",
+)
+
 
 class InstallError(RuntimeError):
     pass
@@ -174,6 +195,28 @@ def json_bytes(value: Any) -> bytes:
 def json_path(path: PurePath) -> str:
     """Serialize filesystem paths with stable forward slashes in JSON records."""
     return path.as_posix()
+
+
+def model_routing_manifest_metadata(
+    *,
+    custom: bool,
+    source: Path,
+    effective_copy: Path,
+    routing_meta: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Return one canonical install-manifest model-routing record."""
+    return {
+        "custom": bool(custom),
+        "source": json_path(source),
+        "effective_copy": json_path(effective_copy),
+        "sha256": routing_meta["model_routing_source_sha256"],
+        "projection_source_sha256": routing_meta["source_sha256"],
+        "schema_version": routing_meta["model_routing_schema"],
+        "mode": routing_meta["model_routing_mode"],
+        "route_count": routing_meta["model_route_count"],
+        "legacy_profile_count": routing_meta["legacy_model_profile_count"],
+        "legacy_role_profile_counts": routing_meta["legacy_role_profile_counts"],
+    }
 
 
 def canonical_path(path: str | os.PathLike[str] | Path) -> Path:
@@ -1213,22 +1256,7 @@ def _perform_install(
         omp_extension = targets["omp_extensions"] / "bbk"
         for name in ["index.js", "package.json", "README.md"]:
             install_file(ROOT / "omp" / "extension" / name, omp_extension / name, **common)
-        for name in [
-            "bbk.py",
-            "contracts.py",
-            "state_effect.py",
-            "review_assurance.py",
-            "verify_package.py",
-            "path_compat.py",
-            "strict_json.py",
-            "artifact_packages.py",
-            "bbk_artifact.py",
-            "context_packages.py",
-            "host_preflight.py",
-            "handoff_packages.py",
-            "artifact_classification.py",
-            "omp_model_routing.py",
-        ]:
+        for name in OMP_EXTENSION_RUNTIME_FILES:
             install_file(ROOT / "tools" / name, omp_extension / name, **common)
         install_file(ROOT / "VERSION", omp_extension / "VERSION", **common)
         install_bytes(
@@ -1375,18 +1403,12 @@ def _perform_install(
         "generic_agent_manifest": json_path(generic_manifest_path) if generic_manifest_path else None,
         "dry_run": args.dry_run,
         "verification": verification,
-        "model_routing": {
-            "custom": args.model_routing is not None,
-            "source": json_path(routing_path),
-            "effective_copy": json_path(effective_routing),
-            "sha256": routing_meta["model_routing_source_sha256"],
-            "projection_source_sha256": routing_meta["source_sha256"],
-            "schema_version": routing_meta["model_routing_schema"],
-            "mode": routing_meta["model_routing_mode"],
-            "route_count": routing_meta["model_route_count"],
-            "legacy_profile_count": routing_meta["legacy_model_profile_count"],
-            "legacy_role_profile_counts": routing_meta["legacy_role_profile_counts"],
-        },
+        "model_routing": model_routing_manifest_metadata(
+            custom=args.model_routing is not None,
+            source=routing_path,
+            effective_copy=effective_routing,
+            routing_meta=routing_meta,
+        ),
         "omp_runtime_routing": (
             {
                 "schema": "bbk.omp-runtime-routing.v1",

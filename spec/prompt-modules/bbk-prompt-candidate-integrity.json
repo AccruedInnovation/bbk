@@ -23,6 +23,14 @@
     {
       "id": "CANDIDATE.SEPARATE_LIFECYCLES",
       "text": "Candidate-producing cohorts and candidate-bound assurance runs are separate lifecycles linked by exact candidate identity, not by shared mutable status."
+    },
+    {
+      "id": "CANDIDATE.REQUIRED_FINALIZATION_EXACT",
+      "text": "When the controlling request explicitly requires `bbk artifact finalize`, satisfy that exact operation with a successful publication receipt. A handoff package, passing tests, a raw implementation directory, `artifact seal`, an archive, or an ad hoc digest is not an equivalent substitute. Report the requirement as blocked until the exact finalization operation succeeds or the user explicitly changes it."
+    },
+    {
+      "id": "CANDIDATE.FINALIZATION_FRESHNESS",
+      "text": "Finalization evidence is bound to the exact source selection and source snapshot that produced it. Any later selected-source addition, removal, or byte change makes that evidence stale. Run deterministic artifact freshness against the publication receipt immediately before a completion relay; stale evidence requires current verification and a successor revision rather than reuse of the predecessor claim."
     }
   ]
 }

@@ -1,0 +1,250 @@
+{
+  "schema": "bbk.prompt-size-report.v1",
+  "baseline_package_version": "0.1.0-alpha.14",
+  "current_package_version": "0.1.0-alpha.16.1",
+  "measurement": "UTF8_BYTES_OF_COMPILED_ROLE_INSTRUCTIONS_ACROSS_SUPPORTED_HOSTS",
+  "size_policy": "MEASURED_NO_ARBITRARY_CAP",
+  "role_count": 19,
+  "hosts": [
+    "generic",
+    "omp",
+    "codex",
+    "claude"
+  ],
+  "aggregate": {
+    "baseline_bytes": 5158115,
+    "current_bytes": 5664882,
+    "delta_bytes": 506767,
+    "delta_percent": 9.825
+  },
+  "roles": {
+    "bbk_root_wayfinder": {
+      "baseline_bytes": 184612,
+      "current_bytes": 219613,
+      "delta_bytes": 35001,
+      "delta_percent": 18.959,
+      "host_bytes": {
+        "generic": 55702,
+        "omp": 53008,
+        "codex": 54633,
+        "claude": 56270
+      }
+    },
+    "bbk_territory_wayfinder": {
+      "baseline_bytes": 186243,
+      "current_bytes": 216684,
+      "delta_bytes": 30441,
+      "delta_percent": 16.345,
+      "host_bytes": {
+        "generic": 54994,
+        "omp": 52000,
+        "codex": 54078,
+        "claude": 55612
+      }
+    },
+    "bbk_questioning_wayfinder": {
+      "baseline_bytes": 215085,
+      "current_bytes": 225536,
+      "delta_bytes": 10451,
+      "delta_percent": 4.859,
+      "host_bytes": {
+        "generic": 57276,
+        "omp": 54063,
+        "codex": 56589,
+        "claude": 57608
+      }
+    },
+    "bbk_planning_wayfinder": {
+      "baseline_bytes": 247293,
+      "current_bytes": 281754,
+      "delta_bytes": 34461,
+      "delta_percent": 13.935,
+      "host_bytes": {
+        "generic": 71443,
+        "omp": 68046,
+        "codex": 70367,
+        "claude": 71898
+      }
+    },
+    "bbk_phase_wayfinder": {
+      "baseline_bytes": 285351,
+      "current_bytes": 315855,
+      "delta_bytes": 30504,
+      "delta_percent": 10.69,
+      "host_bytes": {
+        "generic": 80064,
+        "omp": 76315,
+        "codex": 78991,
+        "claude": 80485
+      }
+    },
+    "bbk_question_guide": {
+      "baseline_bytes": 219897,
+      "current_bytes": 225686,
+      "delta_bytes": 5789,
+      "delta_percent": 2.633,
+      "host_bytes": {
+        "generic": 57418,
+        "omp": 53936,
+        "codex": 56644,
+        "claude": 57688
+      }
+    },
+    "bbk_researcher": {
+      "baseline_bytes": 185734,
+      "current_bytes": 202988,
+      "delta_bytes": 17254,
+      "delta_percent": 9.29,
+      "host_bytes": {
+        "generic": 51685,
+        "omp": 48164,
+        "codex": 51134,
+        "claude": 52005
+      }
+    },
+    "bbk_prototyper": {
+      "baseline_bytes": 310677,
+      "current_bytes": 334336,
+      "delta_bytes": 23659,
+      "delta_percent": 7.615,
+      "host_bytes": {
+        "generic": 84648,
+        "omp": 81034,
+        "codex": 83627,
+        "claude": 85027
+      }
+    },
+    "bbk_synthesizer": {
+      "baseline_bytes": 211256,
+      "current_bytes": 229834,
+      "delta_bytes": 18578,
+      "delta_percent": 8.794,
+      "host_bytes": {
+        "generic": 58381,
+        "omp": 55082,
+        "codex": 57670,
+        "claude": 58701
+      }
+    },
+    "bbk_architect": {
+      "baseline_bytes": 321361,
+      "current_bytes": 333087,
+      "delta_bytes": 11726,
+      "delta_percent": 3.649,
+      "host_bytes": {
+        "generic": 84469,
+        "omp": 80306,
+        "codex": 83523,
+        "claude": 84789
+      }
+    },
+    "bbk_verification_designer": {
+      "baseline_bytes": 295342,
+      "current_bytes": 325825,
+      "delta_bytes": 30483,
+      "delta_percent": 10.321,
+      "host_bytes": {
+        "generic": 82831,
+        "omp": 78435,
+        "codex": 81408,
+        "claude": 83151
+      }
+    },
+    "bbk_worker_designer": {
+      "baseline_bytes": 313399,
+      "current_bytes": 336430,
+      "delta_bytes": 23031,
+      "delta_percent": 7.349,
+      "host_bytes": {
+        "generic": 85400,
+        "omp": 81318,
+        "codex": 83992,
+        "claude": 85720
+      }
+    },
+    "bbk_reviewer": {
+      "baseline_bytes": 270968,
+      "current_bytes": 304712,
+      "delta_bytes": 33744,
+      "delta_percent": 12.453,
+      "host_bytes": {
+        "generic": 77569,
+        "omp": 72991,
+        "codex": 76263,
+        "claude": 77889
+      }
+    },
+    "bbk_root_orchestrator": {
+      "baseline_bytes": 332567,
+      "current_bytes": 364233,
+      "delta_bytes": 31666,
+      "delta_percent": 9.522,
+      "host_bytes": {
+        "generic": 92378,
+        "omp": 88087,
+        "codex": 91002,
+        "claude": 92766
+      }
+    },
+    "bbk_territory_orchestrator": {
+      "baseline_bytes": 354784,
+      "current_bytes": 386782,
+      "delta_bytes": 31998,
+      "delta_percent": 9.019,
+      "host_bytes": {
+        "generic": 97961,
+        "omp": 93782,
+        "codex": 96652,
+        "claude": 98387
+      }
+    },
+    "bbk_worker_orchestrator": {
+      "baseline_bytes": 322889,
+      "current_bytes": 357803,
+      "delta_bytes": 34914,
+      "delta_percent": 10.813,
+      "host_bytes": {
+        "generic": 90866,
+        "omp": 86240,
+        "codex": 89486,
+        "claude": 91211
+      }
+    },
+    "bbk_validator_orchestrator": {
+      "baseline_bytes": 348682,
+      "current_bytes": 383273,
+      "delta_bytes": 34591,
+      "delta_percent": 9.921,
+      "host_bytes": {
+        "generic": 97347,
+        "omp": 92245,
+        "codex": 95959,
+        "claude": 97722
+      }
+    },
+    "bbk_worker": {
+      "baseline_bytes": 271837,
+      "current_bytes": 307366,
+      "delta_bytes": 35529,
+      "delta_percent": 13.07,
+      "host_bytes": {
+        "generic": 78170,
+        "omp": 73829,
+        "codex": 76877,
+        "claude": 78490
+      }
+    },
+    "bbk_validator": {
+      "baseline_bytes": 280138,
+      "current_bytes": 313085,
+      "delta_bytes": 32947,
+      "delta_percent": 11.761,
+      "host_bytes": {
+        "generic": 79725,
+        "omp": 74990,
+        "codex": 78325,
+        "claude": 80045
+      }
+    }
+  }
+}

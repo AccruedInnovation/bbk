@@ -109,7 +109,7 @@ The five constitution modules remain:
 | `execution` | effectful and execution-contract roles | standing authority, capability zones, checkpoints, candidate identity, durable handoffs |
 | `assurance` | evidence, review, synthesis, and acceptance roles | proportional proof, exposure history, stage separation, non-pass dispositions |
 
-Alpha.15 has 31 reusable `bbk.prompt-module.v1` modules under `spec/prompt-modules/`. They carry materially identical behavior—role boundary, invocation binding, human relay, delegation/return, durable handoffs, state-claim truth, profile qualification, liveness/recovery, effects/cleanup, evidence lineage and receipts, finding lifecycle, candidate integrity, execution autonomy, user-attention threshold, planning-to-execution ownership, node-bound evidence, specialist-return disposition, and related concerns—without duplicating the body in every procedure.
+Alpha.16.1 has 32 reusable `bbk.prompt-module.v1` modules under `spec/prompt-modules/`. They carry materially identical behavior—role boundary, invocation binding, human relay, delegation/return, durable handoffs, state-claim truth, workspace/external authority and exact completion vocabulary, profile qualification, liveness/recovery, effects/cleanup, evidence lineage and receipts, finding lifecycle, candidate integrity, execution autonomy, user-attention threshold, planning-to-execution ownership, node-bound evidence, specialist-return disposition, and related concerns—without duplicating the body in every procedure.
 
 Alpha.15 retains the five alpha.14 modules and adds four focused modules for product-first proportionality, mechanical admission, explicit assurance modes, and candidate-focused review. They are guidance and prompt/protocol contracts. They do not create deterministic baseline-acceptance, authority, record-mutation, or release gates; those remain outside BBK's bounded bootstrap role.
 
@@ -165,13 +165,19 @@ Reviewer owns bounded qualitative or interpretive judgment under an exact charte
 
 Main receives a complete controller system-prompt replacement while persistent BBK mode is active. A marked BBK child receives a complete role-specific replacement after the extension authenticates the installed canonical projection. Compatibility-discovered `.codex`, `.claude`, `.gemini`, and other unrelated workflow instructions are excluded unless explicitly supplied as governed project data.
 
-OMP may persist the pre-hook child prompt in `session_init` before extension replacement. Alpha.15 therefore records digest-only `bbk.effective-prompt-receipt.v1` entries after replacement and, when `getSystemPrompt()` is exposed, at `before_provider_request`. `/bbk:prompt-status` reports effective/provider-bound identity and generic-prompt removal. This is observability only and does not add an independent enforcement runtime.
+OMP may resume or wake a session without invoking another ordinary `before_agent_start` replacement. Alpha.16.1 retains alpha.16's guard of the actual outgoing provider payload in `before_provider_request`. It verifies exactly one session-bound canonical BBK system surface, repairs recognized OpenAI/DeepSeek, OpenAI Responses, Anthropic, Google, direct-message-array, `systemPrompt`, and one-level nested payload shapes, or blocks an unsupported/unrepairable BBK request. Blocking calls the host abort control and substitutes a payload containing no user request content. Ordinary non-BBK OMP requests pass through unchanged.
+
+Digest-only `bbk.effective-prompt-receipt.v2` entries record every `VERIFIED`, `REPAIRED`, and `BLOCKED` provider request; raw prompt and provider payload content are not persisted. `/bbk:prompt-status` reports counts, current guarantee, unresolved failures, and the exact extension-order boundary. OMP has no post-chain finalizer, so a later extension handler can still rewrite the payload after BBK's hook; BBK reports but cannot eliminate that host-owned boundary.
 
 OMP markers remain model-visible because the runtime uses them for prompt authentication. Codex does not need this mechanism, so its `developer_instructions` use ordinary Markdown and contain no BBK XML-like build/provenance envelopes.
 
 ## Scope, sandbox, and mutation authority
 
 Host workspace capability and BBK authority are separate.
+
+`WORKSPACE_IMPLEMENTATION` permits requested source, scripts, configuration, tests, documentation, and packages to be produced and locally checked inside the exact authorized workspace. `EXTERNAL_EXECUTION` separately covers real-host or remote-system installation, connection, credentials, provisioning, deployment, service/firewall/network mutation, publication, release, and migration. `PRODUCE_ONLY` grants the first and withholds the second; it is not a stop-before-writing mode.
+
+Use only independently established completion claims: `PLANNING_COMPLETE`, `IMPLEMENTATION_ARTIFACTS_COMPLETE`, `BYTE_INTEGRITY_VERIFIED`, `SEMANTIC_REVIEW_COMPLETE`, `DEPLOYMENT_AUTHORIZED`, `DEPLOYMENT_PERFORMED`, and `LIVE_ACCEPTANCE_VERIFIED`.
 
 Codex custom agents inherit the parent session's sandbox and approval policy; role projections do not silently broaden or narrow it. Claude Code projections similarly permit bounded coordination artifacts when the host workspace allows them. A read-only parent remains read-only.
 

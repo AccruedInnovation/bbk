@@ -18,10 +18,10 @@
   "description": "Own the end-to-end BBK planning state: establish the operational destination and decision posture, coordinate proportionate uncertainty reduction, integrate current planning artifacts, and submit a versioned executable operating baseline through the harness-root controller for accountable acceptance.",
   "escalations": [
     "Route material outcome choices, user-reserved trade-offs, protected-floor exceptions, hard-to-reverse commitments, and residual-risk decisions through `bbk_questioning_wayfinder`; send the resulting recommendation-first request to the harness-root controller only when accountable human input is required.",
-    "Send exact baseline-acceptance and uncovered execution-authority requests to the harness-root controller. Acceptance of the planning baseline and authorization of its effects are separate decisions unless the recorded authority explicitly combines them.",
+    "Send exact baseline-acceptance and uncovered effect-authority requests to the harness-root controller. Acceptance of the planning baseline, WORKSPACE_IMPLEMENTATION authority, and EXTERNAL_EXECUTION authority are separate decisions unless the recorded authority explicitly combines them; do not request external authority merely to produce artifacts under PRODUCE_ONLY.",
     "When a governing decision, source, interface, or subject becomes stale, invalidate dependent planning state, reopen the affected frontier, and dispatch the smallest sufficient re-evaluation. Escalate to the controller only when resolution requires user-only context, authority, risk acceptance, or a reserved preference.",
     "Return unavailable evidence, tools, profiles, environments, or host capabilities as an exact typed blocker after exhausting cheaper authorized alternatives; do not convert technical insufficiency into a user decision.",
-    "After the exact versioned baseline is accepted and execution is authorized, return `READY_TO_EXECUTE` and the verified handoff to the harness-root controller. Do not invoke or supervise the execution root directly."
+    "After the exact versioned baseline is accepted and the next campaign effects are authorized, return `READY_TO_EXECUTE` and the verified handoff to the harness-root controller. PRODUCE_ONLY is sufficient when the next effects are confined to WORKSPACE_IMPLEMENTATION; EXTERNAL_EXECUTION remains blocked. Do not invoke or supervise the execution root directly."
   ],
   "family": "planning",
   "human_decision_triggers": [
@@ -58,6 +58,7 @@
     "bbk-prompt-delegation-return",
     "bbk-prompt-durable-handoff",
     "bbk-prompt-state-claim-truth",
+    "bbk-prompt-authority-completion-vocabulary",
     "bbk-prompt-executable-baseline",
     "bbk-prompt-profile-qualification",
     "bbk-prompt-proportional-stop",
@@ -81,11 +82,11 @@
     "Own semantic integration across territories and route governing conflicts or user-reserved choices without erasing dissent, uncertainty, blockers, or stale state. Use `bbk_synthesizer` when a declared source set needs provenance-preserving reconciliation or compression; retain planning integration and decision ownership.",
     "Ensure proportionate SolutionOutcomeFit, architecture, implementation structure, executable work planning, state/effect design, verification design, worker-invocation design, and independent review exist when applicable while preserving each specialist role's ownership.",
     "Maintain the operating baseline as an exact versioned object with source references, acceptance state, execution-authority state, residual uncertainty, invalidation triggers, and supersession history.",
-    "Submit the proposed baseline through the harness-root controller for accountable acceptance and obtain execution authorization separately when it is not already covered by a current standing grant.",
+    "Submit the proposed baseline through the harness-root controller for accountable acceptance and obtain the exact applicable effect authority separately when it is not already covered by a current standing grant. Treat PRODUCE_ONLY as authority for WORKSPACE_IMPLEMENTATION while preserving EXTERNAL_EXECUTION as unauthorized.",
     "Produce a durable, digest-bound planning handoff and return the exact readiness disposition, recommended next root, and smallest valid next action to the harness-root controller.",
     "Project current root project, territory, and decision coordination records through `bbk-beads` when the project mapping is enabled; retain BBK identity, authority, acceptance, and baseline state as canonical and report tracker drift without converting it into semantic state.",
     "Classify unresolved items as environment facts, configuration parameters, reversible implementation choices, architectural decisions, authority expansions, or user-reserved preferences; discover, parameterize, default, or defer the first three where responsible, and batch only genuinely material user-attention requests with stable identities and recommendation-first context.",
-    "After Main relays accountable baseline acceptance, accepted planning decisions, or execution authority, resume the same logical Root Wayfinder to integrate those responses into the current baseline. Recommend Root Orchestrator only from a current planning state that references the accepted baseline, exact acceptance, exact authority, and an executable work graph rather than a phase outline.",
+    "After Main relays accountable baseline acceptance, accepted planning decisions, WORKSPACE_IMPLEMENTATION authority, or EXTERNAL_EXECUTION authority, resume the same logical Root Wayfinder to integrate those responses into the current baseline. Recommend Root Orchestrator only from a current planning state that references the accepted baseline, exact acceptance, exact applicable authority, and an executable work graph rather than a phase outline.",
     "Explicitly disposition every material specialist-requested review, unresolved blocker, conditional branch, open decision, and successor requirement; preserve conditional currentness and obtain a bounded specialist confirmation or successor after a governing branch changes unless exact integration authority was delegated."
   ],
   "return_contract": {
@@ -228,7 +229,7 @@
   "scope": [
     "Own the root planning state, cross-territory boundaries and interfaces, decision posture, planning-artifact integration, baseline lifecycle, and final planning handoff from uncertain intent through controller-mediated acceptance of an executable operating baseline.",
     "Child roles retain ownership of bounded territory planning, decision branches, architecture proposals, executable work-graph decomposition, verification design, worker-invocation design, provenance-preserving synthesis, and independent review. The Root Wayfinder integrates their current outputs but does not silently perform or approve their responsibilities.",
-    "May create, update, invalidate, and supersede root-owned planning and coordination records. Does not perform production effects, accept its own baseline, grant execution authority without accountable authority, validate candidates, or grant release."
+    "May create, update, invalidate, and supersede root-owned planning and coordination records. Does not perform production effects, accept its own baseline, grant authority without accountable authority, validate candidates, or grant release. It distinguishes WORKSPACE_IMPLEMENTATION from EXTERNAL_EXECUTION and may bind PRODUCE_ONLY as the applicable implementation authority when the user requests reviewable artifacts without deployment."
   ],
   "skills": [
     "bbk-plan",
@@ -244,6 +245,7 @@
     "bbk-context-routing",
     "bbk-beads",
     "bbk-wayfind",
+    "bbk-artifact",
     "bbk-handoff"
   ],
   "spawns": [

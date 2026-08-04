@@ -17,6 +17,7 @@ import contextlib
 import ctypes
 import datetime as dt
 import errno
+import fnmatch
 import hashlib
 import json
 import os
@@ -45,6 +46,34 @@ MANIFEST_FILE = "bbk-package-manifest.json"
 RECEIPT_FILE = "bbk-seal-receipt.json"
 PROFILE_REGISTRY = "spec/contracts/artifact-package-profile-registry.json"
 GENERATED_FILES = frozenset({PACKAGE_FILE, MANIFEST_FILE, RECEIPT_FILE})
+DEFAULT_ARTIFACT_ROOT = Path(".bbk") / "artifacts"
+DEFAULT_SEALED_DIR = "sealed"
+DEFAULT_PUBLICATION_DIR = "publications"
+DEFAULT_CURRENT_DIR = "current"
+DEFAULT_SOFTWARE_EXCLUDED_PARTS = frozenset({
+    ".git", ".jj", ".bbk", ".bbk-kit", ".hg", ".svn",
+    ".pytest_cache", ".mypy_cache", ".ruff_cache", ".tox", ".nox",
+    ".venv", "venv", "env", "node_modules", "__pycache__",
+    "build", "dist", "coverage", ".coverage",
+})
+DEFAULT_SOFTWARE_EXCLUDED_SUFFIXES = (".pyc", ".pyo", ".tmp", ".swp", ".swo")
+MUTABLE_COORDINATION_BASENAMES = frozenset({
+    "status.json",
+    "current.json",
+    "active.json",
+    "latest.json",
+    "planning-readiness.json",
+    "package-index.json",
+    "artifact-index.json",
+    "execution-state.json",
+})
+MUTABLE_COORDINATION_SUFFIXES = (
+    "-status.json",
+    "-current.json",
+    "-active.json",
+    "-latest.json",
+    "-index.json",
+)
 AUTHORITY_BOUNDARY = (
     "This receipt proves exact stored bytes and declared local reference closure only; "
     "it does not establish semantic acceptance, authorization, independent review, "
@@ -1387,6 +1416,1323 @@ def seal_draft(
             shutil.rmtree(stage, ignore_errors=True)
 
 
+def _safe_filename_token(value: Any) -> str:
+    raw = str(value or "").strip()
+    if _SAFE_ID.fullmatch(raw):
+        return raw
+    cleaned = re.sub(r"[^A-Za-z0-9._-]+", "-", raw).strip(".-_")
+    if cleaned and _SAFE_ID.fullmatch(cleaned[:128]):
+        return cleaned[:128]
+    return sha256_bytes(raw.encode("utf-8"))[:16]
+
+
+def _path_is_within(path: Path, parent: Path) -> bool:
+    try:
+        path.resolve(strict=False).relative_to(parent.resolve(strict=False))
+        return True
+    except ValueError:
+        return False
+
+
+def _sealed_tree_snapshot(root: Path) -> dict[str, Any]:
+    """Return a deterministic identity for every stored file in a sealed tree."""
+    files: list[dict[str, Any]] = []
+    for candidate in sorted(root.rglob("*"), key=lambda item: item.relative_to(root).as_posix()):
+        relative = candidate.relative_to(root).as_posix()
+        if candidate.is_symlink():
+            raise ArtifactPackageError(_operation_error(
+                "bbk.artifact-package-finalize-result.v1",
+                "PACKAGE_FINALIZE_SEALED_SYMLINK",
+                "Finalization found a symbolic link inside the sealed package.",
+                path=relative,
+                remediation="Quarantine the exact output and rerun finalization from a clean admitted draft.",
+            ))
+        if candidate.is_file():
+            files.append({
+                "path": relative,
+                "bytes": candidate.stat().st_size,
+                "sha256": sha256_file(candidate),
+            })
+    content = {"schema": "bbk.artifact-package-stored-tree.v1", "files": files}
+    return {
+        "fileCount": len(files),
+        "sha256": sha256_bytes(identity_json_bytes(content)),
+        "files": files,
+    }
+
+
+def _mutable_coordination_path(raw: str) -> bool:
+    pure = PurePosixPath(raw)
+    name = pure.name.lower()
+    if name in MUTABLE_COORDINATION_BASENAMES:
+        return True
+    return any(name.endswith(suffix) for suffix in MUTABLE_COORDINATION_SUFFIXES)
+
+
+def _finalization_mutable_artifacts(descriptor: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """Classify predictable live-state artifacts that should remain external.
+
+    This is intentionally a narrow mechanical classifier.  It does not try to
+    infer semantic mutability from arbitrary prose.  It catches the recurring
+    BBK failure mode where live status/current/index records are included in an
+    immutable subject package and then rewritten to announce that package.
+    """
+    result: list[dict[str, Any]] = []
+    known_schemas = {
+        "bbk.status.v1",
+        "bbk.planning-readiness.v1",
+        "bbk.execution-status.v1",
+        "bbk.package-index.v1",
+        "bbk.artifact-index.v1",
+        "bbk.current-package.v1",
+    }
+    for raw in descriptor.get("artifacts", []):
+        if not isinstance(raw, Mapping):
+            continue
+        path = raw.get("path")
+        if not isinstance(path, str):
+            continue
+        schema = raw.get("schema")
+        reasons: list[str] = []
+        if _mutable_coordination_path(path):
+            reasons.append("path-vocabulary")
+        if isinstance(schema, str) and schema in known_schemas:
+            reasons.append("schema-vocabulary")
+        if reasons:
+            result.append({
+                "artifactId": raw.get("artifactId"),
+                "path": path,
+                "schema": schema,
+                "reasons": reasons,
+            })
+    return sorted(result, key=lambda item: str(item.get("path")))
+
+
+def _source_snapshot(records: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    normalized = [
+        {
+            "path": str(item["path"]),
+            "bytes": int(item["bytes"]),
+            "sha256": str(item["sha256"]),
+        }
+        for item in sorted(records, key=lambda value: str(value["path"]))
+    ]
+    return {
+        "schema": "bbk.artifact-source-snapshot.v1",
+        "fileCount": len(normalized),
+        "sha256": sha256_bytes(identity_json_bytes(normalized)),
+        "files": normalized,
+    }
+
+
+def _snapshot_project_paths(project: Path, paths: Sequence[str]) -> dict[str, Any]:
+    records: list[dict[str, Any]] = []
+    for raw in sorted(set(paths)):
+        try:
+            physical = resolve_local_path(project, raw, must_exist=True)
+        except ValueError as exc:
+            raise ArtifactPackageError(_operation_error(
+                "bbk.artifact-source-snapshot.v1",
+                "PACKAGE_SOURCE_PATH_INVALID",
+                str(exc),
+                path=raw,
+                remediation="Keep every selected implementation file inside the project root and remove symbolic links.",
+            )) from exc
+        if physical.is_symlink() or not physical.is_file():
+            raise ArtifactPackageError(_operation_error(
+                "bbk.artifact-source-snapshot.v1",
+                "PACKAGE_SOURCE_NOT_REGULAR_FILE",
+                "A selected implementation source is not a regular physical file.",
+                path=raw,
+                remediation="Replace the selected path with a regular file inside the project root.",
+            ))
+        records.append({"path": raw, "bytes": physical.stat().st_size, "sha256": sha256_file(physical)})
+    return _source_snapshot(records)
+
+
+def _software_path_excluded(relative: PurePosixPath, excludes: Sequence[str]) -> bool:
+    # Exclusion vocabulary is intentionally case-insensitive so Windows and
+    # case-sensitive qualification hosts select the same logical software
+    # tree. User-supplied glob patterns retain exact fnmatch semantics.
+    if any(part.lower() in DEFAULT_SOFTWARE_EXCLUDED_PARTS for part in relative.parts):
+        return True
+    if relative.name.lower().endswith(DEFAULT_SOFTWARE_EXCLUDED_SUFFIXES):
+        return True
+    rendered = relative.as_posix()
+    return any(fnmatch.fnmatchcase(rendered, pattern) for pattern in excludes)
+
+
+def _software_path_included(relative: PurePosixPath, includes: Sequence[str]) -> bool:
+    if not includes:
+        return True
+    rendered = relative.as_posix()
+    return any(fnmatch.fnmatchcase(rendered, pattern) for pattern in includes)
+
+
+def _collect_software_sources(
+    project: Path,
+    sources: Sequence[Path | str],
+    *,
+    includes: Sequence[str] = (),
+    excludes: Sequence[str] = (),
+) -> list[str]:
+    schema = "bbk.artifact-package-finalize-result.v1"
+    if not sources:
+        raise ArtifactPackageError(_operation_error(
+            schema,
+            "PACKAGE_FINALIZE_SOURCE_REQUIRED",
+            "One-shot software finalization requires at least one --source path.",
+            remediation="Pass --source . for the project implementation, or repeat --source for the exact files/directories to publish.",
+            details={"example_command": "bbk artifact finalize --root . --package-id my-tool --revision 1 --source ."},
+        ))
+    selected: set[str] = set()
+    try:
+        project_physical = project.resolve(strict=True)
+    except (OSError, ValueError) as exc:
+        raise ArtifactPackageError(_operation_error(
+            schema,
+            "PACKAGE_FINALIZE_PROJECT_ROOT_INVALID",
+            f"Artifact finalization project root does not resolve: {exc}",
+            path=str(project),
+            remediation="Restore the project root or provide the exact current --root before checking the source selection.",
+        )) from exc
+    if not project_physical.is_dir():
+        raise ArtifactPackageError(_operation_error(
+            schema,
+            "PACKAGE_FINALIZE_PROJECT_ROOT_INVALID",
+            "Artifact finalization project root is not a directory.",
+            path=str(project_physical),
+            remediation="Provide an existing project root.",
+        ))
+    for source in sources:
+        raw = Path(source).expanduser()
+        if not raw.is_absolute():
+            raw = project_physical / raw
+        if raw.is_symlink():
+            raise ArtifactPackageError(_operation_error(
+                schema,
+                "PACKAGE_FINALIZE_SOURCE_SYMLINK",
+                "One-shot software finalization refuses symbolic-link source roots.",
+                path=str(raw),
+                remediation="Select the physical file or directory inside the project root.",
+            ))
+        try:
+            resolved = raw.resolve(strict=True)
+            relative_root = resolved.relative_to(project_physical)
+        except (OSError, ValueError) as exc:
+            raise ArtifactPackageError(_operation_error(
+                schema,
+                "PACKAGE_FINALIZE_SOURCE_OUTSIDE_PROJECT",
+                f"A selected source does not resolve inside the project root: {exc}",
+                path=str(raw),
+                remediation="Choose existing source files or directories contained by --root.",
+            )) from exc
+        candidates: list[Path] = []
+        if resolved.is_file():
+            candidates.append(resolved)
+        elif resolved.is_dir():
+            for base, directories, files in os.walk(resolved, followlinks=False):
+                base_path = Path(base)
+                kept_dirs: list[str] = []
+                for name in sorted(directories):
+                    child = base_path / name
+                    child_rel = PurePosixPath(child.relative_to(project_physical).as_posix())
+                    # Ignore excluded cache/vendor/build trees before
+                    # inspecting their internal link layout.  A symlink that
+                    # is itself in the selected source set remains forbidden.
+                    if _software_path_excluded(child_rel, excludes):
+                        continue
+                    if child.is_symlink():
+                        raise ArtifactPackageError(_operation_error(
+                            schema,
+                            "PACKAGE_FINALIZE_SOURCE_SYMLINK",
+                            "One-shot software finalization refuses symbolic links inside selected source directories.",
+                            path=child_rel.as_posix(),
+                            remediation="Replace the symbolic link with a regular file/directory or narrow the selected source set.",
+                        ))
+                    kept_dirs.append(name)
+                directories[:] = kept_dirs
+                for name in sorted(files):
+                    child = base_path / name
+                    child_rel = PurePosixPath(child.relative_to(project_physical).as_posix())
+                    if _software_path_excluded(child_rel, excludes):
+                        continue
+                    if child.is_symlink():
+                        raise ArtifactPackageError(_operation_error(
+                            schema,
+                            "PACKAGE_FINALIZE_SOURCE_SYMLINK",
+                            "One-shot software finalization refuses symbolic links inside selected source directories.",
+                            path=child_rel.as_posix(),
+                            remediation="Replace the symbolic link with a regular file or narrow the selected source set.",
+                        ))
+                    if child.is_file() and _software_path_included(child_rel, includes):
+                        candidates.append(child)
+        else:
+            raise ArtifactPackageError(_operation_error(
+                schema,
+                "PACKAGE_FINALIZE_SOURCE_NOT_FILE_OR_DIRECTORY",
+                "A selected source is neither a regular file nor directory.",
+                path=str(resolved),
+                remediation="Select regular implementation files or directories.",
+            ))
+        if resolved.is_file():
+            rel = PurePosixPath(relative_root.as_posix())
+            if not _software_path_excluded(rel, excludes) and _software_path_included(rel, includes):
+                candidates = [resolved]
+            else:
+                candidates = []
+        for candidate in candidates:
+            selected.add(candidate.relative_to(project_physical).as_posix())
+    if not selected:
+        raise ArtifactPackageError(_operation_error(
+            schema,
+            "PACKAGE_FINALIZE_SOURCE_SET_EMPTY",
+            "The one-shot software source selection produced no files.",
+            remediation="Adjust --source, --include, or --exclude so at least one implementation file is selected.",
+        ))
+    return sorted(selected)
+
+
+def _artifact_role_for_source(relative: str) -> str:
+    path_value = PurePosixPath(relative)
+    lowered_parts = {part.lower() for part in path_value.parts}
+    suffix = path_value.suffix.lower()
+    name = path_value.name.lower()
+    if "tests" in lowered_parts or "test" in lowered_parts or "fixtures" in lowered_parts or name.startswith("test_"):
+        return "fixture"
+    if name.startswith("readme") or suffix in {".md", ".rst", ".adoc", ".txt"} or "docs" in lowered_parts:
+        return "documentation"
+    return "source"
+
+
+def _artifact_id_for_source(relative: str) -> str:
+    stem = re.sub(r"[^A-Za-z0-9._-]+", "-", PurePosixPath(relative).stem).strip("._-")[:48]
+    stem = stem or "file"
+    return f"{stem}-{sha256_bytes(relative.encode('utf-8'))[:16]}"
+
+
+def _software_source_selection(
+    project: Path,
+    sources: Sequence[Path | str],
+    *,
+    includes: Sequence[str],
+    excludes: Sequence[str],
+) -> dict[str, Any]:
+    normalized_sources: list[str] = []
+    project_physical = project.resolve(strict=True)
+    for source in sources:
+        raw = Path(source).expanduser()
+        if not raw.is_absolute():
+            raw = project_physical / raw
+        if raw.is_symlink():
+            raise ArtifactPackageError(_operation_error(
+                "bbk.artifact-package-finalize-result.v1",
+                "PACKAGE_FINALIZE_SOURCE_SYMLINK",
+                "One-shot software finalization refuses symbolic-link source roots.",
+                path=str(raw),
+                remediation="Select the physical file or directory inside the project root.",
+            ))
+        try:
+            resolved = raw.resolve(strict=True)
+            relative = resolved.relative_to(project_physical).as_posix()
+        except (OSError, ValueError) as exc:
+            raise ArtifactPackageError(_operation_error(
+                "bbk.artifact-package-finalize-result.v1",
+                "PACKAGE_FINALIZE_SOURCE_OUTSIDE_PROJECT",
+                f"A selected source does not resolve inside the project root: {exc}",
+                path=str(raw),
+                remediation="Choose existing source files or directories contained by --root.",
+            )) from exc
+        normalized_sources.append(relative or ".")
+    return {
+        "schema": "bbk.artifact-source-selection.v1",
+        "sources": list(dict.fromkeys(normalized_sources)),
+        "includes": list(dict.fromkeys(str(value).replace("\\", "/") for value in includes)),
+        "excludes": list(dict.fromkeys(str(value).replace("\\", "/") for value in excludes)),
+    }
+
+
+def finalize_source_set(
+    *,
+    project_root: Path | str,
+    package_id: str,
+    revision: str,
+    sources: Sequence[Path | str],
+    includes: Sequence[str] = (),
+    excludes: Sequence[str] = (),
+    subject_kind: str = "software-implementation",
+    subject_id: str | None = None,
+    subject_revision: str | int | None = None,
+    purpose: str | None = None,
+    output_root: Path | str | None = None,
+    publication_root: Path | str | None = None,
+    registry_path: Path | None = None,
+    write_current_pointer: bool = True,
+    recover_stale_lock: bool = False,
+    finalized_at_utc: str | None = None,
+) -> dict[str, Any]:
+    """Create and finalize a generic package from ordinary project files."""
+    schema = "bbk.artifact-package-finalize-result.v1"
+    try:
+        project = Path(project_root).expanduser().resolve(strict=True)
+    except (OSError, ValueError) as exc:
+        raise ArtifactPackageError(_operation_error(
+            schema,
+            "PACKAGE_FINALIZE_PROJECT_ROOT_INVALID",
+            f"Artifact finalization project root does not resolve: {exc}",
+            path=str(project_root),
+            remediation="Provide an existing project root.",
+        )) from exc
+    if not project.is_dir():
+        raise ArtifactPackageError(_operation_error(
+            schema,
+            "PACKAGE_FINALIZE_PROJECT_ROOT_INVALID",
+            "Artifact finalization project root is not a directory.",
+            path=str(project),
+            remediation="Provide an existing project root.",
+        ))
+    if not _SAFE_ID.fullmatch(str(package_id)):
+        raise ArtifactPackageError(_operation_error(
+            schema,
+            "PACKAGE_FINALIZE_PACKAGE_ID_INVALID",
+            "The package ID must satisfy the BBK safe identifier vocabulary.",
+            path=str(package_id),
+            remediation="Use 1-128 letters, digits, dots, underscores, or hyphens, beginning with a letter or digit.",
+        ))
+    if not str(revision).strip():
+        raise ArtifactPackageError(_operation_error(
+            schema,
+            "PACKAGE_FINALIZE_REVISION_INVALID",
+            "The package revision must be non-empty.",
+            remediation="Provide --revision with a stable package revision.",
+        ))
+    selection = _software_source_selection(project, sources, includes=includes, excludes=excludes)
+    selected = _collect_software_sources(project, selection["sources"], includes=selection["includes"], excludes=selection["excludes"])
+    source_snapshot = _snapshot_project_paths(project, selected)
+    artifact_root = project / DEFAULT_ARTIFACT_ROOT
+    staging_parent = artifact_root / ".staging"
+    staging_parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="software-finalize-", dir=staging_parent) as raw_draft:
+        draft = Path(raw_draft)
+        artifacts: list[dict[str, Any]] = []
+        for relative in selected:
+            source = resolve_local_path(project, relative, must_exist=True)
+            destination = draft / PurePosixPath(relative)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(source, destination, follow_symlinks=False)
+            artifact: dict[str, Any] = {
+                "artifactId": _artifact_id_for_source(relative),
+                "path": relative,
+                "role": _artifact_role_for_source(relative),
+                "references": [],
+            }
+            artifacts.append(artifact)
+        staged_snapshot = _snapshot_project_paths(draft, selected)
+        current_selected = _collect_software_sources(
+            project, selection["sources"], includes=selection["includes"], excludes=selection["excludes"]
+        )
+        current_snapshot = _snapshot_project_paths(project, current_selected)
+        if selected != current_selected or source_snapshot != current_snapshot or source_snapshot != staged_snapshot:
+            raise ArtifactPackageError(_operation_error(
+                schema,
+                "PACKAGE_FINALIZE_SOURCE_CHANGED_DURING_STAGING",
+                "The selected implementation files changed while the one-shot package draft was being staged.",
+                path=str(project),
+                remediation="Stop concurrent writers, rerun tests, and retry finalization against a stable source tree.",
+                details={
+                    "before": source_snapshot,
+                    "after": current_snapshot,
+                    "staged": staged_snapshot,
+                    "selectedBefore": selected,
+                    "selectedAfter": current_selected,
+                },
+            ))
+        descriptor = {
+            "schema": "bbk.artifact-package-draft.v1",
+            "packageId": str(package_id),
+            "revision": str(revision),
+            "profile": {"id": "generic", "version": "1"},
+            "subject": {
+                "kind": str(subject_kind or "software-implementation"),
+                "id": str(subject_id or package_id),
+                "revision": subject_revision if subject_revision is not None else str(revision),
+            },
+            "predecessor": None,
+            "artifacts": artifacts,
+            "metadata": {
+                "purpose": purpose or "One-shot immutable software implementation package.",
+                "sourceSnapshotSha256": source_snapshot["sha256"],
+                "sourceFileCount": source_snapshot["fileCount"],
+                "finalizationMode": "software-source-set",
+            },
+        }
+        atomic_write(draft / DRAFT_FILE, canonical_json_bytes(descriptor))
+        source_binding = {
+            "schema": "bbk.artifact-source-binding.v1",
+            "mode": "software-source-set",
+            # Publication receipts remain project-portable.  Freshness checks
+            # infer the project root from .bbk/artifacts/publications unless an
+            # explicit --root is supplied.
+            "projectRoot": ".",
+            "selection": selection,
+            "snapshot": source_snapshot,
+        }
+        result = finalize_draft(
+            draft,
+            output_root,
+            project_root=project,
+            publication_root=publication_root,
+            registry_path=registry_path,
+            write_current_pointer=write_current_pointer,
+            recover_stale_lock=recover_stale_lock,
+            finalized_at_utc=finalized_at_utc,
+            source_binding=source_binding,
+        )
+    final_selection_error: dict[str, Any] | None = None
+    try:
+        final_selected = _collect_software_sources(
+            project, selection["sources"], includes=selection["includes"], excludes=selection["excludes"]
+        )
+        final_snapshot = _snapshot_project_paths(project, final_selected)
+    except ArtifactPackageError as exc:
+        final_selected = []
+        final_snapshot = _source_snapshot([])
+        final_selection_error = exc.as_dict()
+    source_current = (
+        final_selection_error is None
+        and selected == final_selected
+        and final_snapshot == source_snapshot
+    )
+    result = dict(result)
+    result.update({
+        # The synthesized draft is intentionally ephemeral and has already
+        # been removed by TemporaryDirectory at this point.  Do not return a
+        # plausible-looking dead path to consumers.
+        "draftRoot": None,
+        "stagedDraftRemoved": True,
+        "finalizationMode": "software-source-set",
+        "sourceSnapshot": source_snapshot,
+        "sourceFreshness": "PASS" if source_current else "STALE",
+    })
+    if not source_current:
+        result.update({
+            "status": "REJECTED",
+            "code": "PACKAGE_FINALIZE_SOURCE_CHANGED_AFTER_PUBLICATION",
+            "message": "The immutable package was published, but its live source selection changed before finalization returned.",
+            "observedSourceSnapshot": final_snapshot,
+            "observedSourceSelection": final_selected,
+            "sourceSelectionError": final_selection_error,
+            "smallest_next_action": "Rerun tests and finalize a successor revision from the current stable source tree.",
+            "claims_not_established": [
+                "current implementation byte integrity",
+                "semantic acceptance",
+                "authorization",
+                "independent review",
+                "deployment readiness",
+            ],
+        })
+    return result
+
+
+def _artifact_metadata_project_root(path: Path) -> Path | None:
+    """Infer ``<project>`` from ``<project>/.bbk/artifacts/<kind>/<file>``."""
+    parent = path.parent
+    if parent.name not in {DEFAULT_PUBLICATION_DIR, DEFAULT_CURRENT_DIR}:
+        return None
+    artifacts = parent.parent
+    bbk = artifacts.parent
+    if artifacts.name != "artifacts" or bbk.name != ".bbk":
+        return None
+    return bbk.parent
+
+
+def _publication_project_root(publication_path: Path) -> Path | None:
+    """Infer the project root from the canonical publication location."""
+    try:
+        resolved = publication_path.resolve(strict=True)
+    except (OSError, ValueError):
+        return None
+    parents = resolved.parents
+    if (
+        len(parents) >= 4
+        and parents[0].name == DEFAULT_PUBLICATION_DIR
+        and parents[1].name == "artifacts"
+        and parents[2].name == ".bbk"
+    ):
+        return parents[3]
+    return None
+
+
+def verify_publication_freshness(
+    subject: Path | str,
+    *,
+    project_root: Path | str | None = None,
+    registry_path: Path | None = None,
+) -> dict[str, Any]:
+    """Verify an immutable package and, when bound, its current live source set."""
+    schema = "bbk.artifact-package-freshness-result.v1"
+    raw = Path(subject).expanduser()
+    try:
+        base = (
+            Path(project_root).expanduser().resolve(strict=True)
+            if project_root is not None
+            else Path.cwd().resolve(strict=True)
+        )
+    except (OSError, ValueError) as exc:
+        return _operation_error(
+            schema,
+            "PACKAGE_FRESHNESS_PROJECT_ROOT_INVALID",
+            f"Freshness project root does not resolve: {exc}",
+            path=str(project_root) if project_root is not None else str(Path.cwd()),
+            remediation="Provide an existing project root that owns the publication's live source set.",
+        )
+    if not raw.is_absolute():
+        raw = base / raw
+    try:
+        target = raw.resolve(strict=True)
+    except (OSError, ValueError) as exc:
+        return _operation_error(
+            schema,
+            "PACKAGE_FRESHNESS_SUBJECT_INVALID",
+            f"Freshness subject does not resolve: {exc}",
+            path=str(raw),
+            remediation="Provide a publication receipt, current pointer, or sealed package directory.",
+        )
+    publication: dict[str, Any] | None = None
+    publication_path: Path | None = None
+    pointer: dict[str, Any] | None = None
+    pointer_path: Path | None = None
+    metadata_findings: list[dict[str, Any]] = []
+    if target.is_dir():
+        sealed_root = target
+    else:
+        try:
+            value = load_path(target)
+        except StrictJsonError as exc:
+            return {
+                "schema": schema,
+                "status": "REJECTED",
+                "code": exc.code,
+                "message": exc.message,
+                "diagnostic": exc.as_dict(),
+                "smallest_next_action": "Repair or replace the invalid JSON freshness subject.",
+            }
+        if not isinstance(value, dict):
+            return _operation_error(schema, "PACKAGE_FRESHNESS_SUBJECT_INVALID", "Freshness subject JSON must be an object.", path=str(target))
+        if value.get("schema") == "bbk.artifact-package-current-pointer.v1":
+            pointer = value
+            pointer_path = target
+            pointer_schema_findings = validate_schema_instance(pointer, pointer["schema"])
+            if pointer_schema_findings:
+                return _operation_error(
+                    schema,
+                    "PACKAGE_FRESHNESS_POINTER_INVALID",
+                    "Current pointer does not satisfy its canonical schema.",
+                    path=str(target),
+                    details={"findings": pointer_schema_findings},
+                )
+            raw_publication = value.get("publication")
+            if not isinstance(raw_publication, str) or not raw_publication:
+                return _operation_error(schema, "PACKAGE_FRESHNESS_POINTER_INVALID", "Current pointer has no publication reference.", path=str(target))
+            candidate = Path(raw_publication)
+            if not candidate.is_absolute():
+                inferred = _artifact_metadata_project_root(target)
+                candidate = (inferred or base) / candidate
+            try:
+                publication_path = candidate.resolve(strict=True)
+                publication = load_path(publication_path)
+            except (OSError, ValueError, StrictJsonError) as exc:
+                return _operation_error(schema, "PACKAGE_FRESHNESS_PUBLICATION_INVALID", f"Current pointer publication cannot be read: {exc}", path=str(candidate))
+        elif value.get("schema") == "bbk.artifact-package-publication.v1":
+            publication = value
+            publication_path = target
+        else:
+            return _operation_error(schema, "PACKAGE_FRESHNESS_SUBJECT_INVALID", "JSON subject is neither a BBK publication receipt nor current pointer.", path=str(target))
+        if not isinstance(publication, dict):
+            return _operation_error(schema, "PACKAGE_FRESHNESS_PUBLICATION_INVALID", "Publication receipt is not an object.", path=str(publication_path))
+        publication_schema_findings = validate_schema_instance(publication, "bbk.artifact-package-publication.v1")
+        if publication_schema_findings:
+            return _operation_error(
+                schema,
+                "PACKAGE_FRESHNESS_PUBLICATION_INVALID",
+                "Publication receipt does not satisfy its canonical schema.",
+                path=str(publication_path),
+                details={"findings": publication_schema_findings},
+            )
+        if pointer is not None and publication_path is not None:
+            observed_publication_sha256 = sha256_file(publication_path)
+            if pointer.get("publicationSha256") != observed_publication_sha256:
+                metadata_findings.append({
+                    "code": "PACKAGE_PUBLICATION_DIGEST_MISMATCH",
+                    "path": str(publication_path),
+                    "expected": pointer.get("publicationSha256"),
+                    "observed": observed_publication_sha256,
+                })
+            for key in ("packageId", "revision", "contentSha256"):
+                if pointer.get(key) != publication.get(key):
+                    metadata_findings.append({
+                        "code": "PACKAGE_POINTER_PUBLICATION_IDENTITY_MISMATCH",
+                        "path": str(pointer_path),
+                        "field": key,
+                        "expected": pointer.get(key),
+                        "observed": publication.get(key),
+                    })
+        raw_sealed = publication.get("sealedRoot")
+        if not isinstance(raw_sealed, str) or not raw_sealed:
+            return _operation_error(schema, "PACKAGE_FRESHNESS_PUBLICATION_INVALID", "Publication receipt has no sealedRoot.", path=str(publication_path))
+        binding = publication.get("sourceBinding")
+        inferred_project = _publication_project_root(publication_path) if publication_path is not None else None
+        if project_root is None and inferred_project is not None:
+            base = inferred_project
+        elif isinstance(binding, Mapping) and isinstance(binding.get("projectRoot"), str):
+            publication_project = Path(str(binding["projectRoot"])).expanduser()
+            if project_root is None:
+                base = (
+                    publication_project.resolve(strict=False)
+                    if publication_project.is_absolute()
+                    else (base / publication_project).resolve(strict=False)
+                )
+        sealed_root = Path(raw_sealed)
+        if not sealed_root.is_absolute():
+            sealed_root = base / sealed_root
+        sealed_root = sealed_root.resolve(strict=True)
+    verification = verify_package(sealed_root, registry_path=registry_path)
+    sealed_status = "PASS" if verification.get("status") == "PASS" else "REJECTED"
+    if isinstance(publication, Mapping) and sealed_status == "PASS":
+        for key in ("packageId", "revision", "contentSha256", "manifestSha256"):
+            if publication.get(key) != verification.get(key):
+                metadata_findings.append({
+                    "code": "PACKAGE_PUBLICATION_SEALED_IDENTITY_MISMATCH",
+                    "path": str(publication_path) if publication_path else str(sealed_root),
+                    "field": key,
+                    "expected": publication.get(key),
+                    "observed": verification.get(key),
+                })
+        observed_tree = _sealed_tree_snapshot(sealed_root)
+        if publication.get("sealedTreeSha256") != observed_tree.get("sha256"):
+            metadata_findings.append({
+                "code": "PACKAGE_PUBLICATION_TREE_DIGEST_MISMATCH",
+                "path": str(sealed_root),
+                "expected": publication.get("sealedTreeSha256"),
+                "observed": observed_tree.get("sha256"),
+            })
+    source_status = "NOT_BOUND"
+    source_binding = publication.get("sourceBinding") if isinstance(publication, dict) else None
+    source_findings: list[dict[str, Any]] = []
+    observed_snapshot: dict[str, Any] | None = None
+    expected_snapshot: Mapping[str, Any] | None = None
+    if isinstance(source_binding, Mapping):
+        expected_snapshot = source_binding.get("snapshot") if isinstance(source_binding.get("snapshot"), Mapping) else None
+        source_project_raw = source_binding.get("projectRoot")
+        files = expected_snapshot.get("files") if isinstance(expected_snapshot, Mapping) else None
+        if not isinstance(source_project_raw, str) or not isinstance(files, list):
+            source_status = "REJECTED"
+            source_findings.append({"code": "PACKAGE_SOURCE_BINDING_INVALID", "message": "Publication source binding is malformed."})
+        else:
+            expected_records = [
+                {
+                    "path": str(item.get("path")),
+                    "bytes": int(item.get("bytes", -1)),
+                    "sha256": str(item.get("sha256")),
+                }
+                for item in files
+                if isinstance(item, Mapping)
+            ]
+            recomputed_expected = _source_snapshot(expected_records)
+            if (
+                len(expected_records) != len(files)
+                or expected_snapshot.get("fileCount") != recomputed_expected["fileCount"]
+                or expected_snapshot.get("sha256") != recomputed_expected["sha256"]
+                or expected_snapshot.get("files") != recomputed_expected["files"]
+            ):
+                source_findings.append({
+                    "code": "PACKAGE_SOURCE_SNAPSHOT_INVALID",
+                    "message": "Publication source snapshot identity is internally inconsistent.",
+                    "expected": dict(expected_snapshot),
+                    "observed": recomputed_expected,
+                })
+            if project_root is not None:
+                source_project = Path(project_root).expanduser().resolve(strict=False)
+            else:
+                bound_root = Path(source_project_raw).expanduser()
+                publication_base = (
+                    _publication_project_root(publication_path)
+                    if publication_path is not None
+                    else None
+                ) or base
+                source_project = (
+                    bound_root.resolve(strict=False)
+                    if bound_root.is_absolute()
+                    else (publication_base / bound_root).resolve(strict=False)
+                )
+            selection = source_binding.get("selection")
+            records: list[dict[str, Any]] = []
+            current_paths: list[str]
+            if isinstance(selection, Mapping) and isinstance(selection.get("sources"), list):
+                try:
+                    current_paths = _collect_software_sources(
+                        source_project,
+                        [str(value) for value in selection.get("sources", [])],
+                        includes=[str(value) for value in selection.get("includes", [])],
+                        excludes=[str(value) for value in selection.get("excludes", [])],
+                    )
+                except (ArtifactPackageError, OSError, ValueError) as exc:
+                    diagnostic = exc.as_dict() if isinstance(exc, ArtifactPackageError) else None
+                    source_findings.append({
+                        "code": "PACKAGE_SOURCE_SELECTION_INVALID",
+                        "message": str(exc),
+                        "diagnostic": diagnostic,
+                    })
+                    current_paths = []
+            else:
+                # Compatibility with alpha.16.1 development receipts created
+                # before selectors were persisted: check the exact bound files.
+                current_paths = [
+                    str(item.get("path")) for item in files
+                    if isinstance(item, Mapping) and isinstance(item.get("path"), str)
+                ]
+            for relative in current_paths:
+                try:
+                    physical = resolve_local_path(source_project, relative, must_exist=True)
+                    if physical.is_symlink() or not physical.is_file():
+                        raise ValueError("not a regular physical file")
+                    records.append({"path": relative, "bytes": physical.stat().st_size, "sha256": sha256_file(physical)})
+                except (OSError, ValueError) as exc:
+                    source_findings.append({"code": "PACKAGE_SOURCE_FILE_MISSING", "path": relative, "message": str(exc)})
+            observed_snapshot = _source_snapshot(records)
+            if source_findings:
+                source_status = "STALE"
+            elif observed_snapshot == expected_snapshot:
+                source_status = "PASS"
+            else:
+                source_status = "STALE"
+                expected_by_path = {str(item["path"]): item for item in files if isinstance(item, Mapping) and isinstance(item.get("path"), str)}
+                observed_by_path = {str(item["path"]): item for item in observed_snapshot["files"]}
+                for relative in sorted(set(expected_by_path) | set(observed_by_path)):
+                    if expected_by_path.get(relative) != observed_by_path.get(relative):
+                        source_findings.append({
+                            "code": "PACKAGE_SOURCE_FILE_CHANGED",
+                            "path": relative,
+                            "expected": expected_by_path.get(relative),
+                            "observed": observed_by_path.get(relative),
+                        })
+    status = (
+        "PASS"
+        if sealed_status == "PASS" and source_status in {"PASS", "NOT_BOUND"} and not metadata_findings
+        else "REJECTED"
+    )
+    return {
+        "schema": schema,
+        "status": status,
+        "sealedStatus": sealed_status,
+        "sourceStatus": source_status,
+        "code": None if status == "PASS" else "PACKAGE_FINALIZATION_SOURCE_STALE",
+        "completionClaims": ["BYTE_INTEGRITY_VERIFIED"] if status == "PASS" else [],
+        "publicationReceipt": str(publication_path) if publication_path else None,
+        "packageId": publication.get("packageId") if isinstance(publication, Mapping) else verification.get("packageId"),
+        "revision": publication.get("revision") if isinstance(publication, Mapping) else verification.get("revision"),
+        "contentSha256": publication.get("contentSha256") if isinstance(publication, Mapping) else verification.get("contentSha256"),
+        "manifestSha256": publication.get("manifestSha256") if isinstance(publication, Mapping) else verification.get("manifestSha256"),
+        "sealedRoot": str(sealed_root),
+        "verification": verification,
+        "expectedSourceSnapshot": dict(expected_snapshot) if isinstance(expected_snapshot, Mapping) else None,
+        "observedSourceSnapshot": observed_snapshot,
+        "metadataFindings": metadata_findings,
+        "findings": [*metadata_findings, *source_findings],
+        "smallest_next_action": (
+            "Consume the exact sealed package; its bound live source set is unchanged."
+            if status == "PASS"
+            else "Rerun local verification and finalize a successor revision from the current source tree."
+        ),
+        "claims_not_established": [
+            "semantic acceptance",
+            "authorization",
+            "independent review",
+            "deployment readiness",
+            "live acceptance",
+        ],
+    }
+
+
+def _finalize_project_root(draft: Path, explicit: Path | str | None) -> Path:
+    if explicit is not None:
+        root = Path(explicit).expanduser().resolve(strict=True)
+        if not root.is_dir():
+            raise ValueError(f"artifact finalization project root is not a directory: {root}")
+        return root
+    candidates: list[Path] = []
+    for seed in (Path.cwd(), draft):
+        resolved = seed.resolve(strict=True)
+        if resolved.is_file():
+            resolved = resolved.parent
+        candidates.extend([resolved, *resolved.parents])
+    seen: set[Path] = set()
+    for candidate in candidates:
+        if candidate in seen:
+            continue
+        seen.add(candidate)
+        if (candidate / ".bbk" / "config.json").is_file() or (candidate / ".bbk").is_dir():
+            return candidate
+    return Path.cwd().resolve(strict=True)
+
+
+def _file_restore_snapshot(path: Path) -> dict[str, Any] | None:
+    """Capture exact bytes and mode for one mutable external pointer."""
+    if path.is_symlink():
+        raise ArtifactPackageError(_operation_error(
+            "bbk.artifact-package-finalize-result.v1",
+            "PACKAGE_FINALIZE_EXTERNAL_SYMLINK",
+            "Finalization refuses to publish through a symbolic-link external metadata path.",
+            path=str(path),
+            remediation="Remove the symbolic link and use a regular publication/current-pointer path outside the sealed tree.",
+        ))
+    if not path.exists():
+        return None
+    if not path.is_file():
+        raise ArtifactPackageError(_operation_error(
+            "bbk.artifact-package-finalize-result.v1",
+            "PACKAGE_FINALIZE_EXTERNAL_NOT_FILE",
+            "Finalization requires an existing external metadata target to be a regular file.",
+            path=str(path),
+            remediation="Move or remove the non-file target, then rerun finalization.",
+        ))
+    return {
+        "bytes": path.read_bytes(),
+        "mode": stat.S_IMODE(path.stat().st_mode),
+    }
+
+
+def _restore_external_metadata(path: Path, snapshot: Mapping[str, Any] | None) -> None:
+    """Best-effort rollback for metadata outside an immutable sealed package."""
+    if snapshot is None:
+        if path.is_symlink() or path.is_file():
+            path.unlink()
+            _fsync_dir(path.parent)
+        return
+    atomic_write(path, bytes(snapshot["bytes"]), mode=int(snapshot["mode"]))
+
+
+def finalize_draft(
+    draft_root: Path | str,
+    output_root: Path | str | None = None,
+    *,
+    project_root: Path | str | None = None,
+    publication_root: Path | str | None = None,
+    registry_path: Path | None = None,
+    allow_mutable_coordination: bool = False,
+    write_current_pointer: bool = True,
+    recover_stale_lock: bool = False,
+    finalized_at_utc: str | None = None,
+    source_binding: Mapping[str, Any] | None = None,
+    _test_fail_phase: str | None = None,
+) -> dict[str, Any]:
+    """Finalize one draft into an immutable project-local sealed package.
+
+    The immutable package is published under ``.bbk/artifacts/sealed`` by
+    default.  The publication receipt and mutable current pointer are written
+    beside, never inside, the sealed package.  Finalization rejects common live
+    coordination/status artifacts by default because updating them after seal
+    would invalidate the package that contains them.
+    """
+    schema = "bbk.artifact-package-finalize-result.v1"
+    explicit_project: Path | None = None
+    if project_root is not None:
+        try:
+            explicit_project = Path(project_root).expanduser().resolve(strict=True)
+        except (OSError, ValueError) as exc:
+            raise ArtifactPackageError(_operation_error(
+                schema,
+                "PACKAGE_FINALIZE_PROJECT_ROOT_INVALID",
+                f"Artifact finalization project root does not resolve: {exc}",
+                path=str(project_root),
+                remediation="Provide an existing project root that owns the target .bbk/artifacts directory.",
+            )) from exc
+        if not explicit_project.is_dir():
+            raise ArtifactPackageError(_operation_error(
+                schema,
+                "PACKAGE_FINALIZE_PROJECT_ROOT_INVALID",
+                "Artifact finalization project root is not a directory.",
+                path=str(explicit_project),
+                remediation="Provide an existing project root that owns the target .bbk/artifacts directory.",
+            ))
+
+    raw_draft = Path(draft_root).expanduser()
+    if not raw_draft.is_absolute() and explicit_project is not None:
+        raw_draft = explicit_project / raw_draft
+    try:
+        draft = raw_draft.resolve(strict=True)
+    except (OSError, ValueError) as exc:
+        raise ArtifactPackageError(_operation_error(
+            schema,
+            "PACKAGE_FINALIZE_DRAFT_INVALID",
+            f"Artifact finalization draft does not resolve: {exc}",
+            path=str(raw_draft),
+            remediation="Provide the exact existing directory containing bbk-package-draft.json.",
+        )) from exc
+    if not draft.is_dir():
+        raise ArtifactPackageError(_operation_error(
+            schema,
+            "PACKAGE_FINALIZE_DRAFT_INVALID",
+            "Artifact finalization requires an existing draft directory.",
+            path=str(draft),
+            remediation="Provide the exact directory containing bbk-package-draft.json.",
+        ))
+    preflight = preflight_draft(draft, registry_path=registry_path)
+    if preflight.get("status") != "PASS":
+        raise ArtifactPackageError({
+            "schema": schema,
+            "status": "REJECTED",
+            "code": "PACKAGE_PREFLIGHT_REJECTED",
+            "message": "Artifact finalization stopped because deterministic preflight rejected the draft.",
+            "draftRoot": str(draft),
+            "preflight": preflight,
+            "smallest_next_action": preflight.get("smallest_next_action"),
+            "claims_not_established": preflight.get("claims_not_established", []),
+        })
+    descriptor = load_path(draft / DRAFT_FILE)
+    assert isinstance(descriptor, dict)
+    mutable_artifacts = _finalization_mutable_artifacts(descriptor)
+    if mutable_artifacts and not allow_mutable_coordination:
+        raise ArtifactPackageError({
+            "schema": schema,
+            "status": "REJECTED",
+            "code": "PACKAGE_MUTABLE_COORDINATION_INCLUDED",
+            "classification": "MECHANICAL",
+            "message": "Finalization rejected live coordination/status artifacts from the immutable subject package.",
+            "draftRoot": str(draft),
+            "artifacts": mutable_artifacts,
+            "finding": finding(
+                "PACKAGE_MUTABLE_COORDINATION_INCLUDED",
+                "Common mutable coordination/status files are included in the draft.",
+                pointer="/artifacts",
+                path=str(draft / DRAFT_FILE),
+                remediation="Move live status, current pointers, and indexes outside the draft package, or use --allow-mutable-coordination only when an immutable snapshot is deliberate.",
+                details={"artifacts": mutable_artifacts},
+            ),
+            "smallest_next_action": "Move live status, current pointers, and indexes outside the draft package, then rerun finalize.",
+            "claims_not_established": [
+                "immutable package publication",
+                "semantic acceptance",
+                "authorization",
+                "independent review",
+                "release readiness",
+            ],
+        })
+
+    try:
+        project = explicit_project or _finalize_project_root(draft, None)
+    except (OSError, ValueError) as exc:
+        raise ArtifactPackageError(_operation_error(
+            schema,
+            "PACKAGE_FINALIZE_PROJECT_ROOT_INVALID",
+            str(exc),
+            path=str(project_root) if project_root is not None else None,
+            remediation="Provide an existing project root that owns the target .bbk/artifacts directory.",
+        )) from exc
+    artifact_root = project / DEFAULT_ARTIFACT_ROOT
+    sealed_parent = artifact_root / DEFAULT_SEALED_DIR
+    publications = (
+        Path(publication_root).expanduser()
+        if publication_root is not None
+        else artifact_root / DEFAULT_PUBLICATION_DIR
+    )
+    if not publications.is_absolute():
+        publications = project / publications
+    current_root = artifact_root / DEFAULT_CURRENT_DIR
+    package_token = _safe_filename_token(descriptor.get("packageId"))
+    revision_token = _safe_filename_token(descriptor.get("revision"))
+    output = Path(output_root).expanduser() if output_root is not None else sealed_parent / f"{package_token}-{revision_token}"
+    if not output.is_absolute():
+        output = project / output
+    output = output.absolute()
+    publications = publications.absolute()
+    current_root = current_root.absolute()
+    publication_path = publications / f"{package_token}-{revision_token}.json"
+    current_path = current_root / f"{package_token}.json"
+
+    if _path_is_within(output, draft) or _path_is_within(draft, output):
+        raise ArtifactPackageError(_operation_error(
+            schema,
+            "PACKAGE_FINALIZE_DRAFT_OUTPUT_OVERLAP",
+            "The mutable draft and immutable sealed output may not contain one another.",
+            path=str(output),
+            remediation="Use separate sibling draft and .bbk/artifacts/sealed locations.",
+            details={"draftRoot": str(draft), "outputRoot": str(output)},
+        ))
+
+    metadata_candidates = [("publication receipt", publication_path)]
+    if write_current_pointer:
+        metadata_candidates.append(("current pointer", current_path))
+    for label, candidate in metadata_candidates:
+        if _path_is_within(candidate, output):
+            raise ArtifactPackageError(_operation_error(
+                schema,
+                "PACKAGE_FINALIZE_PUBLICATION_INSIDE_SEALED",
+                f"The {label} must be outside the immutable sealed package.",
+                path=str(candidate),
+                remediation="Use the default .bbk/artifacts/publications and .bbk/artifacts/current locations, or choose another path outside the sealed package.",
+            ))
+        if _path_is_within(candidate, draft):
+            raise ArtifactPackageError(_operation_error(
+                schema,
+                "PACKAGE_FINALIZE_PUBLICATION_INSIDE_DRAFT",
+                f"The {label} must be outside the mutable draft package.",
+                path=str(candidate),
+                remediation="Use the default .bbk/artifacts/publications and .bbk/artifacts/current locations, or choose another path outside both the draft and sealed package trees.",
+            ))
+    sealed_parent.mkdir(parents=True, exist_ok=True)
+    publications.mkdir(parents=True, exist_ok=True)
+    if write_current_pointer:
+        current_root.mkdir(parents=True, exist_ok=True)
+    if publication_path.exists() or publication_path.is_symlink():
+        raise ArtifactPackageError(_operation_error(
+            schema,
+            "PACKAGE_FINALIZE_PUBLICATION_EXISTS",
+            "Finalization refuses to overwrite an existing immutable publication receipt.",
+            path=str(publication_path),
+            remediation="Choose a successor revision or inspect the existing publication before retrying.",
+        ))
+
+    # Serialize all revisions of one package identity because they share the
+    # mutable current pointer.  The immutable output and publication receipt
+    # remain revision-specific.
+    finalize_lock = artifact_root / f".{package_token}.bbk-finalize.lock"
+    artifact_root.mkdir(parents=True, exist_ok=True)
+    with _exclusive_lock(finalize_lock, operation="finalize", target=output, recover_stale=recover_stale_lock):
+        # Repeat external-target checks under the package-level lock.  This
+        # closes the ordinary BBK writer race between preflight and publish.
+        if publication_path.exists() or publication_path.is_symlink():
+            raise ArtifactPackageError(_operation_error(
+                schema,
+                "PACKAGE_FINALIZE_PUBLICATION_EXISTS",
+                "Finalization refuses to overwrite an existing immutable publication receipt.",
+                path=str(publication_path),
+                remediation="Choose a successor revision or inspect the existing publication before retrying.",
+            ))
+        current_snapshot = _file_restore_snapshot(current_path) if write_current_pointer else None
+        seal_result = seal_draft(
+            draft,
+            output,
+            registry_path=registry_path,
+            recover_stale_lock=recover_stale_lock,
+            sealed_at_utc=finalized_at_utc,
+        )
+        before_publication = _sealed_tree_snapshot(output)
+        verification = verify_package(output, registry_path=registry_path)
+        if verification.get("status") != "PASS":
+            raise ArtifactPackageError({
+                "schema": schema,
+                "status": "REJECTED",
+                "code": "PACKAGE_FINALIZE_VERIFY_FAILED",
+                "message": "The sealed package failed verification before publication metadata was written.",
+                "outputRoot": str(output),
+                "verification": verification,
+                "smallest_next_action": verification.get("smallest_next_action"),
+                "claims_not_established": verification.get("claims_not_established", []),
+            })
+        published_at = finalized_at_utc or utc_now()
+        try:
+            sealed_reference = str(output.relative_to(project))
+        except ValueError:
+            sealed_reference = str(output)
+        publication = {
+            "schema": "bbk.artifact-package-publication.v1",
+            "status": "PUBLISHED",
+            "packageId": seal_result["packageId"],
+            "revision": seal_result["revision"],
+            "profile": seal_result["profile"],
+            "artifactCount": seal_result["artifactCount"],
+            "contentSha256": seal_result["contentSha256"],
+            "manifestSha256": seal_result["manifestSha256"],
+            "sealedRoot": sealed_reference,
+            "sealedTreeSha256": before_publication["sha256"],
+            "publishedAtUtc": published_at,
+            "tool": {"name": "bbk", "version": _version()},
+            "policy": {
+                "publicationMetadataOutsideSealedTree": True,
+                "mutableCoordinationOverrideUsed": bool(mutable_artifacts) and allow_mutable_coordination,
+                "mutableCoordinationPaths": [str(item["path"]) for item in mutable_artifacts],
+            },
+            "authorityBoundary": AUTHORITY_BOUNDARY,
+            "completionClaims": ["BYTE_INTEGRITY_VERIFIED"],
+            "claimsNotEstablished": [
+                "semantic acceptance",
+                "authorization",
+                "independent review",
+                "deployment readiness",
+                "live acceptance",
+            ],
+        }
+        if source_binding is not None:
+            publication["sourceBinding"] = dict(source_binding)
+        publication_findings = validate_schema_instance(publication, publication["schema"])
+        if publication_findings:
+            raise ArtifactPackageError({
+                "schema": schema,
+                "status": "REJECTED",
+                "code": "PACKAGE_FINALIZE_PUBLICATION_SCHEMA_INVALID",
+                "message": "The generated external publication receipt did not satisfy its canonical schema.",
+                "publicationReceipt": str(publication_path),
+                "findings": publication_findings,
+                "smallest_next_action": "Treat this as a BBK implementation defect; preserve the draft and sealed output for diagnosis.",
+                "claims_not_established": [
+                    "stable immutable package publication",
+                    "semantic acceptance",
+                    "authorization",
+                    "independent review",
+                    "release readiness",
+                ],
+            })
+        publication_bytes = canonical_json_bytes(publication)
+        publication_sha256 = sha256_bytes(publication_bytes)
+        metadata_published = False
+        try:
+            atomic_write(publication_path, publication_bytes)
+            metadata_published = True
+            if _test_fail_phase == "after-publication":
+                raise OSError("injected artifact-finalize failure after publication")
+            pointer: dict[str, Any] | None = None
+            if write_current_pointer:
+                try:
+                    publication_reference = str(publication_path.relative_to(project))
+                except ValueError:
+                    publication_reference = str(publication_path)
+                pointer = {
+                    "schema": "bbk.artifact-package-current-pointer.v1",
+                    "packageId": seal_result["packageId"],
+                    "revision": seal_result["revision"],
+                    "contentSha256": seal_result["contentSha256"],
+                    "publication": publication_reference,
+                    "publicationSha256": publication_sha256,
+                    "updatedAtUtc": published_at,
+                    "authorityBoundary": "This mutable pointer selects a verified package identity; it does not alter or extend that package's authority.",
+                }
+                pointer_findings = validate_schema_instance(pointer, pointer["schema"])
+                if pointer_findings:
+                    raise ArtifactPackageError({
+                        "schema": schema,
+                        "status": "REJECTED",
+                        "code": "PACKAGE_FINALIZE_CURRENT_POINTER_SCHEMA_INVALID",
+                        "message": "The generated mutable current pointer did not satisfy its canonical schema.",
+                        "currentPointer": str(current_path),
+                        "findings": pointer_findings,
+                        "smallest_next_action": "Treat this as a BBK implementation defect; preserve the draft and sealed output for diagnosis.",
+                        "claims_not_established": [
+                            "stable immutable package publication",
+                            "semantic acceptance",
+                            "authorization",
+                            "independent review",
+                            "release readiness",
+                        ],
+                    })
+                atomic_write(current_path, canonical_json_bytes(pointer))
+            if _test_fail_phase == "after-current":
+                raise OSError("injected artifact-finalize failure after current pointer")
+            after_publication = _sealed_tree_snapshot(output)
+            post_verification = verify_package(output, registry_path=registry_path)
+            if _test_fail_phase == "post-publication-drift":
+                raise ArtifactPackageError({
+                    "schema": schema,
+                    "status": "REJECTED",
+                    "code": "PACKAGE_FINALIZE_POST_PUBLICATION_DRIFT",
+                    "message": "Injected immutable package drift after publication metadata was written.",
+                    "outputRoot": str(output),
+                    "before": before_publication,
+                    "after": after_publication,
+                    "verification": post_verification,
+                    "smallest_next_action": "Quarantine the exact package and create a new successor revision after resolving the writer that mutated sealed content.",
+                    "claims_not_established": [
+                        "stable immutable package publication",
+                        "semantic acceptance",
+                        "authorization",
+                        "independent review",
+                        "release readiness",
+                    ],
+                })
+            if before_publication != after_publication or post_verification.get("status") != "PASS":
+                raise ArtifactPackageError({
+                    "schema": schema,
+                    "status": "REJECTED",
+                    "code": "PACKAGE_FINALIZE_POST_PUBLICATION_DRIFT",
+                    "message": "The immutable package changed while publication metadata was being written.",
+                    "outputRoot": str(output),
+                    "before": before_publication,
+                    "after": after_publication,
+                    "verification": post_verification,
+                    "smallest_next_action": "Quarantine the exact package and create a new successor revision after resolving the writer that mutated sealed content.",
+                    "claims_not_established": [
+                        "stable immutable package publication",
+                        "semantic acceptance",
+                        "authorization",
+                        "independent review",
+                        "release readiness",
+                    ],
+                })
+        except BaseException as exc:
+            # Publication metadata is external to the sealed package and must
+            # never claim success after a failed transaction.  Restore the
+            # prior mutable pointer exactly and remove the new immutable
+            # receipt before propagating the failure.
+            rollback_errors: list[str] = []
+            if metadata_published or publication_path.exists() or publication_path.is_symlink():
+                try:
+                    _restore_external_metadata(publication_path, None)
+                except OSError as exc:
+                    rollback_errors.append(f"publication receipt rollback failed: {exc}")
+            if write_current_pointer:
+                try:
+                    _restore_external_metadata(current_path, current_snapshot)
+                except OSError as exc:
+                    rollback_errors.append(f"current pointer rollback failed: {exc}")
+            if rollback_errors:
+                raise ArtifactPackageError(_operation_error(
+                    schema,
+                    "PACKAGE_FINALIZE_ROLLBACK_FAILED",
+                    "Finalization failed and external publication metadata could not be fully rolled back.",
+                    path=str(artifact_root),
+                    remediation="Quarantine the sealed output and inspect the publication/current paths before retrying with a successor revision.",
+                    details={"rollbackErrors": rollback_errors, "originalError": str(exc)},
+                )) from exc
+            if isinstance(exc, ArtifactPackageError):
+                raise
+            if isinstance(exc, OSError):
+                raise ArtifactPackageError(_operation_error(
+                    schema,
+                    "PACKAGE_FINALIZE_PUBLICATION_WRITE_FAILED",
+                    f"Finalization could not publish external package metadata: {exc}",
+                    path=str(artifact_root),
+                    remediation="Inspect the external publication/current paths and permissions, then retry only after confirming the sealed output identity.",
+                )) from exc
+            raise
+        return {
+            "schema": schema,
+            "status": "PASS",
+            "draftRoot": str(draft),
+            "projectRoot": str(project),
+            "outputRoot": str(output),
+            "packageId": seal_result["packageId"],
+            "revision": seal_result["revision"],
+            "profile": seal_result["profile"],
+            "contentSha256": seal_result["contentSha256"],
+            "manifestSha256": seal_result["manifestSha256"],
+            "artifactCount": seal_result["artifactCount"],
+            "sealedTreeSha256": after_publication["sha256"],
+            "publicationReceipt": str(publication_path),
+            "publicationReceiptSha256": publication_sha256,
+            "currentPointer": str(current_path) if write_current_pointer else None,
+            "verification": post_verification,
+            "sourceBinding": dict(source_binding) if source_binding is not None else None,
+            "authorityBoundary": AUTHORITY_BOUNDARY,
+            "smallest_next_action": "Consume the exact sealed package or its external publication pointer; do not modify the sealed directory.",
+            "claims_not_established": [
+                "semantic acceptance",
+                "authorization",
+                "independent review",
+                "release readiness",
+            ],
+        }
+
+
 def _load_control_file(root: Path, name: str, findings: list[dict[str, Any]]) -> Any | None:
     path = root / name
     if path.is_symlink():
@@ -1876,7 +3222,7 @@ def _human(value: Mapping[str, Any]) -> str:
         lines.extend(f"[{item.get('classification')}] {item.get('code')}: {item.get('message')} ({item.get('path') or item.get('pointer')})" for item in value.get("findings", []))
         lines.append(f"Next: {value.get('smallest_next_action')}")
         return "\n".join(lines)
-    if schema in {"bbk.artifact-package-verification.v1", "bbk.artifact-package-seal-result.v1", "bbk.artifact-package-successor-result.v1"}:
+    if schema in {"bbk.artifact-package-verification.v1", "bbk.artifact-package-seal-result.v1", "bbk.artifact-package-successor-result.v1", "bbk.artifact-package-finalize-result.v1"}:
         lines = [f"{schema}: {status}"]
         for key in ("draftRoot", "sealedRoot", "predecessorRoot", "outputRoot", "packageId", "revision", "contentSha256"):
             if value.get(key) is not None:
@@ -1894,6 +3240,8 @@ def parser() -> argparse.ArgumentParser:
     sub = p.add_subparsers(dest="command", required=True)
     x = sub.add_parser("preflight"); x.add_argument("draft_root"); x.add_argument("--registry"); x.add_argument("--max-depth", type=int, default=DEFAULT_MAX_DEPTH)
     x = sub.add_parser("seal"); x.add_argument("draft_root"); x.add_argument("--output", required=True); x.add_argument("--registry"); x.add_argument("--recover-stale-lock", action="store_true")
+    x = sub.add_parser("finalize"); x.add_argument("draft_root", nargs="?"); x.add_argument("--output"); x.add_argument("--project-root"); x.add_argument("--publication-root"); x.add_argument("--registry"); x.add_argument("--package-id"); x.add_argument("--revision"); x.add_argument("--source", action="append"); x.add_argument("--include", action="append"); x.add_argument("--exclude", action="append"); x.add_argument("--subject-kind"); x.add_argument("--subject-id"); x.add_argument("--subject-revision"); x.add_argument("--purpose"); x.add_argument("--allow-mutable-coordination", action="store_true"); x.add_argument("--no-current-pointer", action="store_true"); x.add_argument("--recover-stale-lock", action="store_true")
+    x = sub.add_parser("freshness"); x.add_argument("subject"); x.add_argument("--project-root"); x.add_argument("--registry")
     x = sub.add_parser("verify"); x.add_argument("sealed_root"); x.add_argument("--registry")
     x = sub.add_parser("successor"); x.add_argument("sealed_root"); x.add_argument("--output", required=True); x.add_argument("--revision", required=True); x.add_argument("--reason", required=True); x.add_argument("--registry"); x.add_argument("--recover-stale-lock", action="store_true")
     return p
@@ -1907,6 +3255,37 @@ def main(argv: Sequence[str] | None = None) -> int:
             value = preflight_draft(args.draft_root, registry_path=registry, max_depth=args.max_depth)
         elif args.command == "seal":
             value = seal_draft(args.draft_root, args.output, registry_path=registry, recover_stale_lock=args.recover_stale_lock)
+        elif args.command == "finalize":
+            if args.draft_root:
+                value = finalize_draft(
+                    args.draft_root,
+                    args.output,
+                    project_root=args.project_root,
+                    publication_root=args.publication_root,
+                    registry_path=registry,
+                    allow_mutable_coordination=bool(args.allow_mutable_coordination),
+                    write_current_pointer=not bool(args.no_current_pointer),
+                    recover_stale_lock=bool(args.recover_stale_lock),
+                )
+            elif args.package_id and args.revision and args.source and args.project_root:
+                value = finalize_source_set(
+                    project_root=args.project_root, package_id=args.package_id, revision=args.revision,
+                    sources=args.source, includes=args.include or [], excludes=args.exclude or [],
+                    subject_kind=args.subject_kind or "software-implementation", subject_id=args.subject_id,
+                    subject_revision=args.subject_revision, purpose=args.purpose, output_root=args.output,
+                    publication_root=args.publication_root, registry_path=registry,
+                    write_current_pointer=not bool(args.no_current_pointer),
+                    recover_stale_lock=bool(args.recover_stale_lock),
+                )
+            else:
+                value = {
+                    "schema": "bbk.artifact-package-finalize-result.v1", "status": "REJECTED",
+                    "code": "PACKAGE_FINALIZE_MODE_INCOMPLETE",
+                    "message": "Provide a draft root, or --project-root, --package-id, --revision, and --source for one-shot software finalization.",
+                    "smallest_next_action": "Choose one complete finalization mode and retry.",
+                }
+        elif args.command == "freshness":
+            value = verify_publication_freshness(args.subject, project_root=args.project_root, registry_path=registry)
         elif args.command == "verify":
             value = verify_package(args.sealed_root, registry_path=registry)
         else:

@@ -103,7 +103,7 @@ class SplitRolePackageV4Tests(unittest.TestCase):
         known = set(method["skills"])
         referenced = {skill for role in self.roles for skill in role["skills"]}
         self.assertTrue(referenced <= known)
-        self.assertEqual(len(known), 39)
+        self.assertEqual(len(known), 40)
 
     def test_beads_on_demand_skill_is_owned_by_exact_record_authorities(self) -> None:
         expected = {

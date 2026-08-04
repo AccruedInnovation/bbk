@@ -150,7 +150,7 @@ class BbkTests(unittest.TestCase):
     def test_omp_extension_parses_and_registers(self):
         m1_run(['node', '--check', m1_ROOT / 'omp' / 'extension' / 'index.js'])
         script = m1_ROOT / 'tests' / '.omp-mock.mjs'
-        script.write_text(textwrap.dedent(f"\n            const chain = () => ({{ optional() {{ return this; }} }});\n            const z = {{\n              object: value => value,\n              string: chain,\n              boolean: chain,\n              enum: values => chain(),\n              array: value => chain(),\n            }};\n            const tools = [], commands = [], handlers = [];\n            const pi = {{\n              zod: {{ z }}, setLabel() {{}},\n              registerTool(value) {{ tools.push(value); }},\n              registerCommand(name, value) {{ commands.push([name, value]); }},\n              on(name, value) {{ handlers.push([name, value]); }},\n              sendMessage() {{}},\n            }};\n            const mod = await import({json.dumps((m1_ROOT / 'omp' / 'extension' / 'index.js').as_uri())});\n            mod.default(pi);\n            if (tools.length !== 42) throw new Error(`tools=${{tools.length}}`);\n            if (commands.length !== 45) throw new Error(`commands=${{commands.length}}`);\n            if (!handlers.some(([n]) => n === 'tool_call')) throw new Error('missing tool_call');\n            if (!handlers.some(([n]) => n === 'session_start')) throw new Error('missing session_start');\n            if (!handlers.some(([n]) => n === 'before_agent_start')) throw new Error('missing before_agent_start');\n            console.log(JSON.stringify({{tools: tools.map(x=>x.name), commands: commands.map(x=>x[0])}}));\n        "), encoding='utf-8')
+        script.write_text(textwrap.dedent(f"\n            const chain = () => ({{ optional() {{ return this; }} }});\n            const z = {{\n              object: value => value,\n              string: chain,\n              boolean: chain,\n              enum: values => chain(),\n              array: value => chain(),\n            }};\n            const tools = [], commands = [], handlers = [];\n            const pi = {{\n              zod: {{ z }}, setLabel() {{}},\n              registerTool(value) {{ tools.push(value); }},\n              registerCommand(name, value) {{ commands.push([name, value]); }},\n              on(name, value) {{ handlers.push([name, value]); }},\n              sendMessage() {{}},\n            }};\n            const mod = await import({json.dumps((m1_ROOT / 'omp' / 'extension' / 'index.js').as_uri())});\n            mod.default(pi);\n            if (tools.length !== 44) throw new Error(`tools=${{tools.length}}`);\n            if (commands.length !== 48) throw new Error(`commands=${{commands.length}}`);\n            if (!handlers.some(([n]) => n === 'tool_call')) throw new Error('missing tool_call');\n            if (!handlers.some(([n]) => n === 'session_start')) throw new Error('missing session_start');\n            if (!handlers.some(([n]) => n === 'before_agent_start')) throw new Error('missing before_agent_start');\n            console.log(JSON.stringify({{tools: tools.map(x=>x.name), commands: commands.map(x=>x[0])}}));\n        "), encoding='utf-8')
         try:
             result = m1_run(['node', script])
             value = json.loads(result.stdout)
@@ -764,7 +764,7 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
         method = json.loads((m2_ROOT / 'spec' / 'method-content.json').read_text(encoding='utf-8'))
         paths = sorted((m2_ROOT / 'shared' / 'skills').glob('*/SKILL.md'))
         self.assertEqual({path.parent.name for path in paths}, set(method['skills']))
-        self.assertEqual(len(paths), 39)
+        self.assertEqual(len(paths), 40)
         for path in paths:
             text = path.read_text(encoding='utf-8')
             self.assertRegex(text.lower(), r'\bprofiles?\b', str(path.relative_to(m2_ROOT)))
@@ -1379,10 +1379,10 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
 
     def test_method_and_schema_surfaces_include_new_contracts(self) -> None:
         methods = a118_json.loads((A118_ROOT / "spec" / "method-content.json").read_text(encoding="utf-8"))
-        self.assertEqual(len(methods["skills"]), 39)
+        self.assertEqual(len(methods["skills"]), 40)
         self.assertEqual(len(methods["references"]), 23)
         prompt_catalog = a118_json.loads((A118_ROOT / "spec" / "prompt-modules" / "catalog.json").read_text(encoding="utf-8"))
-        self.assertEqual(len(prompt_catalog["module_entries"]), 31)
+        self.assertEqual(len(prompt_catalog["module_entries"]), 32)
         for name in ("bbk-wayfind", "bbk-grill", "bbk-handoff", "bbk-work-unit-execution", "bbk-assertion-validation"):
             self.assertIn(name, methods["skills"])
         self.assertIn("handoff.md", methods["references"])

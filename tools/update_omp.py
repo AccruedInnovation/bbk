@@ -10,11 +10,13 @@ agent definitions.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import datetime as dt
 import hashlib
 import json
 import os
 import shutil
+import subprocess
 import sys
 import tempfile
 from dataclasses import dataclass
@@ -230,7 +232,7 @@ def make_desired_files(
     old_manifest: Mapping[str, Any],
     old_records: Mapping[str, Mapping[str, Any]],
     prepared_profiles: Sequence[PreparedProfile],
-) -> tuple[dict[str, DesiredFile], dict[str, Any], list[dict[str, Any]]]:
+) -> tuple[dict[str, DesiredFile], dict[str, Any], list[dict[str, Any]], dict[str, Any]]:
     desired: dict[str, DesiredFile] = {}
     targets = install_tool.installation_targets(scope=scope, project=project)
     omp_agents = targets["omp_agents"]
@@ -280,6 +282,22 @@ def make_desired_files(
         raise OmpUpdateError("Current role catalogue produced no OMP agents")
     routes, baseline = validated_routes(state, role_names)
 
+    # Preserve explicit custom policy ownership, but refresh packaged-default
+    # metadata and its installed effective copy to this successor release.
+    # OMP runtime routes remain preserved independently in ``state``.
+    old_model_routing = old_manifest.get("model_routing")
+    if isinstance(old_model_routing, Mapping) and bool(old_model_routing.get("custom")):
+        model_routing_manifest = dict(old_model_routing)
+    else:
+        effective_routing = root / "effective-model-routing.json"
+        add_file(desired, MODEL_ROUTING_PATH.resolve(), effective_routing)
+        model_routing_manifest = install_tool.model_routing_manifest_metadata(
+            custom=False,
+            source=MODEL_ROUTING_PATH.resolve(),
+            effective_copy=effective_routing,
+            routing_meta=projection_meta,
+        )
+
     for filename, data in sorted(projections["omp"].items()):
         role = Path(filename).stem
         if role not in routes:
@@ -317,16 +335,7 @@ def make_desired_files(
     extension = omp_extensions / "bbk"
     for name in ["index.js", "package.json", "README.md"]:
         add_file(desired, ROOT / "omp" / "extension" / name, extension / name)
-    for name in [
-        "bbk.py",
-        "contracts.py",
-        "state_effect.py",
-        "review_assurance.py",
-        "verify_package.py",
-        "path_compat.py",
-        "artifact_classification.py",
-        "omp_model_routing.py",
-    ]:
+    for name in install_tool.OMP_EXTENSION_RUNTIME_FILES:
         add_file(desired, ROOT / "tools" / name, extension / name)
     add_file(desired, ROOT / "VERSION", extension / "VERSION")
     add_desired(
@@ -428,8 +437,126 @@ def make_desired_files(
                 source="generated:installed-profile-registry-skill:update-omp",
             )
 
-    return desired, updated_state, updated_profiles
+    return desired, updated_state, updated_profiles, model_routing_manifest
 
+
+
+def validate_runtime_inventory(
+    desired: Mapping[str, DesiredFile],
+    *,
+    extension: Path,
+) -> dict[str, Any]:
+    """Prove that the selective updater owns the complete adjacent runtime."""
+    expected = [extension / name for name in install_tool.OMP_EXTENSION_RUNTIME_FILES]
+    missing = [install_tool.json_path(path) for path in expected if normalized(path) not in desired]
+    if missing:
+        raise OmpUpdateError(
+            "OMP selective-update runtime inventory is incomplete; missing desired files:\n- "
+            + "\n- ".join(missing)
+        )
+    return {
+        "schema": "bbk.omp-runtime-inventory.v1",
+        "status": "PASS",
+        "extension": install_tool.json_path(extension),
+        "file_count": len(expected),
+        "files": [install_tool.json_path(path) for path in expected],
+    }
+
+
+def restore_planned_files(plan: Sequence[PlannedFile]) -> None:
+    """Best-effort rollback for a plan after a post-install smoke failure."""
+    for item in reversed(plan):
+        try:
+            if item.action == "unchanged":
+                continue
+            if item.original is None:
+                if item.action == "create":
+                    item.desired.path.unlink(missing_ok=True)
+                continue
+            install_tool.atomic_write(
+                item.desired.path,
+                item.original,
+                (item.original_mode or 0o644) & 0o777,
+            )
+        except Exception:
+            pass
+
+
+def _strict_subprocess_json(command: Sequence[str], *, cwd: Path) -> dict[str, Any]:
+    env = os.environ.copy()
+    env.update({"PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8", "PYTHONDONTWRITEBYTECODE": "1"})
+    try:
+        completed = subprocess.run(
+            list(command), cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            check=False, timeout=45,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise OmpUpdateError(f"Installed OMP runtime smoke command could not run: {exc}") from exc
+    try:
+        stdout = completed.stdout.decode(install_tool.SUBPROCESS_OUTPUT_ENCODING, errors="strict")
+        stderr = completed.stderr.decode(install_tool.SUBPROCESS_OUTPUT_ENCODING, errors="strict")
+    except UnicodeDecodeError as exc:
+        raise OmpUpdateError(f"Installed OMP runtime smoke command returned invalid UTF-8: {exc}") from exc
+    try:
+        value = json.loads(stdout) if stdout.strip() else None
+    except json.JSONDecodeError as exc:
+        raise OmpUpdateError(
+            f"Installed OMP runtime smoke command returned invalid JSON (exit {completed.returncode}): {exc}; "
+            f"stderr={stderr.strip()!r}"
+        ) from exc
+    if completed.returncode != 0:
+        message = value.get("error") if isinstance(value, Mapping) else None
+        raise OmpUpdateError(
+            f"Installed OMP runtime smoke command failed (exit {completed.returncode}): "
+            f"{message or stderr.strip() or stdout.strip()}"
+        )
+    if not isinstance(value, dict):
+        raise OmpUpdateError("Installed OMP runtime smoke command returned no JSON object")
+    return value
+
+
+def smoke_installed_runtime(*, extension: Path, package_root: Path) -> dict[str, Any]:
+    """Execute the installed routing and CLI surfaces after selective replacement."""
+    import_probe = (
+        "import artifact_packages, bbk_artifact, context_packages, handoff_packages, "
+        "host_preflight, omp_model_routing, strict_json; "
+        "print('PASS')"
+    )
+    env = os.environ.copy()
+    env.update({"PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8", "PYTHONDONTWRITEBYTECODE": "1"})
+    try:
+        imported = subprocess.run(
+            [sys.executable, "-X", "utf8", "-c", import_probe],
+            cwd=extension, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            check=False, timeout=45,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise OmpUpdateError(f"Installed OMP runtime import smoke could not run: {exc}") from exc
+    if imported.returncode != 0 or imported.stdout.decode("utf-8", errors="replace").strip() != "PASS":
+        raise OmpUpdateError(
+            "Installed OMP runtime import smoke failed: "
+            + imported.stderr.decode("utf-8", errors="backslashreplace").strip()
+        )
+    routing = _strict_subprocess_json(
+        [sys.executable, "-X", "utf8", str(extension / "omp_model_routing.py"), "--json", "status"],
+        cwd=extension,
+    )
+    if routing.get("status") != "PASS":
+        raise OmpUpdateError(f"Installed OMP model-routing status did not pass: {routing}")
+    schemas = _strict_subprocess_json(
+        [sys.executable, "-X", "utf8", str(extension / "bbk.py"), "--json", "schema", "list"],
+        cwd=package_root,
+    )
+    if not isinstance(schemas.get("count"), int) or int(schemas["count"]) <= 0:
+        raise OmpUpdateError(f"Installed BBK CLI schema surface did not return a catalogue: {schemas}")
+    return {
+        "schema": "bbk.omp-runtime-smoke.v1",
+        "status": "PASS",
+        "import_closure": "PASS",
+        "routing_status": "PASS",
+        "routing_active_profile": routing.get("active_profile"),
+        "schema_catalogue_count": schemas.get("count"),
+    }
 
 def plan_files(
     desired: Mapping[str, DesiredFile],
@@ -658,6 +785,7 @@ def merge_manifest(
     *,
     package_root: Path,
     state: Mapping[str, Any],
+    model_routing: Mapping[str, Any],
     updated_profiles: Sequence[Mapping[str, Any]],
     skipped_profiles: Sequence[str],
     verification: Mapping[str, Any] | None,
@@ -677,6 +805,7 @@ def merge_manifest(
             "schema": "bbk.install-manifest.v1",
             "version": VERSION,
             "package_root": install_tool.json_path(package_root),
+            "model_routing": dict(model_routing),
             "language_profiles": [dict(item) for item in updated_profiles],
             "updated_at": utc_now(),
             "files": sorted(merged_records.values(), key=lambda item: str(item["path"]).replace("\\", "/").casefold()),
@@ -747,7 +876,7 @@ def update_omp(args: argparse.Namespace) -> dict[str, Any]:
 
     with tempfile.TemporaryDirectory(prefix="bbk-omp-update-profiles-") as raw_temp:
         prepared, skipped = prepared_bundled_profiles(installed_ids, Path(raw_temp))
-        desired, state, updated_profiles = make_desired_files(
+        desired, state, updated_profiles, model_routing_manifest = make_desired_files(
             scope=args.scope,
             project=project,
             root=root,
@@ -771,6 +900,8 @@ def update_omp(args: argparse.Namespace) -> dict[str, Any]:
             and str(item.get("id") or "") in set(skipped)
             and isinstance(item.get("omp_extension"), str)
         ]
+        extension = omp_extensions / "bbk"
+        runtime_inventory = validate_runtime_inventory(desired, extension=extension)
         stale_plan = (
             plan_stale_files(
                 old_records,
@@ -785,28 +916,53 @@ def update_omp(args: argparse.Namespace) -> dict[str, Any]:
             if bool(getattr(args, "clean", False))
             else []
         )
-        stale_records = apply_stale_files(stale_plan, dry_run=bool(args.dry_run))
+        manifest_original = mpath.read_bytes()
+        manifest_mode = mpath.stat().st_mode & 0o777
+        manifest_written = False
+        stale_records: list[dict[str, Any]] = []
+        update_records: list[dict[str, Any]] = []
+        runtime_smoke: dict[str, Any] = {
+            "schema": "bbk.omp-runtime-smoke.v1",
+            "status": "NOT_RUN" if args.dry_run else "PENDING",
+        }
         try:
+            stale_records = apply_stale_files(stale_plan, dry_run=bool(args.dry_run))
             update_records = apply_plan(plan, dry_run=bool(args.dry_run))
+            package_root = root / "versions" / VERSION
+            merged = merge_manifest(
+                old_manifest,
+                update_records,
+                package_root=package_root,
+                state=state,
+                model_routing=model_routing_manifest,
+                updated_profiles=updated_profiles,
+                skipped_profiles=skipped,
+                verification=verification,
+                backup_root=backup_root,
+                removed_stale=stale_plan,
+                clean=bool(getattr(args, "clean", False)),
+            )
+            merged_records = record_map(merged)
+            for name in install_tool.OMP_EXTENSION_RUNTIME_FILES:
+                runtime_path = extension / name
+                desired_item = desired.get(normalized(runtime_path))
+                record = merged_records.get(normalized(runtime_path))
+                if desired_item is None or record is None or record.get("sha256") != digest_bytes(desired_item.data):
+                    raise OmpUpdateError(
+                        f"OMP selective-update manifest does not own the current runtime dependency: {runtime_path}"
+                    )
+            if not args.dry_run:
+                install_tool.atomic_write(mpath, install_tool.json_bytes(merged), 0o600)
+                manifest_written = True
+                runtime_smoke = smoke_installed_runtime(extension=extension, package_root=package_root)
         except Exception:
             if not args.dry_run:
+                if manifest_written:
+                    with contextlib.suppress(Exception):
+                        install_tool.atomic_write(mpath, manifest_original, manifest_mode)
+                restore_planned_files(plan)
                 restore_stale_files(stale_plan)
             raise
-        package_root = root / "versions" / VERSION
-        merged = merge_manifest(
-            old_manifest,
-            update_records,
-            package_root=package_root,
-            state=state,
-            updated_profiles=updated_profiles,
-            skipped_profiles=skipped,
-            verification=verification,
-            backup_root=backup_root,
-            removed_stale=stale_plan,
-            clean=bool(getattr(args, "clean", False)),
-        )
-        if not args.dry_run:
-            install_tool.atomic_write(mpath, install_tool.json_bytes(merged), 0o600)
 
     actions: dict[str, int] = {}
     for item in update_records:
@@ -835,6 +991,8 @@ def update_omp(args: argparse.Namespace) -> dict[str, Any]:
         "codex_files_touched": 0,
         "reload_required": True,
         "reload_command": "/reload-plugins",
+        "runtime_inventory": runtime_inventory,
+        "runtime_smoke": runtime_smoke,
         "verification": verification,
     }
 

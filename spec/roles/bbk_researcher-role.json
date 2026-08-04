@@ -41,6 +41,7 @@
     "bbk-prompt-context-human-relay",
     "bbk-prompt-durable-handoff",
     "bbk-prompt-state-claim-truth",
+    "bbk-prompt-authority-completion-vocabulary",
     "bbk-prompt-profile-qualification",
     "bbk-prompt-proportional-stop",
     "bbk-prompt-evidence-lineage",
@@ -233,6 +234,7 @@
   "skills": [
     "bbk-research",
     "bbk-context-routing",
+    "bbk-artifact",
     "bbk-handoff"
   ],
   "spawns": [],

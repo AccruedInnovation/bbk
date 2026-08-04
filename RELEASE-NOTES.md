@@ -1,150 +1,112 @@
-# BBK 0.1.0-alpha.15 release notes
+# BBK 0.1.0-alpha.16.1 release notes
 
-Alpha.15 is a product-first workflow, deterministic packaging, project-routing, and generated-context release over alpha.14. It reduces routine coordination ceremony while preserving BBK's existing 19-role topology, exact reviewed model routes, install scopes, language-profile reuse, Windows path handling, Beads behavior, and Blueprint boundary.
+Alpha.16.1 is a bounded corrective release over alpha.16. It repairs the selective OMP installation path that could remove required adjacent Python modules and retain stale predecessor routing metadata, makes ordinary software publication usable through one-shot `bbk artifact finalize`, binds those publications to the exact live source selection, and prevents an OMP completion relay from substituting a handoff or stale package for explicitly required artifact finalization.
 
-## Product-first proportional assurance
+The release preserves alpha.16's provider-bound prompt guard, authority vocabulary, timing surface, 19-role topology, and reviewed per-role model selections. It does not add Blueprint's global lifecycle, model-suitability, semantic-reference, acceptance, review-invalidation, or release-authority systems.
 
-Four canonical prompt modules now govern the routine workflow across the relevant planning, execution, and assurance roles:
+## Selective OMP installation correction
 
-- `bbk-prompt-product-first-proportionality`
-- `bbk-prompt-mechanical-admission`
-- `bbk-prompt-assurance-modes`
-- `bbk-prompt-candidate-focused-review`
+Alpha.16's full installation path contained the complete OMP runtime, but an OMP-only clean replacement or dedicated OMP update used a shorter file inventory. On an installation that already owned Codex and OMP, this could remove modules such as `strict_json.py` while preserving Codex and shared state. `/bbk:models` would then fail during import. The same path could retain an alpha.15 packaged-default routing source in install-manifest metadata.
 
-Work is organized around actor-visible capability increments with stable interfaces and independent mutation/evidence scopes. Mechanical defects are repaired or rejected at the smallest responsible scope; they do not automatically commission architecture, research, planning, independent review, or user authorization.
+Alpha.16.1 introduces one canonical `OMP_EXTENSION_RUNTIME_FILES` inventory consumed by both the full installer and the selective updater. The updater now:
 
-Assurance now uses three explicit modes:
+1. plans every required adjacent Python runtime module from that inventory;
+2. proves each module is present in the desired plan and owned by the merged install manifest;
+3. refreshes packaged-default model-routing source and effective-copy metadata to the current package while preserving explicit custom policy ownership;
+4. writes the merged manifest before post-install qualification;
+5. executes the installed import closure, installed `/bbk:models` router status, and installed BBK schema catalogue; and
+6. restores the previous manifest and targeted files if post-install smoke qualification fails.
 
-- **INLINE** — the routine default for local, reversible, adequately evidenced work;
-- **FOCUSED** — an exact material risk, candidate scope, or finding-scoped recheck; and
-- **FULL** — consequential boundaries, material external effects, complex recovery, authority ambiguity, interrupted attempts, or an explicit parent request.
+The regression reproduces the reported sequence: install Codex and OMP, perform `--install --scope user --omp --uninstall-existing`, preserve Codex, and execute the installed model-routing status surface successfully.
 
-Independent review normally targets an integrated candidate or an exact material risk. A repair recheck is limited to the finding, successor candidate, affected scope, relevant evidence, and reopening triggers unless semantics changed materially.
+## One-shot software artifact finalization
 
-## Deterministic artifact packages
-
-Alpha.15 adds one canonical strict-JSON and artifact-package implementation under `tools/strict_json.py` and `tools/artifact_packages.py`. `tools/bbk_artifact.py` is a thin adapter to the same implementation.
-
-The strict loader rejects duplicate keys, invalid UTF-8, forbidden BOMs, non-finite values, malformed JSON, trailing data, and configured excessive depth with structured diagnostics.
-
-The package engine provides:
+Ordinary implementations no longer require an agent to reverse-engineer or hand-author `bbk-package-draft.json`. The following is now a complete software-publication operation:
 
 ```text
-bbk artifact preflight <draft-directory>
-bbk artifact seal <draft-directory> --output <sealed-directory>
-bbk artifact verify <sealed-directory>
-bbk artifact successor <sealed-directory> --output <draft-directory> \
-  --revision <revision> --reason <reason>
+bbk artifact finalize --root . \
+  --package-id omp-session-inspector \
+  --revision 1
 ```
 
-`BBK-JSON-1` defines exact stored JSON bytes. JSON artifacts are canonicalized before publication; non-JSON artifacts retain their exact bytes. Generated digests, byte lengths, canonicalization labels, package closure, and seal receipts are tool-owned rather than agent-authored.
-
-Seal uses an exclusive lock, a staged package, complete verification, and atomic publication to a new target. It refuses overwrite. Verification is read-only. Successor creation preserves the immutable predecessor package and binds the new draft to its predecessor identity and digest.
-
-The package profile registry separates generic, handoff, role-return, candidate, review, and worker-context semantics. It distinguishes valid recursive schema references from prohibited artifact-reference cycles and applies profile-specific checks before expensive review.
-
-Legacy `bbk artifact manifest/verify` remains available. Existing v1 records remain consumable.
-
-## Project-local OMP routing creation and repair
-
-A user-scoped OMP installation can now create a project-scoped routing installation directly from `/bbk:models`, including in an existing empty non-Git directory:
+The same mode is exposed through the OMP `bbk_artifact_finalize` tool and the managed Codex/Claude `bbk-artifact` skill. Draft mode remains available for profile-specific semantic packages:
 
 ```text
-/bbk:models project create
-/bbk:models project create D:\Projects\Machine-A
-/bbk:models project status
-/bbk:models project repair --dry-run
-/bbk:models project repair
-/bbk:models project profile testing-flash
+bbk artifact finalize <draft-root> --root <project>
 ```
 
-Creation clones the exact effective user OMP routes into an authenticated temporary `bbk.model-routing.v2` policy and invokes the sibling BBK installer with project scope, OMP only, and no language-profile installation. All 19 project routes are verified. User routing files, agents, binding, and manifest remain byte-identical.
+One-shot software mode:
 
-Partial, divergent, or mis-scoped project installations fail closed with an explicit repair path. Repair shows the dry-run plan first and backs up modified manifest-owned files when applied. Neither path initializes Git or `.bbk`, and neither silently falls back to user-global mutation. OMP must be reloaded or restarted in the project after creation or repair.
+- defaults to the project root when `--source` is omitted, or accepts one or more explicit files/directories to narrow the source set;
+- rejects symbolic-link roots and symbolic links inside selected directories;
+- applies deterministic built-in exclusions for BBK/VCS state, caches, virtual environments, `node_modules`, build output, and bytecode;
+- applies optional project-relative `--include` and `--exclude` globs;
+- copies only selected regular files into an ephemeral generic draft;
+- mechanically classifies source, documentation, and fixture roles;
+- seals to `.bbk/artifacts/sealed/<package-id>-<revision>/` by default;
+- writes the immutable publication receipt outside the package under `.bbk/artifacts/publications/`;
+- updates the mutable selector under `.bbk/artifacts/current/`; and
+- removes the synthesized draft before returning.
 
-The packaged `default`, `testing-flash`, and `deepseek-economy` profiles and all 19 reviewed default model routes are unchanged.
+The operation returns the exact selected-source snapshot and reports `BYTE_INTEGRITY_VERIFIED` only. It does not establish semantic correctness, review closure, acceptance, authorization, deployment readiness, deployment, live acceptance, compliance, or release authority.
 
-## Role-return v2
+## Source-bound freshness
 
-`bbk.role-return.v2` is now the generated producer default for all 19 roles. It supports two detail modes:
-
-- **COMPACT** uses a generated role-specific compact result schema and omits irrelevant empty sections while preserving core truth, evidence, effects/cleanup, blockers/residuals, prohibited claims, and exact next action.
-- **FULL** uses the existing authoritative role-specific result schema for consequential or explicitly requested detail.
-
-The v2 registry, common envelope, 19 compact schemas, and 19 role-return schemas are generated from canonical role sources. `bbk.role-return.v1` schemas, registry, validation, and consumption remain available during the compatibility transition.
-
-## Generated Worker and review contexts
-
-Routine Worker invocation packages are now compiled mechanically from a complete WorkUnit, governing references, authority, profile lock, exact host-preflight result, and output contract:
+A one-shot software publication records its project root, source selectors, exact file paths, byte lengths, and SHA-256 values in the external publication receipt. The new command:
 
 ```text
-bbk context worker --root <project> \
-  --work-unit <work-unit.json> \
-  --profile-lock <profile-lock.json> \
-  --host-preflight <preflight-result.json> \
-  --output <worker-package-directory>
+bbk artifact freshness <publication-or-current-pointer> --root <project>
 ```
 
-The compiler validates canonical inputs and seals the resulting `worker-context-v1` package. It does not invent missing semantics. A nonstandard or incomplete request returns `SPECIALIST_DESIGN_REQUIRED`, preserving Worker Designer as the semantic owner. Required host failures are reported as `BLOCKED_BY_HOST_PREFLIGHT`.
+re-verifies the immutable package and reconstructs the current selected source set. Added, removed, changed, missing, or newly selected files make the result `REJECTED` with `PACKAGE_FINALIZATION_SOURCE_STALE`. A sealed directory without a source binding remains byte-verifiable but reports `sourceStatus: NOT_BOUND`.
 
-Review packages are generated from an exact verified candidate package and a review request:
+Freshness is a local byte-evidence check. It does not rerun tests, semantic review, validation, or live acceptance.
 
-```text
-bbk context review --root <project> \
-  --candidate <candidate-package-directory> \
-  --request <review-request.json> \
-  --output <review-package-directory>
+## OMP finalization and completion guard
+
+When BBK mode observes that the user explicitly required `bbk artifact finalize`, the OMP extension records a durable finalization obligation. A passing handoff, tests, raw implementation directory, or explicit `artifact seal` does not satisfy it.
+
+A successful `bbk_artifact_finalize` result binds its publication receipt to the session. Before a terminal assistant message claims implementation completion, byte integrity, semantic completion, delivered-and-verified status, or live acceptance, BBK runs `artifact freshness` against that receipt. The relay proceeds only while the current selected source set still matches the publication. A later source mutation blocks the completion claim and requires local re-verification plus a successor finalization.
+
+The same freshness check applies when finalization was voluntarily performed even if the initial user request did not make it mandatory. Ordinary sessions that neither require nor perform finalization are unaffected.
+
+This is a local OMP consistency guard, not a global Blueprint lifecycle. It does not infer whether implementation, review, or acceptance is semantically complete; it only prevents a completion-bearing relay from contradicting an explicit finalization requirement or a known source-bound publication.
+
+## Managed host surfaces
+
+The managed Codex and Claude `bbk-artifact` skill now documents both finalization modes and requires a source-bound `freshness` check before reporting completion. It remains PATH-independent and resolves the active installed BBK package through the installation manifest.
+
+The OMP extension now exposes:
+
+- 44 model-facing tools; and
+- 48 UI commands.
+
+The added surface is `bbk_artifact_freshness` and `/bbk:artifact:freshness`.
+
+## Upgrade
+
+Use a clean alpha.16.1 extraction. Do not overlay selected files onto an alpha.16 package directory.
+
+For the reported user-scope installation that owns OMP and Codex:
+
+```powershell
+python tools\setup.py --test-and-install `
+  --scope user `
+  --omp `
+  --codex `
+  --uninstall-existing
 ```
 
-The compiler supports ordinary review and focused recheck. Reviewers consume the generated mechanical context rather than authoring the manifest that admits their own subject.
+For a dedicated OMP-only update that preserves the installed Codex surface:
 
-## Requirement-scoped host preflight
-
-Host preflight accepts a canonical request and inspects only plan-named capabilities:
-
-```text
-bbk preflight run <request.json> --root <project> --output <result.json>
+```powershell
+python tools\setup.py --test-and-update-omp --scope user
 ```
 
-Read-only probes cover command, path, environment, and explicitly declared live checks. Results use `AVAILABLE`, `UNAVAILABLE`, `VERSION_MISMATCH`, `PERMISSION_BLOCKED`, `UNKNOWN`, or `REQUIRES_LIVE_PROBE` and are bound to exact host identity, requirements digest, tool identity, and freshness horizon. Cached observations are evidence only; they do not grant execution authority.
+After either path, run `/reload-plugins` or restart OMP. A successful selective update reports passing `runtime_inventory` and `runtime_smoke` records.
 
-## Compact and full prototype charters
-
-`bbk.prototype-charter.v2` adds COMPACT and FULL prototype modes without adding a role. COMPACT requires one material uncertainty, one parent decision, a decision threshold, bounded time/effect budget, guaranteed fallback, evidence commitment, and cleanup/disposition. FULL retains the larger apparatus for consequential experiments. The Prototyper remains a bounded coordinator and may invoke only Worker Designer and Worker.
-
-## Sealed handoff v2
-
-New handoff creation defaults to a sealed `bbk.handoff.v2` package. Generated byte counts and digests are package-engine output rather than CLI input:
-
-```text
-bbk handoff create --root <project> --work-unit <id> \
-  --disposition COMPLETE --summary "..." --next-action "..."
-bbk handoff verify <sealed-handoff-directory> --root <project>
-bbk handoff list --root <project>
-```
-
-Legacy `bbk.handoff.v1` files remain readable, verifiable, listable, and usable by Beads. Use `--legacy-v1` only when an explicit v1 producer is required. Beads emits the same compact verified pointer for either format.
-
-## OMP surface
-
-The OMP extension now exposes direct tools and slash commands for package preflight/seal/verify/successor, host preflight, Worker/review context generation, and handoff create/verify/list. The extension contains 42 tools and 45 commands after alpha.15 generation. Command payloads remain outside the model prompt boundary.
-
-## Compatibility and migration
-
-No `.bbk` project-record migration is required solely for alpha.15. Existing v1 handoffs, role returns, artifact manifests, model-routing policies, and review records remain consumable. New constructors prefer v2 sealed packages and v2 role returns.
-
-Use a clean extraction and managed install/update paths. Do not overlay release source directories. Reload OMP plugins and start fresh Codex/Claude parent sessions after installing regenerated projections.
-
-Alpha.15 deliberately does **not** add a global acceptance, authorization, candidate, review-invalidation, release, ACL, lease, or lifecycle state machine. It does not add a canonical role or change default routing. Those deterministic lifecycle responsibilities remain Blueprint concerns.
+External model-routing policies remain release-bound: set `package_version` to `0.1.0-alpha.16.1`, preserve exact coverage of all 19 roles, and revalidate before installation. The reviewed role routes themselves are unchanged from alpha.16.
 
 ## Repository-native source
 
-The extracted archive remains **Repository-native source**: canonical specifications, deterministic generators, tests, current documentation, and package metadata are present without an external migration step. The `docs/` directory contains **15 current** public-facing documents. Full qualification transcripts, archive audits, and **pre-public history** are separate release artifacts rather than runtime dependencies. **No `.bbk/` project-record migration** is required solely for alpha.15.
-
-## Qualification boundary
-
-The release is qualified from its source tree and a fresh archive extraction, with deterministic rebuild and exact alpha.14 patch reconstruction checks. Native Windows, live OMP 16.4.8 execution, and a production `bd` executable were not available in the Linux qualification environment; their behavior is covered by deterministic, JavaScript syntax, path-alias, installer, and Beads compatibility tests rather than direct live-host operation.
-
-### Windows symlink-test portability correction
-
-The reissued alpha.15 package no longer assumes that the presence of `os.symlink` means a non-elevated Windows process has permission to create symbolic links. Artifact-package rejection is now covered by a deterministic privilege-independent unit test on every host, plus a real-link integration test that skips only when the operating system or test process denies link creation. Shared test support and a source audit reject future unguarded symlink fixtures. Runtime artifact-package behavior is unchanged.
+The extracted archive remains **Repository-native source**: canonical specifications, deterministic generators, tests, current documentation, and package metadata are present without an external migration step. The `docs/` directory contains **15 current** public-facing documents. Full qualification transcripts, archive audits, and **pre-public history** are separate release artifacts rather than runtime dependencies. **No `.bbk/` project-record migration** is required solely for alpha.16.1.

@@ -368,7 +368,7 @@ class PromptModulePackageV1Tests(unittest.TestCase):
             validator.validate(module)
 
     def test_module_inventory_order_and_clause_identities_are_unique(self) -> None:
-        self.assertEqual(len(self.package.modules), 31)
+        self.assertEqual(len(self.package.modules), 32)
         self.assertEqual(len(self.package.ordered_ids), len(set(self.package.ordered_ids)))
         clause_ids = [
             clause["id"]
@@ -833,12 +833,56 @@ class PromptModulePackageV1Tests(unittest.TestCase):
             set(module_directives(self.method["skills"]["bbk"])),
             {
                 "bbk-prompt-user-attention", "bbk-prompt-execution-autonomy",
+                "bbk-prompt-authority-completion-vocabulary",
                 "bbk-prompt-baseline-transition",
                 "bbk-prompt-product-first-proportionality",
                 "bbk-prompt-mechanical-admission", "bbk-prompt-assurance-modes",
                 "bbk-prompt-candidate-focused-review",
             },
         )
+
+    def test_alpha16_authority_and_completion_vocabulary_is_universal_and_exact(self) -> None:
+        module_id = "bbk-prompt-authority-completion-vocabulary"
+        clauses = {
+            clause["id"]: clause["text"]
+            for clause in self.package.by_id[module_id]["clauses"]
+        }
+        self.assertEqual(
+            set(clauses),
+            {
+                "AUTHORITY.WORKSPACE_IMPLEMENTATION",
+                "AUTHORITY.EXTERNAL_EXECUTION",
+                "AUTHORITY.PRODUCE_ONLY",
+                "AUTHORITY.EXACT_NEXT_EFFECT",
+                "COMPLETION.EXACT_CLAIMS",
+                "COMPLETION.NO_COLLAPSE",
+                "COMPLETION.EVIDENCE_DERIVED",
+                "COMPLETION.BYTE_INTEGRITY_CURRENT",
+            },
+        )
+        self.assertIn("inside the exact authorized workspace", clauses["AUTHORITY.WORKSPACE_IMPLEMENTATION"])
+        self.assertIn("effects on real hosts or remote systems", self.package.by_id[module_id]["description"])
+        self.assertIn("withholding EXTERNAL_EXECUTION", clauses["AUTHORITY.PRODUCE_ONLY"])
+        self.assertIn("may not reinterpret a deterministic failure as a pass", clauses["COMPLETION.EVIDENCE_DERIVED"])
+        self.assertIn("bbk artifact freshness", clauses["COMPLETION.BYTE_INTEGRITY_CURRENT"])
+        for claim in (
+            "PLANNING_COMPLETE", "IMPLEMENTATION_ARTIFACTS_COMPLETE",
+            "BYTE_INTEGRITY_VERIFIED", "SEMANTIC_REVIEW_COMPLETE",
+            "DEPLOYMENT_AUTHORIZED", "DEPLOYMENT_PERFORMED",
+            "LIVE_ACCEPTANCE_VERIFIED",
+        ):
+            self.assertIn(claim, clauses["COMPLETION.EXACT_CLAIMS"])
+        self.assertEqual(
+            {role["name"] for role in self.roles if module_id in role["prompt_modules"]},
+            {role["name"] for role in self.roles},
+        )
+        for host in ("omp", "codex", "claude", "generic"):
+            for role in self.roles:
+                rendered = instruction_text(self.spec, role, host=host)
+                with self.subTest(host=host, role=role["name"]):
+                    self.assertGreaterEqual(rendered.count("WORKSPACE_IMPLEMENTATION"), 2)
+                    self.assertIn("PRODUCE_ONLY", rendered)
+                    self.assertIn("LIVE_ACCEPTANCE_VERIFIED", rendered)
 
     def test_alpha15_assurance_mode_contract_enforces_proportional_selection(self) -> None:
         try:

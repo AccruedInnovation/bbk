@@ -53,6 +53,7 @@
     "bbk-prompt-delegation-return",
     "bbk-prompt-durable-handoff",
     "bbk-prompt-state-claim-truth",
+    "bbk-prompt-authority-completion-vocabulary",
     "bbk-prompt-executable-baseline",
     "bbk-prompt-profile-qualification",
     "bbk-prompt-proportional-stop",
@@ -258,6 +259,7 @@
     "bbk-context-routing",
     "bbk-beads",
     "bbk-wayfind",
+    "bbk-artifact",
     "bbk-handoff"
   ],
   "spawns": [

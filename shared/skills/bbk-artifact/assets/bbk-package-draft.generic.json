@@ -1,0 +1,26 @@
+{
+  "schema": "bbk.artifact-package-draft.v1",
+  "packageId": "pkg-replace-me",
+  "revision": "1",
+  "profile": {
+    "id": "generic",
+    "version": "1"
+  },
+  "subject": {
+    "kind": "replace-me",
+    "id": "replace-me",
+    "revision": "1"
+  },
+  "predecessor": null,
+  "artifacts": [
+    {
+      "artifactId": "primary",
+      "path": "primary.md",
+      "role": "semantic",
+      "references": []
+    }
+  ],
+  "metadata": {
+    "purpose": "Replace this template metadata before preflight."
+  }
+}

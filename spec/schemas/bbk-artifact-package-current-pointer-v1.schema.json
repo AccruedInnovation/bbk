@@ -1,0 +1,58 @@
+{
+  "$defs": {
+    "nonEmpty": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "safeId": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+      "type": "string"
+    },
+    "sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    }
+  },
+  "$id": "https://bbk.local/schemas/bbk-artifact-package-current-pointer-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Mutable project-local pointer to an exact immutable BBK artifact package publication receipt.",
+  "properties": {
+    "authorityBoundary": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "contentSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "packageId": {
+      "$ref": "#/$defs/safeId"
+    },
+    "publication": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "publicationSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "revision": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "schema": {
+      "const": "bbk.artifact-package-current-pointer.v1"
+    },
+    "updatedAtUtc": {
+      "$ref": "#/$defs/nonEmpty"
+    }
+  },
+  "required": [
+    "schema",
+    "packageId",
+    "revision",
+    "contentSha256",
+    "publication",
+    "publicationSha256",
+    "updatedAtUtc",
+    "authorityBoundary"
+  ],
+  "title": "BBK current artifact package pointer v1",
+  "type": "object"
+}

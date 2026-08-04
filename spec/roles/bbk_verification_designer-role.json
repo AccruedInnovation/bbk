@@ -76,6 +76,7 @@
     "bbk-installed-profiles",
     "bbk-procedure-design",
     "bbk-context-routing",
+    "bbk-artifact",
     "bbk-handoff"
   ],
   "primary_skill": "bbk-verification-design",
@@ -89,6 +90,7 @@
     "bbk-prompt-durable-handoff",
     "bbk-prompt-handoff-protocol",
     "bbk-prompt-state-claim-truth",
+    "bbk-prompt-authority-completion-vocabulary",
     "bbk-prompt-executable-baseline",
     "bbk-prompt-profile-qualification",
     "bbk-prompt-proportional-stop",

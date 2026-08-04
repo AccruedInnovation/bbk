@@ -1,8 +1,46 @@
-# OMP child lifetime and BBK callback sequencing
+# OMP child lifetime, callbacks, and revived-agent visibility
 
-## Exact OMP 16.4.8 cause
+## Current alpha.16.1 behavior
 
-BBK alpha.13.4 retains the child-lifetime contract introduced in alpha.13.3 and targets OMP `16.4.8`. That release has two task-execution paths.
+BBK `0.1.0-alpha.16.1` treats **task execution state** and **live peer state** as separate observations.
+
+A child can finish one OMP task attempt, remain parked in the hub, and later be woken for follow-up work. The earlier task lifecycle may still say `completed`; that does not prove that the peer session is dead or inactive. `/bbk:agents` therefore reconciles two ordered evidence sources:
+
+1. OMP task progress and lifecycle events; and
+2. later coordination results from `hub`, legacy `irc`, or `job`.
+
+The coordination source may reactivate a completed peer when Main observes:
+
+- a successful `injected`, `woken`, or `revived` receipt;
+- an authoritative peer roster reporting `running`, `active`, `working`, `busy`, or `waking`; or
+- a legacy `job` running-agent report for a known peer.
+
+A later lifecycle event or authoritative roster supersedes older wake evidence. A failed receipt never activates a peer. Role-bearing rosters may discover nested peers that were not present in the local task history, and stable IDs/aliases are reconciled so the same peer is not shown twice.
+
+`/bbk:agents json` retains the additive `bbk.omp-agent-tree.v1` schema and exposes:
+
+```text
+status                 effective current status
+task_status            newest task progress/lifecycle status
+peer_status            newest coordination status, when observed
+peer_status_current    whether peer evidence is at least as new as task evidence
+status_source          evidence source controlling the effective status
+wake_outcome           current successful wake outcome, only while it remains controlling
+```
+
+The text tree makes split state explicit, for example:
+
+```text
+BaffleRelayWayfinder [bbk_root_wayfinder] · running · task completed · peer running (woken)
+```
+
+This is an observability correction. It does not create cancellation authority, guarantee that a peer will make forward progress, or replace OMP's own task/session lifecycle. `/bbk:agents` reports the newest evidence visible to the current Main session; a wake or roster result not observed by that session cannot be invented.
+
+Alpha.16.1 retains the `controller_timing` attachment on `/bbk:agents json`. While native `ask` is open, human output prefixes `WAITING_ON_USER`, request IDs, wait start, and the count of independently active BBK peers. `/bbk:timing` reports the same wait separately from provider, tool, and sub-agent observations; it does not infer compute from unattributed time.
+
+## Exact OMP 16.4.8 child-lifetime cause
+
+BBK alpha.16.1 retains the child-lifetime contract introduced in alpha.13.3 and targets OMP `16.4.8`. That release has two task-execution paths.
 
 ### Native background path
 
@@ -14,7 +52,7 @@ When all of the following are true:
 
 OMP registers each task spawn as a managed background job and returns control to the parent. The lifecycle event marks the spawn `detached`, a job handle is available for inspect/wait/cancel, and the result is delivered when the child yields.
 
-All generated alpha.13.4 OMP BBK agents explicitly declare:
+All generated alpha.16.1 OMP BBK agents explicitly declare:
 
 ```yaml
 blocking: false
@@ -30,9 +68,9 @@ An IRC message, user response, or steering wake can interrupt the parent's curre
 
 The ordinary model-facing `task` schema does not expose a per-call `detached`, `preserveOnInterrupt`, or non-cascading wait field. Execution mode is derived from OMP's host setting and agent frontmatter.
 
-## Alpha.13.3 implementation path
+## Current scheduling path, introduced in alpha.13.3
 
-Alpha.13.3 uses the native OMP path where it is available and a BBK scheduling fallback everywhere else.
+BBK uses the native OMP path where it is available and a scheduling fallback everywhere else.
 
 1. All 19 generated OMP roles declare `blocking: false`.
 2. A role that sends a `BBK_USER_REQUEST` or equivalent controller callback does not enter a cancellation-sensitive blocking child wait while an immediate response may arrive.
@@ -41,9 +79,9 @@ Alpha.13.3 uses the native OMP path where it is available and a BBK scheduling f
 5. Local analysis may continue while waiting. Independent child work may run concurrently only through a host-proven detached or non-cascading lifetime; otherwise BBK sequences safely.
 6. A parent wake is not cancellation authority. Explicit cancellation, declared cascading abort policy, process/session termination, and unrecoverable runtime failure remain valid cancellation paths.
 
-This avoids the observed failure whether OMP background execution is enabled or not. BBK does not force the user's OMP `async.enabled` setting and does not add a second scheduler.
+This avoids the observed cancellation whether OMP background execution is enabled or not. BBK does not force the user's OMP `async.enabled` setting and does not add a second scheduler.
 
-## Before and after
+## Before and after the sequencing correction
 
 Before alpha.13.3, a parent could send a user decision request, immediately enter an inline specialist batch, then have the user response interrupt that task call and cancel the specialists.
 
@@ -71,6 +109,6 @@ The parent may claim specialist completion only from the successful validated re
 
 ## Upstream boundary
 
-A per-call override would require OMP to expose model-facing lifetime selection separate from agent frontmatter and host settings. Alpha.13.3 does not assume such an option.
+A per-call lifetime override would require OMP to expose model-facing lifetime selection separate from agent frontmatter and host settings. BBK does not assume such an option.
 
 The available managed-job path already provides inspect, wait, result delivery, and explicit cancel operations. When that path is disabled or absent, BBK relies on safe sequencing rather than pretending the inline `AbortSignal` is non-cascading.

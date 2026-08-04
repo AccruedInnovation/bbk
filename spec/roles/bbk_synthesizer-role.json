@@ -60,6 +60,7 @@
   "skills": [
     "bbk-synthesize",
     "bbk-context-routing",
+    "bbk-artifact",
     "bbk-handoff",
     "bbk-evidence",
     "bbk-solution-outcome-fit",
@@ -80,6 +81,7 @@
     "bbk-prompt-durable-handoff",
     "bbk-prompt-handoff-protocol",
     "bbk-prompt-state-claim-truth",
+    "bbk-prompt-authority-completion-vocabulary",
     "bbk-prompt-profile-qualification",
     "bbk-prompt-proportional-stop",
     "bbk-prompt-evidence-lineage",

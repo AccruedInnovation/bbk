@@ -339,6 +339,8 @@ Keep candidate production, frozen identity, assurance, repair, and successor evi
 - `CANDIDATE.READ_ONLY` — Candidate-bound assurance is read-only except explicitly authorized scratch or observation effects. Evaluators never repair the candidate they are evaluating.
 - `CANDIDATE.SUCCESSOR` — Any governed candidate mutation creates a successor identity and invalidates evidence according to declared dependency closure; predecessor candidate, findings, and evidence remain preserved.
 - `CANDIDATE.SEPARATE_LIFECYCLES` — Candidate-producing cohorts and candidate-bound assurance runs are separate lifecycles linked by exact candidate identity, not by shared mutable status.
+- `CANDIDATE.REQUIRED_FINALIZATION_EXACT` — When the controlling request explicitly requires `bbk artifact finalize`, satisfy that exact operation with a successful publication receipt. A handoff package, passing tests, a raw implementation directory, `artifact seal`, an archive, or an ad hoc digest is not an equivalent substitute. Report the requirement as blocked until the exact finalization operation succeeds or the user explicitly changes it.
+- `CANDIDATE.FINALIZATION_FRESHNESS` — Finalization evidence is bound to the exact source selection and source snapshot that produced it. Any later selected-source addition, removal, or byte change makes that evidence stale. Run deterministic artifact freshness against the publication receipt immediately before a completion relay; stale evidence requires current verification and a successor revision rather than reuse of the predecessor claim.
 
 <!-- End BBK prompt module bbk-prompt-candidate-integrity -->
 

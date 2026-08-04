@@ -1,6 +1,6 @@
 {
   "schema_version": "bbk.roles.v4",
-  "package_version": "0.1.0-alpha.15",
+  "package_version": "0.1.0-alpha.16.1",
   "projection_schema": "spec/schemas/bbk-roles-v4.schema.json",
   "source_catalog": "spec/roles/catalog.json",
   "prompt_module_package": "spec/prompt-modules/catalog.json",
@@ -8,130 +8,130 @@
   "source_manifest": {
     "catalog": {
       "path": "spec/roles/catalog.json",
-      "bytes": 16939,
-      "sha256": "248e7075cedd0c0693f92f4f6687705d28d58bbe0f8b347189bd0f42df604f2c"
+      "bytes": 16941,
+      "sha256": "693b61942fa0a834c0928a89dc050a7481f8a50d0bb250c04c3eaa6231c7625e"
     },
     "roles": [
       {
         "name": "bbk_root_wayfinder",
         "path": "spec/roles/bbk_root_wayfinder-role.json",
-        "bytes": 20680,
-        "sha256": "73d89ada1ee70c86d5fc958586a957cf5032bd29e7c7d1d20a181dbee65867cf"
+        "bytes": 21383,
+        "sha256": "3fd3ca574582ddd9fbc19d24c792ab8cd64074db8c8b2dbdb2df400b82130e51"
       },
       {
         "name": "bbk_territory_wayfinder",
         "path": "spec/roles/bbk_territory_wayfinder-role.json",
-        "bytes": 25188,
-        "sha256": "4c3716020936a85b71083935a915b0a3afb069d3f5a9eaa45a5a82ad1d5a9ba5"
+        "bytes": 25258,
+        "sha256": "341820422a2a8c89dd5691a79f21d65fa35add1b25c6f8a9235ceee912e3722e"
       },
       {
         "name": "bbk_questioning_wayfinder",
         "path": "spec/roles/bbk_questioning_wayfinder-role.json",
-        "bytes": 28892,
-        "sha256": "3ad7c6de233c375bad47509236507c81169f57199a935e5eb193b0e112134925"
+        "bytes": 28962,
+        "sha256": "71482dbe5c59e661730b8cc0b125436da3370ccb91c8fb0550b5cdad531baa22"
       },
       {
         "name": "bbk_planning_wayfinder",
         "path": "spec/roles/bbk_planning_wayfinder-role.json",
-        "bytes": 30908,
-        "sha256": "6e23bf1841f0bc28dad36577c7fa2c4e3dc816da60d95f08a487f4d8d091fe94"
+        "bytes": 30978,
+        "sha256": "db54852684b844deda87096151b3bddac26348573df194b7663d7a9ad4ca41d6"
       },
       {
         "name": "bbk_phase_wayfinder",
         "path": "spec/roles/bbk_phase_wayfinder-role.json",
-        "bytes": 37221,
-        "sha256": "c1f96cc096484eb4f7a3b89a296a172b6a6fd7a504df9ecf5c8d1e533489f260"
+        "bytes": 37291,
+        "sha256": "9fe8b4e6526795bd6514756eb381d4c088aaa953050b98f5062186d6de0a1f45"
       },
       {
         "name": "bbk_question_guide",
         "path": "spec/roles/bbk_question_guide-role.json",
-        "bytes": 30693,
-        "sha256": "665c2e2411533cf6d624d503c19a395cbf52b1fa0a156d11dcec307e6a69ce2d"
+        "bytes": 30763,
+        "sha256": "f7e15d705816dd322abe53df9aa7e8e23dcde58a5db06457a13d92311a15dcc4"
       },
       {
         "name": "bbk_researcher",
         "path": "spec/roles/bbk_researcher-role.json",
-        "bytes": 25200,
-        "sha256": "fd294a654b9c4d9c90f3a6971bb1b31277e0127e80d4a0e3fc98f549f86ace0f"
+        "bytes": 25270,
+        "sha256": "90ec2e71598f63d88d3607d0dcef6064715c431ad622453b72633c74ca672288"
       },
       {
         "name": "bbk_prototyper",
         "path": "spec/roles/bbk_prototyper-role.json",
-        "bytes": 38471,
-        "sha256": "930af67ce460a8c52c845811b833e14ca619304c7f621b0f051d0ac5d5aa77ca"
+        "bytes": 38541,
+        "sha256": "b30d452bcb21d0662bb7e38fb614591e72eead136a9789e481ae98f56e15fbf4"
       },
       {
         "name": "bbk_synthesizer",
         "path": "spec/roles/bbk_synthesizer-role.json",
-        "bytes": 25003,
-        "sha256": "7735e2c3ce8cb6c1fec414272f88085054689f9307697d27691e122bce66a662"
+        "bytes": 25073,
+        "sha256": "e5cc1c16c90074c7ddfe9825710559539822bba4741402b95c4e1601c50236c5"
       },
       {
         "name": "bbk_architect",
         "path": "spec/roles/bbk_architect-role.json",
-        "bytes": 43113,
-        "sha256": "71c46282e2341b411d9a60e796302255cbded1478267b6be397dd9160eaa5552"
+        "bytes": 43183,
+        "sha256": "8ed156c334fc9aad1194a4758a33279f952acc36bd589597b15fe697a4c2b058"
       },
       {
         "name": "bbk_verification_designer",
         "path": "spec/roles/bbk_verification_designer-role.json",
-        "bytes": 35884,
-        "sha256": "6ee29244d446b64bb94678cead7b841506b23dbda1ee9df5657c263961a80273"
+        "bytes": 35954,
+        "sha256": "26839495a2e2256eefdcd352ac9279bf573d03669be8d8964b1604bee32282d7"
       },
       {
         "name": "bbk_worker_designer",
         "path": "spec/roles/bbk_worker_designer-role.json",
-        "bytes": 42325,
-        "sha256": "43931cf5bb73f5a8f957bb957295bed69336731ce75b994d2b320e639145bb8f"
+        "bytes": 42395,
+        "sha256": "8f076e18034a7d5f3594dfa641ecaede5b9efc4838c6222619eeff760bc6240d"
       },
       {
         "name": "bbk_reviewer",
         "path": "spec/roles/bbk_reviewer-role.json",
-        "bytes": 38327,
-        "sha256": "7a06ea32a3d621186393b2dd1a80efca7411ca2fddded3597a2b925290af7047"
+        "bytes": 38397,
+        "sha256": "6d35355d3e6677de14622b754d543fd80c9b9b0449ac2dd7751798d389777677"
       },
       {
         "name": "bbk_root_orchestrator",
         "path": "spec/roles/bbk_root_orchestrator-role.json",
-        "bytes": 41791,
-        "sha256": "ba060ed338cc331436ccf88e98fddfa321c7af2190df3e479fdd33d8d7ef797a"
+        "bytes": 42628,
+        "sha256": "7edfaa09253c4fbfe6fa0b5b5a8891e1770de284e575e70f2ae74f032ded75f5"
       },
       {
         "name": "bbk_territory_orchestrator",
         "path": "spec/roles/bbk_territory_orchestrator-role.json",
-        "bytes": 44080,
-        "sha256": "98c08b6f87958991f711f076081c8243dc4d0cf28a8e9da251a7e630faed54fd"
+        "bytes": 44150,
+        "sha256": "8127f654e47f5911f32f8b541b5db7aa56518568fa045f9b4b502da750e0c6c0"
       },
       {
         "name": "bbk_worker_orchestrator",
         "path": "spec/roles/bbk_worker_orchestrator-role.json",
-        "bytes": 42772,
-        "sha256": "2a22ab27544f040668be66189326310a318e2af629a0d2b7c156eceee75fb57d"
+        "bytes": 42842,
+        "sha256": "4cf5965722323e9e06f70b4b7248ffad14595f6ea4fe66390beb69cf2b6ce7fe"
       },
       {
         "name": "bbk_validator_orchestrator",
         "path": "spec/roles/bbk_validator_orchestrator-role.json",
-        "bytes": 46088,
-        "sha256": "0d2f91d504a3f62a8561e092f11b8dfa2e9ce8828548b328011792cf3024568f"
+        "bytes": 46158,
+        "sha256": "ea177aaa08f52f9bb07ef50a59570dc7c1c567a36f4fbeb35b8725bcb96d1da4"
       },
       {
         "name": "bbk_worker",
         "path": "spec/roles/bbk_worker-role.json",
-        "bytes": 34375,
-        "sha256": "f629ce1a36010aab5c72b792071b501f6738a1fa0358350edc3b3c2c215a0bc8"
+        "bytes": 34445,
+        "sha256": "448ab0beb2637371e1b1dbabda3e90a437cfc0b193114a83a88805a6376667ea"
       },
       {
         "name": "bbk_validator",
         "path": "spec/roles/bbk_validator-role.json",
-        "bytes": 36698,
-        "sha256": "e3cdc2ab0be3d96750cd3417d8e6547ef058e0e277635e4bfde43818e52458c7"
+        "bytes": 36768,
+        "sha256": "f9623bd7504a6b76e6897427e887b6816e721ea9ad85cbc64372b9900800a940"
       }
     ],
     "prompt_modules": [
       {
         "path": "spec/prompt-modules/catalog.json",
-        "bytes": 4893,
-        "sha256": "2a92568bdd225cfacbee08130c65ef18aeb3351bf61924931e9279f84e58060c"
+        "bytes": 5050,
+        "sha256": "71b75e3f171e4eecff2bbec3cdc1e5f514627382c7a734976b16988b96cf3781"
       },
       {
         "path": "spec/prompt-modules/bbk-prompt-role-boundary.json",
@@ -172,6 +172,11 @@
         "path": "spec/prompt-modules/bbk-prompt-state-claim-truth.json",
         "bytes": 2569,
         "sha256": "0b781cbacabdab56781155ce0813d39f9cfc4ace292726dd203309760699ca75"
+      },
+      {
+        "path": "spec/prompt-modules/bbk-prompt-authority-completion-vocabulary.json",
+        "bytes": 3962,
+        "sha256": "43929fc9fccffe9f654b486f3ba16015f82844a43d1a5fbf13207e20d3b9f80d"
       },
       {
         "path": "spec/prompt-modules/bbk-prompt-executable-baseline.json",
@@ -230,8 +235,8 @@
       },
       {
         "path": "spec/prompt-modules/bbk-prompt-candidate-integrity.json",
-        "bytes": 1437,
-        "sha256": "b89022348e693700d7cf522a5179df579fddc19fc3dfa02dc359c5012245e47a"
+        "bytes": 2411,
+        "sha256": "2a35f287105a7b1e62eb98845fd4265555a1676a0ace258d0d286b11c91d899e"
       },
       {
         "path": "spec/prompt-modules/bbk-prompt-planning-source-integrity.json",
@@ -710,10 +715,10 @@
       "description": "Own the end-to-end BBK planning state: establish the operational destination and decision posture, coordinate proportionate uncertainty reduction, integrate current planning artifacts, and submit a versioned executable operating baseline through the harness-root controller for accountable acceptance.",
       "escalations": [
         "Route material outcome choices, user-reserved trade-offs, protected-floor exceptions, hard-to-reverse commitments, and residual-risk decisions through `bbk_questioning_wayfinder`; send the resulting recommendation-first request to the harness-root controller only when accountable human input is required.",
-        "Send exact baseline-acceptance and uncovered execution-authority requests to the harness-root controller. Acceptance of the planning baseline and authorization of its effects are separate decisions unless the recorded authority explicitly combines them.",
+        "Send exact baseline-acceptance and uncovered effect-authority requests to the harness-root controller. Acceptance of the planning baseline, WORKSPACE_IMPLEMENTATION authority, and EXTERNAL_EXECUTION authority are separate decisions unless the recorded authority explicitly combines them; do not request external authority merely to produce artifacts under PRODUCE_ONLY.",
         "When a governing decision, source, interface, or subject becomes stale, invalidate dependent planning state, reopen the affected frontier, and dispatch the smallest sufficient re-evaluation. Escalate to the controller only when resolution requires user-only context, authority, risk acceptance, or a reserved preference.",
         "Return unavailable evidence, tools, profiles, environments, or host capabilities as an exact typed blocker after exhausting cheaper authorized alternatives; do not convert technical insufficiency into a user decision.",
-        "After the exact versioned baseline is accepted and execution is authorized, return `READY_TO_EXECUTE` and the verified handoff to the harness-root controller. Do not invoke or supervise the execution root directly."
+        "After the exact versioned baseline is accepted and the next campaign effects are authorized, return `READY_TO_EXECUTE` and the verified handoff to the harness-root controller. PRODUCE_ONLY is sufficient when the next effects are confined to WORKSPACE_IMPLEMENTATION; EXTERNAL_EXECUTION remains blocked. Do not invoke or supervise the execution root directly."
       ],
       "family": "planning",
       "human_decision_triggers": [
@@ -750,6 +755,7 @@
         "bbk-prompt-delegation-return",
         "bbk-prompt-durable-handoff",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-authority-completion-vocabulary",
         "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
@@ -773,11 +779,11 @@
         "Own semantic integration across territories and route governing conflicts or user-reserved choices without erasing dissent, uncertainty, blockers, or stale state. Use `bbk_synthesizer` when a declared source set needs provenance-preserving reconciliation or compression; retain planning integration and decision ownership.",
         "Ensure proportionate SolutionOutcomeFit, architecture, implementation structure, executable work planning, state/effect design, verification design, worker-invocation design, and independent review exist when applicable while preserving each specialist role's ownership.",
         "Maintain the operating baseline as an exact versioned object with source references, acceptance state, execution-authority state, residual uncertainty, invalidation triggers, and supersession history.",
-        "Submit the proposed baseline through the harness-root controller for accountable acceptance and obtain execution authorization separately when it is not already covered by a current standing grant.",
+        "Submit the proposed baseline through the harness-root controller for accountable acceptance and obtain the exact applicable effect authority separately when it is not already covered by a current standing grant. Treat PRODUCE_ONLY as authority for WORKSPACE_IMPLEMENTATION while preserving EXTERNAL_EXECUTION as unauthorized.",
         "Produce a durable, digest-bound planning handoff and return the exact readiness disposition, recommended next root, and smallest valid next action to the harness-root controller.",
         "Project current root project, territory, and decision coordination records through `bbk-beads` when the project mapping is enabled; retain BBK identity, authority, acceptance, and baseline state as canonical and report tracker drift without converting it into semantic state.",
         "Classify unresolved items as environment facts, configuration parameters, reversible implementation choices, architectural decisions, authority expansions, or user-reserved preferences; discover, parameterize, default, or defer the first three where responsible, and batch only genuinely material user-attention requests with stable identities and recommendation-first context.",
-        "After Main relays accountable baseline acceptance, accepted planning decisions, or execution authority, resume the same logical Root Wayfinder to integrate those responses into the current baseline. Recommend Root Orchestrator only from a current planning state that references the accepted baseline, exact acceptance, exact authority, and an executable work graph rather than a phase outline.",
+        "After Main relays accountable baseline acceptance, accepted planning decisions, WORKSPACE_IMPLEMENTATION authority, or EXTERNAL_EXECUTION authority, resume the same logical Root Wayfinder to integrate those responses into the current baseline. Recommend Root Orchestrator only from a current planning state that references the accepted baseline, exact acceptance, exact applicable authority, and an executable work graph rather than a phase outline.",
         "Explicitly disposition every material specialist-requested review, unresolved blocker, conditional branch, open decision, and successor requirement; preserve conditional currentness and obtain a bounded specialist confirmation or successor after a governing branch changes unless exact integration authority was delegated."
       ],
       "return_contract": {
@@ -920,7 +926,7 @@
       "scope": [
         "Own the root planning state, cross-territory boundaries and interfaces, decision posture, planning-artifact integration, baseline lifecycle, and final planning handoff from uncertain intent through controller-mediated acceptance of an executable operating baseline.",
         "Child roles retain ownership of bounded territory planning, decision branches, architecture proposals, executable work-graph decomposition, verification design, worker-invocation design, provenance-preserving synthesis, and independent review. The Root Wayfinder integrates their current outputs but does not silently perform or approve their responsibilities.",
-        "May create, update, invalidate, and supersede root-owned planning and coordination records. Does not perform production effects, accept its own baseline, grant execution authority without accountable authority, validate candidates, or grant release."
+        "May create, update, invalidate, and supersede root-owned planning and coordination records. Does not perform production effects, accept its own baseline, grant authority without accountable authority, validate candidates, or grant release. It distinguishes WORKSPACE_IMPLEMENTATION from EXTERNAL_EXECUTION and may bind PRODUCE_ONLY as the applicable implementation authority when the user requests reviewable artifacts without deployment."
       ],
       "skills": [
         "bbk-plan",
@@ -936,6 +942,7 @@
         "bbk-context-routing",
         "bbk-beads",
         "bbk-wayfind",
+        "bbk-artifact",
         "bbk-handoff"
       ],
       "spawns": [
@@ -1007,6 +1014,7 @@
         "bbk-prompt-delegation-return",
         "bbk-prompt-durable-handoff",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-authority-completion-vocabulary",
         "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
@@ -1212,6 +1220,7 @@
         "bbk-context-routing",
         "bbk-beads",
         "bbk-wayfind",
+        "bbk-artifact",
         "bbk-handoff"
       ],
       "spawns": [
@@ -1284,6 +1293,7 @@
         "bbk-prompt-delegation-return",
         "bbk-prompt-durable-handoff",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-authority-completion-vocabulary",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
         "bbk-prompt-liveness-recovery",
@@ -1493,6 +1503,7 @@
         "bbk-context-routing",
         "bbk-beads",
         "bbk-question-branch",
+        "bbk-artifact",
         "bbk-handoff"
       ],
       "spawns": [
@@ -1554,6 +1565,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-authority-completion-vocabulary",
         "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-execution-slicing",
@@ -1787,6 +1799,7 @@
         "bbk-review-plan",
         "bbk-review-intent",
         "bbk-context-routing",
+        "bbk-artifact",
         "bbk-handoff"
       ],
       "spawns": [
@@ -1850,6 +1863,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-authority-completion-vocabulary",
         "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-execution-slicing",
@@ -2115,6 +2129,7 @@
         "bbk-review-plan",
         "bbk-procedure-design",
         "bbk-context-routing",
+        "bbk-artifact",
         "bbk-handoff"
       ],
       "spawns": [
@@ -2194,6 +2209,7 @@
         "bbk-procedure-design",
         "bbk-context-routing",
         "bbk-grill",
+        "bbk-artifact",
         "bbk-handoff"
       ],
       "primary_skill": "bbk-grill",
@@ -2207,6 +2223,7 @@
         "bbk-prompt-human-request",
         "bbk-prompt-durable-handoff",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-authority-completion-vocabulary",
         "bbk-prompt-proportional-stop",
         "bbk-prompt-liveness-recovery",
         "bbk-prompt-evidence-lineage",
@@ -2477,6 +2494,7 @@
         "bbk-prompt-context-human-relay",
         "bbk-prompt-durable-handoff",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-authority-completion-vocabulary",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
         "bbk-prompt-evidence-lineage",
@@ -2669,6 +2687,7 @@
       "skills": [
         "bbk-research",
         "bbk-context-routing",
+        "bbk-artifact",
         "bbk-handoff"
       ],
       "spawns": [],
@@ -2761,6 +2780,7 @@
         "bbk-installed-profiles",
         "bbk-state-decision-effect-design",
         "bbk-context-routing",
+        "bbk-artifact",
         "bbk-handoff"
       ],
       "primary_skill": "bbk-prototype",
@@ -2775,6 +2795,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-authority-completion-vocabulary",
         "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
@@ -3056,6 +3077,7 @@
       "skills": [
         "bbk-synthesize",
         "bbk-context-routing",
+        "bbk-artifact",
         "bbk-handoff",
         "bbk-evidence",
         "bbk-solution-outcome-fit",
@@ -3076,6 +3098,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-authority-completion-vocabulary",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
         "bbk-prompt-evidence-lineage",
@@ -3294,6 +3317,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-authority-completion-vocabulary",
         "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
@@ -3553,6 +3577,7 @@
       "skills": [
         "bbk-architecture",
         "bbk-context-routing",
+        "bbk-artifact",
         "bbk-handoff",
         "bbk-solution-outcome-fit",
         "bbk-implementation-structure",
@@ -3643,6 +3668,7 @@
         "bbk-installed-profiles",
         "bbk-procedure-design",
         "bbk-context-routing",
+        "bbk-artifact",
         "bbk-handoff"
       ],
       "primary_skill": "bbk-verification-design",
@@ -3656,6 +3682,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-authority-completion-vocabulary",
         "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
@@ -3948,6 +3975,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-authority-completion-vocabulary",
         "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-profile-dispatch",
@@ -4246,6 +4274,7 @@
         "bbk-profile-routing",
         "bbk-installed-profiles",
         "bbk-context-routing",
+        "bbk-artifact",
         "bbk-handoff",
         "bbk-evidence",
         "bbk-implementation-structure",
@@ -4339,6 +4368,7 @@
         "bbk-profile-routing",
         "bbk-installed-profiles",
         "bbk-context-routing",
+        "bbk-artifact",
         "bbk-handoff"
       ],
       "primary_skill": "bbk-review",
@@ -4352,6 +4382,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-authority-completion-vocabulary",
         "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
@@ -4573,7 +4604,7 @@
         "bbk_reviewer": "the active baseline or current authorized execution direction contains one exact global, cross-territory, recovery, intent-conformance, proportionality, or completion-report claim that needs a distinct independent judgment beyond deterministic gates and candidate-bound validation, with a current bounded subject, exact assertions or questions, complete context and exposure policy, result schema, and finding-disposition route",
         "bbk_territory_orchestrator": "one current immutable TerritoryExecutionBoundary has satisfied its full entry contract, including coherent responsibility and completion semantics, closed WorkUnit and dependency membership, exact source and interface bindings, bounded authority and effect fence, workspace and resource isolation, quality and validation obligations, containment and recovery, qualified roles and tools, exact context, and a durable return contract"
       },
-      "description": "Own global coordination of one exact, accepted and separately authorized BBK execution campaign: bind the operating and execution baselines, admit immutable territory execution boundaries, coordinate global dependencies, cross-boundary integration, resources, evidence, findings, recovery, and controller-facing status, and return a truthful completion-readiness or successor-planning report without performing implementation, validation, or acceptance.",
+      "description": "Own global coordination of one exact, accepted and effect-authorized BBK execution campaign, including a PRODUCE_ONLY campaign confined to WORKSPACE_IMPLEMENTATION: bind the operating and execution baselines, admit immutable territory execution boundaries, coordinate global dependencies, cross-boundary integration, resources, evidence, findings, recovery, and controller-facing status, and return a truthful completion-readiness or successor-planning report without performing implementation, validation, or acceptance.",
       "escalations": [
         "Require local implementation, validation, repair, infrastructure, descendant recovery, and territory sequencing issues to travel through their owning Territory Orchestrator. Handle only declared global dependencies, shared resources, cross-boundary integration, campaign controls, cumulative policy, and material campaign consequences at the root.",
         "For a material outcome, requirement, architecture, shared-interface, scope, plan, assurance, protected-floor, risk, completion, or baseline change, fence affected work, preserve state, calculate impact, continue only positively isolated unaffected work, and return an exact `PLANNING_DECISION_REQUIRED` or successor-baseline signal through the harness-root controller with `recommended_next_root: bbk_root_wayfinder`.",
@@ -4617,6 +4648,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-authority-completion-vocabulary",
         "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
@@ -4634,11 +4666,11 @@
         "bbk-prompt-assurance-modes",
         "bbk-prompt-candidate-focused-review"
       ],
-      "purpose": "Keep one authorized execution campaign coherent, contained, recoverable, and evidence-grounded from startup eligibility through controller completion assessment, allowing routine work to proceed locally while fencing material deviations and returning planning or authority changes through the harness-root controller to the responsible owner.",
+      "purpose": "Keep one effect-authorized execution campaign coherent, contained, recoverable, and evidence-grounded from startup eligibility through controller completion assessment, allowing routine work to proceed locally while fencing material deviations and returning planning or authority changes through the harness-root controller to the responsible owner.",
       "responsibilities": [
-        "Bind the exact root execution charter before coordinating children: governed subject, accepted operating baseline and acceptance receipt, compiled execution baseline and source-object closure, execution authorization, campaign and semantic-run identity, current physical attempt, host-exposed lease or fencing state and any missing enforcement limitation, qualified role and model/profile route, repositories, environments, resources, budgets, feared-event controls, completion contract, planning counterpart, harness-root controller route, and return schema.",
+        "Bind the exact root execution charter before coordinating children: governed subject, accepted operating baseline and acceptance receipt, compiled execution baseline and source-object closure, exact applicable effect authority, campaign and semantic-run identity, current physical attempt, host-exposed lease or fencing state and any missing enforcement limitation, qualified role and model/profile route, repositories, environments, resources, budgets, feared-event controls, completion contract, planning counterpart, harness-root controller route, and return schema. Under PRODUCE_ONLY, admit WORKSPACE_IMPLEMENTATION effects and explicitly fence every EXTERNAL_EXECUTION effect.",
         "Verify startup and resume eligibility before any Territory Orchestrator launch: exact identities and digests, current acceptance and authorization, compiler and qualification receipts, repository and workspace state, host and substrate health, provider and tool availability, uniqueness of the semantic run and current attempt, and a digest-bound startup handshake. Do not claim that deterministic authorization, lease, fencing, or core state was checked when the current BBK host cannot establish it; narrow effects or return a typed blocker instead.",
-        "Keep planning acceptance, execution-baseline compilation, execution authorization, root-run reservation, physical-attempt startup, verified handshake, active execution, completion-report readiness, operational observation, outcome assessment, accountable acceptance, and release as distinct states. Never self-authorize, self-launch, or infer effect authority from planning approval.",
+        "Keep planning acceptance, execution-baseline compilation, WORKSPACE_IMPLEMENTATION authority, EXTERNAL_EXECUTION authority, root-run reservation, physical-attempt startup, verified handshake, active execution, completion-report readiness, operational observation, outcome assessment, accountable acceptance, and release as distinct states. Never self-authorize, self-launch, or infer one effect class from approval of another.",
         "Maintain one current global campaign graph across capability and phase references, immutable TerritoryExecutionBoundaries, WorkUnit membership, global dependencies, shared resources, canonical interfaces, cross-boundary bindings, integration obligations, assertions, evidence, feared-event controls, deterministic impact sets, invalidation, and completion conditions.",
         "Enforce campaign invariants: every executable WorkUnit belongs to exactly one current TerritoryExecutionBoundary; every mutable region has one fenced production owner; every cross-boundary interaction has an exact binding, dependency, or gate; and every integration obligation has one accountable execution owner. Missing ownership or boundary closure is a planning defect, not work for the Root Orchestrator to absorb.",
         "Admit `bbk_territory_orchestrator` only for one exact immutable boundary whose responsibility, WorkUnit and dependency closure, source and interface bindings, authority and effect fence, workspace and resource isolation, quality and validation obligations, containment, recovery, completion semantics, qualified roles and tools, context package, and handoff satisfy the entry contract.",
@@ -4663,7 +4695,8 @@
         "Produce one durable, digest-bound checkpoint or final report containing the exact subject, controller and planning routes, campaign charter, operating and execution baselines, authorization, semantic run and attempts, boundaries, dependencies, integration, resources, authority, candidates, evidence, findings, reviews, discoveries, signals, recovery, cleanup, residuals, completion assessment, requested parent actions, and smallest valid next action.",
         "Project root execution-state transitions and compact handoff pointers through `bbk-beads` when the project mapping is enabled; keep execution authority, candidate identity, validation admission, completion, and release state canonical in BBK.",
         "Proceed without user reauthorization for routine plan-detail corrections, local sequencing, reversible implementation choices, ordinary repairs, compatible substitutions, and a single safe realistic blocker resolution that remains inside the accepted outcome and exact authority; record deviations and ask only for a genuine material branch or exact authority expansion.",
-        "Consume exact accepted-baseline, acceptance, executable-work-graph, and execution-authority references supplied by the responsible planning and authority owners. Never author, repair, broaden, or retroactively record the acceptance or authority that made this same campaign eligible."
+        "Consume exact accepted-baseline, acceptance, executable-work-graph, and execution-authority references supplied by the responsible planning and authority owners. Never author, repair, broaden, or retroactively record the acceptance or authority that made this same campaign eligible.",
+        "Under PRODUCE_ONLY, continue through implementation-artifact production and local non-destructive verification inside the authorized workspace without requesting deployment authority. Stop before the first external host, remote service, credential, network, publication, deployment, migration, or release effect, and return IMPLEMENTATION_ARTIFACTS_COMPLETE only when exact evidence supports it."
       ],
       "return_contract": {
         "allowed_invocation_modes": [
@@ -4882,7 +4915,7 @@
         "supplemental_enums": {}
       },
       "scope": [
-        "Own the active root execution-campaign coordination state for one exact accepted operating baseline, compiled execution baseline, execution authorization, and canonical root semantic run. This includes TerritoryExecutionBoundary admission, global dependency and integration state, shared-resource and budget arbitration, authority and scope-fence propagation, direct-child coordination, durable execution signals, campaign-level candidate/evidence/finding lineage, recovery, and completion-readiness reporting.",
+        "Own the active root execution-campaign coordination state for one exact accepted operating baseline, compiled execution baseline, exact applicable effect authority, and canonical root semantic run. Applicable authority may be PRODUCE_ONLY for WORKSPACE_IMPLEMENTATION while EXTERNAL_EXECUTION remains withheld. This includes TerritoryExecutionBoundary admission, global dependency and integration state, shared-resource and budget arbitration, authority and scope-fence propagation, direct-child coordination, durable execution signals, campaign-level candidate/evidence/finding lineage, recovery, and completion-readiness reporting.",
         "The harness-root controller owns physical root selection, user-facing interaction, structured `ask` use, and relay. The responsible Root Wayfinder owns planning semantics and successor planning. BBK core or the host runtime, where available, commits authorization, launch, canonical run and lease state, typed commands, fencing, and terminal semantic state. Territory Orchestrators own contained execution boundaries; Worker and Validator Orchestrators own candidate and assertion-run lifecycles; Workers and Validators perform bounded work; Reviewers own independent judgment; accountable authorities own acceptance, waiver, residual-risk acceptance, outcome acceptance, and release. The Root Orchestrator coordinates these responsibilities but does not absorb them.",
         "May create, update, checkpoint, supersede, and hand off root execution-coordination records, durable signals, status projections, recovery packages, and completion reports. It does not mutate the governed product or frozen candidates, perform leaf or integration implementation, evaluate assertions, change the accepted baseline or boundary mapping, create or broaden authority, contact the user, approve its own report, establish that the operational outcome was achieved, or grant release."
       ],
@@ -4897,6 +4930,7 @@
         "bbk-state-decision-effect-design",
         "bbk-review-plan",
         "bbk-context-routing",
+        "bbk-artifact",
         "bbk-handoff"
       ],
       "spawns": [
@@ -4962,6 +4996,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-authority-completion-vocabulary",
         "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
@@ -5220,6 +5255,7 @@
         "bbk-state-decision-effect-design",
         "bbk-review-plan",
         "bbk-context-routing",
+        "bbk-artifact",
         "bbk-handoff"
       ],
       "spawns": [
@@ -5277,6 +5313,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-authority-completion-vocabulary",
         "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
@@ -5521,6 +5558,7 @@
         "bbk-installed-profiles",
         "bbk-state-decision-effect-design",
         "bbk-context-routing",
+        "bbk-artifact",
         "bbk-handoff"
       ],
       "spawns": [
@@ -5623,6 +5661,7 @@
         "bbk-review-findings",
         "bbk-review-intent",
         "bbk-context-routing",
+        "bbk-artifact",
         "bbk-handoff"
       ],
       "primary_skill": "bbk-validation-orchestration",
@@ -5637,6 +5676,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-authority-completion-vocabulary",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
         "bbk-prompt-liveness-recovery",
@@ -5915,6 +5955,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-authority-completion-vocabulary",
         "bbk-prompt-executable-baseline",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
@@ -6135,6 +6176,7 @@
       "skills": [
         "bbk-work-unit-execution",
         "bbk-context-routing",
+        "bbk-artifact",
         "bbk-handoff",
         "bbk-evidence",
         "bbk-recover",
@@ -6221,6 +6263,7 @@
         "bbk-assertion-validation",
         "bbk-evidence",
         "bbk-context-routing",
+        "bbk-artifact",
         "bbk-handoff",
         "bbk-recover",
         "bbk-solution-outcome-fit",
@@ -6243,6 +6286,7 @@
         "bbk-prompt-durable-handoff",
         "bbk-prompt-handoff-protocol",
         "bbk-prompt-state-claim-truth",
+        "bbk-prompt-authority-completion-vocabulary",
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
         "bbk-prompt-liveness-recovery",

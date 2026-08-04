@@ -24,7 +24,7 @@ const versionPath = (() => {
   try { readFileSync(path.join(extensionDir, "VERSION")); return path.join(extensionDir, "VERSION"); }
   catch { return path.join(sourceRoot, "VERSION"); }
 })();
-let version = "0.1.0-alpha.15";
+let version = "0.1.0-alpha.16.1";
 try { version = readFileSync(versionPath, "utf8").trim() || version; } catch {}
 
 function normalizedFsPath(value) {
@@ -387,9 +387,20 @@ function conciseResultText(value, label) {
   const details = value?.details && typeof value.details === "object" ? value.details : {};
   const status = String(details.status || (value?.code === 0 ? "PASS" : "ERROR"));
   const lines = [`${label}: ${status}`];
+  if (typeof details.code === "string" && details.code.trim()) lines.push(`code: ${details.code.trim()}`);
   const message = details.error || details.message || details.parseError;
   if (typeof message === "string" && message.trim()) lines.push(message.trim().slice(0, 600));
-  for (const key of ["path", "output", "manifest_path", "candidate", "id"]) {
+  if (details.field) {
+    const received = details.received !== null && details.received !== undefined ? `; received=${String(details.received)}` : "";
+    lines.push(`field: ${String(details.field)}${received}`);
+  }
+  if (Array.isArray(details.valid_values) && details.valid_values.length) {
+    lines.push(`valid values: ${details.valid_values.join(", ")}`);
+  }
+  for (const key of [
+    "path", "output", "outputRoot", "publicationReceipt", "currentPointer",
+    "manifest_path", "candidate", "id", "packageId", "revision",
+  ]) {
     if (typeof details[key] === "string" && details[key].trim()) lines.push(`${key}: ${details[key].trim()}`);
   }
   if (details.summary && typeof details.summary === "object" && !Array.isArray(details.summary)) {
@@ -397,6 +408,12 @@ function conciseResultText(value, label) {
       .filter(([, count]) => typeof count === "number")
       .map(([name, count]) => `${name}=${count}`);
     if (counts.length) lines.push(`summary: ${counts.join(", ")}`);
+  }
+  if (typeof details.example_command === "string" && details.example_command.trim()) {
+    lines.push(`example: ${details.example_command.trim()}`);
+  }
+  if (typeof details.smallest_next_action === "string" && details.smallest_next_action.trim()) {
+    lines.push(`next: ${details.smallest_next_action.trim()}`);
   }
   return lines.join("\n");
 }
@@ -424,10 +441,21 @@ function registerCommand(pi, name, description, baseArgv, { requireArgs = false 
 const BBK_MODE_ENTRY_TYPE = "bbk-mode-state";
 const BBK_MODE_SCHEMA = "bbk.omp-mode-state.v2";
 const BBK_PROMPT_RECEIPT_ENTRY_TYPE = "bbk-effective-prompt-receipt";
-const BBK_PROMPT_RECEIPT_SCHEMA = "bbk.effective-prompt-receipt.v1";
+const BBK_PROMPT_RECEIPT_SCHEMA = "bbk.effective-prompt-receipt.v2";
+const BBK_PROMPT_STATUS_SCHEMA = "bbk.prompt-status.v2";
+const BBK_PROMPT_INTEGRITY_STATUS_KEY = "bbk-prompt-integrity";
 const BBK_ACTIVITY_WIDGET_KEY = "bbk-worker-activity";
+const BBK_ARTIFACT_FINALIZATION_ENTRY_TYPE = "bbk-artifact-finalization-state";
+const BBK_ARTIFACT_FINALIZATION_SCHEMA = "bbk.omp-artifact-finalization-state.v1";
+const BBK_ARTIFACT_FINALIZATION_STATUS_KEY = "bbk-artifact-finalization";
+const BBK_ARTIFACT_FINALIZE_MARKER_RE = /(?:bbk\s+artifact\s+finalize|bbk_artifact_finalize|\/bbk:artifact:finalize)/i;
+const BBK_ARTIFACT_FINALIZE_REQUIREMENT_RE = /(?:\b(?:must|required|requires?|using|use|run|execute|finalize|publish|deliver)\b[\s\S]{0,180}(?:bbk\s+artifact\s+finalize|bbk_artifact_finalize|\/bbk:artifact:finalize)|(?:bbk\s+artifact\s+finalize|bbk_artifact_finalize|\/bbk:artifact:finalize)[\s\S]{0,180}\b(?:must|required|requires?|before|using|for the final|as part of)\b)/i;
+const BBK_ARTIFACT_FINALIZE_NEGATION_RE = /(?:(?:\b(?:do not|don't|must not|without|not required|optional)\b[\s\S]{0,100}(?:bbk\s+artifact\s+finalize|bbk_artifact_finalize|\/bbk:artifact:finalize))|(?:(?:bbk\s+artifact\s+finalize|bbk_artifact_finalize|\/bbk:artifact:finalize)[\s\S]{0,100}\b(?:do not|don't|must not|without|not required|optional)\b))/i;
+const BBK_COMPLETION_CLAIM_RE = /(?:\bBYTE_INTEGRITY_VERIFIED\b|\bDELIVERED_AND_VERIFIED\b|\bIMPLEMENTATION_ARTIFACTS_COMPLETE\b|\bSEMANTIC_REVIEW_COMPLETE\b|\bLIVE_ACCEPTANCE_VERIFIED\b|\ball (?:requested )?work (?:is|has been) complete\b|\bimplementation (?:is|has been) complete\b|\bcompleted implementation\b|\bfinal (?:delivery|completion report)\b)/i;
 const TASK_SUBAGENT_PROGRESS_CHANNEL = "task:subagent:progress";
 const TASK_SUBAGENT_LIFECYCLE_CHANNEL = "task:subagent:lifecycle";
+const BBK_COORDINATION_TOOL_NAMES = new Set(["hub", "irc", "job"]);
+const BBK_WAKE_OUTCOMES = new Set(["injected", "woken", "revived"]);
 const BBK_CONTROLLER_PROMPT_MARKER = "<bbk-controller-system";
 const BBK_AGENT_PROMPT_MARKER = "<bbk-agent-system";
 const BBK_AGENT_BLOCK_RE = /<bbk-agent-system\b[^>]*\brole="([^"]+)"[^>]*>[\s\S]*?<\/bbk-agent-system>/i;
@@ -966,6 +994,220 @@ function sourceHasGenericPromptMaterial(blocks) {
   if (!positions.length) return Boolean(text.trim());
   return Boolean(text.slice(0, Math.min(...positions)).trim());
 }
+function cloneProviderValue(value) {
+  try { return structuredClone(value); }
+  catch {
+    try { return JSON.parse(JSON.stringify(value)); }
+    catch { return value; }
+  }
+}
+function providerContentText(value) {
+  if (typeof value === "string") return value;
+  if (Array.isArray(value)) {
+    return value.map(item => {
+      if (typeof item === "string") return item;
+      if (item && typeof item === "object") {
+        if (typeof item.text === "string") return item.text;
+        if (typeof item.content === "string") return item.content;
+      }
+      return "";
+    }).filter(Boolean).join("\n");
+  }
+  if (value && typeof value === "object") {
+    if (typeof value.text === "string") return value.text;
+    if (typeof value.content === "string") return value.content;
+    if (Array.isArray(value.parts)) return providerContentText(value.parts);
+  }
+  return "";
+}
+function providerMessageRole(value) {
+  return String(value?.role || "").trim().toLowerCase();
+}
+function providerMessageBlocks(messages) {
+  if (!Array.isArray(messages)) return [];
+  return messages
+    .filter(item => ["system", "developer"].includes(providerMessageRole(item)))
+    .map(item => providerContentText(item?.content))
+    .filter(text => text.length > 0);
+}
+function providerPromptSurfaceData(payload) {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    return { blocks: [], count: 0 };
+  }
+  const blocks = [];
+  let count = 0;
+  for (const key of ["instructions", "system", "systemInstruction", "systemPrompt"]) {
+    if (!Object.prototype.hasOwnProperty.call(payload, key)) continue;
+    const text = providerContentText(payload[key]);
+    if (!text) continue;
+    blocks.push(text);
+    count += 1;
+  }
+  for (const key of ["messages", "input"]) {
+    if (!Array.isArray(payload[key])) continue;
+    const values = providerMessageBlocks(payload[key]);
+    blocks.push(...values);
+    count += payload[key].filter(item => ["system", "developer"].includes(providerMessageRole(item))).length;
+  }
+  return { blocks, count };
+}
+function filterProviderSystemMessages(value) {
+  if (!Array.isArray(value)) return value;
+  return value.filter(item => !["system", "developer"].includes(providerMessageRole(item)));
+}
+function repairProviderPromptSurfaces(payload, primary, expected) {
+  const result = cloneProviderValue(payload);
+  for (const key of ["messages", "input"]) {
+    if (Array.isArray(result[key])) result[key] = filterProviderSystemMessages(result[key]);
+  }
+  for (const key of ["instructions", "system", "systemInstruction", "systemPrompt"]) {
+    if (key !== primary) delete result[key];
+  }
+  if (primary === "messages") {
+    result.messages = [
+      { role: "system", content: expected },
+      ...filterProviderSystemMessages(result.messages || []),
+    ];
+  } else if (primary === "instructions") {
+    result.instructions = expected;
+  } else if (primary === "system") {
+    result.system = expected;
+  } else if (primary === "systemInstruction") {
+    if (typeof result.systemInstruction === "string") result.systemInstruction = expected;
+    else result.systemInstruction = { ...(result.systemInstruction || {}), parts: [{ text: expected }] };
+  } else if (primary === "systemPrompt") {
+    result.systemPrompt = expected;
+  }
+  return result;
+}
+function providerPayloadAdapterDirect(payload) {
+  if (Array.isArray(payload) && payload.every(item => item && typeof item === "object" && "role" in item)) {
+    return {
+      name: "message-array",
+      blocks: providerMessageBlocks(payload),
+      system_surface_count: payload.filter(item => ["system", "developer"].includes(providerMessageRole(item))).length,
+      repair(expected) {
+        return [
+          { role: "system", content: expected },
+          ...cloneProviderValue(payload).filter(item => !["system", "developer"].includes(providerMessageRole(item))),
+        ];
+      },
+    };
+  }
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) return null;
+
+  const surfaces = providerPromptSurfaceData(payload);
+  let name = null;
+  let primary = null;
+  if (Object.prototype.hasOwnProperty.call(payload, "systemInstruction")) {
+    name = "google-system-instruction";
+    primary = "systemInstruction";
+  } else if (Object.prototype.hasOwnProperty.call(payload, "instructions") || (Array.isArray(payload.input) && !Array.isArray(payload.messages))) {
+    name = "openai-responses";
+    primary = "instructions";
+  } else if (Object.prototype.hasOwnProperty.call(payload, "system")) {
+    name = "anthropic-system";
+    primary = "system";
+  } else if (Array.isArray(payload.messages)) {
+    name = "openai-messages";
+    primary = "messages";
+  } else if (Object.prototype.hasOwnProperty.call(payload, "systemPrompt")) {
+    name = "system-prompt-field";
+    primary = "systemPrompt";
+  }
+  if (!name || !primary) return null;
+  return {
+    name,
+    blocks: surfaces.blocks,
+    system_surface_count: surfaces.count,
+    repair(expected) {
+      return repairProviderPromptSurfaces(payload, primary, expected);
+    },
+  };
+}
+function removedPromptSurfaceCount(adapter, expectedText) {
+  if (!adapter) return 0;
+  const exactObserved = (adapter.blocks || []).some(block => block === expectedText) ? 1 : 0;
+  return Math.max(0, Number(adapter.system_surface_count || 0) - exactObserved);
+}
+
+function providerPayloadAdapter(payload) {
+  const direct = providerPayloadAdapterDirect(payload);
+  if (direct) return direct;
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) return null;
+  for (const key of ["body", "request", "payload"]) {
+    if (!Object.prototype.hasOwnProperty.call(payload, key)) continue;
+    const nested = providerPayloadAdapterDirect(payload[key]);
+    if (!nested) continue;
+    return {
+      name: `${key}.${nested.name}`,
+      blocks: nested.blocks,
+      system_surface_count: nested.system_surface_count,
+      repair(expected) {
+        const result = cloneProviderValue(payload);
+        result[key] = nested.repair(expected);
+        return result;
+      },
+    };
+  }
+  return null;
+}
+function canonicalPromptBlockFromText(value) {
+  const text = String(value || "");
+  const patterns = [
+    /<bbk-controller-system\b[^>]*>[\s\S]*?<\/bbk-controller-system>/i,
+    /<bbk-agent-replacement\b[^>]*>[\s\S]*?<\/bbk-agent-replacement>/i,
+    /<bbk-prompt-assembly-failure\b[^>]*>[\s\S]*?<\/bbk-prompt-assembly-failure>/i,
+  ];
+  const matches = patterns.map(pattern => text.match(pattern)?.[0]?.trim()).filter(Boolean);
+  return matches.length === 1 ? matches[0] : null;
+}
+function canonicalPromptBlockFromProvider(adapter) {
+  const matches = (adapter?.blocks || []).map(canonicalPromptBlockFromText).filter(Boolean);
+  return matches.length === 1 ? matches[0] : null;
+}
+function validatedPromptMarkerCandidate(text) {
+  const raw = String(text || "").trim();
+  const candidate = canonicalPromptBlockFromText(raw);
+  if (!candidate || candidate !== raw) return null;
+  const identity = promptOuterIdentity(candidate);
+  const packageVersion = candidate.match(/^<bbk-(?:controller-system|agent-replacement|prompt-assembly-failure)\b[^>]*\bpackage-version="([^"]+)"/i)?.[1];
+  if (packageVersion !== version) return null;
+  if (identity.kind === "agent" && identity.role && BBK_ROLE_NAME_RE.test(identity.role)) {
+    const roleMatches = [...candidate.matchAll(new RegExp(BBK_AGENT_BLOCK_RE.source, "gi"))];
+    if (roleMatches.length !== 1
+      || roleMatches[0][1] !== identity.role
+      || normalizePromptBlock(roleMatches[0][0]) !== canonicalAgentBlock(identity.role)) return null;
+  } else if (!['controller', 'assembly-failure'].includes(identity.kind)) {
+    return null;
+  }
+  const summary = promptReceiptSummary([candidate]);
+  return { ...summary, text: candidate, role: identity.role, prompt_kind: identity.kind };
+}
+function promptSessionIdentity(ctx) {
+  for (const candidate of [ctx?.sessionId, ctx?.sessionManager?.sessionId]) {
+    if (typeof candidate === "string" && candidate.trim()) return candidate.trim();
+  }
+  try {
+    const id = ctx?.sessionManager?.getSessionId?.();
+    if (id) return String(id);
+  } catch {}
+  try {
+    const file = ctx?.sessionManager?.getSessionFile?.();
+    if (file) return createHash("sha256").update(String(file), "utf8").digest("hex").slice(0, 16);
+  } catch {}
+  try {
+    const header = (ctx?.sessionManager?.getBranch?.() || []).find(entry => entry?.type === "session");
+    if (header?.id) return String(header.id);
+  } catch {}
+  return `cwd:${String(ctx?.cwd || process.cwd())}`;
+}
+function blockedProviderPayload(reason) {
+  return {
+    __bbk_prompt_blocked__: true,
+    reason: oneLine(reason || "provider prompt integrity could not be established", 240),
+  };
+}
 function parseOmpPromptSections(text) {
   const normalized = String(text || "").replace(/\r\n?/g, "\n");
   const lines = normalized.split("\n");
@@ -1047,8 +1289,11 @@ function extractOmpInvocationData(text) {
 }
 function extractBbkAgentBlock(event) {
   const blocks = systemPromptBlocks(event);
-  const replacementBlocks = blocks.filter(block => /^\s*<bbk-agent-replacement\b/i.test(block));
-  if (replacementBlocks.length > 0) return { alreadyReplaced: true };
+  const replacementBlocks = blocks.filter(block => /<bbk-agent-replacement\b/i.test(block));
+  if (replacementBlocks.length > 0) {
+    if (replacementBlocks.length !== 1) throw new Error("ambiguous BBK agent-replacement marker blocks");
+    return { alreadyReplaced: true, replacementBlock: replacementBlocks[0] };
+  }
 
   const markerBlocks = blocks.filter(block => block.includes(BBK_AGENT_PROMPT_MARKER));
   if (markerBlocks.length === 0) return undefined;
@@ -1157,8 +1402,14 @@ function buildControllerSystemPrompt(ctx) {
     "",
     "## Execution autonomy",
     "",
-    "- Once an accepted baseline and execution authority are bound, do not interrupt the user for routine plan-detail corrections, local sequencing, reversible implementation choices, ordinary repairs, compatible dependency substitutions, or a technical blocker with one safe realistic scope-preserving resolution inside current authority. Route the work to the responsible role, record the deviation and rationale, and continue.",
+    "- Once an accepted baseline and applicable authority are bound, do not interrupt the user for routine plan-detail corrections, local sequencing, reversible implementation choices, ordinary repairs, compatible dependency substitutions, or a technical blocker with one safe realistic scope-preserving resolution inside current authority. Route the work to the responsible role, record the deviation and rationale, and continue.",
     "- Request a user decision only for a genuine material branch with at least two viable consequential paths, an explicitly user-reserved preference, or an authority expansion. A sole path outside current authority still requires the smallest exact additional grant; pause only the affected scope.",
+    "",
+    "## Authority and completion vocabulary",
+    "",
+    "- `WORKSPACE_IMPLEMENTATION` covers producing source, scripts, configuration, tests, documentation, packages, and local non-destructive verification inside the exact authorized workspace. `EXTERNAL_EXECUTION` separately covers real-host or remote-system installation, connection, credential use, provisioning, deployment, service, firewall, network, publication, release, or migration effects.",
+    "- `PRODUCE_ONLY` grants `WORKSPACE_IMPLEMENTATION` and withholds `EXTERNAL_EXECUTION`. Continue to produce and locally verify the requested implementation artifacts; stop before the first external effect. Do not ask for deployment authority merely to create reviewable scripts or configuration in the workspace.",
+    "- Use exact independent completion claims: `PLANNING_COMPLETE`, `IMPLEMENTATION_ARTIFACTS_COMPLETE`, `BYTE_INTEGRITY_VERIFIED`, `SEMANTIC_REVIEW_COMPLETE`, `DEPLOYMENT_AUTHORIZED`, `DEPLOYMENT_PERFORMED`, and `LIVE_ACCEPTANCE_VERIFIED`. Never collapse one into another; name absent claims explicitly.",
     "",
     "## Non-bypass rule",
     "",
@@ -1238,7 +1489,7 @@ function createBbkActivityHud(pi) {
   const agents = new Map();
   const aliases = new Map();
   const MAX_RETAINED_AGENTS = 256;
-  const ACTIVE_STATUSES = new Set(["pending", "queued", "running", "waiting", "retrying", "starting"]);
+  const ACTIVE_STATUSES = new Set(["pending", "queued", "running", "waiting", "retrying", "starting", "waking", "busy"]);
   const TERMINAL_STATUSES = new Set(["completed", "failed", "error", "aborted", "cancelled", "canceled", "stopped", "terminated"]);
 
   function clearWidget() {
@@ -1250,10 +1501,49 @@ function createBbkActivityHud(pi) {
     if (raw === "started") return "pending";
     if (raw === "complete" || raw === "done" || raw === "success" || raw === "succeeded") return "completed";
     if (raw === "failure") return "failed";
+    if (raw === "active" || raw === "working" || raw === "revived" || raw === "woken" || raw === "injected") return "running";
+    if (raw === "idle") return "parked";
     return raw || fallback;
   }
+  function statusState(item) {
+    const taskStatus = item?.taskStatus ? statusOf(item.taskStatus) : statusOf(item?.progress?.status);
+    const peerStatus = item?.peerStatus ? statusOf(item.peerStatus) : null;
+    const taskUpdated = Number(item?.taskStatusUpdated || 0);
+    const peerUpdated = Number(item?.peerStatusUpdated || 0);
+    const peerCurrent = Boolean(peerStatus && peerUpdated >= taskUpdated);
+    if (peerCurrent) {
+      return {
+        status: peerStatus,
+        source: item.peerSource || "coordination",
+        taskStatus,
+        peerStatus,
+        peerCurrent,
+        wakeOutcome: item.peerOutcome || null,
+      };
+    }
+    return {
+      status: taskStatus,
+      source: item?.taskSource || item?.source || "task",
+      taskStatus,
+      peerStatus,
+      peerCurrent,
+      wakeOutcome: null,
+    };
+  }
+  function effectiveStatus(item) {
+    return statusState(item).status;
+  }
+  function effectiveProgress(item) {
+    const state = statusState(item);
+    const peerIsCurrent = state.peerStatus && Number(item?.peerStatusUpdated || 0) >= Number(item?.taskStatusUpdated || 0);
+    return {
+      ...(item?.progress || {}),
+      status: state.status,
+      lastIntent: peerIsCurrent && item?.peerActivity ? item.peerActivity : item?.progress?.lastIntent,
+    };
+  }
   function activeAgents() {
-    return [...agents.values()].filter(item => ACTIVE_STATUSES.has(statusOf(item.progress?.status)));
+    return [...agents.values()].filter(item => ACTIVE_STATUSES.has(effectiveStatus(item)));
   }
   function agentLabel(item, max = 42) {
     return oneLine(item?.name || item?.id || item?.description || roleDisplayName(item?.agent), max);
@@ -1297,13 +1587,14 @@ function createBbkActivityHud(pi) {
     }
     const latest = active[0];
     const pathLabel = ancestorPath(latest).join(" › ") || agentLabel(latest);
-    const gauge = contextGauge(latest.progress);
-    const activity = progressActivity(latest.progress);
+    const latestProgress = effectiveProgress(latest);
+    const gauge = contextGauge(latestProgress);
+    const activity = progressActivity(latestProgress);
     let line = `BBK · ${active.length} active · ${pathLabel}${gauge ? ` [${gauge}]` : ""}: ${activity}`;
 
     const otherGauges = active.slice(1, 4).map(item => {
       const otherName = agentLabel(item, 24);
-      const otherGauge = contextGauge(item.progress, { short: true });
+      const otherGauge = contextGauge(effectiveProgress(item), { short: true });
       return otherGauge ? `${otherName} ${otherGauge}` : otherName;
     });
     if (otherGauges.length) line += ` | ${otherGauges.join(" · ")}`;
@@ -1334,7 +1625,7 @@ function createBbkActivityHud(pi) {
   function roleFrom(raw, progress) {
     const values = [
       raw?.agent, progress?.agent, raw?.role, progress?.role,
-      raw?.agentName, progress?.agentName,
+      raw?.agentName, progress?.agentName, raw?.displayName, progress?.displayName,
       raw?.agent?.name, progress?.agent?.name,
       raw?.agent?.id, progress?.agent?.id,
     ];
@@ -1391,7 +1682,7 @@ function createBbkActivityHud(pi) {
   function trimHistory() {
     if (agents.size <= MAX_RETAINED_AGENTS) return;
     const removable = [...agents.values()]
-      .filter(item => !ACTIVE_STATUSES.has(statusOf(item.progress?.status)))
+      .filter(item => !ACTIVE_STATUSES.has(effectiveStatus(item)))
       .sort((a, b) => a.updated - b.updated);
     while (agents.size > MAX_RETAINED_AGENTS && removable.length) {
       const item = removable.shift();
@@ -1437,9 +1728,13 @@ function createBbkActivityHud(pi) {
           : hasExitCode
             ? Number(exitCodeValue) === 0 ? "completed" : "failed"
             : undefined;
+      const observedStatus = progress.status ?? raw.status ?? inferredTerminalStatus
+        ?? (source === "progress" || source === "nested-progress" ? "running" : undefined);
+      const hasTaskStatusEvidence = observedStatus !== undefined && observedStatus !== null
+        && String(observedStatus).trim() !== "";
       const status = statusOf(
-        progress.status || raw.status || inferredTerminalStatus,
-        previous?.progress?.status || (source === "lifecycle" ? "pending" : "running"),
+        observedStatus,
+        previous?.taskStatus || previous?.progress?.status || (source === "lifecycle" ? "pending" : "running"),
       );
       const id = String(progress.id || raw.id || progress.taskId || raw.taskId || raw.name || progress.name || fallbackName);
       const name = String(raw.name || progress.name || id);
@@ -1454,6 +1749,7 @@ function createBbkActivityHud(pi) {
       };
       const modelValue = raw.resolvedModel || progress.resolvedModel || raw.modelOverride || progress.modelOverride || raw.model || progress.model;
       const model = typeof modelValue === "string" ? modelValue : modelSelector(modelValue);
+      const updateSequence = ++sequence;
       const item = {
         ...(previous || {}),
         key,
@@ -1473,10 +1769,22 @@ function createBbkActivityHud(pi) {
         assignment: oneLine(raw.assignment || progress.assignment || previous?.assignment || "", 240),
         index: finiteNumber(raw.index ?? progress.index ?? previous?.index),
         source,
+        taskSource: hasTaskStatusEvidence || !previous ? source : previous?.taskSource || source,
+        taskStatus: hasTaskStatusEvidence || !previous ? status : previous?.taskStatus || status,
+        taskStatusUpdated: hasTaskStatusEvidence || !previous
+          ? updateSequence
+          : Number(previous?.taskStatusUpdated || 0),
+        peerStatus: previous?.peerStatus || null,
+        peerStatusUpdated: Number(previous?.peerStatusUpdated || 0),
+        peerSource: previous?.peerSource || null,
+        peerOutcome: previous?.peerOutcome || null,
+        peerActivity: previous?.peerActivity || "",
         progress: mergedProgress,
-        updated: ++sequence,
-        started: previous?.started || sequence,
-        completed: TERMINAL_STATUSES.has(status) ? sequence : null,
+        updated: updateSequence,
+        started: previous?.started || updateSequence,
+        completed: hasTaskStatusEvidence
+          ? TERMINAL_STATUSES.has(status) ? updateSequence : null
+          : previous?.completed || null,
       };
       agents.set(key, item);
       for (const alias of candidateAliases) aliases.set(alias, key);
@@ -1489,6 +1797,130 @@ function createBbkActivityHud(pi) {
     for (const child of nestedItems(raw, progress)) upsert(child, childParent, "nested-progress", visited);
     return key;
   }
+  function identityValues(raw) {
+    return [raw?.id, raw?.to, raw?.name, raw?.agentId, raw?.agent_id, raw?.peerId, raw?.peer_id]
+      .filter(value => typeof value === "string" && value.trim())
+      .map(value => value.trim());
+  }
+  function coordinationKey(raw) {
+    const parentKey = resolveAlias(raw?.parentId || raw?.parent_id || raw?.parentName, null);
+    for (const value of identityValues(raw)) {
+      const resolved = resolveAlias(value, parentKey) || resolveAlias(value, null);
+      if (resolved) return resolved;
+      const exact = [...agents.values()].find(item => item.id === value || item.name === value || item.key === value);
+      if (exact) return exact.key;
+    }
+    return null;
+  }
+  function ensureCoordinationRecord(raw) {
+    let key = coordinationKey(raw);
+    const role = roleFrom(raw, raw);
+    if (key || !role) return key;
+    const id = String(identityValues(raw)[0] || role);
+    const parentKey = resolveAlias(raw?.parentId || raw?.parent_id || raw?.parentName, null);
+    key = `${parentKey || "Main"}/${role}/${id}`;
+    const updateSequence = ++sequence;
+    const item = {
+      key,
+      id,
+      name: String(raw?.name || raw?.id || id),
+      agent: role,
+      description: oneLine(raw?.activity || raw?.description || "", 240),
+      parentKey: parentKey || null,
+      depth: parentKey && agents.get(parentKey) ? Number(agents.get(parentKey).depth || 0) + 1 : 0,
+      detached: true,
+      model: "",
+      sessionId: "",
+      sessionFile: "",
+      toolCallId: "",
+      parentToolCallId: "",
+      agentSource: "coordination",
+      assignment: oneLine(raw?.activity || "", 240),
+      index: undefined,
+      source: "coordination-discovery",
+      taskSource: null,
+      taskStatus: "unknown",
+      taskStatusUpdated: 0,
+      peerStatus: null,
+      peerStatusUpdated: 0,
+      peerSource: null,
+      peerOutcome: null,
+      peerActivity: "",
+      progress: { id, name: String(raw?.name || raw?.id || id), agent: role, status: "unknown" },
+      updated: updateSequence,
+      started: updateSequence,
+      completed: null,
+    };
+    agents.set(key, item);
+    aliases.set(key, key);
+    for (const value of identityValues(raw)) {
+      aliases.set(`id:${value}`, key);
+      aliases.set(`${parentKey || "Main"}::id:${value}`, key);
+    }
+    return key;
+  }
+  function applyCoordinationStatus(raw, rawStatus, source, outcome = null) {
+    const key = ensureCoordinationRecord(raw);
+    if (!key) return false;
+    const previous = agents.get(key);
+    if (!previous) return false;
+    const parentKey = resolveAlias(raw?.parentId || raw?.parent_id || raw?.parentName, null) || previous.parentKey || null;
+    const status = statusOf(rawStatus, "running");
+    const updateSequence = ++sequence;
+    const activity = oneLine(raw?.activity || raw?.lastActivityText || previous.peerActivity || "", 240);
+    const item = {
+      ...previous,
+      parentKey,
+      depth: parentKey && agents.get(parentKey) ? Number(agents.get(parentKey).depth || 0) + 1 : previous.depth || 0,
+      description: activity || previous.description || "",
+      assignment: activity || previous.assignment || "",
+      source,
+      peerStatus: status,
+      peerStatusUpdated: updateSequence,
+      peerSource: source,
+      peerOutcome: outcome || null,
+      peerActivity: activity,
+      updated: updateSequence,
+    };
+    agents.set(key, item);
+    for (const value of identityValues(raw)) {
+      aliases.set(`id:${value}`, key);
+      aliases.set(`${parentKey || "Main"}::id:${value}`, key);
+    }
+    return true;
+  }
+  function updateCoordinationResult(event) {
+    if (!enabled || !event || typeof event !== "object") return;
+    const toolName = String(event.toolName || event.tool_name || "").trim().toLowerCase();
+    if (!BBK_COORDINATION_TOOL_NAMES.has(toolName)) return;
+    const nestedDetails = event.result?.details && typeof event.result.details === "object"
+      ? event.result.details
+      : {};
+    const directDetails = event.details && typeof event.details === "object" ? event.details : {};
+    const details = { ...nestedDetails, ...directDetails };
+    let changed = false;
+    const peers = Array.isArray(details.peers) ? details.peers.filter(item => item && typeof item === "object") : [];
+    // First establish every peer alias so child-parent relationships are stable even
+    // when a roster is not topologically ordered.
+    for (const peer of peers) ensureCoordinationRecord(peer);
+    for (const peer of peers) {
+      changed = applyCoordinationStatus(peer, peer.status || "running", `${toolName}:roster`) || changed;
+    }
+    const runningAgents = Array.isArray(details.agents) ? details.agents.filter(item => item && typeof item === "object") : [];
+    for (const agent of runningAgents) {
+      changed = applyCoordinationStatus(agent, agent.status || "running", `${toolName}:running-agents`) || changed;
+    }
+    const receipts = Array.isArray(details.receipts) ? details.receipts.filter(item => item && typeof item === "object") : [];
+    for (const receipt of receipts) {
+      const outcome = String(receipt.outcome || receipt.status || receipt.delivery || "").trim().toLowerCase();
+      if (!BBK_WAKE_OUTCOMES.has(outcome)) continue;
+      changed = applyCoordinationStatus(receipt, "running", `${toolName}:receipt`, outcome) || changed;
+    }
+    if (!changed) return;
+    trimHistory();
+    render();
+  }
+
   function setMode(next, ctx) {
     enabled = Boolean(next);
     currentCtx = ctx || currentCtx;
@@ -1525,16 +1957,21 @@ function createBbkActivityHud(pi) {
       .sort((a, b) => (a.started - b.started) || a.name.localeCompare(b.name));
   }
   function lineFor(item, prefix = "") {
-    const status = statusOf(item.progress?.status);
-    const gauge = contextGauge(item.progress);
+    const state = statusState(item);
+    const gauge = contextGauge(effectiveProgress(item));
     const model = item.model ? ` · ${item.model}` : "";
     const detached = item.detached ? " · detached" : " · synchronous";
-    return `${prefix}${agentLabel(item, 72)} [${item.agent}] · ${status}${gauge ? ` · ${gauge}` : ""}${model}${detached}`;
+    const splitStatus = state.peerCurrent && state.peerStatus !== state.taskStatus
+      ? ` · task ${state.taskStatus} · peer ${state.peerStatus}${state.wakeOutcome ? ` (${state.wakeOutcome})` : ""}`
+      : state.wakeOutcome && state.source.endsWith(":receipt")
+        ? ` · ${state.wakeOutcome}`
+        : "";
+    return `${prefix}${agentLabel(item, 72)} [${item.agent}] · ${state.status}${splitStatus}${gauge ? ` · ${gauge}` : ""}${model}${detached}`;
   }
   function treeLines({ activeOnly = false } = {}) {
     const included = new Set(
       [...agents.values()]
-        .filter(item => !activeOnly || ACTIVE_STATUSES.has(statusOf(item.progress?.status)))
+        .filter(item => !activeOnly || ACTIVE_STATUSES.has(effectiveStatus(item)))
         .map(item => item.key),
     );
     if (activeOnly) {
@@ -1562,13 +1999,18 @@ function createBbkActivityHud(pi) {
       role: item.agent,
       parent_id: item.parentKey ? agents.get(item.parentKey)?.id || item.parentKey : "Main",
       depth: depthOf(item),
-      status: statusOf(item.progress?.status),
+      status: effectiveStatus(item),
+      task_status: statusState(item).taskStatus,
+      peer_status: statusState(item).peerStatus,
+      peer_status_current: statusState(item).peerCurrent,
+      status_source: statusState(item).source,
+      wake_outcome: statusState(item).wakeOutcome,
       detached: item.detached,
       spawn_mode: item.detached ? "detached" : "synchronous",
       model: item.model || null,
       task: item.description || null,
       assignment: item.assignment || null,
-      activity: progressActivity(item.progress),
+      activity: progressActivity(effectiveProgress(item)),
       current_tool: oneLine(item.progress?.currentTool || "", 80) || null,
       current_tool_args: oneLine(item.progress?.currentToolArgs || "", 240) || null,
       context_tokens: finiteNumber(item.progress?.contextTokens) ?? null,
@@ -1586,7 +2028,7 @@ function createBbkActivityHud(pi) {
   }
   function snapshot({ activeOnly = false } = {}) {
     const records = [...agents.values()]
-      .filter(item => !activeOnly || ACTIVE_STATUSES.has(statusOf(item.progress?.status)))
+      .filter(item => !activeOnly || ACTIVE_STATUSES.has(effectiveStatus(item)))
       .sort((a, b) => (depthOf(a) - depthOf(b)) || (a.started - b.started) || a.name.localeCompare(b.name));
     return {
       schema: "bbk.omp-agent-tree.v1",
@@ -1627,25 +2069,48 @@ function createBbkActivityHud(pi) {
       try { stop(); } catch {}
     }
   }
-  return { setMode, reset, updateProgress, updateLifecycle, snapshot, details, dispose };
+  return { setMode, reset, updateProgress, updateLifecycle, updateCoordinationResult, snapshot, details, dispose };
 }
 
-function registerAgentViewCommand(pi, activity) {
+function registerAgentViewCommand(pi, activity, timing) {
+  function campaignPrefix(ctx) {
+    const value = timing?.snapshot?.(ctx);
+    if (!value?.current_waiting_on_user) return { value, text: "" };
+    const ids = value.request_ids?.length ? value.request_ids.join(", ") : "not exposed by host";
+    return {
+      value,
+      text: [
+        `Campaign: WAITING_ON_USER since ${value.waiting_since || "unknown"}`,
+        `Pending request IDs: ${ids}`,
+        `Independent work active: ${value.independent_work_active}`,
+      ].join("\n"),
+    };
+  }
   pi.registerCommand("bbk:agents", {
-    description: "show the complete BBK sub-agent tree or inspect one nested agent",
+    description: "show the complete BBK sub-agent tree, current user-wait state, or inspect one nested agent",
     handler: async (first, second) => {
       const { args, ctx } = commandInvocation(first, second);
       const tokens = splitArgs(args);
       const mode = String(tokens[0] || "all").toLowerCase();
+      const campaign = campaignPrefix(ctx);
       let text;
       if (mode === "json") {
-        text = JSON.stringify(activity.snapshot({ activeOnly: false }), null, 2);
+        const value = activity.snapshot({ activeOnly: false });
+        text = JSON.stringify({ ...value, controller_timing: campaign.value }, null, 2);
       } else if (mode === "active") {
         const value = activity.snapshot({ activeOnly: true });
-        text = `BBK agents: ${value.active_count} active / ${value.agent_count} known\n${value.tree.join("\n")}`;
+        text = [
+          `BBK agents: ${value.active_count} active / ${value.agent_count} known`,
+          campaign.text,
+          value.tree.join("\n"),
+        ].filter(Boolean).join("\n");
       } else if (mode === "all" || mode === "tree") {
         const value = activity.snapshot({ activeOnly: false });
-        text = `BBK agents: ${value.active_count} active / ${value.agent_count} known\n${value.tree.join("\n")}`;
+        text = [
+          `BBK agents: ${value.active_count} active / ${value.agent_count} known`,
+          campaign.text,
+          value.tree.join("\n"),
+        ].filter(Boolean).join("\n");
       } else {
         const selector = mode === "details" ? tokens.slice(1).join(" ") : tokens.join(" ");
         if (!selector) {
@@ -1653,7 +2118,7 @@ function registerAgentViewCommand(pi, activity) {
         } else {
           const found = activity.details(selector);
           text = found.length
-            ? JSON.stringify({ schema: "bbk.omp-agent-details.v1", status: "PASS", matches: found }, null, 2)
+            ? JSON.stringify({ schema: "bbk.omp-agent-details.v1", status: "PASS", matches: found, controller_timing: campaign.value }, null, 2)
             : `No BBK agent matched ${selector}. Use /bbk:agents to view the complete tree.`;
         }
       }
@@ -1690,9 +2155,12 @@ function registerBeadsCommand(pi) {
 function createBbkModeController(pi, onStateChange = () => {}) {
   let enabled = false;
   let loaded = false;
-  let latestExpectedPrompt = null;
+  let providerRequestSequence = 0;
+  let turnSequence = 0;
+  const expectedBySession = new Map();
+  const latestProviderBySession = new Map();
+  const integrityBySession = new Map();
   const recordedReplacementDigests = new Set();
-  const recordedProviderDigests = new Set();
 
   function appendPromptReceipt(data) {
     if (typeof pi.appendEntry !== "function") return;
@@ -1703,62 +2171,374 @@ function createBbkModeController(pi, onStateChange = () => {}) {
       ...data,
     });
   }
-  function recordReplacement(sourceBlocks, effectiveBlocks, status, ctx) {
-    const source = promptReceiptSummary(sourceBlocks);
-    const effective = promptReceiptSummary(effectiveBlocks);
-    const identity = promptOuterIdentity(promptBlocksFromValue(effectiveBlocks).join("\n\n"));
-    const key = `${status}:${identity.role || identity.kind}:${effective.sha256}`;
-    latestExpectedPrompt = { ...effective, role: identity.role, prompt_kind: identity.kind };
-    if (recordedReplacementDigests.has(key)) return;
+  function expectedReceiptSummary(binding) {
+    if (!binding) return null;
+    return {
+      block_count: binding.block_count,
+      length: binding.length,
+      sha256: binding.sha256,
+      binding_source: binding.source || "before-agent-start",
+    };
+  }
+  function rememberExpectedPrompt(sessionId, binding) {
+    // Session identifiers are the durable separation boundary. Retain bindings
+    // across wake/resume/navigation events in the same host process, but keep
+    // the cache bounded so long-lived OMP processes cannot accumulate entries
+    // without limit.
+    if (expectedBySession.has(sessionId)) expectedBySession.delete(sessionId);
+    expectedBySession.set(sessionId, binding);
+    while (expectedBySession.size > 128) {
+      expectedBySession.delete(expectedBySession.keys().next().value);
+    }
+  }
+  function branchEntries(ctx) {
+    try {
+      const values = ctx?.sessionManager?.getBranch?.();
+      return Array.isArray(values) ? values : [];
+    } catch {
+      return [];
+    }
+  }
+  function receiptMatchesCandidate(receipt, candidate, sessionId) {
+    const effective = receipt?.effective;
+    return receipt?.schema === BBK_PROMPT_RECEIPT_SCHEMA
+      && receipt?.package_version === version
+      && receipt?.phase === "before_agent_start"
+      && receipt?.action === "BOUND"
+      && receipt?.session_id === sessionId
+      && receipt?.prompt_kind === candidate.prompt_kind
+      && (receipt?.role || null) === (candidate.role || null)
+      && effective?.block_count === candidate.block_count
+      && effective?.length === candidate.length
+      && effective?.sha256 === candidate.sha256;
+  }
+  function recoverCandidateFromDurableReceipt(text, ctx) {
+    const candidate = validatedPromptMarkerCandidate(text);
+    if (!candidate) return null;
+    const sessionId = promptSessionIdentity(ctx);
+    const receipt = [...branchEntries(ctx)].reverse().find(entry => (
+      entry?.type === "custom"
+      && entry?.customType === BBK_PROMPT_RECEIPT_ENTRY_TYPE
+      && receiptMatchesCandidate(entry?.data, candidate, sessionId)
+    ));
+    if (!receipt) return null;
+    return { ...candidate, source: "session-receipt-digest-recovery" };
+  }
+  function recoverBoundPromptCandidate(text, ctx) {
+    const candidate = validatedPromptMarkerCandidate(text);
+    if (!candidate) return null;
+    const sessionId = promptSessionIdentity(ctx);
+    const current = expectedBySession.get(sessionId);
+    if (current?.text === candidate.text
+      && current.sha256 === candidate.sha256
+      && current.prompt_kind === candidate.prompt_kind
+      && (current.role || null) === (candidate.role || null)) {
+      return current;
+    }
+    return recoverCandidateFromDurableReceipt(candidate.text, ctx);
+  }
+  function bindExpectedPrompt(sourceBlocks, effectiveBlocks, status, ctx, source = "before-agent-start") {
+    const sessionId = promptSessionIdentity(ctx);
+    const sourceSummary = promptReceiptSummary(sourceBlocks);
+    const effectiveValues = promptBlocksFromValue(effectiveBlocks);
+    const effectiveText = effectiveValues.join("\n\n");
+    const effective = promptReceiptSummary(effectiveValues);
+    const identity = promptOuterIdentity(effectiveText);
+    const binding = {
+      ...effective,
+      text: effectiveText,
+      role: identity.role,
+      prompt_kind: identity.kind,
+      source,
+    };
+    rememberExpectedPrompt(sessionId, binding);
+    const key = `${sessionId}:${status}:${identity.role || identity.kind}:${effective.sha256}`;
+    if (recordedReplacementDigests.has(key)) return binding;
     recordedReplacementDigests.add(key);
     const genericDetected = sourceHasGenericPromptMaterial(sourceBlocks);
     appendPromptReceipt({
       phase: "before_agent_start",
+      action: "BOUND",
       status,
+      session_id: sessionId,
+      turn_sequence: turnSequence,
       prompt_kind: identity.kind,
       role: identity.role,
       cwd: String(ctx?.cwd || process.cwd()),
-      source,
+      source: sourceSummary,
       effective,
+      binding_source: source,
       generic_omp_contamination_detected: genericDetected,
       generic_omp_contamination_removed: genericDetected && ["agent", "controller"].includes(identity.kind),
+      enforcement: "PROVIDER_PAYLOAD_GUARD_BOUND",
       raw_prompt_persisted: false,
     });
+    return binding;
   }
-  async function verifyProviderPrompt(_event, ctx) {
-    if (!latestExpectedPrompt) return;
-    let observedValue;
-    let availability = "AVAILABLE";
-    try {
-      if (typeof ctx?.getSystemPrompt !== "function") availability = "UNAVAILABLE";
-      else observedValue = await Promise.resolve(ctx.getSystemPrompt());
-    } catch (error) {
-      availability = "ERROR";
-      observedValue = null;
-    }
-    const observed = availability === "AVAILABLE" ? promptReceiptSummary(observedValue) : null;
-    const status = availability === "AVAILABLE"
-      ? observed.sha256 === latestExpectedPrompt.sha256 ? "VERIFIED" : "MISMATCH"
-      : availability;
-    const key = `${status}:${latestExpectedPrompt.sha256}:${observed?.sha256 || "none"}`;
-    if (recordedProviderDigests.has(key)) return;
-    recordedProviderDigests.add(key);
-    appendPromptReceipt({
-      phase: "before_provider_request",
-      status,
-      prompt_kind: latestExpectedPrompt.prompt_kind,
-      role: latestExpectedPrompt.role,
-      cwd: String(ctx?.cwd || process.cwd()),
-      expected: {
-        block_count: latestExpectedPrompt.block_count,
-        length: latestExpectedPrompt.length,
-        sha256: latestExpectedPrompt.sha256,
-      },
-      observed,
-      provider_bound_verification: status,
-      enforcement: "OBSERVABILITY_ONLY",
-      raw_prompt_persisted: false,
+  function setPromptIntegrityUi(ctx, sessionId, action, detail = "") {
+    const previous = integrityBySession.get(sessionId);
+    const unresolved = ["BLOCKED", "UNVERIFIABLE"].includes(action);
+    integrityBySession.set(sessionId, {
+      action,
+      unresolved,
+      detail: oneLine(detail, 240),
+      observed_at: new Date().toISOString(),
     });
+    if (unresolved) {
+      ctx?.ui?.setStatus?.(
+        BBK_PROMPT_INTEGRITY_STATUS_KEY,
+        `BBK prompt ${action.toLowerCase()}${detail ? ` · ${oneLine(detail, 96)}` : ""}`,
+      );
+      return;
+    }
+    if (previous?.unresolved) ctx?.ui?.setStatus?.(BBK_PROMPT_INTEGRITY_STATUS_KEY, undefined);
+  }
+  function recoverExpectedPrompt(adapter, ctx) {
+    const sessionId = promptSessionIdentity(ctx);
+    const current = expectedBySession.get(sessionId);
+    if (current?.text) return current;
+
+    // A cold wake or process/session restoration can lose the in-memory prompt
+    // body. The provider payload may carry the exact previously bound BBK block,
+    // but a closed marker and canonical embedded role body are not authority on
+    // their own: arbitrary text could have been inserted inside the outer block.
+    // Authenticate every recovered child/failure prompt against the SHA-256,
+    // length, role, kind, and session identity persisted by before_agent_start.
+    // User messages are never part of adapter.blocks and are never scanned.
+    if (adapter?.blocks?.length) {
+      const canonical = canonicalPromptBlockFromProvider(adapter);
+      if (canonical) {
+        const candidate = validatedPromptMarkerCandidate(canonical);
+        if (candidate?.prompt_kind === "controller") {
+          ensure(ctx);
+          if (enabled) {
+            const text = buildControllerSystemPrompt(ctx);
+            return bindExpectedPrompt([], [text], "RECOVERED_AT_PROVIDER_BOUNDARY", ctx, "mode-state-controller-rebuild");
+          }
+        } else {
+          const recovered = recoverCandidateFromDurableReceipt(canonical, ctx);
+          if (recovered) {
+            return bindExpectedPrompt([], [recovered.text], "RECOVERED_AT_PROVIDER_BOUNDARY", ctx, recovered.source);
+          }
+        }
+      }
+    }
+
+    ensure(ctx);
+    const observed = (adapter?.blocks || []).join("\n\n");
+    const looksLikeChild = observed.includes(BBK_AGENT_PROMPT_MARKER)
+      || observed.includes("<bbk-agent-replacement");
+    if (enabled && !looksLikeChild) {
+      const text = buildControllerSystemPrompt(ctx);
+      return bindExpectedPrompt([], [text], "RECOVERED_AT_PROVIDER_BOUNDARY", ctx, "mode-state-controller-rebuild");
+    }
+    return null;
+  }
+  function recordProviderReceipt(data, ctx) {
+    const sessionId = promptSessionIdentity(ctx);
+    const receipt = {
+      phase: "provider_request_finalization",
+      hook: "before_provider_request",
+      session_id: sessionId,
+      turn_sequence: turnSequence,
+      request_sequence: providerRequestSequence,
+      cwd: String(ctx?.cwd || process.cwd()),
+      raw_prompt_persisted: false,
+      raw_provider_payload_persisted: false,
+      enforcement: "PROVIDER_PAYLOAD_REWRITE_OR_ABORT",
+      extension_order_finality: "ORDER_DEPENDENT_NO_POST_CHAIN_HOOK",
+      ...data,
+    };
+    latestProviderBySession.set(sessionId, receipt);
+    appendPromptReceipt(receipt);
+  }
+  async function blockProviderRequest(ctx, reason) {
+    let abortSignalled = false;
+    let abortError = null;
+    try {
+      if (typeof ctx?.abort === "function") {
+        await Promise.resolve(ctx.abort());
+        abortSignalled = true;
+      }
+    } catch (error) {
+      abortError = oneLine(error?.message || error, 240);
+    }
+    const sessionId = promptSessionIdentity(ctx);
+    setPromptIntegrityUi(ctx, sessionId, "BLOCKED", reason);
+    ctx?.ui?.notify?.(`BBK blocked a provider request because prompt integrity could not be established: ${reason}`, "error");
+    return {
+      abortSignalled,
+      abortError,
+      payload: blockedProviderPayload(reason),
+    };
+  }
+  async function finalizeProviderPrompt(event, ctx) {
+    providerRequestSequence += 1;
+    const payload = event?.payload ?? event?.request;
+    const payloadSource = event?.payload !== undefined ? "event.payload" : event?.request !== undefined ? "legacy-event.request" : "missing";
+    const adapter = providerPayloadAdapter(payload);
+    const expected = recoverExpectedPrompt(adapter, ctx);
+    let model = null;
+    try { model = ctx?.model || ctx?.getModel?.() || null; } catch {}
+    const modelBinding = {
+      provider: model?.provider || model?.providerId || null,
+      model: model?.id || model?.model || null,
+    };
+
+    if (!expected?.text) {
+      ensure(ctx);
+      const observedSystemText = (adapter?.blocks || []).join("\n\n");
+      const bbkMarkerObserved = /<bbk-(?:controller-system|agent-system|agent-replacement|prompt-assembly-failure)\b/i.test(observedSystemText);
+      // The extension is installed outside BBK mode as well. Ordinary OMP
+      // requests must pass through untouched; only an active BBK controller or
+      // a provider payload carrying BBK identity is subject to this guard.
+      if (!enabled && !bbkMarkerObserved) return undefined;
+      const blocked = await blockProviderRequest(ctx, "exact session-bound BBK prompt binding unavailable");
+      recordProviderReceipt({
+        status: "BLOCKED",
+        action: "BLOCKED",
+        code: "BBK_PROMPT_EXPECTED_UNAVAILABLE",
+        prompt_kind: null,
+        role: null,
+        provider_adapter: adapter?.name || "unsupported",
+        provider_payload_source: payloadSource,
+        model: modelBinding,
+        expected: null,
+        observed_before: adapter ? promptReceiptSummary(adapter.blocks) : null,
+        sent: promptReceiptSummary([]),
+        system_surfaces_observed: adapter?.system_surface_count || 0,
+        generic_blocks_removed: adapter?.system_surface_count || 0,
+        abort_signalled: blocked.abortSignalled,
+        abort_error: blocked.abortError,
+        network_send_prevention: blocked.abortSignalled
+          ? "HOST_ABORT_SIGNALLED_AND_USER_PAYLOAD_REMOVED"
+          : "USER_PAYLOAD_REMOVED_BUT_HOST_ABORT_UNAVAILABLE",
+        smallest_next_action: "Restore the BBK mode/role binding and retry the provider turn.",
+      }, ctx);
+      return blocked.payload;
+    }
+
+    if (!adapter) {
+      const blocked = await blockProviderRequest(ctx, "unsupported provider payload shape");
+      recordProviderReceipt({
+        status: "BLOCKED",
+        action: "BLOCKED",
+        code: "BBK_PROMPT_PROVIDER_ADAPTER_UNAVAILABLE",
+        prompt_kind: expected.prompt_kind,
+        role: expected.role,
+        provider_adapter: "unsupported",
+        provider_payload_source: payloadSource,
+        model: modelBinding,
+        expected: expectedReceiptSummary(expected),
+        observed_before: null,
+        sent: promptReceiptSummary([]),
+        system_surfaces_observed: 0,
+        generic_blocks_removed: 0,
+        abort_signalled: blocked.abortSignalled,
+        abort_error: blocked.abortError,
+        network_send_prevention: blocked.abortSignalled
+          ? "HOST_ABORT_SIGNALLED_AND_USER_PAYLOAD_REMOVED"
+          : "USER_PAYLOAD_REMOVED_BUT_HOST_ABORT_UNAVAILABLE",
+        smallest_next_action: "Use a qualified provider payload adapter or update BBK before retrying this provider.",
+      }, ctx);
+      return blocked.payload;
+    }
+
+    const observedText = adapter.blocks.join("\n\n");
+    const observed = promptReceiptSummary(adapter.blocks);
+    const exact = adapter.blocks.length === 1
+      && adapter.system_surface_count === 1
+      && observedText === expected.text
+      && observed.sha256 === expected.sha256;
+    if (exact) {
+      const sessionId = promptSessionIdentity(ctx);
+      setPromptIntegrityUi(ctx, sessionId, "VERIFIED");
+      recordProviderReceipt({
+        status: "VERIFIED",
+        action: "VERIFIED",
+        code: "BBK_PROMPT_PROVIDER_VERIFIED",
+        prompt_kind: expected.prompt_kind,
+        role: expected.role,
+        provider_adapter: adapter.name,
+        provider_payload_source: payloadSource,
+        model: modelBinding,
+        expected: expectedReceiptSummary(expected),
+        observed_before: observed,
+        sent: observed,
+        system_surfaces_observed: adapter.system_surface_count,
+        generic_blocks_removed: 0,
+        abort_signalled: false,
+        network_send_prevention: "NOT_REQUIRED",
+        smallest_next_action: "Continue the governed turn.",
+      }, ctx);
+      return undefined;
+    }
+
+    let repairedPayload;
+    let repairedAdapter;
+    try {
+      repairedPayload = adapter.repair(expected.text);
+      repairedAdapter = providerPayloadAdapter(repairedPayload);
+    } catch {
+      repairedPayload = undefined;
+      repairedAdapter = null;
+    }
+    const sentBlocks = repairedAdapter?.blocks || [];
+    const sentText = sentBlocks.join("\n\n");
+    const sent = repairedAdapter ? promptReceiptSummary(sentBlocks) : null;
+    const repaired = repairedAdapter
+      && sentBlocks.length === 1
+      && repairedAdapter.system_surface_count === 1
+      && sentText === expected.text
+      && sent.sha256 === expected.sha256;
+    if (repaired) {
+      const sessionId = promptSessionIdentity(ctx);
+      setPromptIntegrityUi(ctx, sessionId, "REPAIRED");
+      ctx?.ui?.notify?.("BBK repaired provider-bound prompt contamination before transmission.", "warning");
+      recordProviderReceipt({
+        status: "REPAIRED",
+        action: "REPAIRED",
+        code: "BBK_PROMPT_PROVIDER_REPAIRED",
+        prompt_kind: expected.prompt_kind,
+        role: expected.role,
+        provider_adapter: adapter.name,
+        provider_payload_source: payloadSource,
+        model: modelBinding,
+        expected: expectedReceiptSummary(expected),
+        observed_before: observed,
+        sent,
+        system_surfaces_observed: adapter.system_surface_count,
+        generic_blocks_removed: removedPromptSurfaceCount(adapter, expected.text),
+        abort_signalled: false,
+        network_send_prevention: "NOT_REQUIRED",
+        smallest_next_action: "Continue with the repaired canonical provider payload.",
+      }, ctx);
+      return repairedPayload;
+    }
+
+    const blocked = await blockProviderRequest(ctx, `provider payload repair failed for ${adapter.name}`);
+    recordProviderReceipt({
+      status: "BLOCKED",
+      action: "BLOCKED",
+      code: "BBK_PROMPT_PROVIDER_REPAIR_FAILED",
+      prompt_kind: expected.prompt_kind,
+      role: expected.role,
+      provider_adapter: adapter.name,
+      provider_payload_source: payloadSource,
+      model: modelBinding,
+      expected: expectedReceiptSummary(expected),
+      observed_before: observed,
+      sent: promptReceiptSummary([]),
+      system_surfaces_observed: adapter.system_surface_count,
+      generic_blocks_removed: removedPromptSurfaceCount(adapter, expected.text),
+      abort_signalled: blocked.abortSignalled,
+      abort_error: blocked.abortError,
+      network_send_prevention: blocked.abortSignalled
+        ? "HOST_ABORT_SIGNALLED_AND_USER_PAYLOAD_REMOVED"
+        : "USER_PAYLOAD_REMOVED_BUT_HOST_ABORT_UNAVAILABLE",
+      smallest_next_action: "Stop this turn, repair the provider adapter, and rerun from the preserved session state.",
+    }, ctx);
+    return blocked.payload;
   }
   function promptStatus(ctx) {
     let branch = [];
@@ -1766,16 +2546,44 @@ function createBbkModeController(pi, onStateChange = () => {}) {
     const receipts = (Array.isArray(branch) ? branch : [])
       .filter(entry => entry?.type === "custom" && entry?.customType === BBK_PROMPT_RECEIPT_ENTRY_TYPE)
       .map(entry => entry.data)
-      .filter(value => value?.schema === BBK_PROMPT_RECEIPT_SCHEMA);
+      .filter(value => [BBK_PROMPT_RECEIPT_SCHEMA, "bbk.effective-prompt-receipt.v1"].includes(value?.schema));
+    const providerReceipts = receipts.filter(receipt => ["provider_request_finalization", "before_provider_request"].includes(receipt?.phase));
     const latestByKey = new Map();
     for (const receipt of receipts) {
       const key = `${receipt.role || receipt.prompt_kind || "unknown"}:${receipt.phase}`;
       latestByKey.set(key, receipt);
     }
+    const counts = { verified: 0, repaired: 0, blocked: 0, unverifiable: 0, mismatch_legacy: 0 };
+    for (const receipt of providerReceipts) {
+      const value = String(receipt.action || receipt.status || "").toUpperCase();
+      if (value === "VERIFIED") counts.verified += 1;
+      else if (value === "REPAIRED") counts.repaired += 1;
+      else if (value === "BLOCKED") counts.blocked += 1;
+      else if (["UNAVAILABLE", "ERROR", "UNVERIFIABLE"].includes(value)) counts.unverifiable += 1;
+      else if (value === "MISMATCH") counts.mismatch_legacy += 1;
+    }
+    const sessionId = promptSessionIdentity(ctx);
+    const latestProvider = providerReceipts.at(-1) || latestProviderBySession.get(sessionId) || null;
+    const latestAction = String(latestProvider?.action || latestProvider?.status || "").toUpperCase();
+    const liveIntegrity = integrityBySession.get(sessionId) || null;
+    const unresolved = Boolean(liveIntegrity?.unresolved || latestAction === "BLOCKED");
     return {
-      schema: "bbk.prompt-status.v1",
+      schema: BBK_PROMPT_STATUS_SCHEMA,
       package_version: version,
+      session_id: sessionId,
       receipt_count: receipts.length,
+      provider_request_count: providerReceipts.length,
+      counts,
+      requests: counts,
+      unresolved_failure: unresolved,
+      current_action: liveIntegrity?.action || latestAction || null,
+      current_guarantee: unresolved
+        ? "PROVIDER_REQUEST_BLOCKED_AT_BBK_HOOK_BOUNDARY"
+        : ["VERIFIED", "REPAIRED"].includes(latestAction)
+          ? "PROVIDER_PAYLOAD_VERIFIED_OR_REPAIRED_AT_BBK_HOOK_BOUNDARY"
+          : "NOT_YET_ESTABLISHED",
+      finality_boundary: "A later extension handler can still rewrite the payload because OMP exposes no post-chain finalizer to BBK.",
+      latest_provider_request: latestProvider,
       latest: [...latestByKey.values()],
     };
   }
@@ -1798,6 +2606,10 @@ function createBbkModeController(pi, onStateChange = () => {}) {
     }
     enabled = found ? restored : false;
     loaded = true;
+    // Keep exact per-session prompt bindings across ordinary wake, resume,
+    // session-switch, branch, and tree navigation events in this process.
+    // A different session ID cannot consume another session's binding, and a
+    // cold process must authenticate the candidate against a durable receipt.
     publishState(ctx);
     return enabled;
   }
@@ -1821,34 +2633,704 @@ function createBbkModeController(pi, onStateChange = () => {}) {
     return changed;
   }
   function enter(ctx) { return persist(true, ctx); }
-  function exit(ctx) { return persist(false, ctx); }
+  function exit(ctx) {
+    const sessionId = promptSessionIdentity(ctx);
+    expectedBySession.delete(sessionId);
+    setPromptIntegrityUi(ctx, sessionId, "VERIFIED");
+    return persist(false, ctx);
+  }
   function promptReplacement(event, ctx) {
+    turnSequence += 1;
     const sourceBlocks = systemPromptBlocks(event);
     try {
       const extracted = extractBbkAgentBlock(event);
       if (extracted?.alreadyReplaced) {
-        recordReplacement(sourceBlocks, sourceBlocks, "ALREADY_REPLACED", ctx);
-        return { systemPrompt: sourceBlocks };
+        const recovered = recoverBoundPromptCandidate(extracted.replacementBlock, ctx);
+        if (!recovered || recovered.prompt_kind !== "agent") {
+          throw new Error("BBK agent-replacement prompt has no exact session-bound or receipt-bound canonical identity");
+        }
+        const effective = [recovered.text];
+        bindExpectedPrompt(sourceBlocks, effective, "ALREADY_REPLACED", ctx, recovered.source);
+        return { systemPrompt: effective };
       }
       if (extracted) {
         const effective = [buildAgentSystemPrompt(extracted, ctx)];
-        recordReplacement(sourceBlocks, effective, "REPLACED", ctx);
+        bindExpectedPrompt(sourceBlocks, effective, "REPLACED", ctx);
         return { systemPrompt: effective };
       }
       ensure(ctx);
       if (!enabled) return undefined;
       const effective = [buildControllerSystemPrompt(ctx)];
-      recordReplacement(sourceBlocks, effective, "REPLACED", ctx);
+      bindExpectedPrompt(sourceBlocks, effective, "REPLACED", ctx);
       return { systemPrompt: effective };
     } catch (error) {
       const effective = [failClosedSystemPrompt(error, ctx)];
-      recordReplacement(sourceBlocks, effective, "FAIL_CLOSED", ctx);
+      bindExpectedPrompt(sourceBlocks, effective, "FAIL_CLOSED", ctx);
       return { systemPrompt: effective };
     }
   }
+  function currentPromptBinding(ctx) {
+    const sessionId = promptSessionIdentity(ctx);
+    const live = expectedBySession.get(sessionId);
+    if (live) return live;
+    let branch = [];
+    try { branch = ctx?.sessionManager?.getBranch?.() || []; } catch {}
+    for (let index = branch.length - 1; index >= 0; index -= 1) {
+      const entry = branch[index];
+      if (entry?.type !== "custom" || entry?.customType !== BBK_PROMPT_RECEIPT_ENTRY_TYPE) continue;
+      const receipt = entry.data;
+      if (receipt?.phase !== "before_agent_start") continue;
+      if (receipt?.session_id && receipt.session_id !== sessionId) continue;
+      if (receipt?.prompt_kind) return receipt;
+    }
+    return null;
+  }
+  function isControllerSession(ctx) {
+    return currentPromptBinding(ctx)?.prompt_kind === "controller";
+  }
   return {
-    enter, exit, restore, ensure, promptReplacement, verifyProviderPrompt, promptStatus,
+    enter, exit, restore, ensure, promptReplacement, finalizeProviderPrompt,
+    verifyProviderPrompt: finalizeProviderPrompt,
+    promptStatus, currentPromptBinding, isControllerSession,
     isEnabled: () => enabled,
+  };
+}
+
+
+function createArtifactFinalizationGuard(pi, bbkMode) {
+  let state = {
+    schema: BBK_ARTIFACT_FINALIZATION_SCHEMA,
+    package_version: version,
+    required: false,
+    finalization_observed: false,
+    satisfied: false,
+    publication_receipt: null,
+    package_id: null,
+    revision: null,
+    content_sha256: null,
+    last_result: null,
+    observed_at: null,
+  };
+  let loaded = false;
+  let statusVisible = false;
+
+  function branchEntries(ctx) {
+    try {
+      const values = ctx?.sessionManager?.getBranch?.();
+      return Array.isArray(values) ? values : [];
+    } catch { return []; }
+  }
+  function textParts(value, result = []) {
+    if (typeof value === "string") {
+      result.push(value);
+      return result;
+    }
+    if (!value || typeof value !== "object") return result;
+    if (Array.isArray(value)) {
+      for (const item of value) textParts(item, result);
+      return result;
+    }
+    if (typeof value.text === "string") result.push(value.text);
+    if (typeof value.content === "string" || Array.isArray(value.content)) textParts(value.content, result);
+    return result;
+  }
+  function userTextsFromBranch(ctx) {
+    const result = [];
+    for (const entry of branchEntries(ctx)) {
+      const message = entry?.message || entry;
+      const role = String(message?.role || entry?.role || "").toLowerCase();
+      if (entry?.type !== "message" || role !== "user") continue;
+      textParts(message?.content, result);
+    }
+    return result;
+  }
+  function restore(ctx) {
+    let restored = null;
+    for (const entry of branchEntries(ctx)) {
+      if (entry?.type === "custom" && entry?.customType === BBK_ARTIFACT_FINALIZATION_ENTRY_TYPE
+        && entry?.data?.schema === BBK_ARTIFACT_FINALIZATION_SCHEMA) {
+        restored = entry.data;
+      }
+    }
+    if (restored) state = { ...state, ...restored };
+    loaded = true;
+    publishUi(ctx);
+    return state;
+  }
+  function ensure(ctx) {
+    if (!loaded) restore(ctx);
+    return state;
+  }
+  function publishUi(ctx) {
+    if (!state.required && !state.finalization_observed) {
+      if (statusVisible) {
+        ctx?.ui?.setStatus?.(BBK_ARTIFACT_FINALIZATION_STATUS_KEY, undefined);
+        statusVisible = false;
+      }
+      return;
+    }
+    const label = state.satisfied
+      ? `BBK artifact finalized · ${state.package_id || "package"}@${state.revision || "?"}`
+      : state.required
+        ? "BBK artifact finalization required · pending"
+        : "BBK finalized implementation stale · successor required";
+    ctx?.ui?.setStatus?.(BBK_ARTIFACT_FINALIZATION_STATUS_KEY, label);
+    statusVisible = true;
+  }
+  function persist(next, ctx) {
+    state = {
+      ...state,
+      ...next,
+      schema: BBK_ARTIFACT_FINALIZATION_SCHEMA,
+      package_version: version,
+      observed_at: new Date().toISOString(),
+    };
+    loaded = true;
+    if (typeof pi.appendEntry === "function") pi.appendEntry(BBK_ARTIFACT_FINALIZATION_ENTRY_TYPE, state);
+    publishUi(ctx);
+    return state;
+  }
+  function textRequiresArtifactFinalization(text) {
+    const value = String(text || "");
+    if (!BBK_ARTIFACT_FINALIZE_MARKER_RE.test(value)) return false;
+    if (BBK_ARTIFACT_FINALIZE_NEGATION_RE.test(value)) return false;
+    return BBK_ARTIFACT_FINALIZE_REQUIREMENT_RE.test(value);
+  }
+  function detectRequirement(event, ctx) {
+    if (!bbkMode.isEnabled() || !bbkMode.isControllerSession(ctx)) return false;
+    ensure(ctx);
+    if (state.required) return true;
+    const candidates = [];
+    if (typeof event?.prompt === "string") candidates.push(event.prompt);
+    if (typeof event?.userPrompt === "string") candidates.push(event.userPrompt);
+    candidates.push(...userTextsFromBranch(ctx));
+    if (!candidates.some(textRequiresArtifactFinalization)) return false;
+    persist({
+      required: true,
+      requirement: "EXPLICIT_BBK_ARTIFACT_FINALIZE",
+      last_result: state.satisfied && state.publication_receipt ? "REQUIRED_SATISFIED" : "REQUIRED",
+      ...(!state.satisfied ? {
+        publication_receipt: null,
+        package_id: null,
+        revision: null,
+        content_sha256: null,
+      } : {}),
+    }, ctx);
+    return true;
+  }
+  function normalizeToolName(event) {
+    return String(event?.toolName ?? event?.tool_name ?? event?.name ?? "").trim();
+  }
+  function resultDetails(event) {
+    for (const candidate of [event?.details, event?.result?.details, event?.result, event?.output?.details]) {
+      if (candidate && typeof candidate === "object" && !Array.isArray(candidate)) return candidate;
+    }
+    return {};
+  }
+  function observeToolResult(event, ctx) {
+    if (!bbkMode.isControllerSession(ctx)) return;
+    ensure(ctx);
+    const toolName = normalizeToolName(event);
+    const details = resultDetails(event);
+    if (toolName === "bbk_artifact_finalize") {
+      const passed = details?.status === "PASS" && typeof details?.publicationReceipt === "string";
+      if (!passed && !state.required) return;
+      persist({
+        finalization_observed: passed || state.finalization_observed,
+        // A failed later attempt is evidence about that attempt, not proof
+        // that an earlier bound publication became stale.  Preserve the
+        // earlier satisfaction state; the completion guard will re-run
+        // freshness against it and invalidate it only on actual drift.
+        satisfied: passed ? true : state.satisfied,
+        publication_receipt: passed ? details.publicationReceipt : state.publication_receipt,
+        package_id: passed ? details.packageId || null : state.package_id,
+        revision: passed ? details.revision || null : state.revision,
+        content_sha256: passed ? details.contentSha256 || null : state.content_sha256,
+        last_result: passed ? "FINALIZED" : String(details?.code || details?.status || "FAILED"),
+      }, ctx);
+      return;
+    }
+    if (toolName === "bbk_artifact_freshness" && details?.status === "PASS" && typeof details?.publicationReceipt === "string") {
+      persist({
+        finalization_observed: true,
+        satisfied: details.sourceStatus !== "STALE",
+        publication_receipt: details.publicationReceipt,
+        package_id: details.packageId || state.package_id,
+        revision: details.revision || state.revision,
+        content_sha256: details.contentSha256 || state.content_sha256,
+        source_status: details.sourceStatus || "NOT_BOUND",
+        last_result: "FRESHNESS_VERIFIED",
+        handoff_observed: null,
+      }, ctx);
+      return;
+    }
+    if (toolName === "bbk_handoff_create" && state.required && !state.satisfied && details?.status === "PASS") {
+      persist({
+        last_result: "HANDOFF_DOES_NOT_SATISFY_FINALIZATION",
+        handoff_observed: details?.output || details?.outputRoot || details?.path || null,
+      }, ctx);
+      ctx?.ui?.notify?.("BBK recorded the handoff, but it does not satisfy the explicit artifact-finalization requirement.", "warning");
+    }
+  }
+  function terminalAssistantMessage(event) {
+    const message = event?.message || event;
+    if (String(message?.role || "").toLowerCase() !== "assistant") return null;
+    const content = message?.content;
+    if (Array.isArray(content) && content.some(item => {
+      const type = String(item?.type || "").toLowerCase();
+      return type === "toolcall" || type === "tool_call" || type === "tooluse" || type === "tool_use";
+    })) return null;
+    const stop = String(message?.stopReason || message?.stop_reason || "").toLowerCase();
+    if (stop.includes("tool")) return null;
+    const text = textParts(content, []).join("\n");
+    if (!BBK_COMPLETION_CLAIM_RE.test(text)) return null;
+    return message;
+  }
+  function replacementMessage(message, text) {
+    return {
+      ...message,
+      role: "assistant",
+      content: [{ type: "text", text }],
+    };
+  }
+  async function finalizeMessage(event, ctx) {
+    const message = terminalAssistantMessage(event);
+    if (!message || !bbkMode.isEnabled() || !bbkMode.isControllerSession(ctx)) return undefined;
+    detectRequirement(event, ctx);
+    ensure(ctx);
+    if (!state.required && !state.finalization_observed) return undefined;
+    if (!state.satisfied || !state.publication_receipt) {
+      if (state.finalization_observed && state.publication_receipt) {
+        const text = [
+          "BBK completion relay blocked: the implementation changed after its most recent artifact-finalization publication and no fresh successor publication is bound to this session.",
+          "The prior publication receipt remains historical evidence; it does not describe the current live source tree.",
+          "Smallest next action: rerun the relevant local checks and finalize a successor revision before reporting completion.",
+        ].join("\n\n");
+        persist({ last_result: "FINAL_RELAY_BLOCKED_STALE" }, ctx);
+        ctx?.ui?.notify?.("BBK blocked a completion relay because the latest finalized implementation is stale.", "error");
+        return { message: replacementMessage(message, text) };
+      }
+      const text = [
+        "BBK completion relay blocked: the user explicitly required `bbk artifact finalize`, but no successful artifact-finalization publication receipt is bound to this session.",
+        "A sealed handoff, passing tests, or an unsealed directory is not a substitute.",
+        "Smallest next action: run `bbk_artifact_finalize` in one-shot software mode (or the exact CLI), verify its PASS result, then issue a new completion report.",
+      ].join("\n\n");
+      persist({ last_result: "FINAL_RELAY_BLOCKED_UNFINALIZED" }, ctx);
+      ctx?.ui?.notify?.("BBK blocked a completion relay because required artifact finalization is unresolved.", "error");
+      return { message: replacementMessage(message, text) };
+    }
+    const value = await runBbk([
+      "artifact", "freshness", state.publication_receipt,
+      "--root", String(ctx?.cwd || process.cwd()),
+    ], ctx?.cwd || process.cwd());
+    const details = value?.details || {};
+    if (value?.code !== 0 || details?.status !== "PASS") {
+      const changed = Array.isArray(details?.findings)
+        ? details.findings.filter(item => item?.path).slice(0, 5).map(item => item.path).join(", ")
+        : "";
+      const text = [
+        "BBK completion relay blocked: the finalized artifact package is no longer fresh against the live implementation source set.",
+        changed ? `Changed or missing source paths: ${changed}.` : `Freshness status: ${String(details?.sourceStatus || details?.status || "ERROR")}.`,
+        "Smallest next action: rerun the relevant local checks and finalize a successor revision from the current source tree before reporting completion.",
+      ].join("\n\n");
+      persist({ satisfied: false, last_result: "FINAL_RELAY_BLOCKED_STALE" }, ctx);
+      ctx?.ui?.notify?.("BBK blocked a completion relay because the finalized implementation is stale.", "error");
+      return { message: replacementMessage(message, text) };
+    }
+    persist({ last_result: "FINAL_RELAY_FRESHNESS_VERIFIED" }, ctx);
+    return undefined;
+  }
+  function reset(ctx) {
+    state = {
+      schema: BBK_ARTIFACT_FINALIZATION_SCHEMA,
+      package_version: version,
+      required: false,
+      finalization_observed: false,
+      satisfied: false,
+      publication_receipt: null,
+      package_id: null,
+      revision: null,
+      content_sha256: null,
+      last_result: null,
+      observed_at: null,
+    };
+    loaded = false;
+    return restore(ctx);
+  }
+  function dispose(ctx) {
+    state = { ...state, required: false, finalization_observed: false, satisfied: false };
+    loaded = false;
+    if (statusVisible) {
+      ctx?.ui?.setStatus?.(BBK_ARTIFACT_FINALIZATION_STATUS_KEY, undefined);
+      statusVisible = false;
+    }
+  }
+  return { detectRequirement, observeToolResult, finalizeMessage, reset, restore, dispose, snapshot: () => ({ ...state }) };
+}
+
+
+function createBbkTimingController(pi, activity) {
+  const WAITING_STATUS_KEY = "bbk-waiting-on-user";
+  const SUBAGENT_ACTIVE = new Set(["started", "starting", "pending", "queued", "running", "active", "busy", "working", "woken", "revived", "injected"]);
+  const SUBAGENT_TERMINAL = new Set(["completed", "complete", "done", "failed", "error", "cancelled", "canceled", "aborted", "stopped", "terminated"]);
+  let sequence = 0;
+  let sessionStartedAtMs = Date.now();
+  let sessionStartedAt = new Date(sessionStartedAtMs).toISOString();
+  let subagentStarts = new Map();
+  let subagentIntervals = [];
+  let providerStarts = [];
+  let providerIntervals = [];
+  let toolStarts = new Map();
+  let toolIntervals = [];
+  let askStarts = new Map();
+  let askIntervals = [];
+  let blockedProviderRequests = 0;
+  let waitingStatusVisible = false;
+  const unsubscribe = [];
+
+  function nowMs() { return Date.now(); }
+  function iso(value) { return new Date(value).toISOString(); }
+  function eventId(event, prefix) {
+    const raw = event?.toolCallId ?? event?.tool_call_id ?? event?.requestId ?? event?.request_id
+      ?? event?.taskId ?? event?.task_id ?? event?.agentId ?? event?.agent_id ?? event?.id;
+    if (raw !== undefined && raw !== null && String(raw).trim()) return String(raw);
+    sequence += 1;
+    return `${prefix}-${sequence}`;
+  }
+  function normalizeToolName(event) {
+    return String(event?.toolName ?? event?.tool_name ?? event?.name ?? "").trim();
+  }
+  function normalizedStatus(event) {
+    const value = event?.status ?? event?.progress?.status ?? event?.state ?? event?.outcome;
+    return String(value || "").trim().toLowerCase();
+  }
+  function requestIds(value) {
+    const result = new Set();
+    const seen = new Set();
+    function visit(item, key = "") {
+      if (item == null || seen.has(item)) return;
+      if (typeof item === "string") {
+        if (/^(?:BUR|REQ|Q|ASK|DEC|AUTH)-?[A-Z0-9_.:-]+$/i.test(item.trim()) || /(?:request|question|decision)[_-]?id/i.test(key)) {
+          if (item.trim()) result.add(item.trim());
+        }
+        return;
+      }
+      if (typeof item !== "object") return;
+      seen.add(item);
+      if (Array.isArray(item)) {
+        for (const child of item) visit(child, key);
+        return;
+      }
+      for (const [childKey, child] of Object.entries(item)) {
+        if (/^(?:id|request_id|requestId|question_id|questionId)$/i.test(childKey) && typeof child === "string" && child.trim()) {
+          result.add(child.trim());
+        }
+        visit(child, childKey);
+      }
+    }
+    visit(value);
+    return [...result];
+  }
+  function intervalPairs(intervals, openStarts = []) {
+    const now = nowMs();
+    return [
+      ...intervals.map(item => [Number(item.start_ms), Number(item.end_ms)]),
+      ...openStarts.map(item => [Number(item.start_ms), now]),
+    ].filter(([start, end]) => Number.isFinite(start) && Number.isFinite(end) && end >= start)
+      .sort((left, right) => left[0] - right[0] || left[1] - right[1]);
+  }
+  function intervalDuration(intervals, openStarts = []) {
+    const raw = intervalPairs(intervals, openStarts);
+    if (!raw.length) return 0;
+    let total = 0;
+    let [start, end] = raw[0];
+    for (const [nextStart, nextEnd] of raw.slice(1)) {
+      if (nextStart <= end) end = Math.max(end, nextEnd);
+      else {
+        total += end - start;
+        [start, end] = [nextStart, nextEnd];
+      }
+    }
+    return total + (end - start);
+  }
+  function intervalSum(intervals, openStarts = []) {
+    return intervalPairs(intervals, openStarts).reduce((total, [start, end]) => total + end - start, 0);
+  }
+  function openAskValues() { return [...askStarts.values()]; }
+  function setWaitingStatus(ctx) {
+    const open = openAskValues();
+    if (!open.length) {
+      if (waitingStatusVisible) {
+        ctx?.ui?.setStatus?.(WAITING_STATUS_KEY, undefined);
+        waitingStatusVisible = false;
+      }
+      return;
+    }
+    const oldest = Math.min(...open.map(item => item.start_ms));
+    const seconds = Math.max(0, Math.floor((nowMs() - oldest) / 1000));
+    const ids = [...new Set(open.flatMap(item => item.request_ids || []))];
+    ctx?.ui?.setStatus?.(WAITING_STATUS_KEY, `WAITING_ON_USER ${seconds}s${ids.length ? ` · ${ids.join(", ")}` : ""}`);
+    waitingStatusVisible = true;
+  }
+  function reset(ctx) {
+    sequence = 0;
+    sessionStartedAtMs = nowMs();
+    sessionStartedAt = iso(sessionStartedAtMs);
+    subagentStarts = new Map();
+    subagentIntervals = [];
+    providerStarts = [];
+    providerIntervals = [];
+    toolStarts = new Map();
+    toolIntervals = [];
+    askStarts = new Map();
+    askIntervals = [];
+    blockedProviderRequests = 0;
+    if (waitingStatusVisible) {
+      ctx?.ui?.setStatus?.(WAITING_STATUS_KEY, undefined);
+      waitingStatusVisible = false;
+    }
+  }
+  function updateSubagentLifecycle(event) {
+    const id = eventId(event, "subagent");
+    const status = normalizedStatus(event);
+    if (SUBAGENT_ACTIVE.has(status)) {
+      if (!subagentStarts.has(id)) {
+        subagentStarts.set(id, {
+          id,
+          role: String(event?.agent ?? event?.role ?? event?.progress?.agent ?? "").trim() || null,
+          start_ms: nowMs(),
+          start_status: status,
+        });
+      }
+      return;
+    }
+    if (!SUBAGENT_TERMINAL.has(status)) return;
+    const start = subagentStarts.get(id);
+    if (!start) return;
+    subagentStarts.delete(id);
+    subagentIntervals.push({ ...start, end_ms: nowMs(), end_status: status });
+  }
+  function updateSubagentProgress(event) {
+    const status = normalizedStatus(event);
+    if (!status) return;
+    updateSubagentLifecycle(event);
+  }
+  function providerStart(event) {
+    const start = {
+      id: eventId(event, "provider"),
+      start_ms: nowMs(),
+      header_ms: null,
+    };
+    providerStarts.push(start);
+    return start.id;
+  }
+  function providerHeader(event) {
+    const open = providerStarts.find(item => item.header_ms == null);
+    if (!open) return;
+    open.header_ms = nowMs();
+    open.response_status = event?.status ?? event?.response?.status ?? null;
+  }
+  function providerEnd(event) {
+    if (event?.message && String(event.message.role || "").toLowerCase() !== "assistant") return;
+    if (!providerStarts.length) return;
+    const start = providerStarts.shift();
+    providerIntervals.push({
+      ...start,
+      end_ms: nowMs(),
+      outcome: event?.outcome || "assistant-message-end",
+    });
+  }
+  function providerBlocked() {
+    const start = providerStarts.pop();
+    if (start) {
+      providerIntervals.push({ ...start, end_ms: nowMs(), outcome: "prompt-guard-blocked", blocked: true });
+    }
+    blockedProviderRequests += 1;
+  }
+  function closeOpenProviders(outcome = "agent-end-without-message") {
+    const end = nowMs();
+    while (providerStarts.length) {
+      const start = providerStarts.shift();
+      providerIntervals.push({ ...start, end_ms: end, outcome });
+    }
+  }
+  function toolStart(event, ctx) {
+    const id = eventId(event, "tool");
+    const name = normalizeToolName(event);
+    const start = { id, tool_name: name, start_ms: nowMs() };
+    toolStarts.set(id, start);
+    if (name === "ask") {
+      const args = event?.args ?? event?.input ?? {};
+      askStarts.set(id, { ...start, request_ids: requestIds(args) });
+      setWaitingStatus(ctx);
+    }
+  }
+  function toolEnd(event, ctx) {
+    const id = String(event?.toolCallId ?? event?.tool_call_id ?? event?.id ?? "");
+    let start = id ? toolStarts.get(id) : null;
+    let key = id;
+    if (!start) {
+      const name = normalizeToolName(event);
+      const candidate = [...toolStarts.entries()].reverse().find(([, item]) => !name || item.tool_name === name);
+      if (candidate) [key, start] = candidate;
+    }
+    if (!start) return;
+    const end = nowMs();
+    toolStarts.delete(key);
+    toolIntervals.push({ ...start, end_ms: end, is_error: Boolean(event?.isError ?? event?.is_error) });
+    const ask = askStarts.get(key);
+    if (ask) {
+      askStarts.delete(key);
+      askIntervals.push({ ...ask, end_ms: end });
+      setWaitingStatus(ctx);
+    }
+  }
+  function snapshot(ctx) {
+    setWaitingStatus(ctx);
+    const observedAtMs = nowMs();
+    const elapsed = Math.max(0, observedAtMs - sessionStartedAtMs);
+    const openSubagents = [...subagentStarts.values()].map(item => ({ ...item }));
+    const openProviders = providerStarts.map(item => ({ ...item }));
+    const openTools = [...toolStarts.values()].map(item => ({ ...item }));
+    const openAsks = openAskValues().map(item => ({ ...item }));
+    const explicitUserWait = intervalDuration(askIntervals, openAsks);
+    const subagentWall = intervalDuration(subagentIntervals, openSubagents);
+    const providerWall = intervalDuration(providerIntervals, openProviders);
+    const providerHeaderIntervals = providerIntervals
+      .filter(item => Number.isFinite(Number(item.header_ms)))
+      .map(item => ({ ...item, end_ms: Number(item.header_ms) }));
+    const openProviderHeaders = openProviders
+      .filter(item => Number.isFinite(Number(item.header_ms)))
+      .map(item => ({ ...item, end_ms: Number(item.header_ms) }));
+    const toolWall = intervalDuration(toolIntervals, openTools);
+    const allCoverage = intervalDuration(
+      [...subagentIntervals, ...providerIntervals, ...toolIntervals, ...askIntervals],
+      [...openSubagents, ...openProviders, ...openTools, ...openAsks],
+    );
+    const currentWait = openAsks.length
+      ? Math.max(0, observedAtMs - Math.min(...openAsks.map(item => item.start_ms)))
+      : 0;
+    let sessionId = null;
+    try { sessionId = ctx?.sessionManager?.getSessionId?.() || ctx?.sessionManager?.getSessionFile?.() || null; } catch {}
+    const requestIdValues = [...new Set(openAsks.flatMap(item => item.request_ids || []))];
+    const activeSnapshot = activity?.snapshot?.({ activeOnly: true }) || { active_count: openSubagents.length };
+    return {
+      schema: "bbk.omp-timing.v1",
+      status: "PASS",
+      package_version: version,
+      observed_at: iso(observedAtMs),
+      session_id: sessionId,
+      session_started_at: sessionStartedAt,
+      elapsed_ms: elapsed,
+      campaign_state: openAsks.length ? "WAITING_ON_USER" : "OBSERVING",
+      explicit_user_wait_ms: explicitUserWait,
+      elapsed_excluding_user_wait_ms: Math.max(0, elapsed - explicitUserWait),
+      current_waiting_on_user: openAsks.length > 0,
+      current_user_wait_ms: currentWait,
+      waiting_since: openAsks.length ? iso(Math.min(...openAsks.map(item => item.start_ms))) : null,
+      request_ids: requestIdValues,
+      independent_work_active: Math.max(Number(activeSnapshot.active_count || 0), openSubagents.length),
+      open_user_requests: openAsks.map(item => ({
+        tool_call_id: item.id,
+        request_ids: item.request_ids,
+        waiting_since: iso(item.start_ms),
+      })),
+      subagents: {
+        runs_completed: subagentIntervals.length,
+        runs_open: openSubagents.length,
+        active_wall_ms: subagentWall,
+        active_sum_ms: intervalSum(subagentIntervals, openSubagents),
+      },
+      provider: {
+        requests_completed: providerIntervals.length,
+        requests_open: openProviders.length,
+        requests_blocked_by_prompt_guard: blockedProviderRequests,
+        end_to_end_wall_ms: providerWall,
+        end_to_end_sum_ms: intervalSum(providerIntervals, openProviders),
+        response_header_wall_ms: intervalDuration([...providerHeaderIntervals, ...openProviderHeaders]),
+        response_header_sum_ms: intervalSum([...providerHeaderIntervals, ...openProviderHeaders]),
+      },
+      tools: {
+        executions_completed: toolIntervals.length,
+        executions_open: openTools.length,
+        execution_wall_ms: toolWall,
+        execution_sum_ms: intervalSum(toolIntervals, openTools),
+      },
+      observed_activity_coverage_ms: Math.min(elapsed, allCoverage),
+      unattributed_elapsed_ms: Math.max(0, elapsed - Math.min(elapsed, allCoverage)),
+      interpretation: {
+        explicit_user_wait: "Measured only while OMP's native ask tool is open.",
+        provider_time: "End-to-end provider time is observed from before_provider_request to assistant message_end; response-header time ends at after_provider_response.",
+        subagent_time: "Sub-agent lifetimes come from task:subagent lifecycle/progress evidence observed by Main.",
+        interval_accounting: "Wall durations merge overlapping intervals; sum durations intentionally retain overlap and must not be read as elapsed wall clock.",
+        unattributed: "Elapsed time not covered by observed ask, sub-agent, provider, or tool-execution intervals; it is not evidence of model compute or inactivity.",
+      },
+    };
+  }
+  function human(value) {
+    const seconds = ms => `${(Number(ms || 0) / 1000).toFixed(1)}s`;
+    const lines = [
+      `BBK timing (${value.campaign_state})`,
+      `Elapsed: ${seconds(value.elapsed_ms)}`,
+      `Explicit user wait: ${seconds(value.explicit_user_wait_ms)}`,
+      `Elapsed excluding user wait: ${seconds(value.elapsed_excluding_user_wait_ms)}`,
+    ];
+    if (value.current_waiting_on_user) {
+      lines.push(`Waiting since: ${value.waiting_since || "unknown"}`);
+      lines.push(`Request IDs: ${value.request_ids.length ? value.request_ids.join(", ") : "not exposed by host"}`);
+      lines.push(`Independent work active: ${value.independent_work_active}`);
+    }
+    lines.push(
+      `Sub-agent active wall: ${seconds(value.subagents.active_wall_ms)} (${value.subagents.runs_completed} completed, ${value.subagents.runs_open} open; sum ${seconds(value.subagents.active_sum_ms)})`,
+      `Provider end-to-end wall: ${seconds(value.provider.end_to_end_wall_ms)} (${value.provider.requests_completed} completed, ${value.provider.requests_open} open, ${value.provider.requests_blocked_by_prompt_guard} prompt-blocked)`,
+      `Provider response-header wall: ${seconds(value.provider.response_header_wall_ms)}`,
+      `Tool execution wall: ${seconds(value.tools.execution_wall_ms)} (${value.tools.executions_completed} completed, ${value.tools.executions_open} open)`,
+      `Unattributed elapsed: ${seconds(value.unattributed_elapsed_ms)}`,
+      "Timing is observational; overlapping categories are merged for wall durations and do not prove active compute.",
+    );
+    return lines.join("\n");
+  }
+  function registerCommand() {
+    pi.registerCommand("bbk:timing", {
+      description: "show observational BBK timing with native-ask user wait separated from session elapsed",
+      handler: async (first, second) => {
+        const { args, ctx } = commandInvocation(first, second);
+        const value = snapshot(ctx);
+        const jsonMode = ["json", "--json"].includes(String(args || "").trim().toLowerCase());
+        ctx?.ui?.notify?.(jsonMode ? JSON.stringify(value, null, 2) : human(value), "info");
+        return undefined;
+      },
+    });
+  }
+  try {
+    const stop = pi.events?.on?.(TASK_SUBAGENT_LIFECYCLE_CHANNEL, updateSubagentLifecycle);
+    if (typeof stop === "function") unsubscribe.push(stop);
+  } catch {}
+  try {
+    const stop = pi.events?.on?.(TASK_SUBAGENT_PROGRESS_CHANNEL, updateSubagentProgress);
+    if (typeof stop === "function") unsubscribe.push(stop);
+  } catch {}
+  function dispose(ctx) {
+    setWaitingStatus(ctx);
+    ctx?.ui?.setStatus?.(WAITING_STATUS_KEY, undefined);
+    for (const stop of unsubscribe.splice(0)) {
+      try { stop(); } catch {}
+    }
+  }
+  return {
+    reset,
+    updateSubagentLifecycle,
+    updateSubagentProgress,
+    providerStart,
+    providerHeader,
+    providerEnd,
+    providerBlocked,
+    closeOpenProviders,
+    toolStart,
+    toolEnd,
+    snapshot,
+    registerCommand,
+    dispose,
   };
 }
 
@@ -1903,9 +3385,13 @@ function registerBbkEntrypoint(pi, mode) {
       const text = jsonMode
         ? JSON.stringify(result, null, 2)
         : result.latest.length
-          ? result.latest.map(item => `${item.role || item.prompt_kind || "unknown"} · ${item.phase} · ${item.status} · ${item.observed?.sha256 || item.effective?.sha256 || item.expected?.sha256 || "no-digest"}`).join("\n")
+          ? [
+              `BBK prompt requests: verified=${result.counts.verified}, repaired=${result.counts.repaired}, blocked=${result.counts.blocked}, unverifiable=${result.counts.unverifiable}`,
+              `Current guarantee: ${result.current_guarantee}`,
+              ...result.latest.map(item => `${item.role || item.prompt_kind || "unknown"} · ${item.phase} · ${item.action || item.status} · ${item.sent?.sha256 || item.effective?.sha256 || item.expected?.sha256 || "no-digest"}`),
+            ].join("\n")
           : "No BBK prompt receipts are recorded in the current branch.";
-      ctx?.ui?.notify?.(text, "info");
+      ctx?.ui?.notify?.(text, result.unresolved_failure ? "error" : "info");
       return undefined;
     },
   });
@@ -2404,6 +3890,23 @@ export default function bbkExtension(pi) {
     argv: p => ["artifact", "seal", p.draftRoot, "--output", p.output, ...(p.registry ? ["--registry", p.registry] : []), ...(p.recoverStaleLock ? ["--recover-stale-lock"] : [])],
   });
   registerCliTool(pi, {
+    name: "bbk_artifact_finalize", label: "BBK Artifact Package Finalize", description: "Finalize either an existing package draft or an ordinary software source set into project-local .bbk/artifacts/sealed. One-shot software mode requires packageId and revision; when sources is omitted it selects the project root with deterministic built-in exclusions. Returns an external publication receipt and live-source freshness binding.",
+    parameters: z.object({ draftRoot: text(), root: text(), output: text(), publicationRoot: text(), registry: text(), packageId: text(), revision: text(), sources: texts(), includes: texts(), excludes: texts(), subjectKind: text(), subjectId: text(), subjectRevision: text(), purpose: text(), allowMutableCoordination: bool(), noCurrentPointer: bool(), recoverStaleLock: bool() }),
+    argv: p => ["artifact", "finalize", ...(p.draftRoot ? [p.draftRoot] : []), ...rootArgs(p.root), ...(p.output ? ["--output", p.output] : []),
+      ...(p.publicationRoot ? ["--publication-root", p.publicationRoot] : []), ...(p.registry ? ["--registry", p.registry] : []),
+      ...(p.packageId ? ["--package-id", p.packageId] : []), ...(p.revision ? ["--revision", p.revision] : []),
+      ...repeated("--source", p.sources), ...repeated("--include", p.includes), ...repeated("--exclude", p.excludes),
+      ...(p.subjectKind ? ["--subject-kind", p.subjectKind] : []), ...(p.subjectId ? ["--subject-id", p.subjectId] : []),
+      ...(p.subjectRevision ? ["--subject-revision", p.subjectRevision] : []), ...(p.purpose ? ["--purpose", p.purpose] : []),
+      ...(p.allowMutableCoordination ? ["--allow-mutable-coordination"] : []), ...(p.noCurrentPointer ? ["--no-current-pointer"] : []),
+      ...(p.recoverStaleLock ? ["--recover-stale-lock"] : [])],
+  });
+  registerCliTool(pi, {
+    name: "bbk_artifact_freshness", label: "BBK Artifact Package Freshness", description: "Verify a publication/current pointer or sealed package and detect source mutations after one-shot software finalization.",
+    parameters: z.object({ subject: z.string(), root: text(), registry: text() }),
+    argv: p => ["artifact", "freshness", p.subject, ...rootArgs(p.root), ...(p.registry ? ["--registry", p.registry] : [])],
+  });
+  registerCliTool(pi, {
     name: "bbk_artifact_verify", label: "BBK Artifact Verify", description: "Read-only verify either a sealed artifact package or a legacy artifact manifest against exact stored bytes.",
     parameters: z.object({ manifest: z.string(), root: text(), registry: text() }),
     argv: p => ["artifact", "verify", p.manifest, ...rootArgs(p.root), ...(p.registry ? ["--registry", p.registry] : [])],
@@ -2565,11 +4068,14 @@ export default function bbkExtension(pi) {
   });
 
   const bbkActivity = createBbkActivityHud(pi);
+  const bbkTiming = createBbkTimingController(pi, bbkActivity);
   const bbkMode = createBbkModeController(pi, (active, ctx) => bbkActivity.setMode(active, ctx));
+  const bbkArtifactFinalization = createArtifactFinalizationGuard(pi, bbkMode);
   registerBbkEntrypoint(pi, bbkMode);
   registerModelRoutingCommand(pi);
-  registerAgentViewCommand(pi, bbkActivity);
+  registerAgentViewCommand(pi, bbkActivity, bbkTiming);
   registerBeadsCommand(pi);
+  bbkTiming.registerCommand();
   registerCommand(pi, "bbk:init", "initialize BBK in the current project", ["init"]);
   registerCommand(pi, "bbk:status", "show BBK status", ["status"]);
   registerCommand(pi, "bbk:doctor", "run BBK diagnostics", ["doctor"]);
@@ -2594,6 +4100,8 @@ export default function bbkExtension(pi) {
   registerCommand(pi, "bbk:artifact:manifest", "[--root <path>] [--path <path>...] [--output <path>]", ["artifact", "manifest"]);
   registerCommand(pi, "bbk:artifact:preflight", "<draft-root> [--registry <path>] [--max-depth <n>]", ["artifact", "preflight"], { requireArgs: true });
   registerCommand(pi, "bbk:artifact:seal", "<draft-root> --output <new-package-dir> [--registry <path>]", ["artifact", "seal"], { requireArgs: true });
+  registerCommand(pi, "bbk:artifact:finalize", "[<draft-root>] [--root <project> --package-id <id> --revision <rev> --source <path>...]", ["artifact", "finalize"], { requireArgs: true });
+  registerCommand(pi, "bbk:artifact:freshness", "<publication-or-current-or-sealed-path> [--root <project>]", ["artifact", "freshness"], { requireArgs: true });
   registerCommand(pi, "bbk:artifact:verify", "<manifest-path> [--root <path>]", ["artifact", "verify"], { requireArgs: true });
   registerCommand(pi, "bbk:artifact:successor", "<sealed-package-dir> --output <draft-dir> --revision <revision> --reason <reason>", ["artifact", "successor"], { requireArgs: true });
   registerCommand(pi, "bbk:preflight", "<request-path> [--output <path>] [--no-cache]", ["preflight", "run"], { requireArgs: true });
@@ -2619,11 +4127,30 @@ export default function bbkExtension(pi) {
   registerCommand(pi, "bbk:review-close", "--finding <path> --id <id> --disposition <value> --successor-ref <ref> --residual-impact <text> --output <path>", ["review", "close"], { requireArgs: true });
   registerCommand(pi, "bbk:review-learn", "--id <id> --type <type> --lesson <text> --scope <scope> --confidence <value> --uncertainty <text> --action <text> --output <path>", ["review", "learn"], { requireArgs: true });
 
-  pi.on?.("before_agent_start", async (event, ctx) => bbkMode.promptReplacement(event, ctx));
-  pi.on?.("before_provider_request", async (event, ctx) => bbkMode.verifyProviderPrompt(event, ctx));
+  pi.on?.("before_agent_start", async (event, ctx) => {
+    const replacement = await bbkMode.promptReplacement(event, ctx);
+    bbkArtifactFinalization.detectRequirement(event, ctx);
+    return replacement;
+  });
+  pi.on?.("before_provider_request", async (event, ctx) => {
+    bbkTiming.providerStart(event);
+    const result = await bbkMode.finalizeProviderPrompt(event, ctx);
+    if (result?.__bbk_prompt_blocked__) bbkTiming.providerBlocked();
+    return result;
+  });
+  pi.on?.("after_provider_response", async event => bbkTiming.providerHeader(event));
+  pi.on?.("message_end", async (event, ctx) => {
+    bbkTiming.providerEnd(event);
+    return bbkArtifactFinalization.finalizeMessage(event, ctx);
+  });
+  pi.on?.("agent_end", async () => bbkTiming.closeOpenProviders());
+  pi.on?.("tool_execution_start", async (event, ctx) => bbkTiming.toolStart(event, ctx));
+  pi.on?.("tool_execution_end", async (event, ctx) => bbkTiming.toolEnd(event, ctx));
   const restoreBbkMode = async (_event, ctx) => {
     bbkActivity.reset(ctx);
+    bbkTiming.reset(ctx);
     const active = bbkMode.restore(ctx);
+    bbkArtifactFinalization.reset(ctx);
     if (_event?.type === "session_start") {
       ctx?.ui?.notify?.(`BBK ${version} loaded in ${ctx?.cwd || process.cwd()}${active ? "; BBK mode restored" : ""}`, "info");
     }
@@ -2631,7 +4158,15 @@ export default function bbkExtension(pi) {
   for (const eventName of ["session_start", "session_switch", "session_branch", "session_tree"]) {
     pi.on?.(eventName, restoreBbkMode);
   }
-  pi.on?.("session_shutdown", async (_event, ctx) => bbkActivity.dispose(ctx));
+  pi.on?.("session_shutdown", async (_event, ctx) => {
+    bbkActivity.dispose(ctx);
+    bbkTiming.dispose(ctx);
+    bbkArtifactFinalization.dispose(ctx);
+  });
+  pi.on?.("tool_result", async (event, ctx) => {
+    bbkActivity.updateCoordinationResult(event);
+    bbkArtifactFinalization.observeToolResult(event, ctx);
+  });
   pi.on?.("tool_call", async event => {
     const encoded = JSON.stringify(event.input || {});
     if (["bash", "write", "edit"].includes(event.toolName) && protectedFragments.some(fragment => encoded.includes(fragment))) {

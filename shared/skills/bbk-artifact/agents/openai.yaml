@@ -1,0 +1,6 @@
+interface:
+  display_name: "BBK Artifact Packages"
+  short_description: "Finalize and verify exact BBK artifact packages"
+  default_prompt: "Use $bbk-artifact to one-shot finalize ordinary implementation sources, verify publication freshness before completion, or create and verify profile-specific BBK artifact packages without relying on the short bbk command."
+policy:
+  allow_implicit_invocation: true

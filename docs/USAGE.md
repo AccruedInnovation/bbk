@@ -1,8 +1,8 @@
-# BBK alpha.15 usage
+# BBK alpha.16.1 usage
 
-Alpha.15 uses the harness-root session as the sole user-facing controller and exposes four controller-selectable canonical roots. All 19 roles are non-user-facing children compiled from split v4 role sources, 31 prompt modules, exact role-specific procedures, and generated v2 return contracts. OMP continues to replace Main and child system prompts so conflicting generic or client-specific instructions cannot govern BBK work.
+Alpha.16.1 uses the harness-root session as the sole user-facing controller and exposes four controller-selectable canonical roots. All 19 roles are non-user-facing children compiled from split v4 role sources, 32 prompt modules, exact role-specific procedures, and generated v2 return contracts. OMP continues to replace Main and child system prompts so conflicting generic or client-specific instructions cannot govern BBK work.
 
-## Alpha.15 operating behavior
+## Alpha.16.1 operating behavior
 
 Routine work is product-first. Stable-interface capability increments may proceed concurrently when their mutation and evidence scopes are independent. Mechanical defects block only the affected package or exact scope and are repaired locally rather than automatically commissioning architecture, research, review, or user authorization.
 
@@ -10,10 +10,15 @@ Assurance uses `INLINE` by default, `FOCUSED` for an exact material risk or find
 
 Generated role returns default to `bbk.role-return.v2`: COMPACT uses role-specific compact schemas, while FULL retains the existing authoritative role result schemas. V1 remains consumable.
 
+Authority is effect-specific. `WORKSPACE_IMPLEMENTATION` covers requested artifact production and local verification inside the authorized workspace; `EXTERNAL_EXECUTION` covers effects on real hosts, remote systems, credentials, deployment, network configuration, publication, release, and migration. `PRODUCE_ONLY` grants workspace implementation while withholding external execution. Completion reports use only the independently established claims `PLANNING_COMPLETE`, `IMPLEMENTATION_ARTIFACTS_COMPLETE`, `BYTE_INTEGRITY_VERIFIED`, `SEMANTIC_REVIEW_COMPLETE`, `DEPLOYMENT_AUTHORIZED`, `DEPLOYMENT_PERFORMED`, and `LIVE_ACCEPTANCE_VERIFIED`.
+
 Useful deterministic utilities include:
 
 ```text
 bbk artifact preflight <draft>
+bbk artifact finalize --root <project> --package-id <id> --revision <rev> [--source <path> ...]
+bbk artifact finalize <draft> --root <project>
+bbk artifact freshness <publication-or-current-pointer> --root <project>
 bbk artifact seal <draft> --output <sealed>
 bbk artifact verify <sealed>
 bbk artifact successor <sealed> --output <draft> --revision <rev> --reason <reason>
@@ -22,7 +27,9 @@ bbk context worker --root <project> --work-unit <wu.json> --profile-lock <lock.j
 bbk context review --root <project> --candidate <candidate-package> --request <request.json> --output <package>
 ```
 
-New constructors use sealed packages. Generated hashes, byte lengths, canonicalization labels, package closure, and receipts are tool-owned. Host-preflight observations are evidence bound to an exact host, not execution authority.
+New constructors use sealed packages. `artifact finalize` supports a one-shot software mode over ordinary project files and the existing profile-specific draft mode. One-shot mode rejects symbolic links, applies deterministic exclusions and optional selectors, builds an ephemeral generic draft, writes the immutable package under `.bbk/artifacts/sealed`, and binds the exact selected live source set in the external publication receipt. `artifact freshness` re-verifies both the package and that source binding. Generated hashes, byte lengths, canonicalization labels, package closure, and receipts are tool-owned. Host-preflight observations are evidence bound to an exact host, not execution authority.
+
+When the user explicitly requires `bbk artifact finalize`, OMP records that obligation. A handoff, passing tests, a raw implementation directory, or `artifact seal` is not a substitute. Before a completion-bearing final relay, BBK verifies the bound publication and source freshness; a post-finalization source mutation requires local re-verification and a successor finalization. This gate checks local byte consistency only and does not infer semantic review, acceptance, deployment, or live validation.
 
 ## Enter BBK
 
@@ -58,7 +65,26 @@ With OMP's advertised batch form, dispatch even one root as `{ context, tasks: [
 
 All named `bbk_*` agents are non-user-facing children. Their generated definitions carry a `<bbk-agent-system>` marker and complete inlined `mandatory_skills`. On child start, the same hook verifies the marker-bearing wrapper's role block against the installed canonical projection, replaces the complete incoming prompt, and preserves only explicit task-call context, approved plan/path, worktree, hub identity/roster, and caller yield schema. A child finishes through OMP's hidden `yield` tool with its governed result in `result.data`.
 
+A second `before_provider_request` guard handles wake, resume, ask-return, and other continuation paths that can skip a fresh `before_agent_start`. It inspects and, where necessary, replaces the actual provider-specific payload. Each governed request becomes `VERIFIED`, `REPAIRED`, or `BLOCKED` in `bbk.effective-prompt-receipt.v2`. Unsupported or failed repair calls the host abort control and substitutes a payload containing no user request content. `/bbk:prompt-status [json]` reports counts and unresolved status. This guarantee ends at BBK's handler because later OMP extension handlers can still replace the payload.
+
 Children coordinate through `hub`/IRC. A material human need is sent to Main as a stable `BBK_USER_REQUEST`. Main must use OMP's native `ask` tool for the user-facing question and relay its structured answer to the exact waiting peer as a matching `BBK_USER_RESPONSE` marked `source: omp.ask`, with `replyTo` when available. Anything phrased as a question only in ordinary assistant prose is informational text: it is not pending, cannot be treated as answered, and cannot become ADR authority. The responsible canonical role—not Main—creates the ADR from an ask-backed response. Delivery, timeout, silence, or missing heartbeat is not a response. Continue independent authorized work after sending and wait only when completely blocked.
+
+Task completion is not peer death. A completed child may remain parked in the OMP hub and later be reactivated for follow-up work. Alpha.16.1 retains alpha.15.1's reconciliation of `/bbk:agents` from ordered task-lifecycle and coordination evidence: successful `injected`, `woken`, or `revived` receipts, live `hub`/IRC rosters, and legacy `job` running-agent reports can make a completed peer active again. Later lifecycle or roster evidence supersedes older wake evidence; failed receipts do not activate. Role-bearing rosters can discover nested peers without duplicating identities.
+
+Use:
+
+```text
+/bbk:agents          complete reconciled tree
+/bbk:agents active   active peers plus their ancestors
+/bbk:agents json     additive machine-readable status evidence
+/bbk:agents details <id-or-name>
+/bbk:timing          observational elapsed/user-wait/activity timing
+/bbk:timing json     machine-readable timing
+```
+
+While OMP's native `ask` tool is open, the agent view reports `WAITING_ON_USER`, observed request IDs, wait start, and independently active work. `/bbk:timing` separates that explicit user-wait interval from session elapsed and reports provider, tool, and sub-agent timing with overlap-aware wall and summed durations. Unattributed elapsed is reported as unknown rather than mislabeled as model compute.
+
+The JSON record distinguishes `task_status`, `peer_status`, `peer_status_current`, `status_source`, and `wake_outcome`. A split text status such as `running · task completed · peer running (woken)` is intentional. This is observability, not cancellation or execution authority, and it can report only wake/roster evidence observed by the current Main session.
 
 `/bbk <request>` sends only the request text through `sendUserMessage`. `/bbk` with no arguments and `/bbk:exit` are local UI/state operations and do not start a model turn. BBK mode does not change the parent model, thinking level, toolset, child model routing, or containment. `/bbk:exit` restores ordinary prompting for subsequent Main turns; named BBK children still receive role-specific replacement whenever invoked.
 
@@ -501,6 +527,25 @@ bbk artifact successor .bbk/packages/C-001 --output .bbk/drafts/C-002 \
   --revision r2 --reason "Focused repair"
 ```
 
+Codex and Claude Code receive the canonical `bbk-artifact` on-demand skill. When the short `bbk` launcher is not on `PATH`, call the skill wrapper; it resolves the nearest valid project install manifest and then the user install manifest, and invokes the exact recorded Python executable and installed `tools/bbk.py`.
+
+User-scope Windows examples:
+
+```powershell
+# Codex
+$BbkArtifact = "$HOME\.agents\skills\bbk-artifact\scripts\bbk-artifact.cmd"
+
+# Claude Code uses this location instead:
+# $BbkArtifact = "$HOME\.claude\skills\bbk-artifact\scripts\bbk-artifact.cmd"
+
+& $BbkArtifact binding
+& $BbkArtifact preflight ".bbk\drafts\C-001"
+& $BbkArtifact seal ".bbk\drafts\C-001" --output ".bbk\packages\C-001"
+& $BbkArtifact verify ".bbk\packages\C-001"
+```
+
+Project-scope roots are `<project>/.agents/skills/bbk-artifact` for Codex and `<project>/.claude/skills/bbk-artifact` for Claude. On Linux and macOS, invoke the wrapper as `sh <skill-root>/scripts/bbk-artifact.sh ...`; release archives intentionally do not rely on executable permission bits. A passing package operation proves stored bytes and declared closure only; it does not establish semantic correctness, acceptance, authorization, validation, deployment readiness, or release authority.
+
 For a bounded legacy handoff or review set, the exact artifact-manifest surface remains available:
 
 ```bash
@@ -587,7 +632,7 @@ To update only BBK's Codex custom-agent definitions while preserving OMP and its
 python tools/setup.py --test-and-update-codex --scope user
 ```
 
-Use `--update-codex` instead when the release has already been verified. The updater changes only BBK's 19 Codex custom-agent files and unified-manifest ownership metadata; it preserves the installed package, launcher, effective model-routing file, OMP state, Claude Code, generic agents, and language profiles. Start a fresh Codex turn or session if the host has cached agent definitions.
+Use `--update-codex` instead when the release has already been verified. The updater changes BBK's 19 Codex custom-agent files, installs or refreshes the seven-file canonical `bbk-artifact` skill under `.agents/skills`, and reconciles unified-manifest ownership. It preserves the installed package, launcher, effective model-routing file, OMP agent/extension state, Claude Code, generic agents, and language profiles. Start a fresh Codex turn or session if the host has cached agent definitions or skills.
 
 To update only OMP while Codex remains running:
 

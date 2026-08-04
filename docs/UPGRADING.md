@@ -2,6 +2,147 @@
 
 Use a clean extraction for each BBK version. Do not overlay a new release onto an older extracted package.
 
+## Upgrade to `0.1.0-alpha.16.1`
+
+`0.1.0-alpha.16.1` is a bounded corrective release over alpha.16. Use a clean extraction; do not overlay selected extension, runtime, generated-agent, skill, schema, or tool files onto an older package.
+
+The correction is especially important when an existing user-scope installation owns both OMP and Codex. Alpha.16's OMP-only clean replacement could delete adjacent Python dependencies required by `/bbk:models` and retain stale packaged-default routing metadata. Alpha.16.1 makes the full installer and selective updater consume one canonical OMP runtime inventory, proves manifest ownership, and smoke-runs the installed import, routing, and schema surfaces before returning success.
+
+### Full managed replacement
+
+For an installation that owns OMP and Codex:
+
+```powershell
+python tools\setup.py --test-and-install `
+  --scope user `
+  --omp `
+  --codex `
+  --uninstall-existing
+```
+
+Add `--claude` and `--generic` when those harnesses are also managed by the installation. Then run `/reload-plugins` or restart OMP and start fresh Codex/Claude parent sessions.
+
+### OMP-only successor update
+
+To update only OMP while preserving the installed Codex surface:
+
+```powershell
+python tools\setup.py --test-and-update-omp --scope user
+```
+
+A successful alpha.16.1 selective update reports passing `runtime_inventory` and `runtime_smoke` records. It preserves active OMP per-role routes. Packaged-default model-routing source/effective-copy metadata is rebound to alpha.16.1; an explicit custom policy remains custom-owned.
+
+### Artifact finalization changes
+
+Ordinary software implementations can now be finalized without hand-authoring package internals:
+
+```powershell
+python tools\bbk.py --json artifact finalize `
+  --root . `
+  --package-id my-tool `
+  --revision 1 `
+  --source src `
+  --source tests `
+  --source README.md
+```
+
+Run the returned publication receipt through:
+
+```powershell
+python tools\bbk.py --json artifact freshness `
+  .bbk\artifacts\publications\my-tool-1.json `
+  --root .
+```
+
+When an OMP BBK request explicitly requires `bbk artifact finalize`, a handoff or passing tests no longer satisfy that requirement. A completion-bearing relay is blocked until a successful finalization receipt is bound and its selected source set remains fresh.
+
+External model-routing policies are release-bound. Set `package_version` to `0.1.0-alpha.16.1`, preserve exact role coverage, and validate the policy before installation. The reviewed role selections are unchanged from alpha.16.
+
+## Upgrade to `0.1.0-alpha.16`
+
+`0.1.0-alpha.16` is a bounded provider-prompt-integrity, artifact-finalization, authority-vocabulary, timing, and CLI-diagnostics release over alpha.15.1. Use a clean extraction and the managed installer or selective updater. Do not overlay extension, generated-agent, skill, schema, or tool files onto an older package.
+
+For a complete managed user-scope upgrade:
+
+```bash
+python tools/setup.py --test-and-install --scope user --omp --codex --claude --generic
+```
+
+For OMP only:
+
+```bash
+python tools/setup.py --test-and-update-omp --scope user
+```
+
+For Codex only:
+
+```bash
+python tools/setup.py --test-and-update-codex --scope user
+```
+
+Reload OMP after updating its extension and begin fresh Codex/Claude parent sessions after updating generated roles or skills.
+
+Alpha.16 adds no mandatory `.bbk/` project-record migration. Existing drafts, sealed packages, handoff v1/v2, role-return v1/v2, generated contexts, review records, Beads mappings, and user/project routing state remain consumable. The new directories below appear only when the one-shot finalizer is used:
+
+```text
+.bbk/artifacts/sealed/
+.bbk/artifacts/publications/
+.bbk/artifacts/current/
+```
+
+The main operational changes are:
+
+- OMP verifies or repairs the actual provider-specific `before_provider_request` payload for active BBK Main/child turns. Unsupported or unrepairable payloads are blocked through the host abort control when available and replaced with a user-content-free sentinel. `/bbk:prompt-status` now reports per-request v2 `VERIFIED`, `REPAIRED`, and `BLOCKED` receipts. The guarantee ends at BBK's handler because a later extension can still rewrite the payload.
+- `bbk artifact finalize <draft-root> --root <project>` is the preferred generic immutable-publication operation. It defaults to `.bbk/artifacts/sealed/<package-id>-<revision>`, keeps publication/current metadata outside the sealed tree, rejects live coordination records by default, verifies again after metadata publication, and rolls external metadata back on failure.
+- `PRODUCE_ONLY` now explicitly grants `WORKSPACE_IMPLEMENTATION` while withholding `EXTERNAL_EXECUTION`. Producing and locally testing requested scripts or configurations should continue without deployment authority; stop before the first real-host, credential, network, publication, or deployment effect.
+- `/bbk:timing` and `/bbk:agents` separate explicit native-`ask` user wait from observed session elapsed and expose provider/tool/sub-agent timing without claiming elapsed-minus-wait is model compute.
+- Invalid CLI arguments return structured `bbk.cli-error.v1` diagnostics with the exact field/value, valid values, corrected example, help command, and smallest next action.
+
+Alpha.16 preserves the exact reviewed 19-role model routes. It does not add model-suitability classification or automatic model escalation; that remains a Blueprint concern.
+
+External model-routing policies are release-bound. Set `package_version` to `0.1.0-alpha.16`, preserve exact role coverage, and validate the policy before installation.
+
+## Upgrade to `0.1.0-alpha.15.1`
+
+`0.1.0-alpha.15.1` is a bounded corrective over the corrected alpha.15 package. Use a clean extraction and the managed installer or selective updater; do not overlay it onto an alpha.15 extraction.
+
+For a complete managed upgrade:
+
+```bash
+python tools/setup.py --test-and-install --scope user --omp --codex --claude --generic
+```
+
+Reload OMP after installation and start fresh Codex/Claude parent sessions so the regenerated roles and newly installed skill catalogue are visible.
+
+For an existing alpha.15 Codex installation, the targeted path also installs the new seven-file artifact skill without rebinding the shared package or changing OMP agent/extension state:
+
+```bash
+python tools/setup.py --test-and-update-codex --scope user
+```
+
+Claude Code has no separate selective updater in this release; select `--claude` through the managed installer so both its agents and `.claude/skills/bbk-artifact` are owned by the unified manifest.
+
+Alpha.15.1 adds no `.bbk/` project-record migration and does not change the 19 reviewed default model routes, bundled profile versions, assurance modes, artifact-package formats, context-package formats, handoff semantics, Beads projection, or global Blueprint boundary. It makes two operational corrections:
+
+- `/bbk:agents` now merges task lifecycle with later `hub`/IRC/job liveness evidence. A successful `injected`, `woken`, or `revived` receipt or running roster reactivates a completed peer; newer lifecycle/roster evidence supersedes older observations.
+- `bbk-artifact` is now a canonical on-demand skill installed for Codex and Claude Code. Its wrapper resolves the exact installation manifest and recorded Python/script binding; `bbk` need not be on `PATH`.
+
+Managed user-scope locations are:
+
+```text
+Codex:  ~/.agents/skills/bbk-artifact
+Claude: ~/.claude/skills/bbk-artifact
+```
+
+Project scope uses `<project>/.agents/skills/bbk-artifact` and `<project>/.claude/skills/bbk-artifact`. Validate a user-scope installation with:
+
+```powershell
+& "$HOME\.agents\skills\bbk-artifact\scripts\bbk-artifact.cmd" binding
+& "$HOME\.agents\skills\bbk-artifact\scripts\bbk-artifact.cmd" --help
+```
+
+External routing policies remain release-bound: set `package_version` to `0.1.0-alpha.15.1`, preserve exact role coverage, and revalidate before installation. Existing alpha.15 v1/v2 records remain consumable.
+
 ## Upgrade to `0.1.0-alpha.15`
 
 `0.1.0-alpha.15` is a product-first workflow and deterministic packaging release over alpha.14. Use a clean extraction and the managed installer or selective updater; do not copy generated roles, skills, extension files, schemas, or routing files into an older extraction.

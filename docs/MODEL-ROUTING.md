@@ -1,10 +1,10 @@
 # Sub-agent model routing
 
-BBK `0.1.0-alpha.15` separates each role's stable responsibility from the model used to perform it.
+BBK `0.1.0-alpha.16.1` separates each role's stable responsibility from the model used to perform it.
 
 The canonical install-time policy is `spec/model-routing.json`. It uses `"schema_version": "bbk.model-routing.v2"` and contains one complete OMP, Codex, and Claude Code route for every canonical role. Exact coverage is required: a missing role and an unknown role both fail validation.
 
-The alpha.15 defaults preserve the reviewed selections supplied with the split-role update. They are copied into the canonical policy, generated projections, packaged OMP `default` runtime profile, and a regression fixture. The only change from that reviewed source is advancing `package_version` to `0.1.0-alpha.15`.
+The alpha.16.1 defaults preserve the reviewed selections supplied with the split-role update. They are copied into the canonical policy, generated projections, packaged OMP `default` runtime profile, and a regression fixture. Alpha.16.1 preserves those reviewed routes while advancing only the package binding and generated prompt digests.
 
 ## Default per-role routes
 
@@ -96,7 +96,7 @@ python tools\install.py install --scope user --omp --codex --claude `
   --model-routing D:\Profiles\bbk-model-routing.json
 ```
 
-The external file's `package_version` must be `0.1.0-alpha.15`. The installer validates it before writing, renders the selected projections from that policy, copies it to `effective-model-routing.json`, and binds its digest into `install-manifest.json`.
+The external file's `package_version` must be `0.1.0-alpha.16.1`. The installer validates it before writing, renders the selected projections from that policy, copies it to `effective-model-routing.json`, and binds its digest into `install-manifest.json`.
 
 Do not edit generated files under `projections/` directly. Drift checks reject manual changes.
 
@@ -189,4 +189,4 @@ Project agent definitions also precede user definitions. A task override or high
 
 ## Upgrade an external policy
 
-An external policy is bound to one BBK release. Update `package_version` to `0.1.0-alpha.15`, compare its role keys and host fields with the new canonical policy, and validate it before installation. Alpha.15 retains the same 19 role names and exact routes while changing return contracts, prompt composition, and generated projection digests. Regenerate installed agents from the alpha.15 package rather than copying files from alpha.14.
+An external policy is bound to one BBK release. Update `package_version` to `0.1.0-alpha.16.1`, compare its role keys and host fields with the new canonical policy, and validate it before installation. Alpha.16.1 retains the same 19 role names and exact routes. It changes selective OMP installation behavior, artifact-finalization/freshness surfaces, generated prompt/skill content, and projection digests. Regenerate installed agents from the alpha.16.1 package rather than copying files from alpha.16.

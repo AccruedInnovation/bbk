@@ -1,6 +1,6 @@
 {
   "schema_version": "bbk.model-routing.v2",
-  "package_version": "0.1.0-alpha.15",
+  "package_version": "0.1.0-alpha.16.1",
   "description": "Canonical alpha.14 model and reasoning-effort routing, preserving the reviewed selections for each generated BBK role. Every role has an independent host route; edit this policy or supply an install-time override, and never edit generated projections directly.",
   "roles": {
     "bbk_root_wayfinder": {

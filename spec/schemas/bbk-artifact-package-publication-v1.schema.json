@@ -1,0 +1,275 @@
+{
+  "$defs": {
+    "nonEmpty": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "profileRef": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/safeId"
+        },
+        "version": {
+          "$ref": "#/$defs/nonEmpty"
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ],
+      "type": "object"
+    },
+    "safeId": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+      "type": "string"
+    },
+    "sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "sourceFile": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "path": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "sourceSelection": {
+      "additionalProperties": false,
+      "properties": {
+        "excludes": {
+          "items": {
+            "$ref": "#/$defs/nonEmpty"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "includes": {
+          "items": {
+            "$ref": "#/$defs/nonEmpty"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "schema": {
+          "const": "bbk.artifact-source-selection.v1"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/nonEmpty"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "schema",
+        "sources",
+        "includes",
+        "excludes"
+      ],
+      "type": "object"
+    },
+    "sourceSnapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "fileCount": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "files": {
+          "items": {
+            "$ref": "#/$defs/sourceFile"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "schema": {
+          "const": "bbk.artifact-source-snapshot.v1"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "required": [
+        "schema",
+        "fileCount",
+        "sha256",
+        "files"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://bbk.local/schemas/bbk-artifact-package-publication-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Immutable publication receipt written outside a sealed BBK artifact package.",
+  "properties": {
+    "artifactCount": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "authorityBoundary": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "claimsNotEstablished": {
+      "items": {
+        "$ref": "#/$defs/nonEmpty"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "completionClaims": {
+      "contains": {
+        "const": "BYTE_INTEGRITY_VERIFIED"
+      },
+      "items": {
+        "enum": [
+          "BYTE_INTEGRITY_VERIFIED"
+        ]
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "contentSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "manifestSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "packageId": {
+      "$ref": "#/$defs/safeId"
+    },
+    "policy": {
+      "additionalProperties": false,
+      "properties": {
+        "mutableCoordinationOverrideUsed": {
+          "type": "boolean"
+        },
+        "mutableCoordinationPaths": {
+          "items": {
+            "$ref": "#/$defs/nonEmpty"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "publicationMetadataOutsideSealedTree": {
+          "const": true
+        }
+      },
+      "required": [
+        "publicationMetadataOutsideSealedTree",
+        "mutableCoordinationOverrideUsed",
+        "mutableCoordinationPaths"
+      ],
+      "type": "object"
+    },
+    "profile": {
+      "$ref": "#/$defs/profileRef"
+    },
+    "publishedAtUtc": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "revision": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "schema": {
+      "const": "bbk.artifact-package-publication.v1"
+    },
+    "sealedRoot": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "sealedTreeSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "sourceBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "const": "software-source-set"
+        },
+        "projectRoot": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "schema": {
+          "const": "bbk.artifact-source-binding.v1"
+        },
+        "selection": {
+          "$ref": "#/$defs/sourceSelection"
+        },
+        "snapshot": {
+          "$ref": "#/$defs/sourceSnapshot"
+        }
+      },
+      "required": [
+        "schema",
+        "mode",
+        "projectRoot",
+        "selection",
+        "snapshot"
+      ],
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "status": {
+      "const": "PUBLISHED"
+    },
+    "tool": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "const": "bbk"
+        },
+        "version": {
+          "$ref": "#/$defs/nonEmpty"
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "packageId",
+    "revision",
+    "profile",
+    "artifactCount",
+    "contentSha256",
+    "manifestSha256",
+    "sealedRoot",
+    "sealedTreeSha256",
+    "publishedAtUtc",
+    "tool",
+    "policy",
+    "authorityBoundary",
+    "completionClaims",
+    "claimsNotEstablished"
+  ],
+  "title": "BBK artifact package publication receipt v1",
+  "type": "object"
+}

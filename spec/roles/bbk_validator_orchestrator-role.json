@@ -92,6 +92,7 @@
     "bbk-review-findings",
     "bbk-review-intent",
     "bbk-context-routing",
+    "bbk-artifact",
     "bbk-handoff"
   ],
   "primary_skill": "bbk-validation-orchestration",
@@ -106,6 +107,7 @@
     "bbk-prompt-durable-handoff",
     "bbk-prompt-handoff-protocol",
     "bbk-prompt-state-claim-truth",
+    "bbk-prompt-authority-completion-vocabulary",
     "bbk-prompt-profile-qualification",
     "bbk-prompt-proportional-stop",
     "bbk-prompt-liveness-recovery",

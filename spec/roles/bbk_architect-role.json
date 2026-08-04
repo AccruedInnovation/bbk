@@ -49,6 +49,7 @@
     "bbk-prompt-durable-handoff",
     "bbk-prompt-handoff-protocol",
     "bbk-prompt-state-claim-truth",
+    "bbk-prompt-authority-completion-vocabulary",
     "bbk-prompt-executable-baseline",
     "bbk-prompt-profile-qualification",
     "bbk-prompt-proportional-stop",
@@ -308,6 +309,7 @@
   "skills": [
     "bbk-architecture",
     "bbk-context-routing",
+    "bbk-artifact",
     "bbk-handoff",
     "bbk-solution-outcome-fit",
     "bbk-implementation-structure",

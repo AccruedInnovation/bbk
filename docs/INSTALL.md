@@ -1,6 +1,6 @@
-# Install and qualify BBK alpha.15
+# Install and qualify BBK alpha.16.1
 
-Alpha.15 is distributed as one archive containing the BBK core and five independently manifested language profiles: CODESYS `0.1.0-alpha.4`, plus Go, Python, Rust, and TypeScript/JavaScript `0.1.0-alpha.3`. It integrates the canonical split-role v4 package, exact role-return/execution contracts, 31 reusable prompt modules, compact infrastructure/schema/artifact tooling, projection manifest v8, and the reviewed per-role model-routing defaults. It preserves bounded verification, harness-scoped updates, the PowerShell-visible default-Yes prompt, OMP controller/activity/`ask` behavior, and installs all five profiles by default. Use a clean extraction for each release.
+Alpha.16.1 is distributed as one archive containing the BBK core and five independently manifested language profiles: CODESYS `0.1.0-alpha.4`, plus Go, Python, Rust, and TypeScript/JavaScript `0.1.0-alpha.3`. It integrates the canonical split-role v4 package, exact role-return/execution contracts, 32 reusable prompt modules, 40 canonical skills including `bbk-artifact`, compact infrastructure/schema/artifact tooling, projection manifest v8, and the reviewed per-role model-routing defaults. It preserves bounded verification, harness-scoped updates, the PowerShell-visible default-Yes prompt, OMP controller/activity/`ask` behavior, and installs all five profiles by default. Use a clean extraction for each release.
 
 ## Prerequisites
 
@@ -126,6 +126,29 @@ python tools/setup.py --test-and-install --scope user --omp --codex \
 `--no-language-profiles` cannot be combined with `--profile-id` or `--language-profiles`.
 
 A core-only installation still generates `bbk-installed-profiles/SKILL.md`; the registry explicitly says no language/domain profile is managed by that installation.
+
+## Codex and Claude artifact skill
+
+When Codex or Claude Code is selected, the installer owns and installs the complete `bbk-artifact` skill even in a core-only installation:
+
+```text
+User-scope Codex:  ~/.agents/skills/bbk-artifact
+User-scope Claude: ~/.claude/skills/bbk-artifact
+Project Codex:     <project>/.agents/skills/bbk-artifact
+Project Claude:    <project>/.claude/skills/bbk-artifact
+```
+
+The package contains `SKILL.md`, host metadata, a generic draft template, the artifact-package reference, and Windows/POSIX wrappers. The wrappers resolve the nearest valid project install manifest first and then the user install manifest. They invoke the exact recorded Python executable and installed `tools/bbk.py`; the short `bbk` launcher does not need to be on `PATH`.
+
+After a user-scope Windows install, validate Codex exposure with:
+
+```powershell
+$BbkArtifact = "$HOME\.agents\skills\bbk-artifact\scripts\bbk-artifact.cmd"
+& $BbkArtifact binding
+& $BbkArtifact --help
+```
+
+For Claude Code, use `$HOME\.claude\skills\bbk-artifact\scripts\bbk-artifact.cmd`. On Linux or macOS, invoke the corresponding wrapper as `sh <skill-root>/scripts/bbk-artifact.sh ...`; release archives intentionally do not rely on executable permission bits. A passing artifact-package operation proves exact bytes and declared closure only; it does not establish acceptance, authorization, validation, deployment readiness, or release authority.
 
 ## Use an alternate profile source
 
@@ -308,7 +331,7 @@ User scope uses the platform data root. On Windows the default is:
   effective-language-profiles.json
   install-manifest.json
   bin\
-  versions\0.1.0-alpha.15\
+  versions\0.1.0-alpha.16.1\
   profiles\<profile-id>\0.1.0-alpha.3\
   profiles\<profile-id>\current.json
 ```
@@ -327,7 +350,7 @@ python tools/install.py install --scope user --omp --codex --claude \
   --model-routing /path/to/model-routing.json --dry-run
 ```
 
-The external file's `package_version` must be `0.1.0-alpha.15`. The installer validates exact coverage of all 19 roles before writing and records the effective policy and digest.
+The external file's `package_version` must be `0.1.0-alpha.16.1`. The installer validates exact coverage of all 19 roles before writing and records the effective policy and digest.
 
 An OMP installation also writes `effective-omp-model-routing.json` and exposes an interactive runtime menu:
 
@@ -368,11 +391,11 @@ In reconciliation mode, a fully current profile bypasses the profile-copy operat
 
 This is not a version-label shortcut. Missing, changed, mode-divergent, or locally modified files follow the ordinary refusal, backup, repair, and `--force` rules. Profile packages are never trusted solely because the profile version string has not changed.
 
-## Upgrade to alpha.15
+## Upgrade to alpha.16.1
 
-Do not overlay one extracted release package directory onto another. Extract alpha.15 into a new directory and choose the narrowest appropriate update. See `UPGRADING.md` for the standard/release verification split, duration-aware pooled testing, and authenticated reuse of unchanged installed profile files.
+Do not overlay one extracted release package directory onto another. Extract alpha.16.1 into a new directory and choose the narrowest appropriate update. See `UPGRADING.md` for the standard/release verification split, duration-aware pooled testing, and authenticated reuse of unchanged installed profile files.
 
-Alpha.15 adds product-first proportional assurance, strict JSON and sealed artifact packages, project-local OMP routing creation/repair, role-return v2, generated Worker/review contexts, requirement-scoped host preflight, prototype charter v2, and sealed handoff v2. It does not add Blueprint lifecycle gates or automatically rewrite accepted-baseline, authority, Markdown, or Beads records. Existing projects and installed language profiles do not require content migration; unchanged authenticated profile packages remain eligible for in-place reuse.
+Alpha.16.1 retains alpha.16's provider-bound verify/repair/block enforcement, authority vocabulary, exact completion claims, native-ask timing, structured CLI errors, and all alpha.15.1 package/context/handoff behavior. It repairs the alpha.16 OMP-only clean-replacement inventory, refreshes packaged-default routing metadata, adds one-shot software finalization without hand-authored package internals, binds those publications to the exact selected source tree, and freshness-checks them before OMP completion claims. It does not add model-suitability routing or Blueprint lifecycle gates. Existing projects and installed language profiles do not require content migration; unchanged authenticated profile packages remain eligible for in-place reuse.
 
 To refresh only OMP while preserving Codex:
 
@@ -386,11 +409,11 @@ To refresh only Codex while preserving OMP:
 python tools/setup.py --test-and-update-codex --scope user
 ```
 
-For a full managed upgrade, select every installed harness and accept the full clean-replacement prompt, or pass `--uninstall-existing` explicitly in automation. A command selecting only `--omp` or only `--codex` now performs a harness-scoped clean replacement and preserves the other installed harness rather than removing it.
+For a full managed upgrade, select every installed harness and accept the full clean-replacement prompt, or pass `--uninstall-existing` explicitly in automation. A command selecting only `--omp` or only `--codex` performs a harness-scoped clean replacement and preserves the other installed harness rather than removing it. Alpha.16.1 specifically qualifies the OMP-only path against the complete adjacent runtime and installed `/bbk:models` surface.
 
-Alpha.15 retains the canonical split role package to split `bbk.roles.v4`, the generated projection manifest to v8, and the default `bbk.model-routing.v2` policy to the exact reviewed per-role selections. It adds generated role-return/result schemas and contract registries while preserving the existing install destinations. Start a fresh Codex session after updating its agents. Reload OMP plugins with `/reload-plugins` after an OMP update.
+Alpha.16.1 retains the canonical split role package as `bbk.roles.v4`, projection manifest v8, and the exact reviewed `bbk.model-routing.v2` role selections. Start a fresh Codex session after updating its agents. Reload OMP plugins with `/reload-plugins` after an OMP update.
 
-No `.bbk` project-record migration is required solely for alpha.15. New initializations place reference templates under `.bbk/examples/`; existing legacy examples remain supported and non-operational.
+No existing `.bbk` project-record migration is required solely for alpha.16.1. The `.bbk/artifacts/{sealed,publications,current}` directories appear only when `artifact finalize` is invoked. One-shot software publications add an optional source binding to the external publication receipt; alpha.16 draft-mode receipts remain consumable. New initializations place reference templates under `.bbk/examples/`; existing legacy examples remain supported and non-operational.
 
 ## Live qualification
 
@@ -413,6 +436,8 @@ Then enter persistent BBK mode:
 ```
 
 Mode state is session-local and persisted with `appendEntry`; it is not sent to the model. While active, `before_agent_start` performs a complete Main **system-prompt replacement** that excludes OMP's generic workflow and compatibility-discovered `.codex`, `.claude`, `.gemini`, or other client-specific instructions. The replacement injects the mandatory `bbk` and `bbk-context-routing` procedures and makes Main the sole user-facing controller.
+
+Alpha.16.1 also verifies the actual provider-specific payload in `before_provider_request`. Recognized contaminated BBK payloads are rewritten to exactly one canonical system surface; unsupported or unrepairable BBK payloads invoke the host abort control and substitute a payload containing no user request content. `/bbk:prompt-status` exposes digest-only v2 receipts and unresolved failures. Because OMP handlers run in extension order and expose no post-chain finalizer, install/load order remains part of the qualification boundary: a later extension can still rewrite the payload after BBK.
 
 Every generated named BBK role is a non-user-facing child with mandatory procedures already inlined. The hook also replaces each marked child's generic OMP subagent prompt while preserving sanitized assignment context, approved plan/path, worktree, hub identity/roster, and caller yield schema. Children coordinate through `hub`/IRC and send material human requests to Main; they do not focus the terminal or question the user directly.
 
@@ -438,9 +463,9 @@ Inspect the plan without writing:
 python tools/setup.py --update-codex --scope user --dry-run
 ```
 
-The operation replaces only the 19 installed BBK Codex agent definitions and reconciles their ownership records plus per-harness version metadata in the unified manifest. It deliberately preserves the installed BBK package copy, current pointer, launcher, effective install-time model-routing file, OMP agents and extensions, OMP runtime model routing, Claude Code agents, generic agents, and installed language-profile packages. It renders the new Codex files from a temporary version-rebound copy of the installed model policy, and refuses locally divergent targeted Codex files unless `--force` is explicit.
+The operation updates the 19 installed BBK Codex agent definitions, installs or refreshes the seven-file canonical `bbk-artifact` skill under Codex's `.agents/skills` root, and reconciles their ownership records plus per-harness version metadata in the unified manifest. It deliberately preserves the installed BBK package copy, current pointer, launcher, effective install-time model-routing file, OMP agents and extensions, OMP runtime model routing, Claude Code agents, generic agents, and installed language-profile packages. It renders the new Codex files from a temporary version-rebound copy of the installed model policy, and refuses locally divergent targeted files unless `--force` is explicit.
 
-Because host caching behavior may vary, start a fresh Codex turn or session after the update before relying on newly generated custom-agent definitions.
+Because host caching behavior may vary, start a fresh Codex turn or session after the update before relying on newly generated custom-agent definitions or the new skill.
 
 ## OMP-only update without stopping Codex
 
@@ -456,6 +481,8 @@ Or, when the release has already been verified:
 python tools/setup.py --update-omp --scope user
 ```
 
-The operation updates the installed BBK package copy and launcher, OMP agents, the core OMP extension, installed bundled-profile OMP extensions, the mutable OMP routing state, and installation metadata. It preserves the active `/bbk:models` profile and per-role routes. It does not modify `.codex` agent files, Claude agent files, or generic agent files, so a running Codex process need not be shut down. The compact shared installed-profile registry may be refreshed only when every installed profile is present in the bundled release; already-loaded Codex context is not changed.
+The operation updates the installed BBK package copy and launcher, OMP agents, the core OMP extension, every adjacent Python runtime dependency, installed bundled-profile OMP extensions, the mutable OMP routing state, and installation metadata. It preserves the active `/bbk:models` profile and per-role routes. Packaged-default routing source/effective-copy metadata is refreshed to the successor release; explicit custom policy ownership is preserved. It does not modify `.codex` agent files, Claude agent files, or generic agent files, so a running Codex process need not be shut down. The compact shared installed-profile registry may be refreshed only when every installed profile is present in the bundled release; already-loaded Codex context is not changed.
+
+Before returning success, alpha.16.1 proves that every canonical OMP runtime module is manifest-owned and smoke-runs the installed import closure, model-routing status, and BBK schema catalogue. A failed post-install smoke restores the previous manifest and targeted files instead of leaving a partially updated OMP runtime.
 
 Use `--dry-run` to inspect the exact plan and `--force` only after reviewing a locally divergent targeted OMP file. After a successful update, run `/reload-plugins` in OMP so the process reloads the changed extensions and agent definitions.

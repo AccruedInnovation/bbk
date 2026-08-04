@@ -16,7 +16,6 @@ import json
 import os
 import platform
 import re
-import shlex
 import shutil
 import socket
 import stat
@@ -27,7 +26,7 @@ import time
 import uuid
 from importlib import metadata as importlib_metadata
 from pathlib import Path, PurePath
-from typing import Any, Iterable, Iterator, Mapping, Sequence
+from typing import Any, Iterable, Iterator, Mapping, NoReturn, Sequence
 
 # When executed from the source package, ``tools`` is the script directory.
 # The OMP installer also places ``bbk.py`` and ``contracts.py`` beside one
@@ -144,7 +143,10 @@ try:
         build_legacy_manifest as artifact_build_legacy_manifest,
         create_successor as artifact_create_successor,
         file_reference as artifact_file_reference,
+        finalize_draft as artifact_finalize_draft,
+        finalize_source_set as artifact_finalize_source_set,
         preflight_draft as artifact_preflight_draft,
+        verify_publication_freshness as artifact_verify_publication_freshness,
         seal_draft as artifact_seal_draft,
         verify_file_reference as artifact_verify_file_reference,
         verify_legacy_manifest as artifact_verify_legacy_manifest,
@@ -166,7 +168,10 @@ except ModuleNotFoundError:
         build_legacy_manifest as artifact_build_legacy_manifest,
         create_successor as artifact_create_successor,
         file_reference as artifact_file_reference,
+        finalize_draft as artifact_finalize_draft,
+        finalize_source_set as artifact_finalize_source_set,
         preflight_draft as artifact_preflight_draft,
+        verify_publication_freshness as artifact_verify_publication_freshness,
         seal_draft as artifact_seal_draft,
         verify_file_reference as artifact_verify_file_reference,
         verify_legacy_manifest as artifact_verify_legacy_manifest,
@@ -327,6 +332,189 @@ class BbkError(RuntimeError):
     def __init__(self, message: str, *, diagnostic: Mapping[str, Any] | None = None):
         super().__init__(message)
         self.diagnostic = dict(diagnostic) if diagnostic is not None else None
+
+
+def invalid_argument_error(
+    message: str,
+    *,
+    field: str,
+    received: Any,
+    valid_values: Sequence[Any] = (),
+    example_command: str = "bbk --help",
+    documentation_command: str = "bbk --help",
+    smallest_next_action: str | None = None,
+) -> BbkError:
+    """Create a command-level argument error with a stable diagnostic."""
+    diagnostic = {
+        "schema": "bbk.cli-error.v1",
+        "status": "INVALID_ARGUMENT",
+        "code": "INVALID_ARGUMENT",
+        "error": message,
+        "message": message,
+        "field": field,
+        "received": received,
+        "valid_values": sorted(str(value) for value in valid_values),
+        "required": [],
+        "example_command": example_command,
+        "documentation_command": documentation_command,
+        "smallest_next_action": smallest_next_action or "Correct the named argument and rerun the command.",
+    }
+    return BbkError(message, diagnostic=diagnostic)
+
+
+class BbkCliParseError(RuntimeError):
+    """Argument-parser failure rendered as a stable machine-readable diagnostic."""
+
+    def __init__(self, diagnostic: Mapping[str, Any]):
+        self.diagnostic = dict(diagnostic)
+        super().__init__(str(self.diagnostic.get("error") or self.diagnostic.get("message") or "invalid arguments"))
+
+
+def _argument_example(parser: argparse.ArgumentParser) -> str:
+    """Build one concise syntactically shaped example from parser metadata."""
+    pieces = [parser.prog]
+    for action in parser._actions:
+        if isinstance(action, argparse._HelpAction):
+            continue
+        if isinstance(action, argparse._SubParsersAction):
+            choices = [name for name in action.choices if name]
+            if choices:
+                pieces.append(sorted(choices)[0])
+            continue
+        if action.option_strings and not action.required:
+            continue
+        if not action.option_strings and not action.required and action.nargs in ("?", "*"):
+            continue
+        if action.option_strings:
+            flag = next((value for value in action.option_strings if value.startswith("--")), action.option_strings[0])
+            pieces.append(flag)
+            if action.nargs != 0:
+                value = sorted(str(item) for item in action.choices)[0] if action.choices else f"<{action.dest.replace('_', '-')}>"
+                pieces.append(value)
+            continue
+        if action.dest in {"help", argparse.SUPPRESS}:
+            continue
+        value = sorted(str(item) for item in action.choices)[0] if action.choices else f"<{action.dest.replace('_', '-')}>"
+        pieces.append(value)
+    return " ".join(pieces)
+
+
+def _argument_for_token(parser: argparse.ArgumentParser, token: str | None) -> argparse.Action | None:
+    if not token:
+        return None
+    for action in parser._actions:
+        if token == action.dest or token in action.option_strings:
+            return action
+    normalized = token.lstrip("-").replace("-", "_")
+    return next((action for action in parser._actions if action.dest == normalized), None)
+
+
+class BbkArgumentParser(argparse.ArgumentParser):
+    """Argparse adapter that never emits an unstructured usage wall on errors."""
+
+    def _raise_diagnostic(
+        self,
+        message: str,
+        *,
+        field: str | None = None,
+        received: Any = None,
+        valid_values: Sequence[Any] | None = None,
+        required: Sequence[str] | None = None,
+        code: str = "INVALID_ARGUMENT",
+        smallest_next_action: str | None = None,
+    ) -> NoReturn:
+        diagnostic = {
+            "schema": "bbk.cli-error.v1",
+            "status": "INVALID_ARGUMENT",
+            "code": code,
+            "command": self.prog,
+            "error": message,
+            "message": message,
+            "field": field,
+            "received": received,
+            "valid_values": sorted(str(value) for value in (valid_values or [])),
+            "required": [str(value) for value in (required or [])],
+            "example_command": _argument_example(self),
+            "documentation_command": f"{self.prog} --help",
+            "smallest_next_action": smallest_next_action
+            or "Correct the named argument using the command help, then rerun the command.",
+        }
+        raise BbkCliParseError(diagnostic)
+
+    def _check_value(self, action: argparse.Action, value: Any) -> None:
+        if action.choices is not None and value not in action.choices:
+            self._raise_diagnostic(
+                f"Invalid value for {action.dest}: {value!r}.",
+                field=action.dest,
+                received=value,
+                valid_values=list(action.choices),
+                code="INVALID_CHOICE",
+                smallest_next_action=f"Use one of the valid values for {action.dest}, then rerun the command.",
+            )
+        super()._check_value(action, value)
+
+    def error(self, message: str) -> NoReturn:
+        field: str | None = None
+        received: Any = None
+        valid_values: list[Any] = []
+        required: list[str] = []
+        code = "INVALID_ARGUMENT"
+        smallest = "Correct the arguments shown by the command help, then rerun the command."
+
+        missing_match = re.search(r"the following arguments are required: (.+)$", message)
+        argument_match = re.search(r"argument ([^:]+): (.+)$", message)
+        unrecognized_match = re.search(r"unrecognized arguments?: (.+)$", message)
+        invalid_choice_match = re.search(r"argument ([^:]+): invalid choice: ['\"]?([^'\" ]+)", message)
+        if missing_match:
+            required = [item.strip() for item in missing_match.group(1).split(",") if item.strip()]
+            token = required[0] if required else None
+            action = _argument_for_token(self, token)
+            field = action.dest if action is not None else (token or "required_arguments").lstrip("-").replace("-", "_")
+            valid_values = list(action.choices) if action is not None and action.choices is not None else []
+            code = "MISSING_REQUIRED_ARGUMENT"
+            smallest = f"Provide {', '.join(required)} and rerun the command."
+        elif invalid_choice_match:
+            token = invalid_choice_match.group(1).strip()
+            action = _argument_for_token(self, token)
+            field = action.dest if action is not None else token.lstrip("-").replace("-", "_")
+            received = invalid_choice_match.group(2)
+            valid_values = list(action.choices) if action is not None and action.choices is not None else []
+            code = "INVALID_CHOICE"
+            smallest = f"Use one of the valid values for {field}, then rerun the command."
+        elif argument_match:
+            token = argument_match.group(1).strip()
+            action = _argument_for_token(self, token)
+            field = action.dest if action is not None else token.lstrip("-").replace("-", "_")
+            valid_values = list(action.choices) if action is not None and action.choices is not None else []
+            value_match = re.search(r"(?:value|choice):? ['\"]?([^'\" ]+)", argument_match.group(2))
+            if value_match:
+                received = value_match.group(1)
+            code = "INVALID_ARGUMENT_VALUE"
+        elif unrecognized_match:
+            received = unrecognized_match.group(1).split()[0]
+            field = "arguments"
+            code = "UNRECOGNIZED_ARGUMENT"
+            smallest = f"Remove or correct {received!r}; inspect {self.prog} --help for supported arguments."
+        elif "invalid choice" in message:
+            choice_match = re.search(r"invalid choice: ['\"]?([^'\" ]+)", message)
+            received = choice_match.group(1) if choice_match else None
+            field = "command"
+            code = "INVALID_CHOICE"
+            for action in self._actions:
+                if isinstance(action, argparse._SubParsersAction):
+                    valid_values = list(action.choices)
+                    field = action.dest or "command"
+                    break
+
+        self._raise_diagnostic(
+            message,
+            field=field,
+            received=received,
+            valid_values=valid_values,
+            required=required,
+            code=code,
+            smallest_next_action=smallest,
+        )
 
 
 def configure_utf8_standard_streams() -> None:
@@ -1743,6 +1931,70 @@ def cmd_artifact_seal(args: argparse.Namespace) -> dict[str, Any]:
         )
     except ArtifactPackageError as exc:
         return exc.as_dict()
+
+
+def cmd_artifact_finalize(args: argparse.Namespace) -> dict[str, Any]:
+    registry = Path(args.registry).expanduser().resolve() if args.registry else None
+    root = resolve_root(args.root, required=False) or Path.cwd().resolve()
+    try:
+        if args.draft_root:
+            return artifact_finalize_draft(
+                Path(args.draft_root).expanduser(),
+                Path(args.output).expanduser() if args.output else None,
+                project_root=root,
+                publication_root=Path(args.publication_root).expanduser() if args.publication_root else None,
+                registry_path=registry,
+                allow_mutable_coordination=bool(args.allow_mutable_coordination),
+                write_current_pointer=not bool(args.no_current_pointer),
+                recover_stale_lock=bool(args.recover_stale_lock),
+            )
+        if not args.package_id or not args.revision:
+            raise invalid_argument_error(
+                "Provide a draft root, or use one-shot software mode with --package-id and --revision. The source set defaults to the project root when --source is omitted.",
+                field="finalization_mode",
+                received={
+                    "draft_root": args.draft_root,
+                    "package_id": args.package_id,
+                    "revision": args.revision,
+                    "source_count": len(args.source or []),
+                },
+                valid_values=[
+                    "<draft-root>",
+                    "--package-id <id> --revision <revision> [--source <path> ...]",
+                ],
+                example_command="bbk artifact finalize --root . --package-id my-tool --revision r1",
+                documentation_command="bbk artifact finalize --help",
+                smallest_next_action="Choose one complete finalization mode and rerun the command.",
+            )
+        return artifact_finalize_source_set(
+            project_root=root,
+            package_id=args.package_id,
+            revision=args.revision,
+            sources=args.source or ["."],
+            includes=args.include or [],
+            excludes=args.exclude or [],
+            subject_kind=args.subject_kind or "software-implementation",
+            subject_id=args.subject_id,
+            subject_revision=args.subject_revision,
+            purpose=args.purpose,
+            output_root=Path(args.output).expanduser() if args.output else None,
+            publication_root=Path(args.publication_root).expanduser() if args.publication_root else None,
+            registry_path=registry,
+            write_current_pointer=not bool(args.no_current_pointer),
+            recover_stale_lock=bool(args.recover_stale_lock),
+        )
+    except ArtifactPackageError as exc:
+        return exc.as_dict()
+
+
+def cmd_artifact_freshness(args: argparse.Namespace) -> dict[str, Any]:
+    registry = Path(args.registry).expanduser().resolve() if args.registry else None
+    root = resolve_root(args.root, required=False) or Path.cwd().resolve()
+    return artifact_verify_publication_freshness(
+        Path(args.subject).expanduser(),
+        project_root=root,
+        registry_path=registry,
+    )
 
 
 def cmd_artifact_successor(args: argparse.Namespace) -> dict[str, Any]:
@@ -3694,10 +3946,26 @@ def _cmd_handoff_create_v1(args: argparse.Namespace) -> dict[str, Any]:
     zones: list[dict[str, Any]] = []
     for raw in args.capability_zone or []:
         if "=" not in raw:
-            raise BbkError("--capability-zone must use KIND=PATH")
+            raise invalid_argument_error(
+                "--capability-zone must use KIND=PATH",
+                field="capability_zone",
+                received=raw,
+                valid_values=["disposable-candidate-root", "protected-worktree", "sealed-evidence"],
+                example_command="bbk handoff create --root . --work-unit WU-1 --disposition COMPLETE --summary done --next-action none --capability-zone protected-worktree=work",
+                documentation_command="bbk handoff create --help",
+                smallest_next_action="Rewrite the capability-zone value as one supported KIND=PATH pair.",
+            )
         kind, raw_path = raw.split("=", 1)
         if kind not in {"disposable-candidate-root", "protected-worktree", "sealed-evidence"}:
-            raise BbkError(f"unrecognized capability-zone kind: {kind}")
+            raise invalid_argument_error(
+                f"unrecognized capability-zone kind: {kind}",
+                field="capability_zone",
+                received=kind,
+                valid_values=["disposable-candidate-root", "protected-worktree", "sealed-evidence"],
+                example_command="bbk handoff create --root . --work-unit WU-1 --disposition COMPLETE --summary done --next-action none --capability-zone protected-worktree=work",
+                documentation_command="bbk handoff create --help",
+                smallest_next_action="Choose one supported capability-zone kind and preserve the intended project-relative path.",
+            )
         zone_path = _normalize_project_relative(root, raw_path, label="capability zone")
         zones.append({"kind": kind, "path": zone_path, "operations": []})
     if args.interrupt_reason and not args.interrupt_evidence:
@@ -3839,10 +4107,26 @@ def cmd_handoff_create(args: argparse.Namespace) -> dict[str, Any]:
     zones: list[dict[str, Any]] = []
     for raw in args.capability_zone or []:
         if "=" not in raw:
-            raise BbkError("--capability-zone must use KIND=PATH")
+            raise invalid_argument_error(
+                "--capability-zone must use KIND=PATH",
+                field="capability_zone",
+                received=raw,
+                valid_values=["disposable-candidate-root", "protected-worktree", "sealed-evidence"],
+                example_command="bbk handoff create --root . --work-unit WU-1 --disposition COMPLETE --summary done --next-action none --capability-zone protected-worktree=work",
+                documentation_command="bbk handoff create --help",
+                smallest_next_action="Rewrite the capability-zone value as one supported KIND=PATH pair.",
+            )
         kind, raw_path = raw.split("=", 1)
         if kind not in {"disposable-candidate-root", "protected-worktree", "sealed-evidence"}:
-            raise BbkError(f"unrecognized capability-zone kind: {kind}")
+            raise invalid_argument_error(
+                f"unrecognized capability-zone kind: {kind}",
+                field="capability_zone",
+                received=kind,
+                valid_values=["disposable-candidate-root", "protected-worktree", "sealed-evidence"],
+                example_command="bbk handoff create --root . --work-unit WU-1 --disposition COMPLETE --summary done --next-action none --capability-zone protected-worktree=work",
+                documentation_command="bbk handoff create --help",
+                smallest_next_action="Choose one supported capability-zone kind and preserve the intended project-relative path.",
+            )
         zones.append({"kind": kind, "path": _normalize_project_relative(root, raw_path, label="capability zone"), "operations": []})
     if args.interrupt_reason and not args.interrupt_evidence:
         raise BbkError("--interrupt-reason requires at least one --interrupt-evidence")
@@ -5379,10 +5663,10 @@ def human(value: Any) -> str:
 
 
 def parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="bbk", description=__doc__)
+    p = BbkArgumentParser(prog="bbk", description=__doc__)
     p.add_argument("--version", action="version", version=f"bbk {VERSION}")
     p.add_argument("--json", action="store_true")
-    sub = p.add_subparsers(dest="command", required=True)
+    sub = p.add_subparsers(parser_class=BbkArgumentParser, dest="command", required=True)
 
     sub.add_parser("version", help="print the BBK package version")
     x = sub.add_parser("init"); x.add_argument("--root"); x.add_argument("--title"); x.add_argument("--project-id"); x.add_argument("--force", action="store_true"); x.add_argument("--no-examples", action="store_true", help="initialize operational BBK state without materializing reference templates"); x.set_defaults(func=cmd_init)
@@ -5390,62 +5674,64 @@ def parser() -> argparse.ArgumentParser:
     x = sub.add_parser("doctor"); x.add_argument("--root"); x.set_defaults(func=cmd_doctor)
     x = sub.add_parser("digest"); x.add_argument("path"); x.set_defaults(func=cmd_digest)
 
-    artifact = sub.add_parser("artifact").add_subparsers(dest="artifact_command", required=True)
+    artifact = sub.add_parser("artifact").add_subparsers(parser_class=BbkArgumentParser, dest="artifact_command", required=True)
     x = artifact.add_parser("inspect"); x.add_argument("path"); x.add_argument("--exclude", action="append"); x.add_argument("--include-examples", action="store_true"); x.add_argument("--verbose", action="store_true"); x.add_argument("--output"); x.set_defaults(func=cmd_artifact_inspect)
     x = artifact.add_parser("manifest"); x.add_argument("--root"); x.add_argument("--path", action="append"); x.add_argument("--source", action="append"); x.add_argument("--include", action="append"); x.add_argument("--exclude", action="append"); x.add_argument("--include-examples", action="store_true"); x.add_argument("--subject"); x.add_argument("--root-label"); x.add_argument("--output"); x.set_defaults(func=cmd_artifact_manifest)
     x = artifact.add_parser("preflight"); x.add_argument("draft_root"); x.add_argument("--registry"); x.add_argument("--max-depth", type=int, default=128); x.set_defaults(func=cmd_artifact_preflight)
     x = artifact.add_parser("seal"); x.add_argument("draft_root"); x.add_argument("--output", required=True); x.add_argument("--registry"); x.add_argument("--recover-stale-lock", action="store_true"); x.set_defaults(func=cmd_artifact_seal)
+    x = artifact.add_parser("finalize"); x.add_argument("draft_root", nargs="?"); x.add_argument("--root"); x.add_argument("--output"); x.add_argument("--publication-root"); x.add_argument("--registry"); x.add_argument("--package-id"); x.add_argument("--revision"); x.add_argument("--source", action="append"); x.add_argument("--include", action="append"); x.add_argument("--exclude", action="append"); x.add_argument("--subject-kind"); x.add_argument("--subject-id"); x.add_argument("--subject-revision"); x.add_argument("--purpose"); x.add_argument("--allow-mutable-coordination", action="store_true"); x.add_argument("--no-current-pointer", action="store_true"); x.add_argument("--recover-stale-lock", action="store_true"); x.set_defaults(func=cmd_artifact_finalize)
+    x = artifact.add_parser("freshness"); x.add_argument("subject"); x.add_argument("--root"); x.add_argument("--registry"); x.set_defaults(func=cmd_artifact_freshness)
     x = artifact.add_parser("verify"); x.add_argument("manifest"); x.add_argument("--root"); x.add_argument("--registry"); x.set_defaults(func=cmd_artifact_verify)
     x = artifact.add_parser("successor"); x.add_argument("sealed_root"); x.add_argument("--output", required=True); x.add_argument("--revision", required=True); x.add_argument("--reason", required=True); x.add_argument("--registry"); x.add_argument("--recover-stale-lock", action="store_true"); x.set_defaults(func=cmd_artifact_successor)
 
-    preflight = sub.add_parser("preflight").add_subparsers(dest="preflight_command", required=True)
+    preflight = sub.add_parser("preflight").add_subparsers(parser_class=BbkArgumentParser, dest="preflight_command", required=True)
     x = preflight.add_parser("run"); x.add_argument("request"); x.add_argument("--root"); x.add_argument("--output"); x.add_argument("--cache-dir"); x.add_argument("--no-cache", action="store_true"); x.add_argument("--timeout", type=float, default=5.0); x.set_defaults(func=cmd_preflight_run)
 
-    context = sub.add_parser("context").add_subparsers(dest="context_command", required=True)
+    context = sub.add_parser("context").add_subparsers(parser_class=BbkArgumentParser, dest="context_command", required=True)
     x = context.add_parser("worker"); x.add_argument("--root"); x.add_argument("--work-unit", required=True); x.add_argument("--profile-lock", required=True); x.add_argument("--host-preflight", required=True); x.add_argument("--prototype-charter"); x.add_argument("--output"); x.add_argument("--id"); x.add_argument("--revision", default="1"); x.set_defaults(func=cmd_context_worker)
     x = context.add_parser("review"); x.add_argument("--root"); x.add_argument("--candidate", required=True); x.add_argument("--request", required=True); x.add_argument("--output"); x.add_argument("--id"); x.add_argument("--revision", default="1"); x.set_defaults(func=cmd_context_review)
 
-    fit = sub.add_parser("fit").add_subparsers(dest="fit_command", required=True)
+    fit = sub.add_parser("fit").add_subparsers(parser_class=BbkArgumentParser, dest="fit_command", required=True)
     x = fit.add_parser("validate"); x.add_argument("path"); x.set_defaults(func=cmd_fit_validate)
     x = fit.add_parser("render"); x.add_argument("path"); x.add_argument("--format", choices=["markdown", "json"], default="markdown"); x.add_argument("--output"); x.set_defaults(func=cmd_fit_render)
     x = fit.add_parser("new"); x.add_argument("--output", required=True); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_fit_new)
     x = fit.add_parser("check-chain"); x.add_argument("--fit", required=True); x.add_argument("--structure", action="append", default=[]); x.add_argument("--slice", action="append", default=[]); x.add_argument("--work-unit", action="append", default=[]); x.set_defaults(func=cmd_fit_check_chain)
 
-    assurance = sub.add_parser("assurance").add_subparsers(dest="assurance_command", required=True)
+    assurance = sub.add_parser("assurance").add_subparsers(parser_class=BbkArgumentParser, dest="assurance_command", required=True)
     x = assurance.add_parser("validate"); x.add_argument("path"); x.set_defaults(func=cmd_assurance_validate)
     x = assurance.add_parser("new"); x.add_argument("--output", required=True); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_assurance_new)
 
-    sde = sub.add_parser("state-effect").add_subparsers(dest="state_effect_command", required=True)
+    sde = sub.add_parser("state-effect").add_subparsers(parser_class=BbkArgumentParser, dest="state_effect_command", required=True)
     x = sde.add_parser("validate"); x.add_argument("path"); x.set_defaults(func=cmd_sde_validate)
     x = sde.add_parser("render"); x.add_argument("path"); x.add_argument("--format", choices=["markdown", "json"], default="markdown"); x.add_argument("--output"); x.set_defaults(func=cmd_sde_render)
     x = sde.add_parser("new"); x.add_argument("--output", required=True); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_sde_new)
 
-    trace = sub.add_parser("trace").add_subparsers(dest="trace_command", required=True)
+    trace = sub.add_parser("trace").add_subparsers(parser_class=BbkArgumentParser, dest="trace_command", required=True)
     x = trace.add_parser("validate"); x.add_argument("path"); x.set_defaults(func=cmd_trace_validate)
     x = trace.add_parser("new"); x.add_argument("--output", required=True); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_trace_new)
     x = trace.add_parser("check-set"); x.add_argument("--design"); x.add_argument("--trace", action="append", required=True); x.set_defaults(func=cmd_trace_check_set)
 
-    structure = sub.add_parser("structure").add_subparsers(dest="structure_command", required=True)
+    structure = sub.add_parser("structure").add_subparsers(parser_class=BbkArgumentParser, dest="structure_command", required=True)
     x = structure.add_parser("validate"); x.add_argument("path"); x.set_defaults(func=cmd_structure_validate)
     x = structure.add_parser("render"); x.add_argument("path"); x.add_argument("--format", choices=["markdown", "json"], default="markdown"); x.add_argument("--output"); x.set_defaults(func=cmd_structure_render)
     x = structure.add_parser("new"); x.add_argument("--output", required=True); x.add_argument("--version", choices=["v1", "v2", "v3"], default="v3"); x.add_argument("--kind", choices=["software", "automation", "hardware", "procedure", "data", "document", "infrastructure", "network_configuration", "deployment_configuration", "mixed", "other"], default="software"); x.add_argument("--depth", choices=["compact", "standard", "full"], default="standard"); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_structure_new)
     x = structure.add_parser("review"); x.add_argument("--contract", required=True); x.add_argument("--inventory", required=True); x.add_argument("--output"); x.set_defaults(func=cmd_structure_review)
 
-    slices = sub.add_parser("slice").add_subparsers(dest="slice_command", required=True)
+    slices = sub.add_parser("slice").add_subparsers(parser_class=BbkArgumentParser, dest="slice_command", required=True)
     x = slices.add_parser("validate"); x.add_argument("path"); x.set_defaults(func=cmd_slice_validate)
     x = slices.add_parser("render"); x.add_argument("path"); x.add_argument("--format", choices=["markdown", "json"], default="markdown"); x.add_argument("--output"); x.set_defaults(func=cmd_slice_render)
     x = slices.add_parser("new"); x.add_argument("--output", required=True); x.add_argument("--version", choices=["v1", "v2"], default="v2"); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_slice_new)
     x = slices.add_parser("check-set"); x.add_argument("--contract", required=True); x.add_argument("--slice", action="append", required=True); x.set_defaults(func=cmd_slice_check_set)
 
-    work_unit = sub.add_parser("work-unit").add_subparsers(dest="work_unit_command", required=True)
+    work_unit = sub.add_parser("work-unit").add_subparsers(parser_class=BbkArgumentParser, dest="work_unit_command", required=True)
     x = work_unit.add_parser("validate"); x.add_argument("path"); x.set_defaults(func=cmd_work_unit_validate)
     x = work_unit.add_parser("new"); x.add_argument("--output", required=True); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_work_unit_new)
 
-    evidence = sub.add_parser("evidence").add_subparsers(dest="evidence_command", required=True)
+    evidence = sub.add_parser("evidence").add_subparsers(parser_class=BbkArgumentParser, dest="evidence_command", required=True)
     x = evidence.add_parser("validate"); x.add_argument("path"); x.set_defaults(func=cmd_evidence_validate)
     x = evidence.add_parser("new"); x.add_argument("--output", required=True); x.add_argument("--kind", choices=["generic", "environment-observation"], default="generic"); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_evidence_new)
 
-    review = sub.add_parser("review").add_subparsers(dest="review_command", required=True)
+    review = sub.add_parser("review").add_subparsers(parser_class=BbkArgumentParser, dest="review_command", required=True)
     x = review.add_parser("plan"); x.add_argument("--assurance", required=True); x.add_argument("--id", required=True); x.add_argument("--purpose", required=True); x.add_argument("--subject"); x.add_argument("--subject-ref"); x.add_argument("--subject-kind"); x.add_argument("--subject-revision"); x.add_argument("--capability", action="append"); x.add_argument("--output"); x.set_defaults(func=cmd_review_plan)
     x = review.add_parser("context"); x.add_argument("--manifest", required=True); x.add_argument("--root"); x.add_argument("--source"); x.add_argument("--id"); x.add_argument("--include", action="append"); x.add_argument("--exclude", action="append"); x.add_argument("--output"); x.set_defaults(func=cmd_review_context)
     x = review.add_parser("run"); x.add_argument("--manifest", required=True); x.add_argument("--context", required=True); x.add_argument("--id", required=True); x.add_argument("--root"); x.add_argument("--attempt", action="append"); x.add_argument("--receipt", action="append"); x.add_argument("--finding", action="append"); x.add_argument("--disposition", action="append"); x.add_argument("--predecessor", action="append"); x.add_argument("--output"); x.set_defaults(func=cmd_review_run)
@@ -5454,24 +5740,24 @@ def parser() -> argparse.ArgumentParser:
     x = review.add_parser("close"); x.add_argument("--finding", required=True); x.add_argument("--id", required=True); x.add_argument("--disposition", required=True, choices=["FIXED", "REBUTTED", "ACCEPTED_RISK", "FALSE_POSITIVE", "DUPLICATE_OF", "SUPERSEDED", "DEFERRED", "OUT_OF_SCOPE", "REMAINS_OPEN"]); x.add_argument("--successor-ref", required=True); x.add_argument("--successor-digest"); x.add_argument("--successor-file"); x.add_argument("--evidence", action="append"); x.add_argument("--review-attempt"); x.add_argument("--authority"); x.add_argument("--residual-impact", required=True); x.add_argument("--reopen-trigger", action="append"); x.add_argument("--output", required=True); x.set_defaults(func=cmd_review_close)
     x = review.add_parser("learn"); x.add_argument("--id", required=True); x.add_argument("--type", required=True); x.add_argument("--lesson", required=True); x.add_argument("--scope", required=True); x.add_argument("--supporting", action="append"); x.add_argument("--contrary", action="append"); x.add_argument("--finding", action="append"); x.add_argument("--run", action="append"); x.add_argument("--disposition", action="append"); x.add_argument("--confidence", required=True); x.add_argument("--uncertainty", required=True); x.add_argument("--action", required=True); x.add_argument("--privacy-class", default="project-local"); x.add_argument("--export-class", default="restricted"); x.add_argument("--output", required=True); x.set_defaults(func=cmd_review_learn)
 
-    m = sub.add_parser("manifest").add_subparsers(dest="manifest_command", required=True)
+    m = sub.add_parser("manifest").add_subparsers(parser_class=BbkArgumentParser, dest="manifest_command", required=True)
     x = m.add_parser("create"); x.add_argument("--root"); x.add_argument("--source"); x.add_argument("--output"); x.add_argument("--exclude", action="append"); x.add_argument("--include-examples", action="store_true", help="explicitly include shipped EXAMPLE-* templates"); x.set_defaults(func=cmd_manifest_create)
     x = m.add_parser("compare"); x.add_argument("--root"); x.add_argument("--left", required=True); g = x.add_mutually_exclusive_group(); g.add_argument("--right"); g.add_argument("--source"); x.add_argument("--include-examples", action="store_true", help="include EXAMPLE-* templates when compiling --source"); x.set_defaults(func=cmd_manifest_compare)
 
-    c = sub.add_parser("candidate").add_subparsers(dest="candidate_command", required=True)
+    c = sub.add_parser("candidate").add_subparsers(parser_class=BbkArgumentParser, dest="candidate_command", required=True)
     x = c.add_parser("freeze"); x.add_argument("--root"); x.add_argument("--id"); x.add_argument("--source"); x.add_argument("--note"); x.add_argument("--output"); x.add_argument("--structure-inventory", action="append"); x.add_argument("--trace", action="append"); x.add_argument("--formal-model", action="append"); x.add_argument("--allow-warnings", action="store_true"); x.add_argument("--allow-external-source", action="store_true"); x.add_argument("--include-examples", action="store_true", help="explicitly include shipped EXAMPLE-* templates in candidate content"); x.set_defaults(func=cmd_candidate_freeze)
     x = c.add_parser("check"); x.add_argument("--root"); x.add_argument("--id", required=True); x.set_defaults(func=cmd_candidate_check)
     x = c.add_parser("status"); x.add_argument("--root"); x.add_argument("--id", required=True); x.add_argument("--check", action="store_true"); x.set_defaults(func=cmd_candidate_status)
     x = c.add_parser("invalidate"); x.add_argument("--root"); x.add_argument("--id", required=True); x.add_argument("--reason", required=True); x.set_defaults(func=cmd_candidate_invalidate)
     x = c.add_parser("verify"); x.add_argument("manifest"); x.set_defaults(func=cmd_candidate_verify_file)
 
-    gates = sub.add_parser("gate").add_subparsers(dest="gate_command", required=True)
+    gates = sub.add_parser("gate").add_subparsers(parser_class=BbkArgumentParser, dest="gate_command", required=True)
     x = gates.add_parser("list"); x.add_argument("--root"); x.set_defaults(func=cmd_gate_list)
     x = gates.add_parser("run"); x.add_argument("--root"); x.add_argument("--phase", required=True); x.add_argument("--candidate"); x.add_argument("--gate", action="append"); x.add_argument("--no-reuse", action="store_true"); x.set_defaults(func=cmd_gate_run)
     x = gates.add_parser("record"); x.add_argument("--candidate", required=True); x.add_argument("--gate-id", required=True); x.add_argument("--status", required=True, choices=["PASS", "FAIL", "BLOCKED", "ERROR", "INCONCLUSIVE", "NOT_RUN"]); x.add_argument("--evidence", action="append", default=[]); x.add_argument("--output", required=True); x.set_defaults(func=cmd_gate_record)
     x = gates.add_parser("check"); x.add_argument("receipt"); x.add_argument("--candidate", required=True); x.set_defaults(func=cmd_gate_check)
 
-    w = sub.add_parser("workspace").add_subparsers(dest="workspace_command", required=True)
+    w = sub.add_parser("workspace").add_subparsers(parser_class=BbkArgumentParser, dest="workspace_command", required=True)
     x = w.add_parser("create"); x.add_argument("--root"); x.add_argument("--id", required=True); x.add_argument("--base", default="HEAD"); x.add_argument("--branch"); x.add_argument("--path"); x.add_argument("--purpose"); x.add_argument("--lease-hours", type=float); x.add_argument("--detach", action="store_true"); x.set_defaults(func=cmd_workspace_create)
     x = w.add_parser("list"); x.add_argument("--root"); x.add_argument("--all", action="store_true"); x.set_defaults(func=cmd_workspace_list)
     x = w.add_parser("inspect"); x.add_argument("--root"); x.add_argument("--id", required=True); x.set_defaults(func=cmd_workspace_inspect)
@@ -5480,24 +5766,24 @@ def parser() -> argparse.ArgumentParser:
 
     # Alpha.4/5 command spelling retained as a compatibility surface.  The
     # workspace command above is preferred because it records ownership and leases.
-    wt = sub.add_parser("worktree").add_subparsers(dest="worktree_command", required=True)
+    wt = sub.add_parser("worktree").add_subparsers(parser_class=BbkArgumentParser, dest="worktree_command", required=True)
     for name, func in [("plan", cmd_worktree_plan), ("create", cmd_worktree_create), ("cleanup", cmd_worktree_cleanup)]:
         x = wt.add_parser(name); x.add_argument("--repo", default="."); x.add_argument("--path", required=True); x.add_argument("--ref", default="HEAD")
         if name == "cleanup": x.add_argument("--force", action="store_true")
         x.set_defaults(func=func)
 
-    pr = sub.add_parser("profile").add_subparsers(dest="profile_command", required=True)
+    pr = sub.add_parser("profile").add_subparsers(parser_class=BbkArgumentParser, dest="profile_command", required=True)
     x = pr.add_parser("list"); x.add_argument("--root"); x.add_argument("--profile-dir", "--profile-root", dest="profile_dir", action="append"); x.set_defaults(func=cmd_profile_list)
     x = pr.add_parser("inspect"); x.add_argument("--root"); x.add_argument("--id", required=True); x.add_argument("--version"); x.add_argument("--profile-dir", "--profile-root", dest="profile_dir", action="append"); x.set_defaults(func=cmd_profile_inspect)
     x = pr.add_parser("resolve"); x.add_argument("--root"); x.add_argument("--source"); x.add_argument("--id", required=True); x.add_argument("--version"); x.add_argument("--profile-dir", "--profile-root", dest="profile_dir", action="append"); x.add_argument("--work-unit"); x.add_argument("--task-profile"); x.add_argument("--assurance-tier", choices=["routine", "material", "consequential", "critical"]); x.add_argument("--role"); x.add_argument("--change-class", action="append"); x.add_argument("--hint", action="append"); x.add_argument("--path", action="append"); x.add_argument("--solution-outcome-fit", action="append"); x.add_argument("--structure-contract", action="append"); x.add_argument("--execution-slice", action="append"); x.add_argument("--state-decision-effect", action="append"); x.add_argument("--assurance-contract", action="append"); x.add_argument("--review-manifest", action="append"); x.add_argument("--evidence-input", action="append"); x.add_argument("--run-tools", action="store_true"); x.add_argument("--write-lock", action="store_true"); x.add_argument("--lock-path"); x.add_argument("--allow-unverified", action="store_true"); x.add_argument("--timeout", type=float, default=120.0); x.set_defaults(func=cmd_profile_resolve)
     x = pr.add_parser("dispatch"); x.add_argument("--operation", required=True, choices=sorted(PROFILE_CAPABILITY_OPERATION_SPEC)); x.add_argument("--root"); x.add_argument("--source"); x.add_argument("--id", required=True); x.add_argument("--version"); x.add_argument("--profile-dir", "--profile-root", dest="profile_dir", action="append"); x.add_argument("--role"); x.add_argument("--task-profile"); x.add_argument("--assurance-tier", choices=["routine", "material", "consequential", "critical"]); x.add_argument("--change-class", action="append"); x.add_argument("--hint", action="append"); x.add_argument("--path", action="append"); x.add_argument("--lens-id", action="append"); x.add_argument("--assignment-id", action="append"); x.add_argument("--state-decision-effect"); x.add_argument("--state-effect-inventory"); x.add_argument("--assurance-contract"); x.add_argument("--review-manifest"); x.add_argument("--review-context"); x.add_argument("--evidence-input"); x.add_argument("--run-tools", action="store_true"); x.add_argument("--allow-unverified", action="store_true"); x.add_argument("--timeout", type=float, default=120.0); x.add_argument("--output"); x.set_defaults(func=cmd_profile_dispatch)
 
-    question = sub.add_parser("question").add_subparsers(dest="question_command", required=True)
+    question = sub.add_parser("question").add_subparsers(parser_class=BbkArgumentParser, dest="question_command", required=True)
     x = question.add_parser("validate"); x.add_argument("path"); x.set_defaults(func=cmd_question_validate)
     x = question.add_parser("new"); x.add_argument("--root"); x.add_argument("--id", required=True); x.add_argument("--root-decision", required=True); x.add_argument("--owner-role", default="bbk_questioning_wayfinder"); x.add_argument("--parent-scope"); x.add_argument("--authority-mode", choices=["USER_DECIDES", "WAYFINDER_RECOMMENDS", "DELEGATED", "CONSTRAINT_DRIVEN"], default="WAYFINDER_RECOMMENDS"); x.add_argument("--authority-holder", default="user"); x.add_argument("--need-class", choices=["ENVIRONMENT_FACT", "CONFIGURATION_PARAMETER", "REVERSIBLE_IMPLEMENTATION_CHOICE", "ARCHITECTURAL_DECISION", "AUTHORITY_EXPANSION", "USER_RESERVED_PREFERENCE"], default="ARCHITECTURAL_DECISION"); x.add_argument("--attention-rationale"); x.add_argument("--discoverability", choices=["DISCOVERABLE_NOW", "DISCOVERABLE_LATER", "NOT_DISCOVERABLE_BY_BBK", "NOT_APPLICABLE"], default="NOT_DISCOVERABLE_BY_BBK"); x.add_argument("--safe-default"); x.add_argument("--blocks-unaffected-work", action="store_true"); x.add_argument("--next-action", default="Prepare and present a decision-ready recommendation."); x.add_argument("--output"); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_question_new)
     x = question.add_parser("list"); x.add_argument("--root"); x.add_argument("--status"); x.set_defaults(func=cmd_question_list)
 
-    handoff = sub.add_parser("handoff").add_subparsers(dest="handoff_command", required=True)
+    handoff = sub.add_parser("handoff").add_subparsers(parser_class=BbkArgumentParser, dest="handoff_command", required=True)
     x = handoff.add_parser("create")
     x.add_argument("--root")
     x.add_argument("--id")
@@ -5551,7 +5837,7 @@ def parser() -> argparse.ArgumentParser:
     x = handoff.add_parser("verify"); x.add_argument("path"); x.add_argument("--root"); x.set_defaults(func=cmd_handoff_verify)
     x = handoff.add_parser("list"); x.add_argument("--root"); x.add_argument("--work-unit"); x.add_argument("--latest", action="store_true"); x.set_defaults(func=cmd_handoff_list)
 
-    schema = sub.add_parser("schema").add_subparsers(dest="schema_command", required=True)
+    schema = sub.add_parser("schema").add_subparsers(parser_class=BbkArgumentParser, dest="schema_command", required=True)
     x = schema.add_parser("list"); x.set_defaults(func=cmd_schema_list)
     x = schema.add_parser("template"); x.add_argument("--kind", required=True, choices=sorted(SCHEMA_TEMPLATE_REGISTRY)); x.add_argument("--output", required=True); x.add_argument("--subject-kind", choices=["software", "automation", "hardware", "procedure", "data", "document", "infrastructure", "network_configuration", "deployment_configuration", "mixed", "other"]); x.add_argument("--depth", choices=["compact", "standard", "full"]); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_schema_template)
     x = schema.add_parser("enum"); x.add_argument("--schema", required=True); x.add_argument("--pointer", required=True); x.set_defaults(func=cmd_schema_enum)
@@ -5559,18 +5845,30 @@ def parser() -> argparse.ArgumentParser:
     x = schema.add_parser("validate"); x.add_argument("--schema", required=True); x.add_argument("--instance", action="append", required=True); x.add_argument("--root"); x.add_argument("--tool-dir"); x.add_argument("--ensure", action="store_true"); x.add_argument("--wheelhouse"); x.add_argument("--timeout", type=float, default=120.0); x.set_defaults(func=cmd_schema_validate)
     x = schema.add_parser("status"); x.add_argument("--root"); x.add_argument("--tool-dir"); x.set_defaults(func=cmd_schema_status)
 
-    b = sub.add_parser("beads").add_subparsers(dest="beads_command", required=True)
+    b = sub.add_parser("beads").add_subparsers(parser_class=BbkArgumentParser, dest="beads_command", required=True)
     x = b.add_parser("plan"); x.add_argument("--root"); x.add_argument("--work-unit"); x.add_argument("--kind", action="append", choices=sorted(BEADS_OBJECT_KINDS)); x.add_argument("--id", action="append"); x.add_argument("--output"); x.add_argument("--apply", action="store_true"); x.add_argument("--initialize", action="store_true"); x.add_argument("--timeout", type=float, default=60.0); x.set_defaults(func=cmd_beads_plan)
     x = b.add_parser("handoff-plan"); x.add_argument("--root"); x.add_argument("--handoff", required=True); x.add_argument("--target-bbk-id"); x.add_argument("--bead"); x.add_argument("--output"); x.add_argument("--apply", action="store_true"); x.add_argument("--timeout", type=float, default=60.0); x.set_defaults(func=cmd_beads_handoff_plan)
 
-    package = sub.add_parser("package").add_subparsers(dest="package_command", required=True)
+    package = sub.add_parser("package").add_subparsers(parser_class=BbkArgumentParser, dest="package_command", required=True)
     x = package.add_parser("verify"); x.add_argument("package_root", nargs="?", default=str(PACKAGE_ROOT)); x.set_defaults(func=cmd_package_verify)
     return p
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     configure_utf8_standard_streams()
-    args = parser().parse_args(argv)
+    raw_argv = list(argv) if argv is not None else sys.argv[1:]
+    wants_json = "--json" in raw_argv
+    try:
+        args = parser().parse_args(raw_argv)
+    except BbkCliParseError as exc:
+        payload = exc.diagnostic
+        if wants_json:
+            print(json.dumps(payload, ensure_ascii=False, sort_keys=True))
+        else:
+            print(f"bbk: error: {payload.get('error') or payload.get('message')}", file=sys.stderr)
+            print(f"example: {payload.get('example_command')}", file=sys.stderr)
+            print(f"help: {payload.get('documentation_command')}", file=sys.stderr)
+        return 2
     if args.command == "version":
         print(VERSION)
         return 0
@@ -5578,12 +5876,47 @@ def main(argv: Sequence[str] | None = None) -> int:
         value = args.func(args)
     except BbkError as exc:
         if args.json:
-            payload: dict[str, Any] = {"status": "ERROR", "error": str(exc)}
-            if exc.diagnostic is not None:
-                payload["diagnostic"] = exc.diagnostic
+            diagnostic = exc.diagnostic or {
+                "schema": "bbk.cli-error.v1",
+                "status": "ERROR",
+                "code": "BBK_COMMAND_ERROR",
+                "error": str(exc),
+                "message": str(exc),
+                "field": None,
+                "received": None,
+                "valid_values": [],
+                "required": [],
+                "example_command": f"bbk {getattr(args, 'command', '')} --help".strip(),
+                "documentation_command": f"bbk {getattr(args, 'command', '')} --help".strip(),
+                "smallest_next_action": "Inspect the error, correct the exact command input or project state, and rerun the command.",
+            }
+            diagnostic_status = str(diagnostic.get("status", "ERROR"))
+            payload: dict[str, Any] = {
+                "schema": "bbk.cli-error.v1",
+                "status": "INVALID_ARGUMENT" if diagnostic_status == "INVALID_ARGUMENT" else "ERROR",
+                "code": diagnostic.get("code", "BBK_COMMAND_ERROR"),
+                "command": diagnostic.get("command", getattr(args, "command", None)),
+                "field": diagnostic.get("field"),
+                "received": diagnostic.get("received"),
+                "valid_values": diagnostic.get("valid_values", []),
+                "required": diagnostic.get("required", []),
+                "message": diagnostic.get("message", str(exc)),
+                "error": str(exc),
+                "example_command": diagnostic.get("example_command", "bbk --help"),
+                "documentation_command": diagnostic.get("documentation_command", "bbk --help"),
+                "smallest_next_action": diagnostic.get("smallest_next_action"),
+                "diagnostic": diagnostic,
+            }
             print(json.dumps(payload, ensure_ascii=False, sort_keys=True))
         else:
             print(f"bbk: error: {exc}", file=sys.stderr)
+            if exc.diagnostic:
+                example = exc.diagnostic.get("example_command")
+                documentation = exc.diagnostic.get("documentation_command")
+                if example:
+                    print(f"example: {example}", file=sys.stderr)
+                if documentation:
+                    print(f"help: {documentation}", file=sys.stderr)
         return 2
     print(json.dumps(value, indent=2, ensure_ascii=False, sort_keys=True) if args.json else human(value))
     if isinstance(value, dict) and (value.get("status") in {"FAIL", "BLOCKED", "ERROR", "DRIFT", "REJECTED"} or value.get("valid") is False):

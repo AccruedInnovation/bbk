@@ -67,6 +67,7 @@
     "bbk-procedure-design",
     "bbk-context-routing",
     "bbk-grill",
+    "bbk-artifact",
     "bbk-handoff"
   ],
   "primary_skill": "bbk-grill",
@@ -80,6 +81,7 @@
     "bbk-prompt-human-request",
     "bbk-prompt-durable-handoff",
     "bbk-prompt-state-claim-truth",
+    "bbk-prompt-authority-completion-vocabulary",
     "bbk-prompt-proportional-stop",
     "bbk-prompt-liveness-recovery",
     "bbk-prompt-evidence-lineage",
