@@ -1,0 +1,122 @@
+{
+  "$id": "bbk-spawn-admission-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "dispatch_ref"
+        ]
+      },
+      "then": {
+        "required": [
+          "dispatch_input_digest",
+          "dispatch_payload_digest",
+          "dispatch_envelope_digest",
+          "lease_ref",
+          "lease_expires_at"
+        ]
+      }
+    }
+  ],
+  "properties": {
+    "agent": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "binding_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "child_session_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "dispatch_envelope_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "dispatch_input_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "dispatch_payload_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "dispatch_ref": {
+      "pattern": "^dispatch:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "enforcement_boundary": {
+      "enum": [
+        "ENFORCED",
+        "DETECT_ONLY",
+        "UNQUALIFIED"
+      ],
+      "type": "string"
+    },
+    "host_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "idempotent_reuse": {
+      "type": "boolean"
+    },
+    "input_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "lease_expires_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "lease_ref": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "parent_session_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "receipt_ref": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "reservation_ref": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.spawn-admission.v1"
+    },
+    "status": {
+      "const": "ADMITTED"
+    },
+    "task_name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "tool_call_id": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "reservation_ref",
+    "binding_ref",
+    "input_digest",
+    "parent_session_id",
+    "child_session_id",
+    "task_name",
+    "agent",
+    "tool_call_id",
+    "host_version",
+    "enforcement_boundary",
+    "status"
+  ],
+  "title": "BBK OMP spawn admission v1",
+  "type": "object"
+}

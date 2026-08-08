@@ -38,7 +38,8 @@
     "tool_environment",
     "work_unit_semantic_validation",
     "worker_invocation_contract_ref",
-    "workspace_and_isolation_requirements"
+    "workspace_and_isolation_requirements",
+    "specialist_trigger_ref"
   ],
   "properties": {
     "artifact_kind": {
@@ -188,6 +189,18 @@
     "workspace_and_isolation_requirements": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
       "description": "Required workspace kind, source or baseline, readable and writable surfaces, branch or worktree policy, shared resources, collision and fencing controls, pre-state, rollback and cleanup; distinguish requirement from a runtime lease."
+    },
+    "specialist_trigger_ref": {
+      "anyOf": [
+        {
+          "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+          "description": "Typed Worker Design trigger authorizing specialist work; null only for an explicitly requested reusable exceptional template."
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Typed Worker Design trigger authorizing specialist work; null only for an explicitly requested reusable exceptional template."
     }
   },
   "x-bbk-role": "bbk_worker_designer",

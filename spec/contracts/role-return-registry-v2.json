@@ -1,6 +1,6 @@
 {
   "schema": "bbk.role-return-registry.v2",
-  "package_version": "0.1.0-alpha.16.1",
+  "package_version": "0.1.0-alpha.17.0.2",
   "source_role_catalog": "spec/roles/catalog.json",
   "envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
   "v1_registry": "spec/contracts/role-return-registry.json",
@@ -34,18 +34,18 @@
       "semantic_state_name": "planning_readiness",
       "return_schema": {
         "path": "spec/schemas/role-returns/bbk-root-wayfinder-return-v2.schema.json",
-        "bytes": 7854,
-        "sha256": "485d45bfb321570cc446f0c46209f16e638239eab2ae1d88255531631a966e9c"
+        "bytes": 7846,
+        "sha256": "dc1314350ab7739183785bdba0ba16938264e1b6826cb7d7119dea087cd7593e"
       },
       "compact_result_schema": {
         "path": "spec/schemas/role-results/bbk-root-wayfinder-compact-result-v2.schema.json",
-        "bytes": 3414,
-        "sha256": "27eea9b56f49eca600096596ae3656302f99436865bfbfa46024a1065c588601"
+        "bytes": 4087,
+        "sha256": "b009f0f47781fbfa871947c9a278c2d5fd6036b9b424fd0307db04d5879e627d"
       },
       "full_result_schema": {
         "path": "spec/schemas/role-results/bbk-root-wayfinder-result-v1.schema.json",
-        "bytes": 5188,
-        "sha256": "9af3705f8bfbaf1ab9041f24ac89f12a7d2daeb9c7ceb35d96a7b78bad5669ce"
+        "bytes": 5861,
+        "sha256": "0789245963afd0bbeb87fbd03be351c2a75b7adf52768ca2e30684fe0d88b7de"
       },
       "v1_compatibility": {
         "contract_id": "bbk.root-wayfinder-return.v1",
@@ -57,7 +57,9 @@
         "blockers",
         "outstanding_user_request_ids",
         "recommended_next_root",
-        "residual_uncertainty"
+        "residual_uncertainty",
+        "planning_readiness",
+        "project_coverage"
       ],
       "full_detail_triggers": [
         "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
@@ -70,8 +72,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_root_wayfinder-role.json",
-        "bytes": 21383,
-        "sha256": "3fd3ca574582ddd9fbc19d24c792ab8cd64074db8c8b2dbdb2df400b82130e51"
+        "bytes": 24596,
+        "sha256": "a2674ee46acbef0307028d72fd25b7e84531e56e45b14c73a205af4fb8cc560e"
       }
     },
     {
@@ -90,13 +92,13 @@
       },
       "compact_result_schema": {
         "path": "spec/schemas/role-results/bbk-territory-wayfinder-compact-result-v2.schema.json",
-        "bytes": 3278,
-        "sha256": "e9ffc99c17c9ceb43596a3cef0ed269aa43d2a6c2121a27b84e040c53ecdff26"
+        "bytes": 3575,
+        "sha256": "844741dd7ded5b86c725aae800415b7bbf5db12618f6f8a42caf3bc137c83f00"
       },
       "full_result_schema": {
         "path": "spec/schemas/role-results/bbk-territory-wayfinder-result-v1.schema.json",
-        "bytes": 5723,
-        "sha256": "f1be658ccaf04081a7c21ef2f543ab95d3a9485a739c543d896ef7e22356af27"
+        "bytes": 6020,
+        "sha256": "3955cc67a012a2f9d3c5c4545292d1084988f3aba9273d1df5ea9b6185e72676"
       },
       "v1_compatibility": {
         "contract_id": "bbk.territory-wayfinder-return.v1",
@@ -108,7 +110,8 @@
         "outward_impacts",
         "blockers",
         "parent_actions_requested",
-        "residual_uncertainty"
+        "residual_uncertainty",
+        "planning_readiness"
       ],
       "full_detail_triggers": [
         "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
@@ -121,8 +124,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_territory_wayfinder-role.json",
-        "bytes": 25258,
-        "sha256": "341820422a2a8c89dd5691a79f21d65fa35add1b25c6f8a9235ceee912e3722e"
+        "bytes": 27538,
+        "sha256": "10c2157cc9867e5f33eaf802b14a1d08159f91a55d37068efc891f92535ddccb"
       }
     },
     {
@@ -172,8 +175,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_questioning_wayfinder-role.json",
-        "bytes": 28962,
-        "sha256": "71482dbe5c59e661730b8cc0b125436da3370ccb91c8fb0550b5cdad531baa22"
+        "bytes": 29593,
+        "sha256": "5318deb299012f377f70fb6f33d1fe39f627e387b8ac77e94be8d852472d7f2b"
       }
     },
     {
@@ -187,18 +190,18 @@
       "semantic_state_name": "work_graph_state",
       "return_schema": {
         "path": "spec/schemas/role-returns/bbk-planning-wayfinder-return-v2.schema.json",
-        "bytes": 10686,
-        "sha256": "3f695e23e488351572acda32b5205d612cf1c48dfddfa3063617ef9bb91825b5"
+        "bytes": 10620,
+        "sha256": "a6a30fea3020aab15fb22d013225f337c2fa61bdcedd71435472a056d0d01b7d"
       },
       "compact_result_schema": {
         "path": "spec/schemas/role-results/bbk-planning-wayfinder-compact-result-v2.schema.json",
-        "bytes": 3427,
-        "sha256": "e7f665829dd4a600476716fffc4f87c2eebd44f1474f30852ae6ab6c40cfbb4b"
+        "bytes": 4171,
+        "sha256": "12bba69678bbfe48f49d58c6a674f8d3bdfcc96940b2eedfdbf80437f1fe64a5"
       },
       "full_result_schema": {
         "path": "spec/schemas/role-results/bbk-planning-wayfinder-result-v1.schema.json",
-        "bytes": 7671,
-        "sha256": "6475f36af8ab4a8f5353a4f63d99f885e5bd3136b1b6bf2dfb56eb42147e8b86"
+        "bytes": 8957,
+        "sha256": "5c54a8c9bff90a972ed5e6bfc6fa443f07a32726716c57650bdb500aa99dcfe5"
       },
       "v1_compatibility": {
         "contract_id": "bbk.planning-wayfinder-return.v1",
@@ -210,7 +213,9 @@
         "dependency_and_parallelism_state",
         "interface_readiness_state",
         "blockers",
-        "parent_actions_requested"
+        "parent_actions_requested",
+        "planning_readiness",
+        "frontier_ref"
       ],
       "full_detail_triggers": [
         "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
@@ -223,8 +228,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_planning_wayfinder-role.json",
-        "bytes": 30978,
-        "sha256": "db54852684b844deda87096151b3bddac26348573df194b7663d7a9ad4ca41d6"
+        "bytes": 33455,
+        "sha256": "27715b7a9ec4e8239fba41183f21164e0541c6a6217afc93c08babfc94a7cd16"
       }
     },
     {
@@ -238,18 +243,18 @@
       "semantic_state_name": "phase_plan_state",
       "return_schema": {
         "path": "spec/schemas/role-returns/bbk-phase-wayfinder-return-v2.schema.json",
-        "bytes": 12086,
-        "sha256": "74b6fccecad451d74c09e8e214d112eb575784d8e29b6caed9a71c6c554b4437"
+        "bytes": 11759,
+        "sha256": "f2bfe43f2658dc657d388ae74f7457ed15140b679dbe12ea784ec93d632eab30"
       },
       "compact_result_schema": {
         "path": "spec/schemas/role-results/bbk-phase-wayfinder-compact-result-v2.schema.json",
-        "bytes": 3633,
-        "sha256": "047501b985b19e606314e3786201a842b71a374a8fc39f014f401ab575667f3b"
+        "bytes": 4136,
+        "sha256": "537ea7da20bf9ab9d58b9f679cb3f2874f698b9b087f8447931152d0806996a4"
       },
       "full_result_schema": {
         "path": "spec/schemas/role-results/bbk-phase-wayfinder-result-v1.schema.json",
-        "bytes": 9929,
-        "sha256": "c9b589310f19e71015520b500d2166be36dd50a7f85b3322c530845a345f0e52"
+        "bytes": 10432,
+        "sha256": "01a345b7a1d96962dd7d384ae466dd352535dba22a027ad8f1b4ab4d72912128"
       },
       "v1_compatibility": {
         "contract_id": "bbk.phase-wayfinder-return.v1",
@@ -261,7 +266,9 @@
         "execution_slice_refs",
         "dependency_and_parallelism_state",
         "blockers",
-        "parent_actions_requested"
+        "parent_actions_requested",
+        "planning_readiness",
+        "deferred_refinements"
       ],
       "full_detail_triggers": [
         "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
@@ -274,8 +281,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_phase_wayfinder-role.json",
-        "bytes": 37291,
-        "sha256": "9fe8b4e6526795bd6514756eb381d4c088aaa953050b98f5062186d6de0a1f45"
+        "bytes": 37958,
+        "sha256": "91f2cfca2ad9c3faad0773223040a7fbba6e6c8267da47fddd66753f195aa25c"
       }
     },
     {
@@ -300,7 +307,7 @@
       "full_result_schema": {
         "path": "spec/schemas/role-results/bbk-question-guide-result-v1.schema.json",
         "bytes": 9625,
-        "sha256": "2c3b4cfb26c53d6ff4a04fdf519d5fa52708a8d06477e667e24ab2b1ecc5513c"
+        "sha256": "3fb51d1b897ed88cf13eaaf6a160935d622474b568f01ec9dcb85eb45eac16bb"
       },
       "v1_compatibility": {
         "contract_id": "bbk.question-guide-return.v1",
@@ -324,8 +331,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_question_guide-role.json",
-        "bytes": 30763,
-        "sha256": "f7e15d705816dd322abe53df9aa7e8e23dcde58a5db06457a13d92311a15dcc4"
+        "bytes": 31394,
+        "sha256": "b12d0544c238b35ad32d2dc5a3a6aaeef5fac948a9c4648f4559034650487243"
       }
     },
     {
@@ -375,8 +382,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_researcher-role.json",
-        "bytes": 25270,
-        "sha256": "90ec2e71598f63d88d3607d0dcef6064715c431ad622453b72633c74ca672288"
+        "bytes": 25928,
+        "sha256": "4a73f38c2d703da04cdb0c40c9e091a0f38eba29843581855d7a21b71bedf58a"
       }
     },
     {
@@ -401,7 +408,7 @@
       "full_result_schema": {
         "path": "spec/schemas/role-results/bbk-prototyper-result-v1.schema.json",
         "bytes": 9977,
-        "sha256": "66d7b99ad7a8e587e0c645ca83d65c3ea9f24136ef83da66f6e1ba2e303691a0"
+        "sha256": "33e66578be46f9c7c9146e10982c6b8863a603af70b6c3ba4f7d7c26567a1dcc"
       },
       "v1_compatibility": {
         "contract_id": "bbk.prototyper-return.v1",
@@ -426,8 +433,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_prototyper-role.json",
-        "bytes": 38541,
-        "sha256": "b30d452bcb21d0662bb7e38fb614591e72eead136a9789e481ae98f56e15fbf4"
+        "bytes": 38922,
+        "sha256": "1aaf7746c7bee5f55f73ce71a0febdfbbcdee41144353f63914736b552d5a7d7"
       }
     },
     {
@@ -452,7 +459,7 @@
       "full_result_schema": {
         "path": "spec/schemas/role-results/bbk-synthesizer-result-v1.schema.json",
         "bytes": 6548,
-        "sha256": "12c09c2d5150c0346a9f9c8b249b257266d3ecf5ce0ff16af95a31422bbf40f6"
+        "sha256": "52a6bb803d936f0012e6ef1e6c6fe474345847c5b4b52c83a08e84ab4aa5aa50"
       },
       "v1_compatibility": {
         "contract_id": "bbk.synthesizer-return.v1",
@@ -476,8 +483,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_synthesizer-role.json",
-        "bytes": 25073,
-        "sha256": "e5cc1c16c90074c7ddfe9825710559539822bba4741402b95c4e1601c50236c5"
+        "bytes": 25671,
+        "sha256": "b6ddcd74578119fcac2a85c74a9537beb6983b01ea2345daa69d4e4eb2066a45"
       }
     },
     {
@@ -527,8 +534,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_architect-role.json",
-        "bytes": 43183,
-        "sha256": "8ed156c334fc9aad1194a4758a33279f952acc36bd589597b15fe697a4c2b058"
+        "bytes": 44128,
+        "sha256": "d922be3246fff6b6c7463820d97783d0272f1369c57d95b092f05590d161c59f"
       }
     },
     {
@@ -547,13 +554,13 @@
       },
       "compact_result_schema": {
         "path": "spec/schemas/role-results/bbk-verification-designer-compact-result-v2.schema.json",
-        "bytes": 3869,
-        "sha256": "80f4c41fbabd84f7ec928357fe18919e74b73af9cd3b218ad73c1d188913041b"
+        "bytes": 4453,
+        "sha256": "5b93e0ddcb99c3e9723ebab41935f036c32f841ead4f4e2690063e3ccc4978a1"
       },
       "full_result_schema": {
         "path": "spec/schemas/role-results/bbk-verification-designer-result-v1.schema.json",
-        "bytes": 11917,
-        "sha256": "2fe1b0920423f64faf495a29e2ec74e79ed4553dacc90562c0688fed9817adb7"
+        "bytes": 12501,
+        "sha256": "0cfeb20937aa036fdff9e6fc0e9522448f0cc3f54e97273f48036f89898f344c"
       },
       "v1_compatibility": {
         "contract_id": "bbk.verification-designer-return.v1",
@@ -565,7 +572,8 @@
         "method_and_evidence_state",
         "repair_and_revalidation_policy",
         "blockers",
-        "parent_actions_requested"
+        "parent_actions_requested",
+        "specialist_trigger_ref"
       ],
       "full_detail_triggers": [
         "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
@@ -578,8 +586,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_verification_designer-role.json",
-        "bytes": 35954,
-        "sha256": "26839495a2e2256eefdcd352ac9279bf573d03669be8d8964b1604bee32282d7"
+        "bytes": 37334,
+        "sha256": "ae72ce4f38cdda2c0dad18173227f099bba7e4f072f2c5e60a1f3715142779b6"
       }
     },
     {
@@ -598,13 +606,13 @@
       },
       "compact_result_schema": {
         "path": "spec/schemas/role-results/bbk-worker-designer-compact-result-v2.schema.json",
-        "bytes": 3813,
-        "sha256": "4a195a05f4585c7d6842a3f1dd3f9aff43bc1dc7bd823723cb334c7fe8c7e6f8"
+        "bytes": 4371,
+        "sha256": "f0e682ae301365adc1ad1844f4224e19e798c38d1a55c704a1cae1e1043b9d08"
       },
       "full_result_schema": {
         "path": "spec/schemas/role-results/bbk-worker-designer-result-v1.schema.json",
-        "bytes": 14249,
-        "sha256": "0666ba1111de97f0faff69a512b2e9d1b1380c2480ff2aafdee32002b0dbbecf"
+        "bytes": 14807,
+        "sha256": "02599b159e6c3c912768a22afa6a4670b2d24d6b7464af0d16f1441bd3565659"
       },
       "v1_compatibility": {
         "contract_id": "bbk.worker-designer-return.v1",
@@ -616,7 +624,8 @@
         "effective_capability_envelope",
         "preflight_and_qualification",
         "blockers",
-        "parent_actions_requested"
+        "parent_actions_requested",
+        "specialist_trigger_ref"
       ],
       "full_detail_triggers": [
         "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
@@ -629,8 +638,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_worker_designer-role.json",
-        "bytes": 42395,
-        "sha256": "8f076e18034a7d5f3594dfa641ecaede5b9efc4838c6222619eeff760bc6240d"
+        "bytes": 43874,
+        "sha256": "3812aadd2d0d017d222309f8e417720f840906a15fe4e78aa516958c4291e984"
       }
     },
     {
@@ -655,7 +664,7 @@
       "full_result_schema": {
         "path": "spec/schemas/role-results/bbk-reviewer-result-v1.schema.json",
         "bytes": 8434,
-        "sha256": "e5985fe86eef9bab5e0a355e28987f7bdf25a727e198a10d7ff964bbaac58f80"
+        "sha256": "2658d54eef89f0c069cdd672341196d68ef1f0ac674598226b480aeff044bf9d"
       },
       "v1_compatibility": {
         "contract_id": "bbk.reviewer-return.v1",
@@ -680,8 +689,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_reviewer-role.json",
-        "bytes": 38397,
-        "sha256": "6d35355d3e6677de14622b754d543fd80c9b9b0449ac2dd7751798d389777677"
+        "bytes": 39032,
+        "sha256": "d1e83943559bca97a0a9ccc369714173bfff9510631b7944cef53328526e8859"
       }
     },
     {
@@ -695,18 +704,18 @@
       "semantic_state_name": "root_execution_state",
       "return_schema": {
         "path": "spec/schemas/role-returns/bbk-root-orchestrator-return-v2.schema.json",
-        "bytes": 12677,
-        "sha256": "a0d4814016c948aa416a582fa2badb1688e994ad9390e6d99d909d59fa36c0e6"
+        "bytes": 12818,
+        "sha256": "17115bc3077e9642241ffa8ba71398d37e31cfb07fec32f2d835c5c322f04019"
       },
       "compact_result_schema": {
         "path": "spec/schemas/role-results/bbk-root-orchestrator-compact-result-v2.schema.json",
-        "bytes": 3946,
-        "sha256": "2c1c8466ec70c382d80d01ff3e0dc9002702d60f163888bd1dbc3478f21552ef"
+        "bytes": 4477,
+        "sha256": "5fb63513ddf8ebd3d1ce7baa0ce260ba1895d88f730f600a74fc74a1357b1f06"
       },
       "full_result_schema": {
         "path": "spec/schemas/role-results/bbk-root-orchestrator-result-v1.schema.json",
-        "bytes": 11954,
-        "sha256": "93b5d7903edd7e8a4350a338de8c4a82a5180bbeaaaabd254debbf728beb3e18"
+        "bytes": 12485,
+        "sha256": "fd28677f104c948db4cdd6b946618125e69e5b3e91a1b8e498f0bdaaf3a206b2"
       },
       "v1_compatibility": {
         "contract_id": "bbk.root-orchestrator-return.v1",
@@ -718,7 +727,9 @@
         "completion_assessment",
         "blockers_and_pauses",
         "parent_actions_requested",
-        "residuals"
+        "residuals",
+        "planning_readiness_ref",
+        "project_coverage"
       ],
       "full_detail_triggers": [
         "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
@@ -731,8 +742,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_root_orchestrator-role.json",
-        "bytes": 42628,
-        "sha256": "7edfaa09253c4fbfe6fa0b5b5a8891e1770de284e575e70f2ae74f032ded75f5"
+        "bytes": 46099,
+        "sha256": "f4d395425bc1f2f2ed6ee233e649ac4a6e5af4dfd3c619dad4cfd580a765bd8f"
       }
     },
     {
@@ -782,8 +793,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_territory_orchestrator-role.json",
-        "bytes": 44150,
-        "sha256": "8127f654e47f5911f32f8b541b5db7aa56518568fa045f9b4b502da750e0c6c0"
+        "bytes": 46329,
+        "sha256": "435298ace14dc91c86824509308d99ead09c75618d5456baedf0ce28f83589b5"
       }
     },
     {
@@ -833,8 +844,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_worker_orchestrator-role.json",
-        "bytes": 42842,
-        "sha256": "4cf5965722323e9e06f70b4b7248ffad14595f6ea4fe66390beb69cf2b6ce7fe"
+        "bytes": 44658,
+        "sha256": "6491c868d3ce136d27f57ec74476eeff16514f8408f8901382d0f30a7231e476"
       }
     },
     {
@@ -853,13 +864,13 @@
       },
       "compact_result_schema": {
         "path": "spec/schemas/role-results/bbk-validator-orchestrator-compact-result-v2.schema.json",
-        "bytes": 5117,
-        "sha256": "f452edeb07887e1d53b45e0d80a44d2436456fc26e978f4690d6c2d73332e2e5"
+        "bytes": 5382,
+        "sha256": "7b6feb804b88f4a185e8d31c796f44f0eafa2fd14db37762ce5a6b53e118c5ec"
       },
       "full_result_schema": {
         "path": "spec/schemas/role-results/bbk-validator-orchestrator-result-v1.schema.json",
-        "bytes": 10571,
-        "sha256": "ae7e7f3c0e8b2b9a7c1951b1be7e420fa6a0bb51db7309d1cf9eea50f5221b61"
+        "bytes": 10836,
+        "sha256": "0efe6bb4bc2823b7fcf8bd28abbcdc4dbd5e345f8bf71737b34e17943131158a"
       },
       "v1_compatibility": {
         "contract_id": "bbk.validator-orchestrator-return.v1",
@@ -871,7 +882,8 @@
         "findings_and_dispositions_state",
         "aggregate_result",
         "repair_and_revalidation_scope",
-        "parent_actions_and_recommended_route"
+        "parent_actions_and_recommended_route",
+        "project_coverage"
       ],
       "full_detail_triggers": [
         "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
@@ -884,8 +896,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_validator_orchestrator-role.json",
-        "bytes": 46158,
-        "sha256": "ea177aaa08f52f9bb07ef50a59570dc7c1c567a36f4fbeb35b8725bcb96d1da4"
+        "bytes": 47511,
+        "sha256": "3259c5ac61a58624a2f12d2cd23e0c8b5db156753dab20b65ae515125ef18968"
       }
     },
     {
@@ -899,8 +911,8 @@
       "semantic_state_name": "work_unit_execution_state",
       "return_schema": {
         "path": "spec/schemas/role-returns/bbk-worker-return-v2.schema.json",
-        "bytes": 9824,
-        "sha256": "36752322250b72beb83b02c6675513c5f5d39a40609c3e83b8bfc3fd0e92f93b"
+        "bytes": 10038,
+        "sha256": "7a6f1a9901ad4cea04dcb70adf219181ac839f8528445186d3cc4eadbf710063"
       },
       "compact_result_schema": {
         "path": "spec/schemas/role-results/bbk-worker-compact-result-v2.schema.json",
@@ -935,8 +947,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_worker-role.json",
-        "bytes": 34445,
-        "sha256": "448ab0beb2637371e1b1dbabda3e90a437cfc0b193114a83a88805a6376667ea"
+        "bytes": 36156,
+        "sha256": "1a2c462e6e08f418a8fc1a52566a3873de281be5c87a6e9b843b87141e88c70e"
       }
     },
     {
@@ -950,8 +962,8 @@
       "semantic_state_name": "validator_attempt_state",
       "return_schema": {
         "path": "spec/schemas/role-returns/bbk-validator-return-v2.schema.json",
-        "bytes": 9171,
-        "sha256": "89c1656917da176b2555097e094299bcce865186c3e480fb343bd6931eccda64"
+        "bytes": 9385,
+        "sha256": "c617356e21cebe21e117c5ed98254c3b1e65597a04aef54cf05351a2edd5cbd3"
       },
       "compact_result_schema": {
         "path": "spec/schemas/role-results/bbk-validator-compact-result-v2.schema.json",
@@ -961,7 +973,7 @@
       "full_result_schema": {
         "path": "spec/schemas/role-results/bbk-validator-result-v1.schema.json",
         "bytes": 10631,
-        "sha256": "5879825945611a6fd38879e2c3fc5ccba77236ff487ed3adf127177d43adec8e"
+        "sha256": "79b747706e369899e6d491ddd0e8a235b44e7d6c2dfca006bc9c25ac0ea67252"
       },
       "v1_compatibility": {
         "contract_id": "bbk.validator-return.v1",
@@ -986,8 +998,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_validator-role.json",
-        "bytes": 36768,
-        "sha256": "f9623bd7504a6b76e6897427e887b6816e721ea9ad85cbc64372b9900800a940"
+        "bytes": 37447,
+        "sha256": "e4fcb551d8db09678830a27451929ad3e891c4995b17773ba9eef7548eb6d6f5"
       }
     }
   ]

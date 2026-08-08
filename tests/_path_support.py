@@ -216,6 +216,48 @@ def assert_labeled_path(
 
 
 
+
+
+
+def command_arguments_after_launcher(
+    command: Sequence[PathValue],
+    launcher: PathValue,
+) -> list[str]:
+    """Return logical arguments after *launcher* in a native command vector.
+
+    On Windows a ``.cmd`` or ``.bat`` launcher is represented as
+    ``cmd.exe /d /s /c <launcher> ...``. Tests must assert the logical launcher
+    and arguments rather than assuming the launcher is always ``argv[0]``.
+    """
+    for index, value in enumerate(command):
+        try:
+            if paths_identify_same(value, launcher):
+                return [os.fspath(item) for item in command[index + 1 :]]
+        except (OSError, TypeError, ValueError):
+            continue
+    rendered = [os.fspath(item) for item in command]
+    raise AssertionError(
+        "command does not invoke the expected launcher\n"
+        f"launcher: {_diagnostic(launcher)}\n"
+        f"command: {rendered!r}"
+    )
+
+
+def assert_command_invokes(
+    case: unittest.TestCase,
+    command: Sequence[PathValue],
+    launcher: PathValue,
+    expected_arguments: Sequence[str],
+    msg: str | None = None,
+) -> None:
+    try:
+        actual = command_arguments_after_launcher(command, launcher)
+    except AssertionError as exc:
+        case.fail((msg + ": " if msg else "") + str(exc))
+        return
+    case.assertEqual(list(expected_arguments), actual, msg)
+
+
 # Historical test refactors used this name; keep it as the public sequence helper.
 assert_path_sequence_equal = assert_same_path_sequence
 

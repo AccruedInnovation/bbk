@@ -192,7 +192,7 @@ class ProjectRoutingLocalizationTests(unittest.TestCase):
                 f"""
                 const chain = () => ({{ optional() {{ return this; }} }});
                 const z = {{ object: value => value, string: chain, boolean: chain,
-                  enum: values => chain(), array: value => chain() }};
+                  enum: values => chain(), array: value => chain(), any: chain }};
                 const commands = new Map(), notifications = [], confirmations = [], menus = [];
                 const pi = {{ zod: {{ z }}, setLabel() {{}}, registerTool() {{}}, on() {{}},
                   registerCommand(name, value) {{ commands.set(name, value); }} }};
@@ -217,6 +217,7 @@ class ProjectRoutingLocalizationTests(unittest.TestCase):
                 await command.handler('project profile testing-flash', ctx);
                 await command.handler('project status', ctx);
                 console.log(JSON.stringify({{notifications, confirmations, menus}}));
+                process.exit(0);
                 """
             ),
             encoding="utf-8",

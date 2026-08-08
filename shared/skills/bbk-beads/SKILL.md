@@ -1,6 +1,8 @@
 ---
 name: bbk-beads
 description: Project the BBK records owned by the invoking role into the project Beads workspace as normal coordination state while keeping BBK records, authority, evidence, decisions, and lifecycle semantics canonical. Load on demand when an owning role creates or changes a project, territory, decision, question, capability increment, phase, WorkUnit, execution-state record, or durable handoff pointer.
+requires_prompt_modules: []
+standalone_prompt_modules: []
 ---
 
 # BBK Beads

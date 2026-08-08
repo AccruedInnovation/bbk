@@ -3,7 +3,7 @@
   "attempt": 1,
   "authority": null,
   "authority_boundary": "A sealed handoff proves exact package bytes and reference closure only.",
-  "bbk_version": "0.1.0-alpha.16.1",
+  "bbk_version": "0.1.0-alpha.17.0.2",
   "blockers": [],
   "capability_zones_used": [],
   "changed_paths": [],

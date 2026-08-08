@@ -1,0 +1,45 @@
+{
+  "allowed_mutation_classes": [
+    "COORDINATION_METADATA"
+  ],
+  "allowed_tools": [
+    "bbk_control_assign",
+    "bbk_control_bind",
+    "bbk_control_dispatch_status",
+    "bbk_control_integrate_request",
+    "bbk_control_spawn",
+    "bbk_control_update",
+    "bbk_governance_status",
+    "bbk_governed_read",
+    "bbk_return_prepare",
+    "bbk_return_template"
+  ],
+  "forbidden_effects": [
+    "BUILD_CONFIGURATION",
+    "DIRECT_BEADS_WRITE",
+    "DOCUMENTATION_CONTENT",
+    "GENERIC_PRODUCT_WRITE",
+    "PRODUCT_CONTENT",
+    "SEALED_MUTATION",
+    "TEST_CONTENT",
+    "TOOLCHAIN_CONFIGURATION",
+    "UNQUALIFIED_SHELL"
+  ],
+  "generated_by": "tools/generate_role_capabilities.py",
+  "manifest_digest": "sha256:733e3fcecf8fd218cee495db494704b9cd518ce5152c60ae23a743beda80d9bf",
+  "policy_version": "1.0.0-alpha.17",
+  "profile": "governed-software",
+  "required_bindings": [
+    "AUTHORITY",
+    "SESSION"
+  ],
+  "role": "bbk_territory_orchestrator",
+  "schema": "bbk.role-capability.v1",
+  "scope_rules": {
+    "path_scope": "READ_ONLY",
+    "sealed_paths": "DENY",
+    "semantic_scope": "BOUND",
+    "workspace_source": "NONE"
+  },
+  "source_role_digest": "sha256:435298ace14dc91c86824509308d99ead09c75618d5456baedf0ce28f83589b5"
+}

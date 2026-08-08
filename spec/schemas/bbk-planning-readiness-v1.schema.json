@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-planning-readiness-v1.schema.json",
+  "title": "BBK Planning Readiness v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "planning_mode",
+    "architecture_mode",
+    "readiness",
+    "roadmap_ref",
+    "frontier_ref",
+    "coverage_ref",
+    "deferred_refinements",
+    "execution_admissible",
+    "invalidation_keys"
+  ],
+  "properties": {
+    "schema": {"const": "bbk.planning-readiness.v1"},
+    "planning_mode": {"enum": ["FAST_CONTINUATION", "STANDARD", "FULL_GOVERNED"]},
+    "architecture_mode": {"enum": ["ADOPT_AND_GAP", "DELTA", "FULL"]},
+    "readiness": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"enum": ["ROADMAP_READY", "FRONTIER_READY", "FULLY_COMPILED"]}
+    },
+    "roadmap_ref": {"$ref": "#/$defs/ref"},
+    "frontier_ref": {"anyOf": [{"$ref": "#/$defs/ref"}, {"type": "null"}]},
+    "coverage_ref": {"$ref": "#/$defs/ref"},
+    "deferred_refinements": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/deferred"}
+    },
+    "execution_admissible": {"type": "boolean"},
+    "full_compilation_trigger": {"type": ["string", "null"]},
+    "invalidation_keys": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"execution_admissible": {"const": true}}},
+      "then": {
+        "properties": {
+          "readiness": {"contains": {"const": "FRONTIER_READY"}},
+          "frontier_ref": {"$ref": "#/$defs/ref"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"planning_mode": {"const": "FULL_GOVERNED"}}},
+      "then": {"required": ["full_compilation_trigger"]}
+    }
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "revision", "digest"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "revision": {"type": ["string", "integer"]},
+        "digest": {"$ref": "#/$defs/sha256"},
+        "path": {"type": ["string", "null"]}
+      }
+    },
+    "deferred": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "purpose", "owner", "status", "refinement_triggers"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "purpose": {"type": "string", "minLength": 1},
+        "owner": {"type": "string", "minLength": 1},
+        "status": {"const": "DEFERRED_UNTIL_FRONTIER"},
+        "dependencies": {"type": "array", "items": {"type": "string"}},
+        "stable_interfaces": {"type": "array", "items": {"type": "string"}},
+        "risk_class": {"enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]},
+        "refinement_triggers": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
-# BBK 0.1.0-alpha.16.1 artifact-package reference
+# BBK 0.1.0-alpha.17 artifact-package reference
 
-This reference describes the `bbk artifact` surface implemented by BBK 0.1.0-alpha.16.1. The skill wrapper invokes the installed CLI as:
+This reference describes the `bbk artifact` surface implemented by BBK 0.1.0-alpha.17. The skill wrapper invokes the installed CLI as:
 
 ```text
 <exact-python> -X utf8 <installed-package>/tools/bbk.py --json artifact <arguments>

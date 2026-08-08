@@ -21,12 +21,14 @@ from generate_agents import expected_files, instruction_text  # noqa: E402
 from prompt_modules import (  # noqa: E402
     PromptModuleError,
     compact_skill_template,
+    compile_standalone_skill,
     expand_skill_template,
     load_prompt_modules,
     mandatory_procedure_exception_measurement,
     module_directives,
     prompt_size_report,
     role_skill_module_requirements,
+    skill_module_dependency,
     source_manifest,
     validate_skill_templates,
 )
@@ -268,6 +270,13 @@ ALPHA15_INTENTIONAL_SKILL_CHANGES = {
     "bbk-worker-execution", "bbk-handoff",
 }
 
+ALPHA1701_INTENTIONAL_SKILL_CHANGES = {
+    "bbk-plan", "bbk-wayfind", "bbk-work-graph", "bbk-phase-plan",
+    "bbk-architecture", "bbk-root-execution", "bbk-territory-execution",
+    "bbk-worker-execution", "bbk-work-unit-execution", "bbk-worker-design",
+    "bbk-verification-design", "bbk-installed-profiles",
+}
+
 AUXILIARY_PROCEDURE_MODULES = {
     "bbk-context-routing": {
         "bbk-prompt-context-human-relay", "bbk-prompt-human-request",
@@ -368,7 +377,7 @@ class PromptModulePackageV1Tests(unittest.TestCase):
             validator.validate(module)
 
     def test_module_inventory_order_and_clause_identities_are_unique(self) -> None:
-        self.assertEqual(len(self.package.modules), 32)
+        self.assertEqual(len(self.package.modules), 43)
         self.assertEqual(len(self.package.ordered_ids), len(set(self.package.ordered_ids)))
         clause_ids = [
             clause["id"]
@@ -394,17 +403,28 @@ class PromptModulePackageV1Tests(unittest.TestCase):
         self.assertEqual(validate_skill_templates(self.method, self.package), [])
         self.assertGreater(len(self.method["skills"]), 0)
 
-    def test_standalone_skill_expands_each_referenced_module_exactly_once(self) -> None:
+    def test_standalone_skill_compiler_expands_only_standalone_modules_once(self) -> None:
         for name, template in self.method["skills"].items():
             with self.subTest(skill=name):
-                expanded = expand_skill_template(template, self.package)
-                self.assertNotIn("{{bbk-module:", expanded)
-                for module_id in module_directives(template):
+                compiled = compile_standalone_skill(
+                    name, template, self.package, self.method,
+                )
+                policy = skill_module_dependency(self.method, name)
+                self.assertNotIn("{{bbk-module:", compiled)
+                for module_id in policy["requires_prompt_modules"]:
                     marker = f"<!-- BBK prompt module {module_id}: expanded from canonical source -->"
-                    self.assertEqual(expanded.count(marker), 1)
+                    self.assertEqual(compiled.count(marker), 0)
+                    self.assertIn(f"already embedded `{module_id}`", compiled)
+                    self.assertNotIn(self.package.by_id[module_id]["description"], compiled)
+                for module_id in policy["standalone_prompt_modules"]:
+                    marker = f"<!-- BBK prompt module {module_id}: expanded from canonical source -->"
+                    self.assertEqual(compiled.count(marker), 1)
                     self.assertEqual(
-                        expanded.count(f"<!-- End BBK prompt module {module_id} -->"), 1,
+                        compiled.count(f"<!-- End BBK prompt module {module_id} -->"), 1,
                     )
+                frontmatter = normalized_frontmatter(compiled)
+                self.assertIn("requires_prompt_modules:", frontmatter)
+                self.assertIn("standalone_prompt_modules:", frontmatter)
 
     def test_compact_skill_templates_reference_but_do_not_duplicate_module_bodies(self) -> None:
         for name, template in self.method["skills"].items():
@@ -422,8 +442,21 @@ class PromptModulePackageV1Tests(unittest.TestCase):
             path = ROOT / "shared" / "skills" / name / "SKILL.md"
             self.assertEqual(
                 assets[path].decode("utf-8"),
-                expand_skill_template(template, self.package),
+                compile_standalone_skill(name, template, self.package, self.method),
             )
+
+    def test_hot_path_generated_skills_meet_alpha17_compaction_budget(self) -> None:
+        names = (
+            "bbk-handoff",
+            "bbk-validation-orchestration",
+            "bbk-work-unit-execution",
+            "bbk-worker-design",
+        )
+        total = sum(
+            len((ROOT / "shared" / "skills" / name / "SKILL.md").read_bytes())
+            for name in names
+        )
+        self.assertLessEqual(total, 72000)
 
     def test_auxiliary_procedures_are_compositions_of_canonical_modules(self) -> None:
         for skill, expected in AUXILIARY_PROCEDURE_MODULES.items():
@@ -450,7 +483,10 @@ class PromptModulePackageV1Tests(unittest.TestCase):
                     role["prompt_modules"],
                     [module_id for module_id in order if module_id in selected],
                 )
-                required = set(role_skill_module_requirements(role, self.method["skills"]))
+                required = set(role_skill_module_requirements(
+                    role, self.method["skills"], self.method["skill_module_dependencies"],
+                    include_all_loaded_skills=True,
+                ))
                 self.assertTrue(required <= selected)
 
     def test_behavior_specific_modules_have_exact_role_ownership(self) -> None:
@@ -641,25 +677,25 @@ class PromptModulePackageV1Tests(unittest.TestCase):
                     for clause in module["clauses"]:
                         self.assertEqual(rendered.count(clause["text"]), 1)
 
-    def test_every_role_prompt_inlines_only_declared_mandatory_procedures(self) -> None:
-        for host in ("omp", "claude", "generic"):
+    def test_every_role_prompt_compiles_declared_mandatory_procedures_once_at_tail(self) -> None:
+        for host in ("omp", "claude", "generic", "codex"):
             for role in self.roles:
                 with self.subTest(host=host, role=role["name"]):
                     rendered = instruction_text(self.spec, role, host=host)
-                    self.assertEqual(
-                        rendered.count('<bbk-inlined-skill name="'),
-                        len(role["mandatory_skills"]),
-                    )
+                    self.assertEqual(rendered.count("## Compiled procedures manifest"), 1)
+                    self.assertEqual(rendered.count("## Compiled procedures\n"), 1)
+                    self.assertEqual(rendered.count("## End compiled procedures"), 1)
+                    self.assertNotIn("<bbk-inlined-skill", rendered)
+                    end = rendered.index("## End compiled procedures")
                     for skill in role["mandatory_skills"]:
-                        self.assertEqual(
-                            rendered.count(f'<bbk-inlined-skill name="{skill}"'), 1,
+                        self.assertEqual(rendered.count(f"- id: {skill}"), 1)
+                        heading = (
+                            f"### Compiled primary procedure: `{skill}`"
+                            if skill == role["primary_skill"]
+                            else f"### Compiled procedure: `{skill}`"
                         )
-        for role in self.roles:
-            rendered = instruction_text(self.spec, role, host="codex")
-            self.assertEqual(
-                rendered.count("### Mandatory procedure: `"),
-                len(role["mandatory_skills"]),
-            )
+                        self.assertEqual(rendered.count(heading), 1)
+                        self.assertLess(rendered.index(heading), end)
 
     def test_roles_not_intentionally_changed_in_alpha14_retain_gate3_behavior(self) -> None:
         excluded = {"primary_skill", "mandatory_skills", "prompt_modules"}
@@ -687,7 +723,7 @@ class PromptModulePackageV1Tests(unittest.TestCase):
     def test_gate3_frontmatter_and_headings_are_preserved(self) -> None:
         for name, baseline in self.baseline["skills"].items():
             with self.subTest(skill=name):
-                if name in ALPHA132_INTENTIONAL_SKILL_REPLACEMENTS | ALPHA14_INTENTIONAL_SKILL_CHANGES | ALPHA15_INTENTIONAL_SKILL_CHANGES:
+                if name in ALPHA132_INTENTIONAL_SKILL_REPLACEMENTS | ALPHA14_INTENTIONAL_SKILL_CHANGES | ALPHA15_INTENTIONAL_SKILL_CHANGES | ALPHA1701_INTENTIONAL_SKILL_CHANGES:
                     continue
                 current = self.method["skills"][name]
                 frontmatter_sha = hashlib.sha256(
@@ -699,7 +735,7 @@ class PromptModulePackageV1Tests(unittest.TestCase):
 
     def test_gate3_sections_not_replaced_by_modules_are_byte_semantically_unchanged(self) -> None:
         for name, baseline in self.baseline["skills"].items():
-            if name in ALPHA132_INTENTIONAL_SKILL_REPLACEMENTS | ALPHA14_INTENTIONAL_SKILL_CHANGES | ALPHA15_INTENTIONAL_SKILL_CHANGES:
+            if name in ALPHA132_INTENTIONAL_SKILL_REPLACEMENTS | ALPHA14_INTENTIONAL_SKILL_CHANGES | ALPHA15_INTENTIONAL_SKILL_CHANGES | ALPHA1701_INTENTIONAL_SKILL_CHANGES:
                 continue
             current_sections = heading_sections(self.method["skills"][name])
             cursor = 0
@@ -784,15 +820,34 @@ class PromptModulePackageV1Tests(unittest.TestCase):
         self.assertGreater(compiled_total, 0)
         self.assertLess(compiled_total, naive_duplicate_total)
 
-    def test_alpha15_product_first_mechanical_assurance_and_candidate_modules_are_exact(self) -> None:
+    def test_alpha17_critical_path_execution_modules_are_exact(self) -> None:
+        critical = "\n".join(
+            clause["text"] for clause in
+            self.package.by_id["bbk-prompt-critical-path-execution"]["clauses"]
+        )
+        for fragment in (
+            "NO_MATERIAL_SUPPORT_WORK",
+            "exactly four blocking facts",
+            "Reuse is mandatory",
+            "REUSED_RECEIPT",
+            "same semantic run and physical attempt",
+            "Use the structured role result directly",
+            "at most once against the final frozen candidate",
+            "named qualitative or cross-cutting product risk",
+            "runtime cost tuning, not semantic invalidation",
+        ):
+            self.assertIn(fragment, critical)
+
         product = "\n".join(
             clause["text"] for clause in
             self.package.by_id["bbk-prompt-product-first-proportionality"]["clauses"]
         )
         for fragment in (
-            "actor-visible product capability", "named material risk",
-            "semantic interfaces are stable", "Duplicate plans, reviews",
-            "support paperwork as product progress",
+            "actor-visible product capability",
+            "NO_MATERIAL_SUPPORT_WORK",
+            "stable semantic interfaces",
+            "Duplicate plans, reviews",
+            "Stop planning and design when work is executable",
         ):
             self.assertIn(fragment, product)
 
@@ -801,9 +856,10 @@ class PromptModulePackageV1Tests(unittest.TestCase):
             self.package.by_id["bbk-prompt-mechanical-admission"]["clauses"]
         )
         for fragment in (
-            "blocks only the affected package seal or exact affected scope",
-            "do not automatically commission architecture, research, planning, independent review, or user authorization",
-            "One safe, realistic mechanical repair is not a decision branch",
+            "same semantic run and physical attempt",
+            "rerun only the affected gate",
+            "Do not create successor planning",
+            "successor candidate and the smallest affected recheck",
             "Route contradictions of meaning",
         ):
             self.assertIn(fragment, mechanical)
@@ -813,8 +869,12 @@ class PromptModulePackageV1Tests(unittest.TestCase):
             self.package.by_id["bbk-prompt-assurance-modes"]["clauses"]
         )
         for fragment in (
-            "Use INLINE by default", "Use FOCUSED", "Use FULL",
-            "bbk.assurance-mode.v1", "does not itself accept a candidate",
+            "Use INLINE by default",
+            "Group compatible assertions",
+            "Use FOCUSED",
+            "Use FULL",
+            "NO_MATERIAL_ASSURANCE_WORK",
+            "does not accept a candidate",
         ):
             self.assertIn(fragment, assurance)
 
@@ -823,9 +883,11 @@ class PromptModulePackageV1Tests(unittest.TestCase):
             self.package.by_id["bbk-prompt-candidate-focused-review"]["clauses"]
         )
         for fragment in (
-            "exact sealed integrated candidate", "Do not rewrite the implementation plan",
-            "focused repair recheck", "Stop when the exact review focus is resolved",
-            "INLINE work does not commission an independent Reviewer",
+            "named qualitative or cross-cutting product risk",
+            "exact frozen integrated candidate",
+            "Do not rerun tests",
+            "rather than rewriting the plan",
+            "revalidate failed assertions",
         ):
             self.assertIn(fragment, candidate)
 
@@ -835,9 +897,12 @@ class PromptModulePackageV1Tests(unittest.TestCase):
                 "bbk-prompt-user-attention", "bbk-prompt-execution-autonomy",
                 "bbk-prompt-authority-completion-vocabulary",
                 "bbk-prompt-baseline-transition",
+                "bbk-prompt-critical-path-execution",
                 "bbk-prompt-product-first-proportionality",
                 "bbk-prompt-mechanical-admission", "bbk-prompt-assurance-modes",
                 "bbk-prompt-candidate-focused-review",
+                "bbk-prompt-delivery-authority", "bbk-prompt-effect-ownership",
+                "bbk-prompt-coordination-economy",
             },
         )
 
@@ -922,7 +987,7 @@ class PromptModulePackageV1Tests(unittest.TestCase):
         self.assertEqual(report, recorded)
         self.assertEqual(report["size_policy"], "MEASURED_NO_ARBITRARY_CAP")
         self.assertEqual(report["role_count"], 19)
-        self.assertEqual(report["hosts"], ["generic", "omp", "codex", "claude"])
+        self.assertEqual(report["hosts"], ["generic", "omp", "codex", "claude", "pi"])
         self.assertGreater(report["aggregate"]["baseline_bytes"], 0)
         self.assertGreater(report["aggregate"]["current_bytes"], 0)
         self.assertEqual(
@@ -931,9 +996,9 @@ class PromptModulePackageV1Tests(unittest.TestCase):
         )
         self.assertEqual(set(report["roles"]), {role["name"] for role in self.roles})
 
-    def test_projection_manifest_v8_binds_method_and_module_sources(self) -> None:
+    def test_projection_manifest_v10_binds_method_modules_and_compiled_procedures(self) -> None:
         _outputs, manifest = expected_files()
-        self.assertEqual(manifest["schema"], "bbk.projection-manifest.v8")
+        self.assertEqual(manifest["schema"], "bbk.projection-manifest.v10")
         self.assertEqual(manifest["method_content_source"], "spec/method-content.json")
         self.assertEqual(manifest["prompt_module_package"], "spec/prompt-modules/catalog.json")
         self.assertEqual(
@@ -941,10 +1006,23 @@ class PromptModulePackageV1Tests(unittest.TestCase):
         )
         self.assertRegex(manifest["method_content_source_sha256"], r"^[0-9a-f]{64}$")
         self.assertRegex(manifest["prompt_module_source_sha256"], r"^[0-9a-f]{64}$")
+        self.assertEqual(manifest["procedure_registry_source"], "spec/procedures/catalog.json")
+        self.assertRegex(manifest["procedure_registry_sha256"], r"^[0-9a-f]{64}$")
+        self.assertRegex(manifest["procedure_registry_revision"], r"^[0-9a-f]{64}$")
         for role in self.roles:
             agent = manifest["agents"][role["name"]]
             self.assertEqual(agent["primary_skill"], role["primary_skill"])
             self.assertEqual(agent["prompt_modules"], role["prompt_modules"])
+            self.assertEqual(set(agent["compiled_procedures"]), {"codex", "omp", "claude", "generic", "pi"})
+            for host, compiled in agent["compiled_procedures"].items():
+                expected = list(role["mandatory_skills"])
+                if role["primary_skill"] == "bbk-wayfind" and "bbk-plan" not in expected:
+                    expected.insert(0, "bbk-plan")
+                expected = [item for item in expected if item != role["primary_skill"]] + [role["primary_skill"]]
+                self.assertEqual([item["id"] for item in compiled["procedures"]], expected, host)
+                self.assertEqual(set(compiled["catalog_suppression_set"]), set(expected))
+                catalog = agent["effective_external_catalogs"][host]
+                self.assertFalse(set(role["mandatory_skills"]) & set(catalog["available_external_procedures"]))
 
     def test_unknown_role_module_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
@@ -1011,7 +1089,9 @@ class PromptModulePackageV1Tests(unittest.TestCase):
             package = load_prompt_modules(root)
             method_path = root / "spec" / "method-content.json"
             method = json.loads(method_path.read_text(encoding="utf-8"))
-            required = set(role_skill_module_requirements(role, method["skills"]))
+            required = set(role_skill_module_requirements(
+                role, method["skills"], method["skill_module_dependencies"],
+            ))
             selected = set(role["prompt_modules"]) | required
             role["prompt_modules"] = [
                 module_id for module_id in package.ordered_ids if module_id in selected
@@ -1077,13 +1157,16 @@ class PromptModulePackageV1Tests(unittest.TestCase):
             self._minimal_copy(root)
             path = root / "spec" / "roles" / "bbk_worker-role.json"
             role = json.loads(path.read_text(encoding="utf-8"))
-            required = next(iter(role_skill_module_requirements(role, self.method["skills"])))
+            required = next(iter(role_skill_module_requirements(
+                role, self.method["skills"], self.method["skill_module_dependencies"],
+                include_all_loaded_skills=True,
+            )))
             role["prompt_modules"].remove(required)
             path.write_bytes(canonical_bytes(role))
             with self.assertRaises(RolePackageError) as caught:
                 assemble(root)
             self.assertIn(
-                "mandatory procedures require unassigned prompt modules",
+                "loaded skills require unassigned prompt modules",
                 "\n".join(caught.exception.errors),
             )
 

@@ -39,7 +39,9 @@
     "Do not make heartbeat, polling timeout, host-window expiry, context pressure or physical child termination mean semantic completion, cancellation or failure. Define and preserve explicit continuation and interruption states.",
     "Do not place audit-only metadata tags, generated-file banners, routing labels, digests or provenance blocks into model-facing instructions when they do not change behavior; preserve them in structured manifests and projections instead.",
     "Do not emit or compile `READY_FOR_VALIDATION` as an operational disposition. New Worker contracts use precise operational completion, blocker, pause, cancellation, or inconclusive states plus a separate semantic state such as `READY_FOR_PARENT_INTEGRATION`; a legacy input value creates no validation-admission authority.",
-    "Do not claim that a valid invocation contract means the Worker ran, the WorkUnit completed, the candidate is frozen or valid, a finding is closed, the baseline is accepted, execution is authorized, or release is granted."
+    "Do not claim that a valid invocation contract means the Worker ran, the WorkUnit completed, the candidate is frozen or valid, a finding is closed, the baseline is accepted, execution is authorized, or release is granted.",
+    "Do not repeat an unchanged deterministic check, commission support work without the four-field material-risk justification, or convert a reversible pre-freeze mechanical defect into successor planning, a new campaign, or a new physical attempt.",
+    "Do not accept routine single-owner, standard-effect, profile-covered WorkUnits without a typed specialist trigger naming the unresolved material ambiguity."
   ],
   "prompt_modules": [
     "bbk-prompt-role-boundary",
@@ -63,7 +65,11 @@
     "bbk-prompt-product-first-proportionality",
     "bbk-prompt-mechanical-admission",
     "bbk-prompt-assurance-modes",
-    "bbk-prompt-candidate-focused-review"
+    "bbk-prompt-candidate-focused-review",
+    "bbk-prompt-critical-path-execution",
+    "bbk-prompt-compiled-procedure-consumption",
+    "bbk-prompt-routine-contract-generation",
+    "bbk-prompt-atomic-finalization"
   ],
   "purpose": "Turn an accepted logical work unit into the smallest qualified physical execution envelope that can complete it safely, reproducibly, and economically while keeping work-unit meaning, planning, authority, scheduling, implementation, independent assurance, acceptance, and release outside the invocation definition and avoiding permanent language-by-task role proliferation.",
   "responsibilities": [
@@ -92,7 +98,9 @@
     "When a WorkUnit, architecture, interface, assertion, authority grant, profile, tool, model route, host capability, environment, context policy, workspace rule, schema or parent plan changes materially, preserve the prior contract and qualification record, identify affected fields and consumers, invalidate only the impacted invocation or template instances, and produce a successor or exact recompile request. Never rewrite historical effective definitions into apparent current validity.",
     "Apply proportionality. Do not generate a permanent role, large prompt, maximal tool set, broad context, unrestricted workspace, multiple profiles, redundant gates, expensive model or elaborate continuation merely because they are available. Stop when the smallest qualified contract or non-authorizing template is exact enough for parent integration, or when the smallest unresolved gap has been returned with a typed state and next action.",
     "Return the versioned Worker Designer result and exact invocation artifact to the invoking semantic parent. The role never launches the Worker, claims that execution is authorized or complete, treats contract validity as candidate validity, or contacts the user.",
-    "Within an accepted grant, continue routine, reversible, scope-preserving corrections and the single safe realistic resolution to an ordinary technical blocker without requesting user reauthorization; record the deviation and request attention only for a genuine material branch or authority expansion."
+    "Within an accepted grant, continue routine, reversible, scope-preserving corrections and the single safe realistic resolution to an ordinary technical blocker without requesting user reauthorization; record the deviation and request attention only for a genuine material branch or authority expansion.",
+    "For routine work, compile a compact reference-based contract containing exact subject/scope, owner/workspace, authority/effects, inputs/interfaces, selected route/tool receipt, outputs/checks, reusable receipts/forbidden duplicates, cleanup/checkpoint, and return route; do not copy complete campaign state into every contract.",
+    "Require a current schema-valid `bbk.worker-design-trigger.v1` for ordinary invocation. Return `NO_MATERIAL_SUPPORT_WORK` when deterministic routine contract generation is sufficient; do not redesign routine profile-covered work merely because the role was callable."
   ],
   "return_contract": {
     "allowed_invocation_modes": [
@@ -127,8 +135,27 @@
       "BLOCKED"
     ],
     "authority_boundary": "A valid `bbk.worker-designer-return.v1` return establishes only the `bbk_worker_designer`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+    "compact_result_fields": [
+      "worker_invocation_contract_ref",
+      "context_manifest_ref",
+      "effective_capability_envelope",
+      "preflight_and_qualification",
+      "blockers",
+      "parent_actions_requested",
+      "specialist_trigger_ref"
+    ],
+    "compact_result_schema": "spec/schemas/role-results/bbk-worker-designer-compact-result-v2.schema.json",
     "contract_id": "bbk.worker-designer-return.v1",
     "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+    "full_detail_triggers": [
+      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+      "The parent explicitly requested FULL detail.",
+      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+    ],
     "readiness_rule": "`READY_FOR_PARENT_INTEGRATION` may be returned only when every current input, required role-owned output, blocking dependency, evidence carrier, cleanup obligation, invalidation condition, and durable handoff required by this contract has been reconciled. The state authorizes only the next parent integration or assessment step named by the role contract.",
     "requirements": [
       "Return one `bbk.role-return.v1` object with `contract` = `bbk.worker-designer-return.v1`, `role` = `bbk_worker_designer`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `invocation_design_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -309,33 +336,20 @@
         "description": "Required workspace kind, source or baseline, readable and writable surfaces, branch or worktree policy, shared resources, collision and fencing controls, pre-state, rollback and cleanup; distinguish requirement from a runtime lease.",
         "kind": "STRUCTURED",
         "nullable": false
+      },
+      "specialist_trigger_ref": {
+        "kind": "REFERENCE",
+        "nullable": true,
+        "description": "Typed Worker Design trigger authorizing specialist work; null only for an explicitly requested reusable exceptional template."
       }
     },
     "result_schema": "spec/schemas/role-results/bbk-worker-designer-result-v1.schema.json",
-    "v2_contract_id": "bbk.worker-designer-return.v2",
-    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
-    "v2_return_schema": "spec/schemas/role-returns/bbk-worker-designer-return-v2.schema.json",
-    "compact_result_schema": "spec/schemas/role-results/bbk-worker-designer-compact-result-v2.schema.json",
-    "compact_result_fields": [
-      "worker_invocation_contract_ref",
-      "context_manifest_ref",
-      "effective_capability_envelope",
-      "preflight_and_qualification",
-      "blockers",
-      "parent_actions_requested"
-    ],
-    "full_detail_triggers": [
-      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
-      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
-      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
-      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
-      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
-      "The parent explicitly requested FULL detail.",
-      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
-    ],
     "return_schema": "spec/schemas/role-returns/bbk-worker-designer-return-v1.schema.json",
     "semantic_state_name": "invocation_design_state",
-    "supplemental_enums": {}
+    "supplemental_enums": {},
+    "v2_contract_id": "bbk.worker-designer-return.v2",
+    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+    "v2_return_schema": "spec/schemas/role-returns/bbk-worker-designer-return-v2.schema.json"
   },
   "scope": [
     "Own one exact Worker Designer charter and its host-neutral effective Worker invocation contract or explicitly requested reusable template, including semantic-input qualification, logical-role binding, model routing and qualification, task and domain profile resolution, instruction and skill composition, context manifest, authority intersection, capability envelope, workspace and isolation requirements, tool and environment manifest, assurance and gate bindings, runtime and continuation policy, result and cleanup contract, host-projection requirements, static preflight, invalidation, and exact return to the invoking semantic parent.",

@@ -2,10 +2,11 @@
 """Load, validate, and compile BBK prompt modules and skill templates.
 
 Prompt modules are small canonical behavior capsules shared by role prompts and
-standalone generated skills.  Canonical skill templates may reference a module
-with ``{{bbk-module:<module-id>}}``.  Standalone ``SKILL.md`` projections expand
-those directives, while role prompts embed each assigned module once and retain
-only compact references inside inlined primary procedures.
+generated skills. Canonical skill templates reference modules with
+``{{bbk-module:<module-id>}}`` and declare a module-dependency policy. Modules
+already guaranteed by every loading role compile to compact references;
+standalone-only dependencies remain expanded. Role prompts emit every assigned
+module once and retain only compact references inside inlined procedures.
 """
 from __future__ import annotations
 
@@ -104,7 +105,8 @@ def load_prompt_modules(root: Path = DEFAULT_ROOT) -> PromptModulePackage:
         policy = {}
     expected_policy = {
         "role_field", "skill_directive_syntax", "embed_each_module_once",
-        "standalone_skill_expands_modules", "role_prompt_uses_compact_skill_references",
+        "standalone_skill_expands_modules", "selective_standalone_skill_compaction",
+        "role_prompt_uses_compact_skill_references",
         "mandatory_procedure_default", "mandatory_procedure_maximum",
         "additional_mandatory_procedure_rule", "additional_mandatory_procedure_exceptions",
     }
@@ -116,7 +118,7 @@ def load_prompt_modules(root: Path = DEFAULT_ROOT) -> PromptModulePackage:
         errors.append("prompt-module directive syntax is not canonical")
     for key in (
         "embed_each_module_once", "standalone_skill_expands_modules",
-        "role_prompt_uses_compact_skill_references",
+        "selective_standalone_skill_compaction", "role_prompt_uses_compact_skill_references",
     ):
         if policy.get(key) is not True:
             errors.append(f"prompt-module policy {key} must be true")
@@ -299,7 +301,18 @@ def validate_skill_templates(
     if not isinstance(skills, dict) or not skills:
         errors.append("method-content skills must be a non-empty object")
         return errors
+    dependencies = method_content.get("skill_module_dependencies")
+    if not isinstance(dependencies, dict):
+        errors.append("method-content skill_module_dependencies must be an object")
+        dependencies = {}
+    missing_policies = sorted(set(skills) - set(dependencies))
+    extra_policies = sorted(set(dependencies) - set(skills))
+    if missing_policies:
+        errors.append(f"method-content skills missing module dependency policies {missing_policies}")
+    if extra_policies:
+        errors.append(f"method-content module dependency policies name unknown skills {extra_policies}")
     known = set(package.by_id)
+    order = list(package.ordered_ids)
     for name, template in skills.items():
         if name != "bbk" and (not isinstance(name, str) or not SKILL_NAME_RE.fullmatch(name)):
             errors.append(f"method-content contains invalid skill name {name!r}")
@@ -313,7 +326,113 @@ def validate_skill_templates(
         residue = DIRECTIVE_RE.sub("", template)
         if "{{bbk-module:" in residue:
             errors.append(f"method-content skill {name!r} contains a malformed prompt-module directive")
+        policy = dependencies.get(name)
+        if not isinstance(policy, dict) or set(policy) != {"requires_prompt_modules", "standalone_prompt_modules"}:
+            errors.append(f"method-content skill {name!r} has a malformed module dependency policy")
+            continue
+        required = policy.get("requires_prompt_modules")
+        standalone = policy.get("standalone_prompt_modules")
+        for field, values in (("requires_prompt_modules", required), ("standalone_prompt_modules", standalone)):
+            if not isinstance(values, list) or len(values) != len(set(values)) or not all(isinstance(item, str) for item in values):
+                errors.append(f"method-content skill {name!r} {field} must be a unique string list")
+        if not isinstance(required, list) or not isinstance(standalone, list):
+            continue
+        selected = set(required) | set(standalone)
+        if set(required) & set(standalone):
+            errors.append(f"method-content skill {name!r} module policy overlaps")
+        if selected != set(directives):
+            errors.append(f"method-content skill {name!r} module policy must cover its directives exactly")
+        for field, values in (("requires_prompt_modules", required), ("standalone_prompt_modules", standalone)):
+            canonical = [module_id for module_id in order if module_id in set(values)]
+            if values != canonical:
+                errors.append(f"method-content skill {name!r} {field} must follow prompt-module catalog order")
     return errors
+
+
+def skill_module_dependency(
+    method_content: Mapping[str, Any],
+    skill_name: str,
+) -> dict[str, tuple[str, ...]]:
+    dependencies = method_content.get("skill_module_dependencies")
+    if not isinstance(dependencies, Mapping) or not isinstance(dependencies.get(skill_name), Mapping):
+        raise PromptModuleError([f"skill {skill_name!r} has no module dependency policy"])
+    policy = dependencies[skill_name]
+    required = policy.get("requires_prompt_modules")
+    standalone = policy.get("standalone_prompt_modules")
+    if not isinstance(required, list) or not isinstance(standalone, list):
+        raise PromptModuleError([f"skill {skill_name!r} has a malformed module dependency policy"])
+    return {
+        "requires_prompt_modules": tuple(str(item) for item in required),
+        "standalone_prompt_modules": tuple(str(item) for item in standalone),
+    }
+
+
+def _inject_dependency_frontmatter(template: str, policy: Mapping[str, Sequence[str]]) -> str:
+    normalized = template.replace("\r\n", "\n").replace("\r", "\n")
+    if not normalized.startswith("---\n"):
+        raise PromptModuleError(["skill template must contain YAML frontmatter"])
+    end = normalized.find("\n---\n", 4)
+    if end < 0:
+        raise PromptModuleError(["skill template contains unterminated YAML frontmatter"])
+    frontmatter = normalized[4:end].splitlines()
+    frontmatter = [
+        line for line in frontmatter
+        if not line.startswith("requires_prompt_modules:")
+        and not line.startswith("standalone_prompt_modules:")
+    ]
+    frontmatter.extend([
+        "requires_prompt_modules: " + json.dumps(list(policy["requires_prompt_modules"]), ensure_ascii=False),
+        "standalone_prompt_modules: " + json.dumps(list(policy["standalone_prompt_modules"]), ensure_ascii=False),
+    ])
+    return "---\n" + "\n".join(frontmatter) + "\n---\n" + normalized[end + 5:]
+
+
+def compile_standalone_skill(
+    skill_name: str,
+    template: str,
+    package: PromptModulePackage,
+    method_content: Mapping[str, Any],
+) -> str:
+    """Compile one installed skill with role-guaranteed modules referenced once.
+
+    Modules declared in ``requires_prompt_modules`` are guaranteed to be in
+    every loading role prompt and therefore compile to compact references.
+    ``standalone_prompt_modules`` remain expanded so the skill is lossless for
+    consumers whose role does not carry those modules.
+    """
+    policy = skill_module_dependency(method_content, skill_name)
+    required = set(policy["requires_prompt_modules"])
+    standalone = set(policy["standalone_prompt_modules"])
+    emitted: set[str] = set()
+
+    def replace(match: re.Match[str]) -> str:
+        module_id = match.group(1)
+        module = package.by_id.get(module_id)
+        if module is None:
+            raise PromptModuleError([f"unknown prompt module {module_id}"])
+        if module_id in required:
+            return f"> Apply the already embedded `{module_id}` module here."
+        if module_id not in standalone:
+            raise PromptModuleError([f"skill {skill_name!r} has no compilation policy for {module_id}"])
+        if module_id in emitted:
+            return f"> Continue to apply the `{module_id}` module expanded above."
+        emitted.add(module_id)
+        return (
+            f"<!-- BBK prompt module {module_id}: expanded from canonical source -->\n\n"
+            f"{render_module(module)}\n\n"
+            f"<!-- End BBK prompt module {module_id} -->"
+        )
+
+    source = _inject_dependency_frontmatter(template, policy)
+    compiled = DIRECTIVE_RE.sub(replace, source)
+    if "{{bbk-module:" in compiled:
+        raise PromptModuleError(["compiled skill contains unresolved prompt-module directive"])
+    if not re.search(r"\bprofiles?\b", compiled, flags=re.IGNORECASE):
+        compiled = compiled.rstrip() + (
+            "\n\n## Profile interaction\n\n"
+            "Use an applicable installed profile by reference; do not embed its inventory here.\n"
+        )
+    return compiled
 
 
 def render_module(module: Mapping[str, Any], *, tagged: bool = False) -> str:
@@ -385,14 +504,24 @@ def ordered_modules(
 def role_skill_module_requirements(
     role: Mapping[str, Any],
     skill_templates: Mapping[str, str],
+    skill_dependencies: Mapping[str, Any] | None = None,
+    *,
+    include_all_loaded_skills: bool = False,
 ) -> tuple[str, ...]:
     found: list[str] = []
-    for skill_name in role.get("mandatory_skills", []):
-        template = skill_templates.get(skill_name)
-        if not isinstance(template, str):
-            continue
-        for module_id in module_directives(template):
-            if module_id not in found:
+    skill_names = role.get("skills", []) if include_all_loaded_skills else role.get("mandatory_skills", [])
+    for skill_name in skill_names:
+        if skill_dependencies is not None:
+            policy = skill_dependencies.get(skill_name)
+            if isinstance(policy, Mapping):
+                values = policy.get("requires_prompt_modules", [])
+            else:
+                values = []
+        else:
+            template = skill_templates.get(skill_name)
+            values = module_directives(template) if isinstance(template, str) else ()
+        for module_id in values:
+            if isinstance(module_id, str) and module_id not in found:
                 found.append(module_id)
     return tuple(found)
 
@@ -485,7 +614,10 @@ def prompt_size_report(
     )
     baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
     package = assemble(root)
-    hosts = tuple(baseline.get("hosts", ("generic", "omp", "codex", "claude")))
+    # Alpha.17.0.1 promotes Pi to an explicit projection.  The retained
+    # Alpha.14 fixture predates Pi, so its generic measurement is the
+    # compatibility baseline for Pi rather than omitting the target.
+    hosts = ("generic", "omp", "codex", "claude", "pi")
     current_by_role: dict[str, dict[str, int]] = {}
     per_role: dict[str, dict[str, Any]] = {}
     for role in package.roles:
@@ -497,7 +629,7 @@ def prompt_size_report(
         current_by_role[name] = current
         prior = baseline["role_instruction_bytes"][name]
         current_total = sum(current.values())
-        baseline_total = sum(int(prior[host]) for host in hosts)
+        baseline_total = sum(int(prior.get(host, prior["generic"])) for host in hosts)
         per_role[name] = {
             "baseline_bytes": baseline_total,
             "current_bytes": current_total,
@@ -507,7 +639,7 @@ def prompt_size_report(
             ) if baseline_total else None,
             "host_bytes": current,
         }
-    baseline_total = int(baseline["aggregate_role_instruction_bytes"])
+    baseline_total = sum(item["baseline_bytes"] for item in per_role.values())
     current_total = sum(sum(value.values()) for value in current_by_role.values())
     return {
         "schema": "bbk.prompt-size-report.v1",

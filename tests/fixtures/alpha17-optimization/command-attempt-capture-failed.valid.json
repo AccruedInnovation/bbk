@@ -1,0 +1,29 @@
+{
+  "schema": "bbk.command-attempt.v1",
+  "semantic_command_id": "CMD-FIXTURE-001",
+  "execution_attempt_ref": "EXEC-FIXTURE-001",
+  "physical_command_attempt": 1,
+  "invocation_identity": {
+    "executable": "python",
+    "arguments_sha256": "9999999999999999999999999999999999999999999999999999999999999999",
+    "inputs_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "environment_constraints_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "effect_class": "READ_ONLY",
+  "disposition": "EVIDENCE_CAPTURE_FAILED",
+  "effects_observed": {
+    "product_mutation": "NONE",
+    "external_effect": "NONE"
+  },
+  "cleanup": {
+    "state": "COMPLETE",
+    "remaining_processes_or_handles": false
+  },
+  "replay": {
+    "eligible": true,
+    "reason": "Child process exited successfully; only receipt finalization failed.",
+    "maximum_replays": 1,
+    "replay_of_physical_attempt": null
+  },
+  "evidence_refs": ["wrapper-diagnostic-fixture"]
+}

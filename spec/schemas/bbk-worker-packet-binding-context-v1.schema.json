@@ -1,0 +1,160 @@
+{
+  "$id": "bbk-worker-packet-binding-context-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "assignment_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "attempt_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "authority_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "baseline_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "candidate_admission_ref": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "candidate_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "capability_ref": {
+      "pattern": "^role:bbk_[A-Za-z0-9_]+@[^#]+#sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "host_version": {
+      "const": "omp/16.4.8"
+    },
+    "invocation_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "jj_change_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "material_transport_reason": {
+      "maxLength": 4096,
+      "type": "string"
+    },
+    "parent_binding_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "parent_session_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "planned_binding_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "planned_session_id": {
+      "pattern": "^planned-session:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "return_contract": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "return_transport_mode": {
+      "enum": [
+        "SEALED_HANDOFF_REQUIRED",
+        "STRUCTURED_RETURN_FIRST",
+        "STRUCTURED_RETURN_ONLY"
+      ],
+      "type": "string"
+    },
+    "role": {
+      "pattern": "^bbk_[A-Za-z0-9_]+$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.worker-packet-binding-context.v1"
+    },
+    "scope": {
+      "additionalProperties": false,
+      "properties": {
+        "mutation_classes": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "path_prefixes": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "semantic_scope": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "path_prefixes",
+        "mutation_classes",
+        "semantic_scope"
+      ],
+      "type": "object"
+    },
+    "task_name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "work_unit_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "workspace_ref": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "planned_binding_ref",
+    "planned_session_id",
+    "parent_binding_ref",
+    "parent_session_id",
+    "host_version",
+    "invocation_id",
+    "role",
+    "work_unit_id",
+    "attempt_id",
+    "baseline_ref",
+    "candidate_ref",
+    "workspace_ref",
+    "jj_change_id",
+    "authority_ref",
+    "scope",
+    "return_contract",
+    "capability_ref",
+    "task_name",
+    "assignment_digest",
+    "return_transport_mode",
+    "material_transport_reason"
+  ],
+  "title": "BBK worker packet binding context v1",
+  "type": "object"
+}

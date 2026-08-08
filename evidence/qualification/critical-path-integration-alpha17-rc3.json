@@ -1,0 +1,207 @@
+{
+  "automated_gate": {
+    "assertion_id": "VER-036",
+    "check_count": 16,
+    "decision": "RC_ELIGIBLE",
+    "evidence_file_digest": "sha256:f63097ec3cea71c577a45525bb2a7f20bcbdfc4d85d06bcaeea79c3b33426d13",
+    "evidence_path": "evidence/qualification/automated-governed-vertical-slice-alpha17-rc3.json",
+    "gate_id": "GATE-017-AUTOMATED",
+    "report_digest": "sha256:ad840bd47e1a9290f8c02f323a02e3033e8f37d834de4b0f979365353dc5235d",
+    "status": "PASS"
+  },
+  "claim_limit": "This report establishes the RC3 source integration and automated/keyless gates. It does not establish VER-037, Alpha.17 final release, deployment, publication, or live acceptance.",
+  "critical_path_policy": {
+    "canonical_module": "bbk-prompt-critical-path-execution",
+    "canonical_module_digest": "sha256:a873794beda0d1238624170a5ad5c232ceeed7d1fa7f57d2119fde2b2a233e43",
+    "governance_floors_retained": true,
+    "required_role_count": 19,
+    "role_count": 19,
+    "roles_bound": [
+      "bbk_architect",
+      "bbk_phase_wayfinder",
+      "bbk_planning_wayfinder",
+      "bbk_prototyper",
+      "bbk_question_guide",
+      "bbk_questioning_wayfinder",
+      "bbk_researcher",
+      "bbk_reviewer",
+      "bbk_root_orchestrator",
+      "bbk_root_wayfinder",
+      "bbk_synthesizer",
+      "bbk_territory_orchestrator",
+      "bbk_territory_wayfinder",
+      "bbk_validator",
+      "bbk_validator_orchestrator",
+      "bbk_verification_designer",
+      "bbk_worker",
+      "bbk_worker_designer",
+      "bbk_worker_orchestrator"
+    ],
+    "semantics": [
+      "PRODUCT_FIRST_AFTER_FOUR_BLOCKING_FACTS",
+      "CURRENT_UNTIL_INVALIDATED_RECEIPT_REUSE",
+      "SAME_ATTEMPT_PREFREEZE_MECHANICAL_REPAIR",
+      "STRUCTURED_RETURN_FIRST",
+      "INPUT_SCOPED_FINAL_PASS_BOUNDED_VALIDATION",
+      "INLINE_GROUPED_ASSURANCE_WITH_NAMED_REVIEW_RISK",
+      "PLANNING_STOP_WHEN_EXECUTABLE",
+      "EFFORT_ONLY_ROUTE_CHANGE_IS_NOT_SEMANTIC_INVALIDATION"
+    ],
+    "status": "PASS"
+  },
+  "manual_provider_gate": {
+    "alpha17_final_authorized": false,
+    "assertion_id": "VER-037",
+    "status": "PENDING_USER_RUN"
+  },
+  "mise_managed_substrate": {
+    "automated_qualification_tool_observations": {
+      "bd": {
+        "adapter_class": "REAL_LOCAL_TOOL_MISE_MANAGED",
+        "executable": "bd",
+        "execution_mode": "MISE_MANAGED",
+        "launcher_basename": "mise",
+        "launcher_sha256": "sha256:961b1fcc78830e861ab887abd19d9b961478bcf252e37881fdd61c81388308d4",
+        "tool_key": "github:gastownhall/beads",
+        "tool_spec": "github:gastownhall/beads@1.1.0",
+        "version": "bd version 1.1.0 (8e4e59d39)"
+      },
+      "jj": {
+        "adapter_class": "REAL_LOCAL_TOOL_MISE_MANAGED",
+        "executable": "jj",
+        "execution_mode": "MISE_MANAGED",
+        "launcher_basename": "mise",
+        "launcher_sha256": "sha256:961b1fcc78830e861ab887abd19d9b961478bcf252e37881fdd61c81388308d4",
+        "tool_key": "jj",
+        "tool_spec": "jj@0.43.0",
+        "version": "jj 0.43.0-89f62ede8c1c611eaf134c0c49252efd65c7945d"
+      },
+      "mise": {
+        "adapter_class": "REAL_LOCAL_TOOL",
+        "path_basename": "mise",
+        "sha256": "sha256:961b1fcc78830e861ab887abd19d9b961478bcf252e37881fdd61c81388308d4",
+        "version": "2026.8.1 linux-x64 (2026-08-03)"
+      }
+    },
+    "canonical_config": "mise.toml",
+    "canonical_config_digest": "sha256:5e1b0d77709c249245cea3ca9ca193886d6e7f21afdb7c5cd82a3e24faa88d0a",
+    "explicit_binary_override_policy": "CONTROLLED_TEST_OR_COMPATIBILITY_ONLY",
+    "global_jj_or_bd_required": false,
+    "status": "PASS",
+    "tools": {
+      "beads": {
+        "execution_mode": "MISE_MANAGED",
+        "spec": "github:gastownhall/beads@1.1.0"
+      },
+      "jj": {
+        "execution_mode": "MISE_MANAGED",
+        "spec": "jj@0.43.0"
+      }
+    }
+  },
+  "model_routing": {
+    "byte_identical_to_supplied_default": true,
+    "canonical_default_digest": "sha256:a98be13d0d5e51f944ff5c29f6b66614a1075fa497ee204341d597139777de98",
+    "package_version": {
+      "absent_and_mismatched_values_accepted": true,
+      "compatibility_authority": "schema_version",
+      "import_field_required": false,
+      "present_nonempty_value_is_provenance_only": true
+    },
+    "role_count": 19,
+    "schema_version": "bbk.model-routing.v2",
+    "status": "PASS",
+    "supplied_default_digest": "sha256:a98be13d0d5e51f944ff5c29f6b66614a1075fa497ee204341d597139777de98"
+  },
+  "observed_at": "2026-08-05T17:33:28Z",
+  "package_version": "0.1.0-alpha.17+rc.3",
+  "prompt_compilation": {
+    "compiler_checked_dependencies": true,
+    "hot_path_skill_bytes": {
+      "shared/skills/bbk-handoff/SKILL.md": 7980,
+      "shared/skills/bbk-validation-orchestration/SKILL.md": 22888,
+      "shared/skills/bbk-work-unit-execution/SKILL.md": 17025,
+      "shared/skills/bbk-worker-design/SKILL.md": 19716
+    },
+    "hot_path_total_bytes": 67609,
+    "prompt_size_report": {
+      "digest": "sha256:5f8c4d0a790547e8a9fd94f1649d7363b1a26d201952d94598a369ec236ca591",
+      "path": "PROMPT-SIZE-REPORT.json"
+    },
+    "shared_module_deduplication": true,
+    "status": "PASS",
+    "supplied_hotfix_total_bytes": 67878,
+    "within_supplied_hotfix_budget": true
+  },
+  "schema": "bbk.alpha17-critical-path-integration-report.v1",
+  "schemas": {
+    "all_declared_ids_unique": true,
+    "count": 195,
+    "new_contracts": [
+      "bbk.verification-receipt.v1",
+      "bbk.admission-certificate.v1",
+      "bbk.verification-budget.v1",
+      "bbk.verification-economy-event-log.v1",
+      "bbk.verification-economy-metrics.v1"
+    ],
+    "status": "PASS",
+    "unique_declared_ids": 195
+  },
+  "source_inputs": {
+    "critical_path_update": {
+      "digest": "sha256:2bce4da7c410618d23fa5f8a15bdceaf315e4e2494c965b1463b832be3bd05b0",
+      "path_basename": "BBK-Alpha17-Critical-Path-Execution-Integration-Update.md"
+    },
+    "default_model_routing": {
+      "digest": "sha256:a98be13d0d5e51f944ff5c29f6b66614a1075fa497ee204341d597139777de98",
+      "path_basename": "tombstone-model-routing.json"
+    },
+    "mise_tool_definition": {
+      "digest": "sha256:3ad84a964d4e21c604a84f171a4b0a5f7d0d1220a2b312b023669c070e4b01e9",
+      "path_basename": "mise.toml"
+    }
+  },
+  "source_qualification": {
+    "all_profiles_pass": true,
+    "fast": {
+      "module_count": 21,
+      "skipped": 1,
+      "status": "PASS",
+      "tests_reported": 227,
+      "wall_seconds": 33.055629
+    },
+    "release": {
+      "module_count": 39,
+      "skipped": 2,
+      "status": "PASS",
+      "tests_reported": 598,
+      "wall_seconds": 73.077165
+    },
+    "standard": {
+      "module_count": 39,
+      "skipped": 2,
+      "status": "PASS",
+      "tests_reported": 576,
+      "wall_seconds": 69.530173
+    }
+  },
+  "status": "PASS",
+  "verification_economy": {
+    "alpha17": {
+      "avoided_check_count": 3,
+      "budget_violation_count": 0,
+      "digest": "sha256:258a6c34c5ad36a77c710aceebaf5c01f7d85664dcd6da9ca920430cf42cce85",
+      "mechanical_repairs_completed_in_place": 2,
+      "path": "evidence/qualification/verification-economy-alpha17-compliant.json",
+      "receipt_reuse_count": 3,
+      "status": "PASS"
+    },
+    "baseline": {
+      "budget_violation_count": 6,
+      "digest": "sha256:ce66ca0a114c162c3251e0113b47d6c368c34ededc09eeb2335806476db1fa48",
+      "expected_status": "FAIL",
+      "path": "evidence/qualification/verification-economy-alpha16-baseline.json"
+    },
+    "status": "PASS"
+  }
+}

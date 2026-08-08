@@ -26,7 +26,11 @@
     "tool_profile_environment_state",
     "work_graph_ref",
     "work_unit_refs",
-    "worker_invocation_refs"
+    "worker_invocation_refs",
+    "planning_readiness",
+    "roadmap_ref",
+    "frontier_ref",
+    "deferred_refinements"
   ],
   "properties": {
     "accepted_source_refs": {
@@ -112,6 +116,30 @@
     "worker_invocation_refs": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
       "description": "Current Worker Designer contracts for every executable work unit, or an explicit not-ready or blocked disposition for each missing contract."
+    },
+    "planning_readiness": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Current roadmap/frontier readiness with planning mode, architecture mode, deferred refinements, and execution-admissible state."
+    },
+    "roadmap_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Exact coarse whole-project roadmap reference."
+    },
+    "frontier_ref": {
+      "anyOf": [
+        {
+          "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+          "description": "Exact current executable frontier reference, null only with a typed blocker."
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Exact current executable frontier reference, null only with a typed blocker."
+    },
+    "deferred_refinements": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Stable future work items deliberately uncompiled until their frontier, each with owner, interfaces, dependencies, risk class, and refinement triggers."
     }
   },
   "x-bbk-role": "bbk_planning_wayfinder",

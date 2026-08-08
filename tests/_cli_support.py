@@ -9,6 +9,7 @@ installed-launcher, Node, Git, and process-tree behavior.
 from __future__ import annotations
 
 import contextlib
+import gc
 import io
 import os
 import runpy
@@ -62,6 +63,22 @@ _IN_PROCESS_CLIS = {
 _COPIED_CLI_SOURCES = {
     "omp_model_routing.py": (TOOLS / "omp_model_routing.py").resolve(),
 }
+
+# In-process command execution avoids interpreter startup, but a full cyclic
+# collection after every command costs more than the command itself on Windows.
+# Young-generation collection remains per-command; a bounded full collection
+# keeps long pooled test processes from retaining old cycles indefinitely.
+_FULL_GC_INTERVAL = 32
+_in_process_cli_calls = 0
+
+
+def _reap_in_process_cycles() -> None:
+    global _in_process_cli_calls
+    _in_process_cli_calls += 1
+    if _in_process_cli_calls % _FULL_GC_INTERVAL == 0:
+        gc.collect()
+    else:
+        gc.collect(0)
 
 
 @contextlib.contextmanager
@@ -263,16 +280,19 @@ def run_cli(
     script, argv = parsed
     stdout = io.StringIO()
     stderr = io.StringIO()
-    with (
-        process_context(cwd=cwd or ROOT, env=env),
-        accelerate_nested_profile_python(),
-        contextlib.redirect_stdout(stdout),
-        contextlib.redirect_stderr(stderr),
-    ):
-        try:
-            returncode = int(_IN_PROCESS_CLIS[script](argv) or 0)
-        except SystemExit as exc:
-            returncode = int(exc.code or 0)
+    try:
+        with (
+            process_context(cwd=cwd or ROOT, env=env),
+            accelerate_nested_profile_python(),
+            contextlib.redirect_stdout(stdout),
+            contextlib.redirect_stderr(stderr),
+        ):
+            try:
+                returncode = int(_IN_PROCESS_CLIS[script](argv) or 0)
+            except SystemExit as exc:
+                returncode = int(exc.code or 0)
+    finally:
+        _reap_in_process_cycles()
     result = subprocess.CompletedProcess(args, returncode, stdout.getvalue(), stderr.getvalue())
     if check and returncode != 0:
         raise subprocess.CalledProcessError(

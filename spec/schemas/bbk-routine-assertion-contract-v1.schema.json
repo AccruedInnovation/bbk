@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": true,
+  "$id": "https://bbk.local/schemas/bbk-routine-assertion-contract-v1.schema.json",
+  "title": "BBK Routine Assertion Contract v1",
+  "required": [
+    "schema",
+    "assertion_id",
+    "criterion_ref",
+    "subject",
+    "method",
+    "candidate_stage",
+    "environment",
+    "evidence",
+    "expected",
+    "disposition",
+    "independence",
+    "invalidation_keys"
+  ],
+  "properties": {
+    "schema": {
+      "const": "bbk.routine-assertion-contract.v1"
+    },
+    "assertion_id": {
+      "type": "string"
+    },
+    "criterion_ref": {
+      "type": "string"
+    },
+    "subject": {},
+    "method": {},
+    "candidate_stage": {
+      "type": "string"
+    },
+    "environment": {
+      "type": "object"
+    },
+    "evidence": {
+      "type": "array"
+    },
+    "expected": {},
+    "disposition": {
+      "type": "string"
+    },
+    "independence": {
+      "type": "string"
+    },
+    "invalidation_keys": {
+      "type": "array",
+      "uniqueItems": true
+    }
+  }
+}

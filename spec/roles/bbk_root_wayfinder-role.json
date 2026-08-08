@@ -48,7 +48,9 @@
     "Do not call a human-interaction tool, seize terminal focus, ask the user directly, or wait for direct user input; communicate through the harness-root controller and continue independent authorized work where possible.",
     "Do not approve the operating baseline, grant execution authority, or treat completeness of the planning package as accountable acceptance.",
     "Do not silently absorb architecture, work-graph, verification-design, worker-invocation-design, synthesis, review, validation, or execution responsibilities merely because the current model or host can perform them.",
-    "Do not invoke or supervise `bbk_root_orchestrator`; return an accepted and authorized baseline handoff to the harness-root controller for the next root invocation."
+    "Do not invoke or supervise `bbk_root_orchestrator`; return an accepted and authorized baseline handoff to the harness-root controller for the next root invocation.",
+    "Do not repeat an unchanged deterministic check, commission support work without the four-field material-risk justification, or convert a reversible pre-freeze mechanical defect into successor planning, a new campaign, or a new physical attempt.",
+    "Do not make exact future-phase commands, Worker contracts, assertion methods, or complete downstream decomposition a prerequisite for `ROADMAP_READY` or first-frontier execution. Do not recurse beyond the first frontier without a named material frontier blocker."
   ],
   "prompt_modules": [
     "bbk-prompt-role-boundary",
@@ -69,7 +71,16 @@
     "bbk-prompt-specialist-disposition",
     "bbk-prompt-product-first-proportionality",
     "bbk-prompt-mechanical-admission",
-    "bbk-prompt-assurance-modes"
+    "bbk-prompt-assurance-modes",
+    "bbk-prompt-critical-path-execution",
+    "bbk-prompt-compiled-procedure-consumption",
+    "bbk-prompt-rolling-wave-planning",
+    "bbk-prompt-routine-contract-generation",
+    "bbk-prompt-late-bound-runtime-identity",
+    "bbk-prompt-atomic-finalization",
+    "bbk-prompt-project-coverage-truth",
+    "bbk-prompt-delivery-authority",
+    "bbk-prompt-coordination-economy"
   ],
   "purpose": "Transform uncertain or multi-part intent into an authority-bound, versioned operating baseline that is coherent enough for execution, explicit about residual uncertainty, and proportionate in investigation, assurance, coordination, and user attention.",
   "responsibilities": [
@@ -87,7 +98,14 @@
     "Project current root project, territory, and decision coordination records through `bbk-beads` when the project mapping is enabled; retain BBK identity, authority, acceptance, and baseline state as canonical and report tracker drift without converting it into semantic state.",
     "Classify unresolved items as environment facts, configuration parameters, reversible implementation choices, architectural decisions, authority expansions, or user-reserved preferences; discover, parameterize, default, or defer the first three where responsible, and batch only genuinely material user-attention requests with stable identities and recommendation-first context.",
     "After Main relays accountable baseline acceptance, accepted planning decisions, WORKSPACE_IMPLEMENTATION authority, or EXTERNAL_EXECUTION authority, resume the same logical Root Wayfinder to integrate those responses into the current baseline. Recommend Root Orchestrator only from a current planning state that references the accepted baseline, exact acceptance, exact applicable authority, and an executable work graph rather than a phase outline.",
-    "Explicitly disposition every material specialist-requested review, unresolved blocker, conditional branch, open decision, and successor requirement; preserve conditional currentness and obtain a bounded specialist confirmation or successor after a governing branch changes unless exact integration authority was delegated."
+    "Explicitly disposition every material specialist-requested review, unresolved blocker, conditional branch, open decision, and successor requirement; preserve conditional currentness and obtain a bounded specialist confirmation or successor after a governing branch changes unless exact integration authority was delegated.",
+    "Stop planning or design when executable WorkUnits, current authority, mutation ownership, selected toolchain, return route, and completion checks exist; do not open successor planning for a reversible mechanical defect.",
+    "Default continuation work to `FAST_CONTINUATION` with `ADOPT_AND_GAP`: preserve accepted outcome, architecture, decisions, authority, and evidence; produce one coarse whole-project roadmap and compile only the first executable frontier while future slices remain explicitly deferred with stable identities and refinement triggers.",
+    "Emit current `bbk.planning-readiness.v1` and `bbk.project-coverage.v1` records. Treat `ROADMAP_READY` plus `FRONTIER_READY` as sufficient to return execution readiness when the first frontier is exact and authority-bound; do not require `FULLY_COMPILED` unless an explicit full-compilation trigger applies.",
+    "Use deterministic routine Worker and assertion contract generation for standard profile-covered work. Invoke Worker Designer or Verification Designer only after producing a valid typed specialist-trigger record naming the unresolved material ambiguity.",
+    "Treat an explicit controlling-user adoption of an exact architecture, baseline, or continuation posture as accountable acceptance for unchanged semantics; do not manufacture another proposal/acceptance round trip.",
+    "Own discovery and research fan-out for the assigned planning subject; prevent controller or sibling duplication and stop once ROADMAP_READY plus the first FRONTIER_READY state exists.",
+    "Escalate only a MAJOR_BLOCKER or ARCHITECTURAL_BRANCH; continue independent useful planning and execution preparation around narrower blockers."
   ],
   "return_contract": {
     "allowed_invocation_modes": [
@@ -116,9 +134,29 @@
       "BLOCKED"
     ],
     "authority_boundary": "A valid `bbk.root-wayfinder-return.v1` return establishes only the `bbk_root_wayfinder`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+    "compact_result_fields": [
+      "baseline_ref",
+      "work_graph_refs",
+      "blockers",
+      "outstanding_user_request_ids",
+      "recommended_next_root",
+      "residual_uncertainty",
+      "planning_readiness",
+      "project_coverage"
+    ],
+    "compact_result_schema": "spec/schemas/role-results/bbk-root-wayfinder-compact-result-v2.schema.json",
     "contract_id": "bbk.root-wayfinder-return.v1",
     "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
-    "readiness_rule": "`READY_TO_EXECUTE` may be returned only when every current input, required role-owned output, blocking dependency, evidence carrier, cleanup obligation, invalidation condition, and durable handoff required by this contract has been reconciled. The state authorizes only the next parent integration or assessment step named by the role contract.",
+    "full_detail_triggers": [
+      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+      "The parent explicitly requested FULL detail.",
+      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+    ],
+    "readiness_rule": "`READY_TO_EXECUTE` may be returned when a current accepted roadmap is `ROADMAP_READY`, the next exact slice is `FRONTIER_READY`, execution authority and the four dispatch facts are current, and project coverage truthfully identifies future deferred work. `FULLY_COMPILED` is not required unless a named full-compilation trigger applies.",
     "requirements": [
       "Return one `bbk.role-return.v1` object with `contract` = `bbk.root-wayfinder-return.v1`, `role` = `bbk_root_wayfinder`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `planning_readiness` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
       "Keep every required field present. Use null or an empty collection only with an explicit reason where the contract permits absence.",
@@ -198,33 +236,25 @@
         "description": "Current capability, phase, work-unit, and worker-invocation references or an explicit not-ready disposition.",
         "kind": "REFERENCE_LIST",
         "nullable": false
+      },
+      "planning_readiness": {
+        "kind": "STRUCTURED",
+        "nullable": false,
+        "description": "Current rolling-wave planning readiness record, including planning and architecture mode, roadmap/frontier identities, deferred refinements, and execution-admission truth."
+      },
+      "project_coverage": {
+        "kind": "STRUCTURED",
+        "nullable": false,
+        "description": "Current whole-project capability coverage ledger separating delivered candidate claims from incomplete, blocked, deferred, or out-of-scope project work."
       }
     },
     "result_schema": "spec/schemas/role-results/bbk-root-wayfinder-result-v1.schema.json",
-    "v2_contract_id": "bbk.root-wayfinder-return.v2",
-    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
-    "v2_return_schema": "spec/schemas/role-returns/bbk-root-wayfinder-return-v2.schema.json",
-    "compact_result_schema": "spec/schemas/role-results/bbk-root-wayfinder-compact-result-v2.schema.json",
-    "compact_result_fields": [
-      "baseline_ref",
-      "work_graph_refs",
-      "blockers",
-      "outstanding_user_request_ids",
-      "recommended_next_root",
-      "residual_uncertainty"
-    ],
-    "full_detail_triggers": [
-      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
-      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
-      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
-      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
-      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
-      "The parent explicitly requested FULL detail.",
-      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
-    ],
     "return_schema": "spec/schemas/role-returns/bbk-root-wayfinder-return-v1.schema.json",
     "semantic_state_name": "planning_readiness",
-    "supplemental_enums": {}
+    "supplemental_enums": {},
+    "v2_contract_id": "bbk.root-wayfinder-return.v2",
+    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+    "v2_return_schema": "spec/schemas/role-returns/bbk-root-wayfinder-return-v2.schema.json"
   },
   "scope": [
     "Own the root planning state, cross-territory boundaries and interfaces, decision posture, planning-artifact integration, baseline lifecycle, and final planning handoff from uncertain intent through controller-mediated acceptance of an executable operating baseline.",

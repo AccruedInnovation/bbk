@@ -1,38 +1,44 @@
 # BBK documentation
 
-The package root is the Git-ready BBK source tree. This directory contains only
-current, durable documentation.
+The root [`README.md`](../README.md) is the public overview. This directory holds the operating, method, assurance, host, and maintainer guides for the current package. Release changes are recorded in [`RELEASE-NOTES.md`](../RELEASE-NOTES.md) and [`CHANGELOG.md`](../CHANGELOG.md).
 
 ## Start here
 
-- [Installation](INSTALL.md) — verification, installation, profile selection,
-  selective host updates, status, and uninstall.
-- [Usage](USAGE.md) — OMP BBK mode, Codex orchestration configuration, worker
-  authority, model routing, profiles, and operational commands.
-- [Upgrading](UPGRADING.md) — clean upgrades and selective OMP/Codex updates.
+- [`INSTALL.md`](INSTALL.md) — prerequisites, install scopes, host selection, updates, status, and removal.
+- [`USAGE.md`](USAGE.md) — day-to-day operation, BBK mode, project records, execution, assurance, artifacts, and recovery.
+- [`UPGRADING.md`](UPGRADING.md) — safe upgrade and rollback procedure.
+- [`BOUNDARIES.md`](BOUNDARIES.md) — what BBK verifies, what it cannot prove, and where host or human authority remains decisive.
 
-## Method and agent model
+## Roles and method
 
-- [Agents, roles, and delegation](AGENTS.md)
-- [Wayfinding and Grill](WAYFINDING-AND-GRILL.md)
-- [Solution–Outcome Fit](SOLUTION-OUTCOME-FIT.md)
-- [Execution design](EXECUTION-DESIGN.md)
-- [Durable handoffs](DURABLE-HANDOFFS.md)
-- [Assurance and review](ASSURANCE.md)
+- [`AGENTS.md`](AGENTS.md) — the 19 canonical roles, four controller roots, delegation, scope, return contracts, and generated projections.
+- [`WAYFINDING-AND-GRILL.md`](WAYFINDING-AND-GRILL.md) — recommendation-first wayfinding and focused deep-question escalation.
+- [`SOLUTION-OUTCOME-FIT.md`](SOLUTION-OUTCOME-FIT.md) — checking whether a proposed intervention fits the required outcome.
+- [`EXECUTION-DESIGN.md`](EXECUTION-DESIGN.md) — implementation structure, state and effects, slices, WorkUnits, authority, and ownership.
+- [`DURABLE-HANDOFFS.md`](DURABLE-HANDOFFS.md) — resumable workers and exact, digest-bound handoffs.
+- [`ASSURANCE.md`](ASSURANCE.md) — candidate identity, review context, evidence, findings, invalidation, and intent checks.
 
-## Host and extension behavior
+## Hosts, routing, and profiles
 
-- [Model routing](MODEL-ROUTING.md)
-- [OMP child lifetime and callback sequencing](OMP-CHILD-LIFETIME.md)
-- [Language and domain profiles](LANGUAGE-PROFILES.md)
-- [Boundaries](BOUNDARIES.md)
+- [`MODEL-ROUTING.md`](MODEL-ROUTING.md) — install-time routes, OMP runtime profiles, precedence, validation, and overrides.
+- [`LANGUAGE-PROFILES.md`](LANGUAGE-PROFILES.md) — bundled profiles, typed capability dispatch, installation, and ownership.
+- [`OMP-CHILD-LIFETIME.md`](OMP-CHILD-LIFETIME.md) — qualified OMP child scheduling, waiting, cancellation, and continuation behavior.
+- [`../omp/extension/README.md`](../omp/extension/README.md) — OMP extension commands and runtime boundary.
+
+## Release implementation records
+
+These documents describe current implementation constraints that remain part of the package contract:
+
+- [`CRITICAL-PATH-EXECUTION-ALPHA17.md`](CRITICAL-PATH-EXECUTION-ALPHA17.md)
+- [`PROMPT-COMPILATION-ALPHA17.0.1.md`](PROMPT-COMPILATION-ALPHA17.0.1.md)
+
+The `qualification/` directory retains release-specific test and host qualification records. Those records document the exact candidate and host boundary they tested; they are not general operating instructions and do not become current merely because they remain in the package.
 
 ## Maintainers
 
-- [Development and repository workflow](DEVELOPMENT.md)
-- [`CHANGELOG.md`](../CHANGELOG.md)
-- [`RELEASE-NOTES.md`](../RELEASE-NOTES.md)
+- [`DEVELOPMENT.md`](DEVELOPMENT.md) — canonical sources, generation, testing, documentation checks, and release builds.
+- [`../spec/roles/README.md`](../spec/roles/README.md) — split role-source workflow.
+- [`../spec/contracts/README.md`](../spec/contracts/README.md) — return and execution companion contracts.
+- [`../spec/prompt-modules/README.md`](../spec/prompt-modules/README.md) — reusable prompt-module workflow.
 
-Historical PRDs, per-alpha migration notes, decision notes, audits, and
-release-specific qualification evidence are intentionally outside the public
-source tree.
+Generated projections and reports should be changed through their canonical sources. See [`DEVELOPMENT.md`](DEVELOPMENT.md) before editing files under `projections/` or generated compatibility files under `spec/`.

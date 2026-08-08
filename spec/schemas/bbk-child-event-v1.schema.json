@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "$id": "https://bbk.local/schemas/bbk-child-event-v1.schema.json",
+  "title": "BBK Child Event v1",
+  "required": [
+    "schema",
+    "child_ref",
+    "state",
+    "detail",
+    "observed_at",
+    "poll_required"
+  ],
+  "properties": {
+    "schema": {
+      "const": "bbk.child-event.v1"
+    },
+    "child_ref": {
+      "type": "string"
+    },
+    "state": {
+      "enum": [
+        "STARTED",
+        "PROGRESS_MILESTONE",
+        "BLOCKED",
+        "RETURN_READY",
+        "FAILED",
+        "CANCELLED"
+      ]
+    },
+    "detail": {
+      "type": "object"
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "poll_required": {
+      "const": false
+    }
+  }
+}

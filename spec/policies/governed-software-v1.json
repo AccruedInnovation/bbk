@@ -1,0 +1,423 @@
+{
+  "compatibility": {
+    "additive_fields": "ALLOWED_OPTIONAL",
+    "semantic_change": "NEW_SCHEMA_VERSION_REQUIRED"
+  },
+  "description": "Portable deterministic precursor policy for BBK governed-software execution. Host adapters assemble typed facts; policy rules do not infer authority from model prose or CWD.",
+  "policy_id": "governed-software",
+  "policy_version": "1.0.0-alpha.17",
+  "rules": [
+    {
+      "level": "INVARIANT",
+      "message": "A sealed package is immutable.",
+      "override_eligibility": {
+        "authorities": [],
+        "eligible": false,
+        "requires_exact_scope": true
+      },
+      "reason_code": "SEALED_SUBJECT_MUTATION_FORBIDDEN",
+      "rule_id": "sealed-package-mutation",
+      "smallest_next_action": "Create a successor draft or write an external annotation.",
+      "when": {
+        "all": [
+          {
+            "field": "intent.operation",
+            "operator": "in",
+            "value": [
+              "WRITE",
+              "EDIT",
+              "DELETE",
+              "write",
+              "edit",
+              "delete",
+              "bash"
+            ]
+          },
+          {
+            "field": "intent.sealed_subject",
+            "operator": "truthy"
+          }
+        ]
+      }
+    },
+    {
+      "level": "INVARIANT",
+      "message": "The active role capability manifest does not authorize this governed tool or mutation class.",
+      "override_eligibility": {
+        "authorities": [],
+        "eligible": false,
+        "requires_exact_scope": true
+      },
+      "reason_code": "ROLE_CAPABILITY_FORBIDDEN",
+      "rule_id": "role-capability-forbidden",
+      "smallest_next_action": "Use a tool and mutation class granted by the active role manifest and immutable binding.",
+      "when": {
+        "all": [
+          {
+            "field": "intent.capability_allowed",
+            "operator": "exists",
+            "value": true
+          },
+          {
+            "field": "intent.capability_allowed",
+            "operator": "ne",
+            "value": true
+          }
+        ]
+      }
+    },
+    {
+      "level": "INVARIANT",
+      "message": "Orchestrators are control-plane actors and cannot mutate product content.",
+      "override_eligibility": {
+        "authorities": [],
+        "eligible": false,
+        "requires_exact_scope": true
+      },
+      "reason_code": "ROLE_MUTATION_CLASS_FORBIDDEN",
+      "rule_id": "orchestrator-product-mutation",
+      "smallest_next_action": "Allocate a bound worker attempt for the requested mutation.",
+      "when": {
+        "all": [
+          {
+            "field": "actor.role",
+            "operator": "in",
+            "value": [
+              "bbk_root_orchestrator",
+              "bbk_territory_orchestrator",
+              "bbk_worker_orchestrator",
+              "bbk_validator_orchestrator"
+            ]
+          },
+          {
+            "field": "intent.mutation_class",
+            "operator": "in",
+            "value": [
+              "PRODUCT_CONTENT",
+              "TEST_CONTENT",
+              "DOCUMENTATION_CONTENT",
+              "BUILD_CONFIGURATION",
+              "TOOLCHAIN_CONFIGURATION"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "level": "INVARIANT",
+      "message": "Reviewer and validator candidate access is read-only.",
+      "override_eligibility": {
+        "authorities": [],
+        "eligible": false,
+        "requires_exact_scope": true
+      },
+      "reason_code": "READ_ONLY_ROLE_MUTATION_FORBIDDEN",
+      "rule_id": "review-validation-mutation",
+      "smallest_next_action": "Return a finding or validation result to a worker orchestrator.",
+      "when": {
+        "all": [
+          {
+            "field": "actor.role",
+            "operator": "in",
+            "value": [
+              "bbk_reviewer",
+              "bbk_validator"
+            ]
+          },
+          {
+            "field": "intent.operation",
+            "operator": "in",
+            "value": [
+              "WRITE",
+              "EDIT",
+              "DELETE",
+              "write",
+              "edit",
+              "delete",
+              "bash"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "level": "INVARIANT",
+      "message": "Writable worker effects require an active immutable work-unit binding.",
+      "override_eligibility": {
+        "authorities": [],
+        "eligible": false,
+        "requires_exact_scope": true
+      },
+      "reason_code": "WORKER_BINDING_REQUIRED",
+      "rule_id": "unbound-writable-worker",
+      "smallest_next_action": "Create a binding containing work unit, attempt, candidate, workspace/change, authority, scope, and return contract.",
+      "when": {
+        "all": [
+          {
+            "field": "actor.role",
+            "operator": "in",
+            "value": [
+              "bbk_worker",
+              "bbk_prototyper"
+            ]
+          },
+          {
+            "field": "intent.operation",
+            "operator": "in",
+            "value": [
+              "WRITE",
+              "EDIT",
+              "DELETE",
+              "write",
+              "edit",
+              "delete"
+            ]
+          },
+          {
+            "field": "state_snapshot.binding_valid",
+            "operator": "ne",
+            "value": true
+          }
+        ]
+      }
+    },
+    {
+      "level": "INVARIANT",
+      "message": "The requested path is outside the bound workspace or assigned path scope.",
+      "override_eligibility": {
+        "authorities": [],
+        "eligible": false,
+        "requires_exact_scope": true
+      },
+      "reason_code": "WORKSPACE_SCOPE_ESCAPE",
+      "rule_id": "workspace-scope-escape",
+      "smallest_next_action": "Use a path inside the bound workspace and declared scope, or request a successor binding.",
+      "when": {
+        "all": [
+          {
+            "field": "intent.operation",
+            "operator": "in",
+            "value": [
+              "WRITE",
+              "EDIT",
+              "DELETE",
+              "write",
+              "edit",
+              "delete"
+            ]
+          },
+          {
+            "field": "intent.within_scope",
+            "operator": "ne",
+            "value": true
+          }
+        ]
+      }
+    },
+    {
+      "level": "INVARIANT",
+      "message": "A model cannot grant itself an override.",
+      "override_eligibility": {
+        "authorities": [],
+        "eligible": false,
+        "requires_exact_scope": true
+      },
+      "reason_code": "MODEL_SELF_WAIVER_FORBIDDEN",
+      "rule_id": "model-self-waiver",
+      "smallest_next_action": "Request an exact-scope decision from an eligible external authority.",
+      "when": {
+        "all": [
+          {
+            "field": "override.present",
+            "operator": "eq",
+            "value": true
+          },
+          {
+            "field": "override.requested_by_kind",
+            "operator": "eq",
+            "value": "MODEL"
+          }
+        ]
+      }
+    },
+    {
+      "level": "INVARIANT",
+      "message": "Accepted canonical records are immutable.",
+      "override_eligibility": {
+        "authorities": [],
+        "eligible": false,
+        "requires_exact_scope": true
+      },
+      "reason_code": "ACCEPTED_RECORD_IMMUTABLE",
+      "rule_id": "accepted-record-in-place-mutation",
+      "smallest_next_action": "Create a successor record and preserve the accepted predecessor.",
+      "when": {
+        "all": [
+          {
+            "field": "intent.accepted_subject",
+            "operator": "truthy"
+          },
+          {
+            "field": "intent.operation",
+            "operator": "in",
+            "value": [
+              "WRITE",
+              "EDIT",
+              "DELETE",
+              "write",
+              "edit",
+              "delete"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "level": "INVARIANT",
+      "message": "Stale evidence cannot satisfy a current claim.",
+      "override_eligibility": {
+        "authorities": [],
+        "eligible": false,
+        "requires_exact_scope": true
+      },
+      "reason_code": "STALE_EVIDENCE_CANNOT_SATISFY_CLAIM",
+      "rule_id": "stale-evidence-current-claim",
+      "smallest_next_action": "Re-run the required evidence against the current candidate.",
+      "when": {
+        "all": [
+          {
+            "field": "intent.claim",
+            "operator": "exists"
+          },
+          {
+            "field": "state_snapshot.evidence_current",
+            "operator": "eq",
+            "value": false
+          }
+        ]
+      }
+    },
+    {
+      "level": "INVARIANT",
+      "message": "Governed agents may mutate Beads only through the BBK typed single-writer adapter.",
+      "override_eligibility": {
+        "authorities": [],
+        "eligible": false,
+        "requires_exact_scope": true
+      },
+      "reason_code": "DIRECT_BEADS_WRITE_FORBIDDEN",
+      "rule_id": "direct-beads-write",
+      "smallest_next_action": "Submit a bbk.beads-command.v1 transition to the BBK adapter.",
+      "when": {
+        "field": "intent.operation",
+        "operator": "eq",
+        "value": "BEADS_DIRECT_WRITE"
+      }
+    },
+    {
+      "level": "INVARIANT",
+      "message": "A required effect cannot be silently replaced by a different artifact or handoff.",
+      "override_eligibility": {
+        "authorities": [],
+        "eligible": false,
+        "requires_exact_scope": true
+      },
+      "reason_code": "REQUIRED_EFFECT_SUBSTITUTION_FORBIDDEN",
+      "rule_id": "required-effect-substitution",
+      "smallest_next_action": "Perform the required effect or return the exact blocker without elevating the claim.",
+      "when": {
+        "all": [
+          {
+            "field": "intent.required_effect",
+            "operator": "exists"
+          },
+          {
+            "field": "intent.substituted_effect",
+            "operator": "exists"
+          },
+          {
+            "field": "intent.required_effect",
+            "operator": "ne",
+            "value_from": "intent.substituted_effect"
+          }
+        ]
+      }
+    },
+    {
+      "level": "INVARIANT",
+      "message": "Final release requires current user-run manual qualification evidence.",
+      "override_eligibility": {
+        "authorities": [],
+        "eligible": false,
+        "requires_exact_scope": true
+      },
+      "reason_code": "MANUAL_GATE_PASS_REQUIRED",
+      "rule_id": "final-release-manual-gate",
+      "smallest_next_action": "Issue or retain an RC and obtain the required user-run gate result.",
+      "when": {
+        "all": [
+          {
+            "field": "intent.claim",
+            "operator": "eq",
+            "value": "FINAL_RELEASE"
+          },
+          {
+            "field": "state_snapshot.manual_gate_pass",
+            "operator": "ne",
+            "value": true
+          }
+        ]
+      }
+    },
+    {
+      "level": "ENFORCE",
+      "message": "Content-changing conflict resolution requires a separately bound Integration Worker.",
+      "override_eligibility": {
+        "authorities": [
+          "USER"
+        ],
+        "eligible": true,
+        "requires_exact_scope": true
+      },
+      "reason_code": "INTEGRATION_WORKER_REQUIRED",
+      "rule_id": "content-changing-integration-conflict",
+      "smallest_next_action": "Allocate an Integration Worker attempt against a new candidate.",
+      "when": {
+        "all": [
+          {
+            "field": "intent.operation",
+            "operator": "eq",
+            "value": "RESOLVE_CONTENT_CONFLICT"
+          },
+          {
+            "field": "actor.role",
+            "operator": "in",
+            "value": [
+              "bbk_root_orchestrator",
+              "bbk_territory_orchestrator",
+              "bbk_worker_orchestrator"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "level": "OBSERVE",
+      "message": "The host cannot establish pre-effect control for this shell effect.",
+      "override_eligibility": {
+        "authorities": [],
+        "eligible": false,
+        "requires_exact_scope": true
+      },
+      "reason_code": "SHELL_BOUNDARY_DETECT_ONLY",
+      "rule_id": "ambient-shell-boundary",
+      "smallest_next_action": "Treat the host profile as DETECT_ONLY or remove shell access.",
+      "when": {
+        "field": "intent.operation",
+        "operator": "eq",
+        "value": "UNINTERCEPTED_SHELL_EFFECT"
+      }
+    }
+  ],
+  "schema": "bbk.governed-policy.v1"
+}

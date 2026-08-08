@@ -223,7 +223,9 @@ class SplitRolePackageV4Tests(unittest.TestCase):
         self.assertEqual(
             worker_modes,
             {
-                "CANDIDATE_PRODUCTION": {"bbk_worker_orchestrator"},
+                "CANDIDATE_PRODUCTION": {
+                    "bbk_root_orchestrator", "bbk_territory_orchestrator", "bbk_worker_orchestrator"
+                },
                 "PROTOTYPE_SUPPORT": {"bbk_prototyper"},
             },
         )

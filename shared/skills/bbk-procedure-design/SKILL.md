@@ -1,6 +1,8 @@
 ---
 name: bbk-procedure-design
 description: Separate reusable organizational procedure from agent identity and one authorized execution baseline. Use when a multi-step, recurring, interactive, adaptive, or assurance-sensitive process must be explicit and inspectable.
+requires_prompt_modules: []
+standalone_prompt_modules: []
 ---
 
 # BBK Procedure Design

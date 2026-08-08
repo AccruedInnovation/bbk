@@ -1,0 +1,110 @@
+{
+  "assertions": {
+    "VER-035": "PASS"
+  },
+  "automated_checks": {
+    "fast_errors": 0,
+    "fast_failures": 0,
+    "fast_skipped": 0,
+    "fast_tests_reported": 159,
+    "implicit_path_text_encodings": 0,
+    "json_files_parsed": 374,
+    "live_omp_16_4_8_keyless": "PASS",
+    "network_used": false,
+    "provider_credentials_used": false,
+    "python_files_compiled": 92,
+    "real_local_beads": "PASS",
+    "real_local_jj": "PASS",
+    "semantic_fixture_audit": "PASS",
+    "source_build_checks_passed": 7,
+    "source_build_checks_total": 7,
+    "source_reproduction": "PASS",
+    "standard_conditional_cases_requalified": 13,
+    "standard_errors": 0,
+    "standard_failures": 0,
+    "standard_tests_reported": 524,
+    "standard_unittest_modules": 32,
+    "standard_unresolved_skips": 0
+  },
+  "derived_contradictions": {
+    "blocking_count": 8,
+    "child_entries_omitted": 629,
+    "child_sessions_omitted": 4,
+    "cost_omitted_usd": "0.295132594",
+    "explicit_ask_waits_omitted": 1,
+    "prompt_integrity_receipts_omitted": 119,
+    "provider_response_ids_as_agents": 166,
+    "provider_responses_omitted": 115,
+    "task_records_omitted": 4
+  },
+  "evidence": [
+    "fixtures/session-inspector-alpha16/source-session-oracle.json",
+    "fixtures/session-inspector-alpha16/derived-analysis-contradictions.json",
+    "spec/schemas/bbk-session-inspector-oracle-manifest-v1.schema.json",
+    "spec/schemas/bbk-session-inspector-contradictions-v1.schema.json",
+    "spec/schemas/bbk-session-inspector-oracle-verification-v1.schema.json",
+    "tests.test_session_oracle",
+    "tools.session_oracle",
+    "docs/qualification/SESSION-INSPECTOR-ORACLE-ALPHA17.md"
+  ],
+  "exact_expectations": {
+    "child_entries": 629,
+    "explicit_ask_wait_ms": 5217,
+    "explicit_ask_waits": 1,
+    "inclusive_cost_usd": "0.47572615",
+    "inclusive_entries": 1319,
+    "inclusive_tokens": 31239337,
+    "main_entries": 690,
+    "main_irc_polls": 14,
+    "main_job_polls": 30,
+    "prompt_binding_receipts": 5,
+    "prompt_integrity_receipts": 286,
+    "prompt_provider_verified_receipts": 281,
+    "provider_responses": 281,
+    "root_task_invocations": 4,
+    "sessions": 5
+  },
+  "fixture_identity": {
+    "contradictions_digest": "sha256:fa02863df7267d51c7eeadc4f993cf54a9c6c2dc6629419867b15d6965a60333",
+    "manifest_digest": "sha256:8cc80edaee86751cd9d8c417a300e723e6c576915ab31f113851ebdee8fdad63",
+    "negative_oracle": "NEGATIVE_ORACLE_CONFIRMED",
+    "source_reproduction": "PASS"
+  },
+  "interface_binding": {
+    "enforcement_boundary": "DETECT_ONLY",
+    "host_version": "UNOBSERVED_IN_EXPORT",
+    "interface": "IF-014",
+    "normalized_host_events": 5,
+    "provider_response_ids_are_agent_authority": false
+  },
+  "notes": [
+    "The raw source files remain external; the package contains immutable hashes and anonymized structural facts only.",
+    "The five IF-014 event records are detect-only because the export does not carry a trustworthy host-version field.",
+    "Thirteen conditional standard-profile cases were requalified with the supplied local bd, jj, and OMP 16.4.8 binaries; no unresolved skips remain.",
+    "This record qualifies WU-016 only and does not satisfy the Alpha.17 manual provider release gate.",
+    "Alpha.17.0.2 reuses this unchanged VER-035 evidence from Alpha.17 final; source_release records the predecessor qualification identity."
+  ],
+  "privacy": {
+    "credentials_retained": false,
+    "provider_response_ids_retained": false,
+    "raw_paths_retained": false,
+    "raw_prompts_retained": false,
+    "raw_session_ids_retained": false,
+    "raw_task_assignments_retained": false
+  },
+  "qualification": "AUTOMATED_PASS",
+  "release": "0.1.0-alpha.17.0.2",
+  "reuse_basis": "The Alpha.17.0.2 successor does not change the anonymized Alpha.16 session-inspector oracle fixture, expectations, schemas, or VER-035 assertion; this record rebinds that unchanged evidence to the successor release while preserving its source release.",
+  "reuse_status": "INHERITED_UNCHANGED_SOURCE_EVIDENCE",
+  "schema": "bbk.session-inspector-oracle-qualification.v1",
+  "source_evidence": {
+    "decoded_payload_sha256": "sha256:a4287b871f65dab84c7f2e0b679f555ab2dffeeea1404019ce601ea9828e8e78",
+    "derived_analysis_sha256": "sha256:2b2ccf00f7a5f51d194f7c226b3281a510a17488738ab8e0dc3f3009491f9e76",
+    "derived_truth_status": "INCOMPLETE_SECONDARY",
+    "raw_sources_packaged": false,
+    "session_export_sha256": "sha256:938defea020e642eb78e9dac7fb95021909619a111046ebbbc444b5f2eefe1a4",
+    "source_precedence": "RAW_SESSION_EXPORT"
+  },
+  "source_release": "0.1.0-alpha.17",
+  "work_unit": "WU-016"
+}

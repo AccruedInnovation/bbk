@@ -11,7 +11,9 @@
     "blockers",
     "outstanding_user_request_ids",
     "recommended_next_root",
-    "residual_uncertainty"
+    "residual_uncertainty",
+    "planning_readiness",
+    "project_coverage"
   ],
   "properties": {
     "baseline_ref": {
@@ -53,6 +55,14 @@
     "residual_uncertainty": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
       "description": "Explicit bounded uncertainty that remains after economic stopping."
+    },
+    "planning_readiness": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Current rolling-wave planning readiness record, including planning and architecture mode, roadmap/frontier identities, deferred refinements, and execution-admission truth."
+    },
+    "project_coverage": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Current whole-project capability coverage ledger separating delivered candidate claims from incomplete, blocked, deferred, or out-of-scope project work."
     }
   },
   "x-bbk-role": "bbk_root_wayfinder",

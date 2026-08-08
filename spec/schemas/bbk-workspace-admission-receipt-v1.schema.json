@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-workspace-admission-receipt-v1.schema.json",
+  "title": "BBK Workspace Admission Receipt v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "receipt_id",
+    "repository_ref",
+    "baseline_ref",
+    "protected_tree_state",
+    "known_unrelated_dirt",
+    "owned_roots",
+    "mutation_owner",
+    "serialization_state",
+    "invalidation_keys",
+    "issued_at"
+  ],
+  "properties": {
+    "schema": {"const": "bbk.workspace-admission-receipt.v1"},
+    "receipt_id": {"type": "string", "minLength": 1},
+    "repository_ref": {"type": "string", "minLength": 1},
+    "baseline_ref": {"type": "string", "minLength": 1},
+    "protected_tree_state": {"enum": ["CLEAN", "KNOWN_ACCEPTED_STATE", "BLOCKED"]},
+    "known_unrelated_dirt": {"type": "array", "items": {"type": "string"}},
+    "owned_roots": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "mutation_owner": {"type": "string", "minLength": 1},
+    "serialization_state": {"enum": ["EXCLUSIVE", "POSITIVELY_SERIALIZED", "READ_ONLY"]},
+    "invalidation_keys": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "issued_at": {"type": "string", "format": "date-time"}
+  }
+}

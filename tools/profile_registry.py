@@ -2,6 +2,7 @@
 """Build the installation-specific BBK language-profile registry and skill."""
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path, PurePosixPath
 from typing import Any, Iterable, Sequence
@@ -77,6 +78,8 @@ def profile_skills(item: Any) -> list[dict[str, str]]:
                 "path": rel.as_posix(),
                 "directory": directory,
                 "description": description,
+                "source_bytes": skill_file.stat().st_size if skill_file.is_file() else 0,
+                "source_sha256": hashlib.sha256(skill_file.read_bytes()).hexdigest() if skill_file.is_file() else None,
             }
         )
     if not values and root is not None and root.is_dir():
@@ -94,6 +97,8 @@ def profile_skills(item: Any) -> list[dict[str, str]]:
                     "path": skill_file.relative_to(item.root).as_posix(),
                     "directory": skill_file.parent.name,
                     "description": meta.get("description", ""),
+                    "source_bytes": skill_file.stat().st_size,
+                    "source_sha256": hashlib.sha256(skill_file.read_bytes()).hexdigest(),
                 }
             )
     return sorted(values, key=lambda value: (value["id"].casefold(), value["kind"].casefold()))
@@ -143,15 +148,53 @@ def profile_capabilities(item: Any) -> list[dict[str, str]]:
     return values
 
 
-def profile_runtime_summary(item: Any) -> dict[str, Any]:
+def profile_runtime_summary(
+    item: Any,
+    *,
+    installed_package_root: str | None = None,
+) -> dict[str, Any]:
     skills = profile_skills(item)
+    router = profile_router_skill(item, skills)
+    required = [router] if router else []
+    optional = [entry["id"] for entry in skills if entry["id"] not in set(required)]
+    procedure_binding = {
+        "profile_id": item.profile_id,
+        "profile_version": item.version,
+        "profile_root_sha256": getattr(item, "root_sha256", None),
+        "installed_package_root": installed_package_root,
+        "required_procedures": required,
+        "optional_procedures": optional,
+        "procedure_sources": [
+            {
+                "id": entry["id"],
+                "path": entry["path"],
+                "installed_path": (
+                    str(Path(installed_package_root).joinpath(*PurePosixPath(entry["path"]).parts))
+                    if installed_package_root
+                    else None
+                ),
+                "sha256": entry.get("source_sha256"),
+                "bytes": entry.get("source_bytes", 0),
+                "selection": "PROFILE_REQUIRED" if entry["id"] in set(required) else "PROFILE_OPTIONAL",
+            }
+            for entry in skills
+        ],
+    }
+    procedure_binding["registry_revision"] = hashlib.sha256(
+        json.dumps(procedure_binding, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
     return {
         "id": item.profile_id,
         "version": item.version,
         "name": item.profile.get("name"),
         "description": item.profile.get("description"),
         "package": item.package_name,
-        "router_skill": profile_router_skill(item, skills),
+        "root_sha256": getattr(item, "root_sha256", None),
+        "router_skill": router,
+        "required_procedures": required,
+        "optional_procedures": optional,
+        "procedure_registry_revision": procedure_binding["registry_revision"],
+        "procedure_binding": procedure_binding,
         "skill_count": len(skills),
         "skills": skills,
         "cli_command": profile_cli_command(item),
@@ -164,9 +207,19 @@ def registry_data(
     *,
     bbk_version: str,
     bbk_cli: dict[str, str | None] | None = None,
+    installed_package_roots: dict[str, str] | None = None,
 ) -> dict[str, Any]:
+    installed_package_roots = installed_package_roots or {}
     profiles = sorted(
-        (profile_runtime_summary(item) for item in items),
+        (
+            profile_runtime_summary(
+                item,
+                installed_package_root=installed_package_roots.get(
+                    f"{item.profile_id}@{item.version}"
+                ),
+            )
+            for item in items
+        ),
         key=lambda value: (str(value["id"]), str(value["version"])),
     )
     return {
@@ -182,9 +235,20 @@ def registry_json_bytes(
     *,
     bbk_version: str,
     bbk_cli: dict[str, str | None] | None = None,
+    installed_package_roots: dict[str, str] | None = None,
 ) -> bytes:
     return (
-        json.dumps(registry_data(items, bbk_version=bbk_version, bbk_cli=bbk_cli), indent=2, ensure_ascii=False, sort_keys=True)
+        json.dumps(
+            registry_data(
+                items,
+                bbk_version=bbk_version,
+                bbk_cli=bbk_cli,
+                installed_package_roots=installed_package_roots,
+            ),
+            indent=2,
+            ensure_ascii=False,
+            sort_keys=True,
+        )
         + "\n"
     ).encode("utf-8")
 
@@ -201,12 +265,20 @@ def registry_skill_text(
     *,
     bbk_version: str,
     bbk_cli: dict[str, str | None] | None = None,
+    installed_package_roots: dict[str, str] | None = None,
 ) -> str:
-    registry = registry_data(items, bbk_version=bbk_version, bbk_cli=bbk_cli)
+    registry = registry_data(
+        items,
+        bbk_version=bbk_version,
+        bbk_cli=bbk_cli,
+        installed_package_roots=installed_package_roots,
+    )
     lines = [
         "---",
         f"name: {REGISTRY_SKILL_NAME}",
         "description: Installation-specific registry of language and domain profiles managed by the active BBK install manifest. Consult before material language-, framework-, runtime-, or toolchain-specific work.",
+        "requires_prompt_modules: []",
+        "standalone_prompt_modules: []",
         "---",
         "",
         "# Installed BBK language and domain profiles",
@@ -227,7 +299,7 @@ def registry_skill_text(
     if python and script:
         lines.append(f"- Exact fallback when `bbk` is not on `PATH`: `{python}` with script `{script}`. Invoke those two paths directly before the remaining BBK arguments.")
     elif script:
-        lines.append(f"- Fallback script: `{script}` using an available Python 3 interpreter.")
+        lines.append(f"- Fallback script: `{script}` using an available Python 3.11+ interpreter.")
     else:
         lines.append("- Source-tree fallback: run `python tools/bbk.py` from the active BBK package root.")
     lines += [
@@ -236,7 +308,7 @@ def registry_skill_text(
         "## Use",
         "",
         "1. Match the exact repository language, framework, runtime, and toolchain surface to the smallest applicable installed profile. Confirm the live discovery set with the bound BBK CLI and `--json profile list`; project-local paths and `BBK_PROFILE_PATH` can change precedence.",
-        "2. Load the profile's router skill first. Let that router and `bbk-profile-routing` select only the focused worker, reviewer, gate, and evidence modules needed for the current role and assertion.",
+        "2. Treat the profile router as the profile-required procedure. When the active harness compiler reports it as `COMPILED_COMPLETE`, do not read it again; otherwise load it once. Let that router and `bbk-profile-routing` select only the focused worker, reviewer, gate, and evidence modules needed for the current role and assertion.",
         "3. Run the profile's preflight or resolution command when material assumptions, environment identity, gate selection, or a profile lock are required.",
         "4. Pass the selected profile identity, router skill, effective digest or lock, and required gates into delegated work. Do not assume a child agent inherits them from ambient context.",
         "5. Treat missing required profile capability or external tooling as `BLOCKED`; do not substitute model memory for an unavailable qualified procedure.",
@@ -260,7 +332,7 @@ def registry_skill_text(
             # complete focused-skill inventory remain in
             # effective-language-profiles.json and the install manifest.
             router = profile.get("router_skill")
-            lines.append(f"- Router skill: `{router}`" if router else "- Router skill: not declared; select a named profile skill explicitly.")
+            lines.append(f"- Required router procedure: `{router}`" if router else "- Required router procedure: not declared; select a named profile procedure explicitly.")
             cli = profile.get("cli_command")
             lines.append(f"- CLI: `{cli}`" if cli else "- CLI: not installed")
             lines.append(f"- Focused skills available: {profile.get('skill_count', 0)}")
@@ -279,8 +351,14 @@ def registry_skill_bytes(
     *,
     bbk_version: str,
     bbk_cli: dict[str, str | None] | None = None,
+    installed_package_roots: dict[str, str] | None = None,
 ) -> bytes:
-    return registry_skill_text(items, bbk_version=bbk_version, bbk_cli=bbk_cli).encode("utf-8")
+    return registry_skill_text(
+        items,
+        bbk_version=bbk_version,
+        bbk_cli=bbk_cli,
+        installed_package_roots=installed_package_roots,
+    ).encode("utf-8")
 
 
 def source_placeholder_skill(*, bbk_version: str) -> str:

@@ -3,7 +3,7 @@
 BBK separates outcome fit, implementation structure, state/effect semantics, execution slicing, and work-unit execution so consequential design choices are visible before effects occur. Routine work may keep these distinctions inline; material, stateful, effectful, interface-heavy, or hard-to-reverse work records them explicitly.
 
 
-## Alpha.13 execution-boundary companions
+## Execution-boundary companions
 
 `TerritoryExecutionBoundary` binds the exact accepted baseline, territory and WorkUnit membership, mutation ownership, shared interfaces, allowed effects, resource budgets, assurance obligations, recovery, invalidation, and completion conditions for one Territory Orchestrator campaign. Root Orchestrator compiles and admits it; Territory Orchestrator operates within it. A semantic change after admission requires a successor boundary.
 
@@ -111,17 +111,17 @@ A structure review should ask:
 
 ### 8. State–Decision–Effect concern
 
-When implementation structure is stateful or effectful, use the nested `stateDecisionEffectDesign` concern described in `STATE-DECISION-EFFECT.md`. It identifies canonical state, independent dimensions, decision boundaries, effect contracts, invariants, trace fixtures, and the proportional formalization level.
+When implementation structure is stateful or effectful, use the nested `stateDecisionEffectDesign` concern described below and in [`ASSURANCE.md`](ASSURANCE.md) where it affects review evidence. It identifies canonical state, independent dimensions, decision boundaries, effect contracts, invariants, trace fixtures, and the proportional formalization level.
 
 The nested concern is part of the structure contract's fixed/delegated decision model. Workers may change private representation inside delegated freedom, but may not silently move state authority, perform undeclared effects, weaken retry/recovery semantics, or invalidate trace/model mappings.
 
 ### 9. Assurance integration
 
-A structure review may become one logical lens in an alpha.7 `ReviewRun`. The original structure-review object remains valid; the review-assurance wrapper preserves its digest and does not reinterpret it as stronger evidence. See `REVIEW-ASSURANCE.md` and `FINDING-LIFECYCLE.md`.
+A structure review may become one logical lens in a `ReviewRun`. The original structure-review object remains valid; the assurance wrapper preserves its digest and does not reinterpret it as stronger evidence. See [`ASSURANCE.md`](ASSURANCE.md).
 
 ## State, decision, effect, recovery, and rollback
 
-BBK alpha.7 adds an applicability-aware `StateDecisionEffectDesign` concern beneath `ImplementationStructureContract`. It makes state ownership, legal transitions, deterministic decisions, external effects, receipts, ambiguity, and recovery explicit before workers improvise them independently.
+BBK provides an applicability-aware `StateDecisionEffectDesign` concern beneath `ImplementationStructureContract`. It makes state ownership, legal transitions, deterministic decisions, external effects, receipts, ambiguity, and recovery explicit before workers improvise them independently.
 
 The concern is domain-neutral. It applies to software, automation, data publication, procedures, hardware commissioning, and mixed human/system workflows. It does not mandate functional programming, one mega-enum, or a formal model.
 

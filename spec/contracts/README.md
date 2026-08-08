@@ -1,24 +1,28 @@
-# BBK contract package
+# Canonical BBK contract package
 
-This directory records the canonical alpha.13 source contract for role returns and the catalogue of formal execution companion objects. It is a source package, not a completed release projection.
+This directory records the canonical contract catalogue for role returns and formal execution companion objects.
 
-## Source direction
+## Source and generated surfaces
 
-Each `spec/roles/bbk_*-role.json` file owns its normalized `return_contract`. The deterministic generator then produces:
+Each `spec/roles/bbk_*-role.json` file owns its normalized `return_contract`. The deterministic generator produces both the full v1 and compact v2 role-return surfaces:
 
 ```text
 canonical split role return_contract
         │
         ├── tools/return_contracts.py
         │       ├── spec/schemas/role-results/*-result-v1.schema.json
+        │       ├── spec/schemas/role-results/*-compact-result-v2.schema.json
         │       ├── spec/schemas/role-returns/*-return-v1.schema.json
-        │       └── spec/contracts/role-return-registry.json
+        │       ├── spec/schemas/role-returns/*-return-v2.schema.json
+        │       ├── spec/contracts/role-return-registry.json
+        │       └── spec/contracts/role-return-registry-v2.json
         │
-        └── spec/schemas/bbk-role-return-v1.schema.json
-                common envelope
+        ├── spec/schemas/bbk-role-return-v1.schema.json
+        └── spec/schemas/bbk-role-return-v2.schema.json
+                common envelopes
 ```
 
-Generated return and result schemas and the registry must not be edited independently. Check them with:
+Generated return/result schemas and registries must not be edited independently. Check them with:
 
 ```console
 python -S tools/return_contracts.py --check
@@ -58,7 +62,7 @@ A schema-valid return does not establish parent acceptance, outcome satisfaction
 
 `spec/capability-status.json` distinguishes deterministic implementation, bootstrap implementation, schema-defined companion contracts, optional host capabilities, target-only capabilities, and retired concepts. Prose or model confidence is not an equivalent implementation state.
 
-## Contract-package validation
+## Validation
 
 Run the source-level contract checks with:
 
@@ -67,4 +71,4 @@ python tools/validate_contract_package.py --check
 python -m unittest discover -s tests -p 'test_contract_package_v1.py' -v
 ```
 
-Contract-package validation checks canonical contract sources and examples. Complete release qualification additionally regenerates host projections, verifies installers and manifests, and tests clean extracted archives.
+Complete release qualification also regenerates host projections, verifies installers and manifests, and tests a clean extracted archive. See [`docs/DEVELOPMENT.md`](../../docs/DEVELOPMENT.md).

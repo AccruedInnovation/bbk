@@ -11,7 +11,8 @@
     "findings_and_dispositions_state",
     "aggregate_result",
     "repair_and_revalidation_scope",
-    "parent_actions_and_recommended_route"
+    "parent_actions_and_recommended_route",
+    "project_coverage"
   ],
   "properties": {
     "subject_candidate_and_eligibility": {
@@ -57,6 +58,10 @@
     "parent_actions_and_recommended_route": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
       "description": "Exact invoking-parent action requested: accept the report for its own assessment, route candidate repair, admit a successor candidate for revalidation, retry or replace an evaluator, rebuild context, qualify a method, profile, tool or environment, obtain assurance redesign or governing decision, apply an authorized finding disposition, recover, pause, cancel, replan or correctly stop. In controller-root mode, include the conditions for Main to choose the next canonical root without making that transition itself."
+    },
+    "project_coverage": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Coverage projection separating candidate assertion outcomes from whole-project completeness."
     }
   },
   "x-bbk-role": "bbk_validator_orchestrator",

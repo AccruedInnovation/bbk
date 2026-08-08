@@ -1,11 +1,19 @@
 ---
 name: bbk-plan
 description: Create or repair a proportional BBK operating plan from an ambiguous request or supplied plan. Use for operational outcomes, Wayfinding, interfaces, capability-oriented work, work units, assurance contracts, agent selection, and execution readiness.
+requires_prompt_modules: []
+standalone_prompt_modules: []
 ---
 
 # BBK Plan
 
-Create the smallest plan that makes safe progress possible. Use `bbk-wayfind` for the recursive navigation loop; this skill defines the planning artifact chain and execution-readiness contract.
+## Delivery-first rolling-wave planning — controlling rule
+
+Use `FAST_CONTINUATION` and `ADOPT_AND_GAP` whenever an accepted outcome and architecture already exist. Establish the whole-project roadmap coarsely as `ROADMAP_READY`, compile only the next one or two executable slices as `FRONTIER_READY`, mark future exact detail `DEFERRED_UNTIL_FRONTIER`, and begin execution immediately when those two states exist. `FULLY_COMPILED` is optional and requires an explicit regulated, contractual, fixed-program, or user requirement.
+
+The exact field list below applies to active-frontier WorkUnits. Future WorkUnits need only stable identity, purpose, owner, dependencies, interface obligations, risk class, and refinement trigger. Generate routine Worker and assertion contracts mechanically. Commission Worker Designer or Verification Designer only for a named material ambiguity. An explicit controlling-user adoption of an exact architecture or baseline is acceptance for unchanged semantics; do not create another proposal/acceptance round trip.
+
+Create the smallest plan that makes safe progress possible. Use `bbk-wayfind` for frontier-first navigation and recurse only when a material contradiction blocks readiness; this skill defines the planning artifact chain and execution-readiness contract.
 
 0. Treat the requested intervention as a candidate means unless it is an accepted preference, learning objective, or hard external constraint. Perform a proportionate SolutionOutcomeFit check before material solution commitment and carry exact fit/outcome references downstream.
 1. State the operational result, success evidence, current/no-change baseline, actors and affected viewpoints, in-scope boundary, exclusions, constraints, feared events, and accountable decision authority. Record any standing user authority as an explicit grant with its source, already approved effect classes, exact scope, safeguards, exclusions, and revocation or expiry conditions.
@@ -16,7 +24,7 @@ Create the smallest plan that makes safe progress possible. Use `bbk-wayfind` fo
 6. Define material interfaces once. Include provider, consumers, ownership, normal behavior, failure, retry, cancellation, compatibility, observability, transition, and recovery as applicable.
 7. Compare credible alternatives for consequential, interface-heavy, uncertain, or hard-to-reverse choices. Prototype only when a bounded artifact resolves uncertainty more cheaply than analysis.
 8. When realization shape is material, create one domain-neutral ImplementationStructureContract, then coherent ExecutionSlices with integrated touchpoints, integration owners, assertions, evidence, containment, and scaffolding disposition.
-9. Organize delivery around actor-visible capability outcomes, then phases and single-concern work units. For every work unit define purpose, exact inputs, mutation scope, standing-authority grant, capability zones, dependencies, interfaces, expected behavior, exact tool environment, payload limits, operational dispositions, interruption policy, checks, runtime budget, checkpoint/handoff contract, rollback, and completion evidence.
+9. Organize delivery around actor-visible capability outcomes, then phases and single-concern work units. For every **active-frontier** WorkUnit define purpose, exact inputs, mutation scope, standing-authority grant, capability zones, dependencies, interfaces, expected behavior, exact tool environment, payload limits, operational dispositions, interruption policy, checks, runtime budget, checkpoint/handoff contract, rollback, and completion evidence. For future WorkUnits preserve only stable coarse identity and refinement triggers.
 10. Assign task-kind and language/toolchain profiles instead of inventing permanent specialist roles. Bind reusable procedures separately from performer identity and execution authorization.
 11. Compile an AssuranceContract from consequence, uncertainty, change class, and protected floors. Prove each material assertion once by the cheapest sufficient method; add independence only for a distinct property.
 12. Close deterministic entry checks before effects and plan late candidate freeze. Do not assign candidate identity while ordinary edits remain expected.

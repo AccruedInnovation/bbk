@@ -1,0 +1,39 @@
+{
+  "schema": "bbk.planning-readiness.v1",
+  "planning_mode": "FAST_CONTINUATION",
+  "architecture_mode": "ADOPT_AND_GAP",
+  "readiness": ["ROADMAP_READY", "FRONTIER_READY"],
+  "roadmap_ref": {
+    "id": "roadmap-fixture",
+    "revision": 3,
+    "digest": "4444444444444444444444444444444444444444444444444444444444444444",
+    "path": ".bbk/roadmap.json"
+  },
+  "frontier_ref": {
+    "id": "frontier-fixture-1",
+    "revision": 1,
+    "digest": "5555555555555555555555555555555555555555555555555555555555555555",
+    "path": ".bbk/frontiers/frontier-1.json"
+  },
+  "coverage_ref": {
+    "id": "coverage-fixture",
+    "revision": 2,
+    "digest": "6666666666666666666666666666666666666666666666666666666666666666",
+    "path": ".bbk/project-coverage.json"
+  },
+  "deferred_refinements": [
+    {
+      "id": "phase-3",
+      "purpose": "Complete a later project capability after frontier 1",
+      "owner": "planning-wayfinder",
+      "status": "DEFERRED_UNTIL_FRONTIER",
+      "dependencies": ["frontier-fixture-1"],
+      "stable_interfaces": ["IF-03"],
+      "risk_class": "MEDIUM",
+      "refinement_triggers": ["frontier-fixture-1 completed", "IF-03 changes"]
+    }
+  ],
+  "execution_admissible": true,
+  "full_compilation_trigger": null,
+  "invalidation_keys": ["roadmap:3", "frontier:1", "coverage:2"]
+}

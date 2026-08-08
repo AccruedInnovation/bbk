@@ -1,6 +1,8 @@
 ---
 name: bbk-solution-outcome-fit
 description: Separate a requested intervention from the outcome the user needs, assess the causal fit, compare proportionate alternatives, and retain an explicit disposition before downstream design or execution.
+requires_prompt_modules: []
+standalone_prompt_modules: []
 ---
 
 # BBK Solution–Outcome Fit

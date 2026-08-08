@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bbk-jsonl-analyzer"
+version = "1.0.0"
+description = "Dependency-free analyzer for Codex rollout JSONL logs"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [{name = "BBK project"}]
+
+[project.scripts]
+bbk-jsonl-analyzer = "bbk_jsonl_analyzer:main"
+
+[tool.setuptools]
+py-modules = ["bbk_jsonl_analyzer"]

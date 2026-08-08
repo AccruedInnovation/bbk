@@ -1,0 +1,42 @@
+{
+  "authority": "release operator",
+  "authorization_basis": [
+    {
+      "evidence": "evidence/qualification/automated-governed-vertical-slice-alpha17-rc9.json",
+      "gate": "VER-036",
+      "status": "PASS"
+    },
+    {
+      "evidence": "evidence/qualification/alpha17-final-provider-gate.json",
+      "evidence_digest": "sha256:5796ab6ecc3a6baebe671bac60614fa2e8a987702934359d78c7b394e08d0961",
+      "gate": "VER-037",
+      "status": "PASS"
+    },
+    {
+      "evidence": "evidence/qualification/alpha17-rc9-result-record-approved.json and approved redacted evidence archive",
+      "gate": "VER-038",
+      "status": "PASS"
+    },
+    {
+      "evidence": "explicit release-operator approval to issue Alpha.17 final",
+      "gate": "VER-039",
+      "status": "PASS"
+    }
+  ],
+  "authorized_at": "2026-08-06T23:30:01Z",
+  "claim_limit": "Authorizes packaging and distribution of BBK 0.1.0-alpha.17 final from the approved RC9 implementation plus evidence-tooling corrections. Unclaimed host/provider parity remains outside this authorization.",
+  "qualified_runtime": {
+    "candidate": "0.1.0-alpha.17+rc.9",
+    "omp": "16.4.8",
+    "provider_gate": "PASS"
+  },
+  "record_digest": "sha256:b4a14544391429592eb7aad3370cb592df0a1253cc4be2180183054e8fbb5910",
+  "schema": "bbk.alpha17-final-authorization.v1",
+  "status": "AUTHORIZED",
+  "unclaimed_parity": [
+    "OMP 17.2.9",
+    "credentialed Codex behavioral parity",
+    "Pi provider parity"
+  ],
+  "version": "0.1.0-alpha.17"
+}

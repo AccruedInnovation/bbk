@@ -40,7 +40,9 @@
     "Do not make diagrams the sole architecture record, duplicate semantic objects across views, or allow views to disagree without an explicit finding or invalidation state.",
     "Do not integrate stale, wrong-subject, unauthorized, incomplete, or provenance-ambiguous source syntheses and evidence. Preserve prior proposals and create successor revisions after exact invalidation rather than overwriting history.",
     "Do not spawn another Architect or any other canonical BBK role. Complex architecture is decomposed and coordinated by the semantic parent through sibling charters with one declared canonical interface and final integration owner.",
-    "Do not return `READY_TO_EXECUTE`, represent the proposal as accepted, or imply that review, verification design, planning, authority, implementation, candidate validation, operational validation, or release has occurred merely because the architecture is internally complete."
+    "Do not return `READY_TO_EXECUTE`, represent the proposal as accepted, or imply that review, verification design, planning, authority, implementation, candidate validation, operational validation, or release has occurred merely because the architecture is internally complete.",
+    "Do not repeat an unchanged deterministic check, commission support work without the four-field material-risk justification, or convert a reversible pre-freeze mechanical defect into successor planning, a new campaign, or a new physical attempt.",
+    "Do not require full future-phase architecture elaboration when the current executable frontier is safely covered."
   ],
   "prompt_modules": [
     "bbk-prompt-role-boundary",
@@ -58,7 +60,11 @@
     "bbk-prompt-evidence-subject-identity",
     "bbk-prompt-specialist-disposition",
     "bbk-prompt-product-first-proportionality",
-    "bbk-prompt-mechanical-admission"
+    "bbk-prompt-mechanical-admission",
+    "bbk-prompt-critical-path-execution",
+    "bbk-prompt-compiled-procedure-consumption",
+    "bbk-prompt-atomic-finalization",
+    "bbk-prompt-delivery-authority"
   ],
   "purpose": "Produce the least-complex responsible architecture that realizes the accepted operational outcome, gives consequential state, rules, schemas, contracts, and effect authority one canonical owner, contains complexity and failure behind intentional boundaries, and makes quality, recovery, compatibility, migration, and evolution obligations explicit without turning design into implementation.",
   "responsibilities": [
@@ -90,7 +96,9 @@
     "Write the exact architecture proposal and substantial interface, scenario, decision, ownership, traceability, and self-check artifacts to durable files. Return concise path, byte-count, SHA-256, schema, subject, revision, and lifecycle references through `bbk-handoff`; successful transport proves only that the parent received the intended bytes, not that the proposal is wise, accepted, reviewed, executable, or verified.",
     "Bind every material environment observation and quantitative estimate to the exact node or subject, hostname or stable identity, source, time, method, scope, confidence, assumptions, units, and limitations. Never transfer evidence between superficially similar machines, networks, versions, or environments.",
     "Select the smallest applicable ImplementationStructureContract depth. Use compact infrastructure, network, or deployment structure when topology, interfaces, effects, recovery, security, and pre-execution confirmation can be represented without speculative software-oriented state machinery; record section applicability explicitly.",
-    "Return explicit dispositions or requested parent dispositions for independent review, blockers, open decisions, conditional branches, and successor architecture; do not allow those obligations to disappear in integration."
+    "Return explicit dispositions or requested parent dispositions for independent review, blockers, open decisions, conditional branches, and successor architecture; do not allow those obligations to disappear in integration.",
+    "Stop planning or design when executable WorkUnits, current authority, mutation ownership, selected toolchain, return route, and completion checks exist; do not open successor planning for a reversible mechanical defect.",
+    "Under `ADOPT_AND_GAP`, preserve accepted architecture and return only named material gaps that block the current frontier; do not restate or redesign settled architecture."
   ],
   "return_contract": {
     "allowed_invocation_modes": [
@@ -123,8 +131,26 @@
       "BLOCKED"
     ],
     "authority_boundary": "A valid `bbk.architect-return.v1` return establishes only the `bbk_architect`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+    "compact_result_fields": [
+      "architecture_ref",
+      "canonical_interface_contracts",
+      "derived_integration_and_verification_obligations",
+      "residual_uncertainty",
+      "blockers",
+      "architecture_artifact_ref"
+    ],
+    "compact_result_schema": "spec/schemas/role-results/bbk-architect-compact-result-v2.schema.json",
     "contract_id": "bbk.architect-return.v1",
     "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+    "full_detail_triggers": [
+      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+      "The parent explicitly requested FULL detail.",
+      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+    ],
     "readiness_rule": "Use `READY_FOR_PARENT_INTEGRATION` only when the exact charter and governing sources are current; the architecture elements, ownership model, canonical interfaces, material scenarios, failure and recovery, quality, deployment, compatibility and evolution, traceability, derived integration obligations, and self-check are complete to the selected depth; required independent review has no blocking undispositioned finding; unresolved items are non-blocking and explicit; and the durable handoff verifies.",
     "requirements": [
       "Return one `bbk.role-return.v1` object with `contract` = `bbk.architect-return.v1`, `role` = `bbk_architect`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `architecture_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -276,30 +302,12 @@
       }
     },
     "result_schema": "spec/schemas/role-results/bbk-architect-result-v1.schema.json",
-    "v2_contract_id": "bbk.architect-return.v2",
-    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
-    "v2_return_schema": "spec/schemas/role-returns/bbk-architect-return-v2.schema.json",
-    "compact_result_schema": "spec/schemas/role-results/bbk-architect-compact-result-v2.schema.json",
-    "compact_result_fields": [
-      "architecture_ref",
-      "canonical_interface_contracts",
-      "derived_integration_and_verification_obligations",
-      "residual_uncertainty",
-      "blockers",
-      "architecture_artifact_ref"
-    ],
-    "full_detail_triggers": [
-      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
-      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
-      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
-      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
-      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
-      "The parent explicitly requested FULL detail.",
-      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
-    ],
     "return_schema": "spec/schemas/role-returns/bbk-architect-return-v1.schema.json",
     "semantic_state_name": "architecture_state",
-    "supplemental_enums": {}
+    "supplemental_enums": {},
+    "v2_contract_id": "bbk.architect-return.v2",
+    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+    "v2_return_schema": "spec/schemas/role-returns/bbk-architect-return-v2.schema.json"
   },
   "scope": [
     "Own one exact architecture charter and the versioned proposal derived from it, including source and decision qualification, system context, architecture elements, responsibility and authority allocation, canonical interfaces and interactions, state and information ownership, failure and recovery, security and trust, quality scenarios, deployment and operations, compatibility and evolution, derived integration and verification obligations, traceability, self-check, invalidation, and exact return to the invoking semantic parent.",

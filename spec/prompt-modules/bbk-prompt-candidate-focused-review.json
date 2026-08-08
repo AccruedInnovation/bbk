@@ -1,28 +1,28 @@
 {
   "schema_version": "bbk.prompt-module.v1",
   "id": "bbk-prompt-candidate-focused-review",
-  "title": "Candidate-focused review and delta recheck",
-  "description": "Review the exact integrated candidate or material boundary and return bounded findings instead of rewriting the plan.",
+  "title": "Candidate-focused qualitative review and scoped recheck",
+  "description": "Review a named qualitative risk over an exact candidate without duplicating deterministic mechanics.",
   "clauses": [
     {
+      "id": "CANDIDATE_REVIEW.NAMED_RISK",
+      "text": "Commission Reviewer only for a named qualitative or cross-cutting product risk deterministic checks cannot establish. If no qualifying question exists, return `NO_MATERIAL_ASSURANCE_WORK`."
+    },
+    {
       "id": "CANDIDATE_REVIEW.EXACT_SUBJECT",
-      "text": "Independent review normally targets an exact sealed integrated candidate or one exact material risk or interface boundary. Do not default to reviewing an abstract plan or every intermediate artifact when those are not the assurance subject."
+      "text": "Review the exact frozen integrated candidate or one exact material interface boundary and consume current identity, package, environment, test, schema, and evidence receipts."
+    },
+    {
+      "id": "CANDIDATE_REVIEW.NO_DUPLICATE_MECHANICS",
+      "text": "Do not rerun tests, schema validation, package verification, hashing, profile discovery, or environment qualification merely to appear independent. Independently interpret the current evidence; execute a separate method only when the assurance contract names the risk it controls."
     },
     {
       "id": "CANDIDATE_REVIEW.DELTA_OUTPUT",
-      "text": "Return findings, evidence gaps, concrete deltas, affected scope, reopening triggers, and the smallest valid next action. Do not rewrite the implementation plan or restate unaffected context as the review product."
+      "text": "Return findings, evidence gaps, concrete deltas, affected scope, reopening triggers, and the smallest valid next action rather than rewriting the plan or restating unaffected context."
     },
     {
-      "id": "CANDIDATE_REVIEW.FINDING_SCOPED_RECHECK",
-      "text": "A focused repair recheck consumes the finding, successor candidate, affected scope, relevant evidence, and reopening triggers. Reopen broader review only when the repair materially changes semantics, interfaces, authority, protected floors, or evidence meaning."
-    },
-    {
-      "id": "CANDIDATE_REVIEW.STOP_RULE",
-      "text": "Stop when the exact review focus is resolved and its required evidence is adequate. Do not expand a bounded review into a general audit, duplicate prior assurance, or continue after the named risk has been retired."
-    },
-    {
-      "id": "CANDIDATE_REVIEW.INLINE_BOUNDARY",
-      "text": "INLINE work does not commission an independent Reviewer. Apply normal worker self-checks and deterministic gates unless a named material risk changes the assurance mode."
+      "id": "CANDIDATE_REVIEW.SCOPED_RECHECK",
+      "text": "After repair, revalidate failed assertions, direct impact closure, and explicitly invalidated regression gates only. Reopen broader review only for changed semantics, interfaces, authority, protected floors, ownership, or evidence meaning."
     }
   ]
 }

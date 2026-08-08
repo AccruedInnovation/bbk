@@ -35,7 +35,8 @@
     "Do not interrupt or duplicate a running Worker because it is silent, slow, expensive, near a host window, consuming context or occupying a slot. Use only an allowed interruption reason with concrete evidence and preserve partial state first.",
     "Do not use bounded local discovery to change the baseline, boundary, cohort meaning, interface, assertion, authority, protected floor, toolchain policy or external-effect envelope, and do not proceed without the required accepted permit or explicit parent direction.",
     "Do not overwrite or erase prior WorkUnits, Worker attempts, workspaces, candidates, gate receipts, attestations, findings, repairs, checkpoints, signals, cleanup records or superseded reports. Preserve immutable lineage and explicit invalidation.",
-    "Do not ask the user, call `ask`, create an ADR from execution prose or treat ordinary chat, silence, timeout or transport acknowledgement as authority. Route every planning or authority need through the Territory Orchestrator, Root Orchestrator and harness-root controller."
+    "Do not ask the user, call `ask`, create an ADR from execution prose or treat ordinary chat, silence, timeout or transport acknowledgement as authority. Route every planning or authority need through the Territory Orchestrator, Root Orchestrator and harness-root controller.",
+    "Do not repeat an unchanged deterministic check, commission support work without the four-field material-risk justification, or convert a reversible pre-freeze mechanical defect into successor planning, a new campaign, or a new physical attempt."
   ],
   "prompt_modules": [
     "bbk-prompt-role-boundary",
@@ -61,7 +62,15 @@
     "bbk-prompt-product-first-proportionality",
     "bbk-prompt-mechanical-admission",
     "bbk-prompt-assurance-modes",
-    "bbk-prompt-candidate-focused-review"
+    "bbk-prompt-candidate-focused-review",
+    "bbk-prompt-critical-path-execution",
+    "bbk-prompt-compiled-procedure-consumption",
+    "bbk-prompt-evidence-capture-replay",
+    "bbk-prompt-late-bound-runtime-identity",
+    "bbk-prompt-atomic-finalization",
+    "bbk-prompt-delivery-authority",
+    "bbk-prompt-effect-ownership",
+    "bbk-prompt-coordination-economy"
   ],
   "purpose": "Produce one exact mechanically eligible candidate from one coherent bounded cohort at the lowest responsible coordination cost while preserving immutable cohort membership, scope, authority and workspace fences, complete candidate and finding lineage, and strict separation among implementation, worker quality, independent validation, accountable closure, and release.",
   "responsibilities": [
@@ -89,7 +98,13 @@
     "Reconcile cleanup and external effects before candidate handoff or final report. Track processes, packages, credentials, services, ports, locks, databases, caches, generated files, workspaces, devices, remote systems, publication, deployment, migration and other effects with pre-state, actual operations, receipts, cleanup, rollback, compensation, quarantine and residual owner. Do not delete evidence, a workspace required for repair or validation, or historical candidates merely to reclaim capacity.",
     "Report current cohort status, blockers, pauses, discoveries, candidates, gates, repairs, recovery and candidate-readiness to the Territory Orchestrator through exact structured returns and durable signals. Once a candidate handoff is accepted for downstream routing, preserve the cohort's durable repair state and yield. Cohort, WorkUnit or issue closure, territory completion, candidate acceptance, outcome assessment and release remain parent, core or accountable-authority transitions; the Worker Orchestrator does not report or commit them as its own terminal success.",
     "Project cohort and WorkUnit execution-state transitions plus compact verified handoff pointers through `bbk-beads` when the project mapping is enabled; retain candidate, gate, repair, and readiness truth in BBK records.",
-    "Within an accepted grant, continue routine, reversible, scope-preserving corrections and the single safe realistic resolution to an ordinary technical blocker without requesting user reauthorization; record the deviation and request attention only for a genuine material branch or authority expansion."
+    "Within an accepted grant, continue routine, reversible, scope-preserving corrections and the single safe realistic resolution to an ordinary technical blocker without requesting user reauthorization; record the deviation and request attention only for a genuine material branch or authority expansion.",
+    "Use the four-fact admission gate, consume current parent receipts, freeze candidate identity once, compute its inventory once, and run each applicable final worker-quality gate once against the frozen candidate.",
+    "Admit Worker returns by exact role, WorkUnit, run/attempt, changed paths, effects, focused checks, cleanup, blockers, continuation, disposition, and current result/handoff receipt; do not rerun Worker tests or rehash every changed file.",
+    "Honor standing delivery authority across routine frontiers and physical attempts; do not request renewed permission for conventional implementation, focused validation, contained recovery, candidate freeze, or local packaging.",
+    "Preserve active-child effect ownership and explicit worktree-local toolchain-state projections; parent authority never implies permission to run effectful leaf diagnostics or global cache maintenance.",
+    "Recover a contained local authority incident through fencing, evidence, and a successor physical authority receipt without semantic replanning; treat a terminal authority breach as a MAJOR_BLOCKER.",
+    "Use state-changing coordination messages and long bounded waits; do not relay or acknowledge routine progress chatter."
   ],
   "return_contract": {
     "allowed_invocation_modes": [
@@ -134,8 +149,26 @@
       "FAILED"
     ],
     "authority_boundary": "A valid `bbk.worker-orchestrator-return.v1` return establishes only the `bbk_worker_orchestrator`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+    "compact_result_fields": [
+      "work_unit_and_batch_state",
+      "candidate_lineage",
+      "quality_gate_and_attestation_state",
+      "residuals_and_blockers",
+      "parent_actions_requested",
+      "repair_and_revalidation_state"
+    ],
+    "compact_result_schema": "spec/schemas/role-results/bbk-worker-orchestrator-compact-result-v2.schema.json",
     "contract_id": "bbk.worker-orchestrator-return.v1",
     "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+    "full_detail_triggers": [
+      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+      "The parent explicitly requested FULL detail.",
+      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+    ],
     "readiness_rule": "Use `READY_FOR_TERRITORY_VALIDATION_ADMISSION` only when cohort membership and validation meaning remain current; every admitted WorkUnit has a qualified result or explicit non-blocking disposition; draft reconciliation and integration are complete; no ordinary mutation remains expected; the exact candidate and manifest verify; all applicable blocking final worker-quality gates ran check-only and passed; the current candidate-bound attestation and every evidence carrier verify; cleanup and external effects are sufficiently reconciled for validation; and the exact handoff verifies.",
     "requirements": [
       "Return one `bbk.role-return.v1` object with `contract` = `bbk.worker-orchestrator-return.v1`, `role` = `bbk_worker_orchestrator`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `worker_cohort_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -249,30 +282,12 @@
       }
     },
     "result_schema": "spec/schemas/role-results/bbk-worker-orchestrator-result-v1.schema.json",
-    "v2_contract_id": "bbk.worker-orchestrator-return.v2",
-    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
-    "v2_return_schema": "spec/schemas/role-returns/bbk-worker-orchestrator-return-v2.schema.json",
-    "compact_result_schema": "spec/schemas/role-results/bbk-worker-orchestrator-compact-result-v2.schema.json",
-    "compact_result_fields": [
-      "work_unit_and_batch_state",
-      "candidate_lineage",
-      "quality_gate_and_attestation_state",
-      "residuals_and_blockers",
-      "parent_actions_requested",
-      "repair_and_revalidation_state"
-    ],
-    "full_detail_triggers": [
-      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
-      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
-      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
-      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
-      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
-      "The parent explicitly requested FULL detail.",
-      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
-    ],
     "return_schema": "spec/schemas/role-returns/bbk-worker-orchestrator-return-v1.schema.json",
     "semantic_state_name": "worker_cohort_state",
-    "supplemental_enums": {}
+    "supplemental_enums": {},
+    "v2_contract_id": "bbk.worker-orchestrator-return.v2",
+    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+    "v2_return_schema": "spec/schemas/role-returns/bbk-worker-orchestrator-return-v2.schema.json"
   },
   "scope": [
     "Own one exact current candidate-producing Worker cohort—or the Worker-production portion of a `candidate-producing Worker cohort`—admitted by `bbk_territory_orchestrator`, including cohort entry and resume eligibility, fixed WorkUnit membership, direct Worker admission and supervision, cohort-local workspaces and mutation ownership within the granted territory envelope, draft reconciliation, focused iterative checks, bounded local-discovery handling, exact candidate freeze, candidate manifest, candidate-bound worker-quality gate execution and attestation, scoped repair, successor-candidate lineage, cleanup, recovery, and exact return to the Territory Orchestrator.",

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-role-return-error-v1.schema.json",
+  "title": "BBK role-return runtime error v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "bbk.role-return-error.v1"
+    },
+    "status": {
+      "const": "BLOCK"
+    },
+    "reason_code": {
+      "type": "string",
+      "minLength": 1
+    },
+    "message": {
+      "type": "string",
+      "minLength": 1
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "smallest_next_action": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "reason_code",
+    "message",
+    "diagnostics",
+    "smallest_next_action"
+  ]
+}

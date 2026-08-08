@@ -1,0 +1,96 @@
+{
+  "$defs": {
+    "sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    }
+  },
+  "$id": "https://bbk.local/schemas/bbk-prompt-compilation-event-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "effective_prompt_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "event": {
+      "enum": [
+        "PROMPT_COMPILED",
+        "PROMPT_REUSED"
+      ]
+    },
+    "external_catalog_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "harness": {
+      "enum": [
+        "CODEX",
+        "OMP",
+        "CLAUDE",
+        "PI",
+        "OTHER"
+      ]
+    },
+    "identity_kind": {
+      "enum": [
+        "ROLE",
+        "CONTROLLER"
+      ]
+    },
+    "logical_child_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "observed_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "physical_attempt_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "procedure_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "procedure_reads_by_model": {
+      "const": 0
+    },
+    "reused": {
+      "type": "boolean"
+    },
+    "role": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.prompt-compilation-event.v1"
+    },
+    "source_reads_by_compiler": {
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "schema",
+    "event",
+    "logical_child_id",
+    "identity_kind",
+    "role",
+    "harness",
+    "effective_prompt_sha256",
+    "procedure_ids",
+    "external_catalog_sha256",
+    "source_reads_by_compiler",
+    "procedure_reads_by_model",
+    "reused"
+  ],
+  "title": "BBK Prompt Compilation Event v1",
+  "type": "object"
+}

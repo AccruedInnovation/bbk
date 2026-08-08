@@ -1,6 +1,8 @@
 ---
 name: bbk-recover
 description: Recover BBK work after interruption, stale candidates, orphaned worktrees, failed gates, ambiguous effects, or partial handoffs. Use when continuing blindly could duplicate work, lose evidence, or mutate the wrong subject.
+requires_prompt_modules: []
+standalone_prompt_modules: []
 ---
 
 # BBK Recover

@@ -1,0 +1,59 @@
+{
+  "$id": "bbk-spawn-dispatch-lease-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "binding_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "dispatch_ref": {
+      "pattern": "^dispatch:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "host_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "leased_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "parent_session_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "reservation_ref": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.spawn-dispatch-lease.v1"
+    },
+    "status": {
+      "const": "LEASED"
+    },
+    "tool_call_id": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "dispatch_ref",
+    "reservation_ref",
+    "binding_ref",
+    "parent_session_id",
+    "tool_call_id",
+    "host_version",
+    "leased_at",
+    "expires_at",
+    "status"
+  ],
+  "title": "BBK spawn dispatch lease v1",
+  "type": "object"
+}

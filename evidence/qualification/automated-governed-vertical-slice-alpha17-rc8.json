@@ -1,0 +1,502 @@
+{
+  "assertion_id": "VER-036",
+  "assertions": {
+    "VER-036": "PASS"
+  },
+  "assurance": [
+    {
+      "assurance_record_ref": "sha256:7a0b81e72ebcd5b5216fe3f9e0e11a044cc975d758e335a1545c9e844242bde6",
+      "blocked_write_reason": "ROLE_CAPABILITY_FORBIDDEN",
+      "blocked_write_receipt": "sha256:ae3300a6eea7c8689f963da46338ef6309a287bbe873a60fea37b025cbfe79ef",
+      "candidate_digest": "sha256:c5dfb83578d60bace94339f8e893f022b4c2a47b036ed76ceb11e518864c3dec",
+      "kind": "REVIEW",
+      "read_receipts": [
+        "sha256:585e40a8384e0d04951b451711c17d75eae6034b860db70f7da877c09a3253f1",
+        "sha256:bdc430a40d18656fd8d2a17c70a95a3f12fc0aed2a62d662c8d7f666b6ba81e6"
+      ],
+      "role": "bbk_reviewer",
+      "status": "PASS",
+      "write_surface_attestation": "READ_ONLY_CONFIRMED"
+    },
+    {
+      "assurance_record_ref": "sha256:9730d6467521a913e4ec4bc0a6c3151eee88cf0ec82be4465f45ce7ba4cadf5c",
+      "blocked_write_reason": "ROLE_CAPABILITY_FORBIDDEN",
+      "blocked_write_receipt": "sha256:0557fbe8208e27fcf82ff0168890d923120604dec992881a97b0affc012de877",
+      "candidate_digest": "sha256:c5dfb83578d60bace94339f8e893f022b4c2a47b036ed76ceb11e518864c3dec",
+      "kind": "VALIDATION",
+      "read_receipts": [
+        "sha256:5428efed295b179cf8b9cc643b99f7823772548cf3a814661f91260ea43d10c3",
+        "sha256:9456b011e9552917c66152a2051fd8865889080a0b8c620db3c44ac91e40f6a3"
+      ],
+      "role": "bbk_validator",
+      "status": "PASS",
+      "write_surface_attestation": "READ_ONLY_CONFIRMED"
+    }
+  ],
+  "checks": [
+    {
+      "evidence": {
+        "git_commit": "14093576070e9239acc0d32284b58accc145bf19",
+        "jj_parent_commit": "14093576070e9239acc0d32284b58accc145bf19"
+      },
+      "id": "A17-001-real-colocated-git-jj-baseline",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "distinct_invocations": 2,
+        "distinct_jj_changes": 2,
+        "distinct_sessions": 2,
+        "distinct_workspaces": 2
+      },
+      "id": "A17-002-two-isolated-workers",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "assignment_projection_ids": [
+          "sha256:791125c564f85880cdd93cced93a1129b109b80e76c6845347c1d72b736bb162",
+          "sha256:9e125e636787e024197ce0518a5953a98e0912f573f68b693c4715a9756a212f"
+        ]
+      },
+      "id": "A17-003-orchestrator-control-plane-only",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "reason_code": "ROLE_CAPABILITY_FORBIDDEN",
+        "receipt_ref": "sha256:2969eb2d1f504508f09bb3521286cd9e6503c8eaf06829eeb76c016b07877684"
+      },
+      "id": "A17-004-root-orchestrator-product-write-blocked",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "changed_paths": [
+          "backend/result.json"
+        ],
+        "cross_worker_reason": "WORKSPACE_SCOPE_ESCAPE",
+        "cross_worker_receipt": "sha256:c5679a2dfa14dc56e7b1275f68eef5361a504fada9615c585d31b9dfa88fbc92",
+        "mutation_receipt": "sha256:be13c73c0e1fc0a86bd8476e0f758f433a6145a3c6549c61ef59a93564e3d3ae",
+        "path_escape_reason": "MUTATION_PATH_TRAVERSAL_FORBIDDEN"
+      },
+      "id": "A17-005-backend-scoped-write",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "changed_paths": [
+          "frontend/result.json"
+        ],
+        "cross_worker_reason": "WORKSPACE_SCOPE_ESCAPE",
+        "cross_worker_receipt": "sha256:c6a3a236289cee964b319c6f00507c00f0c07ccee5e1ce7404ace7b9afcbd367",
+        "mutation_receipt": "sha256:c3f3ff300ddac2992b45085db84714af24161afe6f0be02652fb4c67b925b3ff",
+        "path_escape_reason": "MUTATION_PATH_TRAVERSAL_FORBIDDEN"
+      },
+      "id": "A17-005-frontend-scoped-write",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "projection_id": "sha256:a904ca1e81d586ead0af6564ccee64a83c491df27cc46dc26f31a457fe12b5c9",
+        "route": "CONTENT_NEUTRAL_INTEGRATION_ADAPTER"
+      },
+      "id": "A17-006-content-neutral-route-requested",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "candidate_digest": "sha256:c5dfb83578d60bace94339f8e893f022b4c2a47b036ed76ceb11e518864c3dec",
+        "integrated_paths": [
+          "backend/result.json",
+          "frontend/result.json"
+        ],
+        "integration_digest": "sha256:530cfc92df2fe46644c2416aaaee89037b4170acc18988215ace3c25d7ea99f2"
+      },
+      "id": "A17-007-disjoint-candidates-integrated",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "candidate_digest": "sha256:c5dfb83578d60bace94339f8e893f022b4c2a47b036ed76ceb11e518864c3dec",
+        "mise_version": "2026.8.1 linux-x64 (2026-08-03)",
+        "qualified_task_receipt": "sha256:640abefcef55fd5dd2d0f73a49b6704682e9657c990b1f6be84cacd6433af687",
+        "surface": "bbk_task_run",
+        "task": "fixture:verify",
+        "task_receipt": "sha256:9563751acc8166c2dc9d9406fad7187bdeff016978fb557f66efdd90175aa0dd"
+      },
+      "id": "A17-008-real-mise-task-preserves-candidate",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "assurance_record_refs": [
+          "sha256:7a0b81e72ebcd5b5216fe3f9e0e11a044cc975d758e335a1545c9e844242bde6",
+          "sha256:9730d6467521a913e4ec4bc0a6c3151eee88cf0ec82be4465f45ce7ba4cadf5c"
+        ],
+        "candidate_digest": "sha256:c5dfb83578d60bace94339f8e893f022b4c2a47b036ed76ceb11e518864c3dec",
+        "read_only_binding_refs": [
+          {
+            "activation_ref": "sha256:51a931918cd8e94ae884ddb814ffb4f3350b5a0b28b12617e1a2cb581ca3fe8b",
+            "admission_ref": "sha256:e552be35ea250dc0dc3bd9291276fa01de5bb3912903ad7c574122e6717211bf",
+            "binding_ref": "binding:4593a585a5e674f24e961e5274236f81e2ec6d0ae300f019fad528a24090ccc0",
+            "dispatch_ref": "dispatch:8e452c4e5d89577c4762e66631fee672dedbf26e45ad2e7aee5dfc5fccfc6578",
+            "registration_ref": "sha256:8d6c6be4470cf22053f6875d42b73543095c87178f680fea8a98698d737e4e9d"
+          },
+          {
+            "activation_ref": "sha256:bf20c22d9f46bbd3474a8b98f397808d34c25a1abc6f7fcfad1dacb599fec5fd",
+            "admission_ref": "sha256:964a818756287be6fa4a7c784509b26e0c2d48a1a45c9ed1359abcfe0776aba5",
+            "binding_ref": "binding:e1e46157ab79147164ac07fa6985b75553e2c8857b8036bf4ed6e0ffa4eef673",
+            "dispatch_ref": "dispatch:9fe2dc8d9d4d8055bd66ba71f661d6c8017965d15e7da558a0d8e1879c93509b",
+            "registration_ref": "sha256:69594d52d74cd09a4264fc470ec192bf153a9ccd1a7ea1d09fdb6edd8a9215f9"
+          }
+        ],
+        "surface": "bbk_control_bind"
+      },
+      "id": "A17-009-read-only-review-and-validation",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "actual_mutated_paths": [
+          "backend/result.json",
+          "frontend/result.json"
+        ],
+        "expected_mutated_paths": [
+          "backend/result.json",
+          "frontend/result.json"
+        ],
+        "receipt_counts": {
+          "ASSURANCE_RECORD": 2,
+          "ASSURANCE_REQUEST": 2,
+          "BEADS_COMMAND": 8,
+          "BEADS_PROJECTION": 8,
+          "BINDING_SUPERSESSION": 4,
+          "BOUND_QUALIFIED_TASK": 1,
+          "CANDIDATE_INTEGRATION": 1,
+          "CANDIDATE_INTEGRATION_ADMISSION": 1,
+          "COORDINATION_COMMAND": 8,
+          "FILESYSTEM_MUTATION": 11,
+          "GATE_DECISION": 11,
+          "QUALIFIED_TASK": 1,
+          "READ_ONLY_TASK_REGISTRATION": 2,
+          "SPAWN_ADMISSION": 4,
+          "SPAWN_DISPATCH_LEASE": 4,
+          "SPAWN_RESERVATION": 4,
+          "SPAWN_SESSION_ACTIVATION": 4,
+          "VCS_MUTATION": 2,
+          "WORK_UNIT_ATTEMPT_REGISTRATION": 2
+        }
+      },
+      "id": "A17-010-mutation-and-coordination-receipt-accounting",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "candidate_digest": "sha256:c5dfb83578d60bace94339f8e893f022b4c2a47b036ed76ceb11e518864c3dec",
+        "forbidden_files_absent": 4
+      },
+      "id": "A17-011-no-prohibited-role-product-mutation",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "direct_beads_write_authority": "DENIED",
+        "issue_ids": [
+          "WU-FIXTURE-BACKEND",
+          "WU-FIXTURE-FRONTEND",
+          "WU-FIXTURE-INTEGRATION"
+        ]
+      },
+      "id": "A17-012-beads-single-writer-projection-visible",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "assertion": "VER-035",
+        "evidence_digest": "sha256:68be1742cb37735b9917bed5bb5045c19a46ab3d5c1b1695a5bbabbbafa1000f",
+        "evidence_path": "evidence/qualification/session-inspector-oracle-alpha17.json",
+        "status": "PASS"
+      },
+      "id": "A17-013-session-inspector-oracle-bound",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "assertion": "VER-021",
+        "evidence_digest": "sha256:6d501d77fd05bf463474b4d872c5bbc0b8606728bd4035fa0240d941d00f5165",
+        "evidence_path": "evidence/qualification/omp-host-contract-rc8.json",
+        "host": "omp/16.4.8",
+        "status": "PASS"
+      },
+      "id": "A17-014-keyless-omp-dispatch-rewrite-bound",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "binding_count": 11,
+        "bound_task_receipt": "sha256:9563751acc8166c2dc9d9406fad7187bdeff016978fb557f66efdd90175aa0dd",
+        "dispatch_lifecycles": [
+          {
+            "active_binding_ref": "binding:5ae36532298c94078dd6528d7f3654a07f94895737a5d149fc34f6cb7710362a",
+            "actual_session_id": "session-alpha17-worker-backend",
+            "dispatch_ref": "dispatch:50850d06cd6a1c80cb164caaaed1cadfb26b018a268f251f596bd7785fcde1d4",
+            "status": "TERMINAL"
+          },
+          {
+            "active_binding_ref": "binding:f7323d607fa31f037a64fb54d627890957c30dfbd53724366ed6521196c7f724",
+            "actual_session_id": "session-alpha17-worker-frontend",
+            "dispatch_ref": "dispatch:015ccf95da55cc9be2341407a29360cf0f1ffd4066ccf2e97fb745b36434d389",
+            "status": "TERMINAL"
+          },
+          {
+            "active_binding_ref": "binding:4593a585a5e674f24e961e5274236f81e2ec6d0ae300f019fad528a24090ccc0",
+            "actual_session_id": "session-alpha17-review",
+            "dispatch_ref": "dispatch:8e452c4e5d89577c4762e66631fee672dedbf26e45ad2e7aee5dfc5fccfc6578",
+            "status": "ACTIVATED"
+          },
+          {
+            "active_binding_ref": "binding:e1e46157ab79147164ac07fa6985b75553e2c8857b8036bf4ed6e0ffa4eef673",
+            "actual_session_id": "session-alpha17-validation",
+            "dispatch_ref": "dispatch:9fe2dc8d9d4d8055bd66ba71f661d6c8017965d15e7da558a0d8e1879c93509b",
+            "status": "ACTIVATED"
+          }
+        ],
+        "journal_digest": "sha256:624ee45da3be44ac7b417f71cf9506a6f2a230abbd98168a5976e4cc552d15b3",
+        "queried_roles": [
+          "bbk_reviewer",
+          "bbk_validator",
+          "bbk_validator_orchestrator",
+          "bbk_worker"
+        ],
+        "read_only_registration_refs": [
+          "sha256:8d6c6be4470cf22053f6875d42b73543095c87178f680fea8a98698d737e4e9d",
+          "sha256:69594d52d74cd09a4264fc470ec192bf153a9ccd1a7ea1d09fdb6edd8a9215f9"
+        ],
+        "receipt_count": 80,
+        "status_query_mutated_journal": false,
+        "surfaces": [
+          "bbk_control_bind",
+          "bbk_control_dispatch_status",
+          "bbk_governance_status",
+          "bbk_task_run"
+        ]
+      },
+      "id": "A17-015-advertised-governance-surfaces-bound",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "assertion": "VER-036",
+        "gate": "GATE-017-AUTOMATED",
+        "prior_check_count": 16
+      },
+      "id": "A17-016-report-inputs-complete",
+      "status": "PASS"
+    }
+  ],
+  "claim_limit": "This automated keyless report establishes VER-036 only. It does not establish the real-provider manual gate, Alpha.17 final release, deployment, publication, or live acceptance.",
+  "fixture": {
+    "baseline_git_commit": "14093576070e9239acc0d32284b58accc145bf19",
+    "name": "alpha17-governed-vertical-slice",
+    "source_digest": "sha256:63268cb3c070b8ae67c3dc220ffc2d361004ee9e665f3c4a5c60cb56953b1f2e"
+  },
+  "gate": {
+    "decision": "RC_ELIGIBLE",
+    "gate_id": "GATE-017-AUTOMATED",
+    "manual_provider_gate": "PENDING_WU_018",
+    "pass_criteria": [
+      "all invariants pass",
+      "orchestrator/reviewer/validator prohibited writes blocked",
+      "two worker changes integrated"
+    ],
+    "required_inputs": [
+      "automated vertical-slice evidence",
+      "Session Inspector oracle results"
+    ]
+  },
+  "integration": {
+    "candidate": {
+      "candidate_id": "candidate:fixture:integrated",
+      "changed_paths": [
+        "backend/result.json",
+        "frontend/result.json"
+      ],
+      "digest": "sha256:c5dfb83578d60bace94339f8e893f022b4c2a47b036ed76ceb11e518864c3dec",
+      "git_commit": "14093576070e9239acc0d32284b58accc145bf19",
+      "git_tree": "6221b641ac30e5eec8e1c7f4c54c8ab2950313b2",
+      "identity_kind": "GIT_TREE",
+      "jj_change_id": "pnlmvslpkwxqpwsnrqwwsmukxmyyqvpn",
+      "workspace_ref": "$CAMPAIGN/workspaces/integrated"
+    },
+    "candidate_admission_ref": "sha256:29bb209f25a05ea2414737b1f29664f70b9823d3888e869cefd149917aa64f43",
+    "completion_projection_id": "sha256:f6bd79525537ad06842e528d6438c6ac3954f908a8ff1df30d4b4945d69c01db",
+    "control_projection_id": "sha256:a904ca1e81d586ead0af6564ccee64a83c491df27cc46dc26f31a457fe12b5c9",
+    "integrated_paths": [
+      "backend/result.json",
+      "frontend/result.json"
+    ],
+    "integration_digest": "sha256:530cfc92df2fe46644c2416aaaee89037b4170acc18988215ace3c25d7ea99f2",
+    "integration_receipt_ref": "sha256:fa06dfa40975fe76adc0177f649c19af26826aa299e989a958a8a60e799c8047",
+    "mode": "CONTENT_NEUTRAL_DISJOINT_PATHS",
+    "source_change_ids": [
+      "qtxrtopxotywowyxrlypxomlpmqtwxls",
+      "pxnxtopnuksrsypwnqluqkvnmlmsrsuv"
+    ],
+    "source_commit_ids": [
+      "37ae79c1be79f0c5f16c1ddef1259beae02b9874",
+      "fb39fc06e850e3310d8cb8c1d0baeb4c2c265033"
+    ]
+  },
+  "mode": "AUTOMATED_KEYLESS_LOCAL",
+  "observed_at": "2026-08-06T17:46:18.353014Z",
+  "qualification": "AUTOMATED_PASS",
+  "qualification_id": "alpha17:d19885e70fed8db9c7fd56f0c36a321c70425a19abe8ac172d407cafb86981ff",
+  "qualified_task": {
+    "candidate_digest": "sha256:c5dfb83578d60bace94339f8e893f022b4c2a47b036ed76ceb11e518864c3dec",
+    "candidate_unchanged": true,
+    "exit_status": 0,
+    "mise_version": "2026.8.1 linux-x64 (2026-08-03)",
+    "output_digest": "sha256:fcd0dfc21feb08390ab27d1b9c548143b42895be52edaeda5c1f3b63bcff1744",
+    "receipt_ref": "sha256:9563751acc8166c2dc9d9406fad7187bdeff016978fb557f66efdd90175aa0dd",
+    "status": "PASS",
+    "task": "fixture:verify",
+    "toolchain_definition_digest": "sha256:5d3577e22b5eff7ea9feefe552f01c28b98a4f3e0259f3c0967829046b0eaceb"
+  },
+  "receipt_accounting": {
+    "all_candidate_changes_receipted": true,
+    "beads_backend_writes_via_adapter": true,
+    "changed_paths": [
+      "backend/result.json",
+      "frontend/result.json"
+    ],
+    "counts": {
+      "ASSURANCE_RECORD": 2,
+      "ASSURANCE_REQUEST": 2,
+      "BEADS_COMMAND": 8,
+      "BEADS_PROJECTION": 8,
+      "BINDING_SUPERSESSION": 4,
+      "BOUND_QUALIFIED_TASK": 1,
+      "CANDIDATE_INTEGRATION": 1,
+      "CANDIDATE_INTEGRATION_ADMISSION": 1,
+      "COORDINATION_COMMAND": 8,
+      "FILESYSTEM_MUTATION": 11,
+      "GATE_DECISION": 11,
+      "QUALIFIED_TASK": 1,
+      "READ_ONLY_TASK_REGISTRATION": 2,
+      "SPAWN_ADMISSION": 4,
+      "SPAWN_DISPATCH_LEASE": 4,
+      "SPAWN_RESERVATION": 4,
+      "SPAWN_SESSION_ACTIVATION": 4,
+      "VCS_MUTATION": 2,
+      "WORK_UNIT_ATTEMPT_REGISTRATION": 2
+    }
+  },
+  "release": "0.1.0-alpha.17",
+  "report_digest": "sha256:2a2cd430e51f164d346ebbd317b1fd8e2e32f6be98aa91d1b79fe1b79fb88a71",
+  "schema": "bbk.alpha17-qualification-report.v1",
+  "security": {
+    "credentials_used": false,
+    "dependency_installation_performed": false,
+    "external_provider_used": false,
+    "network_used": false,
+    "waivers": []
+  },
+  "session_inspector_oracle": {
+    "assertions": {
+      "VER-035": "PASS"
+    },
+    "evidence_digest": "sha256:68be1742cb37735b9917bed5bb5045c19a46ab3d5c1b1695a5bbabbbafa1000f",
+    "evidence_path": "evidence/qualification/session-inspector-oracle-alpha17.json",
+    "qualification": "AUTOMATED_PASS",
+    "work_unit": "WU-016"
+  },
+  "smallest_next_action": "Build the exact Alpha.17 release candidate and operator-run real-provider qualification packet for VER-037 through VER-039.",
+  "status": "PASS",
+  "tools": {
+    "bd": {
+      "adapter_class": "REAL_LOCAL_TOOL_EXPLICIT_OVERRIDE",
+      "execution_mode": "EXPLICIT_EXECUTABLE",
+      "path_basename": "bd",
+      "sha256": "sha256:f7dcf3d22eae0bf09d764a9a47ab5c6e263ee91b19f2243d9e0e077561cceb1e",
+      "version": "bd version 1.1.0 (8e4e59d39)"
+    },
+    "git": {
+      "adapter_class": "REAL_LOCAL_TOOL",
+      "path_basename": "git",
+      "sha256": "sha256:356db14e102d68a1a37d8a1ac577dfd678d45d46e92f468bef8b7154e7bfdc60",
+      "version": "git version 2.47.3"
+    },
+    "host_contract": {
+      "assertions": {
+        "VER-017": "PASS",
+        "VER-018": "PASS",
+        "VER-019": "PASS",
+        "VER-020": "PASS",
+        "VER-021": "PASS"
+      },
+      "evidence_digest": "sha256:6d501d77fd05bf463474b4d872c5bbc0b8606728bd4035fa0240d941d00f5165",
+      "evidence_path": "evidence/qualification/omp-host-contract-rc8.json",
+      "mode": "QUALIFIED_KEYLESS_OMP_HOST",
+      "version": "omp/16.4.8"
+    },
+    "jj": {
+      "adapter_class": "REAL_LOCAL_TOOL_EXPLICIT_OVERRIDE",
+      "execution_mode": "EXPLICIT_EXECUTABLE",
+      "path_basename": "jj",
+      "sha256": "sha256:7dfff2e4416e75e5ab20eaf741d60100f43be5a9b4d18c1347364e28a765edbe",
+      "version": "jj 0.43.0-89f62ede8c1c611eaf134c0c49252efd65c7945d"
+    },
+    "mise": {
+      "adapter_class": "REAL_LOCAL_TOOL",
+      "path_basename": "mise-v2026.8.1-linux-x64",
+      "sha256": "sha256:961b1fcc78830e861ab887abd19d9b961478bcf252e37881fdd61c81388308d4",
+      "version": "2026.8.1 linux-x64 (2026-08-03)"
+    }
+  },
+  "work_unit": "WU-017",
+  "workers": [
+    {
+      "attempt_id": "backend-1",
+      "candidate_ref": "candidate:fixture:backend",
+      "changed_paths": [
+        "backend/result.json"
+      ],
+      "completion_projection_id": "sha256:d9c730ca97364fcc171d7fc8c49ebac08b7c4d16e1ff2ba7b3b083669d66964e",
+      "cross_worker_block_receipt": "sha256:c5679a2dfa14dc56e7b1275f68eef5361a504fada9615c585d31b9dfa88fbc92",
+      "cross_worker_reason": "WORKSPACE_SCOPE_ESCAPE",
+      "filesystem_mutation_receipt": "sha256:be13c73c0e1fc0a86bd8476e0f758f433a6145a3c6549c61ef59a93564e3d3ae",
+      "invocation_id": "invocation:c2fec8b7f288d020f8ad30288962f4dd97279de6e5acd786705d47fa567421d5",
+      "jj_change_id": "qtxrtopxotywowyxrlypxomlpmqtwxls",
+      "path_escape_reason": "MUTATION_PATH_TRAVERSAL_FORBIDDEN",
+      "scope": [
+        "backend"
+      ],
+      "session_id": "session-alpha17-worker-backend",
+      "vcs_mutation_receipt": "sha256:22aca41ce0e48986d9449a49db37ccd698072ca2e7f37121912b6aad9b2ead66",
+      "work_unit_id": "WU-FIXTURE-BACKEND",
+      "workspace_label": "$CAMPAIGN/workspaces/bbk-wu-fixture-backend-backend-1-232e8aa4b0"
+    },
+    {
+      "attempt_id": "frontend-1",
+      "candidate_ref": "candidate:fixture:frontend",
+      "changed_paths": [
+        "frontend/result.json"
+      ],
+      "completion_projection_id": "sha256:9b127e83a7850ac758e70ad1154e2caef0db7d27a7614abadda936d232ac9e7e",
+      "cross_worker_block_receipt": "sha256:c6a3a236289cee964b319c6f00507c00f0c07ccee5e1ce7404ace7b9afcbd367",
+      "cross_worker_reason": "WORKSPACE_SCOPE_ESCAPE",
+      "filesystem_mutation_receipt": "sha256:c3f3ff300ddac2992b45085db84714af24161afe6f0be02652fb4c67b925b3ff",
+      "invocation_id": "invocation:7e1cc12606d1aa80d2aadd019a4ae5cd25ddcd3b5cb671d9bf438239d49fcb13",
+      "jj_change_id": "pxnxtopnuksrsypwnqluqkvnmlmsrsuv",
+      "path_escape_reason": "MUTATION_PATH_TRAVERSAL_FORBIDDEN",
+      "scope": [
+        "frontend"
+      ],
+      "session_id": "session-alpha17-worker-frontend",
+      "vcs_mutation_receipt": "sha256:39853ea8ab3bef82b6f9e996ba485b427310cf6dba62d10354d8ad1ece0561f3",
+      "work_unit_id": "WU-FIXTURE-FRONTEND",
+      "workspace_label": "$CAMPAIGN/workspaces/bbk-wu-fixture-frontend-frontend-1-93ae12c923"
+    }
+  ]
+}

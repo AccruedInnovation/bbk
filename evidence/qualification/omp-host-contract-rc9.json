@@ -1,0 +1,361 @@
+{
+  "assertions": {
+    "VER-017": "PASS",
+    "VER-018": "PASS",
+    "VER-019": "PASS",
+    "VER-020": "PASS",
+    "VER-021": "PASS",
+    "VER-022": "PASS"
+  },
+  "enforcement_boundary": {
+    "detect_only_or_unqualified": [
+      "effects without an OMP pre-tool hook",
+      "OS-level writes outside OMP tool mediation",
+      "Windows host behavior",
+      "real-provider behavior"
+    ],
+    "host_quirk": "OMP 16.4.8 suppresses explicit -e extensions when --no-extensions is also present, contrary to the CLI help text.",
+    "manual_launcher_strategy": "Omit --no-extensions, apply a final config overlay containing extensions: [], disable skills and rules, then load the exact BBK extension and qualification helper explicitly in order. The keyless fixture proves the overlay suppresses a configured extension while preserving the explicit extension.",
+    "pre_effect_supported_and_observed": [
+      "write",
+      "edit",
+      "bash",
+      "yield",
+      "custom governed tool"
+    ]
+  },
+  "network_and_credentials": {
+    "provider": "localhost keyless OpenAI-compatible fixture",
+    "provider_api_keys_used": false,
+    "remote_provider_contacted": false
+  },
+  "qualified_host": {
+    "expected_omp_version": "16.4.8",
+    "omp_sha256": "cdf0775e05b88d63f9da606de542cc3fc0beedf0a864b4ac42f777961f86844c",
+    "omp_version_output": "omp/16.4.8",
+    "platform": "linux"
+  },
+  "scenarios": [
+    {
+      "events": {
+        "count": 28,
+        "kinds": [
+          "after_provider_response",
+          "agent_end",
+          "before_agent_start",
+          "before_provider_request",
+          "message_end",
+          "session_start",
+          "tool_call",
+          "tool_execution_end",
+          "tool_execution_start"
+        ],
+        "sessions": [
+          {
+            "cwd": "/tmp/bbk-omp-ambient-block-jig2hkt_/project",
+            "session_file": null,
+            "session_id": "019fd8f1-3b61-7000-8bee-088128157246"
+          }
+        ]
+      },
+      "observations": {
+        "bash_effect_absent": true,
+        "blocked_tools": [
+          "bash",
+          "edit",
+          "write"
+        ],
+        "edit_effect_absent": true,
+        "write_effect_absent": true
+      },
+      "process": {
+        "return_code": 0,
+        "stderr": "",
+        "stdout": "AMBIENT_BLOCK_DONE"
+      },
+      "provider": {
+        "authorization_header_seen": true,
+        "credential_environment_keys_present": [],
+        "loopback_only": true,
+        "request_count": 4,
+        "sensitive_environment_keys_removed_count": 5
+      },
+      "scenario": "ambient-block",
+      "status": "PASS"
+    },
+    {
+      "events": {
+        "count": 16,
+        "kinds": [
+          "after_provider_response",
+          "agent_end",
+          "before_agent_start",
+          "before_provider_request",
+          "custom_scoped_write",
+          "message_end",
+          "session_start",
+          "tool_call",
+          "tool_execution_end",
+          "tool_execution_start",
+          "tool_result"
+        ],
+        "sessions": [
+          {
+            "cwd": "/tmp/bbk-omp-scoped-write-7v16qthl/project",
+            "session_file": null,
+            "session_id": "019fd8f1-47fb-7000-87d9-e56ceb3527c9"
+          }
+        ]
+      },
+      "observations": {
+        "custom_tool_observed": true,
+        "governed_file_content": "GOVERNED",
+        "governed_file_created": true
+      },
+      "process": {
+        "return_code": 0,
+        "stderr": "",
+        "stdout": "SCOPED_WRITE_DONE"
+      },
+      "provider": {
+        "authorization_header_seen": true,
+        "credential_environment_keys_present": [],
+        "loopback_only": true,
+        "request_count": 2,
+        "sensitive_environment_keys_removed_count": 5
+      },
+      "scenario": "scoped-write",
+      "status": "PASS"
+    },
+    {
+      "events": {
+        "count": 44,
+        "kinds": [
+          "after_provider_response",
+          "agent_end",
+          "before_agent_start",
+          "before_provider_request",
+          "custom_identity",
+          "message_end",
+          "session_start",
+          "task:subagent:lifecycle",
+          "task:subagent:progress",
+          "tool_call",
+          "tool_execution_end",
+          "tool_execution_start",
+          "tool_result"
+        ],
+        "sessions": [
+          {
+            "cwd": "/tmp/bbk-omp-child-identity-o_nq7vji/project",
+            "session_file": null,
+            "session_id": "019fd8f1-5581-7000-9de4-8aaf4ff001e8"
+          },
+          {
+            "cwd": "/tmp/bbk-omp-child-identity-o_nq7vji/project",
+            "session_file": "/tmp/omp-task-154d89aa2b942dd1/FixtureWorker.jsonl",
+            "session_id": "019fd8f1-58b8-7000-82d4-4fe9661fc061"
+          }
+        ]
+      },
+      "observations": {
+        "child_identity_tool_observed": true,
+        "lifecycle_statuses": [
+          "completed",
+          "started"
+        ],
+        "parent_child_cwd_equal": true,
+        "parent_child_session_ids_distinct": true,
+        "task_parent_binding_observed": true
+      },
+      "process": {
+        "return_code": 0,
+        "stderr": "",
+        "stdout": "CHILD_IDENTITY_DONE"
+      },
+      "provider": {
+        "authorization_header_seen": true,
+        "credential_environment_keys_present": [],
+        "loopback_only": true,
+        "request_count": 4,
+        "sensitive_environment_keys_removed_count": 5
+      },
+      "scenario": "child-identity",
+      "status": "PASS"
+    },
+    {
+      "events": {
+        "count": 45,
+        "kinds": [
+          "after_provider_response",
+          "agent_end",
+          "before_agent_start",
+          "before_provider_request",
+          "custom_identity",
+          "dispatch_rewrite",
+          "message_end",
+          "session_start",
+          "task:subagent:lifecycle",
+          "task:subagent:progress",
+          "tool_call",
+          "tool_execution_end",
+          "tool_execution_start",
+          "tool_result"
+        ],
+        "sessions": [
+          {
+            "cwd": "/tmp/bbk-omp-dispatch-rewrite-eeut_9lq/project",
+            "session_file": null,
+            "session_id": "019fd8f1-618d-7000-9a40-d8df23c73155"
+          },
+          {
+            "cwd": "/tmp/bbk-omp-dispatch-rewrite-eeut_9lq/project",
+            "session_file": "/tmp/omp-task-154d89ad1ae4a93e/FixtureWorker.jsonl",
+            "session_id": "019fd8f1-6478-7000-b386-5f22d24fa150"
+          }
+        ]
+      },
+      "observations": {
+        "compact_marker_absent_from_child_request": true,
+        "dispatch_rewrite_observed": true,
+        "lifecycle_statuses": [
+          "completed",
+          "started"
+        ],
+        "presentation_i_absent_at_pre_effect_hook": true,
+        "resolved_child_started": true,
+        "resolved_identity_value_observed": true,
+        "task_parent_binding_observed": true
+      },
+      "process": {
+        "return_code": 0,
+        "stderr": "",
+        "stdout": "DISPATCH_REWRITE_DONE"
+      },
+      "provider": {
+        "authorization_header_seen": true,
+        "credential_environment_keys_present": [],
+        "loopback_only": true,
+        "request_count": 4,
+        "sensitive_environment_keys_removed_count": 5
+      },
+      "scenario": "dispatch-rewrite",
+      "status": "PASS"
+    },
+    {
+      "events": {
+        "count": 45,
+        "kinds": [
+          "after_provider_response",
+          "agent_end",
+          "before_agent_start",
+          "before_provider_request",
+          "message_end",
+          "session_start",
+          "task:subagent:lifecycle",
+          "task:subagent:progress",
+          "tool_call",
+          "tool_execution_end",
+          "tool_execution_start",
+          "tool_result",
+          "yield_full_document_admission",
+          "yield_validation_block"
+        ],
+        "sessions": [
+          {
+            "cwd": "/tmp/bbk-omp-yield-validation-dcy3pit3/project",
+            "session_file": null,
+            "session_id": "019fd8f1-6d73-7000-b024-d3724d414471"
+          },
+          {
+            "cwd": "/tmp/bbk-omp-yield-validation-dcy3pit3/project",
+            "session_file": "/tmp/omp-task-154d89b01d1d5905/FixtureYieldWorker.jsonl",
+            "session_id": "019fd8f1-707e-7000-9579-1f58e1c00463"
+          }
+        ]
+      },
+      "observations": {
+        "complete_prepared_yield_admission_observed": true,
+        "complete_role_return_observed_by_parent": true,
+        "lifecycle_statuses": [
+          "completed",
+          "started"
+        ],
+        "malformed_yield_blocked_before_acceptance": true,
+        "unvalidated_malformed_return_absent_from_parent": true
+      },
+      "process": {
+        "return_code": 0,
+        "stderr": "",
+        "stdout": "YIELD_VALIDATION_DONE"
+      },
+      "provider": {
+        "authorization_header_seen": true,
+        "credential_environment_keys_present": [],
+        "loopback_only": true,
+        "request_count": 4,
+        "sensitive_environment_keys_removed_count": 5
+      },
+      "scenario": "yield-validation",
+      "status": "PASS"
+    },
+    {
+      "configuration": {
+        "get_return_code": 0,
+        "get_stderr": "",
+        "get_stdout": "{\n  \"key\": \"extensions\",\n  \"value\": [\n    \"/tmp/bbk-omp-extension-overlay-6hou_tm7/configured-extension.mjs\"\n  ],\n  \"type\": \"array\",\n  \"description\": \"\"\n}",
+        "overlay": "extensions: []",
+        "set_return_code": 0,
+        "set_stderr": "",
+        "set_stdout": "\u2714 Set extensions = [\"/tmp/bbk-omp-extension-overlay-6hou_tm7/configured-extension.mjs\"]"
+      },
+      "events": {
+        "count": 16,
+        "kinds": [
+          "after_provider_response",
+          "agent_end",
+          "before_agent_start",
+          "before_provider_request",
+          "custom_scoped_write",
+          "message_end",
+          "session_start",
+          "tool_call",
+          "tool_execution_end",
+          "tool_execution_start",
+          "tool_result"
+        ],
+        "sessions": [
+          {
+            "cwd": "/tmp/bbk-omp-extension-overlay-6hou_tm7/project",
+            "session_file": null,
+            "session_id": "019fd8f1-7ff0-7000-94dc-1e2d82834098"
+          }
+        ]
+      },
+      "observations": {
+        "configured_extension_loaded": false,
+        "configured_extension_recorded_before_overlay": true,
+        "explicit_extension_effect": "GOVERNED",
+        "explicit_extension_loaded": true,
+        "no_extensions_flag_used": false,
+        "overlay_extensions_empty": true
+      },
+      "process": {
+        "return_code": 0,
+        "stderr": "",
+        "stdout": "SCOPED_WRITE_DONE"
+      },
+      "provider": {
+        "authorization_header_seen": true,
+        "credential_environment_keys_present": [],
+        "loopback_only": true,
+        "request_count": 2,
+        "sensitive_environment_keys_removed_count": 5
+      },
+      "scenario": "extension-overlay",
+      "status": "PASS"
+    }
+  ],
+  "schema": "bbk.omp-host-contract-report.v1",
+  "status": "PASS"
+}

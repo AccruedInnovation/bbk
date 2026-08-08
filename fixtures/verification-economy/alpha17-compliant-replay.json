@@ -1,0 +1,22 @@
+{
+  "schema": "bbk.verification-economy-event-log.v1",
+  "run_id": "alpha17-critical-path-compliant-pattern",
+  "started_at": "2026-08-05T00:00:00Z",
+  "executable_work_at": "2026-08-05T00:00:30Z",
+  "events": [
+    {"type": "session_started", "role_class": "planning", "count": 1},
+    {"type": "session_started", "role_class": "worker", "count": 2},
+    {"type": "campaign_admission", "attempt_key": "attempt:root:1"},
+    {"type": "boundary_admission", "subject_key": "work-unit:1"},
+    {"type": "boundary_admission", "subject_key": "work-unit:2"},
+    {"type": "worker_action", "observed_at": "2026-08-05T00:00:35Z"},
+    {"type": "handoff_verification", "subject_key": "package:final"},
+    {"type": "receipt_reused", "count": 3},
+    {"type": "check_avoided", "count": 3},
+    {"type": "mechanical_repair_in_place", "count": 2},
+    {"type": "repository_validator", "subject_key": "candidate:final", "changed_relevant_inputs": true, "broad_final": true},
+    {"type": "validator_assignment", "subject_key": "candidate:final", "independent": true},
+    {"type": "failed_assertion_preserved", "count": 1},
+    {"type": "child_poll", "count": 1}
+  ]
+}

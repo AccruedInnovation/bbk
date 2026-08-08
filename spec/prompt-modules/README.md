@@ -1,6 +1,6 @@
 # Canonical BBK prompt-module package
 
-This directory owns small, reusable behavior capsules that are shared across canonical role prompts and standalone procedures. The package exists to remove repeated normative text without weakening role-specific purpose, scope, responsibilities, topology, procedure, or return contracts.
+This directory owns small, reusable behavior capsules shared across canonical role prompts and standalone procedures. The package removes repeated normative text without weakening role-specific purpose, scope, responsibilities, topology, procedure, or return contracts.
 
 ## Source ownership
 
@@ -39,7 +39,7 @@ The assembler recomputes that record. A stale measurement, generic rationale, mi
 
 ## Clause design
 
-A module should be created only when the behavior is:
+Create a module only when the behavior is:
 
 - materially identical across multiple role or procedure contexts;
 - independently understandable at the point of use;
@@ -49,15 +49,23 @@ A module should be created only when the behavior is:
 
 Role-specific algorithms, authority, stopping rules, readiness, and result semantics remain in the primary role procedure or role contract. Similar wording alone is not sufficient reason to extract a module.
 
-Role-specific typed vocabularies and protocol ladders also remain explicit where their meaning depends on that role—for example source classifications, authority intersections, assurance attempt taxonomy, candidate/evidence object separation, and failure routing. The Gate 4 preservation tests assert those fragments in the compiled prompts so compaction cannot silently replace them with weaker prose.
+Role-specific typed vocabularies and protocol ladders also remain explicit where their meaning depends on that role—for example source classifications, authority intersections, assurance attempt taxonomy, candidate/evidence object separation, and failure routing. Gate 4 preservation tests assert those fragments in compiled prompts so compaction cannot silently replace them with weaker prose.
 
 ## Validation
 
-During staged alpha.13 work, validate without creating release projections:
+Check the module package, role assembly, and focused tests without writing changes:
 
 ```console
-BBK_ALLOW_STAGED_ROLE_PACKAGE=1 python tools/assemble_roles.py --check
-BBK_ALLOW_STAGED_ROLE_PACKAGE=1 python -m unittest tests.test_prompt_module_package_v1 -v
+python tools/prompt_modules.py --check
+python tools/assemble_roles.py --check
+python -m unittest tests.test_prompt_module_package_v1 -v
 ```
 
-The package is also validated by the OMP adapter and bound into the role and projection source manifests. Generated skills and host projections are intentionally regenerated only during release integration.
+After an intentional module change, regenerate the canonical module projections and assembled role surfaces before regenerating host projections:
+
+```console
+python tools/prompt_modules.py
+python tools/assemble_roles.py
+```
+
+The OMP adapter, source manifests, projection generator, and release tests also verify the package. See [`docs/DEVELOPMENT.md`](../../docs/DEVELOPMENT.md) for the full generation and release sequence.

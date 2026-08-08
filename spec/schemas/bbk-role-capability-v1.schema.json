@@ -1,0 +1,131 @@
+{
+  "$id": "bbk-role-capability-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "allowed_mutation_classes": {
+      "items": {
+        "maxLength": 256,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "allowed_tools": {
+      "items": {
+        "maxLength": 256,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "forbidden_effects": {
+      "items": {
+        "maxLength": 256,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "generated_by": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "manifest_digest": {
+      "pattern": "^(?:sha256:)?[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "policy_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "profile": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "required_bindings": {
+      "items": {
+        "maxLength": 256,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "role": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.role-capability.v1"
+    },
+    "scope_rules": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "path_scope": {
+          "enum": [
+            "BOUND_PREFIXES",
+            "READ_ONLY",
+            "NONE"
+          ],
+          "type": "string"
+        },
+        "sealed_paths": {
+          "const": "DENY"
+        },
+        "semantic_scope": {
+          "enum": [
+            "BOUND",
+            "READ_ONLY",
+            "NONE"
+          ],
+          "type": "string"
+        },
+        "workspace_source": {
+          "enum": [
+            "REGISTRY_BINDING",
+            "NONE"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "workspace_source",
+        "path_scope",
+        "semantic_scope"
+      ],
+      "title": "scope rules",
+      "type": "object"
+    },
+    "source_role_digest": {
+      "pattern": "^(?:sha256:)?[0-9a-f]{64}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "role",
+    "profile",
+    "policy_version",
+    "allowed_tools",
+    "allowed_mutation_classes",
+    "scope_rules",
+    "forbidden_effects",
+    "required_bindings",
+    "manifest_digest"
+  ],
+  "title": "BBK role capability v1",
+  "type": "object"
+}

@@ -1,0 +1,29 @@
+{
+  "allowed_mutation_classes": [],
+  "allowed_tools": [
+    "bbk_governance_status",
+    "bbk_governed_read",
+    "bbk_return_prepare",
+    "bbk_return_template"
+  ],
+  "forbidden_effects": [
+    "DIRECT_BEADS_WRITE",
+    "GENERIC_PRODUCT_WRITE",
+    "SEALED_MUTATION",
+    "UNQUALIFIED_SHELL"
+  ],
+  "generated_by": "tools/generate_role_capabilities.py",
+  "manifest_digest": "sha256:be2d9317a4d0daba0f8f6d629b971ab775b6998098534ce4334f1111496a3ce5",
+  "policy_version": "1.0.0-alpha.17",
+  "profile": "governed-software",
+  "required_bindings": [],
+  "role": "bbk_territory_wayfinder",
+  "schema": "bbk.role-capability.v1",
+  "scope_rules": {
+    "path_scope": "READ_ONLY",
+    "sealed_paths": "DENY",
+    "semantic_scope": "READ_ONLY",
+    "workspace_source": "NONE"
+  },
+  "source_role_digest": "sha256:10c2157cc9867e5f33eaf802b14a1d08159f91a55d37068efc891f92535ddccb"
+}

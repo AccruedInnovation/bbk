@@ -1,0 +1,230 @@
+{
+  "allowed_result_states": [
+    "PASS",
+    "FAIL",
+    "BLOCKED_TECHNICAL",
+    "INCONCLUSIVE"
+  ],
+  "candidate_digest": "sha256:d38b3c438a2c35f4c6a62a005cf6ce4f4d6b685e1d7b44f81df86c34b0cdbe09",
+  "completion_instruction": "The analyzer populates all machine-observable fields and sets template to false. After manual inspection, complete only redaction_attestation. Do not convert a technical failure into semantic PASS or FAIL, and do not include credential values.",
+  "critical_path_observations": {
+    "blocking_wait_or_event_delivery_observed": true,
+    "duplicate_deterministic_checks": 0,
+    "extension_owned_mode_active": true,
+    "four_fact_dispatch": true,
+    "metadata_only_product_validator_runs": 0,
+    "minimum_nonblocking_probe_interval_seconds": null,
+    "receipt_reuse_observed": true,
+    "same_attempt_mechanical_repairs": 5,
+    "skill_fallback_observed": false,
+    "specific_job_poll_attempts": 0,
+    "support_role_fanout_after_executable_work": 0,
+    "unnecessary_handoff_packages": 0
+  },
+  "evidence_files": [
+    "session/omp-session.html",
+    "session/session-admission.json"
+  ],
+  "missing_evidence": [],
+  "observed_invariants": [
+    {
+      "evidence_pointers": [
+        "tool:ask:baseline_acceptance",
+        "session:exact-two-work-unit-baseline"
+      ],
+      "id": "M17-001",
+      "operator_note": "",
+      "reason_codes": [],
+      "result": "PASS"
+    },
+    {
+      "evidence_pointers": [
+        "tool:bbk_governed_write:src/root-orchestrator-forbidden.txt"
+      ],
+      "id": "M17-002",
+      "operator_note": "",
+      "reason_codes": [],
+      "result": "PASS"
+    },
+    {
+      "evidence_pointers": [
+        "custom:bbk-spawn-activation",
+        "tool:bbk_control_spawn"
+      ],
+      "id": "M17-003",
+      "operator_note": "",
+      "reason_codes": [],
+      "result": "PASS"
+    },
+    {
+      "evidence_pointers": [
+        "tool:bbk_governed_write:src/worker-a/result.txt",
+        "tool:bbk_governed_write:src/worker-b/result.txt",
+        "integration:files"
+      ],
+      "id": "M17-004",
+      "operator_note": "",
+      "reason_codes": [],
+      "result": "PASS"
+    },
+    {
+      "evidence_pointers": [
+        "tool:blocked-traversal",
+        "tool:blocked-cross-worker",
+        "integration:forbidden_paths_present"
+      ],
+      "id": "M17-005",
+      "operator_note": "",
+      "reason_codes": [],
+      "result": "PASS"
+    },
+    {
+      "evidence_pointers": [
+        "tool:reviewer-write-block",
+        "tool:validator-write-block",
+        "integration:forbidden_paths_present"
+      ],
+      "id": "M17-006",
+      "operator_note": "",
+      "reason_codes": [],
+      "result": "PASS"
+    },
+    {
+      "evidence_pointers": [
+        "tool:bbk_control_spawn:assignment_projection",
+        "session:tool-name-inventory"
+      ],
+      "id": "M17-007",
+      "operator_note": "",
+      "reason_codes": [],
+      "result": "PASS"
+    },
+    {
+      "evidence_pointers": [
+        "tool:bbk_task_run:alpha17:verify"
+      ],
+      "id": "M17-008",
+      "operator_note": "",
+      "reason_codes": [],
+      "result": "PASS"
+    },
+    {
+      "evidence_pointers": [
+        "tool:bbk_manual_qualification_integrate",
+        "integration:parent_commit_ids"
+      ],
+      "id": "M17-009",
+      "operator_note": "",
+      "reason_codes": [],
+      "result": "PASS"
+    },
+    {
+      "evidence_pointers": [
+        "integration:candidate_admission",
+        "integration:files",
+        "tool:bbk_control_bind"
+      ],
+      "id": "M17-010",
+      "operator_note": "",
+      "reason_codes": [],
+      "result": "PASS"
+    },
+    {
+      "evidence_pointers": [
+        "tool:bbk_manual_qualification_status",
+        "session:tool-name-inventory"
+      ],
+      "id": "M17-011",
+      "operator_note": "",
+      "reason_codes": [],
+      "result": "PASS"
+    },
+    {
+      "evidence_pointers": [
+        "tool:bbk_control_spawn",
+        "custom:bbk-spawn-activation",
+        "session:no-generic-dispatch-fallback"
+      ],
+      "id": "M17-012",
+      "operator_note": "",
+      "reason_codes": [],
+      "result": "PASS"
+    },
+    {
+      "evidence_pointers": [
+        "analysis:verification_economy",
+        "analysis:role_returns"
+      ],
+      "id": "M17-013",
+      "operator_note": "",
+      "reason_codes": [],
+      "result": "PASS"
+    },
+    {
+      "evidence_pointers": [
+        "analysis:mode-and-prompt-admission"
+      ],
+      "id": "M17-014",
+      "operator_note": "",
+      "reason_codes": [],
+      "result": "PASS"
+    },
+    {
+      "evidence_pointers": [
+        "analysis:mode-and-prompt-admission",
+        "session:no-generic-dispatch-fallback"
+      ],
+      "id": "M17-015",
+      "operator_note": "",
+      "reason_codes": [],
+      "result": "PASS"
+    },
+    {
+      "evidence_pointers": [
+        "analysis:coordination-contract"
+      ],
+      "id": "M17-016",
+      "operator_note": "",
+      "reason_codes": [],
+      "result": "PASS"
+    }
+  ],
+  "operator_result": "PASS",
+  "redaction_attestation": {
+    "completed_at": "2026-08-06T23:25:12Z",
+    "credential_values_returned": false,
+    "manual_inspection_completed": true,
+    "operator": "release operator",
+    "scanner_status": "PASS",
+    "status": "PASS"
+  },
+  "release_candidate": {
+    "archive_sha256": "b83f21f0f191402356f4022229ded13003cb923600ca399a24a43e141ba0b170",
+    "package_root_sha256": "27d03b0743d4472953fb07d01dd5b1bc45f288c9e123ad8f456bb6a036d49617",
+    "qualified_omp_host": "omp/16.4.8",
+    "version": "0.1.0-alpha.17+rc.9"
+  },
+  "schema": "bbk.manual-qualification-result.v1",
+  "smallest_next_action": "Issue BBK 0.1.0-alpha.17 final from the approved RC9 runtime and bounded evidence-tooling corrections.",
+  "template": false,
+  "toolchain": {
+    "bd": {
+      "execution_mode": "MISE_MANAGED",
+      "managed_path": "[PATH:adbf5e12b175]",
+      "tool_spec": "github:gastownhall/beads@1.1.0",
+      "version": "bd version 1.1.0 (8e4e59d39)"
+    },
+    "global_jj_or_bd_used": false,
+    "jj": {
+      "execution_mode": "MISE_MANAGED",
+      "managed_path": "[PATH:4aa27f8a3a18]",
+      "tool_spec": "jj@0.43.0",
+      "version": "jj 0.43.0-89f62ede8c1c611eaf134c0c49252efd65c7945d"
+    },
+    "mise": {
+      "path": "[PATH:3770f2edd4b5]",
+      "version": "2026.7.5 windows-x64 (2026-07-09)\r\nmise WARN  mise version 2026.8.2 available\r\nmise WARN  To update, run mise self-update"
+    }
+  },
+  "unexpected_candidate_changes": []
+}

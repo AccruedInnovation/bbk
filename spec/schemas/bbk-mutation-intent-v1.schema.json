@@ -1,0 +1,82 @@
+{
+  "$id": "bbk-mutation-intent-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "binding_ref": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "content_or_patch_digest": {
+      "pattern": "^(?:sha256:)?[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "expected_precondition": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "ANY",
+            "ABSENT",
+            "PRESENT",
+            "SHA256"
+          ],
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^(?:sha256:)?[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "precondition",
+      "type": "object"
+    },
+    "idempotency_key": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "mutation_class": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "operation": {
+      "enum": [
+        "READ",
+        "WRITE",
+        "EDIT",
+        "DELETE"
+      ],
+      "type": "string"
+    },
+    "path": {
+      "maxLength": 4096,
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.mutation-intent.v1"
+    }
+  },
+  "required": [
+    "schema",
+    "binding_ref",
+    "operation",
+    "path",
+    "content_or_patch_digest",
+    "expected_precondition",
+    "mutation_class",
+    "idempotency_key"
+  ],
+  "title": "BBK mutation intent v1",
+  "type": "object"
+}

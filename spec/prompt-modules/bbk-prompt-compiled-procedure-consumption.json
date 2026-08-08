@@ -1,0 +1,28 @@
+{
+  "schema_version": "bbk.prompt-module.v1",
+  "id": "bbk-prompt-compiled-procedure-consumption",
+  "title": "Compiled procedure consumption",
+  "description": "Apply compiled procedures directly and keep them out of the same logical child external catalog.",
+  "clauses": [
+    {
+      "id": "COMPILED_PROCEDURE.APPLY_DIRECTLY",
+      "text": "A procedure marked `COMPILED_COMPLETE` in the invocation manifest is complete developer instruction for this logical child. Apply it directly without a filesystem read, external skill lookup, or source rediscovery."
+    },
+    {
+      "id": "COMPILED_PROCEDURE.MANIFEST_AUTHORITY",
+      "text": "The compiled manifest binds procedure ID, source and effective digests, deterministic ordering, compiler identity, and catalog suppression. Do not re-prove unchanged manifest fields during the child invocation."
+    },
+    {
+      "id": "COMPILED_PROCEDURE.CATALOG_EXCLUSION",
+      "text": "A compiled procedure must be absent from this child's external procedure or skill catalog. If the same ID is externally visible, report a harness/catalog defect rather than reading or reconciling both copies."
+    },
+    {
+      "id": "COMPILED_PROCEDURE.FOLLOWUP_REUSE",
+      "text": "Preserve the compiled procedure set across follow-up turns. Recompile or request a successor set only when a declared source, dependency, selection, compiler, profile, harness, or removal invalidation key changed."
+    },
+    {
+      "id": "COMPILED_PROCEDURE.OPTIONAL_SELECTION",
+      "text": "Optional procedures absent from the compiled manifest may be selected through the available external procedure mechanism only when their method is material to the exact responsibility."
+    }
+  ]
+}

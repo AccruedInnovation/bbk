@@ -1,6 +1,6 @@
 {
   "schema_version": "bbk.prompt-modules.v1",
-  "package_version": "0.1.0-alpha.16.1",
+  "package_version": "0.1.0-alpha.17.0.2",
   "module_schema": "spec/schemas/bbk-prompt-module-v1.schema.json",
   "catalog_schema": "spec/schemas/bbk-prompt-module-catalog-v1.schema.json",
   "module_entries": [
@@ -131,6 +131,50 @@
     {
       "id": "bbk-prompt-candidate-focused-review",
       "file": "spec/prompt-modules/bbk-prompt-candidate-focused-review.json"
+    },
+    {
+      "id": "bbk-prompt-critical-path-execution",
+      "file": "spec/prompt-modules/bbk-prompt-critical-path-execution.json"
+    },
+    {
+      "id": "bbk-prompt-compiled-procedure-consumption",
+      "file": "spec/prompt-modules/bbk-prompt-compiled-procedure-consumption.json"
+    },
+    {
+      "id": "bbk-prompt-rolling-wave-planning",
+      "file": "spec/prompt-modules/bbk-prompt-rolling-wave-planning.json"
+    },
+    {
+      "id": "bbk-prompt-routine-contract-generation",
+      "file": "spec/prompt-modules/bbk-prompt-routine-contract-generation.json"
+    },
+    {
+      "id": "bbk-prompt-evidence-capture-replay",
+      "file": "spec/prompt-modules/bbk-prompt-evidence-capture-replay.json"
+    },
+    {
+      "id": "bbk-prompt-late-bound-runtime-identity",
+      "file": "spec/prompt-modules/bbk-prompt-late-bound-runtime-identity.json"
+    },
+    {
+      "id": "bbk-prompt-atomic-finalization",
+      "file": "spec/prompt-modules/bbk-prompt-atomic-finalization.json"
+    },
+    {
+      "id": "bbk-prompt-project-coverage-truth",
+      "file": "spec/prompt-modules/bbk-prompt-project-coverage-truth.json"
+    },
+    {
+      "id": "bbk-prompt-delivery-authority",
+      "file": "spec/prompt-modules/bbk-prompt-delivery-authority.json"
+    },
+    {
+      "id": "bbk-prompt-effect-ownership",
+      "file": "spec/prompt-modules/bbk-prompt-effect-ownership.json"
+    },
+    {
+      "id": "bbk-prompt-coordination-economy",
+      "file": "spec/prompt-modules/bbk-prompt-coordination-economy.json"
     }
   ],
   "compilation_policy": {
@@ -142,6 +186,7 @@
     "mandatory_procedure_default": 1,
     "mandatory_procedure_maximum": null,
     "additional_mandatory_procedure_rule": "Allowed only when the role catalogue records a specific measured exception and the procedure adds behavior not already present in the primary procedure or prompt modules.",
-    "additional_mandatory_procedure_exceptions": {}
+    "additional_mandatory_procedure_exceptions": {},
+    "selective_standalone_skill_compaction": true
   }
 }

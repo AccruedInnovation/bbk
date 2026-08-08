@@ -1,0 +1,572 @@
+{
+  "defaults": {
+    "allowed_mutation_classes": [],
+    "allowed_tools": [
+      "bbk_governance_status",
+      "bbk_governed_read",
+      "bbk_return_prepare",
+      "bbk_return_template"
+    ],
+    "forbidden_effects": [
+      "GENERIC_PRODUCT_WRITE",
+      "DIRECT_BEADS_WRITE",
+      "UNQUALIFIED_SHELL",
+      "SEALED_MUTATION"
+    ],
+    "required_bindings": [],
+    "scope_rules": {
+      "path_scope": "READ_ONLY",
+      "sealed_paths": "DENY",
+      "semantic_scope": "READ_ONLY",
+      "workspace_source": "NONE"
+    }
+  },
+  "generation": {
+    "catalog": "spec/roles/catalog.json",
+    "generator": "tools/generate_role_capabilities.py",
+    "output_root": "spec/role-capabilities"
+  },
+  "policy_version": "1.0.0-alpha.17",
+  "profile": "governed-software",
+  "roles": {
+    "bbk_architect": {
+      "allowed_mutation_classes": [],
+      "allowed_tools": [
+        "bbk_governance_status",
+        "bbk_governed_read",
+        "bbk_return_prepare",
+        "bbk_return_template"
+      ],
+      "forbidden_effects": [
+        "GENERIC_PRODUCT_WRITE",
+        "DIRECT_BEADS_WRITE",
+        "UNQUALIFIED_SHELL",
+        "SEALED_MUTATION"
+      ],
+      "required_bindings": [],
+      "scope_rules": {
+        "path_scope": "READ_ONLY",
+        "sealed_paths": "DENY",
+        "semantic_scope": "READ_ONLY",
+        "workspace_source": "NONE"
+      }
+    },
+    "bbk_phase_wayfinder": {
+      "allowed_mutation_classes": [],
+      "allowed_tools": [
+        "bbk_governance_status",
+        "bbk_governed_read",
+        "bbk_return_prepare",
+        "bbk_return_template"
+      ],
+      "forbidden_effects": [
+        "GENERIC_PRODUCT_WRITE",
+        "DIRECT_BEADS_WRITE",
+        "UNQUALIFIED_SHELL",
+        "SEALED_MUTATION"
+      ],
+      "required_bindings": [],
+      "scope_rules": {
+        "path_scope": "READ_ONLY",
+        "sealed_paths": "DENY",
+        "semantic_scope": "READ_ONLY",
+        "workspace_source": "NONE"
+      }
+    },
+    "bbk_planning_wayfinder": {
+      "allowed_mutation_classes": [],
+      "allowed_tools": [
+        "bbk_governance_status",
+        "bbk_governed_read",
+        "bbk_return_prepare",
+        "bbk_return_template"
+      ],
+      "forbidden_effects": [
+        "GENERIC_PRODUCT_WRITE",
+        "DIRECT_BEADS_WRITE",
+        "UNQUALIFIED_SHELL",
+        "SEALED_MUTATION"
+      ],
+      "required_bindings": [],
+      "scope_rules": {
+        "path_scope": "READ_ONLY",
+        "sealed_paths": "DENY",
+        "semantic_scope": "READ_ONLY",
+        "workspace_source": "NONE"
+      }
+    },
+    "bbk_prototyper": {
+      "allowed_mutation_classes": [
+        "PROTOTYPE_CONTENT",
+        "TEST_CONTENT",
+        "DOCUMENTATION_CONTENT"
+      ],
+      "allowed_tools": [
+        "bbk_governance_status",
+        "bbk_governed_delete",
+        "bbk_governed_edit",
+        "bbk_governed_read",
+        "bbk_governed_write",
+        "bbk_return_prepare",
+        "bbk_return_template",
+        "bbk_task_run"
+      ],
+      "forbidden_effects": [
+        "PRODUCTION_PROMOTION",
+        "DIRECT_BEADS_WRITE",
+        "UNQUALIFIED_SHELL",
+        "SEALED_MUTATION",
+        "CROSS_WORKSPACE_WRITE"
+      ],
+      "required_bindings": [
+        "SESSION",
+        "INVOCATION",
+        "WORK_UNIT",
+        "ATTEMPT",
+        "CANDIDATE",
+        "WORKSPACE",
+        "JJ_CHANGE",
+        "AUTHORITY",
+        "PATH_SCOPE",
+        "MUTATION_CLASS",
+        "RETURN_CONTRACT"
+      ],
+      "scope_rules": {
+        "path_scope": "BOUND_PREFIXES",
+        "sealed_paths": "DENY",
+        "semantic_scope": "BOUND",
+        "workspace_source": "REGISTRY_BINDING"
+      }
+    },
+    "bbk_question_guide": {
+      "allowed_mutation_classes": [],
+      "allowed_tools": [
+        "bbk_governance_status",
+        "bbk_governed_read",
+        "bbk_return_prepare",
+        "bbk_return_template"
+      ],
+      "forbidden_effects": [
+        "GENERIC_PRODUCT_WRITE",
+        "DIRECT_BEADS_WRITE",
+        "UNQUALIFIED_SHELL",
+        "SEALED_MUTATION"
+      ],
+      "required_bindings": [],
+      "scope_rules": {
+        "path_scope": "READ_ONLY",
+        "sealed_paths": "DENY",
+        "semantic_scope": "READ_ONLY",
+        "workspace_source": "NONE"
+      }
+    },
+    "bbk_questioning_wayfinder": {
+      "allowed_mutation_classes": [],
+      "allowed_tools": [
+        "bbk_governance_status",
+        "bbk_governed_read",
+        "bbk_return_prepare",
+        "bbk_return_template"
+      ],
+      "forbidden_effects": [
+        "GENERIC_PRODUCT_WRITE",
+        "DIRECT_BEADS_WRITE",
+        "UNQUALIFIED_SHELL",
+        "SEALED_MUTATION"
+      ],
+      "required_bindings": [],
+      "scope_rules": {
+        "path_scope": "READ_ONLY",
+        "sealed_paths": "DENY",
+        "semantic_scope": "READ_ONLY",
+        "workspace_source": "NONE"
+      }
+    },
+    "bbk_researcher": {
+      "allowed_mutation_classes": [],
+      "allowed_tools": [
+        "bbk_governance_status",
+        "bbk_governed_read",
+        "bbk_return_prepare",
+        "bbk_return_template"
+      ],
+      "forbidden_effects": [
+        "GENERIC_PRODUCT_WRITE",
+        "DIRECT_BEADS_WRITE",
+        "UNQUALIFIED_SHELL",
+        "SEALED_MUTATION"
+      ],
+      "required_bindings": [],
+      "scope_rules": {
+        "path_scope": "READ_ONLY",
+        "sealed_paths": "DENY",
+        "semantic_scope": "READ_ONLY",
+        "workspace_source": "NONE"
+      }
+    },
+    "bbk_reviewer": {
+      "allowed_mutation_classes": [],
+      "allowed_tools": [
+        "bbk_governance_status",
+        "bbk_governed_read",
+        "bbk_return_prepare",
+        "bbk_return_template"
+      ],
+      "forbidden_effects": [
+        "CANDIDATE_MUTATION",
+        "GENERIC_PRODUCT_WRITE",
+        "DIRECT_BEADS_WRITE",
+        "UNQUALIFIED_SHELL",
+        "SEALED_MUTATION"
+      ],
+      "required_bindings": [
+        "SESSION",
+        "INVOCATION",
+        "CANDIDATE",
+        "WORKSPACE",
+        "RETURN_CONTRACT"
+      ],
+      "scope_rules": {
+        "path_scope": "READ_ONLY",
+        "sealed_paths": "DENY",
+        "semantic_scope": "READ_ONLY",
+        "workspace_source": "REGISTRY_BINDING"
+      }
+    },
+    "bbk_root_orchestrator": {
+      "allowed_mutation_classes": [
+        "COORDINATION_METADATA"
+      ],
+      "allowed_tools": [
+        "bbk_control_assign",
+        "bbk_control_bind",
+        "bbk_control_dispatch_status",
+        "bbk_control_integrate_request",
+        "bbk_control_spawn",
+        "bbk_control_update",
+        "bbk_governance_status",
+        "bbk_governed_read",
+        "bbk_return_prepare",
+        "bbk_return_template"
+      ],
+      "forbidden_effects": [
+        "GENERIC_PRODUCT_WRITE",
+        "PRODUCT_CONTENT",
+        "TEST_CONTENT",
+        "DOCUMENTATION_CONTENT",
+        "BUILD_CONFIGURATION",
+        "TOOLCHAIN_CONFIGURATION",
+        "DIRECT_BEADS_WRITE",
+        "UNQUALIFIED_SHELL",
+        "SEALED_MUTATION"
+      ],
+      "required_bindings": [
+        "SESSION",
+        "AUTHORITY"
+      ],
+      "scope_rules": {
+        "path_scope": "READ_ONLY",
+        "sealed_paths": "DENY",
+        "semantic_scope": "BOUND",
+        "workspace_source": "NONE"
+      }
+    },
+    "bbk_root_wayfinder": {
+      "allowed_mutation_classes": [],
+      "allowed_tools": [
+        "bbk_governance_status",
+        "bbk_governed_read",
+        "bbk_return_prepare",
+        "bbk_return_template"
+      ],
+      "forbidden_effects": [
+        "GENERIC_PRODUCT_WRITE",
+        "DIRECT_BEADS_WRITE",
+        "UNQUALIFIED_SHELL",
+        "SEALED_MUTATION"
+      ],
+      "required_bindings": [],
+      "scope_rules": {
+        "path_scope": "READ_ONLY",
+        "sealed_paths": "DENY",
+        "semantic_scope": "READ_ONLY",
+        "workspace_source": "NONE"
+      }
+    },
+    "bbk_synthesizer": {
+      "allowed_mutation_classes": [],
+      "allowed_tools": [
+        "bbk_governance_status",
+        "bbk_governed_read",
+        "bbk_return_prepare",
+        "bbk_return_template"
+      ],
+      "forbidden_effects": [
+        "GENERIC_PRODUCT_WRITE",
+        "DIRECT_BEADS_WRITE",
+        "UNQUALIFIED_SHELL",
+        "SEALED_MUTATION"
+      ],
+      "required_bindings": [],
+      "scope_rules": {
+        "path_scope": "READ_ONLY",
+        "sealed_paths": "DENY",
+        "semantic_scope": "READ_ONLY",
+        "workspace_source": "NONE"
+      }
+    },
+    "bbk_territory_orchestrator": {
+      "allowed_mutation_classes": [
+        "COORDINATION_METADATA"
+      ],
+      "allowed_tools": [
+        "bbk_control_assign",
+        "bbk_control_bind",
+        "bbk_control_dispatch_status",
+        "bbk_control_integrate_request",
+        "bbk_control_spawn",
+        "bbk_control_update",
+        "bbk_governance_status",
+        "bbk_governed_read",
+        "bbk_return_prepare",
+        "bbk_return_template"
+      ],
+      "forbidden_effects": [
+        "GENERIC_PRODUCT_WRITE",
+        "PRODUCT_CONTENT",
+        "TEST_CONTENT",
+        "DOCUMENTATION_CONTENT",
+        "BUILD_CONFIGURATION",
+        "TOOLCHAIN_CONFIGURATION",
+        "DIRECT_BEADS_WRITE",
+        "UNQUALIFIED_SHELL",
+        "SEALED_MUTATION"
+      ],
+      "required_bindings": [
+        "SESSION",
+        "AUTHORITY"
+      ],
+      "scope_rules": {
+        "path_scope": "READ_ONLY",
+        "sealed_paths": "DENY",
+        "semantic_scope": "BOUND",
+        "workspace_source": "NONE"
+      }
+    },
+    "bbk_territory_wayfinder": {
+      "allowed_mutation_classes": [],
+      "allowed_tools": [
+        "bbk_governance_status",
+        "bbk_governed_read",
+        "bbk_return_prepare",
+        "bbk_return_template"
+      ],
+      "forbidden_effects": [
+        "GENERIC_PRODUCT_WRITE",
+        "DIRECT_BEADS_WRITE",
+        "UNQUALIFIED_SHELL",
+        "SEALED_MUTATION"
+      ],
+      "required_bindings": [],
+      "scope_rules": {
+        "path_scope": "READ_ONLY",
+        "sealed_paths": "DENY",
+        "semantic_scope": "READ_ONLY",
+        "workspace_source": "NONE"
+      }
+    },
+    "bbk_validator": {
+      "allowed_mutation_classes": [],
+      "allowed_tools": [
+        "bbk_governance_status",
+        "bbk_governed_read",
+        "bbk_return_prepare",
+        "bbk_return_template"
+      ],
+      "forbidden_effects": [
+        "CANDIDATE_MUTATION",
+        "GENERIC_PRODUCT_WRITE",
+        "DIRECT_BEADS_WRITE",
+        "UNQUALIFIED_SHELL",
+        "SEALED_MUTATION"
+      ],
+      "required_bindings": [
+        "SESSION",
+        "INVOCATION",
+        "CANDIDATE",
+        "WORKSPACE",
+        "RETURN_CONTRACT"
+      ],
+      "scope_rules": {
+        "path_scope": "READ_ONLY",
+        "sealed_paths": "DENY",
+        "semantic_scope": "READ_ONLY",
+        "workspace_source": "REGISTRY_BINDING"
+      }
+    },
+    "bbk_validator_orchestrator": {
+      "allowed_mutation_classes": [
+        "COORDINATION_METADATA"
+      ],
+      "allowed_tools": [
+        "bbk_control_assign",
+        "bbk_control_bind",
+        "bbk_control_dispatch_status",
+        "bbk_control_integrate_request",
+        "bbk_control_spawn",
+        "bbk_control_update",
+        "bbk_governance_status",
+        "bbk_governed_read",
+        "bbk_return_prepare",
+        "bbk_return_template"
+      ],
+      "forbidden_effects": [
+        "GENERIC_PRODUCT_WRITE",
+        "PRODUCT_CONTENT",
+        "TEST_CONTENT",
+        "DOCUMENTATION_CONTENT",
+        "BUILD_CONFIGURATION",
+        "TOOLCHAIN_CONFIGURATION",
+        "DIRECT_BEADS_WRITE",
+        "UNQUALIFIED_SHELL",
+        "SEALED_MUTATION"
+      ],
+      "required_bindings": [
+        "SESSION",
+        "AUTHORITY"
+      ],
+      "scope_rules": {
+        "path_scope": "READ_ONLY",
+        "sealed_paths": "DENY",
+        "semantic_scope": "BOUND",
+        "workspace_source": "NONE"
+      }
+    },
+    "bbk_verification_designer": {
+      "allowed_mutation_classes": [],
+      "allowed_tools": [
+        "bbk_governance_status",
+        "bbk_governed_read",
+        "bbk_return_prepare",
+        "bbk_return_template"
+      ],
+      "forbidden_effects": [
+        "GENERIC_PRODUCT_WRITE",
+        "DIRECT_BEADS_WRITE",
+        "UNQUALIFIED_SHELL",
+        "SEALED_MUTATION"
+      ],
+      "required_bindings": [],
+      "scope_rules": {
+        "path_scope": "READ_ONLY",
+        "sealed_paths": "DENY",
+        "semantic_scope": "READ_ONLY",
+        "workspace_source": "NONE"
+      }
+    },
+    "bbk_worker": {
+      "allowed_mutation_classes": [
+        "PRODUCT_CONTENT",
+        "TEST_CONTENT",
+        "DOCUMENTATION_CONTENT",
+        "BUILD_CONFIGURATION"
+      ],
+      "allowed_tools": [
+        "bbk_governance_status",
+        "bbk_governed_delete",
+        "bbk_governed_edit",
+        "bbk_governed_read",
+        "bbk_governed_write",
+        "bbk_return_prepare",
+        "bbk_return_template",
+        "bbk_task_run"
+      ],
+      "forbidden_effects": [
+        "DIRECT_BEADS_WRITE",
+        "UNQUALIFIED_SHELL",
+        "SEALED_MUTATION",
+        "CROSS_WORKSPACE_WRITE"
+      ],
+      "required_bindings": [
+        "SESSION",
+        "INVOCATION",
+        "WORK_UNIT",
+        "ATTEMPT",
+        "CANDIDATE",
+        "WORKSPACE",
+        "JJ_CHANGE",
+        "AUTHORITY",
+        "PATH_SCOPE",
+        "MUTATION_CLASS",
+        "RETURN_CONTRACT"
+      ],
+      "scope_rules": {
+        "path_scope": "BOUND_PREFIXES",
+        "sealed_paths": "DENY",
+        "semantic_scope": "BOUND",
+        "workspace_source": "REGISTRY_BINDING"
+      }
+    },
+    "bbk_worker_designer": {
+      "allowed_mutation_classes": [],
+      "allowed_tools": [
+        "bbk_governance_status",
+        "bbk_governed_read",
+        "bbk_return_prepare",
+        "bbk_return_template"
+      ],
+      "forbidden_effects": [
+        "GENERIC_PRODUCT_WRITE",
+        "DIRECT_BEADS_WRITE",
+        "UNQUALIFIED_SHELL",
+        "SEALED_MUTATION"
+      ],
+      "required_bindings": [],
+      "scope_rules": {
+        "path_scope": "READ_ONLY",
+        "sealed_paths": "DENY",
+        "semantic_scope": "READ_ONLY",
+        "workspace_source": "NONE"
+      }
+    },
+    "bbk_worker_orchestrator": {
+      "allowed_mutation_classes": [
+        "COORDINATION_METADATA"
+      ],
+      "allowed_tools": [
+        "bbk_control_assign",
+        "bbk_control_bind",
+        "bbk_control_dispatch_status",
+        "bbk_control_integrate_request",
+        "bbk_control_spawn",
+        "bbk_control_update",
+        "bbk_governance_status",
+        "bbk_governed_read",
+        "bbk_return_prepare",
+        "bbk_return_template"
+      ],
+      "forbidden_effects": [
+        "GENERIC_PRODUCT_WRITE",
+        "PRODUCT_CONTENT",
+        "TEST_CONTENT",
+        "DOCUMENTATION_CONTENT",
+        "BUILD_CONFIGURATION",
+        "TOOLCHAIN_CONFIGURATION",
+        "DIRECT_BEADS_WRITE",
+        "UNQUALIFIED_SHELL",
+        "SEALED_MUTATION"
+      ],
+      "required_bindings": [
+        "SESSION",
+        "AUTHORITY"
+      ],
+      "scope_rules": {
+        "path_scope": "READ_ONLY",
+        "sealed_paths": "DENY",
+        "semantic_scope": "BOUND",
+        "workspace_source": "NONE"
+      }
+    }
+  },
+  "schema": "bbk.role-capability-policy.v1"
+}

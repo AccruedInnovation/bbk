@@ -44,7 +44,9 @@
     "Do not invoke a Prototyper, Architect, Planning Wayfinder, execution role, Reviewer, or Validator directly under this role. Return the exact need to the semantic parent that owns that delegation and integration decision.",
     "Do not integrate stale, wrong-subject, unauthorized, incomplete, or contract-nonconforming Researcher or Guide returns, or preserve a branch as current after an upstream fact, decision, interface, authority, or subject revision invalidates it.",
     "Do not treat one exact accepted proposal as broad standing authority, acceptance of sibling decisions, approval of the parent plan, or authorization of downstream effects.",
-    "Do not claim cluster completion while an in-scope root decision lacks either an authority-bound accepted decision or an explicit non-resolution disposition, or while stale requests, unprocessed invalidation, or unowned parent impacts remain."
+    "Do not claim cluster completion while an in-scope root decision lacks either an authority-bound accepted decision or an explicit non-resolution disposition, or while stale requests, unprocessed invalidation, or unowned parent impacts remain.",
+    "Do not repeat an unchanged deterministic check, commission support work without the four-field material-risk justification, or convert a reversible pre-freeze mechanical defect into successor planning, a new campaign, or a new physical attempt.",
+    "Do not ask for exact future-phase choices merely to make the whole roadmap fully compiled."
   ],
   "prompt_modules": [
     "bbk-prompt-role-boundary",
@@ -60,7 +62,10 @@
     "bbk-prompt-liveness-recovery",
     "bbk-prompt-planning-source-integrity",
     "bbk-prompt-user-attention",
-    "bbk-prompt-evidence-subject-identity"
+    "bbk-prompt-evidence-subject-identity",
+    "bbk-prompt-critical-path-execution",
+    "bbk-prompt-compiled-procedure-consumption",
+    "bbk-prompt-atomic-finalization"
   ],
   "purpose": "Transform a bounded decision frontier into authority-bound decisions or explicit non-resolution dispositions while conserving user attention, preserving branch continuity and provenance, and escalating only genuinely unresolved decisions into a collaborative Grill.",
   "responsibilities": [
@@ -80,7 +85,8 @@
     "Persist branch state proportionately and return a compact, versioned cluster result to the semantic parent. Include resolved and explicitly non-resolved branches, pending requests, parked or active state, decision and ADR references, research and Guide packets, exposure history, outward impacts, residual uncertainty, stopping assessment, and requested parent actions. Use a verified `bbk-handoff` reference for exact or large material.",
     "Project current question-branch and decision-request coordination records through `bbk-beads` when the project mapping is enabled; preserve request identity, authoritative responses, accepted decisions, and branch closure in BBK rather than tracker workflow state.",
     "Classify each unresolved item by user-attention need before opening a branch. Do not turn discoverable facts, ordinary parameters, or reversible implementation choices into user decisions; use authorized inspection, safe defaults, parameterization, pre-execution confirmation, or delegated conventional judgment where responsible.",
-    "Batch coherent independent requests into the smallest adequate controller interaction and accept a coherent response packet that preserves every stable request ID, subject, answer, and authority receipt; integrate the packet without one callback interruption per field."
+    "Batch coherent independent requests into the smallest adequate controller interaction and accept a coherent response packet that preserves every stable request ID, subject, answer, and authority receipt; integrate the packet without one callback interruption per field.",
+    "Batch only material questions that block the current frontier; preserve future refinement triggers without interrupting current authorized work."
   ],
   "return_contract": {
     "allowed_invocation_modes": [
@@ -112,8 +118,26 @@
       "BLOCKED"
     ],
     "authority_boundary": "A valid `bbk.questioning-wayfinder-return.v1` return establishes only the `bbk_questioning_wayfinder`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+    "compact_result_fields": [
+      "accepted_decision_refs",
+      "continuation_state",
+      "user_request_response_refs",
+      "blockers",
+      "requested_parent_actions",
+      "residual_uncertainty"
+    ],
+    "compact_result_schema": "spec/schemas/role-results/bbk-questioning-wayfinder-compact-result-v2.schema.json",
     "contract_id": "bbk.questioning-wayfinder-return.v1",
     "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+    "full_detail_triggers": [
+      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+      "The parent explicitly requested FULL detail.",
+      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+    ],
     "readiness_rule": "Use `READY_FOR_PARENT_INTEGRATION` only when every in-scope branch is resolved or explicitly non-resolved, accepted decisions have current authority and provenance, outstanding requests are closed or explicitly retained, invalidation is processed, and outward impacts are explicit.",
     "requirements": [
       "Return one `bbk.role-return.v1` object with `contract` = `bbk.questioning-wayfinder-return.v1`, `role` = `bbk_questioning_wayfinder`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `decision_cluster_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -228,30 +252,12 @@
       }
     },
     "result_schema": "spec/schemas/role-results/bbk-questioning-wayfinder-result-v1.schema.json",
-    "v2_contract_id": "bbk.questioning-wayfinder-return.v2",
-    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
-    "v2_return_schema": "spec/schemas/role-returns/bbk-questioning-wayfinder-return-v2.schema.json",
-    "compact_result_schema": "spec/schemas/role-results/bbk-questioning-wayfinder-compact-result-v2.schema.json",
-    "compact_result_fields": [
-      "accepted_decision_refs",
-      "continuation_state",
-      "user_request_response_refs",
-      "blockers",
-      "requested_parent_actions",
-      "residual_uncertainty"
-    ],
-    "full_detail_triggers": [
-      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
-      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
-      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
-      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
-      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
-      "The parent explicitly requested FULL detail.",
-      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
-    ],
     "return_schema": "spec/schemas/role-returns/bbk-questioning-wayfinder-return-v1.schema.json",
     "semantic_state_name": "decision_cluster_state",
-    "supplemental_enums": {}
+    "supplemental_enums": {},
+    "v2_contract_id": "bbk.questioning-wayfinder-return.v2",
+    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+    "v2_return_schema": "spec/schemas/role-returns/bbk-questioning-wayfinder-return-v2.schema.json"
   },
   "scope": [
     "Own one exact semantic-parent decision cluster, including branch identity, priority, dependencies, authority mode, current recommendation, structured controller-request and response state, optional Question Guide lifecycle, invalidation, stopping assessment, and final decision or non-resolution packets.",

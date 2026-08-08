@@ -1,0 +1,115 @@
+{
+  "attempts": {
+    "churn_by_cause": {
+      "LEDGER_CHECKPOINT_CONTRADICTION": 1,
+      "OUT_OF_FENCE_PROFILE_PROBE": 1,
+      "TERMINAL_NEWLINE_MATERIALIZATION": 1,
+      "UNAUTHORIZED_TEMPORARY_CARRIER": 1
+    },
+    "mechanical_defect_successor_plans": 3,
+    "mechanical_repairs_completed_in_place": 0
+  },
+  "budgets": {
+    "status": "FAIL",
+    "violation_count": 6,
+    "violations": [
+      {
+        "detail": {
+          "package:A": 94,
+          "package:B": 94,
+          "package:C": 94,
+          "package:D": 94,
+          "package:E": 94
+        },
+        "maximum": 1,
+        "metric": "underlying_handoff_verification_per_unchanged_subject",
+        "observed": 94
+      },
+      {
+        "maximum": 0,
+        "metric": "product_validator_for_metadata_only_changes",
+        "observed": 30
+      },
+      {
+        "detail": {
+          "candidate:final": 3
+        },
+        "maximum": 1,
+        "metric": "broad_product_validator_per_frozen_candidate",
+        "observed": 3
+      },
+      {
+        "maximum": 0,
+        "metric": "mechanical_defect_successor_plan_count",
+        "observed": 3
+      },
+      {
+        "maximum": 0,
+        "metric": "rechecks_without_changed_invalidation_key",
+        "observed": 219
+      },
+      {
+        "maximum": 0,
+        "metric": "support_roles_after_executable_work",
+        "observed": 60
+      }
+    ]
+  },
+  "coordination": {
+    "poll_or_list_calls": 60,
+    "support_roles_after_executable_work": 60
+  },
+  "latency": {
+    "seconds_to_first_outcome_bearing_worker_action": 2520.0
+  },
+  "metrics_digest": "sha256:1090440a8a4605ea764e8879b3c1d229e0d3404ee7ab64b13f960d7cbd97902a",
+  "product_quality": {
+    "defects_found": 0,
+    "escaped_defects": 0,
+    "failed_assertions_preserved": 4
+  },
+  "prompt": {
+    "compactions": 0,
+    "prompt_bytes": 0,
+    "prompt_tokens": 0
+  },
+  "run_id": "alpha16-codex-excessive-verification-pattern",
+  "schema": "bbk.verification-economy-metrics.v1",
+  "sessions": {
+    "by_class": {
+      "assurance": 20,
+      "coordination": 25,
+      "planning": 30,
+      "worker": 4
+    },
+    "planning_coordination_assurance": 75,
+    "total": 79,
+    "worker": 4
+  },
+  "source_digest": "sha256:706ffdf533aaf2e75991ec2240270952ab7b234ce8e73bcdc08031730e027735",
+  "status": "FAIL",
+  "totals": {
+    "attempt_transition": 4,
+    "child_list": 18,
+    "child_poll": 42,
+    "failed_assertion_preserved": 4,
+    "handoff_verification": 470,
+    "repository_validator": 33,
+    "session_started": 79,
+    "shell_call": 7562,
+    "support_role_commissioned": 60,
+    "worker_action": 1
+  },
+  "verification": {
+    "avoided_check_count": 0,
+    "duplicate_handoff_verifications": 465,
+    "handoff_subjects": 5,
+    "metadata_only_repository_validator_invocations": 30,
+    "receipt_reuse_count": 0,
+    "rechecks_without_changed_invalidation_key": 219,
+    "repository_validator_invocations": 33,
+    "reviewer_invocations": 0,
+    "reviewer_without_named_qualitative_risk": 0,
+    "underlying_handoff_verifications": 470
+  }
+}

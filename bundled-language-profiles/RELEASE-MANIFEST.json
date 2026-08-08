@@ -1,0 +1,67 @@
+{
+  "fileCount": 10,
+  "files": [
+    {
+      "bytes": 1042,
+      "path": "README.md",
+      "sha256": "eda7e359bd687f56ed72e6fa8b6a024af7369b1dac9a65ff40daccc565fc5b7e"
+    },
+    {
+      "bytes": 461,
+      "path": "SHA256SUMS.txt",
+      "sha256": "4f629187455d3bad0093159da9f2460f4a0545c1dbd11ed55ae99ee293847f8b"
+    },
+    {
+      "bytes": 249138,
+      "path": "packages/bbk-profile-go-0.1.0-alpha.3.zip",
+      "sha256": "1ee15e44435049a187ed1df8d492241c70d70032a5f5795ceccca995be649faa"
+    },
+    {
+      "bytes": 100,
+      "path": "packages/bbk-profile-go-0.1.0-alpha.3.zip.sha256",
+      "sha256": "d5cd2f3adb45766d3e2a880882a59fbd9c0172fbf8e67ab00e2817a47d34f902"
+    },
+    {
+      "bytes": 261601,
+      "path": "packages/bbk-profile-python-0.1.0-alpha.3.zip",
+      "sha256": "8cd04cc60b60c262b49cc6773476b902b2fef72b947e65cfc6a7bf97a69a50e5"
+    },
+    {
+      "bytes": 104,
+      "path": "packages/bbk-profile-python-0.1.0-alpha.3.zip.sha256",
+      "sha256": "a8d917baf3046792cea6ec4abf003512a34b233882136782c104a45df93bd277"
+    },
+    {
+      "bytes": 735279,
+      "path": "packages/bbk-profile-rust-0.1.0-alpha.3.zip",
+      "sha256": "000cd01298b033a65eacd640d2c1fe20c7828540bddd4fcd7f7f44cda76eecc7"
+    },
+    {
+      "bytes": 102,
+      "path": "packages/bbk-profile-rust-0.1.0-alpha.3.zip.sha256",
+      "sha256": "e6b8bc135e5984f8b41c23481bead69ab2267240eab59e560fbdf408438030c6"
+    },
+    {
+      "bytes": 277322,
+      "path": "packages/bbk-profile-typescript-javascript-0.1.0-alpha.3.zip",
+      "sha256": "8f139ab9b089054ca44513418d37da8976a409f2cc8c4d5513575a6c90fe5ad6"
+    },
+    {
+      "bytes": 119,
+      "path": "packages/bbk-profile-typescript-javascript-0.1.0-alpha.3.zip.sha256",
+      "sha256": "0dcf44286e4cae34d37b71df291c4a2581b1d257c0844e07f33b54e89180629e"
+    }
+  ],
+  "generatedAt": "2026-08-07T00:00:00-06:00",
+  "profileVersions": {
+    "go": "0.1.0-alpha.3",
+    "python": "0.1.0-alpha.3",
+    "rust": "0.1.0-alpha.3",
+    "typescript-javascript": "0.1.0-alpha.3"
+  },
+  "release": "bbk-0.1.0-alpha.17.0.2-language-profiles",
+  "schema": "bbk.language-profiles-release-bundle-manifest.v1",
+  "status": "PASS",
+  "timezone": "America/Edmonton",
+  "variant": "bundled-with-bbk-0.1.0-alpha.17.0.2"
+}

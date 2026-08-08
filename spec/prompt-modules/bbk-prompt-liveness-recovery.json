@@ -1,28 +1,36 @@
 {
   "schema_version": "bbk.prompt-module.v1",
   "id": "bbk-prompt-liveness-recovery",
-  "title": "Liveness, interruption, continuation, and recovery",
-  "description": "Preserve semantic identity and partial work across polling, interruption, replacement, and resume.",
+  "title": "Liveness, bounded waiting, continuation, and recovery",
+  "description": "Preserve semantic identity while avoiding wasteful status polling and unjustified attempt churn.",
   "clauses": [
     {
       "id": "LIVENESS.NON_EVIDENCE",
-      "text": "Heartbeat presence proves participation, not useful progress. Silence, elapsed time, context use, apparent slowness, missing heartbeat, or a parent polling timeout alone is not evidence of failure or hang."
+      "text": "A heartbeat proves participation, not progress. Silence, elapsed time, slowness, missing heartbeat, or parent polling timeout alone is not evidence of failure or hang."
+    },
+    {
+      "id": "LIVENESS.EVENT_DELIVERY",
+      "text": "OMP task results and IRC messages auto-deliver. Do not poll or list merely for status. Continue other authorized work; if blocked, use one blocking empty job wait or IRC wait, waking on completion, messages, steering, or host timeout."
+    },
+    {
+      "id": "LIVENESS.PROBE_INTERVAL",
+      "text": "Permit a nonblocking list, inbox, or roster probe only after at least 300 seconds since dispatch or the prior probe while a child is active. Forbid specific job polls. Restart the 300-second floor after an allowed probe unless concrete interruption evidence arrives."
+    },
+    {
+      "id": "LIVENESS.NO_STATUS_INTERROGATION",
+      "text": "Do not alternate probes or wake Main after short waits. Five minutes of silence permits one observation, not a failure claim, cancellation, restart, duplicate assignment, or assurance cycle."
     },
     {
       "id": "LIVENESS.INTERRUPT_REASONS",
-      "text": "Interrupt a running child or attempt only for USER_CANCELLED, CHILD_REQUESTED_STOP, UNAUTHORIZED_EFFECT, OWNERSHIP_COLLISION, CONFIRMED_HANG, or OBSOLETE_WORK, with concrete evidence and preserved state."
+      "text": "Interrupt only for USER_CANCELLED, CHILD_REQUESTED_STOP, UNAUTHORIZED_EFFECT, OWNERSHIP_COLLISION, CONFIRMED_HANG, or OBSOLETE_WORK, with concrete evidence and preserved state."
     },
     {
       "id": "RECOVERY.CHECKPOINT",
-      "text": "A recovery-capable checkpoint binds semantic run, physical attempt, subject, instructions, authority, completed and remaining work, artifacts, effects, descendants, evidence, findings, cleanup, budgets, and smallest next action."
+      "text": "A recovery checkpoint binds semantic run, attempt, subject, authority, completed/remaining work, artifacts, effects, evidence, findings, cleanup, budgets, and next action."
     },
     {
       "id": "RECOVERY.SAME_RUN",
-      "text": "Resume the same semantic run only while immutable subject, instructions, baseline, authority, criteria, context policy, and completion meaning remain unchanged; otherwise create a successor and preserve the predecessor."
-    },
-    {
-      "id": "RECOVERY.REPLACE",
-      "text": "Before replacement, terminate or epoch-fence the old attempt where supported and reconcile workspaces, effects, descendants, messages, candidates, evidence, findings, budgets, and cleanup."
+      "text": "Continue the same semantic run and physical attempt through reversible pre-freeze mechanical repair. A physical restart may resume the same semantic run while immutable subject, authority, criteria, ownership, context policy, and completion meaning remain unchanged and the prior mutating process is fenced."
     },
     {
       "id": "RECOVERY.NO_BLIND_RETRY",

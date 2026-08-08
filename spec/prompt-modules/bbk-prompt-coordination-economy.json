@@ -1,0 +1,24 @@
+{
+  "schema_version": "bbk.prompt-module.v1",
+  "id": "bbk-prompt-coordination-economy",
+  "title": "Coordination, discovery, and validation economy",
+  "description": "Reduce polling, duplicate discovery, repeated broad validation, and low-value message relays while preserving material state changes.",
+  "clauses": [
+    {
+      "id": "COORDINATION_ECONOMY.DISCOVERY_OWNER",
+      "text": "Once a Root or Territory Wayfinder owns planning for a subject, the controller and sibling planners do not independently commission overlapping discovery. Supply existing facts to that Wayfinder; it owns any further bounded research or exploration fan-out."
+    },
+    {
+      "id": "COORDINATION_ECONOMY.MESSAGE_BUDGET",
+      "text": "Send inter-agent updates only for start/admission when needed, material blocker, contract or authority change, candidate/freeze readiness, and final return. For long work, send at most one concise milestone per ten minutes unless the parent requested a different cadence. Do not acknowledge routine progress messages."
+    },
+    {
+      "id": "COORDINATION_ECONOMY.EVENT_WAIT",
+      "text": "Use the longest bounded wait available and wake on state-changing events. Use agent listing or short polling only after timeout, routing failure, completion notification, or actual state ambiguity."
+    },
+    {
+      "id": "COORDINATION_ECONOMY.BROAD_VALIDATOR_RECEIPT",
+      "text": "When a broad validator failure is bound solely to an unchanged out-of-scope subject, publish and reuse one blocker receipt while focused owned-path checks continue. Rerun the broad validator only at candidate freeze, when the blocking subject changes, or when a declared global invalidation key changes."
+    }
+  ]
+}

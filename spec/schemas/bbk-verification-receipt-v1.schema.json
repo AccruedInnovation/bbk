@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-verification-receipt-v1.schema.json",
+  "title": "BBK verification receipt v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "receipt_id", "verification_key", "claim_id", "subject", "method", "context", "result", "invalidation_keys", "producer", "integrity"],
+  "properties": {
+    "schema": {"const": "bbk.verification-receipt.v1"},
+    "receipt_id": {"$ref": "#/$defs/digest"},
+    "verification_key": {"$ref": "#/$defs/digest"},
+    "claim_id": {"type": "string", "minLength": 1},
+    "subject": {"type": "object", "minProperties": 1, "additionalProperties": true},
+    "method": {"type": "object", "minProperties": 1, "additionalProperties": true},
+    "context": {"type": "object", "additionalProperties": true},
+    "result": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "observed_at", "evidence_refs"],
+      "properties": {
+        "status": {"enum": ["PASS", "FAIL", "INCONCLUSIVE", "BLOCKED"]},
+        "observed_at": {"type": "string", "format": "date-time"},
+        "evidence_refs": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "reason_code": {"type": "string", "minLength": 1}
+      }
+    },
+    "invalidation_keys": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["key", "value"],
+        "properties": {"key": {"type": "string", "minLength": 1}, "value": {"type": "string", "minLength": 1}}
+      }
+    },
+    "producer": {"type": "object", "minProperties": 1, "additionalProperties": true},
+    "integrity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["receipt_digest"],
+      "properties": {"receipt_digest": {"$ref": "#/$defs/digest"}}
+    }
+  },
+  "$defs": {"digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}}
+}

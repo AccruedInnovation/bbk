@@ -31,7 +31,9 @@
     "root_run_ref",
     "signals_and_parent_directions",
     "substrate_and_host_health",
-    "territory_boundary_inventory"
+    "territory_boundary_inventory",
+    "planning_readiness_ref",
+    "project_coverage"
   ],
   "properties": {
     "active_children_and_attempts": {
@@ -137,6 +139,14 @@
     "territory_boundary_inventory": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
       "description": "Every admitted, pending, invalidated, completed, failed, cancelled, or superseded TerritoryExecutionBoundary with exact source territories and architecture elements, WorkUnit membership, dependencies, interfaces, integration obligations, authority, scope fences, resources, child run, recovery, and completion state."
+    },
+    "planning_readiness_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Exact planning-readiness record that admitted the execution frontier."
+    },
+    "project_coverage": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Current whole-project coverage ledger; candidate success must not imply unimplemented project completion."
     }
   },
   "x-bbk-role": "bbk_root_orchestrator",

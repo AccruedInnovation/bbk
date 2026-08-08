@@ -1,0 +1,45 @@
+{
+  "$id": "bbk-spawn-dispatch-release-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "dispatch_ref": {
+      "pattern": "^dispatch:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "lease_ref": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "reason": {
+      "maxLength": 256,
+      "minLength": 1,
+      "type": "string"
+    },
+    "released_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.spawn-dispatch-release.v1"
+    },
+    "status": {
+      "const": "READY"
+    },
+    "tool_call_id": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "dispatch_ref",
+    "lease_ref",
+    "tool_call_id",
+    "reason",
+    "released_at",
+    "status"
+  ],
+  "title": "BBK spawn dispatch lease release v1",
+  "type": "object"
+}

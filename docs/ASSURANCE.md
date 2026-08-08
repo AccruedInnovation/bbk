@@ -18,7 +18,7 @@ AssuranceContract
 
 ## Proportional assurance modes
 
-Alpha.15 uses three explicit modes. `INLINE` is the routine default. `FOCUSED` requires an exact material risk, candidate scope, or finding-scoped recheck. `FULL` is reserved for consequential assurance, material external effects, complex cleanup/recovery, authority ambiguity, interrupted attempts, candidate/release boundaries, or explicit parent request. FOCUSED and FULL record their risk rationale; the presence of a mechanical defect alone is not sufficient.
+BBK uses three explicit modes. `INLINE` is the routine default. `FOCUSED` requires an exact material risk, candidate scope, or finding-scoped recheck. `FULL` is reserved for consequential assurance, material external effects, complex cleanup/recovery, authority ambiguity, interrupted attempts, candidate/release boundaries, or explicit parent request. FOCUSED and FULL record their risk rationale; the presence of a mechanical defect alone is not sufficient.
 
 Independent review normally targets an integrated candidate or an exact material risk. A repair recheck contains only the finding, successor candidate, affected scope, relevant evidence, and reopening triggers unless semantics changed materially.
 
@@ -62,7 +62,7 @@ Captures a proposed reusable lesson with supporting and contrary evidence. It ca
 
 ## Logical lenses
 
-Alpha.7 includes a small extensible registry:
+BBK includes a small extensible registry:
 
 1. intent and outcome conformance;
 2. specification and acceptance completeness;
@@ -301,7 +301,7 @@ Routine repairs may use targeted closure alone. Consequential, broad, recurring,
 
 ## Review independence
 
-Independence is multidimensional. Alpha.7 records:
+Independence is multidimensional. BBK records:
 
 ```text
 author separation

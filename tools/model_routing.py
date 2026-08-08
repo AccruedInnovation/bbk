@@ -100,7 +100,8 @@ def _validate_role_coverage(
 
 def _validate_v1(value: Mapping[str, Any], *, role_names: set[str], errors: list[str]) -> None:
     expected_top = {"schema_version", "package_version", "description", "profiles", "role_profiles"}
-    missing_top = sorted(expected_top - set(value))
+    required_top = expected_top - {"package_version"}
+    missing_top = sorted(required_top - set(value))
     extra_top = sorted(set(value) - expected_top)
     if missing_top:
         errors.append(f"model-routing root missing fields: {missing_top}")
@@ -129,7 +130,8 @@ def _validate_v1(value: Mapping[str, Any], *, role_names: set[str], errors: list
 
 def _validate_v2(value: Mapping[str, Any], *, role_names: set[str], errors: list[str]) -> None:
     expected_top = {"schema_version", "package_version", "description", "roles"}
-    missing_top = sorted(expected_top - set(value))
+    required_top = expected_top - {"package_version"}
+    missing_top = sorted(required_top - set(value))
     extra_top = sorted(set(value) - expected_top)
     if missing_top:
         errors.append(f"model-routing root missing fields: {missing_top}")
@@ -155,8 +157,11 @@ def validate_model_routing(value: Any, *, version: str, role_names: set[str]) ->
     schema = value.get("schema_version")
     if schema not in SUPPORTED_SCHEMAS:
         errors.append("schema_version must equal bbk.model-routing.v1 or bbk.model-routing.v2")
-    if value.get("package_version") != version:
-        errors.append(f"package_version {value.get('package_version')!r} != {version!r}")
+    # package_version is optional provenance. The routing schema version and
+    # complete role catalogue govern import compatibility; a package label
+    # must never reject an otherwise valid routing policy.
+    if "package_version" in value:
+        _nonempty_string(value.get("package_version"), "package_version", errors)
     _nonempty_string(value.get("description"), "description", errors)
     if schema == "bbk.model-routing.v1":
         _validate_v1(value, role_names=role_names, errors=errors)
@@ -265,12 +270,15 @@ def as_v2(
         if route_description:
             entry["description"] = route_description
         roles[role_name] = entry
-    return {
+    result: dict[str, Any] = {
         "schema_version": "bbk.model-routing.v2",
-        "package_version": package_version or str(routing.get("package_version") or ""),
         "description": description or str(routing.get("description") or "Per-role BBK model routing."),
         "roles": roles,
     }
+    effective_package_version = package_version or routing.get("package_version")
+    if isinstance(effective_package_version, str) and effective_package_version.strip():
+        result["package_version"] = effective_package_version.strip()
+    return result
 
 
 def merge_host_routes(
@@ -278,7 +286,7 @@ def merge_host_routes(
     preserved: Mapping[str, Any],
     *,
     selected_hosts: set[str],
-    package_version: str,
+    package_version: str | None,
     description: str,
 ) -> dict[str, Any]:
     """Build one v2 policy with selected hosts from one policy and others preserved."""
@@ -307,12 +315,14 @@ def merge_host_routes(
         if route_description:
             entry["description"] = route_description
         roles[role_name] = entry
-    return {
+    result: dict[str, Any] = {
         "schema_version": "bbk.model-routing.v2",
-        "package_version": package_version,
         "description": description,
         "roles": roles,
     }
+    if isinstance(package_version, str) and package_version.strip():
+        result["package_version"] = package_version.strip()
+    return result
 
 
 def routing_statistics(routing: Mapping[str, Any]) -> dict[str, Any]:

@@ -1,6 +1,8 @@
 ---
 name: bbk-implementation-structure
 description: Create or review a proportional domain-neutral ImplementationStructureContract, including compact infrastructure, network, deployment, software, automation, hardware, data, procedure, and mixed-system structures.
+requires_prompt_modules: ["bbk-prompt-evidence-subject-identity"]
+standalone_prompt_modules: ["bbk-prompt-planning-source-integrity", "bbk-prompt-specialist-disposition"]
 ---
 
 # BBK Implementation Structure
@@ -21,17 +23,7 @@ Preserve accepted decisions and exact source lineage while planning, decomposing
 
 <!-- End BBK prompt module bbk-prompt-planning-source-integrity -->
 
-<!-- BBK prompt module bbk-prompt-evidence-subject-identity: expanded from canonical source -->
-
-### Evidence subject and environment identity
-
-Bind observations and quantitative claims to the exact node, environment, source, time, and method so evidence is not transferred between superficially similar systems.
-
-- `EVIDENCE.NODE_BINDING` — Every material environment observation must identify the exact node or subject, node_id when available, hostname or stable system identity, environment and location, observation source, observation time or as-of boundary, method and command or API, scope, authority, and confidence or limitation.
-- `EVIDENCE.NO_TRANSFERENCE` — Do not transfer an observation from one machine, account, network, repository, version, jurisdiction, or environment to another merely because they share an operating system or role. Unknown target-node state remains unknown until established or explicitly assumed.
-- `EVIDENCE.ESTIMATE_TRUTH` — Bind every quantitative estimate to its source, assumptions, units, environment, uncertainty, and intended use. Label an estimate as measured, documented, calculated, inferred, or illustrative; do not present an unmeasured planning estimate as observed performance.
-
-<!-- End BBK prompt module bbk-prompt-evidence-subject-identity -->
+> Apply the already embedded `bbk-prompt-evidence-subject-identity` module here.
 
 <!-- BBK prompt module bbk-prompt-specialist-disposition: expanded from canonical source -->
 

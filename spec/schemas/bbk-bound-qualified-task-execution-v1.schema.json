@@ -1,0 +1,22 @@
+{
+  "$id": "bbk-bound-qualified-task-execution-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BBK bound qualified task execution request v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const": "bbk.bound-qualified-task-execution.v1"},
+    "host_version": {"const": "omp/16.4.8"},
+    "session_id": {"type": "string", "minLength": 1},
+    "invocation_id": {"type": "string", "minLength": 1},
+    "binding_ref": {"type": "string", "minLength": 1},
+    "task": {"type": "string", "minLength": 1},
+    "arguments": {"type": "array", "items": {"type": "string"}},
+    "environment_allowlist": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "idempotency_key": {"type": "string", "minLength": 1}
+  },
+  "required": [
+    "schema", "host_version", "session_id", "invocation_id", "binding_ref", "task",
+    "arguments", "environment_allowlist", "idempotency_key"
+  ]
+}

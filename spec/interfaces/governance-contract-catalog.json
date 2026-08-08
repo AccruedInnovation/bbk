@@ -1,0 +1,68 @@
+{
+  "interfaces": [
+    {
+      "id": "IF-001",
+      "request_schema": "spec/schemas/bbk-gate-evaluation-request-v1.schema.json",
+      "response_schema": "spec/schemas/bbk-gate-decision-v1.schema.json"
+    },
+    {
+      "id": "IF-002",
+      "request_schema": "spec/schemas/bbk-role-capability-query-v1.schema.json",
+      "response_schema": "spec/schemas/bbk-role-capability-v1.schema.json"
+    },
+    {
+      "id": "IF-003",
+      "request_schema": "spec/schemas/bbk-invocation-binding-create-v1.schema.json",
+      "response_schema": "spec/schemas/bbk-work-unit-binding-v1.schema.json"
+    },
+    {
+      "id": "IF-004",
+      "request_schema": "spec/schemas/bbk-mutation-intent-v1.schema.json",
+      "response_schema": "spec/schemas/bbk-mutation-result-v1.schema.json"
+    },
+    {
+      "id": "IF-006",
+      "response_schema": "spec/schemas/bbk-vcs-mutation-receipt-v1.schema.json"
+    },
+    {
+      "id": "IF-007",
+      "request_schema": "spec/schemas/bbk-beads-command-v1.schema.json"
+    },
+    {
+      "id": "IF-008",
+      "request_schema": "spec/schemas/bbk-qualified-task-request-v1.schema.json",
+      "response_schema": "spec/schemas/bbk-qualified-task-result-v1.schema.json"
+    },
+    {
+      "id": "IF-014",
+      "response_schema": "spec/schemas/bbk-host-event-v1.schema.json"
+    },
+    {
+      "id": "IF-018",
+      "request_schema": "spec/schemas/bbk-substrate-doctor-request-v1.schema.json",
+      "response_schema": "spec/schemas/bbk-substrate-lock-v1.schema.json"
+    },
+    {
+      "id": "IF-019",
+      "request_schema": "spec/schemas/bbk-role-return-template-query-v1.schema.json",
+      "response_schema": "spec/schemas/bbk-role-return-template-v1.schema.json"
+    },
+    {
+      "id": "IF-020",
+      "request_schema": "spec/schemas/bbk-role-return-prepare-v1.schema.json",
+      "response_schema": "spec/schemas/bbk-role-return-prepared-v1.schema.json"
+    },
+    {
+      "id": "IF-021",
+      "request_schema": "spec/schemas/bbk-role-return-validate-v1.schema.json",
+      "response_schema": "spec/schemas/bbk-role-return-validation-v1.schema.json"
+    },
+    {
+      "id": "IF-022",
+      "request_schema": "spec/schemas/bbk-role-return-resolve-v1.schema.json",
+      "response_schema": "spec/schemas/bbk-role-return-yield-admission-v1.schema.json"
+    }
+  ],
+  "package_version": "0.1.0-alpha.17.0.2",
+  "schema": "bbk.governance-interface-catalog.v1"
+}

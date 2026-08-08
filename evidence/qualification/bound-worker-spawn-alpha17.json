@@ -1,0 +1,51 @@
+{
+  "assertions": {
+    "VER-029": "PASS",
+    "VER-030": "PASS"
+  },
+  "automated_checks": {
+    "errors": 0,
+    "failures": 0,
+    "implicit_path_text_encodings": 0,
+    "json_files_parsed": 361,
+    "network_used": false,
+    "omp_javascript_syntax": "PASS",
+    "profile": "standard",
+    "provider_credentials_used": false,
+    "python_files_compiled": 88,
+    "skipped": 5,
+    "tests_reported": 505,
+    "unittest_modules": 30,
+    "verification_checks_passed": 8,
+    "verification_checks_total": 8
+  },
+  "boundaries": {
+    "actual_child_session_activation": "ENFORCED_BEFORE_PROVIDER_TURN",
+    "cwd_as_authority": "DENIED",
+    "exact_task_admission": "ENFORCED",
+    "operating_system_sandbox": "UNQUALIFIED",
+    "provider_api_campaign": "PENDING_WU_018_MANUAL_RELEASE_GATE",
+    "retry_supersession": "ENFORCED",
+    "wake_inject_resume_continuity": "ENFORCED",
+    "writable_binding_completeness": "ENFORCED"
+  },
+  "evidence": [
+    "tests.test_worker_spawn",
+    "tests.test_omp_binding_registry",
+    "tests.test_omp_governed_profile",
+    "tests.test_governed_filesystem",
+    "docs/qualification/BOUND-WORKER-SPAWN-ALPHA17.md"
+  ],
+  "notes": [
+    "The parent pre-effect boundary uses a deterministic planned session because OMP assigns the actual child session only after task admission.",
+    "The child before_agent_start hook explicitly supersedes the planned binding with the observed host session.",
+    "The activation marker is accepted only from authenticated host-supplied CONTEXT attached to an installed canonical BBK role wrapper.",
+    "Raw worker assignment text is excluded from durable receipts.",
+    "CWD is never accepted as candidate or workspace authority.",
+    "This record qualifies WU-014 automation only; it does not satisfy the Alpha.17 manual provider release gate."
+  ],
+  "qualification": "AUTOMATED_PASS",
+  "release": "0.1.0-alpha.17",
+  "schema": "bbk.bound-worker-spawn-qualification.v1",
+  "work_unit": "WU-014"
+}

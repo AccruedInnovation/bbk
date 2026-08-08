@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-verification-economy-event-log-v1.schema.json",
+  "title": "BBK verification-economy event log v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "run_id", "started_at", "events"],
+  "properties": {
+    "schema": {"const": "bbk.verification-economy-event-log.v1"},
+    "run_id": {"type": "string", "minLength": 1},
+    "started_at": {"type": "string", "format": "date-time"},
+    "executable_work_at": {"type": "string", "format": "date-time"},
+    "source": {"type": "object", "additionalProperties": true},
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["type"],
+        "properties": {
+          "type": {"type": "string", "minLength": 1},
+          "count": {"type": "integer", "minimum": 1},
+          "observed_at": {"type": "string", "format": "date-time"},
+          "subject_key": {"type": "string", "minLength": 1},
+          "attempt_key": {"type": "string", "minLength": 1},
+          "role_class": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "$id": "bbk-omp-enforcement-boundary-status-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "boundaries": {
+      "additionalProperties": {
+        "enum": ["ENFORCED", "DETECT_ONLY", "UNQUALIFIED"],
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "host_version": {"minLength": 1, "type": "string"},
+    "notes": {"items": {"type": "string"}, "type": "array"},
+    "qualification": {"enum": ["QUALIFIED", "UNQUALIFIED"], "type": "string"},
+    "qualified_hosts": {"items": {"minLength": 1, "type": "string"}, "minItems": 1, "type": "array", "uniqueItems": true},
+    "schema": {"const": "bbk.omp-enforcement-boundary-status.v1"}
+  },
+  "required": ["schema", "host_version", "qualification", "qualified_hosts", "boundaries", "notes"],
+  "title": "BBK OMP enforcement-boundary status v1",
+  "type": "object"
+}

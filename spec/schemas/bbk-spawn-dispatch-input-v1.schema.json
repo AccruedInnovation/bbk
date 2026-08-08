@@ -1,0 +1,50 @@
+{
+  "$id": "bbk-spawn-dispatch-input-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "context": {
+      "pattern": "^<bbk-spawn-dispatch ref=\"dispatch:[0-9a-f]{64}\"/>$",
+      "type": "string"
+    },
+    "i": {
+      "description": "Optional host presentation field; excluded from dispatch integrity.",
+      "minLength": 1,
+      "type": "string"
+    },
+    "tasks": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "agent": {
+            "pattern": "^bbk_[A-Za-z0-9_]+$",
+            "type": "string"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "task": {
+            "pattern": "^<bbk-spawn-dispatch ref=\"dispatch:[0-9a-f]{64}\"/>$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "agent",
+          "name",
+          "task"
+        ],
+        "type": "object"
+      },
+      "maxItems": 1,
+      "minItems": 1,
+      "type": "array"
+    }
+  },
+  "required": [
+    "context",
+    "tasks"
+  ],
+  "title": "BBK canonical token-addressed OMP spawn dispatch input v1",
+  "type": "object"
+}

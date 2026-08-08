@@ -1,0 +1,50 @@
+{
+  "allowed_mutation_classes": [
+    "BUILD_CONFIGURATION",
+    "DOCUMENTATION_CONTENT",
+    "PRODUCT_CONTENT",
+    "TEST_CONTENT"
+  ],
+  "allowed_tools": [
+    "bbk_governance_status",
+    "bbk_governed_delete",
+    "bbk_governed_edit",
+    "bbk_governed_read",
+    "bbk_governed_write",
+    "bbk_return_prepare",
+    "bbk_return_template",
+    "bbk_task_run"
+  ],
+  "forbidden_effects": [
+    "CROSS_WORKSPACE_WRITE",
+    "DIRECT_BEADS_WRITE",
+    "SEALED_MUTATION",
+    "UNQUALIFIED_SHELL"
+  ],
+  "generated_by": "tools/generate_role_capabilities.py",
+  "manifest_digest": "sha256:2f42effa0151752e14d307374edbdac5008fdbafeeb5496e4676d1b248886e96",
+  "policy_version": "1.0.0-alpha.17",
+  "profile": "governed-software",
+  "required_bindings": [
+    "ATTEMPT",
+    "AUTHORITY",
+    "CANDIDATE",
+    "INVOCATION",
+    "JJ_CHANGE",
+    "MUTATION_CLASS",
+    "PATH_SCOPE",
+    "RETURN_CONTRACT",
+    "SESSION",
+    "WORKSPACE",
+    "WORK_UNIT"
+  ],
+  "role": "bbk_worker",
+  "schema": "bbk.role-capability.v1",
+  "scope_rules": {
+    "path_scope": "BOUND_PREFIXES",
+    "sealed_paths": "DENY",
+    "semantic_scope": "BOUND",
+    "workspace_source": "REGISTRY_BINDING"
+  },
+  "source_role_digest": "sha256:1a2c462e6e08f418a8fc1a52566a3873de281be5c87a6e9b843b87141e88c70e"
+}

@@ -1,0 +1,46 @@
+{
+  "assertions": {
+    "VER-031": "PASS",
+    "VER-032": "PASS"
+  },
+  "baseline_commit": "3e20ec4a6d6ce506e0b2bb8070dece2953a7dfef",
+  "boundaries": {
+    "bound_workspace_path_resolution": "ENFORCED",
+    "effects_outside_omp_mediation": "DETECT_ONLY",
+    "git_jj_post_effect_reconciliation": "ENFORCED",
+    "operating_system_sandbox": "UNQUALIFIED",
+    "pre_effect_gate_kernel": "ENFORCED",
+    "role_capability_and_mutation_scope": "ENFORCED",
+    "sealed_package_immutability": "INVARIANT"
+  },
+  "evidence": [
+    "tests.test_governed_filesystem",
+    "tests.test_gate_kernel",
+    "tests.test_omp_governed_profile",
+    "tests.test_installation_portability.SharedPathAssertionSupportTests",
+    "docs/qualification/GOVERNED-FILESYSTEM-ALPHA17.md"
+  ],
+  "jj_change_id": "loqtsroyovyqozprxrvsmwnurqnwnmqk",
+  "model_tools": [
+    "bbk_governed_read",
+    "bbk_governed_write",
+    "bbk_governed_edit",
+    "bbk_governed_delete"
+  ],
+  "notes": [
+    "CWD is never accepted as workspace authority.",
+    "Absolute paths, traversal, workspace escape, and symlink traversal fail closed.",
+    "Raw prompts, credentials, and provider payloads are excluded from receipts.",
+    "Release-wide API-key-enabled OMP qualification remains mandatory before Alpha.17 finalization."
+  ],
+  "operations": [
+    "READ",
+    "WRITE",
+    "EDIT",
+    "DELETE"
+  ],
+  "qualification": "QUALIFIED",
+  "release": "0.1.0-alpha.17+rc.2",
+  "schema": "bbk.governed-filesystem-qualification.v1",
+  "work_unit": "WU-013"
+}

@@ -1,5 +1,130 @@
 # Changelog
 
+## 0.1.0-alpha.17.0.2
+
+- Corrected native Windows qualification isolation: runtime mise resolution is now explicit/PATH-only, batch-launcher assertions understand `cmd.exe /c`, byte-exact fixtures force LF, and real-mise qualification uses isolated Windows and mise state directories with network/auto-install/lockfile effects disabled.
+ — 2026-08-07
+
+- Set Python 3.11 as the package-wide minimum; enforce it at the setup, install, update, CLI, verification, test-runner, release, and package entry points, and declare it for the standalone JSONL analyzer.
+- Add a single host-aware dependency contract for Git, mise, pinned `jj@0.43.0`, Beads `1.1.0`, runtime `jsonschema` and `referencing`, and Node.js only when OMP is selected.
+- Add `tools/setup.py --check-dependencies` as an offline, non-installing preflight that disables mise network and automatic-install paths, checks exact managed versions through `mise which`, and blocks before tests or destination access.
+- Add the explicit `tools/setup.py --install-dependencies` bootstrap. After user consent it can use supported Windows, macOS, and Linux package managers for Git and mise, install pinned managed tools through mise, and install compatible Python runtime packages through the active interpreter. Host apps and language-profile toolchains remain separate.
+- Pin the OMP-managed Node runtime in non-default `tools/omp-runtime.mise.toml`, keep Node out of root mise tasks, accept a compatible direct Node.js 22+ runtime, and remove Node from every Codex-only install, update, dependency, and verification path.
+- Add focused Codex and OMP setup profiles; standard and release remain cross-host profiles and declare their Node requirement. Guard host-specific tests so missing unrelated host tools cause a clear skip or preflight block instead of a raw process error.
+- Make Windows batch verification execute only the modules selected for the active profile, avoiding unused host imports and broad-discovery startup cost.
+- Prevent dependency probes from causing mise downloads or tool installs, reject unsupported Windows `PATHEXT` source-file matches, and correct aggregate doctor status for all blocked dependency states.
+- Audit tool imports and copied OMP runtime modules so every third-party Python package and package-local import is declared and tested.
+- Make native Windows CI provision and verify the same Git, mise, jj, Beads, Python-package, and OMP Node dependency contract used by setup rather than relying on runner-image tools.
+- Align the README, installation, usage, development, upgrade, release, and qualification guidance with the Python floor, opt-in bootstrap, host-app boundary, and Codex/OMP dependency split.
+
+## 0.1.0-alpha.17.0.1 — 2026-08-07
+
+- Replace the former root README with the concise public BBK overview, consolidate its operating detail into `docs/USAGE.md`, and reorganize the documentation index around user, method, host, release-record, and maintainer paths.
+- Reconcile current documentation with the package: five install targets, 19 roles, 43 prompt modules, 40 shared skills, projection manifest v10, 58 OMP model tools, 48 OMP UI commands, mixed profile versions, and current critical-path skill sizes.
+- Keep volatile route tables, install detail, and verification commands in their canonical focused guides; update documentation tests to check those ownership boundaries.
+- Preserve the exact promoted Alpha.17 runtime and add delivery-first continuation as a side-by-side successor rather than modifying the final bytes.
+- Make `FAST_CONTINUATION`, `ADOPT_AND_GAP`, `ROADMAP_READY + FRONTIER_READY`, and `DEFERRED_UNTIL_FRONTIER` the canonical rolling-wave planning model.
+- Add standing delivery authority, `MAJOR_BLOCKER` / `ARCHITECTURAL_BRANCH` user-attention boundaries, active-child effect ownership, worktree-local toolchain-state projection, contained authority-incident recovery, and bounded coordination-message budgets.
+- Add a v2 host-neutral procedure registry with `bbk-wayfind -> bbk-plan` dependency closure and identity-aware `COMPILED_ONLY`, `COMPILER_SELECTABLE`, `EXTERNAL_OPTIONAL`, and `HOST_TOOL_ONLY` catalog classes.
+- Compile controllers and all 19 roles for Codex, OMP, Claude, explicit Pi, and generic/Pi compatibility from one `CompilationResult` per target; preserve primary-last prompt tails, selected-ID suppression, source maps, prompt metrics, typed events, and exact follow-up invalidation.
+- Add profile- and invocation-selected procedure support through `tools/prompt_compile.py`, plus generated plans, manifests, effective catalogs, source maps, logical-child state, and zero-source-read unchanged reuse.
+- Generate controller projections and make the OMP runtime consume the generated controller/role prompt surfaces, place runtime data before the compiled tail, and emit typed events tied to the actual effective prompt digest.
+- Add `tools/prompt_lint.py`, a 100-projection prompt compilation report, semantic contradiction checks, explicit Pi install/update support, and per-harness installed prompt metadata.
+- Harden JSONL/manual qualification so free-form model prose cannot satisfy compilation, reuse, readiness, Worker-start, or completion gates.
+- Retain Alpha.17 record compatibility and the exact predecessor provider-evidence boundary; changed Alpha.17.0.1 bytes require separate live-host qualification.
+- Derive bundled language-profile inventory and test expectations from the archives and release manifest that are present; no test assumes a fixed profile count or requires an excluded optional profile.
+- Replace POSIX-only fake command fixtures with Python-backed POSIX launchers and Windows `.cmd` launchers, stabilize governed-filesystem byte assertions against Git line-ending conversion, and make invalid-UTF-8 transport tests invoke the recorded Python interpreter directly.
+- Compile only the harness projections selected by an install or update command, share validated prompt/compiler inputs across one render, cache immutable schema documents, and keep behavior-level CLI checks in-process while retaining real processes for launcher, Node, Git, and process-boundary coverage.
+- Replace stale partial test weights with measured weights for all 49 modules and bind local timing caches to the exact packaged seed so an older install cannot override a corrected shard plan.
+- Prevent Windows `PATHEXT` from exposing Python payload files as native substrate commands: fake launchers now use non-command payload names, and substrate discovery accepts only the declared extensionless, `.exe`, `.cmd`, and `.bat` spellings.
+
+## 0.1.0-alpha.17 — 2026-08-06
+
+- Promote the approved RC9 governed runtime to Alpha.17 final after the Windows/OMP 16.4.8 provider campaign passed all sixteen M17 invariants and the release operator approved the redacted evidence.
+- Preserve token-addressed Worker dispatch, READY/LEASED/ACTIVATED/TERMINAL retry semantics, Windows-safe jj path identity, exact two-parent content-neutral integration, candidate admission, persistent BBK mode, and event-oriented completion.
+- Preserve product-first execution, current-until-invalidated verification receipts, same-attempt mechanical repair, structured-return-first transport, scope-aware validators, grouped assurance, and planning-stop behavior.
+- Preserve compiled-once child procedures, same-child external-catalog suppression, unchanged follow-up reuse, and ROADMAP_READY + FRONTIER_READY rolling-wave execution.
+- Preserve pre-effect validation of every governed child `yield` and the `bbk_return_template` / `bbk_return_prepare` schema-correct construction path.
+- Correct final evidence tooling so complete assistant-message arguments supersede filtered host projections, rejected-then-corrected return preparations count as same-attempt repair, Windows Python probes use temporary source files, and response-ID redaction does not corrupt ordinary code identifiers.
+- Qualify Alpha.17 final for OMP 16.4.8. OMP 17.2.9 and credentialed Codex/Pi behavioral parity remain explicitly unclaimed.
+
+## 0.1.0-alpha.17+rc.9
+
+- Validate every governed child `yield` against its exact role-return Draft 2020-12 schema before OMP acceptance.
+- Bind schema-valid returns to the active work unit, revision, attempt, session, invocation, parent route, authority, and effect fence.
+- Add `bbk_return_template` and `bbk_return_prepare` for deterministic role-return construction and complete immutable binding-scoped yield inputs.
+- Record role-return validation and admission receipts and return focused JSON-pointer diagnostics for same-attempt repair.
+- Extend manual evidence analysis across nested child sessions, structured returns, verification-economy duplication, all M17 invariants, and analyzer-populated result records.
+- Add the live OMP 16.4.8 `VER-022` malformed-yield block and prepared-yield replacement contract.
+
+## 0.1.0-alpha.17+rc.8 — 2026-08-06
+
+- Preserve RC7's real-provider-proven READY/LEASED/ACTIVATED/TERMINAL native Worker dispatch lifecycle without reopening the accepted Alpha.17 architecture.
+- Canonicalize `jj diff --name-only` results to validated repository-relative POSIX paths at the shared adapter boundary, including Windows backslash output, and apply the same contract to direct and baseline-relative path closure.
+- Refresh only isolated source workspaces during content-neutral integration; do not snapshot the repository/root workspace carrying mutable `.bbk` coordination state.
+- Derive integration-request Beads revisions internally and reuse the immutable idempotency-record revision for exact retries; retain `expected_revision` only as an optional compatibility field.
+- Treat a named poll denied before effect as a recorded efficiency finding rather than an executed polling violation; unblocked or unobserved named polling still fails admission.
+- Require a genuine token boundary for secret redaction so BBK receipt/schema identifiers containing `rk_` remain intact while standalone key-shaped values are removed.
+- Add Windows-path, integration, polling/analyzer, redaction, revision-derivation, migration, rollback, deterministic packaging, and credentialed-harness regression coverage. Alpha.17 final remains provider-gated.
+
+## 0.1.0-alpha.17+rc.7 — 2026-08-06
+
+- Corrected the OMP 16.4.8 compact-dispatch digest boundary by excluding the host-discarded presentation-only `i` field while retaining exact marker, agent, task-name, and parent-session checks.
+- Made `bbk_control_spawn` the atomic logical-attempt, jj-workspace, immutable-registration, Beads-assignment, and private-payload preparation surface; normal dispatch no longer requires model-authored `bbk_control_assign`.
+- Added durable READY/LEASED/ACTIVATED/TERMINAL dispatch status, lease release/expiry, activation acknowledgement, same-token retry, and duplicate-attempt prevention independent of idempotency keys.
+- Serialized full spawn preparation with bounded waiting while preserving parallel child execution after preparation.
+- Added `bbk_control_dispatch_status` and blocked eval/shell/Python/JavaScript dispatch emulation before effect.
+- Updated schemas, role capabilities, OMP/manual qualification fixtures, Windows scripts, tests, release packages, and migration/rollback material for RC7.
+
+## 0.1.0-alpha.17+rc.6 — 2026-08-06
+
+- Compile canonical required procedures exactly once into a closed final child-prompt tail, place the primary procedure last, and suppress the same IDs from each child's effective external skill catalog and indexed installation roots.
+- Retain compiled manifest/prompt/catalog state across unchanged follow-ups with declared invalidation keys and zero procedure-source reads.
+- Add `FAST_CONTINUATION`, `ADOPT_AND_GAP`, `ROADMAP_READY`, and `FRONTIER_READY`, permitting current Worker execution while future phases remain stable `DEFERRED_UNTIL_FRONTIER` records.
+- Generate routine Worker and assertion contracts deterministically; require typed material triggers for Worker Designer and Verification Designer.
+- Add transactional planning state, immutable semantic event transactions, atomic current-pointer publication, optimistic conflict detection, migration anchors, and rollback of failed publication.
+- Add atomic `bbk result finalize` and `bbk manifest finalize` operations with canonical UTF-8/LF bytes and sidecar identity receipts.
+- Add one bounded same-attempt evidence-capture replay for exact safe capture-only failures, plus expanded PowerShell wrapper preflight.
+- Add late-bound effective profile receipts, reusable workspace admission receipts, typed child events, and candidate-versus-project coverage truth.
+- Ship the standalone Alpha.17 JSONL analyzer configuration, hard-gate evaluator, synthetic acceptance fixture, deterministic Codex manual qualification kit, and corrected current-RC OMP redaction/rollback paths.
+- Preserve RC5's token-addressed bound dispatch, create-once root identity, exact two-parent integration, candidate-admission closure, structured-return-first enforcement, event-oriented completion, and generic evaluator fallback prohibition.
+- Keep `jj@0.43.0` and Beads `1.1.0` mise-managed, retain the supplied 19-role routing defaults, and keep routing `package_version` optional.
+- Defer the canonical candidate-workspace/jj-overlay redesign to a successor release.
+
+## 0.1.0-alpha.17+rc.5 — 2026-08-05
+
+- Replace model-reproduced bound task payloads with immutable token-addressed dispatch reservations. `bbk_control_spawn` and `bbk_control_bind` return one compact OMP-native one-item batch; the qualified pre-effect OMP hook admits the reservation and rewrites it to the exact privately stored assignment before the built-in task tool executes.
+- Add a keyless OMP 16.4.8 host-contract scenario proving that compact dispatch survives host schema validation, the pre-effect hook forwards the exact resolved payload, and the child never receives the compact marker as its assignment. Generic `eval`, shell, Python, or free-form task reconstruction remains forbidden.
+- Make the manual root bootstrap create-once and parent-aware. Child sessions may observe but cannot replace the original root binding, and the qualification integration bridge authenticates the exact top-level root identity rather than the most recently started child.
+- Repair content-neutral two-parent jj integration by verifying the integrated path closure against the exact baseline revision, source commit identities, disjoint worker paths, conflict state, and candidate workspace. The bridge now emits a current candidate-admission receipt or fails closed before reviewer/validator binding.
+- Require that an integrated candidate have a successful current integration receipt, exact two-source closure, exact expected paths, no conflicts, and matching workspace, jj, Git-tree, and candidate digests. A failed integration cannot be relabelled or substituted with a single-worker workspace.
+- Add a deterministic structured-return transport fence. `STRUCTURED_RETURN_ONLY` bindings block `bbk_handoff_create`; `STRUCTURED_RETURN_FIRST` requires a named material durable-transport reason before a sealed package may be created.
+- Correct the Windows manual-kit installer with bounded mise discovery across current PATH, explicit parameters, environment hints, standard user-local locations, and WinGet package roots while preserving native-stderr-safe exit handling. Global `jj` and `bd` remain unnecessary; mise owns both pinned tools.
+- Replace the unreliable OMP start runner with a pure command emitter. It validates the isolated install, writes and prints one exact copy-and-paste PowerShell launch block, and never starts, backgrounds, waits for, or exits an OMP process itself.
+- Correct evidence analysis to deduplicate host and assistant projections by shared tool-call identity, avoiding doubled calls and false zero-second polling intervals. Preserve event-driven completion, the five-minute probe floor, and truthful nonpass evidence.
+- Retain all RC4 persistent-mode, prompt-integrity, polling, collector, schema-registry, critical-path, routing, governed-filesystem, control-plane, jj/mise, and verification-economy corrections. The observed RC4 provider run is retained as nonpass evidence; `VER-037` requires a new archive-bound RC5 Windows/provider PASS before Alpha.17 final.
+
+## 0.1.0-alpha.17+rc.4 — 2026-08-05
+
+- Correct the Windows manual-qualification launcher so OMP remains foreground-attached for native executables and PowerShell/CMD wrappers; disable discovered skills as well as discovered extensions, load only the exact RC extension and helper, and remove the script-level `exit` path.
+- Publish an exact version-bound `bbk.omp-runtime.v1` marker from the OMP extension. The manual helper now requires that marker, activates persistent BBK mode before the first user prompt, requires current controller/provider prompt-integrity receipts, and fails closed when a skill-only fallback or mismatched extension is observed.
+- Make the canonical `bbk` skill an explicit compatibility discovery surface rather than a mode substitute. A `skill-prompt` without extension-owned `bbk_*` tools, `bbk-mode-state`, and `bbk-effective-prompt-receipt` evidence returns `BBK_OMP_EXTENSION_NOT_ACTIVE` instead of emulating BBK through generic tools.
+- Replace high-frequency child polling with event-delivery semantics. OMP task results and IRC messages auto-deliver; a blocking empty `job`/IRC wait remains available, specific-job polling is denied, and successful nonblocking list/inbox/roster probes are limited to one per 300 seconds while children remain active.
+- Correct `collect-evidence.ps1` to preserve native stderr warnings as evidence and determine success from the actual process exit code, matching the earlier installer correction. Add session-admission analysis that preserves a non-mode or skill-fallback run as `INCONCLUSIVE` rather than losing evidence or allowing a false manual PASS.
+- Expand the Windows manual gate from 13 to 16 invariants to cover extension-owned mode/prompt admission, foreground/no-skill-fallback launch, and event-driven coordination. The observed RC3 user run is retained as nonpass evidence and does not satisfy `VER-037`.
+- Preserve every RC3 substrate, critical-path, routing, schema-registry, governed-filesystem, control-plane, jj/mise, and verification-economy correction. Alpha.17 final remains blocked on a successful RC4 real-provider run.
+
+## 0.1.0-alpha.17+rc.3 — 2026-08-05
+
+- Make mise the canonical owner and launcher for `jj@0.43.0` and `github:gastownhall/beads@1.1.0`; normal BBK, substrate-doctor, Beads, jj, and release-qualification paths no longer require globally installed `jj` or `bd`. Git remains a global prerequisite.
+- Adopt the supplied 19-role `bbk.model-routing.v2` policy as the packaged default. Treat `package_version` as optional provenance for imported v1/v2 routing policies; schema version, exact live-role coverage, and host route fields remain governing.
+- Integrate the critical-path execution policy into canonical prompt modules, all 19 roles, high-frequency skills, schemas, deterministic runtime helpers, generators, documentation, and tests. Current PASS receipts are reused until invalidated, Worker dispatch uses exactly four blocking facts, and executable work stops further planning unless a named material blocker or risk is supplied.
+- Permit reversible pre-freeze mechanical defects to be repaired in the same semantic run and physical attempt with only the affected mechanical gate rerun. Scope broad product validators to declared inspected-input changes and at most one final frozen-candidate pass. Default routine assurance to INLINE, group compatible assertions, and require a named qualitative risk for Reviewer dispatch.
+- Compile shared prompt modules once per effective role/skill closure. Generated skills declare `requires_prompt_modules` and `standalone_prompt_modules`; the four hot-path skills now total 67,609 bytes while retaining lossless standalone handoff/recovery content where needed.
+- Add verification-receipt, admission-certificate, verification-budget, verification-economy event-log, and metrics schemas; deterministic dispatch, pre-check/reuse, receipt persistence, repair-transition, validator-scope, assurance-grouping, and planning-stop code; and replay fixtures for the observed Alpha.16 verification-churn pattern.
+- Preserve the Alpha.16.1 recursive declared-`$id` schema registry and structured managed-validator failure correction, the RC2 governed write/control-plane/session-oracle work, content-neutral jj integration, and candidate-safe mise task execution.
+- Publish only as a successor release candidate. `VER-037` real-provider qualification remains mandatory before Alpha.17 final.
+
 ## 0.1.0-alpha.16.1 — 2026-08-04
 
 - Repair harness-scoped OMP clean replacement and the dedicated OMP updater by sharing one canonical adjacent Python runtime inventory with the full installer, proving manifest ownership, smoke-running the installed import/routing/schema surfaces, and rolling back targeted files plus the prior manifest on post-install failure.
@@ -77,7 +202,7 @@
 - Centralize `EXAMPLE-*` classification and exclude examples from live counts, automatic question/handoff discovery, default manifests, and candidate inputs while reporting them separately and retaining template access.
 - Compare OMP project routing, bindings, installed paths, manifests, agent directories, and test expectations by physical identity, covering Windows long-name/8.3 aliases without weakening fail-closed cross-project routing.
 - Add proportional research stopping, executable-command verification, a bounded pre-execution confirmation register, and concise transport-versus-integration claim truth through reusable prompt modules.
-- Audit and preserve exact candidate/review binding, specialist ownership, Beads operation, project/user routing isolation, nested-agent visibility, test-runner acceleration, all five language profiles, and the reviewed 19-role default model routes.
+- Audit and preserve exact candidate/review binding, specialist ownership, Beads operation, project/user routing isolation, nested-agent visibility, test-runner acceleration, all bundled language profiles, and the reviewed 19-role default model routes.
 - Explicitly defer deterministic claim-state transitions, automatic review invalidation, filesystem-enforced specialist ownership, and Blueprint lifecycle/release gates.
 
 ## 0.1.0-alpha.13.2 — 2026-08-02
@@ -179,7 +304,7 @@
 - Correct schema-validator coverage to treat optional-dependency `BLOCKED` plus exit code 1 as the documented machine-readable status contract.
 - Centralize install/update path identity across core installation, Codex-only update, OMP-only update, and installed OMP routing; use native physical identity for live files and a stricter case/slash-normalized portable key for cross-platform install-plan collision checks.
 - Add a native Windows compatibility probe and GitHub Actions matrix for Python 3.11/3.13, full verification, strict CP1252 output, path aliases, and Win32 sharing violations.
-- Preserve the 19-role method, project-record formats, installer destinations, model-routing defaults, and all five bundled language-profile archives; beyond the Windows portability corrections, changes are limited to release identity, generated integrity metadata, documentation, and version-bound fixtures.
+- Preserve the 19-role method, project-record formats, installer destinations, model-routing defaults, and all bundled language-profile archives; beyond the Windows portability corrections, changes are limited to release identity, generated integrity metadata, documentation, and version-bound fixtures.
 
 ## 0.1.0-alpha.11.11 — 2026-07-30
 
@@ -189,7 +314,7 @@
 - Remove pre-public-only Blueprint alignment/dogfood material and the one-off alpha.9.1 Windows leak-recovery utility from the current package.
 - Replace history-presence regressions with direct public-repository-shape, documentation-inventory, and product-neutrality checks while retaining the five consolidated test modules.
 - Update the deterministic release builder and current documentation for direct repository maintenance without changing role, runtime, installer, project-record, model-routing, or bundled-profile operational behavior.
-- Promote the bundled CODESYS profile to its independently versioned `0.1.0-alpha.4` successor after CI-script/documentation review; preserve the Go, Python, Rust, and TypeScript/JavaScript `0.1.0-alpha.3` packages byte-for-byte.
+- Refresh bundled language-profile release metadata after CI-script and documentation review; preserve the published Go, Python, Rust, and TypeScript/JavaScript `0.1.0-alpha.3` packages byte-for-byte.
 
 ## 0.1.0-alpha.11.10 — 2026-07-30
 
@@ -204,7 +329,7 @@
 
 ## 0.1.0-alpha.11.9 — 2026-07-29
 
-- Rebuilt all five bundled language profiles at their existing independently versioned `0.1.0-alpha.3` identities before the first public tag.
+- Rebuilt all bundled language profiles at their existing independently versioned `0.1.0-alpha.3` identities before the first public tag.
 - Normalized current profile metadata to require BBK `0.1.0-alpha.8` or a compatible successor while preserving predecessor provenance and the structure/slice contract dialect introduced in alpha.4.
 - Corrected Python structure-contract validator compatibility so alpha.8, alpha.11.x, stable, and compatible future cores are accepted while genuinely older cores remain unavailable.
 - Consolidated profile tests into responsibility-oriented suites, enforced explicit UTF-8 text I/O, and made OMP `.py` command overrides interpreter-safe across Windows and POSIX.
@@ -265,7 +390,7 @@
 - Remove structured slash-command return payloads; retain structured JSON only for explicitly LLM-callable tools.
 - Keep `/bbk <request>` as the sole deliberate extension prompt path through `sendUserMessage`, while `/bbk status` remains deterministic and UI-only.
 - Add `tools/update_omp.py`, `setup.py --update-omp`, and `setup.py --test-and-update-omp` for manifest-safe OMP-only upgrades that preserve active routing and do not modify `.codex`, Claude, or generic agent files.
-- Update and remanifest the bundled CODESYS, Go, Python, Rust, and TypeScript/JavaScript alpha.3 profile archives with the same OMP command/context boundary.
+- Update and remanifest the bundled Go, Python, Rust, and TypeScript/JavaScript alpha.3 profile archives with the same OMP command/context boundary.
 - Add cross-command, cross-profile, routing-preservation, Codex-nonmutation, setup-surface, documentation, and installed-manifest regressions.
 - Preserve alpha.11.3 routing profiles, alpha.11.2 Windows portability, alpha.11.1 bundled default profiles, role composition, and project-record compatibility.
 
@@ -277,7 +402,7 @@
 - Refuse missing, divergent, or unowned agents rather than overwriting local changes; attempt rollback if a routing-state write fails.
 - Document OMP precedence: `task.agentModelOverrides` and project-scope agents can supersede BBK-managed user-agent frontmatter.
 - Add a compact `bbk.omp-model-routing-profile.v1` template/schema, installed routing helper, six alpha.11.3 regressions, and update the OMP surface to 26 tools and 26 commands.
-- Preserve alpha.11.2 Windows UTF-8/isolation corrections, the single bundled archive, five default-installed language profiles, corrected TypeScript/JavaScript alpha.3 metadata, role composition, install-time model routing, and project-record compatibility.
+- Preserve alpha.11.2 Windows UTF-8/isolation corrections, the single bundled archive, the default-installed bundled language profiles, corrected TypeScript/JavaScript alpha.3 metadata, role composition, install-time model routing, and project-record compatibility.
 
 ## 0.1.0-alpha.11.2 — 2026-07-27
 
@@ -285,13 +410,13 @@
 - Extend source sanity so implicit `Path` text encoding is a blocking pre-unittest verification error rather than a locale-dependent runtime surprise.
 - Add alpha.11.2 regressions for current UTF-8 canonical-input loading, package-wide explicit-encoding compliance, and detector behavior.
 - Isolate installer regressions from an ambient `BBK_HOME` by binding both `BBK_HOME` and `HOME` to each temporary test profile.
-- Preserve alpha.11.1's single bundled archive, five default-installed language profiles, corrected TypeScript/JavaScript alpha.3 metadata, installer transaction model, role composition, model routing, and project-record compatibility.
+- Preserve alpha.11.1's single bundled archive, the default-installed bundled language profiles, corrected TypeScript/JavaScript alpha.3 metadata, installer transaction model, role composition, model routing, and project-record compatibility.
 
 ## 0.1.0-alpha.11.1 — 2026-07-27
 
 - Reconcile the parallel alpha.11 and alpha.10.2 successors into one canonical release that supersedes both branches.
-- Bundle the verified CODESYS, Go, Python, Rust, and TypeScript/JavaScript `0.1.0-alpha.3` profile archives inside the BBK distributable.
-- Install all five bundled profiles by default; add `--no-language-profiles` for core-only installs and allow repeated `--profile-id` selection without an external bundle path.
+- Bundle the verified Go, Python, Rust, and TypeScript/JavaScript `0.1.0-alpha.3` profile archives inside the BBK distributable.
+- Install all bundled profiles by default; add `--no-language-profiles` for core-only installs and allow repeated `--profile-id` selection without an external bundle path.
 - Treat an explicit `--language-profiles` source as a deliberate replacement for the bundled profile source for that invocation.
 - Correct stale current-release metadata in the TypeScript/JavaScript alpha.3 package, rebuild its manifest/root digest, and retain legitimate alpha.2 lineage references without a version bump.
 - Merge alpha.11 complete-plan preflight, destination collision checks, executable-mode preservation/repair, mode-aware status/uninstall, setup aliases, and archive safety with alpha.10.2 delegation/profile-registry/prompt-efficiency changes.

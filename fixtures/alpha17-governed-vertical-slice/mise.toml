@@ -1,0 +1,3 @@
+[tasks."fixture:verify"]
+description = "Verify the integrated Alpha.17 governed vertical-slice fixture"
+run = "python verify_fixture.py"

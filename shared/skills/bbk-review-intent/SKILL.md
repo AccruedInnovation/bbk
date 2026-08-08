@@ -1,6 +1,8 @@
 ---
 name: bbk-review-intent
 description: Check intent and outcome conformance across requested intervention, SolutionOutcomeFit, plans, structure, slices, work, candidate, evidence, and promised capability.
+requires_prompt_modules: []
+standalone_prompt_modules: []
 ---
 
 # BBK Intent Conformance

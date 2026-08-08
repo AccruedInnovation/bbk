@@ -1,0 +1,94 @@
+{
+  "$defs": {},
+  "$id": "bbk-policy-predicate-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "all": {
+          "items": {
+            "$ref": "#"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "all"
+      ],
+      "title": "all predicate",
+      "type": "object"
+    },
+    {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "any": {
+          "items": {
+            "$ref": "#"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "any"
+      ],
+      "title": "any predicate",
+      "type": "object"
+    },
+    {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "not": {
+          "$ref": "#"
+        }
+      },
+      "required": [
+        "not"
+      ],
+      "title": "not predicate",
+      "type": "object"
+    },
+    {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "type": "string"
+        },
+        "operator": {
+          "enum": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "exists",
+            "truthy",
+            "contains",
+            "prefix",
+            "path_within"
+          ],
+          "type": "string"
+        },
+        "value": {},
+        "value_from": {
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "field",
+        "operator"
+      ],
+      "title": "field predicate",
+      "type": "object"
+    }
+  ],
+  "title": "BBK policy predicate v1"
+}

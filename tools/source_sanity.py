@@ -6,11 +6,20 @@ import argparse
 import ast
 import json
 import py_compile
+import sys
 import tempfile
 from pathlib import Path
 from typing import Any, Sequence
 
 ROOT = Path(__file__).resolve().parents[1]
+TOOLS_DIR = ROOT / "tools"
+if str(TOOLS_DIR) not in sys.path:
+    sys.path.insert(0, str(TOOLS_DIR))
+
+from runtime_requirements import enforce_supported_python
+
+enforce_supported_python(program="BBK source sanity check")
+
 EXCLUDED_PARTS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
 EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
 

@@ -42,8 +42,11 @@ EXPECTED_HUMAN_REQUEST_ORIGINATORS = (
     "bbk_questioning_wayfinder",
     "bbk_question_guide",
 )
+EXPECTED_ALL_ROLE_NAMES = {'bbk_architect', 'bbk_phase_wayfinder', 'bbk_planning_wayfinder', 'bbk_prototyper', 'bbk_question_guide', 'bbk_questioning_wayfinder', 'bbk_researcher', 'bbk_reviewer', 'bbk_root_orchestrator', 'bbk_root_wayfinder', 'bbk_synthesizer', 'bbk_territory_orchestrator', 'bbk_territory_wayfinder', 'bbk_validator', 'bbk_validator_orchestrator', 'bbk_verification_designer', 'bbk_worker', 'bbk_worker_designer', 'bbk_worker_orchestrator'}
+
 EXPECTED_EXCLUSIVE_PROMPT_MODULE_ROLES = {
     "bbk-prompt-human-request": set(EXPECTED_HUMAN_REQUEST_ORIGINATORS),
+    "bbk-prompt-critical-path-execution": set(EXPECTED_ALL_ROLE_NAMES),
     "bbk-prompt-handoff-protocol": {
         "bbk_architect",
         "bbk_phase_wayfinder",
@@ -905,11 +908,14 @@ def assemble(
         ]
         if role_prompt_modules != canonical_module_order:
             errors.append(f"{where}: prompt_modules must follow catalog order")
-        required_by_skills = set(role_skill_module_requirements(role, method_skills))
+        required_by_skills = set(role_skill_module_requirements(
+            role, method_skills, method_content.get("skill_module_dependencies", {}),
+            include_all_loaded_skills=True,
+        ))
         missing_required_modules = sorted(required_by_skills - set(role_prompt_modules))
         if missing_required_modules:
             errors.append(
-                f"{where}: mandatory procedures require unassigned prompt modules "
+                f"{where}: loaded skills require unassigned prompt modules "
                 f"{missing_required_modules}"
             )
 
@@ -1148,7 +1154,9 @@ def assemble(
         if isinstance(mode, str)
     }
     expected_worker_modes = {
-        "CANDIDATE_PRODUCTION": {"bbk_worker_orchestrator"},
+        "CANDIDATE_PRODUCTION": {
+            "bbk_root_orchestrator", "bbk_territory_orchestrator", "bbk_worker_orchestrator"
+        },
         "PROTOTYPE_SUPPORT": {"bbk_prototyper"},
     }
     if worker_modes != expected_worker_modes:

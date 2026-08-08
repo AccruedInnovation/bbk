@@ -1,0 +1,28 @@
+{
+  "schema_version": "bbk.prompt-module.v1",
+  "id": "bbk-prompt-evidence-capture-replay",
+  "title": "Bounded evidence-capture replay",
+  "description": "Permit one same-execution-attempt physical replay when only evidence capture failed and no mutation or external effect occurred.",
+  "clauses": [
+    {
+      "id": "EVIDENCE_REPLAY.IDENTITY",
+      "text": "Separate the semantic command identity from its physical execution attempts."
+    },
+    {
+      "id": "EVIDENCE_REPLAY.ELIGIBILITY",
+      "text": "When a command is read-only or idempotent inside a disposable scope, product mutation and external effects are proven `NONE`, cleanup is complete, invocation identity remains exact, the candidate is not frozen, and only evidence capture failed, record `EVIDENCE_CAPTURE_FAILED` and permit one repaired physical replay in the same execution attempt."
+    },
+    {
+      "id": "EVIDENCE_REPLAY.LINEAGE",
+      "text": "Give the replay a new physical command-attempt ID while retaining the same semantic command ID. Preserve both attempts and the eligibility proof."
+    },
+    {
+      "id": "EVIDENCE_REPLAY.NO_PLANNING",
+      "text": "Do not route an eligible capture failure to planning or create a successor execution attempt. A second capture failure is a technical blocker owned by the execution/tooling layer."
+    },
+    {
+      "id": "EVIDENCE_REPLAY.PROHIBITIONS",
+      "text": "Replay is prohibited after candidate freeze or whenever mutation, effects, cleanup, idempotence, invocation identity, or result semantics are uncertain."
+    }
+  ]
+}

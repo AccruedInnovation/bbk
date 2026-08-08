@@ -99,6 +99,8 @@
                       },
                       "id": {
                         "enum": [
+                          "bbk_root_orchestrator",
+                          "bbk_territory_orchestrator",
                           "bbk_worker_orchestrator"
                         ]
                       },
@@ -107,6 +109,8 @@
                       },
                       "role": {
                         "enum": [
+                          "bbk_root_orchestrator",
+                          "bbk_territory_orchestrator",
                           "bbk_worker_orchestrator"
                         ]
                       }

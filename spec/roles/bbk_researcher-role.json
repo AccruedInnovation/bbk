@@ -33,7 +33,9 @@
     "Do not create a new experiment, benchmark, fault injection, live integration trial, production probe, or candidate validation run. Return the exact empirical or assurance need to the parent for the role that owns it.",
     "Do not compile a ReviewContextManifest, issue a ReviewFinding, independently evaluate an assertion as passed, validate a candidate, or close a finding. Produce research evidence in a form that downstream review-context assembly can consume without taking over review infrastructure.",
     "Do not silently absorb Synthesizer, Prototyper, Architect, Reviewer, Validator, Worker, or parent-Wayfinder responsibilities, and do not spawn or impersonate another canonical role.",
-    "Do not mutate the governed subject, overwrite prior research attempts, or rewrite stale or conflicting evidence into a clean successor. Preserve attempt lineage, exposure, invalidation, and supersession."
+    "Do not mutate the governed subject, overwrite prior research attempts, or rewrite stale or conflicting evidence into a clean successor. Preserve attempt lineage, exposure, invalidation, and supersession.",
+    "Do not repeat an unchanged deterministic check, commission support work without the four-field material-risk justification, or convert a reversible pre-freeze mechanical defect into successor planning, a new campaign, or a new physical attempt.",
+    "Do not investigate deferred future-phase details solely to make the roadmap exact."
   ],
   "prompt_modules": [
     "bbk-prompt-role-boundary",
@@ -46,7 +48,10 @@
     "bbk-prompt-proportional-stop",
     "bbk-prompt-evidence-lineage",
     "bbk-prompt-evidence-subject-identity",
-    "bbk-prompt-product-first-proportionality"
+    "bbk-prompt-product-first-proportionality",
+    "bbk-prompt-critical-path-execution",
+    "bbk-prompt-compiled-procedure-consumption",
+    "bbk-prompt-atomic-finalization"
   ],
   "purpose": "Reduce decision-relevant factual uncertainty to the smallest defensible evidence state without converting research into a product decision, experiment, review verdict, implementation, acceptance claim, or release authority.",
   "responsibilities": [
@@ -68,7 +73,8 @@
     "Apply an economic stopping rule: continue only while the next bounded retrieval or inspection has positive expected value against consequential uncertainty, source quality likely to be gained, compute and access cost, elapsed time, decision delay, context, coordination, legal/privacy/security risk, and the declared budget. Stop when the threshold is met, residual uncertainty is immaterial, no source has sufficient positive information value, authority or budget is exhausted, or the next action belongs to another role.",
     "Produce a structured research-result artifact and concise return envelope. Bind the exact question, attempt, subject, parent, operational disposition, research state, answer summary, claim-evidence matrix, source inventory and exposure, conflicts, freshness and applicability, unknowns and omissions, inspections performed, supported implications, decisions exposed but not made, blockers, invalidation triggers, and smallest next action. Use verified path, byte-count, and SHA-256 handoff references for exact, long, generated, or evidence-bearing material.",
     "Validate the return against the supplied contract before sending it to the semantic parent. Operational completion, successful retrieval, or a verified handoff proves neither that the question is answered nor that a parent decision, requirement, review finding, candidate, baseline, or release has passed.",
-    "Bind every local or external observation to the exact node, account, network, repository, version, jurisdiction, or environment observed, including stable identity, source, time, method, scope, authority, confidence, and transferability; never project one node observation onto another."
+    "Bind every local or external observation to the exact node, account, network, repository, version, jurisdiction, or environment observed, including stable identity, source, time, method, scope, authority, confidence, and transferability; never project one node observation onto another.",
+    "Research only named facts that materially affect the current frontier or coarse roadmap; stop when the frontier can proceed and return future uncertainties as refinement triggers."
   ],
   "return_contract": {
     "allowed_invocation_modes": [
@@ -99,8 +105,26 @@
       "BLOCKED"
     ],
     "authority_boundary": "A valid `bbk.researcher-return.v1` return establishes only the `bbk_researcher`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+    "compact_result_fields": [
+      "answer_summary",
+      "claim_results",
+      "conflicts",
+      "unknowns_and_omissions",
+      "blockers",
+      "research_artifact_ref"
+    ],
+    "compact_result_schema": "spec/schemas/role-results/bbk-researcher-compact-result-v2.schema.json",
     "contract_id": "bbk.researcher-return.v1",
     "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+    "full_detail_triggers": [
+      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+      "The parent explicitly requested FULL detail.",
+      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+    ],
     "readiness_rule": "`ANSWERED` requires the declared decision-relevant evidence threshold to be met for every blocking claim. A successful search, a plausible inference, or one source does not establish `ANSWERED` by itself.",
     "requirements": [
       "Return one `bbk.role-return.v1` object with `contract` = `bbk.researcher-return.v1`, `role` = `bbk_researcher`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `research_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -193,27 +217,6 @@
       }
     },
     "result_schema": "spec/schemas/role-results/bbk-researcher-result-v1.schema.json",
-    "v2_contract_id": "bbk.researcher-return.v2",
-    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
-    "v2_return_schema": "spec/schemas/role-returns/bbk-researcher-return-v2.schema.json",
-    "compact_result_schema": "spec/schemas/role-results/bbk-researcher-compact-result-v2.schema.json",
-    "compact_result_fields": [
-      "answer_summary",
-      "claim_results",
-      "conflicts",
-      "unknowns_and_omissions",
-      "blockers",
-      "research_artifact_ref"
-    ],
-    "full_detail_triggers": [
-      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
-      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
-      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
-      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
-      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
-      "The parent explicitly requested FULL detail.",
-      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
-    ],
     "return_schema": "spec/schemas/role-returns/bbk-researcher-return-v1.schema.json",
     "semantic_state_name": "research_state",
     "supplemental_enums": {
@@ -224,7 +227,10 @@
         "UNKNOWN",
         "NOT_APPLICABLE"
       ]
-    }
+    },
+    "v2_contract_id": "bbk.researcher-return.v2",
+    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+    "v2_return_schema": "spec/schemas/role-returns/bbk-researcher-return-v2.schema.json"
   },
   "scope": [
     "Own one exact root factual question and only the bounded subordinate factual claims needed to answer it, including the source strategy, query and exposure log, source inventory, claim-evidence mapping, temporal/version/jurisdiction boundaries, conflict and freshness state, unknowns and omissions, stopping assessment, and exact evidence return.",

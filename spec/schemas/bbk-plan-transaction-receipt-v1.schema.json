@@ -1,0 +1,71 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-plan-transaction-receipt-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "atomic": {
+      "const": true
+    },
+    "authority_ref": {
+      "type": "string"
+    },
+    "durable_planning_write_count": {
+      "maximum": 10,
+      "minimum": 3,
+      "type": "integer"
+    },
+    "durable_planning_writes": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 3,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "event_ids": {
+      "type": "array"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "head": {
+      "type": "string"
+    },
+    "prior_head": {
+      "type": "string"
+    },
+    "projection_identities": {
+      "type": "array"
+    },
+    "schema": {
+      "const": "bbk.plan-transaction-receipt.v1"
+    },
+    "status": {
+      "const": "PASS"
+    },
+    "transaction_id": {
+      "type": "string"
+    },
+    "write_accounting_basis": {
+      "const": "LOGICAL_DURABLE_ARTIFACTS"
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "transaction_id",
+    "prior_head",
+    "head",
+    "event_ids",
+    "projection_identities",
+    "authority_ref",
+    "generated_at",
+    "atomic",
+    "durable_planning_writes",
+    "durable_planning_write_count",
+    "write_accounting_basis"
+  ],
+  "title": "BBK Plan Transaction Receipt v1",
+  "type": "object"
+}

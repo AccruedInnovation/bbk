@@ -12,13 +12,23 @@ import subprocess
 import sys
 import tempfile
 import zipfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Iterable, Sequence
+
+TOOLS_DIR = Path(__file__).resolve().parent
+if str(TOOLS_DIR) not in sys.path:
+    sys.path.insert(0, str(TOOLS_DIR))
+
+from runtime_requirements import enforce_supported_python
+
+enforce_supported_python(program='BBK release builder')
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 TOP = f"bbk-{VERSION}"
-FIXED_TIME = (2026, 8, 3, 0, 0, 0)
+FIXED_TIME = (2026, 8, 7, 0, 0, 0)
+PACKAGE_CREATED_AT = "2026-08-07T00:00:00Z"
+PROFILE_GENERATED_AT = "2026-08-07T00:00:00-06:00"
 EXCLUDED_PARTS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
 EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
 # Package executability is an explicit release contract, not an accident of the
@@ -68,7 +78,7 @@ def build_manifest() -> dict[str, Any]:
     projection = json.loads((ROOT / "projections" / "manifest.json").read_text(encoding="utf-8"))
     return {
         "schema": "bbk.package-manifest.v1", "name": "Blueprint Bootstrap Kit", "version": VERSION,
-        "created_at": "2026-08-03T00:00:00Z", "file_count": len(files), "files": files,
+        "created_at": PACKAGE_CREATED_AT, "file_count": len(files), "files": files,
         "root_sha256": hashlib.sha256(canonical(payload)).hexdigest(),
         "targets": projection.get("targets", []), "role_count": projection.get("role_count"),
         "projection_count": projection.get("projection_count"), "projection_source_sha256": projection.get("source_sha256"),
@@ -78,6 +88,88 @@ def build_manifest() -> dict[str, Any]:
         "model_routing_source_sha256": projection.get("model_routing_source_sha256"),
         "authority_disclaimer": "BBK is a temporary method harness and is not an official Blueprint release or authority-bearing package.",
     }
+
+
+def refresh_bundled_profile_integrity() -> dict[str, Any]:
+    """Rebuild the public profile inventory from the archives that are present."""
+    bundle_root = ROOT / "bundled-language-profiles"
+    packages_root = bundle_root / "packages"
+    archives = sorted(packages_root.glob("*.zip"), key=lambda item: item.name.casefold())
+    if not archives:
+        raise RuntimeError(f"No bundled language-profile archives found in {packages_root}")
+
+    expected_companions: set[Path] = set()
+    profile_versions: dict[str, str] = {}
+    sum_lines: list[str] = []
+    for archive in archives:
+        digest = sha256_file(archive)
+        companion = archive.with_name(archive.name + ".sha256")
+        companion.write_text(f"{digest}  {archive.name}\n", encoding="utf-8")
+        expected_companions.add(companion.resolve())
+        sum_lines.append(f"{digest}  packages/{archive.name}\n")
+
+        with zipfile.ZipFile(archive) as source:
+            candidates = [
+                name
+                for name in source.namelist()
+                if len(PurePosixPath(name).parts) == 2
+                and PurePosixPath(name).name == "PROFILE.json"
+            ]
+            if len(candidates) != 1:
+                raise RuntimeError(
+                    f"Expected one top-level PROFILE.json in {archive}, found {len(candidates)}"
+                )
+            profile = json.loads(source.read(candidates[0]).decode("utf-8"))
+        profile_id = profile.get("id")
+        version = profile.get("version")
+        if not isinstance(profile_id, str) or not profile_id:
+            raise RuntimeError(f"Invalid profile id in {archive}")
+        if not isinstance(version, str) or not version:
+            raise RuntimeError(f"Invalid profile version in {archive}")
+        if profile_id in profile_versions:
+            raise RuntimeError(f"Duplicate bundled profile id: {profile_id}")
+        profile_versions[profile_id] = version
+
+    for companion in packages_root.glob("*.zip.sha256"):
+        if companion.resolve() not in expected_companions:
+            companion.unlink()
+
+    (bundle_root / "SHA256SUMS.txt").write_text("".join(sum_lines), encoding="utf-8")
+    manifest_path = bundle_root / "RELEASE-MANIFEST.json"
+    previous: dict[str, Any] = {}
+    if manifest_path.is_file():
+        try:
+            value = json.loads(manifest_path.read_text(encoding="utf-8"))
+            if isinstance(value, dict):
+                previous = value
+        except json.JSONDecodeError:
+            previous = {}
+
+    files = []
+    for path in sorted(bundle_root.rglob("*"), key=lambda item: item.relative_to(bundle_root).as_posix()):
+        if not path.is_file() or path == manifest_path:
+            continue
+        files.append({
+            "path": path.relative_to(bundle_root).as_posix(),
+            "bytes": path.stat().st_size,
+            "sha256": sha256_file(path),
+        })
+    manifest = {
+        "schema": "bbk.language-profiles-release-bundle-manifest.v1",
+        "release": f"bbk-{VERSION}-language-profiles",
+        "variant": f"bundled-with-bbk-{VERSION}",
+        "status": "PASS",
+        "generatedAt": PROFILE_GENERATED_AT,
+        "timezone": previous.get("timezone", "America/Edmonton"),
+        "fileCount": len(files),
+        "profileVersions": dict(sorted(profile_versions.items())),
+        "files": files,
+    }
+    manifest_path.write_text(
+        json.dumps(manifest, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return manifest
 
 
 def write_manifest() -> dict[str, Any]:
@@ -119,6 +211,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     output_dir = Path(args.output_dir).expanduser().resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
+    # Refresh the nested profile bundle first so deleted or added optional
+    # profiles cannot leave stale checksums or inventory records behind.
+    refresh_bundled_profile_integrity()
     # PACKAGE-MANIFEST.json is excluded from its own root digest, so write it
     # before qualification and use it as the pre-execution trust gate.
     manifest = write_manifest()

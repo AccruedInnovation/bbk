@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-role-return-template-v1.schema.json",
+  "title": "BBK role-return template result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "bbk.role-return-template.v1"
+    },
+    "status": {
+      "const": "PASS"
+    },
+    "binding_ref": {
+      "type": "string",
+      "pattern": "^binding:[0-9a-f]{64}$"
+    },
+    "invocation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "role": {
+      "type": "string",
+      "pattern": "^bbk_[a-z][a-z0-9_]*$"
+    },
+    "contract": {
+      "type": "string",
+      "minLength": 1
+    },
+    "return_schema": {
+      "type": "string",
+      "minLength": 1
+    },
+    "invocation_mode": {
+      "type": "string",
+      "minLength": 1
+    },
+    "allowed_return_kinds": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "allowed_operational_dispositions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "semantic_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "allowed_values": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "name",
+        "allowed_values"
+      ]
+    },
+    "parent_ref": {
+      "type": "object",
+      "minProperties": 1
+    },
+    "compact_result_fields": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "minProperties": 1
+      }
+    },
+    "result_json_example": {
+      "type": "string",
+      "minLength": 1
+    },
+    "instruction": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "binding_ref",
+    "invocation_id",
+    "role",
+    "contract",
+    "return_schema",
+    "invocation_mode",
+    "allowed_return_kinds",
+    "allowed_operational_dispositions",
+    "semantic_state",
+    "parent_ref",
+    "compact_result_fields",
+    "result_json_example",
+    "instruction"
+  ]
+}

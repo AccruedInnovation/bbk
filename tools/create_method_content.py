@@ -15,7 +15,7 @@ if str(TOOLS) not in sys.path:
 
 from prompt_modules import (  # noqa: E402
     PromptModuleError,
-    expand_skill_template,
+    compile_standalone_skill,
     load_prompt_modules,
     validate_skill_templates,
 )
@@ -46,8 +46,8 @@ def expected(*, allow_staged: bool = False) -> dict[Path, bytes]:
 
     values: dict[Path, bytes] = {}
     for name, template in data.get("skills", {}).items():
-        expanded = expand_skill_template(template, package)
-        values[ROOT / "shared" / "skills" / name / "SKILL.md"] = expanded.encode("utf-8")
+        compiled = compile_standalone_skill(name, template, package, data)
+        values[ROOT / "shared" / "skills" / name / "SKILL.md"] = compiled.encode("utf-8")
     for name, text in data.get("references", {}).items():
         if not isinstance(name, str) or not isinstance(text, str):
             raise PromptModuleError(["method-content references must map string names to string content"])

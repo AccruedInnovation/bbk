@@ -1,0 +1,116 @@
+{
+  "$id": "bbk-bound-worker-spawn-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "assignment_projection": {
+      "type": "object"
+    },
+    "attempt_registration_ref": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "binding_created": {
+      "type": "boolean"
+    },
+    "dispatch_envelope_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "dispatch_input": {
+      "$ref": "bbk-spawn-dispatch-input-v1.schema.json"
+    },
+    "dispatch_input_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "dispatch_ref": {
+      "pattern": "^dispatch:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "dispatch_status": {
+      "$ref": "bbk-dispatch-status-v1.schema.json"
+    },
+    "idempotent_reuse": {
+      "type": "boolean"
+    },
+    "invocation_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "logical_attempt_ref": {
+      "pattern": "^attempt:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "logical_request_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "planned_binding_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "planned_session_id": {
+      "pattern": "^planned-session:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "registration_created": {
+      "type": "boolean"
+    },
+    "request_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.bound-worker-spawn.v1"
+    },
+    "spawn_reservation_ref": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "READY_TO_DISPATCH",
+        "DISPATCH_LEASED",
+        "ACTIVATED",
+        "TERMINAL"
+      ]
+    },
+    "task_input_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "worker_packet": {
+      "$ref": "bbk-bound-worker-packet-v1.schema.json"
+    },
+    "workspace": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "idempotent_reuse",
+    "request_digest",
+    "binding_created",
+    "registration_created",
+    "planned_binding_ref",
+    "planned_session_id",
+    "invocation_id",
+    "workspace",
+    "worker_packet",
+    "dispatch_ref",
+    "dispatch_input",
+    "dispatch_input_digest",
+    "task_input_digest",
+    "attempt_registration_ref",
+    "spawn_reservation_ref",
+    "logical_attempt_ref",
+    "logical_request_digest",
+    "dispatch_envelope_digest",
+    "dispatch_status",
+    "assignment_projection"
+  ],
+  "title": "BBK compiled bound worker spawn v1",
+  "type": "object"
+}

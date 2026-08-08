@@ -1,0 +1,88 @@
+{
+  "$id": "bbk-beads-command-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "attempt_id": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "command_id": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "correlation_id": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "evidence_refs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "expected_revision": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "finding_refs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "idempotency_key": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.beads-command.v1"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "transition": {
+      "enum": [
+        "CREATE",
+        "START",
+        "BLOCK",
+        "UNBLOCK",
+        "COMPLETE",
+        "FAIL",
+        "ANNOTATE"
+      ],
+      "type": "string"
+    },
+    "work_unit_id": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "projection_payload": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "command_id",
+    "work_unit_id",
+    "attempt_id",
+    "transition",
+    "correlation_id",
+    "expected_revision",
+    "idempotency_key"
+  ],
+  "title": "BBK typed Beads projection command v1",
+  "type": "object"
+}

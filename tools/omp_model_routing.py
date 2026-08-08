@@ -184,10 +184,9 @@ def load_custom_profile(path: Path, version: str, roles: list[str]) -> tuple[str
     value = load_json(path, "custom OMP routing profile")
     if value.get("schema_version") != "bbk.omp-model-routing-profile.v1":
         raise RoutingError("Custom profile schema_version must be bbk.omp-model-routing-profile.v1")
-    if value.get("package_version") != version:
-        raise RoutingError(
-            f"Custom profile package_version {value.get('package_version')!r} != {version!r}"
-        )
+    package_version = value.get("package_version")
+    if package_version is not None and (not isinstance(package_version, str) or not package_version.strip()):
+        raise RoutingError("Custom profile package_version must be a non-empty string when present")
     profile_id = value.get("id")
     description = value.get("description")
     if not isinstance(profile_id, str) or not PROFILE_PATTERN.fullmatch(profile_id):
@@ -723,6 +722,7 @@ def _run_installer(
         policy_path.write_bytes(pretty_json_bytes(policy))
         command = [
             sys.executable,
+            "-S",
             "-X",
             "utf8",
             str(installer),
@@ -853,6 +853,7 @@ def inspect_project_localization(context: Mapping[str, Any], project_value: str 
         installer = _authenticated_installer(context)
         command = [
             sys.executable,
+            "-S",
             "-X",
             "utf8",
             str(installer),

@@ -11,7 +11,8 @@
     "method_and_evidence_state",
     "repair_and_revalidation_policy",
     "blockers",
-    "parent_actions_requested"
+    "parent_actions_requested",
+    "specialist_trigger_ref"
   ],
   "properties": {
     "assurance_contract_ref": {
@@ -37,6 +38,18 @@
     "parent_actions_requested": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
       "description": "Exact claim clarification, decision, source repair, architecture or observability redesign, investigation, capability qualification, work-graph binding, review, validation, authority, waiver, or integration actions requested from the semantic parent."
+    },
+    "specialist_trigger_ref": {
+      "anyOf": [
+        {
+          "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/reference",
+          "description": "Typed Verification Design trigger authorizing specialist method work; null only for an explicitly requested reusable exceptional template."
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Typed Verification Design trigger authorizing specialist method work; null only for an explicitly requested reusable exceptional template."
     }
   },
   "x-bbk-role": "bbk_verification_designer",

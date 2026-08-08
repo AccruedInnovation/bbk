@@ -1,0 +1,29 @@
+{
+  "allowed_mutation_classes": [],
+  "allowed_tools": [
+    "bbk_governance_status",
+    "bbk_governed_read",
+    "bbk_return_prepare",
+    "bbk_return_template"
+  ],
+  "forbidden_effects": [
+    "DIRECT_BEADS_WRITE",
+    "GENERIC_PRODUCT_WRITE",
+    "SEALED_MUTATION",
+    "UNQUALIFIED_SHELL"
+  ],
+  "generated_by": "tools/generate_role_capabilities.py",
+  "manifest_digest": "sha256:aa02480a2780f95e699b841cf124a4ffb714621c4c7b62b66045bfba0c15d549",
+  "policy_version": "1.0.0-alpha.17",
+  "profile": "governed-software",
+  "required_bindings": [],
+  "role": "bbk_question_guide",
+  "schema": "bbk.role-capability.v1",
+  "scope_rules": {
+    "path_scope": "READ_ONLY",
+    "sealed_paths": "DENY",
+    "semantic_scope": "READ_ONLY",
+    "workspace_source": "NONE"
+  },
+  "source_role_digest": "sha256:b12d0544c238b35ad32d2dc5a3a6aaeef5fac948a9c4648f4559034650487243"
+}

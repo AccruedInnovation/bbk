@@ -1,0 +1,65 @@
+{
+  "schema": "bbk.orchestrator-control-plane-qualification.v1",
+  "release": "0.1.0-alpha.17",
+  "work_unit": "WU-015",
+  "qualification": "AUTOMATED_PASS",
+  "assertions": {
+    "VER-020": "PASS",
+    "VER-021": "PASS",
+    "VER-026": "PASS",
+    "VER-034": "PASS"
+  },
+  "automated_checks": {
+    "source_build_checks_passed": 8,
+    "source_build_checks_total": 8,
+    "standard_execution": "COMPLETE_MODULE_SET_BOUNDED_SHARDS",
+    "standard_unittest_modules": 31,
+    "standard_tests_reported": 518,
+    "standard_skipped": 1,
+    "standard_failures": 0,
+    "standard_errors": 0,
+    "fast_tests_reported": 153,
+    "fast_skipped": 0,
+    "fast_failures": 0,
+    "fast_errors": 0,
+    "python_files_compiled": 90,
+    "json_files_parsed": 368,
+    "implicit_path_text_encodings": 0,
+    "role_capability_projections": 19,
+    "omp_javascript_syntax": "PASS",
+    "real_local_beads": "PASS",
+    "network_used": false,
+    "provider_credentials_used": false
+  },
+  "boundaries": {
+    "beads_writer": "SINGLE_BBK_ADAPTER",
+    "raw_bd_orchestrator_authority": "DENIED",
+    "unqualified_shell_orchestrator_authority": "DENIED",
+    "orchestrator_product_mutation": "DENIED",
+    "assignment_attempt_binding": "IMMUTABLE_AND_CURRENT",
+    "coordination_revision_precondition": "ENFORCED",
+    "coordination_idempotency": "ENFORCED",
+    "direct_adapter_shape_revalidation": "ENFORCED",
+    "content_changing_integration": "BOUND_INTEGRATION_WORKER_REQUIRED",
+    "integration_effect_in_wu015": "REQUEST_RECORDED_ONLY",
+    "provider_api_campaign": "PENDING_WU_018_MANUAL_RELEASE_GATE"
+  },
+  "evidence": [
+    "tests.test_control_plane",
+    "tests.test_substrate_beads",
+    "tests.test_role_capabilities",
+    "tests.test_omp_governed_profile",
+    "tests.test_installation_portability",
+    "tests.test_core_contracts",
+    "tests.test_system",
+    "spec/schemas/bbk-coordination-command-v1.schema.json",
+    "spec/schemas/bbk-beads-projection-receipt-v1.schema.json",
+    "docs/qualification/ORCHESTRATOR-CONTROL-PLANE-ALPHA17.md"
+  ],
+  "notes": [
+    "The complete standard profile module set was executed in alphabetic shards solely to remain within the qualification container's per-command runtime limit.",
+    "The single skip is the optional live OMP host-contract probe; the qualified keyless OMP 16.4.8 fixture and extension runtime tests passed.",
+    "Semantic coordination records, backend Beads receipts, and projection receipts are separate immutable records.",
+    "This record qualifies WU-015 only and does not satisfy the Alpha.17 manual provider release gate."
+  ]
+}

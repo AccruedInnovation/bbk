@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-effective-procedure-catalog-v2.schema.json",
+  "title": "BBK Effective Procedure Catalog v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "identity_kind",
+    "role",
+    "available_external_procedures",
+    "compiler_selectable_procedures",
+    "suppressed_compiled_procedures",
+    "catalog_sha256",
+    "status"
+  ],
+  "properties": {
+    "schema": {
+      "const": "bbk.effective-procedure-catalog.v2"
+    },
+    "identity_kind": {
+      "enum": [
+        "ROLE",
+        "CONTROLLER"
+      ]
+    },
+    "role": {
+      "type": "string",
+      "minLength": 1
+    },
+    "available_external_procedures": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "compiler_selectable_procedures": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "suppressed_compiled_procedures": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "catalog_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "status": {
+      "const": "PASS"
+    }
+  }
+}

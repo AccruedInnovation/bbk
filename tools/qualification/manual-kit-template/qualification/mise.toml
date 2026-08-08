@@ -1,0 +1,7 @@
+[tools]
+"github:gastownhall/beads" = "1.1.0"
+jj = "0.43.0"
+
+[tasks."alpha17:verify"]
+description = "Verify the Alpha.17 manual worker candidate without mutation"
+run = "python qualification/verify_candidate.py"

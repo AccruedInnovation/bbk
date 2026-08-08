@@ -1,6 +1,8 @@
 ---
 name: bbk-artifact
 description: Create, preflight, finalize, seal, verify, inspect, manifest, or revise BBK artifact packages with the installed BBK artifact-package engine. Use when exact artifact bytes, declared reference closure, immutable publication, tamper detection, or predecessor-bound successors matter. Do not treat a passing package check as semantic acceptance, authorization, validation, deployment readiness, or release authority.
+requires_prompt_modules: []
+standalone_prompt_modules: []
 ---
 
 # BBK artifact packages

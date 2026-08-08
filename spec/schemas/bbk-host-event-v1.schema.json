@@ -1,0 +1,80 @@
+{
+  "$id": "bbk-host-event-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "correlation": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "enforcement_boundary": {
+      "enum": [
+        "ENFORCED",
+        "DETECT_ONLY",
+        "UNQUALIFIED"
+      ],
+      "type": "string"
+    },
+    "event_class": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "event_type": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "host_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "normalized_identity": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "observed_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "parent_session": {
+      "type": "string"
+    },
+    "payload_digest": {
+      "pattern": "^(?:sha256:)?[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.host-event.v1"
+    },
+    "session_id": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "task_or_tool_id": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "host_version",
+    "event_type",
+    "session_id",
+    "task_or_tool_id",
+    "payload_digest",
+    "observed_at",
+    "normalized_identity",
+    "correlation",
+    "event_class",
+    "enforcement_boundary"
+  ],
+  "title": "BBK normalized OMP host event v1",
+  "type": "object"
+}

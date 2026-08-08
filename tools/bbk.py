@@ -23,10 +23,22 @@ import subprocess
 import sys
 import tempfile
 import time
+import traceback
 import uuid
 from importlib import metadata as importlib_metadata
 from pathlib import Path, PurePath
 from typing import Any, Iterable, Iterator, Mapping, NoReturn, Sequence
+
+TOOLS_DIR = Path(__file__).resolve().parent
+if str(TOOLS_DIR) not in sys.path:
+    sys.path.insert(0, str(TOOLS_DIR))
+
+from runtime_requirements import enforce_supported_python
+
+enforce_supported_python(program="BBK")
+
+import dependencies as dependency_tool
+from urllib.parse import urlparse
 
 # When executed from the source package, ``tools`` is the script directory.
 # The OMP installer also places ``bbk.py`` and ``contracts.py`` beside one
@@ -135,6 +147,32 @@ try:
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     from artifact_classification import is_non_operational_example
+
+try:
+    from substrate import mise_adapter as substrate_mise_adapter
+except ModuleNotFoundError:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from substrate import mise_adapter as substrate_mise_adapter
+
+try:
+    from atomic_finalizer import FinalizationError, finalize_json as finalize_atomic_json
+    from evidence_replay import ReplayError, evaluate_replay as evaluate_command_replay, powershell_capture_preflight, replay_attempt as build_replay_attempt
+    from planning_optimization import (
+        PlanningOptimizationError, build_planning_readiness, child_event as build_child_event,
+        coverage_return_projection, generate_assertion_contract, generate_worker_contract,
+        issue_workspace_receipt, migrate_legacy_planning_readiness, transact_plan, validate_project_coverage,
+    )
+    from runtime_identity import RuntimeIdentityError, resolve_effective_profile
+except ModuleNotFoundError:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from atomic_finalizer import FinalizationError, finalize_json as finalize_atomic_json
+    from evidence_replay import ReplayError, evaluate_replay as evaluate_command_replay, powershell_capture_preflight, replay_attempt as build_replay_attempt
+    from planning_optimization import (
+        PlanningOptimizationError, build_planning_readiness, child_event as build_child_event,
+        coverage_return_projection, generate_assertion_contract, generate_worker_contract,
+        issue_workspace_receipt, migrate_legacy_planning_readiness, transact_plan, validate_project_coverage,
+    )
+    from runtime_identity import RuntimeIdentityError, resolve_effective_profile
 
 try:
     from strict_json import StrictJsonError, load_path as strict_load_path
@@ -608,10 +646,26 @@ def run(argv: Sequence[str], cwd: Path, *, timeout: float | None = None, env: di
     if not command:
         raise BbkError("Command argv must not be empty")
     started = time.monotonic()
-    executable = shutil.which(command[0], path=(env or os.environ).get("PATH"))
+    execution_environment = os.environ if env is None else env
+    executable = shutil.which(command[0], path=execution_environment.get("PATH"))
+    execution_command = list(command)
+    if command[0].casefold() == "git":
+        configured = execution_environment.get("BBK_GIT") or execution_environment.get("BBK_TEST_GIT")
+        resolved = (
+            Path(configured).expanduser().resolve()
+            if configured
+            else dependency_tool.discover_executable("git", environment=execution_environment)
+        )
+        if resolved is not None:
+            executable = str(resolved)
+            execution_command = dependency_tool.command_argv(
+                resolved,
+                command[1:],
+                environment=execution_environment,
+            )
     try:
         result = subprocess.run(
-            command, cwd=str(cwd), env=env, timeout=timeout, check=False,
+            execution_command, cwd=str(cwd), env=env, timeout=timeout, check=False,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
         )
         try:
@@ -2665,13 +2719,49 @@ def git_metadata(root: Path) -> dict[str, Any]:
         return {"available": False}
     head = git(root, "rev-parse", "HEAD")
     branch = git(root, "branch", "--show-current")
-    status = git(root, "status", "--porcelain=v1", "--untracked-files=all")
+    # Bind working-tree observations to the requested source root. Git walks
+    # upward from ``root`` to discover a repository; an unscoped status would
+    # therefore include unrelated parent-repository changes (and can vary while
+    # another test or worker writes elsewhere in that repository). ``-- .``
+    # keeps the metadata useful for repository subtrees while ensuring the
+    # manifest depends only on the bounded source tree.
+    status = git(root, "status", "--porcelain=v1", "-z", "--untracked-files=all", "--", ".")
+    prefix_result = git(root, "rev-parse", "--show-prefix")
+    prefix = prefix_result["stdout"].strip() if prefix_result["returncode"] == 0 else ""
+
+    def source_relative(path: str) -> str:
+        if prefix and path.startswith(prefix):
+            return path[len(prefix):]
+        return path
+
+    status_porcelain: list[str] = []
+    fields = status["stdout"].split("\0")
+    index = 0
+    while index < len(fields):
+        field = fields[index]
+        index += 1
+        if not field:
+            continue
+        if len(field) < 3 or field[2] != " ":
+            status_porcelain.append(field)
+            continue
+        code = field[:2]
+        path = source_relative(field[3:])
+        if "R" in code or "C" in code:
+            if index >= len(fields) or not fields[index]:
+                status_porcelain.append(f"{code} {path}")
+                continue
+            original = source_relative(fields[index])
+            index += 1
+            status_porcelain.append(f"{code} {original} -> {path}")
+        else:
+            status_porcelain.append(f"{code} {path}")
     return {
         "available": head["returncode"] == 0,
         "head": head["stdout"].strip() or None,
         "branch": branch["stdout"].strip() or None,
-        "dirty": bool(status["stdout"].strip()),
-        "status_porcelain": status["stdout"].splitlines(),
+        "dirty": bool(status_porcelain),
+        "status_porcelain": status_porcelain,
     }
 
 
@@ -4431,23 +4521,136 @@ def _smallest_schema_example(node: Any) -> Any:
     return None
 
 
+def _schema_registry_paths(schema_root: Path, extra_paths: Sequence[Path] = ()) -> list[Path]:
+    """Return every schema resource path in stable physical-path order.
+
+    Role return/result schemas intentionally live below nested directories.  A
+    top-level-only glob leaves their declared ``$id`` values unavailable to the
+    Draft 2020-12 resolver even though the package contains the files.
+    """
+    root = schema_root.resolve()
+    candidates = {path.resolve() for path in root.rglob("*.json") if path.is_file()}
+    candidates.update(path.resolve() for path in extra_paths if path.is_file())
+    return sorted(candidates, key=lambda path: path.as_posix())
+
+
+def _build_schema_registry(
+    schema_root: Path,
+    *,
+    extra_paths: Sequence[Path] = (),
+) -> tuple[Any, dict[str, Any]]:
+    """Build one deterministic local-only registry and reject URI ambiguity."""
+    from referencing import Registry, Resource  # type: ignore
+
+    root = schema_root.resolve()
+    paths = _schema_registry_paths(root, extra_paths)
+    registry = Registry()
+    uri_owners: dict[str, Path] = {}
+    declared_ids: list[str] = []
+    records: list[dict[str, Any]] = []
+
+    for candidate in paths:
+        value = read_json(candidate)
+        if not isinstance(value, dict):
+            continue
+        resource = Resource.from_contents(value)
+        declared = value.get("$id")
+        uris: list[str] = []
+        if isinstance(declared, str) and declared.strip():
+            uris.append(declared.strip())
+        uris.append(candidate.as_uri())
+        for uri in uris:
+            prior = uri_owners.get(uri)
+            if prior is not None and prior != candidate:
+                message = f"Schema registry URI {uri!r} is declared by both {prior} and {candidate}"
+                raise BbkError(
+                    message,
+                    diagnostic={
+                        "schema": "bbk.schema-registry-error.v1",
+                        "status": "ERROR",
+                        "code": "SCHEMA_REGISTRY_DUPLICATE_ID",
+                        "message": message,
+                        "duplicate_uri": uri,
+                        "first_path": str(prior),
+                        "duplicate_path": str(candidate),
+                        "registry_roots": [str(root)],
+                        "smallest_next_action": "Give every packaged schema one unique declared $id and rerun validation.",
+                    },
+                )
+            if prior is None:
+                uri_owners[uri] = candidate
+                registry = registry.with_resource(uri, resource)
+        if isinstance(declared, str) and declared.strip():
+            declared_ids.append(declared.strip())
+        records.append({
+            "path": str(candidate),
+            "file_uri": candidate.as_uri(),
+            "declared_id": declared.strip() if isinstance(declared, str) and declared.strip() else None,
+        })
+
+    metadata = {
+        "registry_roots": [str(root)],
+        "registered_schema_ids": sorted(declared_ids),
+        "registered_schema_files": records,
+        "registered_resource_count": len(uri_owners),
+    }
+    return registry, metadata
+
+
+def _reference_error_uri(exc: BaseException) -> str | None:
+    for candidate in (exc, exc.__cause__, exc.__context__, getattr(exc, "_wrapped", None)):
+        ref = getattr(candidate, "ref", None)
+        if isinstance(ref, str) and ref:
+            return ref
+    return None
+
+
+def _schema_reference_failure(
+    exc: BaseException,
+    *,
+    schema_path: Path,
+    schema_value: Any,
+    registry_metadata: Mapping[str, Any],
+) -> dict[str, Any]:
+    unresolved_uri = _reference_error_uri(exc)
+    filename = Path(urlparse(unresolved_uri).path).name if unresolved_uri else ""
+    registered_files = registry_metadata.get("registered_schema_files", [])
+    matching = [
+        record["path"]
+        for record in registered_files
+        if isinstance(record, Mapping) and filename and Path(str(record.get("path", ""))).name == filename
+    ]
+    return {
+        "schema": "bbk.schema-validation.v1",
+        "status": "BLOCKED",
+        "valid": False,
+        "code": "SCHEMA_REFERENCE_UNRESOLVED",
+        "draft": "2020-12",
+        "schema_path": str(schema_path),
+        "schema_sha256": sha256_file(schema_path),
+        "referencing_schema": {
+            "path": str(schema_path),
+            "declared_id": schema_value.get("$id") if isinstance(schema_value, Mapping) else None,
+        },
+        "unresolved_uri": unresolved_uri,
+        "registry_roots": list(registry_metadata.get("registry_roots", [])),
+        "registered_schema_ids": list(registry_metadata.get("registered_schema_ids", [])),
+        "candidate_physical_files": matching,
+        "error": str(exc),
+        "exception_type": f"{type(exc).__module__}.{type(exc).__name__}",
+        "exception_traceback": "".join(traceback.format_exception(type(exc), exc, exc.__traceback__)),
+        "instances": [],
+        "smallest_next_action": "Restore or register the schema resource identified by unresolved_uri, then rerun the same validation.",
+    }
+
+
 def _jsonschema_validator(schema_path: Path) -> tuple[Any | None, str | None, str | None]:
     package, version = _jsonschema_runtime()
     if package is None:
         return None, None, "The Python jsonschema package is not available."
     schema_value = read_json(schema_path)
     try:
-        from referencing import Registry, Resource  # type: ignore
-
-        registry = Registry()
-        for candidate in sorted(SCHEMA_DIR.glob("*.json")):
-            value = read_json(candidate)
-            if not isinstance(value, dict):
-                continue
-            resource = Resource.from_contents(value)
-            if isinstance(value.get("$id"), str):
-                registry = registry.with_resource(value["$id"], resource)
-            registry = registry.with_resource(candidate.resolve().as_uri(), resource)
+        registry, _ = _build_schema_registry(SCHEMA_DIR, extra_paths=(schema_path,))
         validator = package.Draft202012Validator(schema_value, registry=registry)
     except Exception as exc:
         return None, version, f"Could not initialize Draft 2020-12 registry: {exc}"
@@ -4652,11 +4855,65 @@ def cmd_schema_validate(args: argparse.Namespace) -> dict[str, Any]:
                 argv += ["--root", args.root]
             result = run(argv, Path.cwd(), timeout=args.timeout)
             if result["returncode"] not in {0, 1}:
-                raise BbkError(f"Managed schema validator failed: {result['stderr'] or result['stdout']}")
+                message = f"Managed schema validator process failed with exit code {result['returncode']}"
+                raise BbkError(
+                    message,
+                    diagnostic={
+                        "schema": "bbk.managed-validator-error.v1",
+                        "status": "ERROR",
+                        "code": "VALIDATOR_PROCESS_FAILED",
+                        "message": message,
+                        "command_identity": "bbk schema validate",
+                        "argv": result.get("argv", argv),
+                        "returncode": result["returncode"],
+                        "stdout": result.get("stdout", ""),
+                        "stderr": result.get("stderr", ""),
+                        "timed_out": bool(result.get("timed_out", False)),
+                        "tool_version": "jsonschema==4.25.1",
+                        "managed_environment": str(tool_root),
+                        "smallest_next_action": "Inspect the preserved managed-validator stderr, repair the process-level failure, and rerun the same command.",
+                    },
+                )
             try:
                 value = json.loads(result["stdout"])
             except json.JSONDecodeError as exc:
-                raise BbkError(f"Managed schema validator returned invalid JSON: {result['stdout']}") from exc
+                message = "Managed schema validator exited normally but returned malformed JSON"
+                raise BbkError(
+                    message,
+                    diagnostic={
+                        "schema": "bbk.managed-validator-error.v1",
+                        "status": "ERROR",
+                        "code": "VALIDATOR_OUTPUT_INVALID",
+                        "message": message,
+                        "command_identity": "bbk schema validate",
+                        "argv": result.get("argv", argv),
+                        "returncode": result["returncode"],
+                        "stdout": result.get("stdout", ""),
+                        "stderr": result.get("stderr", ""),
+                        "tool_version": "jsonschema==4.25.1",
+                        "managed_environment": str(tool_root),
+                        "smallest_next_action": "Preserve the child output, repair its JSON transport, and rerun without interpreting the malformed payload as a validation result.",
+                    },
+                ) from exc
+            if not isinstance(value, dict):
+                message = "Managed schema validator returned a JSON value that is not an object"
+                raise BbkError(
+                    message,
+                    diagnostic={
+                        "schema": "bbk.managed-validator-error.v1",
+                        "status": "ERROR",
+                        "code": "VALIDATOR_OUTPUT_INVALID",
+                        "message": message,
+                        "command_identity": "bbk schema validate",
+                        "argv": result.get("argv", argv),
+                        "returncode": result["returncode"],
+                        "stdout": result.get("stdout", ""),
+                        "stderr": result.get("stderr", ""),
+                        "tool_version": "jsonschema==4.25.1",
+                        "managed_environment": str(tool_root),
+                        "smallest_next_action": "Return one structured JSON object from the managed validator and rerun.",
+                    },
+                )
             value["managed_environment"] = str(tool_root)
             return value
         return {
@@ -4684,38 +4941,65 @@ def cmd_schema_validate(args: argparse.Namespace) -> dict[str, Any]:
             "instances": [],
         }
     try:
-        from referencing import Registry, Resource  # type: ignore
-        registry = Registry()
-        for candidate in sorted(SCHEMA_DIR.glob("*.json")):
-            candidate_value = read_json(candidate)
-            identifier = candidate_value.get("$id") if isinstance(candidate_value, dict) else None
-            if isinstance(identifier, str) and identifier:
-                registry = registry.with_resource(identifier, Resource.from_contents(candidate_value))
-        identifier = schema_value.get("$id") if isinstance(schema_value, dict) else None
-        if isinstance(identifier, str) and identifier:
-            registry = registry.with_resource(identifier, Resource.from_contents(schema_value))
+        registry, registry_metadata = _build_schema_registry(SCHEMA_DIR, extra_paths=(schema_path,))
         validator = package.Draft202012Validator(schema_value, registry=registry)
-    except (ImportError, TypeError):
+    except ImportError:
+        registry_metadata = {
+            "registry_roots": [str(SCHEMA_DIR.resolve())],
+            "registered_schema_ids": [],
+            "registered_schema_files": [],
+            "registered_resource_count": 0,
+        }
         validator = package.Draft202012Validator(schema_value)
     instances: list[dict[str, Any]] = []
     valid = True
     for raw in args.instance:
         path = Path(raw).expanduser().resolve()
         instance = read_json(path)
-        errors = sorted(validator.iter_errors(instance), key=lambda item: list(item.absolute_path))
+        try:
+            errors = sorted(validator.iter_errors(instance), key=lambda item: list(item.absolute_path))
+        except Exception as exc:
+            if _reference_error_uri(exc) is not None:
+                failure = _schema_reference_failure(
+                    exc,
+                    schema_path=schema_path,
+                    schema_value=schema_value,
+                    registry_metadata=registry_metadata,
+                )
+                failure["instances"] = [{
+                    "path": str(path),
+                    "sha256": sha256_file(path),
+                    "valid": False,
+                    "code": "SCHEMA_REFERENCE_UNRESOLVED",
+                    "errors": [],
+                }]
+                return failure
+            raise
         rendered = [_schema_error_detail(error) for error in errors]
         if rendered:
             valid = False
-        instances.append({"path": str(path), "valid": not rendered, "errors": rendered})
+        instances.append({
+            "path": str(path),
+            "sha256": sha256_file(path),
+            "valid": not rendered,
+            "code": None if not rendered else "SCHEMA_VALIDATION_FAILED",
+            "errors": rendered,
+        })
     return {
         "schema": "bbk.schema-validation.v1",
         "status": "PASS" if valid else "FAIL",
         "valid": valid,
+        "code": None if valid else "SCHEMA_VALIDATION_FAILED",
         "draft": "2020-12",
         "validator": "python-jsonschema",
         "validator_version": version,
         "schema_path": str(schema_path),
         "schema_sha256": sha256_file(schema_path),
+        "registry": {
+            "roots": registry_metadata.get("registry_roots", []),
+            "registered_schema_count": len(registry_metadata.get("registered_schema_ids", [])),
+            "registered_resource_count": registry_metadata.get("registered_resource_count", 0),
+        },
         "instances": instances,
     }
 
@@ -4808,8 +5092,44 @@ def _beads_issue_record(value: Any) -> dict[str, Any] | None:
     return None
 
 
-def _beads_run_json(executable: str, argv: Sequence[str], workspace: Path, timeout: float) -> tuple[dict[str, Any], dict[str, Any] | None]:
-    executed = run([executable, *argv], workspace, timeout=timeout)
+def _beads_command(workspace: Path) -> tuple[list[str] | None, dict[str, Any]]:
+    try:
+        command, binding = substrate_mise_adapter.managed_tool_command(
+            workspace,
+            "bd",
+            mise_path_value=os.environ.get("BBK_MISE"),
+            environment=os.environ,
+        )
+    except substrate_mise_adapter.MiseAdapterError as exc:
+        return None, {
+            "status": "BLOCKED",
+            "code": exc.code,
+            "message": exc.message,
+            "execution_mode": "MISE_MANAGED",
+        }
+    return command, {"status": "CONFIGURED", **binding}
+
+
+def _require_beads_command(workspace: Path) -> tuple[list[str], dict[str, Any]]:
+    command, binding = _beads_command(workspace)
+    if command is None:
+        raise BbkError(
+            "Cannot execute Beads operation through mise: "
+            f"{binding.get('code')}: {binding.get('message')}"
+        )
+    return command, binding
+
+
+def _beads_environment() -> dict[str, str]:
+    return {
+        **substrate_mise_adapter.managed_tool_environment(os.environ),
+        "BD_NON_INTERACTIVE": "1",
+        "BEADS_DISABLE_METRICS": "1",
+    }
+
+
+def _beads_run_json(command_prefix: Sequence[str], argv: Sequence[str], workspace: Path, timeout: float) -> tuple[dict[str, Any], dict[str, Any] | None]:
+    executed = run([*command_prefix, *argv], workspace, timeout=timeout, env=_beads_environment())
     parsed = _beads_parse_json_output(str(executed.get("stdout") or ""))
     issue = _beads_issue_record(parsed)
     return executed, issue
@@ -5070,8 +5390,8 @@ def _beads_execution_record(executed: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
-def _beads_verify_issue(executable: str, bead_id: str, workspace: Path, timeout: float) -> dict[str, Any]:
-    executed, issue = _beads_run_json(executable, ["show", bead_id, "--json"], workspace, timeout)
+def _beads_verify_issue(command_prefix: Sequence[str], bead_id: str, workspace: Path, timeout: float) -> dict[str, Any]:
+    executed, issue = _beads_run_json(command_prefix, ["show", bead_id, "--json"], workspace, timeout)
     if executed["returncode"] != 0:
         raise BbkError((executed.get("stderr") or executed.get("stdout") or f"bd show {bead_id} failed").strip())
     if issue is None:
@@ -5130,7 +5450,11 @@ def cmd_beads_handoff_plan(args: argparse.Namespace) -> dict[str, Any]:
     ])
     if len(note.encode("utf-8")) > 4096:
         raise BbkError("Compact Beads handoff pointer exceeds 4096 UTF-8 bytes")
-    argv = ["bd", "comments", "add", bead_id, note]
+    workspace = _beads_workspace(root, mapping)
+    command_prefix, declared_tool_binding = substrate_mise_adapter.managed_tool_plan_command(
+        workspace, "bd", launcher=os.environ.get("BBK_MISE", "mise"),
+    )
+    argv = [*command_prefix, "comments", "add", bead_id, note]
     value: dict[str, Any] = {
         "schema": "bbk.beads-handoff-plan.v1",
         "status": "PASS",
@@ -5147,6 +5471,7 @@ def cmd_beads_handoff_plan(args: argparse.Namespace) -> dict[str, Any]:
         "handoff": handoff,
         "note": note,
         "argv": argv,
+        "capability": declared_tool_binding,
         "warnings": [
             "The Beads comment is an append-only coordination pointer; the verified BBK handoff file remains authoritative.",
             "Do not paste large artifacts, protected evidence, credentials, or secrets into the Beads comment.",
@@ -5158,17 +5483,20 @@ def cmd_beads_handoff_plan(args: argparse.Namespace) -> dict[str, Any]:
             raise BbkError(
                 "Beads handoff writes require .bbk/mappings/beads.json with enabled=true and write_enabled=true"
             )
-        executable = shutil.which("bd")
-        if not executable:
-            raise BbkError("Cannot apply Beads handoff: bd is not available on PATH")
-        workspace = _beads_workspace(root, mapping)
-        executed = run([executable, "comments", "add", bead_id, note], workspace, timeout=args.timeout)
+        command_prefix, tool_binding = _require_beads_command(workspace)
+        value["capability"] = tool_binding
+        executed = run(
+            [*command_prefix, "comments", "add", bead_id, note],
+            workspace,
+            timeout=args.timeout,
+            env=_beads_environment(),
+        )
         value["execution"] = _beads_execution_record(executed)
         if executed["returncode"] != 0:
             value["status"] = "ERROR"
             value["error"] = (executed.get("stderr") or executed.get("stdout") or "bd comments add failed").strip()
         else:
-            value["verification"] = _beads_verify_issue(executable, bead_id, workspace, args.timeout)
+            value["verification"] = _beads_verify_issue(command_prefix, bead_id, workspace, args.timeout)
             value["applied"] = True
             value["dry_run"] = False
     if args.output:
@@ -5217,7 +5545,7 @@ def cmd_beads_plan(args: argparse.Namespace) -> dict[str, Any]:
         mapping,
         canonical_ids={str(item["bbk_id"]) for item in canonical_objects},
     )
-    executable = shutil.which("bd")
+    command_prefix, tool_binding = _beads_command(workspace)
     initialized = (workspace / ".beads").exists()
     result: dict[str, Any] = {
         "schema": "bbk.beads-plan.v2",
@@ -5229,9 +5557,10 @@ def cmd_beads_plan(args: argparse.Namespace) -> dict[str, Any]:
         "workspace": str(workspace),
         "mapping_path": str(mapping_path) if mapping_path is not None else None,
         "capability": {
-            "bd": executable,
-            "status": "READY" if executable and initialized else ("NOT_INITIALIZED" if executable else "NOT_INSTALLED"),
+            "bd": tool_binding.get("tool_spec"),
+            "status": "READY" if command_prefix and initialized else ("NOT_INITIALIZED" if command_prefix else "MISE_TOOL_UNAVAILABLE"),
             "initialized": initialized,
+            "tool_binding": tool_binding,
         },
         "selected_kinds": sorted(selected_kinds) if selected_kinds else sorted({item["kind"] for item in objects}),
         "selected_ids": sorted(selected_ids),
@@ -5243,8 +5572,10 @@ def cmd_beads_plan(args: argparse.Namespace) -> dict[str, Any]:
             "Stale or directly edited bindings require review; BBK never uses last-write-wins reconciliation.",
         ],
     }
-    if not executable:
-        result["warnings"].append("Beads coordination is enabled but bd is not available on PATH; canonical BBK work may continue.")
+    if command_prefix is None:
+        result["warnings"].append(
+            "Beads coordination is enabled but the mise-managed bd tool is unavailable; canonical BBK work may continue."
+        )
     elif not initialized:
         result["warnings"].append("The configured Beads workspace is not initialized; apply will initialize it only when auto_initialize=true or --initialize is supplied.")
 
@@ -5253,8 +5584,13 @@ def cmd_beads_plan(args: argparse.Namespace) -> dict[str, Any]:
             raise BbkError("Applying Beads projection requires an initialized BBK project")
         if not mapping.get("enabled") or not mapping.get("write_enabled"):
             raise BbkError("Beads writes require enabled=true and write_enabled=true in .bbk/mappings/beads.json")
-        if not executable:
-            raise BbkError("Cannot apply Beads projection: bd is not available on PATH")
+        if command_prefix is None:
+            command_prefix, tool_binding = _require_beads_command(workspace)
+            result["capability"].update({
+                "bd": tool_binding.get("tool_spec"),
+                "status": "NOT_INITIALIZED" if not initialized else "READY",
+                "tool_binding": tool_binding,
+            })
         invalid_actions = sorted(
             (item["operation"], item["object"]["bbk_id"])
             for item in operations
@@ -5272,7 +5608,13 @@ def cmd_beads_plan(args: argparse.Namespace) -> dict[str, Any]:
                 raise BbkError("Beads bindings exist but the configured workspace is not initialized; reconcile the workspace before apply")
             if not (args.initialize or mapping.get("auto_initialize")):
                 raise BbkError("Beads workspace is not initialized; rerun with --initialize or enable auto_initialize")
-            init_exec = run([executable, "init", "--quiet", "--skip-agents"], workspace, timeout=args.timeout)
+            assert command_prefix is not None
+            init_exec = run(
+                [*command_prefix, "init", "--quiet", "--skip-agents"],
+                workspace,
+                timeout=args.timeout,
+                env=_beads_environment(),
+            )
             executions.append({"operation": "initialize", "execution": _beads_execution_record(init_exec)})
             result["initialization"] = executions[-1]
             if init_exec["returncode"] != 0:
@@ -5290,7 +5632,7 @@ def cmd_beads_plan(args: argparse.Namespace) -> dict[str, Any]:
             item = operation["object"]
             binding = current_bindings[item["bbk_id"]]
             bead_id = str(binding["bead_id"])
-            verification = _beads_verify_issue(executable, bead_id, workspace, args.timeout)
+            verification = _beads_verify_issue(command_prefix, bead_id, workspace, args.timeout)
             preflight[item["bbk_id"]] = verification
             expected_previous = _beads_binding_projection(binding)
             if expected_previous is None:
@@ -5345,22 +5687,22 @@ def cmd_beads_plan(args: argparse.Namespace) -> dict[str, Any]:
                     if parent_bead:
                         argv.extend(["--parent", parent_bead])
                     argv.append("--json")
-                    executed, issue = _beads_run_json(executable, argv, workspace, args.timeout)
+                    executed, issue = _beads_run_json(command_prefix, argv, workspace, args.timeout)
                     if executed["returncode"] != 0 or issue is None or not isinstance(issue.get("id"), str):
                         raise BbkError((executed.get("stderr") or executed.get("stdout") or f"bd create failed for {item['bbk_id']}").strip())
                     bead_id = str(issue["id"])
                     execution_record = _beads_execution_record(executed)
-                    verification = _beads_verify_issue(executable, bead_id, workspace, args.timeout)
+                    verification = _beads_verify_issue(command_prefix, bead_id, workspace, args.timeout)
                 else:
                     binding = current_bindings[item["bbk_id"]]
                     bead_id = str(binding["bead_id"])
                     if action == "update":
                         argv = ["update", bead_id, "--title", item["title"], "--description", description, "--json"]
-                        executed, _issue = _beads_run_json(executable, argv, workspace, args.timeout)
+                        executed, _issue = _beads_run_json(command_prefix, argv, workspace, args.timeout)
                         if executed["returncode"] != 0:
                             raise BbkError((executed.get("stderr") or executed.get("stdout") or f"bd update failed for {bead_id}").strip())
                         execution_record = _beads_execution_record(executed)
-                        verification = _beads_verify_issue(executable, bead_id, workspace, args.timeout)
+                        verification = _beads_verify_issue(command_prefix, bead_id, workspace, args.timeout)
                     else:
                         verification = preflight[item["bbk_id"]]
                         execution_record = verification["execution"]
@@ -5508,7 +5850,7 @@ def cmd_status(args: argparse.Namespace) -> dict[str, Any]:
     example_counts["total"] = sum(example_counts.values())
     beads_path, beads_mapping = _beads_mapping(root)
     beads_workspace = _beads_workspace(root, beads_mapping)
-    beads_executable = shutil.which("bd")
+    beads_command, beads_tool_binding = _beads_command(beads_workspace)
     beads_view = {
         "enabled": bool(beads_mapping.get("enabled")),
         "write_enabled": bool(beads_mapping.get("write_enabled")),
@@ -5516,7 +5858,8 @@ def cmd_status(args: argparse.Namespace) -> dict[str, Any]:
         "mapping_path": str(beads_path),
         "workspace": str(beads_workspace),
         "binding_count": len(beads_mapping.get("objects", [])),
-        "bd": beads_executable,
+        "bd": beads_tool_binding.get("tool_spec"),
+        "tool_binding": beads_tool_binding,
         "initialized": (beads_workspace / ".beads").exists(),
     }
     return {
@@ -5543,7 +5886,7 @@ def cmd_doctor(args: argparse.Namespace) -> dict[str, Any]:
     checks: list[dict[str, Any]] = []
     def add(name: str, status: str, detail: Any) -> None:
         checks.append({"name": name, "status": status, "detail": detail})
-    add("python", "PASS" if sys.version_info >= (3, 10) else "FAIL", sys.version.split()[0])
+    add("python", "PASS" if sys.version_info >= (3, 11) else "FAIL", sys.version.split()[0])
     jsonschema_package, jsonschema_version = _jsonschema_runtime()
     managed_schema_python = _venv_python(_schema_tool_root(root, None))
     schema_available = jsonschema_package is not None or managed_schema_python.is_file()
@@ -5581,11 +5924,11 @@ def cmd_doctor(args: argparse.Namespace) -> dict[str, Any]:
                 add(f"project-file:{name}", "PASS", "valid JSON")
             _beads_path, beads_mapping = _beads_mapping(root)
             beads_workspace = _beads_workspace(root, beads_mapping)
-            beads_executable = shutil.which("bd")
+            beads_command, beads_tool_binding = _beads_command(beads_workspace)
             if not beads_mapping.get("enabled"):
                 beads_status = "DISABLED"
-            elif not beads_executable:
-                beads_status = "NOT_INSTALLED"
+            elif beads_command is None:
+                beads_status = "MISE_TOOL_UNAVAILABLE"
             elif not (beads_workspace / ".beads").exists():
                 beads_status = "NOT_INITIALIZED"
             else:
@@ -5595,14 +5938,21 @@ def cmd_doctor(args: argparse.Namespace) -> dict[str, Any]:
                 "write_enabled": bool(beads_mapping.get("write_enabled")),
                 "auto_initialize": bool(beads_mapping.get("auto_initialize")),
                 "workspace": str(beads_workspace),
-                "bd": beads_executable,
+                "bd": beads_tool_binding.get("tool_spec"),
+                "tool_binding": beads_tool_binding,
                 "binding_count": len(beads_mapping.get("objects", [])),
             })
         except BbkError as exc:
             add("project-config", "FAIL", str(exc))
     else:
         add("project-config", "NOT_FOUND", "run from a BBK project or pass --root")
-    return {"schema": "bbk.doctor.v1", "bbk_version": VERSION, "status": "FAIL" if any(item["status"] == "FAIL" for item in checks) else "PASS", "checks": checks}
+    blocking_statuses = {"FAIL", "BLOCKED", "ERROR", "MISE_TOOL_UNAVAILABLE"}
+    return {
+        "schema": "bbk.doctor.v1",
+        "bbk_version": VERSION,
+        "status": "FAIL" if any(item["status"] in blocking_statuses for item in checks) else "PASS",
+        "checks": checks,
+    }
 
 
 def human(value: Any) -> str:
@@ -5662,11 +6012,241 @@ def human(value: Any) -> str:
     return json.dumps(value, indent=2, ensure_ascii=False, sort_keys=True)
 
 
+
+def _read_object_argument(path: str, label: str) -> dict[str, Any]:
+    value = read_json(Path(path).expanduser().resolve())
+    if not isinstance(value, dict):
+        raise BbkError(f"{label} must contain a JSON object")
+    return value
+
+
+def _write_optional_output(value: dict[str, Any], output: str | None, force: bool = False) -> dict[str, Any]:
+    if output:
+        path = Path(output).expanduser().resolve()
+        if path.exists() and not force:
+            raise BbkError(f"Output already exists: {path}; use --force to replace it")
+        write_json(path, value)
+        value = dict(value)
+        value["output"] = path.as_posix()
+    return value
+
+
+def cmd_result_finalize(args: argparse.Namespace) -> dict[str, Any]:
+    try:
+        return finalize_atomic_json(
+            Path(args.input).expanduser(), Path(args.output).expanduser(),
+            subject_kind="ROLE_RETURN", schema=args.schema,
+            references=[Path(item).expanduser() for item in (args.reference or [])],
+            generated_at=args.generated_at, replace=args.force, root=PACKAGE_ROOT,
+        )
+    except FinalizationError as exc:
+        raise BbkError(str(exc), diagnostic={"code": exc.code, "message": exc.message, "command": "result finalize"}) from exc
+
+
+def cmd_manifest_finalize_opt(args: argparse.Namespace) -> dict[str, Any]:
+    try:
+        return finalize_atomic_json(
+            Path(args.input).expanduser(), Path(args.output).expanduser(),
+            subject_kind="MANIFEST", schema=args.schema,
+            references=[Path(item).expanduser() for item in (args.reference or [])],
+            generated_at=args.generated_at, replace=args.force, root=PACKAGE_ROOT,
+        )
+    except FinalizationError as exc:
+        raise BbkError(str(exc), diagnostic={"code": exc.code, "message": exc.message, "command": "manifest finalize"}) from exc
+
+
+def cmd_planning_readiness(args: argparse.Namespace) -> dict[str, Any]:
+    roadmap = _read_object_argument(args.roadmap, "roadmap")
+    coverage = _read_object_argument(args.coverage, "coverage")
+    frontier = _read_object_argument(args.frontier, "frontier") if args.frontier else None
+    deferred = []
+    for path in args.deferred or []:
+        value = read_json(Path(path).expanduser().resolve())
+        if isinstance(value, list): deferred.extend(item for item in value if isinstance(item, dict))
+        elif isinstance(value, dict): deferred.append(value)
+        else: raise BbkError("--deferred must contain an object or object array")
+    try:
+        value = build_planning_readiness(
+            roadmap=roadmap, frontier=frontier, coverage=coverage,
+            planning_mode=args.planning_mode, architecture_mode=args.architecture_mode,
+            deferred_refinements=deferred, fully_compiled=args.fully_compiled,
+            full_compilation_trigger=args.full_compilation_trigger,
+        )
+    except PlanningOptimizationError as exc:
+        raise BbkError(str(exc), diagnostic={"code":exc.code,"message":exc.message,"command":"plan readiness"}) from exc
+    return _write_optional_output(value, args.output, args.force)
+
+
+def cmd_plan_migrate_readiness(args: argparse.Namespace) -> dict[str, Any]:
+    legacy = _read_object_argument(args.legacy, "legacy planning artifact")
+    roadmap = _read_object_argument(args.roadmap, "roadmap")
+    frontier = _read_object_argument(args.frontier, "frontier")
+    coverage = _read_object_argument(args.coverage, "coverage")
+    try:
+        value = migrate_legacy_planning_readiness(
+            legacy, roadmap=roadmap, frontier=frontier, coverage=coverage,
+            authority_ref=args.authority, generated_at=args.generated_at,
+        )
+    except PlanningOptimizationError as exc:
+        raise BbkError(str(exc), diagnostic={"code": exc.code, "message": exc.message, "command": "plan migrate-readiness"}) from exc
+    return _write_optional_output(value, args.output, args.force)
+
+
+def cmd_plan_transact_opt(args: argparse.Namespace) -> dict[str, Any]:
+    events=[_read_object_argument(path,"event") for path in args.event]
+    outputs={}
+    for name in ("roadmap","frontier","coverage","role_return"):
+        raw=getattr(args,f"{name}_out",None)
+        if raw: outputs[name.replace('_','-')]=Path(raw).expanduser().resolve()
+    try:
+        return transact_plan(Path(args.state_root).expanduser(), events, authority_ref=args.authority,
+                             projection_outputs=outputs, expected_head=args.expected_head,
+                             transaction_id=args.transaction_id, created_at=args.generated_at)
+    except PlanningOptimizationError as exc:
+        raise BbkError(str(exc), diagnostic={"code":exc.code,"message":exc.message,"command":"plan transact","retryable":exc.retryable}) from exc
+
+
+def cmd_worker_contract_generate(args: argparse.Namespace) -> dict[str, Any]:
+    try:
+        value=generate_worker_contract(
+            _read_object_argument(args.work_unit,"work unit"),
+            _read_object_argument(args.authority,"authority"),
+            _read_object_argument(args.workspace_receipt,"workspace receipt"),
+            _read_object_argument(args.profile_constraints,"profile constraints"),
+            return_contract=args.return_contract,
+        )
+    except PlanningOptimizationError as exc:
+        raise BbkError(str(exc), diagnostic={"code":exc.code,"message":exc.message,"command":"worker-contract generate"}) from exc
+    return _write_optional_output(value,args.output,args.force)
+
+
+def cmd_assertion_contract_generate(args: argparse.Namespace) -> dict[str, Any]:
+    try:
+        value=generate_assertion_contract(
+            _read_object_argument(args.acceptance_criterion,"acceptance criterion"),
+            _read_object_argument(args.profile_template,"profile template"),
+            candidate_stage=args.candidate_stage,
+        )
+    except PlanningOptimizationError as exc:
+        raise BbkError(str(exc), diagnostic={"code":exc.code,"message":exc.message,"command":"assertion-contract generate"}) from exc
+    return _write_optional_output(value,args.output,args.force)
+
+
+def cmd_command_replay_evaluate(args: argparse.Namespace) -> dict[str, Any]:
+    value=_read_object_argument(args.attempt,"command attempt")
+    try:
+        result=evaluate_command_replay(value,candidate_frozen=args.candidate_frozen)
+        if args.emit_replay and result.get("eligible"):
+            result["replay_attempt"]=build_replay_attempt(value,candidate_frozen=args.candidate_frozen)
+    except ReplayError as exc:
+        raise BbkError(str(exc), diagnostic={"code":exc.code,"message":exc.message,"command":"command replay-evaluate"}) from exc
+    return _write_optional_output(result,args.output,args.force)
+
+
+def cmd_command_capture_preflight(args: argparse.Namespace) -> dict[str, Any]:
+    try:
+        text=Path(args.script).expanduser().read_text(encoding='utf-8-sig')
+        result=powershell_capture_preflight(text,Path(args.receipt_dir).expanduser().resolve())
+    except (OSError,UnicodeError) as exc:
+        raise BbkError(f"Cannot inspect capture wrapper: {exc}") from exc
+    return _write_optional_output(result,args.output,args.force)
+
+
+def cmd_profile_admit(args: argparse.Namespace) -> dict[str, Any]:
+    try:
+        value=resolve_effective_profile(
+            _read_object_argument(args.constraints,"profile constraints"),
+            _read_object_argument(args.effective_profile,"effective profile"),
+            _read_object_argument(args.environment,"environment identity"),
+            registry_revision=args.registry_revision, selector=args.selector,
+            exact_digest_required=args.exact_digest_required,
+            exact_digest_reason=args.exact_digest_reason, observed_at=args.observed_at,
+        )
+    except RuntimeIdentityError as exc:
+        raise BbkError(str(exc), diagnostic={"code":exc.code,"message":exc.message,"command":"profile admit"}) from exc
+    return _write_optional_output(value,args.output,args.force)
+
+
+def cmd_project_coverage_project(args: argparse.Namespace) -> dict[str, Any]:
+    value=_read_object_argument(args.coverage,"project coverage")
+    try:
+        validate_project_coverage(value); result=coverage_return_projection(value)
+    except PlanningOptimizationError as exc:
+        raise BbkError(str(exc), diagnostic={"code":exc.code,"message":exc.message,"command":"coverage project"}) from exc
+    return _write_optional_output(result,args.output,args.force)
+
+
+def cmd_workspace_admit(args: argparse.Namespace) -> dict[str, Any]:
+    try:
+        value=issue_workspace_receipt(
+            repository_ref=args.repository_ref, baseline_ref=args.baseline_ref,
+            protected_tree_state=args.protected_tree_state,
+            known_unrelated_dirt=args.known_unrelated_dirt or [], owned_roots=args.owned_root,
+            mutation_owner=args.mutation_owner, serialization_state=args.serialization_state,
+            issued_at=args.issued_at,
+        )
+    except PlanningOptimizationError as exc:
+        raise BbkError(str(exc), diagnostic={"code":exc.code,"message":exc.message,"command":"workspace admit"}) from exc
+    return _write_optional_output(value,args.output,args.force)
+
+
+def cmd_child_event_emit(args: argparse.Namespace) -> dict[str, Any]:
+    detail=_read_object_argument(args.detail,"event detail") if args.detail else {}
+    try: value=build_child_event(child_ref=args.child_ref,state=args.state,detail=detail,observed_at=args.observed_at)
+    except PlanningOptimizationError as exc: raise BbkError(str(exc),diagnostic={"code":exc.code,"message":exc.message,"command":"child-event emit"}) from exc
+    return _write_optional_output(value,args.output,args.force)
+
+
 def parser() -> argparse.ArgumentParser:
     p = BbkArgumentParser(prog="bbk", description=__doc__)
     p.add_argument("--version", action="version", version=f"bbk {VERSION}")
     p.add_argument("--json", action="store_true")
     sub = p.add_subparsers(parser_class=BbkArgumentParser, dest="command", required=True)
+
+    result = sub.add_parser(
+        "result", help="atomically finalize durable role results and emit identity receipts",
+        description="Workspace implementation effect. Canonicalizes and validates JSON, atomically publishes the result and sidecar identity receipt, invalidates on subject/finalizer/reference digest changes, and is not replay-legal. Legacy return readers remain supported.",
+    ).add_subparsers(parser_class=BbkArgumentParser, dest="result_command", required=True)
+    x = result.add_parser(
+        "finalize", help="canonicalize, validate, and atomically publish one JSON role result",
+        description="Effect: WORKSPACE_IMPLEMENTATION. Atomic: yes, with prior-pair rollback. Validates optional Draft 2020-12 schema and safe references. Emits <output>.identity.json. Replay legal: no. Compatibility: reads UTF-8/BOM and writes canonical UTF-8 LF.",
+    )
+    x.add_argument("--input", required=True); x.add_argument("--output", required=True); x.add_argument("--schema"); x.add_argument("--reference", action="append"); x.add_argument("--generated-at"); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_result_finalize)
+
+    plan = sub.add_parser(
+        "plan", help="rolling-wave readiness, migration, and transactional planning state",
+        description="Planning-state effect only. Readiness and migration are deterministic projections; transact commits immutable events through an atomic current-pointer and emits a transaction receipt. Conflicts are retryable; semantic invalidations are explicit.",
+    ).add_subparsers(parser_class=BbkArgumentParser, dest="plan_command", required=True)
+    x = plan.add_parser(
+        "readiness", help="project ROADMAP_READY/FRONTIER_READY execution admission",
+        description="Effect: optional workspace projection. Atomic only when written by the caller's finalizer. Validates roadmap/frontier readiness and separates FULLY_COMPILED from execution admission. Emits no receipt by itself; invalidates on roadmap/frontier/coverage digests. Replay legal: yes for unchanged inputs.",
+    )
+    x.add_argument("--roadmap", required=True); x.add_argument("--frontier"); x.add_argument("--coverage", required=True); x.add_argument("--deferred", action="append"); x.add_argument("--planning-mode", choices=["FAST_CONTINUATION","STANDARD","FULL_GOVERNED"], default="FAST_CONTINUATION"); x.add_argument("--architecture-mode", choices=["ADOPT_AND_GAP","DELTA","FULL"], default="ADOPT_AND_GAP"); x.add_argument("--fully-compiled", action="store_true"); x.add_argument("--full-compilation-trigger"); x.add_argument("--output"); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_planning_readiness)
+    x = plan.add_parser(
+        "migrate-readiness", help="project an immutable legacy fully detailed plan into Alpha.17 readiness",
+        description="Effect: WORKSPACE_IMPLEMENTATION only when --output is used. Leaves the legacy artifact unchanged, emits a successor compatibility projection plus BASELINE_ADVANCED migration anchor, and binds the source digest. Replay legal for unchanged inputs.",
+    )
+    x.add_argument("--legacy", required=True); x.add_argument("--roadmap", required=True); x.add_argument("--frontier", required=True); x.add_argument("--coverage", required=True); x.add_argument("--authority", required=True); x.add_argument("--generated-at"); x.add_argument("--output"); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_plan_migrate_readiness)
+    x = plan.add_parser(
+        "transact", help="atomically append plan events and regenerate requested projections",
+        description="Effect: PLANNING_STATE_MUTATION. Atomic commit point: state-root/current.json. Validates event types, predecessor/head expectations, and authority; emits bbk.plan-transaction-receipt.v1. A changed current head invalidates and returns retryable BBK-PLAN-TX-CONFLICT. Replay legal only after confirming no commit occurred.",
+    )
+    x.add_argument("--state-root", required=True); x.add_argument("--authority", required=True); x.add_argument("--event", action="append", required=True); x.add_argument("--roadmap-out"); x.add_argument("--frontier-out"); x.add_argument("--coverage-out"); x.add_argument("--role-return-out"); x.add_argument("--expected-head"); x.add_argument("--transaction-id"); x.add_argument("--generated-at"); x.set_defaults(func=cmd_plan_transact_opt)
+
+    wc = sub.add_parser("worker-contract", help="deterministic routine Worker contracts").add_subparsers(parser_class=BbkArgumentParser, dest="worker_contract_command", required=True)
+    x=wc.add_parser("generate"); x.add_argument("--work-unit",required=True); x.add_argument("--authority",required=True); x.add_argument("--workspace-receipt",required=True); x.add_argument("--profile-constraints",required=True); x.add_argument("--return-contract",default="bbk.worker-return.v2"); x.add_argument("--output"); x.add_argument("--force",action="store_true"); x.set_defaults(func=cmd_worker_contract_generate)
+    ac = sub.add_parser("assertion-contract", help="deterministic routine verification assertions").add_subparsers(parser_class=BbkArgumentParser, dest="assertion_contract_command", required=True)
+    x=ac.add_parser("generate"); x.add_argument("--acceptance-criterion",required=True); x.add_argument("--profile-template",required=True); x.add_argument("--candidate-stage",required=True); x.add_argument("--output"); x.add_argument("--force",action="store_true"); x.set_defaults(func=cmd_assertion_contract_generate)
+
+    command = sub.add_parser("command", help="semantic command attempt and evidence replay operations").add_subparsers(parser_class=BbkArgumentParser, dest="command_command", required=True)
+    x=command.add_parser("replay-evaluate", description="Read-only evaluation. Validates command-attempt lineage and permits at most one same-semantic-attempt replay only when effects are proven NONE, cleanup COMPLETE, candidate unfrozen, and failure is capture-only. Emits no effect receipt unless --output is used."); x.add_argument("--attempt",required=True); x.add_argument("--candidate-frozen",action="store_true"); x.add_argument("--emit-replay",action="store_true"); x.add_argument("--output"); x.add_argument("--force",action="store_true"); x.set_defaults(func=cmd_command_replay_evaluate)
+    x=command.add_parser("capture-preflight", description="Read-only wrapper inspection. Validates PowerShell reserved-variable safety, native stderr/exit capture, output bounds, timeout/cleanup declarations, canonical encoding, and atomic receipt-path support. Replay legal: yes."); x.add_argument("--script",required=True); x.add_argument("--receipt-dir",required=True); x.add_argument("--output"); x.add_argument("--force",action="store_true"); x.set_defaults(func=cmd_command_capture_preflight)
+
+    coverage = sub.add_parser("coverage", help="project coverage and completion-truth projections").add_subparsers(parser_class=BbkArgumentParser, dest="coverage_command", required=True)
+    x=coverage.add_parser("project", description="Read-only deterministic completion-truth projection unless --output is used. Validates capability/claim closure and never infers whole-project completion from candidate PASS. Invalidates on coverage input digest; replay legal."); x.add_argument("--coverage",required=True); x.add_argument("--output"); x.add_argument("--force",action="store_true"); x.set_defaults(func=cmd_project_coverage_project)
+
+    child_event_parser = sub.add_parser("child-event", help="emit typed child lifecycle events").add_subparsers(parser_class=BbkArgumentParser, dest="child_event_command", required=True)
+    x=child_event_parser.add_parser("emit"); x.add_argument("--child-ref",required=True); x.add_argument("--state",required=True,choices=["STARTED","PROGRESS_MILESTONE","BLOCKED","RETURN_READY","FAILED","CANCELLED"]); x.add_argument("--detail"); x.add_argument("--observed-at"); x.add_argument("--output"); x.add_argument("--force",action="store_true"); x.set_defaults(func=cmd_child_event_emit)
 
     sub.add_parser("version", help="print the BBK package version")
     x = sub.add_parser("init"); x.add_argument("--root"); x.add_argument("--title"); x.add_argument("--project-id"); x.add_argument("--force", action="store_true"); x.add_argument("--no-examples", action="store_true", help="initialize operational BBK state without materializing reference templates"); x.set_defaults(func=cmd_init)
@@ -5741,6 +6321,8 @@ def parser() -> argparse.ArgumentParser:
     x = review.add_parser("learn"); x.add_argument("--id", required=True); x.add_argument("--type", required=True); x.add_argument("--lesson", required=True); x.add_argument("--scope", required=True); x.add_argument("--supporting", action="append"); x.add_argument("--contrary", action="append"); x.add_argument("--finding", action="append"); x.add_argument("--run", action="append"); x.add_argument("--disposition", action="append"); x.add_argument("--confidence", required=True); x.add_argument("--uncertainty", required=True); x.add_argument("--action", required=True); x.add_argument("--privacy-class", default="project-local"); x.add_argument("--export-class", default="restricted"); x.add_argument("--output", required=True); x.set_defaults(func=cmd_review_learn)
 
     m = sub.add_parser("manifest").add_subparsers(parser_class=BbkArgumentParser, dest="manifest_command", required=True)
+    x = m.add_parser("finalize", help="canonicalize, validate, and atomically publish one JSON manifest")
+    x.add_argument("--input", required=True); x.add_argument("--output", required=True); x.add_argument("--schema"); x.add_argument("--reference", action="append"); x.add_argument("--generated-at"); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_manifest_finalize_opt)
     x = m.add_parser("create"); x.add_argument("--root"); x.add_argument("--source"); x.add_argument("--output"); x.add_argument("--exclude", action="append"); x.add_argument("--include-examples", action="store_true", help="explicitly include shipped EXAMPLE-* templates"); x.set_defaults(func=cmd_manifest_create)
     x = m.add_parser("compare"); x.add_argument("--root"); x.add_argument("--left", required=True); g = x.add_mutually_exclusive_group(); g.add_argument("--right"); g.add_argument("--source"); x.add_argument("--include-examples", action="store_true", help="include EXAMPLE-* templates when compiling --source"); x.set_defaults(func=cmd_manifest_compare)
 
@@ -5758,6 +6340,8 @@ def parser() -> argparse.ArgumentParser:
     x = gates.add_parser("check"); x.add_argument("receipt"); x.add_argument("--candidate", required=True); x.set_defaults(func=cmd_gate_check)
 
     w = sub.add_parser("workspace").add_subparsers(parser_class=BbkArgumentParser, dest="workspace_command", required=True)
+    x=w.add_parser("admit", help="issue a reusable workspace admission receipt", description="Read-only observation projection unless --output is used. Binds baseline, protected-tree state, known dirt, owned roots, mutation owner, and serialization. Emits bbk.workspace-admission-receipt.v1; invalidates on repository/baseline/ownership changes.")
+    x.add_argument("--repository-ref",required=True); x.add_argument("--baseline-ref",required=True); x.add_argument("--protected-tree-state",choices=["CLEAN","KNOWN_ACCEPTED_STATE","BLOCKED"],required=True); x.add_argument("--known-unrelated-dirt",action="append"); x.add_argument("--owned-root",action="append",required=True); x.add_argument("--mutation-owner",required=True); x.add_argument("--serialization-state",choices=["EXCLUSIVE","POSITIVELY_SERIALIZED","READ_ONLY"],required=True); x.add_argument("--issued-at"); x.add_argument("--output"); x.add_argument("--force",action="store_true"); x.set_defaults(func=cmd_workspace_admit)
     x = w.add_parser("create"); x.add_argument("--root"); x.add_argument("--id", required=True); x.add_argument("--base", default="HEAD"); x.add_argument("--branch"); x.add_argument("--path"); x.add_argument("--purpose"); x.add_argument("--lease-hours", type=float); x.add_argument("--detach", action="store_true"); x.set_defaults(func=cmd_workspace_create)
     x = w.add_parser("list"); x.add_argument("--root"); x.add_argument("--all", action="store_true"); x.set_defaults(func=cmd_workspace_list)
     x = w.add_parser("inspect"); x.add_argument("--root"); x.add_argument("--id", required=True); x.set_defaults(func=cmd_workspace_inspect)
@@ -5773,6 +6357,8 @@ def parser() -> argparse.ArgumentParser:
         x.set_defaults(func=func)
 
     pr = sub.add_parser("profile").add_subparsers(parser_class=BbkArgumentParser, dest="profile_command", required=True)
+    x=pr.add_parser("admit", help="late-bind an effective profile/environment identity against semantic constraints", description="Read-only runtime admission unless --output is used. Validates capabilities, gates, family, environment, and optional exact digest. Emits bbk.effective-profile-receipt.v1; semantic equivalence avoids replanning while changed constraints/profile/environment invalidate the receipt.")
+    x.add_argument("--constraints",required=True); x.add_argument("--effective-profile",required=True); x.add_argument("--environment",required=True); x.add_argument("--registry-revision",required=True); x.add_argument("--selector"); x.add_argument("--exact-digest-required",action="store_true"); x.add_argument("--exact-digest-reason"); x.add_argument("--observed-at"); x.add_argument("--output"); x.add_argument("--force",action="store_true"); x.set_defaults(func=cmd_profile_admit)
     x = pr.add_parser("list"); x.add_argument("--root"); x.add_argument("--profile-dir", "--profile-root", dest="profile_dir", action="append"); x.set_defaults(func=cmd_profile_list)
     x = pr.add_parser("inspect"); x.add_argument("--root"); x.add_argument("--id", required=True); x.add_argument("--version"); x.add_argument("--profile-dir", "--profile-root", dest="profile_dir", action="append"); x.set_defaults(func=cmd_profile_inspect)
     x = pr.add_parser("resolve"); x.add_argument("--root"); x.add_argument("--source"); x.add_argument("--id", required=True); x.add_argument("--version"); x.add_argument("--profile-dir", "--profile-root", dest="profile_dir", action="append"); x.add_argument("--work-unit"); x.add_argument("--task-profile"); x.add_argument("--assurance-tier", choices=["routine", "material", "consequential", "critical"]); x.add_argument("--role"); x.add_argument("--change-class", action="append"); x.add_argument("--hint", action="append"); x.add_argument("--path", action="append"); x.add_argument("--solution-outcome-fit", action="append"); x.add_argument("--structure-contract", action="append"); x.add_argument("--execution-slice", action="append"); x.add_argument("--state-decision-effect", action="append"); x.add_argument("--assurance-contract", action="append"); x.add_argument("--review-manifest", action="append"); x.add_argument("--evidence-input", action="append"); x.add_argument("--run-tools", action="store_true"); x.add_argument("--write-lock", action="store_true"); x.add_argument("--lock-path"); x.add_argument("--allow-unverified", action="store_true"); x.add_argument("--timeout", type=float, default=120.0); x.set_defaults(func=cmd_profile_resolve)

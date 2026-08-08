@@ -18,6 +18,7 @@ import ctypes
 import datetime as dt
 import errno
 import fnmatch
+import functools
 import hashlib
 import json
 import os
@@ -346,14 +347,33 @@ def resolve_local_path(root: Path, raw: str, *, must_exist: bool) -> Path:
     return resolved
 
 
-def _schema_index(schema_root: Path = SCHEMA_ROOT) -> dict[str, Path]:
+@functools.lru_cache(maxsize=512)
+def _load_schema_document_cached(path_text: str, mtime_ns: int, size: int) -> Any:
+    del mtime_ns, size
+    return load_path(Path(path_text))
+
+
+def _load_schema_document(path: Path) -> Any:
+    stat_result = path.stat()
+    return _load_schema_document_cached(
+        str(path.resolve()),
+        stat_result.st_mtime_ns,
+        stat_result.st_size,
+    )
+
+
+@functools.lru_cache(maxsize=32)
+def _schema_index_cached(
+    root_text: str,
+    signature: tuple[tuple[str, int, int], ...],
+) -> dict[str, Path]:
+    root = Path(root_text)
     result: dict[str, Path] = {}
-    if not schema_root.is_dir():
-        return result
-    for path in sorted(schema_root.glob("*.json")):
+    for name, _mtime_ns, _size in signature:
+        path = root / name
         result[path.name] = path
         try:
-            value = load_path(path)
+            value = _load_schema_document(path)
         except StrictJsonError:
             continue
         if not isinstance(value, dict):
@@ -370,6 +390,17 @@ def _schema_index(schema_root: Path = SCHEMA_ROOT) -> dict[str, Path]:
                 if isinstance(const, str):
                     result[const] = path
     return result
+
+
+def _schema_index(schema_root: Path = SCHEMA_ROOT) -> dict[str, Path]:
+    if not schema_root.is_dir():
+        return {}
+    root = schema_root.resolve()
+    signature = tuple(
+        (path.name, path.stat().st_mtime_ns, path.stat().st_size)
+        for path in sorted(root.glob("*.json"))
+    )
+    return _schema_index_cached(str(root), signature)
 
 
 def _json_type_matches(value: Any, expected: str) -> bool:
@@ -405,7 +436,7 @@ class _SchemaValidator:
         if path is None:
             return None
         if path not in self.cache:
-            self.cache[path] = load_path(path)
+            self.cache[path] = _load_schema_document(path)
         return path, self.cache[path]
 
     @staticmethod
@@ -434,7 +465,7 @@ class _SchemaValidator:
         if path is None:
             raise ValueError(f"unresolved schema reference: {ref}")
         if path not in self.cache:
-            self.cache[path] = load_path(path)
+            self.cache[path] = _load_schema_document(path)
         value = self.cache[path]
         return path, self._fragment(value, f"#{fragment}" if marker else "")
 

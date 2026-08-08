@@ -1,0 +1,40 @@
+{
+  "$id": "bbk-spawn-dispatch-payload-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BBK immutable private spawn dispatch payload v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "bbk.spawn-dispatch-payload.v1"
+    },
+    "dispatch_ref": {
+      "type": "string",
+      "pattern": "^dispatch:[0-9a-f]{64}$"
+    },
+    "binding_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "input_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "task_input": {
+      "type": "object",
+      "minProperties": 1
+    },
+    "payload_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  },
+  "required": [
+    "schema",
+    "dispatch_ref",
+    "binding_ref",
+    "input_digest",
+    "task_input",
+    "payload_digest"
+  ]
+}

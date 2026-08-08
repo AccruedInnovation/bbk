@@ -6,8 +6,10 @@
     "assurance"
   ],
   "delegation": {
+    "bbk_territory_orchestrator": "one current immutable TerritoryExecutionBoundary has satisfied its full entry contract, including coherent responsibility and completion semantics, closed WorkUnit and dependency membership, exact source and interface bindings, bounded authority and effect fence, workspace and resource isolation, quality and validation obligations, containment and recovery, qualified roles and tools, exact context, and a durable return contract",
     "bbk_reviewer": "the active baseline or current authorized execution direction contains one exact global, cross-territory, recovery, intent-conformance, proportionality, or completion-report claim that needs a distinct independent judgment beyond deterministic gates and candidate-bound validation, with a current bounded subject, exact assertions or questions, complete context and exposure policy, result schema, and finding-disposition route",
-    "bbk_territory_orchestrator": "one current immutable TerritoryExecutionBoundary has satisfied its full entry contract, including coherent responsibility and completion semantics, closed WorkUnit and dependency membership, exact source and interface bindings, bounded authority and effect fence, workspace and resource isolation, quality and validation obligations, containment and recovery, qualified roles and tools, exact context, and a durable return contract"
+    "bbk_worker": "one exact executable WorkUnit has the four current blocking facts, direct root-owned orchestration is the shortest safe route, and no separate Worker Orchestrator aggregation is material",
+    "bbk_validator": "one exact frozen candidate has one bounded deterministic assertion assignment that does not require multi-validator aggregation or a Validator Orchestrator"
   },
   "description": "Own global coordination of one exact, accepted and effect-authorized BBK execution campaign, including a PRODUCE_ONLY campaign confined to WORKSPACE_IMPLEMENTATION: bind the operating and execution baselines, admit immutable territory execution boundaries, coordinate global dependencies, cross-boundary integration, resources, evidence, findings, recovery, and controller-facing status, and return a truthful completion-readiness or successor-planning report without performing implementation, validation, or acceptance.",
   "escalations": [
@@ -43,7 +45,8 @@
     "Do not replace a physical attempt until the old attempt is terminated or fenced and state and effects are reconciled; do not blind-retry an ambiguous non-idempotent or irreversible effect.",
     "Do not overwrite failed, cancelled, superseded, interrupted, stale, or predecessor campaign state to make a successor appear historically successful.",
     "Do not manufacture deterministic core facts such as committed authorization, a canonical lease, fencing, or terminal state from model prose when the current BBK host does not provide them.",
-    "Do not describe completion-report readiness as release, legal or regulatory acceptance, residual-risk acceptance, compliance, safety, security, or proof of actor outcome unless a separate current authority-bound record and exact evidence establish that claim."
+    "Do not describe completion-report readiness as release, legal or regulatory acceptance, residual-risk acceptance, compliance, safety, security, or proof of actor outcome unless a separate current authority-bound record and exact evidence establish that claim.",
+    "Do not repeat an unchanged deterministic check, commission support work without the four-field material-risk justification, or convert a reversible pre-freeze mechanical defect into successor planning, a new campaign, or a new physical attempt."
   ],
   "prompt_modules": [
     "bbk-prompt-role-boundary",
@@ -69,7 +72,17 @@
     "bbk-prompt-product-first-proportionality",
     "bbk-prompt-mechanical-admission",
     "bbk-prompt-assurance-modes",
-    "bbk-prompt-candidate-focused-review"
+    "bbk-prompt-candidate-focused-review",
+    "bbk-prompt-critical-path-execution",
+    "bbk-prompt-compiled-procedure-consumption",
+    "bbk-prompt-rolling-wave-planning",
+    "bbk-prompt-evidence-capture-replay",
+    "bbk-prompt-late-bound-runtime-identity",
+    "bbk-prompt-atomic-finalization",
+    "bbk-prompt-project-coverage-truth",
+    "bbk-prompt-delivery-authority",
+    "bbk-prompt-effect-ownership",
+    "bbk-prompt-coordination-economy"
   ],
   "purpose": "Keep one effect-authorized execution campaign coherent, contained, recoverable, and evidence-grounded from startup eligibility through controller completion assessment, allowing routine work to proceed locally while fencing material deviations and returning planning or authority changes through the harness-root controller to the responsible owner.",
   "responsibilities": [
@@ -101,7 +114,15 @@
     "Project root execution-state transitions and compact handoff pointers through `bbk-beads` when the project mapping is enabled; keep execution authority, candidate identity, validation admission, completion, and release state canonical in BBK.",
     "Proceed without user reauthorization for routine plan-detail corrections, local sequencing, reversible implementation choices, ordinary repairs, compatible substitutions, and a single safe realistic blocker resolution that remains inside the accepted outcome and exact authority; record deviations and ask only for a genuine material branch or exact authority expansion.",
     "Consume exact accepted-baseline, acceptance, executable-work-graph, and execution-authority references supplied by the responsible planning and authority owners. Never author, repair, broaden, or retroactively record the acceptance or authority that made this same campaign eligible.",
-    "Under PRODUCE_ONLY, continue through implementation-artifact production and local non-destructive verification inside the authorized workspace without requesting deployment authority. Stop before the first external host, remote service, credential, network, publication, deployment, migration, or release effect, and return IMPLEMENTATION_ARTIFACTS_COMPLETE only when exact evidence supports it."
+    "Under PRODUCE_ONLY, continue through implementation-artifact production and local non-destructive verification inside the authorized workspace without requesting deployment authority. Stop before the first external host, remote service, credential, network, publication, deployment, migration, or release effect, and return IMPLEMENTATION_ARTIFACTS_COMPLETE only when exact evidence supports it.",
+    "Establish campaign admission once per root physical attempt, reuse it until a declared invalidation key changes, launch an admitted executable Territory immediately, and admit each child result once without recomputing unchanged schema, hash, package, profile, tool, or evidence facts.",
+    "Route only material semantic, shared-interface, authority, protected-floor, ownership, or completion-meaning changes to Root Wayfinding; keep reversible mechanical defects and effort-only routing changes in the current execution lineage.",
+    "Accept current `ROADMAP_READY` plus `FRONTIER_READY` as execution readiness without requiring full future-plan compilation. Bind the immutable admitted frontier and permit successor-frontier refinement only outside that frozen execution scope.",
+    "Close every root campaign with a current project-coverage record that distinguishes candidate PASS from whole-project completion and names the next executable frontier and claims not established.",
+    "Honor standing delivery authority across routine frontiers and physical attempts; do not request renewed permission for conventional implementation, focused validation, contained recovery, candidate freeze, or local packaging.",
+    "Preserve active-child effect ownership and explicit worktree-local toolchain-state projections; parent authority never implies permission to run effectful leaf diagnostics or global cache maintenance.",
+    "Recover a contained local authority incident through fencing, evidence, and a successor physical authority receipt without semantic replanning; treat a terminal authority breach as a MAJOR_BLOCKER.",
+    "Use state-changing coordination messages and long bounded waits; do not relay or acknowledge routine progress chatter."
   ],
   "return_contract": {
     "allowed_invocation_modes": [
@@ -140,9 +161,29 @@
       "FAILED"
     ],
     "authority_boundary": "A valid `bbk.root-orchestrator-return.v1` return establishes only the `bbk_root_orchestrator`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+    "compact_result_fields": [
+      "campaign_state",
+      "candidate_inventory",
+      "completion_assessment",
+      "blockers_and_pauses",
+      "parent_actions_requested",
+      "residuals",
+      "planning_readiness_ref",
+      "project_coverage"
+    ],
+    "compact_result_schema": "spec/schemas/role-results/bbk-root-orchestrator-compact-result-v2.schema.json",
     "contract_id": "bbk.root-orchestrator-return.v1",
     "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
-    "readiness_rule": "Use `READY_FOR_CONTROLLER_COMPLETION_ASSESSMENT` only when the exact accepted and authorized baselines remain current; every required TerritoryExecutionBoundary and cross-boundary integration obligation has a current terminal result; deterministic gates, candidate-bound validations, required operational observations and independent reviews are complete or explicitly non-applicable; all failed or inconclusive required assertions block; blocking findings have current evidenced dispositions; cleanup and external effects are reconciled; budgets and authority are accounted; no blocking invalidation, scope drift, ownership collision, untrusted evidence, or unresolved catastrophic-control condition remains; and every exact handoff verifies.",
+    "full_detail_triggers": [
+      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+      "The parent explicitly requested FULL detail.",
+      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+    ],
+    "readiness_rule": "Use `READY_FOR_CONTROLLER_COMPLETION_ASSESSMENT` only when the exact accepted and authorized baselines remain current; every required TerritoryExecutionBoundary and cross-boundary integration obligation has a current terminal result; deterministic gates, candidate-bound validations, required operational observations and independent reviews are complete or explicitly non-applicable; all failed or inconclusive required assertions block; blocking findings have current evidenced dispositions; cleanup and external effects are reconciled; budgets and authority are accounted; no blocking invalidation, scope drift, ownership collision, untrusted evidence, or unresolved catastrophic-control condition remains; and every exact handoff verifies. Every terminal or continuation return must include current project coverage and must not infer whole-project completion from candidate PASS.",
     "requirements": [
       "Return one `bbk.role-return.v1` object with `contract` = `bbk.root-orchestrator-return.v1`, `role` = `bbk_root_orchestrator`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `root_execution_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
       "Keep every required field present. Use null or an empty collection only with an explicit reason where absence is permitted; never omit an inconvenient blocker, failed assertion, stale source, unsupported claim, ambiguous effect, or unresolved finding.",
@@ -291,33 +332,25 @@
         "description": "Every admitted, pending, invalidated, completed, failed, cancelled, or superseded TerritoryExecutionBoundary with exact source territories and architecture elements, WorkUnit membership, dependencies, interfaces, integration obligations, authority, scope fences, resources, child run, recovery, and completion state.",
         "kind": "STRUCTURED",
         "nullable": false
+      },
+      "planning_readiness_ref": {
+        "kind": "REFERENCE",
+        "nullable": false,
+        "description": "Exact planning-readiness record that admitted the execution frontier."
+      },
+      "project_coverage": {
+        "kind": "STRUCTURED",
+        "nullable": false,
+        "description": "Current whole-project coverage ledger; candidate success must not imply unimplemented project completion."
       }
     },
     "result_schema": "spec/schemas/role-results/bbk-root-orchestrator-result-v1.schema.json",
-    "v2_contract_id": "bbk.root-orchestrator-return.v2",
-    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
-    "v2_return_schema": "spec/schemas/role-returns/bbk-root-orchestrator-return-v2.schema.json",
-    "compact_result_schema": "spec/schemas/role-results/bbk-root-orchestrator-compact-result-v2.schema.json",
-    "compact_result_fields": [
-      "campaign_state",
-      "candidate_inventory",
-      "completion_assessment",
-      "blockers_and_pauses",
-      "parent_actions_requested",
-      "residuals"
-    ],
-    "full_detail_triggers": [
-      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
-      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
-      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
-      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
-      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
-      "The parent explicitly requested FULL detail.",
-      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
-    ],
     "return_schema": "spec/schemas/role-returns/bbk-root-orchestrator-return-v1.schema.json",
     "semantic_state_name": "root_execution_state",
-    "supplemental_enums": {}
+    "supplemental_enums": {},
+    "v2_contract_id": "bbk.root-orchestrator-return.v2",
+    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+    "v2_return_schema": "spec/schemas/role-returns/bbk-root-orchestrator-return-v2.schema.json"
   },
   "scope": [
     "Own the active root execution-campaign coordination state for one exact accepted operating baseline, compiled execution baseline, exact applicable effect authority, and canonical root semantic run. Applicable authority may be PRODUCE_ONLY for WORKSPACE_IMPLEMENTATION while EXTERNAL_EXECUTION remains withheld. This includes TerritoryExecutionBoundary admission, global dependency and integration state, shared-resource and budget arbitration, authority and scope-fence propagation, direct-child coordination, durable execution signals, campaign-level candidate/evidence/finding lineage, recovery, and completion-readiness reporting.",
@@ -340,7 +373,9 @@
   ],
   "spawns": [
     "bbk_territory_orchestrator",
-    "bbk_reviewer"
+    "bbk_reviewer",
+    "bbk_worker",
+    "bbk_validator"
   ],
   "title": "BBK Root Orchestrator",
   "web": false

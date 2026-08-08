@@ -9,7 +9,7 @@ import re
 import sys
 from functools import lru_cache
 from pathlib import Path, PurePath
-from typing import Any, Callable, Mapping
+from typing import Any, Callable, Mapping, Sequence
 
 TOOLS_DIR = Path(__file__).resolve().parent
 if str(TOOLS_DIR) not in sys.path:
@@ -20,6 +20,7 @@ from prompt_modules import (
     PromptModuleError,
     compact_skill_template,
     load_prompt_modules,
+    skill_module_dependency,
     module_directives,
     ordered_modules,
     source_manifest as prompt_module_source_manifest,
@@ -27,6 +28,14 @@ from prompt_modules import (
     validate_skill_templates,
 )
 from return_contracts import render_return_contract_prompt
+from compiled_procedures import (
+    CompilationResult,
+    catalog_projection as compiled_catalog_projection,
+    compile_role_prompt,
+    compile_controller_prompt,
+    globally_suppressed_procedures,
+    load_registry as load_procedure_registry,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC_PATH = ROOT / "spec" / "roles.json"
@@ -36,8 +45,10 @@ TARGETS = {
     "codex": ROOT / "projections" / "codex" / "agents",
     "omp": ROOT / "projections" / "omp" / "agents",
     "claude": ROOT / "projections" / "claude" / "agents",
+    "pi": ROOT / "projections" / "pi" / "agents",
     "generic": ROOT / "projections" / "generic" / "agents",
 }
+CONTROLLER_TARGETS = {name: ROOT / "projections" / name / "controllers" for name in TARGETS}
 MANIFEST = ROOT / "projections" / "manifest.json"
 
 
@@ -124,6 +135,12 @@ def load_skill(name: str) -> dict[str, Any]:
     body = mandatory_skill_body(name)
     encoded = body.encode("utf-8")
     template_encoded = template.encode("utf-8")
+    dependency = skill_module_dependency(canonical_method_content(), name)
+    package = prompt_module_package()
+    module_digests = {
+        module_id: sha256(json.dumps(package.by_id[module_id], ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8"))
+        for module_id in module_directives(template)
+    }
     return {
         "name": name,
         "path": f"shared/skills/{name}/SKILL.md",
@@ -133,6 +150,9 @@ def load_skill(name: str) -> dict[str, Any]:
         "template_bytes": len(template_encoded),
         "template_sha256": sha256(template_encoded),
         "prompt_modules": list(module_directives(template)),
+        "requires_prompt_modules": list(dependency["requires_prompt_modules"]),
+        "standalone_prompt_modules": list(dependency["standalone_prompt_modules"]),
+        "prompt_module_digests": module_digests,
     }
 
 
@@ -155,7 +175,7 @@ def render_role_prompt_module(module: Mapping[str, Any], *, tagged: bool) -> str
         '</bbk-prompt-module>'
     )
 
-def instruction_text(
+def base_instruction_text(
     spec: dict[str, Any],
     role: dict[str, Any],
     *,
@@ -343,45 +363,62 @@ def instruction_text(
         "Apply the embedded `bbk-prompt-invocation-binding` module before substantive work. Invocation-, organization-, session-, sandbox-, and runtime-level controls take precedence over a generated default; unavailable or materially downgraded capabilities must be reported truthfully.",
     ]
 
-    if host == "omp":
-        lines += [
-            "",
-            "## Return contract",
-            "",
-            "The BBK OMP adapter injects the exact role-specific return contract from the installed v4 role catalogue. Treat it as controlling and fail closed if it is absent or inconsistent.",
-        ]
-    else:
-        lines += ["", render_return_contract_prompt(role)]
-
-    if mandatory_skills:
-        lines += [
-            "",
-            "## Mandatory procedures — injected",
-            "",
-            "Apply these compact canonical procedure templates directly. Their shared module references point to the single embedded copies above.",
-        ]
-        for name in mandatory_skills:
-            body = mandatory_skill_body(name)
-            lines.append("")
-            if host == "codex":
-                lines += [f"### Mandatory procedure: `{name}`", "", body]
-            else:
-                lines += [
-                    f'<bbk-inlined-skill name="{name}" source="spec/method-content.json#skills/{name}">',
-                    body,
-                    "</bbk-inlined-skill>",
-                ]
+    # The exact return contract is compiled before the procedure tail for every
+    # harness.  Adapters may add invocation data but may not append semantic
+    # instructions after the compiled primary procedure.
+    lines += ["", render_return_contract_prompt(role)]
 
     if tagged_contract:
         lines += ["", "</bbk-role-contract>"]
     return "\n".join(lines).strip() + "\n"
 
 
+def compiled_instruction(
+    spec: dict[str, Any],
+    role: dict[str, Any],
+    *,
+    host: str,
+    route: Mapping[str, Any] | None = None,
+    procedure_registry: Mapping[str, Any] | None = None,
+    method_content: Mapping[str, Any] | None = None,
+    prompt_package: Any | None = None,
+) -> CompilationResult:
+    """Compile one immutable effective role prompt for one target."""
+    harness = {"generic": "pi"}.get(host, host)
+    base = base_instruction_text(spec, role, host=host)
+    return compile_role_prompt(
+        base, role, harness=harness,
+        logical_child_id=f"projection:{harness}:{role['name']}",
+        return_contract=role.get("return_contract"),
+        model_route=route or {},
+        tool_capabilities={
+            "mutates": bool(role.get("mutates")),
+            "spawns": role.get("spawns", []),
+            "web": bool(role.get("web")),
+        },
+        adapter_template={"target": host, "generator": "tools/generate_agents.py"},
+        root=ROOT,
+        procedure_registry=procedure_registry,
+        method_content=method_content,
+        prompt_package=prompt_package,
+    )
+
+def instruction_text(
+    spec: dict[str, Any],
+    role: dict[str, Any],
+    *,
+    host: str,
+) -> str:
+    """Compatibility wrapper returning the fully compiled prompt."""
+    return compiled_instruction(spec, role, host=host).prompt
+
+
 def render_codex(
     spec: dict[str, Any], role: dict[str, Any], route: dict[str, Any],
     role_digest: str, routing_digest: str, source_digest: str,
+    compiled: CompilationResult | None = None,
 ) -> str:
-    body = instruction_text(spec, role, host="codex")
+    body = (compiled or compiled_instruction(spec, role, host="codex", route=route)).prompt
     codex = route["codex"]
     lines = [
         f"name = {toml_string(role['name'])}",
@@ -400,6 +437,7 @@ def render_codex(
 def render_omp(
     spec: dict[str, Any], role: dict[str, Any], route: dict[str, Any],
     role_digest: str, routing_digest: str, source_digest: str,
+    compiled: CompilationResult | None = None,
 ) -> str:
     omp = route["omp"]
     lines = [
@@ -417,7 +455,7 @@ def render_omp(
         "",
         f'<bbk-agent-system role="{role["name"]}" package-version="{spec["package_version"]}">',
         "",
-        instruction_text(spec, role, host="omp").rstrip(),
+        (compiled or compiled_instruction(spec, role, host="omp", route=route)).prompt.rstrip(),
         "",
         "</bbk-agent-system>",
     ])
@@ -451,6 +489,7 @@ def render_yaml_list(lines: list[str], key: str, values: list[str]) -> None:
 def render_claude(
     spec: dict[str, Any], role: dict[str, Any], route: dict[str, Any],
     role_digest: str, routing_digest: str, source_digest: str,
+    compiled: CompilationResult | None = None,
 ) -> str:
     name = claude_name(role)
     tools, denied = claude_tools(role)
@@ -472,7 +511,7 @@ def render_claude(
     lines.extend([
         "---",
         "",
-        instruction_text(spec, role, host="claude").rstrip(),
+        (compiled or compiled_instruction(spec, role, host="claude", route=route)).prompt.rstrip(),
     ])
     return "\n".join(lines) + "\n"
 
@@ -480,41 +519,130 @@ def render_claude(
 def render_generic(
     spec: dict[str, Any], role: dict[str, Any], route: dict[str, Any],
     role_digest: str, routing_digest: str, source_digest: str,
+    compiled: CompilationResult | None = None,
 ) -> str:
-    # Generic projections contain only model-facing operational instructions.
-    # Machine-readable role, spawn, skill, routing, and provenance metadata lives
-    # in projections/manifest.json.
-    return instruction_text(spec, role, host="generic")
+    return (compiled or compiled_instruction(spec, role, host="generic", route=route)).prompt
+
+
+def render_pi(
+    spec: dict[str, Any], role: dict[str, Any], route: dict[str, Any],
+    role_digest: str, routing_digest: str, source_digest: str,
+    compiled: CompilationResult | None = None,
+) -> str:
+    return (compiled or compiled_instruction(spec, role, host="pi", route=route)).prompt
+
+
+def controller_base_prompt(spec: Mapping[str, Any], *, host: str) -> str:
+    """Canonical semantic controller contract shared by every harness."""
+    lines = [
+        "# BBK harness-root controller", "",
+        "You are the sole user-facing BBK controller. You route work to canonical roles; you do not absorb Wayfinder, Orchestrator, Worker, Reviewer, Validator, or Architect responsibilities.", "",
+        "## Routing", "",
+        "- Inspect current child/state before launching a root. Resume the same logical child whenever its subject and compiled state remain current.",
+        "- Planning, architecture, uncertainty, or missing/stale readiness routes to `bbk_root_wayfinder`.",
+        "- Execution or recovery routes to `bbk_root_orchestrator` after an accepted executable frontier and authority exist.",
+        "- Bounded qualitative review routes to `bbk_reviewer`; assertion-scoped candidate acceptance routes to `bbk_validator_orchestrator`.",
+        "- Once a Root Wayfinder owns a subject, do not commission overlapping controller-side discovery.", "",
+        "## Delivery authority", "",
+        "- Treat the user’s explicit delivery assignment and exact architecture/baseline adoption as standing authority for routine continuation inside its bounds.",
+        "- Ask the user only for `MAJOR_BLOCKER` or `ARCHITECTURAL_BRANCH`; continue independent work around narrower blockers.",
+        "- Relay one recommendation-first request with exact IDs and consequences when attention is genuinely required.", "",
+        "## Coordination", "",
+        "- Use state-changing messages, durable receipts, and long bounded waits. Do not acknowledge routine progress chatter or recreate checks already established for unchanged subjects.",
+        "- Preserve active-child effect ownership. The controller does not run package, build, test, cache, cleanup, or process commands on a child-owned surface.", "",
+        "## Claim limits", "",
+        "Separate planning readiness, implementation artifacts, candidate validation, capability completion, project completion, deployment, and live acceptance. The controller does not self-accept or self-release child work.",
+        "", f"package_version: {spec['package_version']}", f"harness: {host}",
+    ]
+    if host == "omp":
+        lines.extend([
+            "", "## OMP mode lifecycle", "",
+            "- Persistent BBK mode remains active across ordinary turns until the user invokes `/bbk:exit`. `/bbk:status` and `/bbk:prompt-status` are read-only controller diagnostics.",
+            "- Use OMP's native `ask` tool for accountable user decisions. Anything phrased as a question outside an `ask` tool call is informational text only and is not decision evidence; accepted responses are recorded as `source: omp.ask`.",
+        ])
+    return "\n".join(lines).strip()+"\n"
+
+
+def compiled_controller(
+    spec: Mapping[str, Any],
+    *,
+    host: str,
+    procedure_registry: Mapping[str, Any] | None = None,
+    method_content: Mapping[str, Any] | None = None,
+    prompt_package: Any | None = None,
+) -> CompilationResult:
+    base=controller_base_prompt(spec,host=host)
+    return compile_controller_prompt(
+        base,harness={"generic":"pi"}.get(host,host),
+        logical_child_id=f"projection:{host}:bbk_controller",
+        tool_capabilities={"user_facing":True,"routes_canonical_roles":True},
+        adapter_template={"target":host,"generator":"tools/generate_agents.py"},
+        root=ROOT,
+        procedure_registry=procedure_registry,
+        method_content=method_content,
+        prompt_package=prompt_package,
+    )
+
+
+def render_controller(spec: Mapping[str, Any], *, host: str, compiled: CompilationResult) -> str:
+    if host == "omp":
+        return "\n".join([
+            "---", "name: bbk_controller",
+            f"description: {yaml_scalar('Canonical BBK harness-root controller')}",
+            "---", "",
+            f'<bbk-controller-system package-version="{spec["package_version"]}">', "",
+            compiled.prompt.rstrip(), "", "</bbk-controller-system>", "",
+        ])
+    return compiled.prompt
 
 
 def rendered_projections(
     model_routing_path: Path = MODEL_ROUTING_PATH,
+    *,
+    targets: Sequence[str] | None = None,
 ) -> tuple[dict[str, dict[str, bytes]], dict[str, Any]]:
-    """Render every host projection from canonical roles and one routing policy.
+    """Render selected host projections from canonical roles and one routing policy.
+
+    ``targets=None`` retains the full release-generation behavior. Install and
+    update commands pass only their selected harnesses so they do not compile
+    unused agent and controller prompts.
 
     The returned paths are filenames relative to each host's agent directory,
     which lets the installer apply an external routing policy without mutating
     or re-sealing the qualified package tree.
     """
+    if targets is None:
+        selected_targets = tuple(TARGETS)
+    else:
+        requested = {str(target) for target in targets}
+        unknown = sorted(requested - set(TARGETS))
+        if unknown:
+            raise ValueError(f"unknown projection targets: {unknown}")
+        selected_targets = tuple(target for target in TARGETS if target in requested)
+        if not selected_targets:
+            raise ValueError("at least one projection target is required")
     spec = json.loads(SPEC_PATH.read_text(encoding="utf-8"))
     routing = load_model_routing(model_routing_path, root=ROOT, role_spec=spec)
     method_content = canonical_method_content()
     module_package = prompt_module_package()
     module_manifest = prompt_module_source_manifest(module_package)
     skill_sources = mandatory_skill_sources(spec)
+    procedure_registry = load_procedure_registry(ROOT)
     role_digest = sha256(canonical_json_bytes(spec))
     routing_digest = sha256(canonical_json_bytes(routing))
     method_content_digest = sha256(METHOD_CONTENT_PATH.read_bytes())
     prompt_module_digest = sha256(canonical_json_bytes(module_manifest))
     mandatory_skill_digest = sha256(canonical_json_bytes(skill_sources))
+    procedure_registry_digest = sha256(canonical_json_bytes(procedure_registry))
     source_digest = sha256(canonical_json_bytes({
         "roles": spec,
         "model_routing": routing,
         "method_content": method_content,
         "prompt_module_sources": module_manifest,
         "mandatory_skill_sources": skill_sources,
+        "procedure_registry": procedure_registry,
     }))
-    outputs: dict[str, dict[str, bytes]] = {target: {} for target in TARGETS}
+    outputs: dict[str, dict[str, bytes]] = {target: {} for target in selected_targets}
     renderers: dict[
         str,
         Callable[[dict[str, Any], dict[str, Any], dict[str, Any], str, str, str], str],
@@ -522,19 +650,34 @@ def rendered_projections(
         "codex": render_codex,
         "omp": render_omp,
         "claude": render_claude,
+        "pi": render_pi,
         "generic": render_generic,
     }
-    extensions = {"codex": ".toml", "omp": ".md", "claude": ".md", "generic": ".md"}
+    extensions = {"codex": ".toml", "omp": ".md", "claude": ".md", "pi": ".md", "generic": ".md"}
     agents: dict[str, Any] = {}
     for role in sorted(spec["roles"], key=lambda item: item["name"]):
         route = route_for_role(routing, role["name"])
         filenames: dict[str, str] = {}
-        for target, renderer in renderers.items():
+        compiled_by_target = {
+            target: compiled_instruction(
+                spec,
+                role,
+                host=target,
+                route=route,
+                procedure_registry=procedure_registry,
+                method_content=method_content,
+                prompt_package=module_package,
+            )
+            for target in selected_targets
+        }
+        for target in selected_targets:
+            renderer = renderers[target]
             stem = claude_name(role) if target == "claude" else role["name"]
             filename = f"{stem}{extensions[target]}"
             filenames[target] = filename
             outputs[target][filename] = renderer(
-                spec, role, route, role_digest, routing_digest, source_digest
+                spec, role, route, role_digest, routing_digest, source_digest,
+                compiled_by_target[target],
             ).encode("utf-8")
         agents[role["name"]] = {
             "family": role["family"],
@@ -546,6 +689,26 @@ def rendered_projections(
             "mandatory_skills": role.get("mandatory_skills", []),
             "prompt_modules": role.get("prompt_modules", []),
             "inlined_skills": mandatory_skill_metadata(role),
+            "compiled_procedures": {
+                target: result.manifest
+                for target, result in sorted(compiled_by_target.items())
+            },
+            "prompt_compilation_events": {
+                target: result.event
+                for target, result in sorted(compiled_by_target.items())
+            },
+            "prompt_source_maps": {
+                target: list(result.source_map)
+                for target, result in sorted(compiled_by_target.items())
+            },
+            "effective_external_catalogs": {
+                target: compiled_catalog_projection(
+                    role,
+                    result.manifest,
+                    procedure_registry=procedure_registry,
+                )
+                for target, result in sorted(compiled_by_target.items())
+            },
             "spawns": role.get("spawns", []),
             "delegation": role.get("delegation", {}),
             "return_contract": role.get("return_contract", {}),
@@ -561,6 +724,27 @@ def rendered_projections(
                 "claude": route["claude"],
             },
             "files": filenames,
+        }
+    controllers: dict[str, Any] = {}
+    for target in selected_targets:
+        compiled = compiled_controller(
+            spec,
+            host=target,
+            procedure_registry=procedure_registry,
+            method_content=method_content,
+            prompt_package=module_package,
+        )
+        filename = "bbk_controller.md"
+        outputs[target][f"../controllers/{filename}"] = render_controller(spec, host=target, compiled=compiled).encode("utf-8")
+        controllers[target] = {
+            "file": filename, "compiled_procedures": compiled.manifest,
+            "effective_external_catalog": compiled_catalog_projection(
+                procedure_registry["controller"],
+                compiled.manifest,
+                root=ROOT,
+                procedure_registry=procedure_registry,
+            ),
+            "source_map": list(compiled.source_map), "event": compiled.event,
         }
     routing_stats = routing_statistics(routing)
     metadata = {
@@ -579,6 +763,12 @@ def rendered_projections(
         "prompt_module_sources": module_manifest["sources"],
         "mandatory_skill_source_sha256": mandatory_skill_digest,
         "mandatory_skill_sources": sorted(skill_sources),
+        "procedure_registry_source": "spec/procedures/catalog.json",
+        "procedure_registry_sha256": procedure_registry_digest,
+        "procedure_registry_revision": procedure_registry["registry_revision"],
+        "globally_suppressed_procedures": list(globally_suppressed_procedures(ROOT)),
+        "physical_catalog_classes": procedure_registry.get("physical_catalog_classes", {}),
+        "controllers": controllers,
         "role_count": len(spec["roles"]),
         "model_routing_schema": routing["schema_version"],
         "model_routing_mode": routing_stats["mode"],
@@ -587,9 +777,9 @@ def rendered_projections(
         # profile statistics without exposing profile tiers in the v2 projection manifest.
         "legacy_model_profile_count": routing_stats["profile_count"],
         "legacy_role_profile_counts": routing_stats["role_profile_counts"],
-        "target_count": len(TARGETS),
+        "target_count": len(selected_targets),
         "projection_count": sum(len(files) for files in outputs.values()),
-        "targets": sorted(TARGETS),
+        "targets": sorted(selected_targets),
         "model_routing_path": model_routing_path.resolve().as_posix(),
         "agents": agents,
     }
@@ -601,13 +791,16 @@ def expected_files() -> tuple[dict[Path, bytes], dict[str, Any]]:
     outputs: dict[Path, bytes] = {}
     for target, files in projections.items():
         for filename, content in files.items():
-            outputs[TARGETS[target] / filename] = content
+            if filename.startswith("../controllers/"):
+                outputs[CONTROLLER_TARGETS[target] / Path(filename).name] = content
+            else:
+                outputs[TARGETS[target] / filename] = content
     manifest_files = {
         portable_relative_path(path, ROOT): sha256(content)
         for path, content in sorted(outputs.items(), key=lambda item: str(item[0]))
     }
     manifest = {
-        "schema": "bbk.projection-manifest.v8",
+        "schema": "bbk.projection-manifest.v10",
         "package_version": metadata["package_version"],
         "contract_package": metadata["contract_package"],
         "role_return_registry": metadata["role_return_registry"],
@@ -628,6 +821,12 @@ def expected_files() -> tuple[dict[Path, bytes], dict[str, Any]]:
         "model_route_count": metadata["model_route_count"],
         "mandatory_skill_source_sha256": metadata["mandatory_skill_source_sha256"],
         "mandatory_skill_sources": metadata["mandatory_skill_sources"],
+        "procedure_registry_source": metadata["procedure_registry_source"],
+        "procedure_registry_sha256": metadata["procedure_registry_sha256"],
+        "procedure_registry_revision": metadata["procedure_registry_revision"],
+        "globally_suppressed_procedures": metadata["globally_suppressed_procedures"],
+        "physical_catalog_classes": metadata["physical_catalog_classes"],
+        "controllers": metadata["controllers"],
         "role_count": metadata["role_count"],
         "target_count": metadata["target_count"],
         "projection_count": metadata["projection_count"],
@@ -649,7 +848,7 @@ def check(outputs: dict[Path, bytes]) -> list[str]:
             errors.append(f"missing: {portable_relative_path(path, ROOT)}")
         elif path.read_bytes() != expected:
             errors.append(f"drift: {portable_relative_path(path, ROOT)}")
-    for directory in TARGETS.values():
+    for directory in [*TARGETS.values(), *CONTROLLER_TARGETS.values()]:
         if not directory.exists():
             continue
         for path in directory.iterdir():

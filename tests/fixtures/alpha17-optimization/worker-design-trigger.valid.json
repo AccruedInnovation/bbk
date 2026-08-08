@@ -1,0 +1,9 @@
+{
+  "schema": "bbk.worker-design-trigger.v1",
+  "work_unit_ref": "WU-FIXTURE-EXCEPTION-001",
+  "trigger": "CROSS_INTERFACE_MULTI_OWNER_MUTATION",
+  "material_ambiguity": "The WorkUnit must atomically update two separately owned interface projections.",
+  "why_template_is_insufficient": "The routine single-owner mutation contract cannot establish safe serialization across both owners.",
+  "required_designer_output": "One bounded ownership/serialization contract and recovery route.",
+  "unaffected_work_may_continue": true
+}

@@ -1,0 +1,14 @@
+{
+  "$id": "bbk-bound-worker-packet-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "binding_context": {"$ref": "bbk-worker-packet-binding-context-v1.schema.json"},
+    "packet_digest": {"pattern": "^sha256:[0-9a-f]{64}$", "type": "string"},
+    "planned_binding_ref": {"minLength": 1, "type": "string"},
+    "schema": {"const": "bbk.bound-worker-packet.v1"}
+  },
+  "required": ["schema", "planned_binding_ref", "binding_context", "packet_digest"],
+  "title": "BBK bound worker packet v1",
+  "type": "object"
+}

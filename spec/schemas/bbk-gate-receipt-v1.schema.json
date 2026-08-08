@@ -1,0 +1,92 @@
+{
+  "$id": "bbk-gate-receipt-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "decision": {
+      "$ref": "bbk-gate-decision-v1.schema.json"
+    },
+    "implementation_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "previous_receipt_ref": {
+      "type": "string"
+    },
+    "receipt_id": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "receipt_kind": {
+      "const": "GATE_DECISION"
+    },
+    "recorded_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "request": {
+      "$ref": "bbk-gate-evaluation-request-v1.schema.json"
+    },
+    "schema": {
+      "const": "bbk.gate-receipt.v1"
+    },
+    "subject": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "actor_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+          "type": "string"
+        },
+        "authority_ref": {
+          "maxLength": 256,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+          "type": "string"
+        },
+        "candidate_ref": {
+          "maxLength": 256,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+          "type": "string"
+        },
+        "invocation_id": {
+          "type": "string"
+        },
+        "policy_version": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "work_unit_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "actor_id",
+        "invocation_id",
+        "work_unit_id",
+        "candidate_ref",
+        "authority_ref",
+        "policy_version"
+      ],
+      "title": "receipt subject",
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "receipt_id",
+    "receipt_kind",
+    "recorded_at",
+    "request",
+    "decision",
+    "subject"
+  ],
+  "title": "BBK gate receipt v1",
+  "type": "object"
+}

@@ -1,0 +1,18 @@
+{
+  "schema": "bbk.identity-receipt.v1",
+  "subject_ref": ".bbk/returns/root-return.json",
+  "subject_kind": "ROLE_RETURN",
+  "byte_count": 1024,
+  "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "canonicalization_profile": "bbk-json-utf8-lf-v1",
+  "schema_id": "bbk.root-return.vX",
+  "schema_validation": "PASS",
+  "referenced_artifact_identities": [],
+  "finalizer": {
+    "id": "bbk-result-finalizer",
+    "version": "0.1.0-alpha.17",
+    "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+  },
+  "generated_at": "2026-08-05T12:00:00Z",
+  "invalidation_keys": ["root-return-content", "finalizer-version"]
+}

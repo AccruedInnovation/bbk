@@ -1,0 +1,24 @@
+{
+  "schema_version": "bbk.prompt-module.v1",
+  "id": "bbk-prompt-late-bound-runtime-identity",
+  "title": "Late-bound effective profile and environment identity",
+  "description": "Bind semantic profile constraints during planning and resolve exact runtime identity at admission without reopening planning for equivalent materializations.",
+  "clauses": [
+    {
+      "id": "LATE_BOUND_PROFILE.PLAN_CONSTRAINTS",
+      "text": "Planning binds semantic capabilities, required gates, profile selector, registry/package revision, allowed provider/model/tool/runtime families, authority, and protected constraints."
+    },
+    {
+      "id": "LATE_BOUND_PROFILE.RUNTIME_RECEIPT",
+      "text": "Runtime admission resolves the exact effective profile and material environment identity and emits a receipt."
+    },
+    {
+      "id": "LATE_BOUND_PROFILE.EQUIVALENCE",
+      "text": "A different materialization digest does not reopen planning when every bound semantic capability, gate, family, authority, and protected constraint passes. Record the deviation and effective identity."
+    },
+    {
+      "id": "LATE_BOUND_PROFILE.BLOCKING",
+      "text": "Reopen or block only when a required semantic constraint fails or the plan explicitly requires exact byte identity for a named reason."
+    }
+  ]
+}

@@ -1,0 +1,196 @@
+{
+  "$id": "bbk-work-unit-attempt-registration-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "assignment_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "attempt_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "authority_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "baseline_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "candidate_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "capability_ref": {
+      "pattern": "^role:bbk_[A-Za-z0-9_]+@[^#]+#sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "dispatch_envelope_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "dispatch_input_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "dispatch_ref": {
+      "pattern": "^dispatch:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "host_version": {
+      "const": "omp/16.4.8"
+    },
+    "idempotency_key": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "invocation_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "jj_change_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "jj_commit_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "logical_attempt_ref": {
+      "pattern": "^attempt:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "logical_request_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "material_transport_reason": {
+      "maxLength": 4096,
+      "type": "string"
+    },
+    "packet_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "parent_binding_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "parent_invocation_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "parent_revision": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "parent_session_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "planned_binding_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "planned_session_id": {
+      "pattern": "^planned-session:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "registration_id": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "request_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "return_contract": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "return_transport_mode": {
+      "enum": [
+        "SEALED_HANDOFF_REQUIRED",
+        "STRUCTURED_RETURN_FIRST",
+        "STRUCTURED_RETURN_ONLY"
+      ],
+      "type": "string"
+    },
+    "role": {
+      "pattern": "^bbk_[A-Za-z0-9_]+$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.work-unit-attempt-registration.v1"
+    },
+    "scope": {
+      "type": "object"
+    },
+    "spawn_reservation_ref": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "status": {
+      "const": "REGISTERED"
+    },
+    "task_input_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "task_name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "work_unit_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "workspace_ref": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "registration_id",
+    "idempotency_key",
+    "request_digest",
+    "planned_binding_ref",
+    "planned_session_id",
+    "parent_binding_ref",
+    "parent_session_id",
+    "parent_invocation_id",
+    "host_version",
+    "invocation_id",
+    "role",
+    "work_unit_id",
+    "attempt_id",
+    "baseline_ref",
+    "candidate_ref",
+    "workspace_ref",
+    "jj_change_id",
+    "authority_ref",
+    "scope",
+    "return_contract",
+    "capability_ref",
+    "task_name",
+    "assignment_digest",
+    "packet_digest",
+    "task_input_digest",
+    "dispatch_ref",
+    "dispatch_input_digest",
+    "status",
+    "return_transport_mode",
+    "material_transport_reason",
+    "logical_attempt_ref",
+    "logical_request_digest",
+    "parent_revision",
+    "jj_commit_id",
+    "dispatch_envelope_digest",
+    "spawn_reservation_ref"
+  ],
+  "title": "BBK immutable work-unit attempt registration v1",
+  "type": "object"
+}

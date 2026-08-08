@@ -1,0 +1,61 @@
+{
+  "$id": "bbk-mutation-result-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "after_digest": {
+      "pattern": "^(?:sha256:)?[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "before_digest": {
+      "pattern": "^(?:sha256:)?[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "changed_paths": {
+      "items": {
+        "maxLength": 4096,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "effect_status": {
+      "enum": [
+        "APPLIED",
+        "NO_CHANGE",
+        "BLOCKED",
+        "FAILED"
+      ],
+      "type": "string"
+    },
+    "gate_decision_ref": {
+      "type": "string"
+    },
+    "observed_path": {
+      "maxLength": 4096,
+      "minLength": 1,
+      "type": "string"
+    },
+    "receipt_ref": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.mutation-result.v1"
+    },
+    "vcs_reconciliation_ref": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "gate_decision_ref",
+    "effect_status",
+    "observed_path",
+    "vcs_reconciliation_ref",
+    "receipt_ref"
+  ],
+  "title": "BBK mutation result v1",
+  "type": "object"
+}

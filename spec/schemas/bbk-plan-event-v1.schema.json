@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-plan-event-v1.schema.json",
+  "title": "BBK Plan Event v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "event_id",
+    "transaction_id",
+    "sequence",
+    "event_type",
+    "subject_ref",
+    "authority_ref",
+    "predecessor_refs",
+    "payload",
+    "created_at"
+  ],
+  "properties": {
+    "schema": {"const": "bbk.plan-event.v1"},
+    "event_id": {"type": "string", "minLength": 1},
+    "transaction_id": {"type": "string", "minLength": 1},
+    "sequence": {"type": "integer", "minimum": 1},
+    "event_type": {
+      "enum": [
+        "DECISION_ACCEPTED",
+        "DECISION_SUPERSEDED",
+        "FINDING_DISPOSITION_CHANGED",
+        "BASELINE_ADVANCED",
+        "AUTHORITY_UPDATED",
+        "ROADMAP_REVISED",
+        "FRONTIER_REVISED",
+        "FRONTIER_ADVANCED",
+        "PROJECT_COVERAGE_UPDATED",
+        "ARTIFACT_INVALIDATED",
+        "BLOCKER_RECORDED",
+        "BLOCKER_CLEARED"
+      ]
+    },
+    "subject_ref": {"type": "string", "minLength": 1},
+    "authority_ref": {"type": "string", "minLength": 1},
+    "predecessor_refs": {"type": "array", "items": {"type": "string"}},
+    "payload": {"type": "object"},
+    "created_at": {"type": "string", "format": "date-time"}
+  }
+}

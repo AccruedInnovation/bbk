@@ -1,0 +1,41 @@
+{
+  "$id": "bbk-role-capability-query-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "invocation_kind": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "policy_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "profile": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "role": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.role-capability-query.v1"
+    }
+  },
+  "required": [
+    "schema",
+    "role",
+    "invocation_kind",
+    "profile",
+    "policy_version"
+  ],
+  "title": "BBK role capability query v1",
+  "type": "object"
+}

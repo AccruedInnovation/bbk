@@ -1,0 +1,112 @@
+{
+  "$id": "bbk-beads-projection-receipt-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BBK Beads projection receipt v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "bbk.beads-projection-receipt.v1"
+    },
+    "status": {
+      "const": "PASS"
+    },
+    "operation": {
+      "enum": [
+        "ASSIGN",
+        "UPDATE",
+        "INTEGRATE_REQUEST"
+      ]
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "work_unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "attempt": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "work_unit",
+        "attempt"
+      ]
+    },
+    "previous_revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "new_revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "bd_receipt": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "semantic_record_ref": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "backend": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "issue_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "transition": {
+          "enum": [
+            "CREATE",
+            "START",
+            "BLOCK",
+            "UNBLOCK",
+            "COMPLETE",
+            "FAIL",
+            "ANNOTATE"
+          ]
+        },
+        "projected_status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "exit_code": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "issue_id",
+        "transition",
+        "projected_status",
+        "exit_code"
+      ]
+    },
+    "projection_id": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "idempotent_reuse": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "operation",
+    "subject",
+    "previous_revision",
+    "new_revision",
+    "bd_receipt",
+    "semantic_record_ref",
+    "backend",
+    "projection_id",
+    "idempotent_reuse"
+  ]
+}

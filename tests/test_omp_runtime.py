@@ -20,6 +20,7 @@ import textwrap
 import unittest
 from pathlib import Path
 from tests._cli_support import run_cli as test_run_cli
+from tests._fake_executable import write_python_executable
 from tests._path_support import assert_labeled_path, assert_same_path, paths_identify_same
 m1_ROOT = Path(__file__).resolve().parents[1]
 m1_TOOLS = m1_ROOT / 'tools'
@@ -29,6 +30,7 @@ m1_INSTALL = m1_ROOT / 'tools' / 'install.py'
 m1_ROUTING = m1_ROOT / 'tools' / 'omp_model_routing.py'
 m1_PROFILES = m1_ROOT / 'spec' / 'omp-model-routing-profiles.json'
 m1_TEMPLATE = m1_ROOT / 'templates' / 'omp-model-routing-profile.json'
+m1_VERSION = (m1_ROOT / 'VERSION').read_text(encoding='utf-8').strip()
 
 def m1_run(command, *, env=None, cwd=m1_ROOT, check=True):
     return test_run_cli(command, cwd=cwd, env=env, check=check)
@@ -68,14 +70,14 @@ def m1_write_minimal_routing_install(*, base: Path, home: Path, scope: str, proj
         agents = home / '.omp' / 'agent' / 'agents'
         state_path = base / 'data' / 'effective-omp-model-routing.json'
         manifest_path = base / 'data' / 'install-manifest.json'
-        package_root = base / 'data' / '0.1.0-alpha.16.1'
+        package_root = base / 'data' / m1_VERSION
     else:
         assert project is not None
         extension = project / '.omp' / 'extensions' / 'bbk'
         agents = project / '.omp' / 'agents'
         state_path = project / '.bbk-kit' / 'effective-omp-model-routing.json'
         manifest_path = project / '.bbk-kit-install.json'
-        package_root = project / '.bbk-kit' / '0.1.0-alpha.16.1'
+        package_root = project / '.bbk-kit' / m1_VERSION
     extension.mkdir(parents=True, exist_ok=True)
     agents.mkdir(parents=True, exist_ok=True)
     state_path.parent.mkdir(parents=True, exist_ok=True)
@@ -99,7 +101,7 @@ def m1_write_minimal_routing_install(*, base: Path, home: Path, scope: str, proj
     canonical_routes = json.dumps(routes, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode('utf-8')
     state = {
         'schema': 'bbk.omp-model-routing-state.v1',
-        'package_version': '0.1.0-alpha.16.1',
+        'package_version': m1_VERSION,
         'active_profile': 'installation-default',
         'source': 'minimal-routing-test-fixture',
         'description': 'Canonical installation-default routing for an isolated OMP scope test.',
@@ -122,7 +124,7 @@ def m1_write_minimal_routing_install(*, base: Path, home: Path, scope: str, proj
     ]
     manifest = {
         'schema': 'bbk.install-manifest.v1',
-        'version': '0.1.0-alpha.16.1',
+        'version': m1_VERSION,
         'scope': scope,
         'project_root': str(project.resolve()) if project else None,
         'omp': True,
@@ -132,7 +134,7 @@ def m1_write_minimal_routing_install(*, base: Path, home: Path, scope: str, proj
     manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
     binding = {
         'schema': 'bbk.omp-package-binding.v3',
-        'version': '0.1.0-alpha.16.1',
+        'version': m1_VERSION,
         'path': str(package_root.resolve()),
         'package_root': str(package_root.resolve()),
         'scope': scope,
@@ -157,7 +159,7 @@ class Alpha113OmpModelMenuTests(unittest.TestCase):
         value = json.loads(m1_PROFILES.read_text(encoding='utf-8'))
         roles = {item['name'] for item in json.loads((m1_ROOT / 'spec' / 'roles.json').read_text(encoding='utf-8'))['roles']}
         self.assertEqual(value['schema_version'], 'bbk.omp-model-routing-profiles.v1')
-        self.assertEqual(value['package_version'], '0.1.0-alpha.16.1')
+        self.assertEqual(value['package_version'], m1_VERSION)
         self.assertEqual(set(value['profiles']), {'default', 'testing-flash', 'deepseek-economy'})
         for profile in value['profiles'].values():
             self.assertEqual(set(profile['roles']), roles)
@@ -205,7 +207,7 @@ class Alpha113OmpModelMenuTests(unittest.TestCase):
             script.write_text(textwrap.dedent(f'''
                 const chain = () => ({{ optional() {{ return this; }} }});
                 const z = {{ object: value => value, string: chain, boolean: chain,
-                  enum: values => chain(), array: value => chain() }};
+                  enum: values => chain(), array: value => chain(), any: chain }};
                 const commands = new Map(), notifications = [], confirmations = [];
                 const pi = {{ zod: {{ z }}, setLabel() {{}}, registerTool() {{}}, on() {{}},
                   events: {{ on() {{ return () => {{}}; }} }},
@@ -313,7 +315,7 @@ class Alpha113OmpModelMenuTests(unittest.TestCase):
             script.write_text(textwrap.dedent(f"""
                 const chain = () => ({{ optional() {{ return this; }} }});
                 const z = {{ object: value => value, string: chain, boolean: chain,
-                  enum: values => chain(), array: value => chain() }};
+                  enum: values => chain(), array: value => chain(), any: chain }};
                 const tools = new Map();
                 const pi = {{ zod: {{ z }}, setLabel() {{}}, on() {{}},
                   events: {{ on() {{ return () => {{}}; }} }},
@@ -337,18 +339,21 @@ class Alpha113OmpModelMenuTests(unittest.TestCase):
             self.assertEqual(json.loads((project / '.bbk' / 'config.json').read_text(encoding='utf-8'))['title'], title)
             self.assertIn(title, (project / '.bbk' / 'project.md').read_text(encoding='utf-8'))
 
-    @unittest.skipUnless(shutil.which('node') and os.name != 'nt', 'POSIX executable shim required for invalid UTF-8 transport test')
+    @unittest.skipUnless(shutil.which('node'), 'node is required for invalid UTF-8 transport test')
     def test_omp_tool_transport_rejects_invalid_utf8_without_replacement(self):
         with tempfile.TemporaryDirectory() as temp:
             base = Path(temp)
-            fake = base / 'fake-python'
-            fake.write_text("#!/bin/sh\nprintf '\\377'\n", encoding='utf-8')
-            fake.chmod(0o755)
+            fake = base / 'invalid-utf8-cli.py'
+            fake.write_text(
+                "import sys\nsys.stdout.buffer.write(b'\\xff')\n",
+                encoding='utf-8',
+                newline='\n',
+            )
             script = base / 'invalid-utf8.mjs'
             script.write_text(textwrap.dedent(f"""
                 const chain = () => ({{ optional() {{ return this; }} }});
                 const z = {{ object: value => value, string: chain, boolean: chain,
-                  enum: values => chain(), array: value => chain() }};
+                  enum: values => chain(), array: value => chain(), any: chain }};
                 const tools = new Map();
                 const pi = {{ zod: {{ z }}, setLabel() {{}}, on() {{}},
                   events: {{ on() {{ return () => {{}}; }} }}, registerCommand() {{}},
@@ -358,7 +363,7 @@ class Alpha113OmpModelMenuTests(unittest.TestCase):
                 const value = await tools.get('bbk_status').execute('status', {{}}, undefined, undefined, {{cwd: {json.dumps(str(base))}}});
                 console.log(JSON.stringify(value));
             """), encoding='utf-8')
-            value = json.loads(m1_run(['node', script], env={**os.environ, 'BBK_PYTHON': str(fake)}).stdout)
+            value = json.loads(m1_run(['node', script], env={**os.environ, 'BBK_PYTHON': sys.executable, 'BBK_CLI': str(fake)}).stdout)
             self.assertTrue(value['isError'])
             self.assertEqual(value['details']['schema'], 'bbk.utf8-transport-error.v1')
             self.assertIn('not valid UTF-8', value['details']['error'])
@@ -367,11 +372,34 @@ class Alpha113OmpModelMenuTests(unittest.TestCase):
     def test_template_is_compact_and_valid_for_runtime_application(self):
         value = json.loads(m1_TEMPLATE.read_text(encoding='utf-8'))
         self.assertEqual(value['schema_version'], 'bbk.omp-model-routing-profile.v1')
-        self.assertEqual(value['package_version'], '0.1.0-alpha.16.1')
+        self.assertNotIn('package_version', value)
         self.assertEqual(set(value['default']), {'model', 'thinkingLevel'})
         canonical = {item['name'] for item in json.loads((m1_ROOT / 'spec' / 'roles.json').read_text(encoding='utf-8'))['roles']}
         self.assertLessEqual(set(value['roles']), canonical)
 
+    def test_custom_profile_package_version_is_optional_provenance(self):
+        roles = [item['name'] for item in json.loads((m1_ROOT / 'spec' / 'roles.json').read_text(encoding='utf-8'))['roles']]
+        base = json.loads(m1_TEMPLATE.read_text(encoding='utf-8'))
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / 'profile.json'
+            for label in (None, 'different-release-label'):
+                value = dict(base)
+                if label is not None:
+                    value['package_version'] = label
+                path.write_text(json.dumps(value), encoding='utf-8')
+                profile_id, description, routes = __import__('omp_model_routing').load_custom_profile(
+                    path, m1_VERSION, roles
+                )
+                self.assertEqual(profile_id, value['id'])
+                self.assertEqual(description, value['description'])
+                self.assertEqual(set(routes), set(roles))
+            invalid = dict(base)
+            invalid['package_version'] = ''
+            path.write_text(json.dumps(invalid), encoding='utf-8')
+            with self.assertRaisesRegex(__import__('omp_model_routing').RoutingError, 'non-empty string'):
+                __import__('omp_model_routing').load_custom_profile(path, m1_VERSION, roles)
+
+    @unittest.skipUnless(shutil.which('node'), 'Node.js is required for OMP model-menu behavior')
     def test_install_apply_menu_profiles_manifest_status_and_uninstall_round_trip(self):
         with tempfile.TemporaryDirectory() as temp:
             base = Path(temp)
@@ -394,7 +422,7 @@ class Alpha113OmpModelMenuTests(unittest.TestCase):
             self.assertEqual(status['route_surface'], 'bbk-managed-agent-frontmatter')
             self.assertIn('task.agentModelOverrides', status['precedence_note'])
             script = base / 'model-menu.mjs'
-            script.write_text(textwrap.dedent(f"\n                const chain = () => ({{ optional() {{ return this; }} }});\n                const z = {{ object: value => value, string: chain, boolean: chain,\n                  enum: values => chain(), array: value => chain() }};\n                const commands = new Map(), messages = [], userMessages = [], notifications = [];\n                const pi = {{ zod: {{ z }}, setLabel() {{}}, registerTool() {{}}, on() {{}},\n                  registerCommand(name, value) {{ commands.set(name, value); }},\n                  sendMessage(value) {{ messages.push(value); }},\n                  sendUserMessage(value) {{ userMessages.push(value); }} }};\n                const mod = await import({json.dumps((extension / 'index.js').as_uri())});\n                mod.default(pi);\n                const command = commands.get('bbk:models');\n                if (!command) throw new Error('missing bbk:models');\n                const ui = {{\n                  async select(title, options) {{\n                    if (title.includes('sub-agent model routing')) return 'Apply a routing profile';\n                    if (title === 'Routing profile') return options.find(value => value.startsWith('testing-flash'));\n                    throw new Error(`unexpected select ${{title}}`);\n                  }},\n                  async confirm() {{ return true; }},\n                  notify(message, level) {{ notifications.push({{message, level}}); }},\n                }};\n                const result = await command.handler('', {{cwd: {json.dumps(str(base))}, hasUI: true, ui, models: {{list() {{ return []; }}}}}});\n                console.log(JSON.stringify({{\n                  resultIsUndefined: result === undefined,\n                  messages: messages.length,\n                  userMessages: userMessages.length,\n                  notifications: notifications.length,\n                }}));\n            "), encoding='utf-8')
+            script.write_text(textwrap.dedent(f"\n                const chain = () => ({{ optional() {{ return this; }} }});\n                const z = {{ object: value => value, string: chain, boolean: chain,\n                  enum: values => chain(), array: value => chain(), any: chain }};\n                const commands = new Map(), messages = [], userMessages = [], notifications = [];\n                const pi = {{ zod: {{ z }}, setLabel() {{}}, registerTool() {{}}, on() {{}},\n                  registerCommand(name, value) {{ commands.set(name, value); }},\n                  sendMessage(value) {{ messages.push(value); }},\n                  sendUserMessage(value) {{ userMessages.push(value); }} }};\n                const mod = await import({json.dumps((extension / 'index.js').as_uri())});\n                mod.default(pi);\n                const command = commands.get('bbk:models');\n                if (!command) throw new Error('missing bbk:models');\n                const ui = {{\n                  async select(title, options) {{\n                    if (title.includes('sub-agent model routing')) return 'Apply a routing profile';\n                    if (title === 'Routing profile') return options.find(value => value.startsWith('testing-flash'));\n                    throw new Error(`unexpected select ${{title}}`);\n                  }},\n                  async confirm() {{ return true; }},\n                  notify(message, level) {{ notifications.push({{message, level}}); }},\n                }};\n                const result = await command.handler('', {{cwd: {json.dumps(str(base))}, hasUI: true, ui, models: {{list() {{ return []; }}}}}});\n                console.log(JSON.stringify({{\n                  resultIsUndefined: result === undefined,\n                  messages: messages.length,\n                  userMessages: userMessages.length,\n                  notifications: notifications.length,\n                }}));\n            "), encoding='utf-8')
             menu = json.loads(m1_run(['node', script], env=env).stdout)
             self.assertTrue(menu['resultIsUndefined'])
             self.assertEqual(menu['messages'], 0)
@@ -455,7 +483,7 @@ class Alpha113OmpModelMenuTests(unittest.TestCase):
 
     def test_version_and_extension_metadata_agree(self):
         version = (m1_ROOT / 'VERSION').read_text(encoding='utf-8').strip()
-        self.assertEqual(version, '0.1.0-alpha.16.1')
+        self.assertEqual(version, m1_VERSION)
         self.assertEqual(json.loads((m1_ROOT / 'omp' / 'extension' / 'package.json').read_text(encoding='utf-8'))['version'], version)
         self.assertEqual(json.loads(m1_PROFILES.read_text(encoding='utf-8'))['package_version'], version)
 
@@ -521,7 +549,7 @@ class Alpha114OmpContextAndUpdateTests(unittest.TestCase):
             installation['binding'].write_text(json.dumps(binding, indent=2, sort_keys=True) + '\n', encoding='utf-8')
             extension = installation['extension'] / 'index.js'
             script = base / 'context-boundary.mjs'
-            script.write_text(textwrap.dedent(f"\n                    const chain = () => ({{ optional() {{ return this; }} }});\n                    const z = {{ object: value => value, string: chain, boolean: chain,\n                      enum: values => chain(), array: value => chain() }};\n                    const commands = new Map(), handlers = new Map();\n                    const messages = [], userMessages = [], notifications = [], entries = [], statuses = [];\n                    const branch = [];\n                    const pi = {{\n                      zod: {{ z }}, setLabel() {{}}, registerTool() {{}},\n                      on(name, value) {{ if (!handlers.has(name)) handlers.set(name, []); handlers.get(name).push(value); }},\n                      registerCommand(name, value) {{ commands.set(name, value); }},\n                      sendMessage(value, options) {{ messages.push({{value, options}}); }},\n                      async sendUserMessage(value, options) {{ userMessages.push({{value, options}}); }},\n                      appendEntry(customType, data) {{ entries.push({{customType, data}}); branch.push({{type:'custom', customType, data}}); }},\n                    }};\n                    const mod = await import({json.dumps(extension.as_uri())});\n                    mod.default(pi);\n                    const ctx = {{\n                      cwd: {json.dumps(str(base))}, hasUI: true,\n                      isIdle() {{ return true; }},\n                      sessionManager: {{ getBranch() {{ return branch; }} }},\n                      models: {{ list() {{ return []; }}, resolve() {{ return true; }} }},\n                      ui: {{\n                        notify(message, level) {{ notifications.push({{message, level}}); }},\n                        setStatus(key, value) {{ statuses.push({{key, value: value ?? null}}); }},\n                        async select() {{ throw new Error('unexpected interactive menu'); }},\n                      }},\n                    }};\n                    const results = [];\n                    const commandNames = [...commands.keys()].sort();\n                    for (const name of commandNames) {{\n                      if (name === 'bbk') {{\n                        results.push(await commands.get(name).handler('status', ctx));\n                      }} else if (name === 'bbk:models') {{\n                        results.push(await commands.get(name).handler('status', ctx));\n                      }} else {{\n                        results.push(await commands.get(name).handler('', ctx));\n                      }}\n                    }}\n                    const beforeMode = {{ messages: messages.length, userMessages: userMessages.length, entries: entries.length }};\n                    results.push(await commands.get('bbk').handler('', ctx));\n                    const afterEnter = {{ messages: messages.length, userMessages: userMessages.length, entries: entries.length }};\n                    const beforeAgent = handlers.get('before_agent_start')?.[0];\n                    if (!beforeAgent) throw new Error('missing before_agent_start');\n                    const activeOverlay = await beforeAgent({{systemPrompt:['<<OMP-INHERITED-CONTAMINATION>>']}}, ctx);\n                    results.push(await commands.get('bbk').handler('Plan the sample system', ctx));\n                    results.push(await commands.get('bbk:exit').handler('', ctx));\n                    const inactiveOverlay = await beforeAgent({{systemPrompt:['<<OMP-INHERITED-CONTAMINATION>>']}}, ctx);\n                    console.log(JSON.stringify({{\n                      allUndefined: results.every(value => value === undefined),\n                      commandNames,\n                      messages: messages.length,\n                      userMessages: userMessages.length,\n                      beforeMode,\n                      afterEnter,\n                      entries,\n                      statuses,\n                      notifications: notifications.length,\n                      prompt: userMessages[0]?.value || '',\n                      activeOverlay: activeOverlay?.systemPrompt?.join(String.fromCharCode(10)) || '',\n                      inactiveOverlay: inactiveOverlay ?? null,\n                    }}));\n                    "), encoding='utf-8')
+            script.write_text(textwrap.dedent(f"\n                    const chain = () => ({{ optional() {{ return this; }} }});\n                    const z = {{ object: value => value, string: chain, boolean: chain,\n                      enum: values => chain(), array: value => chain(), any: chain }};\n                    const commands = new Map(), handlers = new Map();\n                    const messages = [], userMessages = [], notifications = [], entries = [], statuses = [];\n                    const branch = [];\n                    const pi = {{\n                      zod: {{ z }}, setLabel() {{}}, registerTool() {{}},\n                      on(name, value) {{ if (!handlers.has(name)) handlers.set(name, []); handlers.get(name).push(value); }},\n                      registerCommand(name, value) {{ commands.set(name, value); }},\n                      sendMessage(value, options) {{ messages.push({{value, options}}); }},\n                      async sendUserMessage(value, options) {{ userMessages.push({{value, options}}); }},\n                      appendEntry(customType, data) {{ entries.push({{customType, data}}); branch.push({{type:'custom', customType, data}}); }},\n                    }};\n                    const mod = await import({json.dumps(extension.as_uri())});\n                    mod.default(pi);\n                    const ctx = {{\n                      cwd: {json.dumps(str(base))}, hasUI: true,\n                      isIdle() {{ return true; }},\n                      sessionManager: {{ getBranch() {{ return branch; }} }},\n                      models: {{ list() {{ return []; }}, resolve() {{ return true; }} }},\n                      ui: {{\n                        notify(message, level) {{ notifications.push({{message, level}}); }},\n                        setStatus(key, value) {{ statuses.push({{key, value: value ?? null}}); }},\n                        async select() {{ throw new Error('unexpected interactive menu'); }},\n                      }},\n                    }};\n                    const results = [];\n                    const commandNames = [...commands.keys()].sort();\n                    for (const name of commandNames) {{\n                      if (name === 'bbk') {{\n                        results.push(await commands.get(name).handler('status', ctx));\n                      }} else if (name === 'bbk:models') {{\n                        results.push(await commands.get(name).handler('status', ctx));\n                      }} else {{\n                        results.push(await commands.get(name).handler('', ctx));\n                      }}\n                    }}\n                    const beforeMode = {{ messages: messages.length, userMessages: userMessages.length, entries: entries.length }};\n                    results.push(await commands.get('bbk').handler('', ctx));\n                    const afterEnter = {{ messages: messages.length, userMessages: userMessages.length, entries: entries.length }};\n                    const beforeAgent = handlers.get('before_agent_start')?.[0];\n                    if (!beforeAgent) throw new Error('missing before_agent_start');\n                    const activeOverlay = await beforeAgent({{systemPrompt:['<<OMP-INHERITED-CONTAMINATION>>']}}, ctx);\n                    results.push(await commands.get('bbk').handler('Plan the sample system', ctx));\n                    results.push(await commands.get('bbk:exit').handler('', ctx));\n                    const inactiveOverlay = await beforeAgent({{systemPrompt:['<<OMP-INHERITED-CONTAMINATION>>']}}, ctx);\n                    console.log(JSON.stringify({{\n                      allUndefined: results.every(value => value === undefined),\n                      commandNames,\n                      messages: messages.length,\n                      userMessages: userMessages.length,\n                      beforeMode,\n                      afterEnter,\n                      entries,\n                      statuses,\n                      notifications: notifications.length,\n                      prompt: userMessages[0]?.value || '',\n                      activeOverlay: activeOverlay?.systemPrompt?.join(String.fromCharCode(10)) || '',\n                      inactiveOverlay: inactiveOverlay ?? null,\n                    }}));\n                    "), encoding='utf-8')
             value = json.loads(m2_run([shutil.which('node') or 'node', script], env=env).stdout)
             self.assertTrue(value['allUndefined'])
             self.assertEqual(len(value['commandNames']), 48)
@@ -542,8 +570,8 @@ class Alpha114OmpContextAndUpdateTests(unittest.TestCase):
             self.assertEqual(value['prompt'], 'Plan the sample system')
             self.assertNotIn('bbk_root_wayfinder', value['prompt'])
             self.assertIn('<bbk-controller-system', value['activeOverlay'])
-            self.assertIn('BBK OMP harness-root controller', value['activeOverlay'])
-            self.assertIn('<bbk-inlined-skill name="bbk"', value['activeOverlay'])
+            self.assertIn('BBK harness-root controller', value['activeOverlay'])
+            self.assertIn('### Compiled primary procedure: `bbk`', value['activeOverlay'])
             self.assertIn('`hub`/IRC', value['activeOverlay'])
             self.assertIn('bbk_root_wayfinder', value['activeOverlay'])
             self.assertNotIn('OMP DEFAULT', value['activeOverlay'])
@@ -554,12 +582,18 @@ class Alpha114OmpContextAndUpdateTests(unittest.TestCase):
 
     def test_every_bundled_profile_extension_is_ui_only_but_tools_remain_model_facing(self):
         archives = sorted(m2_BUNDLED.glob('*.zip'))
-        self.assertEqual(len(archives), 5)
+        release = json.loads((m2_BUNDLED.parent / 'RELEASE-MANIFEST.json').read_text(encoding='utf-8'))
+        declared = dict(sorted((release.get('profileVersions') or {}).items()))
+        self.assertEqual(len(archives), len(declared))
+        self.assertTrue(archives)
+        found = {}
         for archive in archives:
             with self.subTest(archive=archive.name), ZipFile(archive) as zf:
                 roots = {name.split('/', 1)[0] for name in zf.namelist() if '/' in name}
                 self.assertEqual(len(roots), 1)
                 package_root = next(iter(roots))
+                profile = json.loads(zf.read(f'{package_root}/PROFILE.json'))
+                found[profile['id']] = profile['version']
                 extension_name = f'{package_root}/omp/extension/index.js'
                 text = zf.read(extension_name).decode('utf-8')
                 self.assertNotIn('sendMessage(', text)
@@ -575,6 +609,7 @@ class Alpha114OmpContextAndUpdateTests(unittest.TestCase):
                 self.assertEqual(record['bytes'], len(data))
                 self.assertEqual(record['sha256'], hashlib.sha256(data).hexdigest())
                 self.assertIn(f'{package_root}/tests/test_dispatch_runtime.py', zf.namelist())
+        self.assertEqual(dict(sorted(found.items())), declared)
 
     def test_setup_exposes_omp_only_update_and_rejects_harness_selection(self):
         help_text = m2_run([sys.executable, m2_SETUP, '--help']).stdout
@@ -662,7 +697,7 @@ def m3_run_node(source: str) -> dict[str, object]:
 m3_MOCK_PREFIX = textwrap.dedent('''\
     const chain = () => ({ optional() { return this; } });
     const z = { object: value => value, string: chain, boolean: chain,
-      enum: values => chain(), array: value => chain() };
+      enum: values => chain(), array: value => chain(), any: chain };
     const commands = new Map(), handlers = new Map(), busHandlers = new Map();
     const userMessages = [], customMessages = [], entries = [], notifications = [], statuses = [], widgets = [];
     let branch = [];
@@ -728,16 +763,60 @@ class Alpha12OmpPromptBoundaryTests(unittest.TestCase):
         self.assertNotIn('<bbk-session-mode>', source)
         self.assertIn('packageText("shared", "skills", name, "SKILL.md")', source)
         self.assertIn('hub`/IRC', source)
-        self.assertIn('sole BBK identity that may focus the terminal and interact with the user', source)
+        self.assertIn('generatedControllerProjection', source)
+        self.assertIn('projections", "omp", "controllers", "bbk_controller.md', source)
         self.assertIn('task:subagent:progress', source)
         self.assertIn('task:subagent:lifecycle', source)
         self.assertIn('BBK_COORDINATION_TOOL_NAMES', source)
         self.assertIn('BBK_WAKE_OUTCOMES', source)
         self.assertIn('"tool_result"', source)
         self.assertIn('setWidget', source)
-        self.assertIn("native `ask` tool", source)
+        controller = (m3_ROOT / 'projections' / 'omp' / 'controllers' / 'bbk_controller.md').read_text(encoding='utf-8')
+        self.assertIn("native `ask` tool", controller)
         self.assertIn('source: omp.ask', source)
         self.assertNotIn('BBK_MODE_STATUS_KEY', source)
+
+    def test_runtime_marker_exposes_exact_mode_activation_for_manual_harness(self):
+        value = m3_run_node(textwrap.dedent(f'''\
+                {m3_MOCK_PREFIX}
+                const mod = await import({json.dumps(m3_EXTENSION.as_uri())});
+                mod.default(pi);
+                const runtime = globalThis[Symbol.for("bbk.omp.runtime.v1")];
+                if (!runtime) throw new Error("BBK runtime marker missing");
+                const changed = runtime.enterMode(ctx);
+                const before = handlers.get("before_agent_start")?.[0];
+                const overlay = await before({{systemPrompt:["generic OMP prompt"]}}, ctx);
+                console.log(JSON.stringify({{
+                  schema: runtime.schema,
+                  packageVersion: runtime.package_version,
+                  changed,
+                  enabled: runtime.isModeEnabled(),
+                  prompt: overlay?.systemPrompt?.join("\\n") || "",
+                  entries,
+                  coordination: runtime.coordinationStatus(ctx),
+                }}));
+        '''))
+        self.assertEqual(value["schema"], "bbk.omp-runtime.v1")
+        self.assertEqual(value["packageVersion"], m3_VERSION)
+        self.assertTrue(value["changed"])
+        self.assertTrue(value["enabled"])
+        self.assertIn("<bbk-controller-system ", value["prompt"])
+        self.assertEqual(
+            [entry["data"]["enabled"] for entry in value["entries"] if entry["customType"] == "bbk-mode-state"],
+            [True],
+        )
+        self.assertEqual(value["coordination"]["minimum_probe_interval_ms"], 300000)
+
+    def test_omp_skill_fallback_guard_rejects_skill_only_mode_imitation(self):
+        skill = (m3_ROOT / "shared" / "skills" / "bbk" / "SKILL.md").read_text(encoding="utf-8")
+        for expected in (
+            "When OMP delivers this file as a `skill-prompt`",
+            "BBK_OMP_EXTENSION_NOT_ACTIVE",
+            "bbk-mode-state",
+            "bbk-effective-prompt-receipt",
+            "Do not imitate BBK mode",
+        ):
+            self.assertIn(expected, skill)
 
     def test_enter_every_turn_replacement_verbatim_first_directive_and_exit(self):
         value = m3_run_node(textwrap.dedent(f'''\
@@ -796,9 +875,9 @@ class Alpha12OmpPromptBoundaryTests(unittest.TestCase):
         self.assertEqual(mode_entries[0]['data']['package_version'], m3_VERSION)
         self.assertEqual(value['activeBlocks'], 1)
         for expected in (
-            '<bbk-controller-system ', 'BBK OMP harness-root controller', 'bbk_root_wayfinder',
+            '<bbk-controller-system ', 'BBK harness-root controller', 'bbk_root_wayfinder',
             'bbk_root_orchestrator', 'bbk_reviewer', 'bbk_validator_orchestrator',
-            '<bbk-inlined-skill name="bbk"', '<bbk-inlined-skill name="bbk-context-routing"',
+            '### Compiled primary procedure: `bbk`', '### Compiled procedure: `bbk-context-routing`',
             '`task`', '`hub`/IRC', 'Main', '/bbk:exit',
             '{ context, tasks: [{ name, agent, task, ... }] }',
             '`agent` is the exact canonical `bbk_*` role',
@@ -1521,7 +1600,7 @@ class Alpha12OmpPromptBoundaryTests(unittest.TestCase):
             self.assertIn('source: omp.ask', text, role_name)
             self.assertIn('Never call `ask`', text, role_name)
             for skill in role['mandatory_skills']:
-                self.assertIn(f'<bbk-inlined-skill name="{skill}"', text, role_name)
+                self.assertIn((f'### Compiled primary procedure: `{skill}`' if skill == role['primary_skill'] else f'### Compiled procedure: `{skill}`'), text, role_name)
             for excluded in ('OMP DEFAULT', 'C:/Users/Tombstone/.codex/AGENTS.md', 'spawn_agent'):
                 self.assertNotIn(excluded, text, role_name)
         self.assertIn('<bbk-prompt-assembly-failure', value['malformed'])
@@ -1623,7 +1702,7 @@ You NEVER give up due to uncertainty. You MUST keep going until this ticket is c
             'changedPaths: string[]',
             'source: omp.ask',
             'Never call `ask`',
-            '<bbk-inlined-skill name="bbk-work-unit-execution"',
+            '### Compiled primary procedure: `bbk-work-unit-execution`',
             '<bbk-prompt-module id="bbk-prompt-handoff-protocol"',
         ):
             self.assertIn(expected, text)

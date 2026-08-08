@@ -48,6 +48,11 @@ try:
 except ModuleNotFoundError:  # pragma: no cover - package-relative fallback
     from .artifact_classification import is_non_operational_example  # type: ignore
 
+try:
+    from dependencies import command_argv, discover_executable
+except ModuleNotFoundError:  # pragma: no cover - package-relative fallback
+    from .dependencies import command_argv, discover_executable  # type: ignore
+
 RISK_TIERS = {"routine", "material", "consequential", "critical"}
 APPLICABILITY = {"none", "inline", "manifest"}
 LENSES = {
@@ -409,17 +414,33 @@ def _git_classification(root: Path) -> tuple[set[str], set[str], set[str]]:
     tracked: set[str] = set()
     untracked: set[str] = set()
     ignored: set[str] = set()
+    environment = {**os.environ, "GIT_TERMINAL_PROMPT": "0"}
+    configured = environment.get("BBK_GIT") or environment.get("BBK_TEST_GIT")
+    git = Path(configured).expanduser().resolve() if configured else discover_executable("git", environment=environment)
+    if git is None:
+        return tracked, untracked, ignored
+
+    def git_ls_files(arguments: Sequence[str]) -> set[str]:
+        result = subprocess.run(
+            command_argv(git, ("-C", str(root), "ls-files", *arguments), environment=environment),
+            env=environment,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            check=False,
+        )
+        if result.returncode != 0:
+            return set()
+        return {
+            value.decode("utf-8", errors="strict")
+            for value in result.stdout.split(b"\0")
+            if value
+        }
+
     try:
-        result = subprocess.run(["git", "-C", str(root), "ls-files", "-z"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, check=False)
-        if result.returncode == 0:
-            tracked = {value.decode("utf-8", errors="strict") for value in result.stdout.split(b"\0") if value}
-        result = subprocess.run(["git", "-C", str(root), "ls-files", "--others", "--exclude-standard", "-z"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, check=False)
-        if result.returncode == 0:
-            untracked = {value.decode("utf-8", errors="strict") for value in result.stdout.split(b"\0") if value}
-        result = subprocess.run(["git", "-C", str(root), "ls-files", "--others", "--ignored", "--exclude-standard", "-z"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, check=False)
-        if result.returncode == 0:
-            ignored = {value.decode("utf-8", errors="strict") for value in result.stdout.split(b"\0") if value}
-    except OSError:
+        tracked = git_ls_files(("-z",))
+        untracked = git_ls_files(("--others", "--exclude-standard", "-z"))
+        ignored = git_ls_files(("--others", "--ignored", "--exclude-standard", "-z"))
+    except (OSError, UnicodeDecodeError):
         pass
     return tracked, untracked, ignored
 

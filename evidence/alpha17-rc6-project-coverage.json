@@ -1,0 +1,54 @@
+{
+  "candidate_and_project_completion_separate": true,
+  "candidate_id": "0.1.0-alpha.17+rc.6",
+  "candidate_status": "AUTOMATED_IMPLEMENTATION_COMPLETE_PENDING_CREDENTIALED_HARNESS",
+  "capabilities_completed": [
+    "Canonicalize the critical-path policy",
+    "Build the compiled-procedure registry and compiler",
+    "Suppress compiled procedures from child catalogs",
+    "Preserve compiled procedures across follow-ups",
+    "Add planning modes and readiness states",
+    "Update planning roles and procedures",
+    "Generate routine Worker and assertion contracts",
+    "Add transactional planning state and projections",
+    "Add atomic result and manifest finalizers",
+    "Add bounded evidence-capture replay",
+    "Late-bind effective profile/environment identity",
+    "Add project-coverage truth",
+    "Reduce coordination polling and global workspace checks",
+    "Add structural and behavioral regression tests"
+  ],
+  "capabilities_not_started": [
+    "Canonical candidate workspace/jj overlay/copy-on-write redesign (post-RC)."
+  ],
+  "capabilities_partial": [
+    "JSONL observability: automated analyzer and hard-gate evidence complete; credentialed real-Codex evidence remains USER_ACTION_REQUIRED.",
+    "Harness parity: OMP/provider and Pi/provider evidence remain USER_ACTION_REQUIRED in operator-supplied runtimes."
+  ],
+  "claims_not_established": [
+    "Real Codex zero-filesystem-read behavior in the operator credentialed environment.",
+    "OMP/Pi external-provider parity result for RC6.",
+    "Alpha.17 final release authorization."
+  ],
+  "delivered_scope": [
+    "WU-A17-OPT-001",
+    "WU-A17-OPT-002",
+    "WU-A17-OPT-003",
+    "WU-A17-OPT-004",
+    "WU-A17-OPT-005",
+    "WU-A17-OPT-006",
+    "WU-A17-OPT-007",
+    "WU-A17-OPT-008",
+    "WU-A17-OPT-009",
+    "WU-A17-OPT-010",
+    "WU-A17-OPT-011",
+    "WU-A17-OPT-012",
+    "WU-A17-OPT-013",
+    "WU-A17-OPT-014",
+    "WU-A17-OPT-015",
+    "WU-A17-OPT-016"
+  ],
+  "next_executable_frontier": "Run the prefilled credentialed Codex and OMP harness packets; admit returned analyzer/session evidence before Alpha.17 final authorization.",
+  "project_id": "BBK-ALPHA17-RC-OPTIMIZATION",
+  "schema": "bbk.project-coverage.v1"
+}

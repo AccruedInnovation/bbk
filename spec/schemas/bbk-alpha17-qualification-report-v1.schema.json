@@ -1,0 +1,960 @@
+{
+  "$defs": {
+    "assurance": {
+      "additionalProperties": false,
+      "properties": {
+        "assurance_record_ref": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "blocked_write_reason": {
+          "const": "ROLE_CAPABILITY_FORBIDDEN"
+        },
+        "blocked_write_receipt": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "candidate_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "REVIEW",
+            "VALIDATION"
+          ]
+        },
+        "read_receipts": {
+          "items": {
+            "pattern": "^sha256:[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "role": {
+          "enum": [
+            "bbk_reviewer",
+            "bbk_validator"
+          ]
+        },
+        "status": {
+          "const": "PASS"
+        },
+        "write_surface_attestation": {
+          "const": "READ_ONLY_CONFIRMED"
+        }
+      },
+      "required": [
+        "kind",
+        "role",
+        "candidate_digest",
+        "read_receipts",
+        "blocked_write_receipt",
+        "blocked_write_reason",
+        "status",
+        "write_surface_attestation",
+        "assurance_record_ref"
+      ],
+      "type": "object"
+    },
+    "candidate": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id": {
+          "const": "candidate:fixture:integrated"
+        },
+        "changed_paths": {
+          "const": [
+            "backend/result.json",
+            "frontend/result.json"
+          ],
+          "type": "array"
+        },
+        "digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "git_commit": {
+          "pattern": "^[0-9a-f]{40}(?:[0-9a-f]{24})?$",
+          "type": "string"
+        },
+        "git_tree": {
+          "pattern": "^[0-9a-f]{40}(?:[0-9a-f]{24})?$",
+          "type": "string"
+        },
+        "identity_kind": {
+          "const": "GIT_TREE"
+        },
+        "jj_change_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "workspace_ref": {
+          "const": "$CAMPAIGN/workspaces/integrated"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "digest",
+        "identity_kind",
+        "git_commit",
+        "git_tree",
+        "jj_change_id",
+        "workspace_ref",
+        "changed_paths"
+      ],
+      "type": "object"
+    },
+    "check": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "type": "object"
+        },
+        "id": {
+          "pattern": "^A17-[0-9]{3}(?:-[a-z0-9-]+)?$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "evidence"
+      ],
+      "type": "object"
+    },
+    "digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "error": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "details": {
+          "type": "object"
+        },
+        "message": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "details"
+      ],
+      "type": "object"
+    },
+    "gate": {
+      "additionalProperties": false,
+      "properties": {
+        "decision": {
+          "enum": [
+            "RC_ELIGIBLE",
+            "BLOCK_AUTOMATED"
+          ]
+        },
+        "gate_id": {
+          "const": "GATE-017-AUTOMATED"
+        },
+        "manual_provider_gate": {
+          "enum": [
+            "PENDING_WU_018",
+            "NOT_REACHED"
+          ]
+        },
+        "pass_criteria": {
+          "const": [
+            "all invariants pass",
+            "orchestrator/reviewer/validator prohibited writes blocked",
+            "two worker changes integrated"
+          ]
+        },
+        "required_inputs": {
+          "const": [
+            "automated vertical-slice evidence",
+            "Session Inspector oracle results"
+          ]
+        }
+      },
+      "required": [
+        "gate_id",
+        "decision",
+        "manual_provider_gate",
+        "required_inputs",
+        "pass_criteria"
+      ],
+      "type": "object"
+    },
+    "gitId": {
+      "pattern": "^[0-9a-f]{40}(?:[0-9a-f]{24})?$",
+      "type": "string"
+    },
+    "nonEmpty": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "security": {
+      "additionalProperties": false,
+      "properties": {
+        "credentials_used": {
+          "const": false
+        },
+        "dependency_installation_performed": {
+          "const": false
+        },
+        "external_provider_used": {
+          "const": false
+        },
+        "network_used": {
+          "const": false
+        },
+        "waivers": {
+          "maxItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "external_provider_used",
+        "network_used",
+        "credentials_used",
+        "dependency_installation_performed",
+        "waivers"
+      ],
+      "type": "object"
+    },
+    "tool": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "adapter_class": {
+              "const": "REAL_LOCAL_TOOL"
+            },
+            "path_basename": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "version": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "path_basename",
+            "sha256",
+            "version",
+            "adapter_class"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "adapter_class": {
+              "const": "REAL_LOCAL_TOOL_EXPLICIT_OVERRIDE"
+            },
+            "execution_mode": {
+              "const": "EXPLICIT_EXECUTABLE"
+            },
+            "path_basename": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "version": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "path_basename",
+            "sha256",
+            "version",
+            "adapter_class",
+            "execution_mode"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "adapter_class": {
+              "const": "REAL_LOCAL_TOOL_MISE_MANAGED"
+            },
+            "executable": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "execution_mode": {
+              "const": "MISE_MANAGED"
+            },
+            "launcher_basename": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "launcher_sha256": {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "tool_key": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "tool_spec": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "version": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "launcher_basename",
+            "launcher_sha256",
+            "version",
+            "adapter_class",
+            "execution_mode",
+            "tool_key",
+            "tool_spec",
+            "executable"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "worker": {
+      "additionalProperties": false,
+      "properties": {
+        "attempt_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "candidate_ref": {
+          "pattern": "^candidate:fixture:(backend|frontend)$",
+          "type": "string"
+        },
+        "changed_paths": {
+          "items": {
+            "enum": [
+              "backend/result.json",
+              "frontend/result.json"
+            ]
+          },
+          "maxItems": 1,
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "completion_projection_id": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "cross_worker_block_receipt": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "cross_worker_reason": {
+          "const": "WORKSPACE_SCOPE_ESCAPE"
+        },
+        "filesystem_mutation_receipt": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "invocation_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "jj_change_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "path_escape_reason": {
+          "const": "MUTATION_PATH_TRAVERSAL_FORBIDDEN"
+        },
+        "scope": {
+          "items": {
+            "enum": [
+              "backend",
+              "frontend"
+            ]
+          },
+          "maxItems": 1,
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "session_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "vcs_mutation_receipt": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "work_unit_id": {
+          "enum": [
+            "WU-FIXTURE-BACKEND",
+            "WU-FIXTURE-FRONTEND"
+          ]
+        },
+        "workspace_label": {
+          "pattern": "^\\$CAMPAIGN/workspaces/",
+          "type": "string"
+        }
+      },
+      "required": [
+        "work_unit_id",
+        "attempt_id",
+        "candidate_ref",
+        "session_id",
+        "invocation_id",
+        "jj_change_id",
+        "workspace_label",
+        "scope",
+        "changed_paths",
+        "filesystem_mutation_receipt",
+        "vcs_mutation_receipt",
+        "cross_worker_block_receipt",
+        "cross_worker_reason",
+        "path_escape_reason",
+        "completion_projection_id"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://bbk.local/schemas/bbk-alpha17-qualification-report-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "oneOf": [
+    {
+      "not": {
+        "required": [
+          "error"
+        ]
+      },
+      "properties": {
+        "assertions": {
+          "properties": {
+            "VER-036": {
+              "const": "PASS"
+            }
+          }
+        },
+        "checks": {
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/check"
+              },
+              {
+                "properties": {
+                  "status": {
+                    "const": "PASS"
+                  }
+                }
+              }
+            ]
+          },
+          "minItems": 15
+        },
+        "gate": {
+          "properties": {
+            "decision": {
+              "const": "RC_ELIGIBLE"
+            },
+            "manual_provider_gate": {
+              "const": "PENDING_WU_018"
+            }
+          }
+        },
+        "qualification": {
+          "const": "AUTOMATED_PASS"
+        },
+        "status": {
+          "const": "PASS"
+        }
+      },
+      "required": [
+        "fixture",
+        "session_inspector_oracle",
+        "tools",
+        "workers",
+        "integration",
+        "qualified_task",
+        "assurance",
+        "receipt_accounting"
+      ]
+    },
+    {
+      "properties": {
+        "assertions": {
+          "properties": {
+            "VER-036": {
+              "const": "FAIL"
+            }
+          }
+        },
+        "checks": {
+          "maxItems": 0
+        },
+        "gate": {
+          "properties": {
+            "decision": {
+              "const": "BLOCK_AUTOMATED"
+            },
+            "manual_provider_gate": {
+              "const": "NOT_REACHED"
+            }
+          }
+        },
+        "qualification": {
+          "const": "AUTOMATED_FAIL"
+        },
+        "status": {
+          "const": "FAIL"
+        }
+      },
+      "required": [
+        "error"
+      ]
+    }
+  ],
+  "properties": {
+    "assertion_id": {
+      "const": "VER-036"
+    },
+    "assertions": {
+      "additionalProperties": false,
+      "properties": {
+        "VER-036": {
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        }
+      },
+      "required": [
+        "VER-036"
+      ],
+      "type": "object"
+    },
+    "assurance": {
+      "items": {
+        "$ref": "#/$defs/assurance"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "checks": {
+      "items": {
+        "$ref": "#/$defs/check"
+      },
+      "type": "array"
+    },
+    "claim_limit": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "error": {
+      "$ref": "#/$defs/error"
+    },
+    "fixture": {
+      "additionalProperties": false,
+      "properties": {
+        "baseline_git_commit": {
+          "pattern": "^[0-9a-f]{40}(?:[0-9a-f]{24})?$",
+          "type": "string"
+        },
+        "name": {
+          "const": "alpha17-governed-vertical-slice"
+        },
+        "source_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "source_digest",
+        "baseline_git_commit"
+      ],
+      "type": "object"
+    },
+    "gate": {
+      "$ref": "#/$defs/gate"
+    },
+    "integration": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate": {
+          "$ref": "#/$defs/candidate"
+        },
+        "candidate_admission_ref": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "completion_projection_id": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "control_projection_id": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "integrated_paths": {
+          "const": [
+            "backend/result.json",
+            "frontend/result.json"
+          ],
+          "type": "array"
+        },
+        "integration_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "integration_receipt_ref": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "mode": {
+          "const": "CONTENT_NEUTRAL_DISJOINT_PATHS"
+        },
+        "source_change_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "source_commit_ids": {
+          "items": {
+            "pattern": "^[0-9a-f]{40}(?:[0-9a-f]{24})?$",
+            "type": "string"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "control_projection_id",
+        "integration_receipt_ref",
+        "candidate_admission_ref",
+        "integration_digest",
+        "mode",
+        "source_change_ids",
+        "source_commit_ids",
+        "integrated_paths",
+        "candidate",
+        "completion_projection_id"
+      ],
+      "type": "object"
+    },
+    "mode": {
+      "const": "AUTOMATED_KEYLESS_LOCAL"
+    },
+    "observed_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "qualification": {
+      "enum": [
+        "AUTOMATED_PASS",
+        "AUTOMATED_FAIL"
+      ]
+    },
+    "qualification_id": {
+      "pattern": "^alpha17:(?:failed:)?[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "qualified_task": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "candidate_unchanged": {
+          "const": true
+        },
+        "exit_status": {
+          "const": 0
+        },
+        "mise_version": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "output_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "receipt_ref": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "status": {
+          "const": "PASS"
+        },
+        "task": {
+          "const": "fixture:verify"
+        },
+        "toolchain_definition_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "task",
+        "status",
+        "exit_status",
+        "candidate_digest",
+        "toolchain_definition_digest",
+        "mise_version",
+        "output_digest",
+        "receipt_ref",
+        "candidate_unchanged"
+      ],
+      "type": "object"
+    },
+    "receipt_accounting": {
+      "additionalProperties": false,
+      "properties": {
+        "all_candidate_changes_receipted": {
+          "const": true
+        },
+        "beads_backend_writes_via_adapter": {
+          "const": true
+        },
+        "changed_paths": {
+          "const": [
+            "backend/result.json",
+            "frontend/result.json"
+          ],
+          "type": "array"
+        },
+        "counts": {
+          "additionalProperties": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "minProperties": 1,
+          "propertyNames": {
+            "pattern": "^[A-Z][A-Z0-9_]+$"
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "counts",
+        "changed_paths",
+        "all_candidate_changes_receipted",
+        "beads_backend_writes_via_adapter"
+      ],
+      "type": "object"
+    },
+    "release": {
+      "const": "0.1.0-alpha.17.0.2"
+    },
+    "report_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.alpha17-qualification-report.v1"
+    },
+    "security": {
+      "$ref": "#/$defs/security"
+    },
+    "session_inspector_oracle": {
+      "additionalProperties": false,
+      "properties": {
+        "assertions": {
+          "additionalProperties": false,
+          "properties": {
+            "VER-035": {
+              "const": "PASS"
+            }
+          },
+          "required": [
+            "VER-035"
+          ],
+          "type": "object"
+        },
+        "evidence_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "evidence_path": {
+          "const": "evidence/qualification/session-inspector-oracle-alpha17.json"
+        },
+        "qualification": {
+          "const": "AUTOMATED_PASS"
+        },
+        "work_unit": {
+          "const": "WU-016"
+        }
+      },
+      "required": [
+        "evidence_path",
+        "evidence_digest",
+        "work_unit",
+        "assertions",
+        "qualification"
+      ],
+      "type": "object"
+    },
+    "smallest_next_action": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "PASS",
+        "FAIL"
+      ]
+    },
+    "tools": {
+      "additionalProperties": false,
+      "properties": {
+        "bd": {
+          "$ref": "#/$defs/tool"
+        },
+        "git": {
+          "$ref": "#/$defs/tool"
+        },
+        "host_contract": {
+          "additionalProperties": false,
+          "properties": {
+            "assertions": {
+              "additionalProperties": false,
+              "properties": {
+                "VER-017": {
+                  "const": "PASS"
+                },
+                "VER-018": {
+                  "const": "PASS"
+                },
+                "VER-019": {
+                  "const": "PASS"
+                },
+                "VER-020": {
+                  "const": "PASS"
+                },
+                "VER-021": {
+                  "const": "PASS"
+                },
+                "VER-022": {
+                  "const": "PASS"
+                }
+              },
+              "required": [
+                "VER-017",
+                "VER-018",
+                "VER-019",
+                "VER-020",
+                "VER-021",
+                "VER-022"
+              ],
+              "type": "object"
+            },
+            "evidence_digest": {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "evidence_path": {
+              "const": "evidence/qualification/omp-host-contract-rc9.json"
+            },
+            "mode": {
+              "const": "QUALIFIED_KEYLESS_OMP_HOST"
+            },
+            "version": {
+              "const": "omp/16.4.8"
+            }
+          },
+          "required": [
+            "version",
+            "mode",
+            "evidence_path",
+            "evidence_digest",
+            "assertions"
+          ],
+          "type": "object"
+        },
+        "jj": {
+          "$ref": "#/$defs/tool"
+        },
+        "mise": {
+          "$ref": "#/$defs/tool"
+        }
+      },
+      "required": [
+        "git",
+        "jj",
+        "bd",
+        "mise",
+        "host_contract"
+      ],
+      "type": "object"
+    },
+    "work_unit": {
+      "const": "WU-017"
+    },
+    "workers": {
+      "items": {
+        "$ref": "#/$defs/worker"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array",
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema",
+    "qualification_id",
+    "release",
+    "work_unit",
+    "qualification",
+    "assertion_id",
+    "assertions",
+    "gate",
+    "mode",
+    "status",
+    "observed_at",
+    "checks",
+    "security",
+    "claim_limit",
+    "smallest_next_action",
+    "report_digest"
+  ],
+  "title": "BBK Alpha.17 automated governed vertical-slice qualification report",
+  "type": "object"
+}

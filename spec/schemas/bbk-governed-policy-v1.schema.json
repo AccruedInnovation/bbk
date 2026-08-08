@@ -1,0 +1,137 @@
+{
+  "$id": "bbk-governed-policy-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Host-neutral deterministic gate policy. Projections and host adapters are consumers, not alternate authorities.",
+  "properties": {
+    "compatibility": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "additive_fields": {
+          "enum": [
+            "ALLOWED_OPTIONAL",
+            "FORBIDDEN"
+          ],
+          "type": "string"
+        },
+        "semantic_change": {
+          "enum": [
+            "NEW_SCHEMA_VERSION_REQUIRED"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "additive_fields",
+        "semantic_change"
+      ],
+      "title": "compatibility",
+      "type": "object"
+    },
+    "description": {
+      "type": "string"
+    },
+    "policy_id": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "policy_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "rules": {
+      "items": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "level": {
+            "enum": [
+              "OBSERVE",
+              "ENFORCE",
+              "INVARIANT"
+            ],
+            "type": "string"
+          },
+          "message": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "override_eligibility": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "additionalProperties": false,
+            "properties": {
+              "authorities": {
+                "items": {
+                  "maxLength": 256,
+                  "minLength": 1,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "eligible": {
+                "type": "boolean"
+              },
+              "requires_exact_scope": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "eligible",
+              "authorities"
+            ],
+            "title": "override eligibility",
+            "type": "object"
+          },
+          "reason_code": {
+            "maxLength": 256,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+            "type": "string"
+          },
+          "rule_id": {
+            "maxLength": 256,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+            "type": "string"
+          },
+          "smallest_next_action": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "when": {
+            "$ref": "bbk-policy-predicate-v1.schema.json"
+          }
+        },
+        "required": [
+          "rule_id",
+          "level",
+          "when",
+          "reason_code",
+          "message",
+          "smallest_next_action",
+          "override_eligibility"
+        ],
+        "title": "gate rule",
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "schema": {
+      "const": "bbk.governed-policy.v1"
+    }
+  },
+  "required": [
+    "schema",
+    "policy_id",
+    "policy_version",
+    "rules"
+  ],
+  "title": "BBK governed policy v1",
+  "type": "object"
+}

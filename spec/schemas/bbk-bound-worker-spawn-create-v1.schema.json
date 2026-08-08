@@ -1,0 +1,155 @@
+{
+  "$id": "bbk-bound-worker-spawn-create-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "assignment": {
+      "maxLength": 524288,
+      "minLength": 1,
+      "type": "string"
+    },
+    "attempt_id": {
+      "maxLength": 256,
+      "minLength": 1,
+      "type": "string"
+    },
+    "authority_ref": {
+      "maxLength": 256,
+      "minLength": 1,
+      "type": "string"
+    },
+    "baseline_ref": {
+      "maxLength": 256,
+      "minLength": 1,
+      "type": "string"
+    },
+    "candidate_ref": {
+      "maxLength": 256,
+      "minLength": 1,
+      "type": "string"
+    },
+    "description": {
+      "maxLength": 4096,
+      "type": "string"
+    },
+    "host_version": {
+      "const": "omp/16.4.8"
+    },
+    "idempotency_key": {
+      "maxLength": 256,
+      "minLength": 1,
+      "type": "string"
+    },
+    "material_transport_reason": {
+      "maxLength": 4096,
+      "type": "string"
+    },
+    "mutation_classes": {
+      "items": {
+        "maxLength": 256,
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "parent_binding_ref": {
+      "maxLength": 256,
+      "minLength": 1,
+      "type": "string"
+    },
+    "parent_invocation_id": {
+      "maxLength": 256,
+      "minLength": 1,
+      "type": "string"
+    },
+    "parent_revision": {
+      "maxLength": 256,
+      "minLength": 1,
+      "type": "string"
+    },
+    "parent_session_id": {
+      "maxLength": 256,
+      "minLength": 1,
+      "type": "string"
+    },
+    "path_prefixes": {
+      "items": {
+        "maxLength": 4096,
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "return_contract": {
+      "maxLength": 256,
+      "minLength": 1,
+      "type": "string"
+    },
+    "return_transport_mode": {
+      "enum": [
+        "SEALED_HANDOFF_REQUIRED",
+        "STRUCTURED_RETURN_FIRST",
+        "STRUCTURED_RETURN_ONLY"
+      ],
+      "type": "string"
+    },
+    "role": {
+      "pattern": "^bbk_[A-Za-z0-9_]+$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.bound-worker-spawn-create.v1"
+    },
+    "semantic_scope": {
+      "items": {
+        "maxLength": 4096,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "task_name": {
+      "maxLength": 256,
+      "minLength": 1,
+      "type": "string"
+    },
+    "work_unit_id": {
+      "maxLength": 256,
+      "minLength": 1,
+      "type": "string"
+    },
+    "workspace_parent": {
+      "maxLength": 4096,
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "host_version",
+    "parent_binding_ref",
+    "parent_session_id",
+    "parent_invocation_id",
+    "task_name",
+    "role",
+    "work_unit_id",
+    "attempt_id",
+    "baseline_ref",
+    "candidate_ref",
+    "authority_ref",
+    "return_contract",
+    "parent_revision",
+    "workspace_parent",
+    "path_prefixes",
+    "mutation_classes",
+    "assignment",
+    "idempotency_key"
+  ],
+  "title": "BBK bound worker spawn request v1",
+  "type": "object"
+}

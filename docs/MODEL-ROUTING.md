@@ -1,10 +1,12 @@
 # Sub-agent model routing
 
-BBK `0.1.0-alpha.16.1` separates each role's stable responsibility from the model used to perform it.
+BBK `0.1.0-alpha.17.0.2` separates each role's stable responsibility from the model used to perform it. The effective prompt compiler binds the selected route digest into the logical-child invalidation vector, so a route or reasoning-effort change recompiles the child without being misrepresented as a product-semantic change.
 
 The canonical install-time policy is `spec/model-routing.json`. It uses `"schema_version": "bbk.model-routing.v2"` and contains one complete OMP, Codex, and Claude Code route for every canonical role. Exact coverage is required: a missing role and an unknown role both fail validation.
 
-The alpha.16.1 defaults preserve the reviewed selections supplied with the split-role update. They are copied into the canonical policy, generated projections, packaged OMP `default` runtime profile, and a regression fixture. Alpha.16.1 preserves those reviewed routes while advancing only the package binding and generated prompt digests.
+Pi and generic projections carry the same canonical role content but receive no host-native model selector from the v2 policy. Their external agent manifests retain the canonical route record as provenance; the Pi or generic host chooses the model it actually runs.
+
+The reviewed Alpha.17 route selection remains the packaged canonical default. It is copied into the canonical policy, generated projections, the packaged OMP `default` runtime profile, and an exact regression fixture. The policy intentionally omits `package_version`: schema version and exact role/host structure govern compatibility.
 
 ## Default per-role routes
 
@@ -14,10 +16,12 @@ Identical values are grouped here only for readability. These groups are not sch
 |---|---|---|---|
 | Root Wayfinder, Question Guide, Planning Wayfinder, Phase Wayfinder, Architect, Verification Designer, Worker Designer, Root Orchestrator, Reviewer | `openai-codex/gpt-5.6-sol`, `thinkingLevel: high` | `gpt-5.6-sol`, `model_reasoning_effort: high` | `opus`, `effort: high` |
 | Territory Wayfinder, Questioning Wayfinder, Synthesizer | `openai-codex/gpt-5.6-sol`, `thinkingLevel: medium` | `gpt-5.6-sol`, `model_reasoning_effort: medium` | `opus`, `effort: high` |
-| Researcher, Prototyper, Worker Orchestrator | `deepseek/deepseek-v4-flash`, `thinkingLevel: max` | `gpt-5.6-luna`, `model_reasoning_effort: xhigh` | `sonnet`, `effort: medium` |
-| Territory Orchestrator | `openai-codex/gpt-5.6-luna`, `thinkingLevel: xhigh` | `gpt-5.6-luna`, `model_reasoning_effort: xhigh` | `sonnet`, `effort: medium` |
-| Validator Orchestrator | `openai-codex/gpt-5.6-sol`, `thinkingLevel: medium` | `gpt-5.6-sol`, `model_reasoning_effort: medium` | `sonnet`, `effort: medium` |
-| Worker, Validator | `deepseek/deepseek-v4-flash`, `thinkingLevel: max` | `gpt-5.6-luna`, `model_reasoning_effort: xhigh` | `haiku`, `effort: high` |
+| Researcher | `deepseek/deepseek-v4-pro`, `thinkingLevel: high` | `gpt-5.6-luna`, `model_reasoning_effort: high` | `sonnet`, `effort: medium` |
+| Prototyper | `deepseek/deepseek-v4-pro`, `thinkingLevel: high` | `gpt-5.6-luna`, `model_reasoning_effort: xhigh` | `sonnet`, `effort: medium` |
+| Territory Orchestrator, Worker Orchestrator | `deepseek/deepseek-v4-pro`, `thinkingLevel: high` | `gpt-5.6-luna`, `model_reasoning_effort: medium` | `sonnet`, `effort: medium` |
+| Validator Orchestrator | `deepseek/deepseek-v4-pro`, `thinkingLevel: high` | `gpt-5.6-sol`, `model_reasoning_effort: medium` | `sonnet`, `effort: medium` |
+| Worker | `deepseek/deepseek-v4-flash`, `thinkingLevel: max` | `gpt-5.6-luna`, `model_reasoning_effort: high` | `haiku`, `effort: high` |
+| Validator | `deepseek/deepseek-v4-pro`, `thinkingLevel: high` | `gpt-5.6-luna`, `model_reasoning_effort: medium` | `haiku`, `effort: high` |
 
 These are starting points, not claims that a model is sufficient for every invocation. Consequence, uncertainty, context size, tool use, model availability, organizational policy, and live host behavior may require an invocation-level override or escalation.
 
@@ -35,7 +39,7 @@ spec/omp-model-routing-profiles.json packaged OMP runtime profiles
 
 `tools/assemble_roles.py` validates and assembles the split role package. `tools/generate_agents.py` combines the generated role projection, method content, prompt modules, exact return contracts, and model-routing policy to create host-native definitions.
 
-`projections/manifest.json` uses `bbk.projection-manifest.v8`. It binds the split role sources, prompt-module assignments, primary procedures, exact role-return schemas, routing policy, generated files, and source digests.
+`projections/manifest.json` uses `bbk.projection-manifest.v10`. It binds the split role sources, prompt-module assignments, primary procedures, exact role-return schemas, routing policy, generated files, and source digests.
 
 ## Host fields
 
@@ -68,7 +72,7 @@ python tools/generate_agents.py --check
 The validator checks:
 
 - direct-role `bbk.model-routing.v2` structure, or legacy v1 compatibility structure;
-- exact package-version binding;
+- optional `package_version` provenance when present;
 - complete and exact coverage of the live 19-role catalogue;
 - required host objects and fields;
 - non-empty model and effort/thinking values; and
@@ -81,7 +85,7 @@ spec/schemas/bbk-model-routing-v2.schema.json
 spec/schemas/bbk-model-routing-v1.schema.json    # compatibility only
 ```
 
-Cross-role coverage and package binding are enforced by `tools/model_routing.py`, because they depend on the live role catalogue and release version.
+Cross-role coverage is enforced by `tools/model_routing.py` because it depends on the live role catalogue. `package_version` is optional provenance and is not compared with the active BBK release label.
 
 ## Customize without modifying the qualified package
 
@@ -96,13 +100,13 @@ python tools\install.py install --scope user --omp --codex --claude `
   --model-routing D:\Profiles\bbk-model-routing.json
 ```
 
-The external file's `package_version` must be `0.1.0-alpha.16.1`. The installer validates it before writing, renders the selected projections from that policy, copies it to `effective-model-routing.json`, and binds its digest into `install-manifest.json`.
+`package_version` is optional provenance. A missing or different package label does not reject an otherwise valid policy; `schema_version`, exact 19-role coverage, host objects, and required route fields are governing. The installer validates those semantics before writing, renders selected projections, copies the effective policy to `effective-model-routing.json`, and binds its digest into `install-manifest.json`.
 
 Do not edit generated files under `projections/` directly. Drift checks reject manual changes.
 
 ## Legacy v1 compatibility
 
-`bbk.model-routing.v1` did not reserve the names `judgment`, `coordination`, and `mechanical`; any profile key matching `^[a-z][a-z0-9_-]*$` was valid if every role referenced a defined profile and the rest of the policy validated. Alpha.15 retains read and install-time validation compatibility with v1 policies.
+`bbk.model-routing.v1` did not reserve the names `judgment`, `coordination`, and `mechanical`; any profile key matching `^[a-z][a-z0-9_-]*$` was valid if every role referenced a defined profile and the rest of the policy validated. The current release retains read and install-time validation compatibility with v1 policies.
 
 V2 remains preferred because it removes profile indirection. A role route can be tuned without inventing a category or moving other roles assigned to it.
 
@@ -125,7 +129,7 @@ Packaged runtime profiles are:
 | Profile | Behavior |
 |---|---|
 | `installation-default` | Restore the exact OMP routes selected at installation, including an external v2 or legacy v1 policy. |
-| `default` | Restore alpha.15's packaged routes, preserving the reviewed per-role selections. |
+| `default` | Restore the packaged canonical per-role OMP selections. |
 | `testing-flash` | Route all 19 BBK OMP children through `deepseek/deepseek-v4-flash` for inexpensive functional testing. |
 | `deepseek-economy` | Use DeepSeek routes for a cost-conscious OMP configuration. |
 
@@ -143,7 +147,6 @@ Commands:
 Runtime changes affect future OMP child spawns only. BBK rewrites managed OMP agent frontmatter, writes `effective-omp-model-routing.json`, and reconciles ownership digests into the selected installation manifest. Already-running children are unaffected.
 
 ### Project and user routing targets
-
 
 Project-local routing can be created directly from a user-scoped session without first initializing Git or `.bbk`:
 
@@ -189,4 +192,4 @@ Project agent definitions also precede user definitions. A task override or high
 
 ## Upgrade an external policy
 
-An external policy is bound to one BBK release. Update `package_version` to `0.1.0-alpha.16.1`, compare its role keys and host fields with the new canonical policy, and validate it before installation. Alpha.16.1 retains the same 19 role names and exact routes. It changes selective OMP installation behavior, artifact-finalization/freshness surfaces, generated prompt/skill content, and projection digests. Regenerate installed agents from the alpha.16.1 package rather than copying files from alpha.16.
+An external policy is governed by its routing schema, complete role coverage, and host fields—not by the BBK package label. Preserve or add `schema_version: bbk.model-routing.v2`, compare all 19 role keys and host-native fields with the current canonical policy, and validate before installation. `package_version` may be retained as provenance, changed, or omitted. Do not copy generated agent files between releases; regenerate them from the selected policy and current BBK package.

@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-role-return-validation-v1.schema.json",
+  "title": "BBK direct role-return validation v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "bbk.role-return-validation.v1"
+    },
+    "status": {
+      "const": "PASS"
+    },
+    "role": {
+      "type": "string",
+      "pattern": "^bbk_[a-z][a-z0-9_]*$"
+    },
+    "contract": {
+      "type": "string",
+      "minLength": 1
+    },
+    "schema_path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "schema_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "document_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "diagnostics": {
+      "type": "array",
+      "maxItems": 0
+    },
+    "binding_ref": {
+      "type": "string",
+      "pattern": "^binding:[0-9a-f]{64}$"
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "invocation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tool_call_id": {
+      "type": "string"
+    },
+    "binding_identity_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "return_ref": {
+      "type": "string",
+      "pattern": "^return:[0-9a-f]{64}$"
+    },
+    "admission_receipt_ref": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "prepared_return_verified": {
+      "const": true
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "role",
+    "contract",
+    "schema_path",
+    "schema_id",
+    "document_digest",
+    "diagnostics",
+    "binding_ref",
+    "session_id",
+    "invocation_id",
+    "tool_call_id",
+    "binding_identity_digest",
+    "return_ref",
+    "admission_receipt_ref",
+    "prepared_return_verified"
+  ]
+}

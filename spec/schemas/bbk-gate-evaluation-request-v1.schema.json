@@ -1,0 +1,260 @@
+{
+  "$id": "bbk-gate-evaluation-request-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "actor": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "actor_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+          "type": "string"
+        },
+        "actor_kind": {
+          "enum": [
+            "MODEL",
+            "HUMAN",
+            "SYSTEM",
+            "ADAPTER"
+          ],
+          "type": "string"
+        },
+        "capability_ref": {
+          "type": "string"
+        },
+        "invocation_id": {
+          "type": "string"
+        },
+        "role": {
+          "maxLength": 256,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+          "type": "string"
+        },
+        "session_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "actor_id",
+        "actor_kind"
+      ],
+      "title": "actor",
+      "type": "object"
+    },
+    "authority": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "authority_ref": {
+          "maxLength": 256,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+          "type": "string"
+        },
+        "holder_kind": {
+          "enum": [
+            "USER",
+            "SYSTEM_POLICY",
+            "EXTERNAL_REVIEWER",
+            "MODEL"
+          ],
+          "type": "string"
+        },
+        "scopes": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "standing": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "authority_ref",
+        "holder_kind",
+        "scopes"
+      ],
+      "title": "authority",
+      "type": "object"
+    },
+    "candidate_ref": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "idempotency_key": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "intent": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "accepted_subject": {
+          "type": "boolean"
+        },
+        "claim": {
+          "type": "string"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "mutation_class": {
+          "maxLength": 256,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+          "type": "string"
+        },
+        "operation": {
+          "maxLength": 256,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "required_effect": {
+          "type": "string"
+        },
+        "sealed_subject": {
+          "type": "boolean"
+        },
+        "substituted_effect": {
+          "type": "string"
+        },
+        "within_scope": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "operation",
+        "mutation_class"
+      ],
+      "title": "intent",
+      "type": "object"
+    },
+    "override": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "authority_ref": {
+          "type": "string"
+        },
+        "decision_ref": {
+          "type": "string"
+        },
+        "present": {
+          "type": "boolean"
+        },
+        "requested_by_kind": {
+          "enum": [
+            "MODEL",
+            "HUMAN",
+            "SYSTEM",
+            "NONE"
+          ],
+          "type": "string"
+        },
+        "scopes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "present",
+        "requested_by_kind",
+        "authority_ref",
+        "scopes"
+      ],
+      "title": "override",
+      "type": "object"
+    },
+    "policy_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "request_digest": {
+      "pattern": "^(?:sha256:)?[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.gate-evaluation-request.v1"
+    },
+    "state_snapshot": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "binding_ref": {
+          "type": "string"
+        },
+        "binding_valid": {
+          "type": "boolean"
+        },
+        "evidence_current": {
+          "type": "boolean"
+        },
+        "expected_revision": {
+          "type": "string"
+        },
+        "manual_gate_pass": {
+          "type": "boolean"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "observations": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "snapshot_ref": {
+          "maxLength": 256,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "snapshot_ref"
+      ],
+      "title": "state snapshot",
+      "type": "object"
+    },
+    "work_unit_id": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "policy_ref",
+    "actor",
+    "authority",
+    "intent",
+    "state_snapshot",
+    "candidate_ref",
+    "work_unit_id",
+    "idempotency_key"
+  ],
+  "title": "BBK gate evaluation request v1",
+  "type": "object"
+}

@@ -1,0 +1,285 @@
+{
+  "candidate_version": "0.1.0-alpha.17+rc.6",
+  "plan_id": "BBK-A17-RC-OPT-001",
+  "schema": "bbk.alpha17-rc-optimization-work-unit-dispositions.v1",
+  "status": "IMPLEMENTATION_COMPLETE_PENDING_EXTERNAL_HARNESS",
+  "work_units": [
+    {
+      "changed_paths": [
+        "spec/prompt-modules/bbk-prompt-critical-path-execution.json",
+        "spec/method-content.json",
+        "spec/roles/",
+        "projections/"
+      ],
+      "evidence_refs": [
+        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
+        "evidence/alpha17-rc6-project-coverage.json",
+        "tests/test_compiled_procedures_alpha17.py"
+      ],
+      "id": "WU-A17-OPT-001",
+      "priority": "RC_BLOCKER",
+      "residuals": [],
+      "status": "COMPLETE"
+    },
+    {
+      "changed_paths": [
+        "tools/compiled_procedures.py",
+        "tools/create_procedure_registry.py",
+        "spec/procedures/catalog.json",
+        "spec/schemas/bbk-compiled-procedure-manifest-v1.schema.json"
+      ],
+      "evidence_refs": [
+        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
+        "evidence/alpha17-rc6-project-coverage.json",
+        "tests/test_compiled_procedures_alpha17.py"
+      ],
+      "id": "WU-A17-OPT-002",
+      "priority": "RC_BLOCKER",
+      "residuals": [],
+      "status": "COMPLETE"
+    },
+    {
+      "changed_paths": [
+        "tools/generate_agents.py",
+        "tools/install.py",
+        "tools/update_codex.py",
+        "projections/manifest.json"
+      ],
+      "evidence_refs": [
+        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
+        "evidence/alpha17-rc6-project-coverage.json",
+        "tests/test_compiled_procedures_alpha17.py"
+      ],
+      "id": "WU-A17-OPT-003",
+      "priority": "RC_BLOCKER",
+      "residuals": [],
+      "status": "COMPLETE"
+    },
+    {
+      "changed_paths": [
+        "tools/compiled_procedures.py",
+        "tests/test_compiled_procedures_alpha17.py"
+      ],
+      "evidence_refs": [
+        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
+        "evidence/alpha17-rc6-project-coverage.json",
+        "tests/test_compiled_procedures_alpha17.py"
+      ],
+      "id": "WU-A17-OPT-004",
+      "priority": "RC_BLOCKER",
+      "residuals": [],
+      "status": "COMPLETE"
+    },
+    {
+      "changed_paths": [
+        "tools/planning_optimization.py",
+        "spec/schemas/bbk-planning-readiness-v1.schema.json"
+      ],
+      "evidence_refs": [
+        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
+        "evidence/alpha17-rc6-project-coverage.json",
+        "tests/test_planning_optimization_alpha17.py"
+      ],
+      "id": "WU-A17-OPT-005",
+      "priority": "RC_BLOCKER",
+      "residuals": [],
+      "status": "COMPLETE"
+    },
+    {
+      "changed_paths": [
+        "spec/prompt-modules/bbk-prompt-rolling-wave-planning.json",
+        "spec/roles/",
+        "projections/"
+      ],
+      "evidence_refs": [
+        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
+        "evidence/alpha17-rc6-project-coverage.json",
+        "tests/test_planning_optimization_alpha17.py"
+      ],
+      "id": "WU-A17-OPT-006",
+      "priority": "RC_BLOCKER",
+      "residuals": [],
+      "status": "COMPLETE"
+    },
+    {
+      "changed_paths": [
+        "tools/planning_optimization.py",
+        "spec/schemas/bbk-routine-worker-contract-v1.schema.json",
+        "spec/schemas/bbk-routine-assertion-contract-v1.schema.json"
+      ],
+      "evidence_refs": [
+        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
+        "evidence/alpha17-rc6-project-coverage.json",
+        "tests/test_planning_optimization_alpha17.py"
+      ],
+      "id": "WU-A17-OPT-007",
+      "priority": "RC_BLOCKER",
+      "residuals": [],
+      "status": "COMPLETE"
+    },
+    {
+      "changed_paths": [
+        "tools/planning_optimization.py",
+        "spec/schemas/bbk-plan-event-v1.schema.json",
+        "spec/schemas/bbk-plan-transaction-receipt-v1.schema.json"
+      ],
+      "evidence_refs": [
+        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
+        "evidence/alpha17-rc6-project-coverage.json",
+        "tests/test_planning_optimization_alpha17.py"
+      ],
+      "id": "WU-A17-OPT-008",
+      "priority": "RC_REQUIRED",
+      "residuals": [],
+      "status": "COMPLETE"
+    },
+    {
+      "changed_paths": [
+        "tools/atomic_finalizer.py",
+        "spec/schemas/bbk-identity-receipt-v1.schema.json",
+        "tools/bbk.py"
+      ],
+      "evidence_refs": [
+        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
+        "evidence/alpha17-rc6-project-coverage.json",
+        "tests/test_atomic_finalizer_alpha17.py"
+      ],
+      "id": "WU-A17-OPT-009",
+      "priority": "RC_BLOCKER",
+      "residuals": [],
+      "status": "COMPLETE"
+    },
+    {
+      "changed_paths": [
+        "tools/evidence_replay.py",
+        "spec/schemas/bbk-command-attempt-v1.schema.json",
+        "tools/bbk.py"
+      ],
+      "evidence_refs": [
+        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
+        "evidence/alpha17-rc6-project-coverage.json",
+        "tests/test_evidence_replay_alpha17.py"
+      ],
+      "id": "WU-A17-OPT-010",
+      "priority": "RC_BLOCKER",
+      "residuals": [],
+      "status": "COMPLETE"
+    },
+    {
+      "changed_paths": [
+        "tools/runtime_identity.py",
+        "spec/schemas/bbk-effective-profile-receipt-v1.schema.json"
+      ],
+      "evidence_refs": [
+        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
+        "evidence/alpha17-rc6-project-coverage.json",
+        "tests/test_planning_optimization_alpha17.py"
+      ],
+      "id": "WU-A17-OPT-011",
+      "priority": "RC_REQUIRED",
+      "residuals": [],
+      "status": "COMPLETE"
+    },
+    {
+      "changed_paths": [
+        "tools/planning_optimization.py",
+        "spec/schemas/bbk-project-coverage-v1.schema.json",
+        "spec/schemas/role-results/",
+        "spec/schemas/role-returns/"
+      ],
+      "evidence_refs": [
+        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
+        "evidence/alpha17-rc6-project-coverage.json",
+        "tests/test_planning_optimization_alpha17.py"
+      ],
+      "id": "WU-A17-OPT-012",
+      "priority": "RC_BLOCKER",
+      "residuals": [],
+      "status": "COMPLETE"
+    },
+    {
+      "changed_paths": [
+        "tools/planning_optimization.py",
+        "spec/schemas/bbk-child-event-v1.schema.json",
+        "spec/schemas/bbk-workspace-admission-receipt-v1.schema.json",
+        "omp/extension/index.js"
+      ],
+      "evidence_refs": [
+        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
+        "evidence/alpha17-rc6-project-coverage.json",
+        "tests/test_planning_optimization_alpha17.py"
+      ],
+      "id": "WU-A17-OPT-013",
+      "priority": "RC_REQUIRED",
+      "residuals": [],
+      "status": "COMPLETE"
+    },
+    {
+      "changed_paths": [
+        "tests/test_compiled_procedures_alpha17.py",
+        "tests/test_planning_optimization_alpha17.py",
+        "tests/test_atomic_finalizer_alpha17.py",
+        "tests/test_evidence_replay_alpha17.py",
+        "tests/test_alpha17_optimization_cli.py",
+        "tools/jsonl_analyzer/tests/"
+      ],
+      "evidence_refs": [
+        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
+        "evidence/alpha17-rc6-project-coverage.json",
+        "delivery/evidence/release-profile-rc6.log"
+      ],
+      "id": "WU-A17-OPT-014",
+      "priority": "RC_BLOCKER",
+      "residuals": [],
+      "status": "COMPLETE"
+    },
+    {
+      "changed_paths": [
+        "tools/jsonl_analyzer/",
+        "implementation/release/MANUAL-CODEX-QUALIFICATION-ALPHA17-RC6.md"
+      ],
+      "evidence_refs": [
+        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
+        "evidence/alpha17-rc6-project-coverage.json",
+        "delivery/evidence/analyzer-synthetic/alpha17-gate-report.json"
+      ],
+      "id": "WU-A17-OPT-015",
+      "priority": "RC_REQUIRED",
+      "residuals": [
+        "Credentialed real-Codex JSONL acceptance remains USER_ACTION_REQUIRED; automated synthetic hard-gate evidence is included."
+      ],
+      "status": "COMPLETE"
+    },
+    {
+      "changed_paths": [
+        "tools/install.py",
+        "tools/qualification/",
+        "docs/",
+        "RELEASE-NOTES.md",
+        "CHANGELOG.md",
+        "PACKAGE-MANIFEST.json"
+      ],
+      "evidence_refs": [
+        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
+        "evidence/alpha17-rc6-project-coverage.json",
+        "delivery/ALPHA17-RC6-RELEASE-CANDIDATE-REPORT.json"
+      ],
+      "id": "WU-A17-OPT-016",
+      "priority": "RC_BLOCKER",
+      "residuals": [
+        "Credentialed/full-harness manual results cannot be established without the operator environment."
+      ],
+      "status": "COMPLETE"
+    },
+    {
+      "changed_paths": [],
+      "evidence_refs": [],
+      "id": "WU-A17-OPT-017",
+      "priority": "POST_RC_CANDIDATE",
+      "residuals": [
+        "Explicit post-RC candidate; no final-RC workspace redesign was attempted."
+      ],
+      "status": "DEFERRED_POST_RC"
+    }
+  ]
+}

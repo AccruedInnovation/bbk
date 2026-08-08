@@ -1,0 +1,125 @@
+{
+  "$id": "bbk-gate-decision-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "decision": {
+      "enum": [
+        "ALLOW",
+        "BLOCK",
+        "REQUIRE_OVERRIDE"
+      ],
+      "type": "string"
+    },
+    "implementation_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "matched_rules": {
+      "items": {
+        "maxLength": 256,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "observations": {
+      "items": {
+        "maxLength": 256,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "override_eligibility": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "authorities": {
+          "items": {
+            "maxLength": 256,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "eligible": {
+          "type": "boolean"
+        },
+        "requires_exact_scope": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "eligible",
+        "authorities",
+        "requires_exact_scope"
+      ],
+      "title": "decision override eligibility",
+      "type": "object"
+    },
+    "policy_id": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "policy_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "reason_codes": {
+      "items": {
+        "maxLength": 256,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "receipt_ref": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "request_digest": {
+      "pattern": "^(?:sha256:)?[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "required_evidence": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "schema": {
+      "const": "bbk.gate-decision.v1"
+    },
+    "smallest_next_action": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "decision",
+    "reason_codes",
+    "observations",
+    "required_evidence",
+    "override_eligibility",
+    "receipt_ref",
+    "smallest_next_action",
+    "policy_id",
+    "policy_version",
+    "request_digest"
+  ],
+  "title": "BBK gate decision v1",
+  "type": "object"
+}

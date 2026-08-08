@@ -185,7 +185,7 @@ def _failure(checked: list[str]) -> int:
 def _run(binding: dict[str, Any], arguments: list[str]) -> int:
     python = str(binding["python"])
     script = str(binding["script"])
-    command = [python, "-B", "-X", "utf8", script, "--json", "artifact", *arguments]
+    command = [python, "-S", "-B", "-X", "utf8", script, "--json", "artifact", *arguments]
     try:
         completed = subprocess.run(command, check=False)
     except OSError as exc:

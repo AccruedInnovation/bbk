@@ -1,0 +1,26 @@
+# BBK governed task vocabulary. This file is canonical toolchain configuration.
+# Changes require a bound foundation/toolchain work unit and invalidate affected evidence.
+
+[tools]
+"github:gastownhall/beads" = "1.1.0"
+jj = "0.43.0"
+
+[tasks."bbk:test:fast"]
+description = "Run the bounded fast BBK verification profile"
+run = "python tools/run_tests.py --profile fast"
+
+[tasks."bbk:test:standard"]
+description = "Run the complete standard BBK unittest profile"
+run = "python tools/run_tests.py --profile standard"
+
+[tasks."bbk:test:release"]
+description = "Run release qualification, including immutable package and generated-surface checks"
+run = "python tools/run_tests.py --profile release --all"
+
+[tasks."bbk:verify:package"]
+description = "Verify the package manifest against the current candidate"
+run = "python tools/verify_package.py --strict-mode"
+
+[tasks."bbk:qualify:alpha17"]
+description = "Compile the Alpha.17 automated qualification report"
+run = "python tools/release_qualification.py alpha17 --automated"

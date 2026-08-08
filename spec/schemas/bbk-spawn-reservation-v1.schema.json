@@ -1,0 +1,137 @@
+{
+  "$id": "bbk-spawn-reservation-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "dispatch_ref"
+        ]
+      },
+      "then": {
+        "required": [
+          "dispatch_input_digest",
+          "dispatch_payload_digest",
+          "dispatch_envelope_digest"
+        ]
+      }
+    }
+  ],
+  "properties": {
+    "agent": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "attempt_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "authority_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "binding_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "binding_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "candidate_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "child_session_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "dispatch_envelope_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "dispatch_input_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "dispatch_payload_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "dispatch_ref": {
+      "pattern": "^dispatch:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "input_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "invocation_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "parent_session_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "receipt_ref": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "reservation_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "return_contract": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.spawn-reservation.v1"
+    },
+    "scope": {
+      "type": "object"
+    },
+    "status": {
+      "const": "RESERVED"
+    },
+    "task_name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "tool_name": {
+      "const": "task"
+    },
+    "work_unit_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "workspace_ref": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "reservation_id",
+    "binding_ref",
+    "parent_session_id",
+    "child_session_id",
+    "invocation_id",
+    "work_unit_id",
+    "attempt_id",
+    "candidate_ref",
+    "workspace_ref",
+    "authority_ref",
+    "scope",
+    "return_contract",
+    "task_name",
+    "agent",
+    "tool_name",
+    "input_digest",
+    "binding_digest"
+  ],
+  "title": "BBK bound OMP spawn reservation v1",
+  "type": "object"
+}

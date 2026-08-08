@@ -16,6 +16,12 @@ from tests._cli_support import run_cli
 from tests._path_support import assert_same_path
 
 ROOT = Path(__file__).resolve().parents[1]
+TOOLS = ROOT / "tools"
+if str(TOOLS) not in sys.path:
+    sys.path.insert(0, str(TOOLS))
+
+import create_method_content  # noqa: E402
+
 SKILL_ROOT = ROOT / "shared" / "skills" / "bbk-artifact"
 WRAPPER = SKILL_ROOT / "scripts" / "bbk_artifact.py"
 INSTALLER = ROOT / "tools" / "install.py"
@@ -55,7 +61,8 @@ class BbkArtifactSkillTests(unittest.TestCase):
         self.assertIn("bbk_on_path_required", WRAPPER.read_text(encoding="utf-8"))
 
         method = json.loads((ROOT / "spec" / "method-content.json").read_text(encoding="utf-8"))
-        self.assertEqual(method["skills"]["bbk-artifact"], skill_text)
+        expected_skill = create_method_content.expected()[SKILL_ROOT / "SKILL.md"].decode("utf-8")
+        self.assertEqual(expected_skill, skill_text)
         roles = json.loads((ROOT / "spec" / "roles.json").read_text(encoding="utf-8"))["roles"]
         self.assertEqual(len(roles), 19)
         self.assertTrue(all("bbk-artifact" in role["skills"] for role in roles))

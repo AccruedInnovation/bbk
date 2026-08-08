@@ -13,6 +13,54 @@ const sourceCli = path.join(sourceRoot, "tools", "bbk.py");
 const cliPath = process.env.BBK_CLI || (process.platform ? (() => {
   try { readFileSync(adjacentCli); return adjacentCli; } catch { return sourceCli; }
 })() : sourceCli);
+const adjacentGovernanceRegistry = path.join(extensionDir, "omp_binding_registry.py");
+const sourceGovernanceRegistry = path.join(sourceRoot, "tools", "omp_binding_registry.py");
+const governanceRegistryPath = process.env.BBK_OMP_BINDING_REGISTRY_CLI || (() => {
+  try { readFileSync(adjacentGovernanceRegistry); return adjacentGovernanceRegistry; }
+  catch { return sourceGovernanceRegistry; }
+})();
+const adjacentGovernedFilesystem = path.join(extensionDir, "governed_filesystem.py");
+const sourceGovernedFilesystem = path.join(sourceRoot, "tools", "governed_filesystem.py");
+const governedFilesystemPath = process.env.BBK_GOVERNED_FILESYSTEM_CLI || (() => {
+  try { readFileSync(adjacentGovernedFilesystem); return adjacentGovernedFilesystem; }
+  catch { return sourceGovernedFilesystem; }
+})();
+const adjacentWorkerSpawn = path.join(extensionDir, "worker_spawn.py");
+const sourceWorkerSpawn = path.join(sourceRoot, "tools", "worker_spawn.py");
+const workerSpawnPath = process.env.BBK_WORKER_SPAWN_CLI || (() => {
+  try { readFileSync(adjacentWorkerSpawn); return adjacentWorkerSpawn; }
+  catch { return sourceWorkerSpawn; }
+})();
+const adjacentControlPlane = path.join(extensionDir, "control_plane.py");
+const sourceControlPlane = path.join(sourceRoot, "tools", "control_plane.py");
+const controlPlanePath = process.env.BBK_CONTROL_PLANE_CLI || (() => {
+  try { readFileSync(adjacentControlPlane); return adjacentControlPlane; }
+  catch { return sourceControlPlane; }
+})();
+const adjacentGovernanceStatus = path.join(extensionDir, "governance_status.py");
+const sourceGovernanceStatus = path.join(sourceRoot, "tools", "governance_status.py");
+const governanceStatusPath = process.env.BBK_GOVERNANCE_STATUS_CLI || (() => {
+  try { readFileSync(adjacentGovernanceStatus); return adjacentGovernanceStatus; }
+  catch { return sourceGovernanceStatus; }
+})();
+const adjacentReadOnlySpawn = path.join(extensionDir, "read_only_spawn.py");
+const sourceReadOnlySpawn = path.join(sourceRoot, "tools", "read_only_spawn.py");
+const readOnlySpawnPath = process.env.BBK_READ_ONLY_SPAWN_CLI || (() => {
+  try { readFileSync(adjacentReadOnlySpawn); return adjacentReadOnlySpawn; }
+  catch { return sourceReadOnlySpawn; }
+})();
+const adjacentQualifiedTask = path.join(extensionDir, "qualified_task.py");
+const sourceQualifiedTask = path.join(sourceRoot, "tools", "qualified_task.py");
+const qualifiedTaskPath = process.env.BBK_QUALIFIED_TASK_CLI || (() => {
+  try { readFileSync(adjacentQualifiedTask); return adjacentQualifiedTask; }
+  catch { return sourceQualifiedTask; }
+})();
+const adjacentRoleReturnRuntime = path.join(extensionDir, "role_return_runtime.py");
+const sourceRoleReturnRuntime = path.join(sourceRoot, "tools", "role_return_runtime.py");
+const roleReturnRuntimePath = process.env.BBK_ROLE_RETURN_RUNTIME_CLI || (() => {
+  try { readFileSync(adjacentRoleReturnRuntime); return adjacentRoleReturnRuntime; }
+  catch { return sourceRoleReturnRuntime; }
+})();
 const adjacentRoutingCli = path.join(extensionDir, "omp_model_routing.py");
 const sourceRoutingCli = path.join(sourceRoot, "tools", "omp_model_routing.py");
 const routingCliPath = process.env.BBK_OMP_ROUTING_CLI || (() => {
@@ -24,7 +72,7 @@ const versionPath = (() => {
   try { readFileSync(path.join(extensionDir, "VERSION")); return path.join(extensionDir, "VERSION"); }
   catch { return path.join(sourceRoot, "VERSION"); }
 })();
-let version = "0.1.0-alpha.16.1";
+let version = "0.1.0-alpha.17.0.2";
 try { version = readFileSync(versionPath, "utf8").trim() || version; } catch {}
 
 function normalizedFsPath(value) {
@@ -327,6 +375,1158 @@ function runRouting(args, cwd, signal, requestedScope = "auto") {
     });
   });
 }
+function runJsonScript(script, args, cwd, signal, extraEnvironment = {}, stdinValue = null) {
+  return new Promise(resolve => {
+    const child = spawn(pythonCommand(), [...scriptPrefix(script), ...args], {
+      cwd,
+      env: pythonUtf8Environment({ BBK_PACKAGE_ROOT: packageRoot, ...extraEnvironment }),
+      windowsHide: true,
+      stdio: [stdinValue === null ? "ignore" : "pipe", "pipe", "pipe"],
+    });
+    const stdoutChunks = [], stderrChunks = [];
+    child.stdout.on("data", chunk => { stdoutChunks.push(Buffer.from(chunk)); });
+    child.stderr.on("data", chunk => { stderrChunks.push(Buffer.from(chunk)); });
+    const abort = () => child.kill("SIGTERM");
+    signal?.addEventListener?.("abort", abort, { once: true });
+    child.on("error", error => resolve({
+      code: 2,
+      details: { status: "ERROR", reason_code: "BBK_SCRIPT_START_FAILED", message: String(error?.message || error) },
+      stdout: "",
+      stderr: "",
+    }));
+    if (stdinValue !== null) {
+      child.stdin.on("error", () => {});
+      child.stdin.end(typeof stdinValue === "string" ? stdinValue : JSON.stringify(stdinValue));
+    }
+    child.on("close", code => {
+      signal?.removeEventListener?.("abort", abort);
+      let stdout, stderr;
+      try {
+        stdout = decodeStrictUtf8(stdoutChunks, "stdout");
+        stderr = decodeStrictUtf8(stderrChunks, "stderr");
+      } catch (error) {
+        resolve(utf8TransportFailure(error));
+        return;
+      }
+      let details;
+      try { details = stdout.trim() ? JSON.parse(stdout) : { status: code === 0 ? "PASS" : "ERROR" }; }
+      catch { details = { status: "ERROR", stdout, stderr, parseError: "BBK governed runtime did not return JSON" }; }
+      if (stderr.trim()) details.stderr = stderr;
+      resolve({ code, details, stdout, stderr });
+    });
+  });
+}
+function runGovernanceRegistry(args, projectRoot, signal) {
+  return runJsonScript(
+    governanceRegistryPath,
+    ["--root", projectRoot, ...args],
+    projectRoot,
+    signal,
+    { BBK_PROJECT_ROOT: projectRoot },
+  );
+}
+function runGovernedFilesystem(request, projectRoot, signal) {
+  return runJsonScript(
+    governedFilesystemPath,
+    ["--root", projectRoot, "execute", "--request", "-"],
+    projectRoot,
+    signal,
+    { BBK_PROJECT_ROOT: projectRoot },
+    request,
+  );
+}
+function runWorkerSpawn(request, projectRoot, signal) {
+  return runJsonScript(
+    workerSpawnPath,
+    ["--root", projectRoot, "compile", "--request", "-"],
+    projectRoot,
+    signal,
+    { BBK_PROJECT_ROOT: projectRoot },
+    request,
+  );
+}
+function runControlPlane(request, projectRoot, signal) {
+  return runJsonScript(
+    controlPlanePath,
+    ["--root", projectRoot, "execute", "--request", "-"],
+    projectRoot,
+    signal,
+    { BBK_PROJECT_ROOT: projectRoot },
+    request,
+  );
+}
+function runGovernanceStatus(request, projectRoot, signal) {
+  return runJsonScript(
+    governanceStatusPath,
+    ["--root", projectRoot, "status", "--request", "-"],
+    projectRoot,
+    signal,
+    { BBK_PROJECT_ROOT: projectRoot },
+    request,
+  );
+}
+function runReadOnlySpawn(request, projectRoot, signal) {
+  return runJsonScript(
+    readOnlySpawnPath,
+    ["--root", projectRoot, "compile", "--request", "-"],
+    projectRoot,
+    signal,
+    { BBK_PROJECT_ROOT: projectRoot },
+    request,
+  );
+}
+function runQualifiedTask(request, projectRoot, signal) {
+  return runJsonScript(
+    qualifiedTaskPath,
+    ["--root", projectRoot, "execute", "--request", "-"],
+    projectRoot,
+    signal,
+    { BBK_PROJECT_ROOT: projectRoot },
+    request,
+  );
+}
+function runRoleReturn(command, request, projectRoot, signal) {
+  return runJsonScript(
+    roleReturnRuntimePath,
+    ["--root", projectRoot, "--package-root", packageRoot, command, "--request", "-"],
+    projectRoot,
+    signal,
+    { BBK_PROJECT_ROOT: projectRoot, BBK_PACKAGE_ROOT: packageRoot },
+    request,
+  );
+}
+function canonicalJsonValue(value) {
+  if (Array.isArray(value)) return value.map(canonicalJsonValue);
+  if (value && typeof value === "object") {
+    const result = {};
+    for (const key of Object.keys(value).sort()) {
+      if (value[key] !== undefined) result[key] = canonicalJsonValue(value[key]);
+    }
+    return result;
+  }
+  return value;
+}
+function governedPayloadDigest(value) {
+  const normalized = canonicalJsonValue(JSON.parse(JSON.stringify(value ?? {})));
+  return `sha256:${createHash("sha256").update(JSON.stringify(normalized), "utf8").digest("hex")}`;
+}
+function canonicalDispatchEnvelope(input) {
+  const value = input && typeof input === "object" && !Array.isArray(input) ? input : {};
+  const tasks = Array.isArray(value.tasks) ? value.tasks : [];
+  if (tasks.length !== 1 || !tasks[0] || typeof tasks[0] !== "object" || Array.isArray(tasks[0])) return null;
+  const context = String(value.context || "").trim();
+  const task = String(tasks[0].task || "").trim();
+  const pattern = /^<bbk-spawn-dispatch ref="(dispatch:[0-9a-f]{64})"\/>$/;
+  const contextMatch = pattern.exec(context);
+  const taskMatch = pattern.exec(task);
+  if (!contextMatch || !taskMatch || contextMatch[1] !== taskMatch[1]) return null;
+  return {
+    context,
+    tasks: [{
+      agent: String(tasks[0].agent || "").trim(),
+      name: String(tasks[0].name || "").trim(),
+      task,
+    }],
+  };
+}
+const governedDispatchLeases = new Map();
+const governedActivatedDispatches = new Map();
+async function releaseGovernedDispatchLease(toolCallId, reason, signal) {
+  const callId = String(toolCallId || "").trim();
+  const active = governedDispatchLeases.get(callId);
+  if (!callId || !active) return null;
+  governedDispatchLeases.delete(callId);
+  return runGovernanceRegistry([
+    "release-dispatch",
+    "--dispatch-ref", active.dispatchRef,
+    "--tool-call-id", callId,
+    "--reason", String(reason || "HOST_TASK_LAUNCH_FAILED").slice(0, 256),
+    "--observed-at", new Date().toISOString(),
+  ], active.projectRoot, signal);
+}
+async function terminalizeGovernedDispatch(event, ctx) {
+  const sessionId = hostSessionIdentity(ctx);
+  const active = governedActivatedDispatches.get(sessionId);
+  if (!sessionId || !active) return null;
+  governedActivatedDispatches.delete(sessionId);
+  const failed = Boolean(
+    event?.isError || event?.error || event?.result?.isError
+    || ["error", "failed"].includes(String(event?.status || "").toLowerCase()),
+  );
+  const cancelled = String(event?.status || "").toLowerCase() === "cancelled";
+  return runGovernanceRegistry([
+    "terminal-dispatch",
+    "--dispatch-ref", active.dispatchRef,
+    "--actual-session-id", sessionId,
+    "--outcome", cancelled ? "CANCELLED" : failed ? "FAILED" : "COMPLETED",
+    "--reason", failed ? "OMP_CHILD_AGENT_END_FAILED" : cancelled ? "OMP_CHILD_AGENT_END_CANCELLED" : "OMP_CHILD_AGENT_END_COMPLETED",
+    "--observed-at", new Date().toISOString(),
+  ], active.projectRoot);
+}
+function governedProfileEnabled() {
+  return String(process.env.BBK_GOVERNED_PROFILE || "").trim() === "governed-software";
+}
+function governedProjectRoot() {
+  const explicit = String(process.env.BBK_PROJECT_ROOT || "").trim();
+  if (explicit) return path.resolve(explicit);
+  if (loadedBinding?.scope === "project" && loadedBinding?.projectRoot) return path.resolve(loadedBinding.projectRoot);
+  return null;
+}
+function governedHostVersion() {
+  return String(process.env.BBK_OMP_HOST_VERSION || "omp/unknown").trim() || "omp/unknown";
+}
+function hostSessionIdentity(ctx) {
+  const value = promptSessionIdentity(ctx);
+  return String(value || "").startsWith("cwd:") ? null : String(value || "");
+}
+function governedBlock(reasonCode, message, smallestNextAction = "Use a typed governed tool with a complete active binding.") {
+  return {
+    block: true,
+    reason: `${reasonCode}: ${message} Next: ${smallestNextAction}`,
+    details: {
+      schema: "bbk.governed-tool-block.v1",
+      status: "BLOCK",
+      reason_code: reasonCode,
+      message,
+      smallest_next_action: smallestNextAction,
+    },
+  };
+}
+async function recordGovernedHostDecision(event, ctx, { eventType = "TOOL_CALL", postEffect = false, bindingRef = null } = {}) {
+  const projectRoot = governedProjectRoot();
+  const sessionId = hostSessionIdentity(ctx);
+  if (!projectRoot || !sessionId) return null;
+  const toolCallId = String(event?.toolCallId || event?.tool_call_id || event?.id || event?.toolName || "tool-call");
+  const envelope = {
+    host_version: governedHostVersion(),
+    event_type: eventType,
+    session_id: sessionId,
+    parent_session: String(event?.parentSessionId || event?.parent_session_id || ""),
+    task_or_tool_id: toolCallId,
+    payload_digest: governedPayloadDigest(event?.input || {}),
+    observed_at: new Date().toISOString(),
+  };
+  const args = ["record-host-event", "--event", JSON.stringify(envelope)];
+  if (bindingRef) args.push("--binding-ref", bindingRef);
+  if (postEffect) args.push("--post-effect");
+  return runGovernanceRegistry(args, projectRoot);
+}
+async function admitGovernedTask(event, ctx) {
+  const projectRoot = governedProjectRoot();
+  if (!projectRoot) {
+    return governedBlock(
+      "GOVERNED_PROJECT_ROOT_REQUIRED",
+      "governed mode has no explicit BBK_PROJECT_ROOT or project-scoped package binding; CWD is not accepted as authority",
+      "Bind the exact project root and retry the spawn.",
+    );
+  }
+  const sessionId = hostSessionIdentity(ctx);
+  if (!sessionId) {
+    return governedBlock(
+      "OMP_PARENT_SESSION_REQUIRED",
+      "OMP did not expose a stable parent session identity; CWD fallback is not accepted",
+      "Use a qualified OMP host/session surface or mark the host unqualified.",
+    );
+  }
+  const input = event?.input && typeof event.input === "object" ? event.input : {};
+  const compactEnvelope = canonicalDispatchEnvelope(input);
+  const compactDispatchRef = compactEnvelope
+    ? /^<bbk-spawn-dispatch ref="(dispatch:[0-9a-f]{64})"\/>$/.exec(compactEnvelope.context)?.[1] || null
+    : null;
+  if (compactDispatchRef) {
+    const toolCallId = String(event?.toolCallId || event?.tool_call_id || event?.id || "").trim();
+    if (!toolCallId) {
+      return governedBlock(
+        "OMP_SPAWN_IDENTITY_INCOMPLETE",
+        "compact dispatch lacks a stable OMP tool-call identity",
+        "Invoke the exact dispatch_input returned by bbk_control_spawn or bbk_control_bind.",
+      );
+    }
+    const taskItem = compactEnvelope.tasks[0];
+    const value = await runGovernanceRegistry([
+      "admit-dispatch",
+      "--dispatch-ref", compactDispatchRef,
+      "--dispatch-envelope-digest", governedPayloadDigest(compactEnvelope),
+      "--parent-session-id", sessionId,
+      "--task-name", taskItem.name,
+      "--agent", taskItem.agent,
+      "--tool-call-id", toolCallId,
+      "--host-version", governedHostVersion(),
+      "--observed-at", new Date().toISOString(),
+    ], projectRoot);
+    if (value.code !== 0 || value.details?.status !== "ADMITTED") {
+      return governedBlock(
+        value.details?.reason_code || "OMP_SPAWN_DISPATCH_REQUIRED",
+        value.details?.message || "the compact dispatch does not identify one current immutable spawn reservation",
+        value.details?.smallest_next_action || "Use the current dispatch_input returned by BBK without alteration.",
+      );
+    }
+    if (value.details?.enforcement_boundary !== "ENFORCED") {
+      return governedBlock(
+        "OMP_HOST_UNQUALIFIED_FOR_SPAWN",
+        `dispatch reservation matched but host boundary is ${String(value.details?.enforcement_boundary || "UNQUALIFIED")}`,
+        "Use the qualified OMP 16.4.8 host or re-qualify the changed host.",
+      );
+    }
+    governedDispatchLeases.set(toolCallId, { dispatchRef: compactDispatchRef, projectRoot });
+    const resolved = value.details?.resolved_task_input;
+    if (!resolved || typeof resolved !== "object" || Array.isArray(resolved)
+      || governedPayloadDigest(resolved) !== value.details?.resolved_task_input_digest) {
+      await releaseGovernedDispatchLease(toolCallId, "OMP_SPAWN_DISPATCH_PAYLOAD_INVALID");
+      return governedBlock(
+        "OMP_SPAWN_DISPATCH_PAYLOAD_INVALID",
+        "the immutable dispatch payload was absent or failed its exact digest check",
+        "Recompile the bound spawn; do not emulate it with eval, shell, Python, or free-form task input.",
+      );
+    }
+    // OMP 16.4.8 accepts a replacement `input` from the pre-effect tool_call
+    // hook. Mutate the observed object as a compatibility belt, and return the
+    // replacement explicitly so the built-in task tool receives exactly the
+    // payload whose digest was admitted.
+    try {
+      for (const key of Object.keys(input)) delete input[key];
+      Object.assign(input, resolved);
+      event.input = input;
+    } catch (error) {
+      await releaseGovernedDispatchLease(toolCallId, "OMP_SPAWN_DISPATCH_REWRITE_FAILED");
+      return governedBlock(
+        "OMP_SPAWN_DISPATCH_REWRITE_FAILED",
+        `OMP did not expose a mutable pre-effect task payload: ${String(error?.message || error)}`,
+        "Preserve the failure and re-qualify the host bridge; do not use generic eval as a fallback.",
+      );
+    }
+    return { input: resolved };
+  }
+  let taskIdentity = input;
+  if (Array.isArray(input.tasks)) {
+    if (input.tasks.length !== 1) {
+      return governedBlock(
+        "OMP_BOUND_SPAWN_BATCH_CARDINALITY",
+        `bound writable spawn requires exactly one independently reserved task item; received ${input.tasks.length}`,
+        "Compile and invoke one bbk_control_spawn result per writable child.",
+      );
+    }
+    if (!String(input.context || "").trim()) {
+      return governedBlock(
+        "OMP_BOUND_SPAWN_CONTEXT_REQUIRED",
+        "OMP batch task input lacks the authenticated worker-packet context",
+        "Invoke the exact dispatch_input returned by bbk_control_spawn without alteration.",
+      );
+    }
+    taskIdentity = input.tasks[0] && typeof input.tasks[0] === "object" ? input.tasks[0] : {};
+  }
+  const taskName = String(taskIdentity.name || taskIdentity.taskName || taskIdentity.task_name || "").trim();
+  const agent = String(taskIdentity.agent || taskIdentity.role || "").trim();
+  const toolCallId = String(event?.toolCallId || event?.tool_call_id || event?.id || "").trim();
+  if (!taskName || !agent || !toolCallId) {
+    return governedBlock(
+      "OMP_SPAWN_IDENTITY_INCOMPLETE",
+      "task spawn lacks exact name, agent, or tool-call identity",
+      "Invoke the bound task tool with the exact reserved name, role, and host call identity.",
+    );
+  }
+  const value = await runGovernanceRegistry([
+    "admit-spawn",
+    "--input-digest", governedPayloadDigest(input),
+    "--parent-session-id", sessionId,
+    "--task-name", taskName,
+    "--agent", agent,
+    "--tool-call-id", toolCallId,
+    "--host-version", governedHostVersion(),
+  ], projectRoot);
+  if (value.code !== 0 || value.details?.status !== "ADMITTED") {
+    return governedBlock(
+      value.details?.reason_code || "OMP_SPAWN_BINDING_REQUIRED",
+      value.details?.message || "the task call has no exact active spawn reservation",
+      value.details?.smallest_next_action || "Create a complete bound spawn reservation before invoking task.",
+    );
+  }
+  if (value.details?.enforcement_boundary !== "ENFORCED") {
+    return governedBlock(
+      "OMP_HOST_UNQUALIFIED_FOR_SPAWN",
+      `spawn reservation matched but host boundary is ${String(value.details?.enforcement_boundary || "UNQUALIFIED")}`,
+      "Use the qualified OMP 16.4.8 host or re-qualify the changed host before writable execution.",
+    );
+  }
+  return undefined;
+}
+async function guardStructuredReturnTransport(event, ctx) {
+  const toolName = String(event?.toolName || event?.tool_name || "").trim().toLowerCase();
+  if (toolName !== "bbk_handoff_create" || !governedProfileEnabled()) return undefined;
+  const projectRoot = governedProjectRoot();
+  const sessionId = hostSessionIdentity(ctx);
+  if (!projectRoot || !sessionId) return undefined;
+  const value = await runGovernanceRegistry([
+    "binding-policy",
+    "--session-id", sessionId,
+  ], projectRoot);
+  // Let the handoff tool's ordinary capability checks handle sessions that are
+  // not governed children. A current governed child policy, however, is a
+  // deterministic pre-effect transport fence.
+  if (value.code !== 0 || value.details?.status !== "PASS") return undefined;
+  const mode = String(value.details?.return_transport_mode || "STRUCTURED_RETURN_FIRST");
+  if (mode === "STRUCTURED_RETURN_ONLY") {
+    return governedBlock(
+      "BBK_STRUCTURED_RETURN_ONLY",
+      `binding ${String(value.details?.binding_ref || "unknown")} requires the structured role return and forbids manufacturing a sealed handoff package`,
+      "Return the exact schema-valid role result through the OMP task-result channel.",
+    );
+  }
+  if (mode === "STRUCTURED_RETURN_FIRST" && !String(value.details?.material_transport_reason || "").trim()) {
+    return governedBlock(
+      "BBK_MATERIAL_TRANSPORT_REASON_REQUIRED",
+      "structured-return-first binding has no recorded material reason for durable exact transport",
+      "Use the structured role return, or compile a successor binding with a named large/binary/truncation/recovery/schema transport requirement.",
+    );
+  }
+  return undefined;
+}
+
+
+function boundWorkerMarker(event, _ctx) {
+  // Ordinary BBK child prompt replacement also parses the canonical role
+  // wrapper, including deliberately malformed fixtures that must be converted
+  // into a prompt-assembly failure.  Spawn activation is an additional path,
+  // not a second unconditional parser: only enter it when the host-supplied
+  // invocation block actually carries a bound-worker marker.  Once a marker is
+  // present, extractBbkAgentBlock remains strict so a forged/tampered role
+  // wrapper fails closed before the first provider turn.
+  const blocks = systemPromptBlocks(event);
+  if (!blocks.some(block => block.includes("<bbk-bound-worker-packet "))) return null;
+  const agent = extractBbkAgentBlock(event);
+  if (!agent || agent.alreadyReplaced) return null;
+  const context = String(agent.invocation?.context || "").replace(/\r\n?/g, "\n");
+  const firstLine = context.split("\n", 1)[0];
+  const pattern = /^<bbk-bound-worker-packet planned-binding-ref="([A-Za-z0-9._:/@+\-]+)" packet-digest="(sha256:[0-9a-f]{64})">(?:\r?\n|$)/;
+  const match = pattern.exec(`${firstLine}\n`);
+  return match ? { plannedBindingRef: match[1], packetDigest: match[2] } : null;
+}
+async function activateBoundWorker(event, ctx, pi) {
+  const marker = boundWorkerMarker(event, ctx);
+  if (!marker) return null;
+  if (!governedProfileEnabled()) {
+    const error = new Error("GOVERNED_PROFILE_REQUIRED: bound worker packet cannot start outside governed-software mode");
+    error.code = "GOVERNED_PROFILE_REQUIRED";
+    throw error;
+  }
+  const projectRoot = governedProjectRoot();
+  const sessionId = hostSessionIdentity(ctx);
+  if (!projectRoot || !sessionId) {
+    const error = new Error("OMP_CHILD_BINDING_IDENTITY_REQUIRED: project root and actual child session are required; CWD is not authority");
+    error.code = "OMP_CHILD_BINDING_IDENTITY_REQUIRED";
+    throw error;
+  }
+  const value = await runGovernanceRegistry([
+    "activate-spawn",
+    "--planned-binding-ref", marker.plannedBindingRef,
+    "--actual-session-id", sessionId,
+    "--packet-digest", marker.packetDigest,
+    "--host-version", governedHostVersion(),
+    "--observed-at", new Date().toISOString(),
+  ], projectRoot);
+  if (value.code !== 0 || value.details?.status !== "ACTIVATED") {
+    const reason = value.details?.reason_code || "OMP_SPAWN_ACTIVATION_FAILED";
+    const error = new Error(`${reason}: ${value.details?.message || "bound child activation failed"}`);
+    error.code = reason;
+    error.details = value.details;
+    throw error;
+  }
+  const activated = value.details;
+  if (activated?.tool_call_id) governedDispatchLeases.delete(String(activated.tool_call_id));
+  if (activated?.dispatch_ref && activated?.actual_session_id) {
+    governedActivatedDispatches.set(String(activated.actual_session_id), {
+      dispatchRef: String(activated.dispatch_ref),
+      projectRoot,
+    });
+  }
+  if (typeof pi?.appendEntry === "function") pi.appendEntry("bbk-spawn-activation", activated);
+  return activated;
+}
+function governedToolError(reasonCode, message, smallestNextAction, extraDetails = undefined) {
+  const details = {
+    schema: "bbk.governed-tool-result.v1",
+    status: "BLOCK",
+    reason_code: reasonCode,
+    message,
+    smallest_next_action: smallestNextAction || "Correct the active binding or typed request and retry.",
+  };
+  if (extraDetails && typeof extraDetails === "object" && !Array.isArray(extraDetails)) {
+    for (const [key, value] of Object.entries(extraDetails)) {
+      if (value !== undefined && !Object.hasOwn(details, key)) details[key] = value;
+    }
+  }
+  return {
+    content: [{ type: "text", text: JSON.stringify(details, null, 2) }],
+    details,
+    isError: true,
+  };
+}
+async function executeGovernanceStatusTool(_toolCallId, params, signal, ctx) {
+  if (!governedProfileEnabled()) {
+    return governedToolError(
+      "GOVERNED_PROFILE_REQUIRED",
+      "bbk_governance_status is available only in governed-software mode",
+      "Enable governed-software mode and use the current active binding.",
+    );
+  }
+  const projectRoot = governedProjectRoot();
+  const sessionId = hostSessionIdentity(ctx);
+  if (!projectRoot || !sessionId) {
+    return governedToolError(
+      "GOVERNANCE_STATUS_IDENTITY_REQUIRED",
+      "explicit BBK project root and stable OMP session identity are required; CWD is not authority",
+      "Bind the project and invoke status from a qualified OMP session.",
+    );
+  }
+  const request = {
+    schema: "bbk.governance-status-query.v1",
+    host_version: governedHostVersion(),
+    session_id: sessionId,
+    invocation_id: String(params.invocationId || "").trim(),
+    binding_ref: String(params.bindingRef || "").trim(),
+  };
+  const value = await runGovernanceStatus(request, projectRoot, signal);
+  if (value.code !== 0 || value.details?.status !== "PASS") {
+    return governedToolError(
+      value.details?.reason_code || "GOVERNANCE_STATUS_FAILED",
+      value.details?.message || "governance status could not be correlated to an active binding",
+      value.details?.smallest_next_action || "Use the current active binding and retry.",
+    );
+  }
+  return result(value);
+}
+async function executeControlBindTool(toolCallId, params, signal, ctx) {
+  if (!governedProfileEnabled()) {
+    return governedToolError(
+      "GOVERNED_PROFILE_REQUIRED",
+      "bbk_control_bind is available only in governed-software mode",
+      "Enable governed-software mode before binding a read-only child.",
+    );
+  }
+  const projectRoot = governedProjectRoot();
+  const parentSessionId = hostSessionIdentity(ctx);
+  if (!projectRoot || !parentSessionId) {
+    return governedToolError(
+      "CONTROL_BIND_PARENT_IDENTITY_REQUIRED",
+      "explicit BBK project root and stable OMP parent session are required; CWD is not authority",
+      "Bind the project and use the qualified OMP session surface.",
+    );
+  }
+  if (governedHostVersion() !== "omp/16.4.8") {
+    return governedToolError(
+      "OMP_HOST_UNQUALIFIED_FOR_CONTROL_BIND",
+      `host ${governedHostVersion()} is not qualified for read-only child binding`,
+      "Use OMP 16.4.8 or re-qualify the changed host.",
+    );
+  }
+  const parentBindingRef = String(params.parentBindingRef || "").trim();
+  const hostReceipt = await recordGovernedHostDecision(
+    { toolName: "bbk_control_bind", toolCallId, input: params },
+    ctx,
+    { bindingRef: parentBindingRef },
+  );
+  if (!hostReceipt || hostReceipt.code !== 0) {
+    return governedToolError(
+      hostReceipt?.details?.reason_code || "OMP_HOST_EVENT_RECEIPT_FAILED",
+      hostReceipt?.details?.message || "the read-only binding host event could not be correlated",
+      hostReceipt?.details?.smallest_next_action || "Repair the parent binding before retrying.",
+    );
+  }
+  const request = {
+    schema: "bbk.bound-read-only-task-create.v1",
+    host_version: governedHostVersion(),
+    parent_binding_ref: parentBindingRef,
+    parent_session_id: parentSessionId,
+    parent_invocation_id: String(params.parentInvocationId || "").trim(),
+    task_name: String(params.taskName || "").trim(),
+    role: String(params.role || "").trim(),
+    work_unit_id: String(params.workUnitId || "").trim(),
+    attempt_id: String(params.attemptId || "").trim(),
+    baseline_ref: String(params.baselineRef || "").trim(),
+    candidate_id: String(params.candidateId || "").trim(),
+    candidate_admission_ref: String(params.candidateAdmissionRef || "").trim() || undefined,
+    authority_ref: String(params.authorityRef || "").trim(),
+    return_contract: String(params.returnContract || "").trim(),
+    workspace_ref: String(params.workspaceRef || "").trim(),
+    path_prefixes: Array.isArray(params.pathPrefixes) ? params.pathPrefixes.map(String) : [],
+    semantic_scope: Array.isArray(params.semanticScope) ? params.semanticScope.map(String) : [],
+    assignment: String(params.assignment || ""),
+    description: String(params.description || ""),
+    idempotency_key: String(params.idempotencyKey || "").trim(),
+  };
+  const value = await runReadOnlySpawn(request, projectRoot, signal);
+  if (value.code !== 0 || value.details?.status !== "READY_TO_DISPATCH") {
+    return governedToolError(
+      value.details?.reason_code || "CONTROL_BIND_FAILED",
+      value.details?.message || "read-only child packet compilation failed",
+      value.details?.smallest_next_action || "Correct the typed read-only binding request and retry.",
+    );
+  }
+  return result(value);
+}
+async function executeQualifiedTaskTool(toolCallId, params, signal, ctx) {
+  if (!governedProfileEnabled()) {
+    return governedToolError(
+      "GOVERNED_PROFILE_REQUIRED",
+      "bbk_task_run is available only in governed-software mode",
+      "Enable governed-software mode before running a qualified task.",
+    );
+  }
+  const projectRoot = governedProjectRoot();
+  const sessionId = hostSessionIdentity(ctx);
+  if (!projectRoot || !sessionId) {
+    return governedToolError(
+      "BOUND_TASK_ACTOR_IDENTITY_REQUIRED",
+      "explicit BBK project root and stable OMP session identity are required; CWD is not authority",
+      "Bind the project and invoke the task from its exact worker session.",
+    );
+  }
+  if (governedHostVersion() !== "omp/16.4.8") {
+    return governedToolError(
+      "OMP_HOST_UNQUALIFIED_FOR_BOUND_TASK",
+      `host ${governedHostVersion()} is not qualified for bound mise task execution`,
+      "Use OMP 16.4.8 or re-qualify the changed host.",
+    );
+  }
+  const bindingRef = String(params.bindingRef || "").trim();
+  const hostReceipt = await recordGovernedHostDecision(
+    { toolName: "bbk_task_run", toolCallId, input: params },
+    ctx,
+    { bindingRef },
+  );
+  if (!hostReceipt || hostReceipt.code !== 0) {
+    return governedToolError(
+      hostReceipt?.details?.reason_code || "OMP_HOST_EVENT_RECEIPT_FAILED",
+      hostReceipt?.details?.message || "the qualified-task host event could not be correlated",
+      hostReceipt?.details?.smallest_next_action || "Repair the active worker binding before retrying.",
+    );
+  }
+  const request = {
+    schema: "bbk.bound-qualified-task-execution.v1",
+    host_version: governedHostVersion(),
+    session_id: sessionId,
+    invocation_id: String(params.invocationId || "").trim(),
+    binding_ref: bindingRef,
+    task: String(params.task || "").trim(),
+    arguments: Array.isArray(params.arguments) ? params.arguments.map(String) : [],
+    environment_allowlist: Array.isArray(params.environmentAllowlist) ? params.environmentAllowlist.map(String) : [],
+    idempotency_key: String(params.idempotencyKey || "").trim(),
+  };
+  const value = await runQualifiedTask(request, projectRoot, signal);
+  if (value.code !== 0 || value.details?.status !== "PASS") {
+    return governedToolError(
+      value.details?.reason_code || "BOUND_TASK_FAILED",
+      value.details?.message || (value.details?.status === "FAIL"
+        ? "qualified task failed or changed the candidate"
+        : "bound qualified task execution failed"),
+      value.details?.smallest_next_action || "Use a declared candidate-preserving task and the current worker binding.",
+    );
+  }
+  return result(value);
+}
+function parseReturnJson(value, field, fallback) {
+  if (value === undefined || value === null || String(value).trim() === "") return fallback;
+  try {
+    return typeof value === "string" ? JSON.parse(value) : value;
+  } catch (error) {
+    const failure = new Error(`${field} is not valid JSON: ${String(error?.message || error)}`);
+    failure.reasonCode = "ROLE_RETURN_REQUEST_INVALID_JSON";
+    throw failure;
+  }
+}
+function roleReturnField(params, directField, jsonField, fallback, { required = false } = {}) {
+  const hasDirect = Object.hasOwn(params, directField) && params[directField] !== undefined && params[directField] !== null;
+  const rawJson = params[jsonField];
+  const hasJson = rawJson !== undefined && rawJson !== null && String(rawJson).trim() !== "";
+  if (!hasDirect && !hasJson) {
+    if (required) {
+      const failure = new Error(`${directField} is required; supply the structured value directly or use compatibility field ${jsonField}`);
+      failure.reasonCode = "ROLE_RETURN_REQUEST_FIELD_REQUIRED";
+      throw failure;
+    }
+    return fallback;
+  }
+  const direct = hasDirect ? params[directField] : undefined;
+  const parsed = hasJson ? parseReturnJson(rawJson, jsonField, fallback) : undefined;
+  if (hasDirect && hasJson && governedPayloadDigest(direct) !== governedPayloadDigest(parsed)) {
+    const failure = new Error(`${directField} and ${jsonField} describe different values`);
+    failure.reasonCode = "ROLE_RETURN_REQUEST_AMBIGUOUS";
+    failure.smallestNextAction = `Use ${directField} directly; keep ${jsonField} only for an exact compatibility duplicate.`;
+    throw failure;
+  }
+  return hasDirect ? direct : parsed;
+}
+async function activeReturnToolContext(params, ctx) {
+  if (!governedProfileEnabled()) {
+    throw Object.assign(new Error("BBK structured-return tools are available only in governed-software mode"), {
+      reasonCode: "GOVERNED_PROFILE_REQUIRED",
+      smallestNextAction: "Enable governed-software mode and use the exact active child binding.",
+    });
+  }
+  const projectRoot = governedProjectRoot();
+  const sessionId = hostSessionIdentity(ctx);
+  if (!projectRoot || !sessionId) {
+    throw Object.assign(new Error("structured return requires an explicit BBK project root and stable OMP session identity"), {
+      reasonCode: "ROLE_RETURN_IDENTITY_REQUIRED",
+      smallestNextAction: "Invoke the tool from the exact activated BBK child session.",
+    });
+  }
+  return {
+    projectRoot,
+    sessionId,
+    bindingRef: String(params.bindingRef || "").trim(),
+    invocationId: String(params.invocationId || "").trim(),
+  };
+}
+async function executeReturnTemplateTool(toolCallId, params, signal, ctx) {
+  try {
+    const active = await activeReturnToolContext(params, ctx);
+    const hostReceipt = await recordGovernedHostDecision(
+      { toolName: "bbk_return_template", toolCallId, input: params },
+      ctx,
+      { bindingRef: active.bindingRef },
+    );
+    if (!hostReceipt || hostReceipt.code !== 0) {
+      return governedToolError(
+        hostReceipt?.details?.reason_code || "OMP_HOST_EVENT_RECEIPT_FAILED",
+        hostReceipt?.details?.message || "the role-return template query could not be correlated",
+        hostReceipt?.details?.smallest_next_action || "Repair the active binding and retry.",
+      );
+    }
+    const value = await runRoleReturn("template", {
+      schema: "bbk.role-return-template-query.v1",
+      session_id: active.sessionId,
+      binding_ref: active.bindingRef,
+      invocation_id: active.invocationId,
+      invocation_mode: String(params.invocationMode || "").trim() || undefined,
+    }, active.projectRoot, signal);
+    if (value.code !== 0 || value.details?.status !== "PASS") {
+      return governedToolError(
+        value.details?.reason_code || "ROLE_RETURN_TEMPLATE_FAILED",
+        value.details?.message || "the active role-return template could not be produced",
+        value.details?.smallest_next_action || "Use the exact active binding and declared role-parent route.",
+      );
+    }
+    return result(value);
+  } catch (error) {
+    return governedToolError(
+      error?.reasonCode || "ROLE_RETURN_TEMPLATE_FAILED",
+      String(error?.message || error),
+      error?.smallestNextAction || "Correct the typed template request and retry.",
+    );
+  }
+}
+async function executeReturnPrepareTool(toolCallId, params, signal, ctx) {
+  try {
+    const active = await activeReturnToolContext(params, ctx);
+    const hostReceipt = await recordGovernedHostDecision(
+      { toolName: "bbk_return_prepare", toolCallId, input: params },
+      ctx,
+      { bindingRef: active.bindingRef },
+    );
+    if (!hostReceipt || hostReceipt.code !== 0) {
+      return governedToolError(
+        hostReceipt?.details?.reason_code || "OMP_HOST_EVENT_RECEIPT_FAILED",
+        hostReceipt?.details?.message || "the role-return preparation could not be correlated",
+        hostReceipt?.details?.smallest_next_action || "Repair the active binding and retry.",
+      );
+    }
+    const nextAction = {
+      action: String(params.nextAction || "").trim(),
+      owner: String(params.nextActionOwner || "").trim(),
+      reason: String(params.nextActionReason || "").trim(),
+      affected_refs: Array.isArray(params.nextActionAffectedRefs)
+        ? params.nextActionAffectedRefs.map(value => ({ id: String(value) }))
+        : [],
+      unaffected_work_may_continue: Boolean(params.unaffectedWorkMayContinue),
+    };
+    if (nextAction.affected_refs.length === 0) delete nextAction.affected_refs;
+    const request = {
+      schema: "bbk.role-return-prepare.v1",
+      session_id: active.sessionId,
+      binding_ref: active.bindingRef,
+      invocation_id: active.invocationId,
+      invocation_mode: String(params.invocationMode || "").trim() || undefined,
+      return_kind: String(params.returnKind || "").trim(),
+      detail_level: String(params.detailLevel || "COMPACT").trim(),
+      operational_disposition: String(params.operationalDisposition || "").trim(),
+      semantic_state_value: String(params.semanticStateValue || "").trim(),
+      summary: String(params.summary || ""),
+      result: roleReturnField(params, "result", "resultJson", {}, { required: true }),
+      smallest_valid_next_action: nextAction,
+      authority_refs: roleReturnField(params, "authorityRefs", "authorityRefsJson", undefined),
+      allowed_effect_classes: Array.isArray(params.allowedEffectClasses) ? params.allowedEffectClasses.map(String) : [],
+      effects_used: roleReturnField(params, "effectsUsed", "effectsUsedJson", []),
+      denied_or_uncovered_effects: roleReturnField(params, "deniedOrUncoveredEffects", "deniedOrUncoveredEffectsJson", []),
+      violations_or_ambiguities: roleReturnField(params, "violationsOrAmbiguities", "violationsOrAmbiguitiesJson", []),
+      outputs: roleReturnField(params, "outputs", "outputsJson", undefined),
+      checks_and_evidence: roleReturnField(params, "checksAndEvidence", "checksAndEvidenceJson", undefined),
+      effects_and_cleanup: roleReturnField(params, "effectsAndCleanup", "effectsAndCleanupJson", undefined),
+      blockers_and_residuals: Array.isArray(params.blockersAndResiduals) ? params.blockersAndResiduals.map(String) : undefined,
+      prohibited_claims: Array.isArray(params.prohibitedClaims) ? params.prohibitedClaims.map(String) : undefined,
+      durable_handoff_refs: roleReturnField(params, "durableHandoffRefs", "durableHandoffRefsJson", undefined),
+      idempotency_key: String(params.idempotencyKey || "").trim(),
+    };
+    const value = await runRoleReturn("prepare", request, active.projectRoot, signal);
+    if (value.code !== 0 || value.details?.status !== "PASS") {
+      return governedToolError(
+        value.details?.reason_code || "ROLE_RETURN_PREPARE_FAILED",
+        value.details?.message || "role-return preparation failed",
+        value.details?.smallest_next_action || "Use bbk_return_template, repair the reported fields, and retry in the same attempt.",
+        {
+          diagnostics: Array.isArray(value.details?.diagnostics) ? value.details.diagnostics : undefined,
+          role: value.details?.role,
+          contract: value.details?.contract,
+          schema_path: value.details?.schema_path,
+          document_digest: value.details?.document_digest,
+        },
+      );
+    }
+    return result(value);
+  } catch (error) {
+    return governedToolError(
+      error?.reasonCode || "ROLE_RETURN_PREPARE_FAILED",
+      String(error?.message || error),
+      error?.smallestNextAction || "Correct the typed return fields and retry in the same attempt.",
+    );
+  }
+}
+async function guardYieldRoleReturn(event, ctx, pi) {
+  const toolName = String(event?.toolName || event?.tool_name || "").trim().toLowerCase();
+  if (toolName !== "yield" || !governedProfileEnabled()) return undefined;
+  const projectRoot = governedProjectRoot();
+  const sessionId = hostSessionIdentity(ctx);
+  if (!projectRoot || !sessionId) {
+    return governedBlock(
+      "BBK_ROLE_RETURN_IDENTITY_REQUIRED",
+      "governed yield requires an explicit BBK project root and stable OMP child session identity",
+      "Invoke yield only from the exact activated BBK child session.",
+    );
+  }
+  const policy = await runGovernanceRegistry(["binding-policy", "--session-id", sessionId], projectRoot);
+  if (policy.code !== 0 || policy.details?.status !== "PASS") {
+    return governedBlock(
+      policy.details?.reason_code || "BBK_ROLE_RETURN_BINDING_REQUIRED",
+      policy.details?.message || `no active immutable BBK binding exists for yielding session ${sessionId}`,
+      policy.details?.smallest_next_action || "Activate the exact child binding before yielding; do not bypass return validation.",
+    );
+  }
+  const toolCallId = String(event?.toolCallId || event?.tool_call_id || event?.id || "").trim();
+  const input = event?.input && typeof event.input === "object" ? event.input : {};
+  const data = input?.result?.data;
+  let value;
+  if (data?.schema === "bbk.prepared-role-return.v1" && typeof data?.return_ref === "string") {
+    return governedBlock(
+      "ROLE_RETURN_COMPLETE_YIELD_REQUIRED",
+      "OMP 16.4.8 exposes hidden yield to pre-effect validation but does not reliably apply a rewritten yield payload",
+      "Call bbk_return_prepare again and invoke hidden yield with the exact complete yield_input it returns.",
+    );
+  }
+  if (!data || typeof data !== "object" || Array.isArray(data)) {
+    return governedBlock(
+      "BBK_STRUCTURED_ROLE_RETURN_REQUIRED",
+      `binding ${String(policy.details.binding_ref || "unknown")} requires a schema-valid ${String(policy.details.return_contract || "role return")}`,
+      "Use bbk_return_template and bbk_return_prepare, then invoke the returned yield_input exactly.",
+    );
+  }
+  value = await runRoleReturn("validate", {
+    schema: "bbk.role-return-validate.v1",
+    session_id: sessionId,
+    binding_ref: policy.details.binding_ref,
+    invocation_id: policy.details.invocation_id,
+    document: data,
+    tool_call_id: toolCallId,
+  }, projectRoot);
+  if (value.code !== 0 || value.details?.status !== "PASS") {
+    if (typeof pi?.appendEntry === "function") pi.appendEntry("bbk-role-return-validation", value.details || {});
+    const diagnostic = Array.isArray(value.details?.diagnostics) && value.details.diagnostics.length
+      ? `; first error ${value.details.diagnostics[0].instance_pointer || "/"}: ${value.details.diagnostics[0].message}`
+      : "";
+    return governedBlock(
+      value.details?.reason_code || "BBK_ROLE_RETURN_SCHEMA_INVALID",
+      `${value.details?.message || "role return did not satisfy its declared schema"}${diagnostic}`,
+      value.details?.smallest_next_action || "Use bbk_return_template, repair only the reported fields, and retry in the same attempt.",
+    );
+  }
+  if (!value.details?.prepared_return_verified) {
+    return governedBlock(
+      "ROLE_RETURN_PREPARATION_REQUIRED",
+      "the schema-valid role return is not bound to an immutable bbk_return_prepare record",
+      "Call bbk_return_prepare with the same role-specific facts, then invoke hidden yield with its exact complete yield_input.",
+    );
+  }
+  if (typeof pi?.appendEntry === "function") pi.appendEntry("bbk-role-return-validation", value.details);
+  return undefined;
+}
+
+async function executeControlSpawnTool(toolCallId, params, signal, ctx) {
+  if (!governedProfileEnabled()) {
+    return governedToolError(
+      "GOVERNED_PROFILE_REQUIRED",
+      "bbk_control_spawn is available only in governed-software mode",
+      "Enable the governed-software profile before compiling a writable child.",
+    );
+  }
+  const projectRoot = governedProjectRoot();
+  const parentSessionId = hostSessionIdentity(ctx);
+  if (!projectRoot || !parentSessionId) {
+    return governedToolError(
+      "BOUND_SPAWN_PARENT_IDENTITY_REQUIRED",
+      "explicit BBK project root and stable OMP parent session are required; CWD is not authority",
+      "Bind the project and use the qualified OMP session surface.",
+    );
+  }
+  if (governedHostVersion() !== "omp/16.4.8") {
+    return governedToolError(
+      "OMP_HOST_UNQUALIFIED_FOR_SPAWN",
+      `host ${governedHostVersion()} is not qualified for bound writable spawn`,
+      "Use OMP 16.4.8 or re-qualify the changed host.",
+    );
+  }
+  const parentBindingRef = String(params.parentBindingRef || "").trim();
+  const hostReceipt = await recordGovernedHostDecision(
+    { toolName: "bbk_control_spawn", toolCallId, input: params },
+    ctx,
+    { bindingRef: parentBindingRef },
+  );
+  if (!hostReceipt || hostReceipt.code !== 0) {
+    return governedToolError(
+      hostReceipt?.details?.reason_code || "OMP_HOST_EVENT_RECEIPT_FAILED",
+      hostReceipt?.details?.message || "the writable spawn host event could not be correlated",
+      hostReceipt?.details?.smallest_next_action || "Repair the parent binding before retrying.",
+    );
+  }
+  const request = {
+    schema: "bbk.bound-worker-spawn-create.v1",
+    host_version: governedHostVersion(),
+    parent_binding_ref: parentBindingRef,
+    parent_session_id: parentSessionId,
+    parent_invocation_id: String(params.parentInvocationId || "").trim(),
+    task_name: String(params.taskName || "").trim(),
+    role: String(params.role || "").trim(),
+    work_unit_id: String(params.workUnitId || "").trim(),
+    attempt_id: String(params.attemptId || "").trim(),
+    baseline_ref: String(params.baselineRef || "").trim(),
+    candidate_ref: String(params.candidateRef || "").trim(),
+    authority_ref: String(params.authorityRef || "").trim(),
+    return_contract: String(params.returnContract || "").trim(),
+    return_transport_mode: String(params.returnTransportMode || "STRUCTURED_RETURN_FIRST").trim(),
+    material_transport_reason: String(params.materialTransportReason || "").trim(),
+    parent_revision: String(params.parentRevision || "").trim(),
+    workspace_parent: String(params.workspaceParent || "").trim(),
+    path_prefixes: Array.isArray(params.pathPrefixes) ? params.pathPrefixes.map(String) : [],
+    mutation_classes: Array.isArray(params.mutationClasses) ? params.mutationClasses.map(String) : [],
+    semantic_scope: Array.isArray(params.semanticScope) ? params.semanticScope.map(String) : [],
+    assignment: String(params.assignment || ""),
+    description: String(params.description || ""),
+    idempotency_key: String(params.idempotencyKey || "").trim(),
+  };
+  const value = await runWorkerSpawn(request, projectRoot, signal);
+  const acceptedStatuses = new Set(["READY_TO_DISPATCH", "DISPATCH_LEASED", "ACTIVATED", "TERMINAL"]);
+  if (value.code !== 0 || !acceptedStatuses.has(String(value.details?.status || ""))) {
+    return governedToolError(
+      value.details?.reason_code || "BOUND_SPAWN_FAILED",
+      value.details?.message || "bound worker packet compilation failed",
+      value.details?.smallest_next_action || "Correct the typed spawn request and retry.",
+    );
+  }
+  return result(value);
+}
+async function executeDispatchStatusTool(_toolCallId, params, signal, ctx) {
+  if (!governedProfileEnabled()) {
+    return governedToolError(
+      "GOVERNED_PROFILE_REQUIRED",
+      "bbk_control_dispatch_status is available only in governed-software mode",
+      "Enable governed-software mode and query the current dispatch token.",
+    );
+  }
+  const projectRoot = governedProjectRoot();
+  const parentSessionId = hostSessionIdentity(ctx);
+  if (!projectRoot || !parentSessionId) {
+    return governedToolError(
+      "OMP_PARENT_SESSION_REQUIRED",
+      "dispatch status requires the exact governed project and stable parent session",
+      "Use the qualified OMP parent session that created the reservation.",
+    );
+  }
+  const dispatchRef = String(params.dispatchRef || "").trim();
+  const value = await runGovernanceRegistry([
+    "dispatch-status",
+    "--dispatch-ref", dispatchRef,
+    "--parent-session-id", parentSessionId,
+    "--observed-at", new Date().toISOString(),
+  ], projectRoot, signal);
+  if (value.code !== 0 || !["READY", "LEASED", "ACTIVATED", "TERMINAL"].includes(String(value.details?.status || ""))) {
+    return governedToolError(
+      value.details?.reason_code || "OMP_SPAWN_DISPATCH_STATUS_FAILED",
+      value.details?.message || "dispatch status could not be resolved",
+      value.details?.smallest_next_action || "Use the exact dispatch_ref returned by BBK.",
+    );
+  }
+  return result(value);
+}
+async function executeControlPlaneTool(toolCallId, requestSchema, params, signal, ctx) {
+  if (!governedProfileEnabled()) {
+    return governedToolError(
+      "GOVERNED_PROFILE_REQUIRED",
+      `${TOOL_NAME_BY_CONTROL_SCHEMA[requestSchema] || "BBK control tool"} is available only in governed-software mode`,
+      "Enable the governed-software profile before issuing coordination effects.",
+    );
+  }
+  const projectRoot = governedProjectRoot();
+  const sessionId = hostSessionIdentity(ctx);
+  if (!projectRoot || !sessionId) {
+    return governedToolError(
+      "CONTROL_PLANE_ACTOR_IDENTITY_REQUIRED",
+      "explicit BBK project root and stable OMP session identity are required; CWD is not authority",
+      "Bind the project and invoke the tool from the qualified OMP session surface.",
+    );
+  }
+  if (governedHostVersion() !== "omp/16.4.8") {
+    return governedToolError(
+      "CONTROL_PLANE_HOST_UNQUALIFIED",
+      `host ${governedHostVersion()} is not qualified for enforced orchestrator control effects`,
+      "Use OMP 16.4.8 or re-qualify the changed host contract.",
+    );
+  }
+  const bindingRef = String(params.bindingRef || "").trim();
+  const request = {
+    schema: requestSchema,
+    host_version: governedHostVersion(),
+    session_id: sessionId,
+    binding_ref: bindingRef,
+    invocation_id: String(params.invocationId || "").trim(),
+    command_id: String(params.commandId || "").trim(),
+    work_unit_id: String(params.workUnitId || "").trim(),
+    attempt_id: String(params.attemptId || "").trim(),
+    correlation_id: String(params.correlationId || "").trim(),
+    payload_summary: String(params.payloadSummary || ""),
+    expected_revision: params.expectedRevision,
+    idempotency_key: String(params.idempotencyKey || "").trim(),
+    evidence_refs: Array.isArray(params.evidenceRefs) ? params.evidenceRefs.map(String) : [],
+    finding_refs: Array.isArray(params.findingRefs) ? params.findingRefs.map(String) : [],
+  };
+  if (requestSchema === "bbk.control-assign.v1") {
+    request.worker_binding_ref = String(params.workerBindingRef || "").trim();
+    request.attempt_registration_ref = String(params.attemptRegistrationRef || "").trim();
+  } else if (requestSchema === "bbk.control-update.v1") {
+    request.transition = String(params.transition || "").trim();
+  } else if (requestSchema === "bbk.control-integrate-request.v1") {
+    request.source_candidate_refs = Array.isArray(params.sourceCandidateRefs) ? params.sourceCandidateRefs.map(String) : [];
+    request.target_candidate_ref = String(params.targetCandidateRef || "").trim();
+    request.conflict_classification = String(params.conflictClassification || "").trim();
+  }
+  const hostReceipt = await recordGovernedHostDecision(
+    { toolName: TOOL_NAME_BY_CONTROL_SCHEMA[requestSchema] || "bbk_control", toolCallId, input: params },
+    ctx,
+    { bindingRef },
+  );
+  if (!hostReceipt || hostReceipt.code !== 0) {
+    return governedToolError(
+      hostReceipt?.details?.reason_code || "OMP_HOST_EVENT_RECEIPT_FAILED",
+      hostReceipt?.details?.message || "the control-plane host event could not be durably correlated",
+      hostReceipt?.details?.smallest_next_action || "Repair the active binding/host identity before retrying.",
+    );
+  }
+  return result(await runControlPlane(request, projectRoot, signal));
+}
+const TOOL_NAME_BY_CONTROL_SCHEMA = Object.freeze({
+  "bbk.control-assign.v1": "bbk_control_assign",
+  "bbk.control-update.v1": "bbk_control_update",
+  "bbk.control-integrate-request.v1": "bbk_control_integrate_request",
+});
+function governedFilesystemPayload(operation, params) {
+  if (operation === "WRITE") {
+    return { content: String(params.content ?? ""), encoding: String(params.encoding || "utf-8") };
+  }
+  if (operation === "EDIT") {
+    return {
+      old_text: String(params.oldText ?? ""),
+      new_text: String(params.newText ?? ""),
+      replace_all: Boolean(params.replaceAll),
+    };
+  }
+  return {};
+}
+async function executeGovernedFilesystemTool(toolCallId, operation, params, signal, ctx) {
+  if (!governedProfileEnabled()) {
+    return governedToolError(
+      "GOVERNED_PROFILE_REQUIRED",
+      `bbk_governed_${operation.toLowerCase()} is available only in governed-software mode`,
+      "Enable the explicit governed-software profile or use the baseline non-governed tool surface.",
+    );
+  }
+  const projectRoot = governedProjectRoot();
+  if (!projectRoot) {
+    return governedToolError(
+      "GOVERNED_PROJECT_ROOT_REQUIRED",
+      "no explicit BBK project root is bound; process CWD is not accepted as mutation authority",
+      "Set BBK_PROJECT_ROOT or load a valid project-scoped BBK package binding.",
+    );
+  }
+  const sessionId = hostSessionIdentity(ctx);
+  if (!sessionId) {
+    return governedToolError(
+      "OMP_SESSION_ID_REQUIRED",
+      "OMP did not expose a stable session identity; CWD fallback is not accepted",
+      "Use a qualified host/session surface before invoking governed filesystem tools.",
+    );
+  }
+  const hostVersion = governedHostVersion();
+  if (hostVersion !== "omp/16.4.8") {
+    return governedToolError(
+      "MUTATION_HOST_UNQUALIFIED",
+      `host ${hostVersion || "unknown"} is not qualified for governed pre-effect mutation`,
+      "Use OMP 16.4.8 or re-qualify the changed host before writable execution.",
+    );
+  }
+  const bindingRef = String(params.bindingRef || "").trim();
+  const invocationId = String(params.invocationId || "").trim();
+  const relativePath = String(params.path || "").trim();
+  const idempotencyKey = String(params.idempotencyKey || "").trim();
+  const mutationClass = String(params.mutationClass || (operation === "READ" ? "READ_ONLY" : "")).trim();
+  if (!bindingRef || !invocationId || !relativePath || !idempotencyKey || !mutationClass) {
+    return governedToolError(
+      "MUTATION_IDENTITY_INCOMPLETE",
+      "bindingRef, invocationId, path, mutationClass, and idempotencyKey are required",
+      "Use the exact identities and scope supplied in the immutable worker binding.",
+    );
+  }
+  const payload = governedFilesystemPayload(operation, params);
+  const preconditionKind = String(params.preconditionKind || (operation === "READ" ? "PRESENT" : "ANY")).toUpperCase();
+  const expectedPrecondition = { kind: preconditionKind };
+  if (preconditionKind === "SHA256") expectedPrecondition.sha256 = String(params.expectedSha256 || "").trim();
+  const envelope = {
+    schema: "bbk.governed-filesystem-execution.v1",
+    host_version: hostVersion,
+    session_id: sessionId,
+    invocation_id: invocationId,
+    intent: {
+      schema: "bbk.mutation-intent.v1",
+      binding_ref: bindingRef,
+      operation,
+      path: relativePath,
+      content_or_patch_digest: governedPayloadDigest(payload),
+      expected_precondition: expectedPrecondition,
+      mutation_class: mutationClass,
+      idempotency_key: idempotencyKey,
+    },
+    payload,
+  };
+  const hostReceipt = await recordGovernedHostDecision(
+    { toolName: `bbk_governed_${operation.toLowerCase()}`, toolCallId, input: params },
+    ctx,
+    { bindingRef },
+  );
+  if (!hostReceipt || hostReceipt.code !== 0) {
+    return governedToolError(
+      hostReceipt?.details?.reason_code || "OMP_HOST_EVENT_RECEIPT_FAILED",
+      hostReceipt?.details?.message || "the pre-effect host event could not be durably correlated",
+      hostReceipt?.details?.smallest_next_action || "Repair the active binding/host identity before retrying.",
+    );
+  }
+  return result(await runGovernedFilesystem(envelope, projectRoot, signal));
+}
 function runBbk(args, cwd, signal) {
   return new Promise((resolve, reject) => {
     const child = spawn(pythonCommand(), [...commandPrefix(), "--json", ...args], {
@@ -440,8 +1640,12 @@ function registerCommand(pi, name, description, baseArgv, { requireArgs = false 
 }
 const BBK_MODE_ENTRY_TYPE = "bbk-mode-state";
 const BBK_MODE_SCHEMA = "bbk.omp-mode-state.v2";
+const BBK_RUNTIME_SYMBOL = Symbol.for("bbk.omp.runtime.v1");
+const BBK_COORDINATION_PROBE_INTERVAL_MS = 300_000;
 const BBK_PROMPT_RECEIPT_ENTRY_TYPE = "bbk-effective-prompt-receipt";
 const BBK_PROMPT_RECEIPT_SCHEMA = "bbk.effective-prompt-receipt.v2";
+const BBK_PROMPT_COMPILATION_ENTRY_TYPE = "bbk-prompt-compilation-event";
+const BBK_PROMPT_COMPILATION_SCHEMA = "bbk.prompt-compilation-event.v1";
 const BBK_PROMPT_STATUS_SCHEMA = "bbk.prompt-status.v2";
 const BBK_PROMPT_INTEGRITY_STATUS_KEY = "bbk-prompt-integrity";
 const BBK_ACTIVITY_WIDGET_KEY = "bbk-worker-activity";
@@ -460,7 +1664,6 @@ const BBK_CONTROLLER_PROMPT_MARKER = "<bbk-controller-system";
 const BBK_AGENT_PROMPT_MARKER = "<bbk-agent-system";
 const BBK_AGENT_BLOCK_RE = /<bbk-agent-system\b[^>]*\brole="([^"]+)"[^>]*>[\s\S]*?<\/bbk-agent-system>/i;
 const BBK_ROLE_NAME_RE = /^bbk_[a-z0-9_]+$/;
-const CONTROLLER_MANDATORY_SKILLS = ["bbk", "bbk-context-routing"];
 
 function oneLine(value, max = 180) {
   const text = String(value ?? "")
@@ -542,6 +1745,31 @@ function stripFrontmatter(raw, sourceLabel) {
 function packageText(...parts) {
   const target = path.join(packageRoot, ...parts);
   return readFileSync(target, "utf8");
+}
+let cachedProjectionManifest;
+function projectionManifest() {
+  if (cachedProjectionManifest) return cachedProjectionManifest;
+  const value = JSON.parse(packageText("projections", "manifest.json"));
+  if (value?.schema !== "bbk.projection-manifest.v10"
+    || value?.package_version !== version
+    || !value?.agents || !value?.controllers?.omp) {
+    throw new Error("installed projection manifest is missing required prompt-compilation metadata");
+  }
+  cachedProjectionManifest = value;
+  return value;
+}
+function promptCompilationTemplate(identity) {
+  if (!identity || !["controller", "agent"].includes(identity.kind)) return null;
+  const manifest = projectionManifest();
+  const value = identity.kind === "controller"
+    ? manifest.controllers?.omp?.event
+    : manifest.agents?.[identity.role]?.prompt_compilation_events?.omp;
+  if (!value || value.schema !== BBK_PROMPT_COMPILATION_SCHEMA
+    || value.harness !== "OMP" || !Array.isArray(value.procedure_ids)
+    || value.procedure_ids.length === 0) {
+    throw new Error(`installed prompt-compilation event is invalid for ${identity?.role || identity?.kind || "unknown"}`);
+  }
+  return value;
 }
 function loadControllerSkill(name) {
   const body = stripFrontmatter(
@@ -678,6 +1906,8 @@ function exactRoleReturnContractBlock(role, catalogueEntry) {
   return [
     `<bbk-exact-role-return-contract role="${role.name}">`,
     "Return one JSON object. New returns use v2 COMPACT by default; conversational prose is not a substitute.",
+    "Use bbk_return_template when the role-specific payload shape is not already exact, then call bbk_return_prepare. Invoke hidden yield with the returned complete yield_input exactly; do not hand-author or abbreviate the common envelope.",
+    "The yield pre-effect hook validates every direct return against the bound role schema and rejects malformed returns with focused same-attempt repair diagnostics.",
     "schema: bbk.role-return.v2",
     `contract: ${contract.v2_contract_id}`,
     `envelope_schema: ${contract.v2_envelope_schema}`,
@@ -978,7 +2208,8 @@ function promptReceiptSummary(blocks) {
   };
 }
 function promptOuterIdentity(text) {
-  const value = String(text || "");
+  const raw = String(text || "");
+  const value = raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, "");
   const child = value.match(/^\s*<bbk-agent-replacement\b[^>]*\brole="([^"]+)"/i);
   if (child) return { kind: "agent", role: child[1] };
   if (/^\s*<bbk-controller-system\b/i.test(value)) return { kind: "controller", role: "Main" };
@@ -1312,9 +2543,22 @@ function extractBbkAgentBlock(event) {
     throw new Error(`BBK role ${roleName} prompt does not match the installed canonical projection`);
   }
   for (const skill of role.mandatory_skills || []) {
-    if (!roleBlock.includes(`<bbk-inlined-skill name="${skill}"`)) {
-      throw new Error(`BBK role ${roleName} is missing mandatory inlined skill ${skill}`);
+    const manifestMarker = `- id: ${skill}`;
+    const bodyMarker = role.primary_skill === skill
+      ? `### Compiled primary procedure: \`${skill}\``
+      : `### Compiled procedure: \`${skill}\``;
+    if (countLiteral(roleBlock, manifestMarker) !== 1
+      || countLiteral(roleBlock, bodyMarker) !== 1
+      || !roleBlock.includes("catalog_visibility: SUPPRESSED")
+      || !roleBlock.includes("state: COMPILED_COMPLETE")) {
+      throw new Error(`BBK role ${roleName} is missing compiled procedure ${skill}`);
     }
+    if (roleBlock.includes(`<bbk-inlined-skill name="${skill}"`)) {
+      throw new Error(`BBK role ${roleName} exposes legacy inlined skill markup for ${skill}`);
+    }
+  }
+  if (!roleBlock.includes("## End compiled procedures")) {
+    throw new Error(`BBK role ${roleName} has no closed compiled-procedure tail`);
   }
   for (const moduleId of role.prompt_modules || []) {
     const marker = `<bbk-prompt-module id="${moduleId}">`;
@@ -1357,75 +2601,23 @@ function runtimeBlock(ctx) {
     "</bbk-runtime-context>",
   ].join("\n");
 }
-function inlinedControllerSkills() {
-  return CONTROLLER_MANDATORY_SKILLS.map(name => [
-    `<bbk-inlined-skill name="${name}" source="shared/skills/${name}/SKILL.md">`,
-    loadControllerSkill(name),
-    "</bbk-inlined-skill>",
-  ].join("\n")).join("\n\n");
+function generatedControllerProjection(ctx) {
+  const source = packageText("projections", "omp", "controllers", "bbk_controller.md");
+  const marker = "## Compiled procedures manifest";
+  if (!source.includes(marker) || !source.includes("## End compiled procedures")) {
+    throw new Error("installed OMP controller projection has no closed compiled-procedure tail");
+  }
+  // Runtime data is inserted before the compiled procedure tail so the
+  // generated primary procedure remains the final semantic instruction.
+  return source.replace(marker, `${runtimeBlock(ctx)}
+
+${marker}`);
 }
 function buildControllerSystemPrompt(ctx) {
-  roleCatalogue(); // Fail closed if the installed role catalogue is unavailable or stale.
-  return [
-    `<bbk-controller-system package-version="${version}">`,
-    "",
-    "# BBK OMP harness-root controller",
-    "",
-    "This is the complete system prompt for an active BBK parent session. It replaces, rather than appends to, OMP's generic workflow prompt and compatibility-discovered context. Do not follow planning, delegation, validation, completion, anti-ceremony, `spawn_agent`, or client-specific instructions inherited from `.codex`, `.claude`, `.gemini`, or another harness. OMP tool schemas and runtime containment still define physical capability; they do not create BBK authority.",
-    "",
-    "## Identity and user channel",
-    "",
-    "- You are the OMP peer whose kind is `main`, normally named `Main`, and the sole BBK identity that may focus the terminal and interact with the user.",
-    "- You are a controller and relay, not a Wayfinder, Orchestrator, Worker, Reviewer, Validator, Architect, or Question Guide. Never imitate, abbreviate, or absorb a canonical role's substantive work.",
-    "- Every named `bbk_*` agent is a non-user-facing child, including roles whose names contain `root`, `guide`, `orchestrator`, or `reviewer`.",
-    "- Canonical roles communicate through OMP `hub`/IRC. Use `hub` roster data; never invent peer IDs. A send receipt, timeout, silence, or missing heartbeat is not a decision or proof of failure.",
-    "- BBK mode remains session-local and active until `/bbk:exit`; that command restores ordinary OMP prompt behavior for subsequent Main turns.",
-    "",
-    "## Turn procedure",
-    "",
-    "1. Inspect live `hub` messages, the roster/jobs, and current `.bbk` state before creating a new root child.",
-    "2. If the user message answers, corrects, steers, cancels, or authorizes an existing BBK request, collect coherent answers into one response packet and relay it through `hub` to the exact requesting peer or active logical root, preserving every request/message ID and using `replyTo` when available. For baseline acceptance, execution authority, or accepted planning decisions, resume the originating Root Wayfinder so it can integrate the response; do not launch a duplicate or successor root from the raw user answer.",
-    "3. Otherwise select exactly one canonical root: no accepted baseline, planning, architecture, design, ambiguity, or material uncertainty -> `bbk_root_wayfinder`; execution or recovery -> `bbk_root_orchestrator` only after the responsible Root Wayfinder has integrated accountable acceptance and current execution authority and returned `READY_TO_EXECUTE` with an exact executable work-graph reference; bounded independent review -> `bbk_reviewer`; assertion-scoped candidate acceptance -> `bbk_validator_orchestrator`. When planning readiness is proposed, missing, stale, or conditional, resume `bbk_root_wayfinder` instead.",
-    "4. Invoke that named agent with OMP `task`, preferably as a background/non-blocking job so Main remains available for user relay. When OMP advertises the batch form, use `{ context, tasks: [{ name, agent, task, ... }] }` even for one root: `agent` is the exact canonical `bbk_*` role, `name` is a stable IRC/job identifier, and `task` is the complete self-contained assignment. Never put the role name only in `name` while omitting `agent`. If OMP advertises only a flat form, follow that schema and carry reusable shared background through a durable `local://` context file. Supply exact subject, desired result, bounded context, authority and standing approvals, allowed effects, capability zones, assurance obligations, stopping conditions, logical parent, Main peer ID, branch/request IDs, and return envelope.",
-    "5. Before dispatch, perform only bounded controller operations required to recover state and compile the invocation. Do not select architecture, write the operating plan, edit subject files, execute product work, review, validate, or certify in Main.",
-    "6. Supervise through task state and `hub`. Continue useful controller work and wait only when no other valid action remains. Resume or message the same logical child when possible instead of restarting discovery.",
-    "",
-    "## Human-request relay",
-    "",
-    "- A child first classifies an unresolved item as ENVIRONMENT_FACT, CONFIGURATION_PARAMETER, REVERSIBLE_IMPLEMENTATION_CHOICE, ARCHITECTURAL_DECISION, AUTHORITY_EXPANSION, or USER_RESERVED_PREFERENCE. Only a material architectural branch with several viable consequential alternatives, an authority expansion, a user-reserved preference, protected-floor exception, hard-to-reverse commitment, private-context need, or accountable acceptance normally warrants `BBK_USER_REQUEST`. Discover, parameterize, safely default, or defer ordinary facts and reversible choices.",
-    "- A child needing such input sends Main one compact `BBK_USER_REQUEST` packet over `hub`/IRC. It must include stable request IDs, exact subjects, classification, smallest material questions, recommendations, credible materially different alternatives, consequences, residual uncertainty, blocking state, unaffected work, and durable packet references.",
-    "- Use OMP's native `ask` tool for every user-facing question or decision request. Do not put a question in ordinary assistant prose and wait for an answer. Anything phrased as a question outside an `ask` tool call is informational text only: it is not a pending BBK question, does not establish a decision surface, and must not be treated as answered.",
-    "- Translate coherent child requests into the smallest adequate single `ask` interaction, preserving every request ID and recommendation. Do not answer on the user's behalf or substitute your own design judgment.",
-    "- Only a structured answer returned by `ask` is eligible to become an ADR-compatible accepted decision. Relay coherent answers in one `BBK_USER_RESPONSE_BATCH` packet to the exact requesting logical role, with every matching request ID and `source: omp.ask`, and notify its integrating parent when required. Main never authors the ADR, baseline acceptance, or execution-authorization record; the responsible canonical role records and integrates the response and continues its branch.",
-    "- Ordinary user prose may steer, correct, cancel, or grant operational authority, but it is not an answer to an unissued prose question and must not be converted into an ADR. When durable decision authority is required, obtain or confirm it through `ask` first. Silence, timeout, cancellation, `Chat about this`, a send receipt, or anticipated answers are not acceptance. Baseline acceptance and execution authority return to the originating Root Wayfinder for durable integration before execution routing.",
-    "- Keep IRC concise and plain prose. Large or authority-bearing material belongs in a durable handoff; relay path, bytes, SHA-256, disposition, and smallest next action.",
-    "",
-    "## Execution autonomy",
-    "",
-    "- Once an accepted baseline and applicable authority are bound, do not interrupt the user for routine plan-detail corrections, local sequencing, reversible implementation choices, ordinary repairs, compatible dependency substitutions, or a technical blocker with one safe realistic scope-preserving resolution inside current authority. Route the work to the responsible role, record the deviation and rationale, and continue.",
-    "- Request a user decision only for a genuine material branch with at least two viable consequential paths, an explicitly user-reserved preference, or an authority expansion. A sole path outside current authority still requires the smallest exact additional grant; pause only the affected scope.",
-    "",
-    "## Authority and completion vocabulary",
-    "",
-    "- `WORKSPACE_IMPLEMENTATION` covers producing source, scripts, configuration, tests, documentation, packages, and local non-destructive verification inside the exact authorized workspace. `EXTERNAL_EXECUTION` separately covers real-host or remote-system installation, connection, credential use, provisioning, deployment, service, firewall, network, publication, release, or migration effects.",
-    "- `PRODUCE_ONLY` grants `WORKSPACE_IMPLEMENTATION` and withholds `EXTERNAL_EXECUTION`. Continue to produce and locally verify the requested implementation artifacts; stop before the first external effect. Do not ask for deployment authority merely to create reviewable scripts or configuration in the workspace.",
-    "- Use exact independent completion claims: `PLANNING_COMPLETE`, `IMPLEMENTATION_ARTIFACTS_COMPLETE`, `BYTE_INTEGRITY_VERIFIED`, `SEMANTIC_REVIEW_COMPLETE`, `DEPLOYMENT_AUTHORIZED`, `DEPLOYMENT_PERFORMED`, and `LIVE_ACCEPTANCE_VERIFIED`. Never collapse one into another; name absent claims explicitly.",
-    "",
-    "## Non-bypass rule",
-    "",
-    "Absence of `.bbk` records is a greenfield Wayfinding condition, not permission to bypass BBK. Do not dismiss BBK as ceremony, overhead, over-engineering, or disproportionate process. Proportionality is decided inside the selected canonical procedure.",
-    "",
-    runtimeBlock(ctx),
-    "",
-    "# Inlined mandatory controller procedures",
-    "",
-    "The following procedure bodies are mandatory and already available. Apply them directly; do not spend a Skill/read call reloading them.",
-    "",
-    inlinedControllerSkills(),
-    "",
-    "</bbk-controller-system>",
-  ].join("\n");
+  roleCatalogue();
+  return generatedControllerProjection(ctx);
 }
+
 function buildAgentSystemPrompt(extracted, ctx) {
   const invocation = extracted.invocation || {};
   const invocationLines = [
@@ -1464,8 +2656,6 @@ function buildAgentSystemPrompt(extracted, ctx) {
     invocationLines.join("\n"),
     "",
     extracted.roleBlock,
-    "",
-    exactRoleReturnContractBlock(extracted.role, extracted.catalogueEntry),
     "",
     "</bbk-agent-replacement>",
   ].join("\n");
@@ -2161,6 +3351,7 @@ function createBbkModeController(pi, onStateChange = () => {}) {
   const latestProviderBySession = new Map();
   const integrityBySession = new Map();
   const recordedReplacementDigests = new Set();
+  const recordedCompilationEvents = new Set();
 
   function appendPromptReceipt(data) {
     if (typeof pi.appendEntry !== "function") return;
@@ -2169,6 +3360,25 @@ function createBbkModeController(pi, onStateChange = () => {}) {
       package_version: version,
       observed_at: new Date().toISOString(),
       ...data,
+    });
+  }
+  function appendPromptCompilationEvent(identity, effective, sessionId, reused) {
+    if (typeof pi.appendEntry !== "function") return;
+    const template = promptCompilationTemplate(identity);
+    if (!template) return;
+    const eventKey = `${sessionId}:${turnSequence}:${identity?.role || identity?.kind}:${effective.sha256}:${reused ? "reuse" : "compile"}`;
+    if (recordedCompilationEvents.has(eventKey)) return;
+    recordedCompilationEvents.add(eventKey);
+    pi.appendEntry(BBK_PROMPT_COMPILATION_ENTRY_TYPE, {
+      ...template,
+      event: reused ? "PROMPT_REUSED" : "PROMPT_COMPILED",
+      logical_child_id: `omp:${sessionId}:${identity?.role || "bbk_controller"}`,
+      physical_attempt_id: `omp:${sessionId}:${turnSequence}`,
+      effective_prompt_sha256: effective.sha256,
+      source_reads_by_compiler: reused ? 0 : Number(template.source_reads_by_compiler || template.procedure_ids.length),
+      procedure_reads_by_model: 0,
+      reused: Boolean(reused),
+      observed_at: new Date().toISOString(),
     });
   }
   function expectedReceiptSummary(binding) {
@@ -2253,7 +3463,10 @@ function createBbkModeController(pi, onStateChange = () => {}) {
     };
     rememberExpectedPrompt(sessionId, binding);
     const key = `${sessionId}:${status}:${identity.role || identity.kind}:${effective.sha256}`;
-    if (recordedReplacementDigests.has(key)) return binding;
+    if (recordedReplacementDigests.has(key)) {
+      appendPromptCompilationEvent(identity, effective, sessionId, true);
+      return binding;
+    }
     recordedReplacementDigests.add(key);
     const genericDetected = sourceHasGenericPromptMaterial(sourceBlocks);
     appendPromptReceipt({
@@ -2273,6 +3486,7 @@ function createBbkModeController(pi, onStateChange = () => {}) {
       enforcement: "PROVIDER_PAYLOAD_GUARD_BOUND",
       raw_prompt_persisted: false,
     });
+    appendPromptCompilationEvent(identity, effective, sessionId, false);
     return binding;
   }
   function setPromptIntegrityUi(ctx, sessionId, action, detail = "") {
@@ -2694,6 +3908,133 @@ function createBbkModeController(pi, onStateChange = () => {}) {
     promptStatus, currentPromptBinding, isControllerSession,
     isEnabled: () => enabled,
   };
+}
+
+
+function createBbkCoordinationThrottle(bbkMode, activity) {
+  const states = new Map();
+
+  function stateFor(ctx) {
+    const key = promptSessionIdentity(ctx);
+    let state = states.get(key);
+    if (!state) {
+      state = {
+        session_id: key,
+        dispatch_observed: false,
+        dispatched_at_ms: null,
+        last_probe_at_ms: null,
+        next_probe_at_ms: null,
+      };
+      states.set(key, state);
+    }
+    return state;
+  }
+  function activeBinding(ctx) {
+    if (!bbkMode.isEnabled()) return false;
+    const binding = bbkMode.currentPromptBinding(ctx);
+    // A controller may dispatch in its first governed turn immediately after
+    // mode activation. The durable mode state is sufficient before that first
+    // prompt receipt is materialized; later calls retain the exact binding.
+    return Boolean(binding || bbkMode.ensure(ctx));
+  }
+  function activeCount() {
+    try { return Number(activity?.snapshot?.({ activeOnly: true })?.active_count || 0); }
+    catch { return 0; }
+  }
+  function noteTaskDispatch(ctx) {
+    if (!activeBinding(ctx)) return;
+    const now = Date.now();
+    const state = stateFor(ctx);
+    state.dispatch_observed = true;
+    state.dispatched_at_ms = now;
+    state.next_probe_at_ms = now + BBK_COORDINATION_PROBE_INTERVAL_MS;
+  }
+  function reset(ctx) {
+    states.delete(promptSessionIdentity(ctx));
+  }
+  function status(ctx) {
+    const state = stateFor(ctx);
+    return {
+      schema: "bbk.omp-coordination-throttle.v1",
+      package_version: version,
+      session_id: state.session_id,
+      minimum_probe_interval_ms: BBK_COORDINATION_PROBE_INTERVAL_MS,
+      active_count: activeCount(),
+      ...state,
+    };
+  }
+  function waitingJobInput(input) {
+    const keys = Object.keys(input || {}).filter(key => !["i", "intent"].includes(key));
+    return keys.length === 0;
+  }
+  function guard(event, ctx) {
+    if (!activeBinding(ctx)) return undefined;
+    const toolName = String(event?.toolName || event?.tool_name || "").trim().toLowerCase();
+    if (!["job", "irc", "hub"].includes(toolName)) return undefined;
+    const input = event?.input && typeof event.input === "object" ? event.input : {};
+    const state = stateFor(ctx);
+
+    if (toolName === "job") {
+      if (Array.isArray(input.cancel) && input.cancel.length) return undefined;
+      if (Array.isArray(input.poll) && input.poll.length) {
+        return governedBlock(
+          "BBK_COORDINATION_SPECIFIC_POLL_FORBIDDEN",
+          "specific job polling creates an avoidable wake/probe loop while OMP already auto-delivers task results",
+          "When completely blocked, call job with no fields so completion, steering, or the host wait window wakes the turn.",
+        );
+      }
+      if (waitingJobInput(input)) return undefined;
+      if (!input.list) return undefined;
+    } else {
+      const op = String(input.op || "").trim().toLowerCase();
+      if (["send", "wait"].includes(op) || input.await === true) return undefined;
+      if (!["inbox", "list", "roster"].includes(op)) return undefined;
+    }
+
+    const now = Date.now();
+    const active = activeCount();
+    // Immediately after a task call the lifecycle bus may not yet have emitted
+    // its first event. Treat the dispatch as active until the first five-minute
+    // observation window expires; completed results will auto-deliver sooner.
+    const assumedActive = state.dispatch_observed
+      && state.dispatched_at_ms !== null
+      && now < Number(state.next_probe_at_ms || 0);
+    if (!active && !assumedActive) return undefined;
+
+    const notBefore = Number(state.next_probe_at_ms || 0);
+    if (now < notBefore) {
+      const remainingMs = Math.max(0, notBefore - now);
+      return governedBlock(
+        "BBK_COORDINATION_PROBE_TOO_EARLY",
+        `non-blocking ${toolName} status probing is rate-limited while BBK children are active; ${remainingMs} ms remain in the minimum interval`,
+        "Continue independent work or use one blocking empty job wait/IRC wait. Probe again only after five minutes of silence.",
+      );
+    }
+    state.last_probe_at_ms = now;
+    state.next_probe_at_ms = now + BBK_COORDINATION_PROBE_INTERVAL_MS;
+    return undefined;
+  }
+  function dispose(ctx) {
+    if (ctx) reset(ctx);
+    else states.clear();
+  }
+  return { guard, noteTaskDispatch, reset, status, dispose };
+}
+
+function publishBbkRuntime(mode, activity, coordination) {
+  const runtime = Object.freeze({
+    schema: "bbk.omp-runtime.v1",
+    package_version: version,
+    enterMode(ctx) { return mode.enter(ctx); },
+    exitMode(ctx) { return mode.exit(ctx); },
+    ensureMode(ctx) { return mode.ensure(ctx); },
+    isModeEnabled() { return mode.isEnabled(); },
+    promptStatus(ctx) { return mode.promptStatus(ctx); },
+    activityStatus() { return activity.snapshot({ activeOnly: false }); },
+    coordinationStatus(ctx) { return coordination.status(ctx); },
+  });
+  globalThis[BBK_RUNTIME_SYMBOL] = runtime;
+  return runtime;
 }
 
 
@@ -4067,9 +5408,232 @@ export default function bbkExtension(pi) {
     parameters: z.object({ root: text() }), argv: p => ["package", "verify", ...(p.root ? [p.root] : [])],
   });
 
+  pi.registerTool({
+    name: "bbk_governance_status",
+    label: "BBK Governance Status",
+    description: "Return the current binding, host-enforcement boundary, and canonical governance-journal counts after verifying the active role capability. This query does not rebuild or mutate projections.",
+    parameters: z.object({ bindingRef: text(), invocationId: text() }),
+    async execute(id, params, signal, _onUpdate, ctx) {
+      return executeGovernanceStatusTool(id, params || {}, signal, ctx);
+    },
+  });
+
+  const governedIdentity = {
+    bindingRef: z.string(),
+    invocationId: z.string(),
+    path: z.string(),
+    mutationClass: z.string(),
+    idempotencyKey: z.string(),
+    preconditionKind: z.enum(["ANY", "ABSENT", "PRESENT", "SHA256"]).optional(),
+    expectedSha256: text(),
+  };
+  pi.registerTool({
+    name: "bbk_governed_read",
+    label: "BBK Governed Read",
+    description: "Read one regular file from the exact workspace and path scope in an active immutable binding.",
+    parameters: z.object({
+      bindingRef: z.string(), invocationId: z.string(), path: z.string(),
+      mutationClass: text(), idempotencyKey: z.string(),
+      preconditionKind: z.enum(["ANY", "PRESENT", "SHA256"]).optional(), expectedSha256: text(),
+    }),
+    async execute(id, params, signal, _onUpdate, ctx) {
+      return executeGovernedFilesystemTool(id, "READ", params || {}, signal, ctx);
+    },
+  });
+  pi.registerTool({
+    name: "bbk_governed_write",
+    label: "BBK Governed Write",
+    description: "Atomically create or replace one file after binding, capability, scope, precondition, sealed-package, and Gate Kernel checks.",
+    parameters: z.object({
+      ...governedIdentity,
+      content: z.string(),
+      encoding: z.enum(["utf-8", "base64"]).optional(),
+    }),
+    async execute(id, params, signal, _onUpdate, ctx) {
+      return executeGovernedFilesystemTool(id, "WRITE", params || {}, signal, ctx);
+    },
+  });
+  pi.registerTool({
+    name: "bbk_governed_edit",
+    label: "BBK Governed Edit",
+    description: "Apply one exact UTF-8 replacement after binding, capability, scope, precondition, sealed-package, and Gate Kernel checks.",
+    parameters: z.object({
+      ...governedIdentity,
+      oldText: z.string(), newText: z.string(), replaceAll: bool(),
+    }),
+    async execute(id, params, signal, _onUpdate, ctx) {
+      return executeGovernedFilesystemTool(id, "EDIT", params || {}, signal, ctx);
+    },
+  });
+  pi.registerTool({
+    name: "bbk_governed_delete",
+    label: "BBK Governed Delete",
+    description: "Delete one regular file after binding, capability, scope, precondition, sealed-package, and Gate Kernel checks.",
+    parameters: z.object(governedIdentity),
+    async execute(id, params, signal, _onUpdate, ctx) {
+      return executeGovernedFilesystemTool(id, "DELETE", params || {}, signal, ctx);
+    },
+  });
+
+  pi.registerTool({
+    name: "bbk_task_run",
+    label: "BBK Qualified Task",
+    description: "Run one declared candidate-preserving mise task from the exact active worker binding. BBK derives candidate and toolchain digests, records the real mise path/version, and fails if the task changes candidate content.",
+    parameters: z.object({
+      bindingRef: z.string(), invocationId: z.string(), task: z.string(),
+      arguments: z.array(z.string()).optional(), environmentAllowlist: z.array(z.string()).optional(),
+      idempotencyKey: z.string(),
+    }),
+    async execute(id, params, signal, _onUpdate, ctx) {
+      return executeQualifiedTaskTool(id, params || {}, signal, ctx);
+    },
+  });
+
+  pi.registerTool({
+    name: "bbk_return_template",
+    label: "BBK Role Return Template",
+    description: "Return the exact active role contract, allowed values, parent route, compact result fields, and a minimal result JSON example. Use this instead of guessing the terminal return envelope.",
+    parameters: z.object({
+      bindingRef: z.string(), invocationId: z.string(), invocationMode: z.string().optional(),
+    }),
+    async execute(id, params, signal, _onUpdate, ctx) {
+      return executeReturnTemplateTool(id, params || {}, signal, ctx);
+    },
+  });
+
+  pi.registerTool({
+    name: "bbk_return_prepare",
+    label: "BBK Validated Role Return",
+    description: "Build and Draft-2020-12 validate the exact role-specific structured return from the active binding. Returns the complete immutable yield_input; invoke hidden yield with that input exactly instead of hand-authoring the common envelope.",
+    parameters: z.object({
+      bindingRef: z.string(), invocationId: z.string(), invocationMode: z.string().optional(),
+      returnKind: z.string(), detailLevel: z.enum(["COMPACT", "FULL"]).optional(),
+      operationalDisposition: z.string(), semanticStateValue: z.string(), summary: z.string(),
+      result: z.any().optional(), resultJson: z.string().optional(),
+      nextAction: z.string(), nextActionOwner: z.string(), nextActionReason: z.string(),
+      nextActionAffectedRefs: z.array(z.string()).optional(), unaffectedWorkMayContinue: z.boolean().optional(),
+      authorityRefs: z.any().optional(), authorityRefsJson: z.string().optional(), allowedEffectClasses: z.array(z.string()).optional(),
+      effectsUsed: z.any().optional(), effectsUsedJson: z.string().optional(),
+      deniedOrUncoveredEffects: z.any().optional(), deniedOrUncoveredEffectsJson: z.string().optional(),
+      violationsOrAmbiguities: z.any().optional(), violationsOrAmbiguitiesJson: z.string().optional(),
+      outputs: z.any().optional(), outputsJson: z.string().optional(),
+      checksAndEvidence: z.any().optional(), checksAndEvidenceJson: z.string().optional(),
+      effectsAndCleanup: z.any().optional(), effectsAndCleanupJson: z.string().optional(),
+      blockersAndResiduals: z.array(z.string()).optional(), prohibitedClaims: z.array(z.string()).optional(),
+      durableHandoffRefs: z.any().optional(), durableHandoffRefsJson: z.string().optional(), idempotencyKey: z.string(),
+    }),
+    async execute(id, params, signal, _onUpdate, ctx) {
+      return executeReturnPrepareTool(id, params || {}, signal, ctx);
+    },
+  });
+
+  pi.registerTool({
+    name: "bbk_control_bind",
+    label: "BBK Read-Only Child Binding",
+    description: "Freeze an existing Git/jj candidate, bind one reviewer/validator-style child to that exact workspace with no mutation authority, and return a compact one-use dispatch_input. Invoke that small dispatch_input through OMP task without alteration; BBK resolves the full assignment internally.",
+    parameters: z.object({
+      parentBindingRef: z.string(), parentInvocationId: z.string(), taskName: z.string(), role: z.string(),
+      workUnitId: z.string(), attemptId: z.string(), baselineRef: z.string(), candidateId: z.string(),
+      candidateAdmissionRef: z.string().optional(),
+      authorityRef: z.string(), returnContract: z.string(), workspaceRef: z.string(),
+      pathPrefixes: z.array(z.string()), semanticScope: z.array(z.string()).optional(),
+      assignment: z.string(), description: z.string().optional(), idempotencyKey: z.string(),
+    }),
+    async execute(id, params, signal, _onUpdate, ctx) {
+      return executeControlBindTool(id, params || {}, signal, ctx);
+    },
+  });
+
+  pi.registerTool({
+    name: "bbk_control_spawn",
+    label: "BBK Bound Worker Spawn",
+    description: "Atomically allocate or reuse one logical worker attempt, project its immutable Beads assignment through the single writer, reserve the exact private task payload, and return a compact token dispatch. Invoke the dispatch once through native OMP task; on uncertainty query bbk_control_dispatch_status and never respawn the same attempt.",
+    parameters: z.object({
+      parentBindingRef: z.string(), parentInvocationId: z.string(), taskName: z.string(), role: z.string(),
+      workUnitId: z.string(), attemptId: z.string(), baselineRef: z.string(), candidateRef: z.string(),
+      authorityRef: z.string(), returnContract: z.string(),
+      returnTransportMode: z.enum(["STRUCTURED_RETURN_FIRST", "STRUCTURED_RETURN_ONLY", "SEALED_HANDOFF_REQUIRED"]).optional(),
+      materialTransportReason: z.string().optional(), parentRevision: z.string(), workspaceParent: z.string(),
+      pathPrefixes: z.array(z.string()), mutationClasses: z.array(z.string()), semanticScope: z.array(z.string()).optional(),
+      assignment: z.string(), description: z.string().optional(), idempotencyKey: z.string(),
+    }),
+    async execute(id, params, signal, _onUpdate, ctx) {
+      return executeControlSpawnTool(id, params || {}, signal, ctx);
+    },
+  });
+
+  pi.registerTool({
+    name: "bbk_control_dispatch_status",
+    label: "BBK Dispatch Status",
+    description: "Read the durable READY, LEASED, ACTIVATED, or TERMINAL state of one compact dispatch token. Use this on uncertainty instead of creating another binding or retrying through eval/shell/Python.",
+    parameters: z.object({ dispatchRef: z.string() }),
+    async execute(id, params, signal, _onUpdate, ctx) {
+      return executeDispatchStatusTool(id, params || {}, signal, ctx);
+    },
+  });
+
+  const controlCommandBaseIdentity = {
+    bindingRef: z.string(),
+    invocationId: z.string(),
+    commandId: z.string(),
+    workUnitId: z.string(),
+    attemptId: z.string(),
+    correlationId: z.string(),
+    payloadSummary: z.string(),
+    idempotencyKey: z.string(),
+    evidenceRefs: z.array(z.string()).optional(),
+    findingRefs: z.array(z.string()).optional(),
+  };
+  const controlCommandIdentity = {
+    ...controlCommandBaseIdentity,
+    expectedRevision: typeof z.number === "function" ? z.number() : z.string(),
+  };
+  pi.registerTool({
+    name: "bbk_control_assign",
+    label: "BBK Bound Assignment",
+    description: "Compatibility-only explicit assignment projection. Normal worker dispatch performs this transaction inside bbk_control_spawn; orchestrators must not call this separately unless a migration tool explicitly requires it.",
+    parameters: z.object({
+      ...controlCommandIdentity,
+      workerBindingRef: z.string(),
+      attemptRegistrationRef: z.string(),
+    }),
+    async execute(id, params, signal, _onUpdate, ctx) {
+      return executeControlPlaneTool(id, "bbk.control-assign.v1", params || {}, signal, ctx);
+    },
+  });
+  pi.registerTool({
+    name: "bbk_control_update",
+    label: "BBK Coordination Update",
+    description: "Project one typed work-unit state transition through BBK's single Beads writer with exact attempt, correlation, revision, and idempotency identities.",
+    parameters: z.object({
+      ...controlCommandIdentity,
+      transition: z.enum(["START", "BLOCK", "UNBLOCK", "COMPLETE", "FAIL", "ANNOTATE"]),
+    }),
+    async execute(id, params, signal, _onUpdate, ctx) {
+      return executeControlPlaneTool(id, "bbk.control-update.v1", params || {}, signal, ctx);
+    },
+  });
+  pi.registerTool({
+    name: "bbk_control_integrate_request",
+    label: "BBK Integration Request",
+    description: "Record an integration request without changing candidate content. BBK derives the current Beads revision internally; the orchestrator must not guess or supply expectedRevision. Content-changing or unknown conflicts are deterministically routed to a future bound Integration Worker, never repaired by the orchestrator.",
+    parameters: z.object({
+      ...controlCommandBaseIdentity,
+      sourceCandidateRefs: z.array(z.string()),
+      targetCandidateRef: z.string(),
+      conflictClassification: z.enum(["NONE", "CONTENT_NEUTRAL", "CONTENT_CHANGING", "UNKNOWN"]),
+    }),
+    async execute(id, params, signal, _onUpdate, ctx) {
+      return executeControlPlaneTool(id, "bbk.control-integrate-request.v1", params || {}, signal, ctx);
+    },
+  });
+
   const bbkActivity = createBbkActivityHud(pi);
   const bbkTiming = createBbkTimingController(pi, bbkActivity);
   const bbkMode = createBbkModeController(pi, (active, ctx) => bbkActivity.setMode(active, ctx));
+  const bbkCoordination = createBbkCoordinationThrottle(bbkMode, bbkActivity);
+  const bbkRuntime = publishBbkRuntime(bbkMode, bbkActivity, bbkCoordination);
+  void bbkRuntime;
   const bbkArtifactFinalization = createArtifactFinalizationGuard(pi, bbkMode);
   registerBbkEntrypoint(pi, bbkMode);
   registerModelRoutingCommand(pi);
@@ -4128,6 +5692,7 @@ export default function bbkExtension(pi) {
   registerCommand(pi, "bbk:review-learn", "--id <id> --type <type> --lesson <text> --scope <scope> --confidence <value> --uncertainty <text> --action <text> --output <path>", ["review", "learn"], { requireArgs: true });
 
   pi.on?.("before_agent_start", async (event, ctx) => {
+    await activateBoundWorker(event, ctx, pi);
     const replacement = await bbkMode.promptReplacement(event, ctx);
     bbkArtifactFinalization.detectRequirement(event, ctx);
     return replacement;
@@ -4143,14 +5708,28 @@ export default function bbkExtension(pi) {
     bbkTiming.providerEnd(event);
     return bbkArtifactFinalization.finalizeMessage(event, ctx);
   });
-  pi.on?.("agent_end", async () => bbkTiming.closeOpenProviders());
+  pi.on?.("agent_end", async (event, ctx) => {
+    bbkTiming.closeOpenProviders();
+    await terminalizeGovernedDispatch(event, ctx);
+  });
   pi.on?.("tool_execution_start", async (event, ctx) => bbkTiming.toolStart(event, ctx));
-  pi.on?.("tool_execution_end", async (event, ctx) => bbkTiming.toolEnd(event, ctx));
+  pi.on?.("tool_execution_end", async (event, ctx) => {
+    bbkTiming.toolEnd(event, ctx);
+    const failed = Boolean(event?.isError || event?.error || event?.result?.isError || String(event?.status || "").toLowerCase() === "error");
+    if (failed) await releaseGovernedDispatchLease(event?.toolCallId || event?.tool_call_id, "OMP_TASK_TOOL_EXECUTION_FAILED");
+  });
   const restoreBbkMode = async (_event, ctx) => {
     bbkActivity.reset(ctx);
     bbkTiming.reset(ctx);
+    bbkCoordination.reset(ctx);
     const active = bbkMode.restore(ctx);
     bbkArtifactFinalization.reset(ctx);
+    if (governedProfileEnabled()) {
+      await recordGovernedHostDecision(_event || {}, ctx, {
+        eventType: String(_event?.type || "SESSION_NAVIGATION").toUpperCase(),
+        postEffect: true,
+      });
+    }
     if (_event?.type === "session_start") {
       ctx?.ui?.notify?.(`BBK ${version} loaded in ${ctx?.cwd || process.cwd()}${active ? "; BBK mode restored" : ""}`, "info");
     }
@@ -4161,16 +5740,62 @@ export default function bbkExtension(pi) {
   pi.on?.("session_shutdown", async (_event, ctx) => {
     bbkActivity.dispose(ctx);
     bbkTiming.dispose(ctx);
+    bbkCoordination.dispose(ctx);
     bbkArtifactFinalization.dispose(ctx);
   });
   pi.on?.("tool_result", async (event, ctx) => {
     bbkActivity.updateCoordinationResult(event);
     bbkArtifactFinalization.observeToolResult(event, ctx);
+    const failed = Boolean(event?.isError || event?.error || event?.result?.isError || String(event?.status || "").toLowerCase() === "error");
+    if (failed) await releaseGovernedDispatchLease(event?.toolCallId || event?.tool_call_id, "OMP_TASK_TOOL_RESULT_FAILED");
   });
-  pi.on?.("tool_call", async event => {
-    const encoded = JSON.stringify(event.input || {});
-    if (["bash", "write", "edit"].includes(event.toolName) && protectedFragments.some(fragment => encoded.includes(fragment))) {
-      return { block: true, reason: "BBK protects frozen candidates, attestations, gate receipts, review runs, findings, and dispositions. Create a successor or write an external annotation." };
+  pi.on?.("tool_call", async (event, ctx) => {
+    const toolName = String(event?.toolName || event?.tool_name || "").trim().toLowerCase();
+    const encoded = JSON.stringify(event?.input || {});
+    const genericExecutionSurface = new Set(["eval", "python", "bash", "shell", "exec", "execute", "javascript", "js"]);
+    const dispatchFallbackAttempt = encoded.includes("<bbk-spawn-dispatch")
+      || (/dispatch:[0-9a-f]{64}/.test(encoded) && /(tool\.task|\"task\"|tasks)/i.test(encoded));
+    if (governedProfileEnabled() && genericExecutionSurface.has(toolName) && dispatchFallbackAttempt) {
+      await recordGovernedHostDecision(event, ctx);
+      return governedBlock(
+        "BBK_GENERIC_DISPATCH_FALLBACK_FORBIDDEN",
+        `generic ${toolName} cannot invoke, reconstruct, or emulate a BBK child dispatch`,
+        "Use the exact native task dispatch once, then query bbk_control_dispatch_status on uncertainty.",
+      );
     }
+    if (["bash", "write", "edit"].includes(toolName) && protectedFragments.some(fragment => encoded.includes(fragment))) {
+      return governedBlock(
+        "BBK_ACCEPTED_RECORD_PROTECTED",
+        "BBK protects frozen candidates, attestations, gate receipts, review runs, findings, and dispositions",
+        "Create a successor or write an external annotation.",
+      );
+    }
+    if (toolName === "yield") {
+      const yieldDecision = await guardYieldRoleReturn(event, ctx, pi);
+      if (yieldDecision) return yieldDecision;
+      return undefined;
+    }
+    if (toolName === "task") {
+      if (governedProfileEnabled()) {
+        const admission = await admitGovernedTask(event, ctx);
+        if (admission) return admission;
+      }
+      bbkCoordination.noteTaskDispatch(ctx);
+      return undefined;
+    }
+    const coordinationDecision = bbkCoordination.guard(event, ctx);
+    if (coordinationDecision) return coordinationDecision;
+    const transportDecision = await guardStructuredReturnTransport(event, ctx);
+    if (transportDecision) return transportDecision;
+    if (!governedProfileEnabled()) return undefined;
+    if (["bash", "write", "edit"].includes(toolName)) {
+      await recordGovernedHostDecision(event, ctx);
+      return governedBlock(
+        "AMBIENT_MUTATION_TOOL_FORBIDDEN",
+        `built-in ${toolName} is disabled before effect in governed-software mode`,
+        "Use bbk_governed_read/write/edit/delete with an exact active binding.",
+      );
+    }
+    return undefined;
   });
 }

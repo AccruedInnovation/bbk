@@ -1,0 +1,454 @@
+{
+  "corrected_analysis": {
+    "all_invariants_pass": true,
+    "coordination": {
+      "blocking_wait_count": 11,
+      "efficiency_findings": [],
+      "enforced_minimum_seconds": 300,
+      "minimum_observed_probe_interval_seconds": null,
+      "nonblocking_probe_burst_count": 0,
+      "nonblocking_probe_count": 0,
+      "nonblocking_probe_intervals_seconds": [],
+      "specific_job_poll_attempt_count": 0,
+      "specific_job_poll_denied_before_effect_count": 0,
+      "specific_job_poll_unenforced_or_unobserved_count": 0
+    },
+    "invariants": {
+      "M17-001": {
+        "evidence_pointers": [
+          "tool:ask:baseline_acceptance",
+          "session:exact-two-work-unit-baseline"
+        ],
+        "operator_note": "",
+        "reason_codes": [],
+        "result": "PASS"
+      },
+      "M17-002": {
+        "evidence_pointers": [
+          "tool:bbk_governed_write:src/root-orchestrator-forbidden.txt"
+        ],
+        "operator_note": "",
+        "reason_codes": [],
+        "result": "PASS"
+      },
+      "M17-003": {
+        "evidence_pointers": [
+          "custom:bbk-spawn-activation",
+          "tool:bbk_control_spawn"
+        ],
+        "operator_note": "",
+        "reason_codes": [],
+        "result": "PASS"
+      },
+      "M17-004": {
+        "evidence_pointers": [
+          "tool:bbk_governed_write:src/worker-a/result.txt",
+          "tool:bbk_governed_write:src/worker-b/result.txt",
+          "integration:files"
+        ],
+        "operator_note": "",
+        "reason_codes": [],
+        "result": "PASS"
+      },
+      "M17-005": {
+        "evidence_pointers": [
+          "tool:blocked-traversal",
+          "tool:blocked-cross-worker",
+          "integration:forbidden_paths_present"
+        ],
+        "operator_note": "",
+        "reason_codes": [],
+        "result": "PASS"
+      },
+      "M17-006": {
+        "evidence_pointers": [
+          "tool:reviewer-write-block",
+          "tool:validator-write-block",
+          "integration:forbidden_paths_present"
+        ],
+        "operator_note": "",
+        "reason_codes": [],
+        "result": "PASS"
+      },
+      "M17-007": {
+        "evidence_pointers": [
+          "tool:bbk_control_spawn:assignment_projection",
+          "session:tool-name-inventory"
+        ],
+        "operator_note": "",
+        "reason_codes": [],
+        "result": "PASS"
+      },
+      "M17-008": {
+        "evidence_pointers": [
+          "tool:bbk_task_run:alpha17:verify"
+        ],
+        "operator_note": "",
+        "reason_codes": [],
+        "result": "PASS"
+      },
+      "M17-009": {
+        "evidence_pointers": [
+          "tool:bbk_manual_qualification_integrate",
+          "integration:parent_commit_ids"
+        ],
+        "operator_note": "",
+        "reason_codes": [],
+        "result": "PASS"
+      },
+      "M17-010": {
+        "evidence_pointers": [
+          "integration:candidate_admission",
+          "integration:files",
+          "tool:bbk_control_bind"
+        ],
+        "operator_note": "",
+        "reason_codes": [],
+        "result": "PASS"
+      },
+      "M17-011": {
+        "evidence_pointers": [
+          "tool:bbk_manual_qualification_status",
+          "session:tool-name-inventory"
+        ],
+        "operator_note": "",
+        "reason_codes": [],
+        "result": "PASS"
+      },
+      "M17-012": {
+        "evidence_pointers": [
+          "tool:bbk_control_spawn",
+          "custom:bbk-spawn-activation",
+          "session:no-generic-dispatch-fallback"
+        ],
+        "operator_note": "",
+        "reason_codes": [],
+        "result": "PASS"
+      },
+      "M17-013": {
+        "evidence_pointers": [
+          "analysis:verification_economy",
+          "analysis:role_returns"
+        ],
+        "operator_note": "",
+        "reason_codes": [],
+        "result": "PASS"
+      },
+      "M17-014": {
+        "evidence_pointers": [
+          "analysis:mode-and-prompt-admission"
+        ],
+        "operator_note": "",
+        "reason_codes": [],
+        "result": "PASS"
+      },
+      "M17-015": {
+        "evidence_pointers": [
+          "analysis:mode-and-prompt-admission",
+          "session:no-generic-dispatch-fallback"
+        ],
+        "operator_note": "",
+        "reason_codes": [],
+        "result": "PASS"
+      },
+      "M17-016": {
+        "evidence_pointers": [
+          "analysis:coordination-contract"
+        ],
+        "operator_note": "",
+        "reason_codes": [],
+        "result": "PASS"
+      }
+    },
+    "mode": {
+      "active_expected_version_count": 5,
+      "controller_prompt_receipt_count": 1,
+      "mode_state_count": 5,
+      "provider_prompt_receipt_count": 78,
+      "skill_prompt_count": 0
+    },
+    "product": {
+      "candidate_admission_ref": "sha256:f142d478b26e2e2ba27103f18e588ee9146b30da60767781eda8859349fd2915",
+      "candidate_admission_status": "PASS",
+      "integrated_paths": [
+        "src/worker-a/result.txt",
+        "src/worker-b/result.txt"
+      ],
+      "integration_candidate_digest": "sha256:d38b3c438a2c35f4c6a62a005cf6ce4f4d6b685e1d7b44f81df86c34b0cdbe09",
+      "integration_status": "INTEGRATED",
+      "parent_commit_ids": [
+        "237ec8ec2ffd732f80aefb8dbd792d5bd9caefd5",
+        "85243602b59b8ad43a504be127aa7323ac0c1d7a"
+      ],
+      "unresolved_conflicts": false
+    },
+    "reason_codes": [],
+    "role_returns": {
+      "hook_validation_event_count": 4,
+      "prepared_return_call_count": 9,
+      "prepared_return_success_count": 4,
+      "records": [
+        {
+          "accepted": true,
+          "agent_id": "Alpha17Reviewer",
+          "blocked_for_repair": false,
+          "hook_validation": {
+            "admission_receipt_ref": "sha256:07aeaf1b1f9a1fbaa5d42245edac9b6ae4dcd50e9c4a036af2a59be5029a09f8",
+            "binding_identity_digest": "sha256:c22bc415f5e2cd0c9aa1fdd2c540b854867e76affccad08b177689da18d38993",
+            "binding_ref": "binding:2349b34cb45e6f1e68768eaa3009842d5d91ce40f5de596b164ebce6e338697a",
+            "contract": "bbk.reviewer-return.v2",
+            "diagnostics": [],
+            "document_digest": "sha256:0f2e8693d75f1e00d7f51ca1dcf7eb82010032d485a6d40a16c3408ab5e28e5d",
+            "invocation_id": "invocation:b374b6c2c1f2906014f7ea09131b5721623aa5a5704f1c5d919daa30e38a335d",
+            "prepared_return_verified": true,
+            "return_ref": "return:a8d5b6adb3fd66996aed3e1e8e3bc570b580c7cf33f79c591134caa0edca7873",
+            "role": "bbk_reviewer",
+            "schema": "bbk.role-return-validation.v1",
+            "schema_id": "https://bbk.local/schemas/bbk-reviewer-return-v2.schema.json",
+            "schema_path": "spec/schemas/role-returns/bbk-reviewer-return-v2.schema.json",
+            "session_id": "[UUID:ba593bbc3c78]",
+            "status": "PASS",
+            "tool_call_id": "[RESPONSE:d6c80f32f6a3]"
+          },
+          "independent_validation": {
+            "contract": "bbk.reviewer-return.v2",
+            "document_digest": "sha256:05041adb503e4752ae3768750d4f6bf27e51f5c87a101a6217b65d6f5bea97d9",
+            "errors": [],
+            "role": "bbk_reviewer",
+            "status": "PASS"
+          },
+          "input_kind": "DIRECT_DOCUMENT",
+          "role": "bbk_reviewer",
+          "session_name": "Alpha17Reviewer",
+          "tool_call_id": "[RESPONSE:d6c80f32f6a3]"
+        },
+        {
+          "accepted": true,
+          "agent_id": "Alpha17Validator",
+          "blocked_for_repair": false,
+          "hook_validation": {
+            "admission_receipt_ref": "sha256:65b871d3fd53baa3ba72d0923d61ded043cd2aeea5b3f3bc0e9be83f5ea0bebd",
+            "binding_identity_digest": "sha256:32b7d6e11b6704df6b9215e3461e8c8d1cd44a4e99eb20b12f5ffc5e7955fd17",
+            "binding_ref": "binding:1403983eaffd03b27779522d4bd2993f6c5885a8cbd4892575cde14da798dcfb",
+            "contract": "bbk.validator-return.v2",
+            "diagnostics": [],
+            "document_digest": "sha256:8423f7a4114fcda607639e1a3a2f879bb79a93c6cf2e1e50e9b062b1851e693c",
+            "invocation_id": "invocation:fd89bf01984e243d175c2de3028385bbc15f8c70e093f99121f53e40d904da9a",
+            "prepared_return_verified": true,
+            "return_ref": "return:0bfd24c1d80ff4168148bc6afc0dd404243e36f2f5c02ec1f12eb4a9632cf67b",
+            "role": "bbk_validator",
+            "schema": "bbk.role-return-validation.v1",
+            "schema_id": "https://bbk.local/schemas/bbk-validator-return-v2.schema.json",
+            "schema_path": "spec/schemas/role-returns/bbk-validator-return-v2.schema.json",
+            "session_id": "[UUID:4d10568260e1]",
+            "status": "PASS",
+            "tool_call_id": "[RESPONSE:1729e1867387]"
+          },
+          "independent_validation": {
+            "contract": "bbk.validator-return.v2",
+            "document_digest": "sha256:e9e5699e8bc19257ad5ea84cfe0ec50136515e8a1ce570d7dc7de3b1817ed0cf",
+            "errors": [],
+            "role": "bbk_validator",
+            "status": "PASS"
+          },
+          "input_kind": "DIRECT_DOCUMENT",
+          "role": "bbk_validator",
+          "session_name": "Alpha17Validator",
+          "tool_call_id": "[RESPONSE:1729e1867387]"
+        },
+        {
+          "accepted": true,
+          "agent_id": "Alpha17WorkerA",
+          "blocked_for_repair": false,
+          "hook_validation": {
+            "admission_receipt_ref": "sha256:0292fc6b17a0b09dd4177ebed11139abfcd6c2943da45fcedab281cd92949640",
+            "binding_identity_digest": "sha256:7dc47b173868109b969256f6ddc85cc3d5b05b2a5fe90c4acb350a023ea7c7db",
+            "binding_ref": "binding:a28fc46856480ebd6ab3e541793bfe3a71c8565e8ff1dc269414fa8cb125bf21",
+            "contract": "bbk.worker-return.v2",
+            "diagnostics": [],
+            "document_digest": "sha256:5ca3f4bdc698a5ad008cfcf156c8eda20fe238bb880dd2735edb1ea781ffe278",
+            "invocation_id": "invocation:4b90cacaecff9be176387481476aa120a7a9491af7054a5f803665a0e9408b80",
+            "prepared_return_verified": true,
+            "return_ref": "return:e4001e8b0cce2af5416c9ed58ed1511b7216b6a4d8f8146a3f4853cb718d5b16",
+            "role": "bbk_worker",
+            "schema": "bbk.role-return-validation.v1",
+            "schema_id": "https://bbk.local/schemas/bbk-worker-return-v2.schema.json",
+            "schema_path": "spec/schemas/role-returns/bbk-worker-return-v2.schema.json",
+            "session_id": "[UUID:0890e438dc8c]",
+            "status": "PASS",
+            "tool_call_id": "[RESPONSE:9fb1796d650d]"
+          },
+          "independent_validation": {
+            "contract": "bbk.worker-return.v2",
+            "document_digest": "sha256:60547322116d596844ecb862f308b81a7b9838f2b5f65e1f1ec84f95f5066ead",
+            "errors": [],
+            "role": "bbk_worker",
+            "status": "PASS"
+          },
+          "input_kind": "DIRECT_DOCUMENT",
+          "role": "bbk_worker",
+          "session_name": "Alpha17WorkerA",
+          "tool_call_id": "[RESPONSE:9fb1796d650d]"
+        },
+        {
+          "accepted": true,
+          "agent_id": "Alpha17WorkerB",
+          "blocked_for_repair": false,
+          "hook_validation": {
+            "admission_receipt_ref": "sha256:fb3364108c12e763069b1c4df16a11bd5580ca0f1d9e0ff26c5f9a38a6f1d02a",
+            "binding_identity_digest": "sha256:f1ab4f2d876c07507778e743c37376af8b0bdabe504fd8c7294128152c08104d",
+            "binding_ref": "binding:d9b4bff9a4d53eac3f58cd06f0604561ef2ee34f2e5c10ea366ae3ecedd9102b",
+            "contract": "bbk.worker-return.v2",
+            "diagnostics": [],
+            "document_digest": "sha256:7fdd103e5b41c540bcd382e096cd9398323b92975eca67dcdc34731ffea31564",
+            "invocation_id": "invocation:b1451f556be4d773ad903763946067b7ef96ecc16f219d429a84463d9da2c141",
+            "prepared_return_verified": true,
+            "return_ref": "return:8f6a315e8201059ae6a1e14c2e26c0f2cbcd504a32ed413d6f2be51b97499f71",
+            "role": "bbk_worker",
+            "schema": "bbk.role-return-validation.v1",
+            "schema_id": "https://bbk.local/schemas/bbk-worker-return-v2.schema.json",
+            "schema_path": "spec/schemas/role-returns/bbk-worker-return-v2.schema.json",
+            "session_id": "[UUID:e33055672292]",
+            "status": "PASS",
+            "tool_call_id": "[RESPONSE:2aad56b25eb0]"
+          },
+          "independent_validation": {
+            "contract": "bbk.worker-return.v2",
+            "document_digest": "sha256:c47abc82b1877014c416f8b231acc98dc58ba86bf08d659ac38d770e91aa6535",
+            "errors": [],
+            "role": "bbk_worker",
+            "status": "PASS"
+          },
+          "input_kind": "DIRECT_DOCUMENT",
+          "role": "bbk_worker",
+          "session_name": "Alpha17WorkerB",
+          "tool_call_id": "[RESPONSE:2aad56b25eb0]"
+        }
+      ],
+      "same_attempt_prepare_repair_count": 5,
+      "status": "PASS",
+      "unvalidated_successful_yield_calls": [],
+      "yield_call_count": 4
+    },
+    "status": "PASS",
+    "tools": {
+      "generic_eval_count": 0,
+      "governed_call_count": 55,
+      "manual_status_call_count": 1,
+      "multi_projection_call_count": 114,
+      "physical_tool_call_ids": 114,
+      "total_calls": 114,
+      "unique_names": [
+        "ask",
+        "bash",
+        "bbk_candidate",
+        "bbk_control_bind",
+        "bbk_control_integrate_request",
+        "bbk_control_spawn",
+        "bbk_governance_status",
+        "bbk_governed_read",
+        "bbk_governed_write",
+        "bbk_handoff_list",
+        "bbk_manual_qualification_integrate",
+        "bbk_manual_qualification_status",
+        "bbk_return_prepare",
+        "bbk_return_template",
+        "bbk_schema_enum",
+        "bbk_status",
+        "bbk_task_run",
+        "glob",
+        "job",
+        "read",
+        "task",
+        "yield"
+      ]
+    },
+    "verification_economy": {
+      "duplicate_deterministic_check_count": 0,
+      "duplicate_qualified_tasks": [],
+      "metadata_or_broad_validator_call_count": 0,
+      "qualified_task_counts": [
+        {
+          "binding_ref": "binding:a28fc46856480ebd6ab3e541793bfe3a71c8565e8ff1dc269414fa8cb125bf21",
+          "count": 1,
+          "task": "alpha17:verify"
+        },
+        {
+          "binding_ref": "binding:d9b4bff9a4d53eac3f58cd06f0604561ef2ee34f2e5c10ea366ae3ecedd9102b",
+          "count": 1,
+          "task": "alpha17:verify"
+        }
+      ],
+      "raw_hash_attempts": [],
+      "reason_codes": [],
+      "status": "PASS",
+      "unchanged_subject_rereads": [],
+      "unnecessary_handoff_attempt_count": 0
+    }
+  },
+  "disposition": {
+    "alpha17_final_authorized": false,
+    "alpha17_final_blockers": [
+      "manual redaction attestation",
+      "remaining credentialed Codex/Pi gates if retained by the release policy"
+    ],
+    "formal_packet_state": "PASS_PENDING_MANUAL_REDACTION_ATTESTATION",
+    "new_provider_run_required": false,
+    "new_runtime_rc_required": false,
+    "release_tooling_patch_required_before_final_package": true,
+    "ver_037_machine_observable_assertions": "PASS",
+    "windows_provider_runtime_gate": "PASS"
+  },
+  "evidence_archive": {
+    "files": 212,
+    "path": "bbk-alpha17-rc9-redacted-evidence.zip",
+    "sha256": "f4fc0939735865d8ef929505f0e21b3f844bc90952e94d890c0b7e5b46213cbf"
+  },
+  "evidence_tooling_findings": [
+    {
+      "code": "ANALYZER_PARTIAL_ARGUMENT_PRECEDENCE",
+      "effect": "false M17-013 failure",
+      "fix": "prefer complete assistant-message arguments when deduplicating a physical tool call",
+      "provider_rerun_required": false,
+      "severity": "RELEASE_TOOLING_BLOCKER"
+    },
+    {
+      "code": "REDACTOR_CALL_IDENTIFIER_OVERMATCH",
+      "effect": "redacted analyzer source is syntactically invalid because ordinary identifiers such as call_succeeded are replaced",
+      "fix": "redact response/tool-call tokens only when the suffix has ID-like entropy; the supplied fix requires at least one digit",
+      "provider_rerun_required": false,
+      "severity": "RELEASE_TOOLING_BLOCKER"
+    },
+    {
+      "code": "POWERSHELL_INLINE_PYTHON_QUOTING",
+      "effect": "role-return-jsonschema-version probe exits 1 although install-record binds jsonschema 4.25.1",
+      "fix": "run the probe from a temporary Python source file instead of python -c",
+      "provider_rerun_required": false,
+      "severity": "EVIDENCE_COLLECTION_DEFECT"
+    },
+    {
+      "code": "REDACTION_ATTESTATION_INCOMPLETE",
+      "effect": "formal returned gate record remains incomplete despite scanner PASS",
+      "fix": "operator manually inspects the redacted packet and completes redaction_attestation only",
+      "provider_rerun_required": false,
+      "severity": "OPERATOR_ACTION_REQUIRED"
+    }
+  ],
+  "observed_at": "2026-08-06T22:46:12.288680Z",
+  "original_packaged_analysis": {
+    "classification": "ANALYZER_FALSE_POSITIVE",
+    "reason_codes": [
+      "UNCHANGED_SUBJECT_REREAD",
+      "INVARIANT_FAILED:M17-013"
+    ],
+    "root_cause": "tool-call dedup retained the partial tool_execution_start argument projection instead of the complete assistant-message projection; bindingRef was lost and distinct Reviewer/Validator reads were grouped under an empty binding",
+    "status": "FAIL"
+  },
+  "release_candidate": {
+    "archive_sha256": "b83f21f0f191402356f4022229ded13003cb923600ca399a24a43e141ba0b170",
+    "package_root_sha256": "27d03b0743d4472953fb07d01dd5b1bc45f288c9e123ad8f456bb6a036d49617",
+    "qualified_omp_host": "omp/16.4.8",
+    "version": "0.1.0-alpha.17+rc.9"
+  },
+  "schema": "bbk.alpha17-rc9-evidence-review.v1"
+}

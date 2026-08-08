@@ -1,0 +1,95 @@
+{
+  "analysis": {
+    "coordination": {
+      "blocking_wait_count": 11,
+      "efficiency_findings": [],
+      "enforced_minimum_seconds": 300,
+      "minimum_observed_probe_interval_seconds": null,
+      "nonblocking_probe_burst_count": 0,
+      "nonblocking_probe_count": 0,
+      "nonblocking_probe_intervals_seconds": [],
+      "specific_job_poll_attempt_count": 0,
+      "specific_job_poll_denied_before_effect_count": 0,
+      "specific_job_poll_unenforced_or_unobserved_count": 0
+    },
+    "m17_pass_count": 16,
+    "m17_total": 16,
+    "product": {
+      "candidate_admission_ref": "sha256:f142d478b26e2e2ba27103f18e588ee9146b30da60767781eda8859349fd2915",
+      "candidate_admission_status": "PASS",
+      "integrated_paths": [
+        "src/worker-a/result.txt",
+        "src/worker-b/result.txt"
+      ],
+      "integration_candidate_digest": "sha256:d38b3c438a2c35f4c6a62a005cf6ce4f4d6b685e1d7b44f81df86c34b0cdbe09",
+      "integration_status": "INTEGRATED",
+      "parent_commit_ids": [
+        "237ec8ec2ffd732f80aefb8dbd792d5bd9caefd5",
+        "85243602b59b8ad43a504be127aa7323ac0c1d7a"
+      ],
+      "unresolved_conflicts": false
+    },
+    "reason_codes": [],
+    "role_returns": {
+      "prepared_return_success_count": 4,
+      "same_attempt_schema_repair_count": 5,
+      "status": "PASS",
+      "unvalidated_successful_yield_calls": []
+    },
+    "status": "PASS",
+    "verification_economy": {
+      "duplicate_deterministic_check_count": 0,
+      "duplicate_qualified_tasks": [],
+      "metadata_or_broad_validator_call_count": 0,
+      "qualified_task_counts": [
+        {
+          "binding_ref": "binding:a28fc46856480ebd6ab3e541793bfe3a71c8565e8ff1dc269414fa8cb125bf21",
+          "count": 1,
+          "task": "alpha17:verify"
+        },
+        {
+          "binding_ref": "binding:d9b4bff9a4d53eac3f58cd06f0604561ef2ee34f2e5c10ea366ae3ecedd9102b",
+          "count": 1,
+          "task": "alpha17:verify"
+        }
+      ],
+      "raw_hash_attempts": [],
+      "reason_codes": [],
+      "status": "PASS",
+      "unchanged_subject_rereads": [],
+      "unnecessary_handoff_attempt_count": 0
+    }
+  },
+  "analysis_artifacts": {
+    "approved_result_record": {
+      "path": "evidence/qualification/alpha17-rc9-result-record-approved.json",
+      "sha256": "5ef95769e7f47ce8759c5f4b73628f0daf0a2a8295f78e6c5586abf6f6f7b598"
+    },
+    "evidence_review": {
+      "path": "evidence/qualification/alpha17-rc9-evidence-review.json",
+      "sha256": "d56ce42499bb090e25c22134be72b31bf4712ad6d76350731591114f8a69014c"
+    },
+    "session_admission": {
+      "path": "evidence/qualification/alpha17-rc9-session-admission-corrected.json",
+      "sha256": "a7270211f1920e87454e8752a3c02df11ae0fc423ae2adc4260a58625252da73"
+    }
+  },
+  "approved_at": "2026-08-06T23:30:00Z",
+  "claim_limit": "Establishes the Alpha.17 RC9 Windows/provider OMP 16.4.8 manual gate and operator redaction approval. It does not claim OMP 17.2.9 qualification or credentialed Codex/Pi behavioral parity.",
+  "evidence_archive": {
+    "bytes": 1303205,
+    "credential_values_returned": false,
+    "manual_inspection_completed": true,
+    "name": "bbk-alpha17-rc9-redacted-evidence.zip",
+    "redaction_scanner_status": "PASS",
+    "sha256": "f4fc0939735865d8ef929505f0e21b3f844bc90952e94d890c0b7e5b46213cbf"
+  },
+  "gate_id": "VER-037",
+  "observed_at": "2026-08-06T23:26:17.213585Z",
+  "operator_approval": "APPROVED",
+  "qualified_host": "omp/16.4.8",
+  "record_digest": "sha256:5796ab6ecc3a6baebe671bac60614fa2e8a987702934359d78c7b394e08d0961",
+  "release_candidate": "0.1.0-alpha.17+rc.9",
+  "schema": "bbk.alpha17-final-provider-gate.v1",
+  "status": "PASS"
+}

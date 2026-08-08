@@ -1,0 +1,9 @@
+{
+  "schema": "bbk.verification-design-trigger.v1",
+  "subject_ref": "ASSERTION-FIXTURE-EXCEPTION-001",
+  "trigger": "METHOD_AMBIGUITY",
+  "material_ambiguity": "Two methods produce materially different confidence for the protected timing floor.",
+  "why_template_is_insufficient": "The profile template does not select between hardware and simulated timing evidence.",
+  "required_designer_output": "Select and justify the minimum sufficient method, environment, evidence, and independence level.",
+  "unaffected_work_may_continue": true
+}

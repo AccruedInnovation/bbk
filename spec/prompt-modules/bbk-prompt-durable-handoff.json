@@ -1,24 +1,28 @@
 {
   "schema_version": "bbk.prompt-module.v1",
   "id": "bbk-prompt-durable-handoff",
-  "title": "Durable handoff and exact return",
-  "description": "Preserve exact or consequential state across role, invocation, host-window, and recovery boundaries without treating a chat channel as the authoritative carrier.",
+  "title": "Structured return and durable exact handoff",
+  "description": "Prefer structured role returns and use one verified durable carrier only when exact state materially requires it.",
   "clauses": [
     {
-      "id": "HANDOFF.CARRIER",
-      "text": "Store exact, consequential, generated, evidence-heavy, binary, large, or truncation-sensitive material in an authorized durable carrier. A small inline result is acceptable only when no exact state could be lost."
+      "id": "HANDOFF.STRUCTURED_RETURN_FIRST",
+      "text": "Use the structured role result directly when the result fits safely in the return channel and no exact state can be lost. Do not convert every role return into a package."
+    },
+    {
+      "id": "HANDOFF.MATERIAL_PACKAGE",
+      "text": "Create `bbk.handoff.v2` only for large or truncation-sensitive output, binary content, cross-process/session/host or durable recovery, a schema or external-interface requirement, or exact artifact/evidence closure that cannot be represented safely in the role result."
     },
     {
       "id": "HANDOFF.BIND",
-      "text": "Bind every carrier and material referenced artifact by safe project-relative path, exact subject and revision, producer attempt, and declared disposition. Use the BBK package engine to compute byte counts, lowercase SHA-256 values, canonicalization metadata, manifests, and receipts from stored bytes; never hand-author generated identity fields."
+      "text": "For a material package, bind safe project-relative paths, exact subject and revision, producer attempt, disposition, canonicalization, manifests, hashes, byte counts, and receipt through the BBK package engine. Do not reconstruct generated identity fields with shell commands."
     },
     {
-      "id": "HANDOFF.VERIFY",
-      "text": "Verify the sealed package and every referenced artifact through the BBK verifier before creation is announced, before consumption or reuse, and after transfer. A locator without matching tool-generated package identity, subject, schema, and reference closure is not an exact handoff."
+      "id": "HANDOFF.VERIFY_ONCE_REUSE",
+      "text": "The producer seals and verifies the package once. Consumers validate the current verifier receipt and expected binding; they do not rerun the underlying verifier merely because the result crossed a role, process, session, or orchestration boundary. Rerun only after changed bytes or declared invalidation keys, a missing or mismatched receipt, observed corruption, or an explicitly justified independent method."
     },
     {
       "id": "HANDOFF.SEPARATE_STATE",
-      "text": "Keep physical-attempt disposition, role-specific semantic readiness, accountable acceptance, finding closure, completion, and release as separate fields and authorities."
+      "text": "Keep physical-attempt disposition, semantic readiness, accountable acceptance, finding closure, completion, and release as separate fields and authorities."
     },
     {
       "id": "HANDOFF.HISTORY",
@@ -26,7 +30,7 @@
     },
     {
       "id": "HANDOFF.CHANNEL_LIMIT",
-      "text": "Use live inter-agent messages only for concise coordination and verified references. Chat, task results, tracker comments, patches, and IRC do not replace the governed final return channel or durable domain object."
+      "text": "Use live messages for concise coordination and verified references. A durable package is not required when the structured result is lossless, and chat never substitutes for a required exact carrier."
     }
   ]
 }

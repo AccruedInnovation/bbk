@@ -1,6 +1,8 @@
 ---
 name: bbk-evidence
 description: Create, compare, interpret, and reuse BBK manifests, candidate identities, gate receipts, validation evidence, and handoffs. Use when exact file identity, semantic JSON equivalence, stale evidence, or repeated validation is material.
+requires_prompt_modules: ["bbk-prompt-durable-handoff", "bbk-prompt-profile-qualification", "bbk-prompt-evidence-subject-identity"]
+standalone_prompt_modules: ["bbk-prompt-evidence-lineage", "bbk-prompt-evidence-receipts"]
 ---
 
 
@@ -21,17 +23,7 @@ Bind every observation and receipt to the exact assertion, subject, environment,
 
 <!-- End BBK prompt module bbk-prompt-evidence-lineage -->
 
-<!-- BBK prompt module bbk-prompt-evidence-subject-identity: expanded from canonical source -->
-
-### Evidence subject and environment identity
-
-Bind observations and quantitative claims to the exact node, environment, source, time, and method so evidence is not transferred between superficially similar systems.
-
-- `EVIDENCE.NODE_BINDING` — Every material environment observation must identify the exact node or subject, node_id when available, hostname or stable system identity, environment and location, observation source, observation time or as-of boundary, method and command or API, scope, authority, and confidence or limitation.
-- `EVIDENCE.NO_TRANSFERENCE` — Do not transfer an observation from one machine, account, network, repository, version, jurisdiction, or environment to another merely because they share an operating system or role. Unknown target-node state remains unknown until established or explicitly assumed.
-- `EVIDENCE.ESTIMATE_TRUTH` — Bind every quantitative estimate to its source, assumptions, units, environment, uncertainty, and intended use. Label an estimate as measured, documented, calculated, inferred, or illustrative; do not present an unmeasured planning estimate as observed performance.
-
-<!-- End BBK prompt module bbk-prompt-evidence-subject-identity -->
+> Apply the already embedded `bbk-prompt-evidence-subject-identity` module here.
 
 ## EvidenceReceipt v2
 
@@ -50,6 +42,9 @@ Represent byte, semantic, command, profile, and observation evidence with the ex
 - `EVIDENCE.NO_SELF_HASH` — Do not hash mutable indexes into themselves or copy one current digest into many hand-maintained authorities. Generate projections from one canonical mapping source.
 - `EVIDENCE.PROFILE_BINDING` — For profile-derived evidence, bind exact profile ID and version, source or effective digest, router and focused procedure, capability operation, adapter identity, toolchain context, request digest, and input/output subject. An installed skill name alone establishes neither selection nor qualification.
 - `EVIDENCE.COMMAND_STREAMS` — When a configured gate stores only bounded UTF-8 previews in its JSON receipt, preserve authoritative stdout and stderr beside the receipt and bind each by safe project-relative path, byte count, and SHA-256. A reusable PASS remains eligible only while both raw streams match.
+- `EVIDENCE.CURRENT_UNTIL_INVALIDATED` — A successful deterministic receipt remains current while its exact subject binding and declared invalidation-key values are unchanged. Consumers validate identity and binding, then reuse it; a role, process, session, host, or orchestration boundary alone is not an invalidation.
+- `EVIDENCE.DUPLICATE_CHECK` — Before a deterministic operation, derive claim ID, subject identity, method identity, and invalidation-key values. Return a matching current PASS as `REUSED_RECEIPT`; authorize the smallest check only when no current match exists or an explicit independent-method requirement applies.
+- `EVIDENCE.VERIFICATION_BUDGET` — Invocation contracts declare required checks, reusable receipts, independent checks, forbidden duplicates, invalidation triggers, maximum rechecks, and a stop condition. Stop when every required claim has a current adequate receipt; independent judgment does not imply duplicate execution.
 
 <!-- End BBK prompt module bbk-prompt-evidence-receipts -->
 
@@ -57,36 +52,11 @@ Represent byte, semantic, command, profile, and observation evidence with the ex
 
 For an exact deliverable set, prefer `bbk artifact manifest --root <root> --path <path> --output <manifest>` and `bbk artifact verify <manifest> --root <root>` over ad hoc shell or PowerShell hashing. The manifest uses portable relative paths, byte counts, SHA-256, one content digest, deterministic ordering, and excludes BBK examples by default.
 
-<!-- BBK prompt module bbk-prompt-durable-handoff: expanded from canonical source -->
-
-### Durable handoff and exact return
-
-Preserve exact or consequential state across role, invocation, host-window, and recovery boundaries without treating a chat channel as the authoritative carrier.
-
-- `HANDOFF.CARRIER` — Store exact, consequential, generated, evidence-heavy, binary, large, or truncation-sensitive material in an authorized durable carrier. A small inline result is acceptable only when no exact state could be lost.
-- `HANDOFF.BIND` — Bind every carrier and material referenced artifact by safe project-relative path, exact subject and revision, producer attempt, and declared disposition. Use the BBK package engine to compute byte counts, lowercase SHA-256 values, canonicalization metadata, manifests, and receipts from stored bytes; never hand-author generated identity fields.
-- `HANDOFF.VERIFY` — Verify the sealed package and every referenced artifact through the BBK verifier before creation is announced, before consumption or reuse, and after transfer. A locator without matching tool-generated package identity, subject, schema, and reference closure is not an exact handoff.
-- `HANDOFF.SEPARATE_STATE` — Keep physical-attempt disposition, role-specific semantic readiness, accountable acceptance, finding closure, completion, and release as separate fields and authorities.
-- `HANDOFF.HISTORY` — Preserve partial, failed, blocked, cancelled, stale, superseded, and predecessor state. Never overwrite a published record to make a successor appear originally successful.
-- `HANDOFF.CHANNEL_LIMIT` — Use live inter-agent messages only for concise coordination and verified references. Chat, task results, tracker comments, patches, and IRC do not replace the governed final return channel or durable domain object.
-
-<!-- End BBK prompt module bbk-prompt-durable-handoff -->
+> Apply the already embedded `bbk-prompt-durable-handoff` module here.
 
 ## Profile-bound evidence
 
-<!-- BBK prompt module bbk-prompt-profile-qualification: expanded from canonical source -->
-
-### Language, domain, toolchain, and model qualification
-
-Select only applicable installed profiles and focused procedures without allowing them to broaden authority.
-
-- `PROFILE.EXPLICIT` — Use only a profile explicitly supplied or selected from the current installed-profile registry for the exact language, domain, framework, runtime, or toolchain responsibility.
-- `PROFILE.FOCUSED` — Load the router and only the focused procedures and gates material to this role and assertion; do not fan out every profile or specialist pack.
-- `PROFILE.BIND` — Carry profile identity, version or digest, toolchain assumptions, required gates, qualified operations, unavailable-capability policy, and evidence bindings into child and return contracts.
-- `PROFILE.NO_AUTHORITY` — A profile, skill, tool, model route, or host capability adds method and evidence requirements only. It cannot broaden scope, effects, authority, or acceptance.
-- `PROFILE.UNAVAILABLE` — When a required profile, toolchain, model, environment, or qualified operation is unavailable, return the exact technical or eligibility blocker instead of improvising qualification.
-
-<!-- End BBK prompt module bbk-prompt-profile-qualification -->
+> Apply the already embedded `bbk-prompt-profile-qualification` module here.
 
 ## Lossless command evidence
 

@@ -1,58 +1,40 @@
 {
-  "schema": "bbk.capability-status-inventory.v1",
-  "package_version": "0.1.0-alpha.16.1",
-  "status_vocabulary": [
-    "IMPLEMENTED_DETERMINISTIC",
-    "IMPLEMENTED_BOOTSTRAP",
-    "SCHEMA_DEFINED_COMPANION",
-    "HOST_PROVIDED_OPTIONAL",
-    "TARGET_ONLY",
-    "RETIRED_NOT_IMPLEMENTED"
-  ],
   "entries": [
     {
       "capability_id": "RoleReturnEnvelope",
       "category": "RETURN_CONTRACT",
-      "status": "IMPLEMENTED_DETERMINISTIC",
-      "source_refs": [
-        "spec/schemas/bbk-role-return-v1.schema.json",
-        "tools/return_contracts.py"
-      ],
-      "owner_roles": [],
       "consumer_roles": [],
       "enforcement": "Deterministic schema generation, source drift checking, and optional Draft 2020-12 document validation.",
       "limitations": [
         "Schema-valid returns establish contract shape and source congruence, not factual correctness, semantic acceptance, authority, completion, or release.",
         "Host transports may report or store return envelopes without providing Blueprint-grade lifecycle enforcement."
-      ]
+      ],
+      "owner_roles": [],
+      "source_refs": [
+        "spec/schemas/bbk-role-return-v1.schema.json",
+        "tools/return_contracts.py"
+      ],
+      "status": "IMPLEMENTED_DETERMINISTIC"
     },
     {
       "capability_id": "RoleSpecificReturnSchemas",
       "category": "RETURN_CONTRACT",
-      "status": "IMPLEMENTED_DETERMINISTIC",
+      "consumer_roles": [],
+      "enforcement": "Nineteen closed result schemas and nineteen full role-envelope schemas are generated from canonical split role files and checked byte-for-byte.",
+      "limitations": [
+        "A valid schema establishes contract shape, not factual correctness, acceptance, authority, completion, or release."
+      ],
+      "owner_roles": [],
       "source_refs": [
         "spec/contracts/role-return-registry.json",
         "spec/schemas/role-returns",
         "spec/schemas/role-results"
       ],
-      "owner_roles": [],
-      "consumer_roles": [],
-      "enforcement": "Nineteen closed result schemas and nineteen full role-envelope schemas are generated from canonical split role files and checked byte-for-byte.",
-      "limitations": [
-        "A valid schema establishes contract shape, not factual correctness, acceptance, authority, completion, or release."
-      ]
+      "status": "IMPLEMENTED_DETERMINISTIC"
     },
     {
       "capability_id": "TerritoryExecutionBoundary",
       "category": "EXECUTION_BOUNDARY",
-      "status": "SCHEMA_DEFINED_COMPANION",
-      "source_refs": [
-        "spec/schemas/bbk-territory-execution-boundary-v1.schema.json",
-        "templates/contracts/territory-execution-boundary.json"
-      ],
-      "owner_roles": [
-        "bbk_root_orchestrator"
-      ],
       "consumer_roles": [
         "bbk_territory_orchestrator",
         "bbk_worker_orchestrator",
@@ -61,19 +43,19 @@
       "enforcement": "Schema-valid companion artifact with explicit compiler, admission, lifecycle, immutable fields, successor rule, ownership, authority, assurance, recovery, and completion contracts.",
       "limitations": [
         "Current BBK does not yet provide a deterministic runtime commit primitive or lease-backed mutation fence for this object."
-      ]
+      ],
+      "owner_roles": [
+        "bbk_root_orchestrator"
+      ],
+      "source_refs": [
+        "spec/schemas/bbk-territory-execution-boundary-v1.schema.json",
+        "templates/contracts/territory-execution-boundary.json"
+      ],
+      "status": "SCHEMA_DEFINED_COMPANION"
     },
     {
       "capability_id": "LocalDiscoveryPolicy",
       "category": "DISCOVERY_CONTROL",
-      "status": "SCHEMA_DEFINED_COMPANION",
-      "source_refs": [
-        "spec/policies/local-discovery-v1.json",
-        "spec/schemas/bbk-local-discovery-policy-v1.schema.json"
-      ],
-      "owner_roles": [
-        "bbk_territory_orchestrator"
-      ],
       "consumer_roles": [
         "bbk_worker_orchestrator",
         "bbk_worker"
@@ -81,19 +63,19 @@
       "enforcement": "Published zero-default policy and ceiling.",
       "limitations": [
         "Policy text does not itself grant authority; an active envelope and exact permit are both required."
-      ]
-    },
-    {
-      "capability_id": "LocalDiscoveryEnvelope",
-      "category": "DISCOVERY_CONTROL",
-      "status": "SCHEMA_DEFINED_COMPANION",
-      "source_refs": [
-        "spec/schemas/bbk-local-discovery-envelope-v1.schema.json",
-        "templates/contracts/local-discovery-envelope.json"
       ],
       "owner_roles": [
         "bbk_territory_orchestrator"
       ],
+      "source_refs": [
+        "spec/policies/local-discovery-v1.json",
+        "spec/schemas/bbk-local-discovery-policy-v1.schema.json"
+      ],
+      "status": "SCHEMA_DEFINED_COMPANION"
+    },
+    {
+      "capability_id": "LocalDiscoveryEnvelope",
+      "category": "DISCOVERY_CONTROL",
       "consumer_roles": [
         "bbk_worker_orchestrator",
         "bbk_worker"
@@ -101,19 +83,19 @@
       "enforcement": "Schema-valid boundary-, cohort-charter-ID/revision/SHA-256-, baseline-, authority-, WorkUnit-, candidate-, validation-, exact-denominator-, budget-, expiry-, and invalidation-bound envelope.",
       "limitations": [
         "Current BBK records the companion artifact but does not yet commit it through a dedicated runtime primitive."
-      ]
-    },
-    {
-      "capability_id": "LocalDiscoveryPermit",
-      "category": "DISCOVERY_CONTROL",
-      "status": "SCHEMA_DEFINED_COMPANION",
-      "source_refs": [
-        "spec/schemas/bbk-local-discovery-permit-v1.schema.json",
-        "templates/contracts/local-discovery-permit.json"
       ],
       "owner_roles": [
         "bbk_territory_orchestrator"
       ],
+      "source_refs": [
+        "spec/schemas/bbk-local-discovery-envelope-v1.schema.json",
+        "templates/contracts/local-discovery-envelope.json"
+      ],
+      "status": "SCHEMA_DEFINED_COMPANION"
+    },
+    {
+      "capability_id": "LocalDiscoveryPermit",
+      "category": "DISCOVERY_CONTROL",
       "consumer_roles": [
         "bbk_worker_orchestrator",
         "bbk_worker"
@@ -121,37 +103,38 @@
       "enforcement": "One-item permit with exact issuer, envelope, WorkUnit, budget charge, prohibited governance changes, candidate impact, expiry, revocation, consumption, and supersession.",
       "limitations": [
         "Model judgment or ordinary prose is not an equivalent grant."
-      ]
+      ],
+      "owner_roles": [
+        "bbk_territory_orchestrator"
+      ],
+      "source_refs": [
+        "spec/schemas/bbk-local-discovery-permit-v1.schema.json",
+        "templates/contracts/local-discovery-permit.json"
+      ],
+      "status": "SCHEMA_DEFINED_COMPANION"
     },
     {
       "capability_id": "WorkerValidationBatch",
       "category": "CANDIDATE_AND_GATE",
-      "status": "RETIRED_NOT_IMPLEMENTED",
-      "source_refs": [
-        "spec/capability-status.json"
-      ],
-      "owner_roles": [],
       "consumer_roles": [],
       "enforcement": "No active object, schema, owner, or lifecycle.",
       "limitations": [
         "The concept was ambiguous between candidate production and assurance ownership."
       ],
+      "owner_roles": [],
       "replacement_refs": [
         "candidate-producing Worker cohort",
         "immutable candidate identity",
         "candidate-assurance run"
-      ]
+      ],
+      "source_refs": [
+        "spec/capability-status.json"
+      ],
+      "status": "RETIRED_NOT_IMPLEMENTED"
     },
     {
       "capability_id": "CandidateManifest",
       "category": "CANDIDATE_AND_GATE",
-      "status": "IMPLEMENTED_BOOTSTRAP",
-      "source_refs": [
-        "tools/bbk.py"
-      ],
-      "owner_roles": [
-        "bbk_worker_orchestrator"
-      ],
       "consumer_roles": [
         "bbk_territory_orchestrator",
         "bbk_validator_orchestrator"
@@ -159,18 +142,18 @@
       "enforcement": "BBK candidate freeze, manifest, digest, state, staleness, and verification commands.",
       "limitations": [
         "Bootstrap candidate identity is useful but does not establish requirement satisfaction, acceptance, operational outcome, risk acceptance, or release."
-      ]
-    },
-    {
-      "capability_id": "GateReceipt",
-      "category": "CANDIDATE_AND_GATE",
-      "status": "IMPLEMENTED_BOOTSTRAP",
-      "source_refs": [
-        "tools/bbk.py"
       ],
       "owner_roles": [
         "bbk_worker_orchestrator"
       ],
+      "source_refs": [
+        "tools/bbk.py"
+      ],
+      "status": "IMPLEMENTED_BOOTSTRAP"
+    },
+    {
+      "capability_id": "GateReceipt",
+      "category": "CANDIDATE_AND_GATE",
       "consumer_roles": [
         "bbk_territory_orchestrator",
         "bbk_validator_orchestrator"
@@ -178,18 +161,18 @@
       "enforcement": "Candidate-bound gate receipts with complete output carriers, digests, reuse checks, and status.",
       "limitations": [
         "Configured gate execution is not automatically independent validation or sufficient assurance."
-      ]
-    },
-    {
-      "capability_id": "WorkerQualityAttestation",
-      "category": "CANDIDATE_AND_GATE",
-      "status": "IMPLEMENTED_BOOTSTRAP",
-      "source_refs": [
-        "tools/bbk.py"
       ],
       "owner_roles": [
         "bbk_worker_orchestrator"
       ],
+      "source_refs": [
+        "tools/bbk.py"
+      ],
+      "status": "IMPLEMENTED_BOOTSTRAP"
+    },
+    {
+      "capability_id": "WorkerQualityAttestation",
+      "category": "CANDIDATE_AND_GATE",
       "consumer_roles": [
         "bbk_territory_orchestrator",
         "bbk_validator_orchestrator"
@@ -197,16 +180,18 @@
       "enforcement": "Candidate-bound bootstrap prevalidation attestation generated from configured blocking gates.",
       "limitations": [
         "It establishes only the configured bootstrap worker-quality gate eligibility it records; it does not establish requirements, behavior, architecture, operational outcomes, risk acceptance, completion, or release."
-      ]
+      ],
+      "owner_roles": [
+        "bbk_worker_orchestrator"
+      ],
+      "source_refs": [
+        "tools/bbk.py"
+      ],
+      "status": "IMPLEMENTED_BOOTSTRAP"
     },
     {
       "capability_id": "ExecutionAuthorization",
       "category": "AUTHORITY_AND_RUNTIME",
-      "status": "TARGET_ONLY",
-      "source_refs": [
-        "spec/method-content.json"
-      ],
-      "owner_roles": [],
       "consumer_roles": [
         "bbk_root_orchestrator",
         "bbk_territory_orchestrator"
@@ -214,16 +199,16 @@
       "enforcement": "Target architecture requires a separately accountable authorization object.",
       "limitations": [
         "Current BBK must bind the strongest exact authority evidence available and state the missing deterministic enforcement property."
-      ]
+      ],
+      "owner_roles": [],
+      "source_refs": [
+        "spec/method-content.json"
+      ],
+      "status": "TARGET_ONLY"
     },
     {
       "capability_id": "ExecutionScopeFence",
       "category": "AUTHORITY_AND_RUNTIME",
-      "status": "TARGET_ONLY",
-      "source_refs": [
-        "spec/method-content.json"
-      ],
-      "owner_roles": [],
       "consumer_roles": [
         "bbk_root_orchestrator",
         "bbk_territory_orchestrator",
@@ -232,16 +217,16 @@
       "enforcement": "Target architecture requires a machine-enforced effect and scope fence.",
       "limitations": [
         "Current hosts may expose only partial filesystem, workspace, credential, process, network, or external-effect controls."
-      ]
+      ],
+      "owner_roles": [],
+      "source_refs": [
+        "spec/method-content.json"
+      ],
+      "status": "TARGET_ONLY"
     },
     {
       "capability_id": "SemanticRun",
       "category": "AUTHORITY_AND_RUNTIME",
-      "status": "HOST_PROVIDED_OPTIONAL",
-      "source_refs": [
-        "spec/method-content.json"
-      ],
-      "owner_roles": [],
       "consumer_roles": [
         "bbk_root_orchestrator",
         "bbk_territory_orchestrator",
@@ -251,16 +236,16 @@
       "enforcement": "Bind host run, job, session, continuation, and replacement identities when exposed.",
       "limitations": [
         "Current BBK does not commit a universal canonical semantic-run object."
-      ]
+      ],
+      "owner_roles": [],
+      "source_refs": [
+        "spec/method-content.json"
+      ],
+      "status": "HOST_PROVIDED_OPTIONAL"
     },
     {
       "capability_id": "LeaseAndFencingToken",
       "category": "AUTHORITY_AND_RUNTIME",
-      "status": "HOST_PROVIDED_OPTIONAL",
-      "source_refs": [
-        "spec/method-content.json"
-      ],
-      "owner_roles": [],
       "consumer_roles": [
         "bbk_root_orchestrator",
         "bbk_territory_orchestrator",
@@ -269,18 +254,16 @@
       "enforcement": "Use host lease and fencing primitives where available.",
       "limitations": [
         "Where unavailable, duplicate-attempt ambiguity must be preserved and effects narrowed or stopped rather than fictional fencing being claimed."
-      ]
+      ],
+      "owner_roles": [],
+      "source_refs": [
+        "spec/method-content.json"
+      ],
+      "status": "HOST_PROVIDED_OPTIONAL"
     },
     {
       "capability_id": "RepairRecord",
       "category": "REPAIR_AND_CLOSURE",
-      "status": "TARGET_ONLY",
-      "source_refs": [
-        "spec/method-content.json"
-      ],
-      "owner_roles": [
-        "bbk_territory_orchestrator"
-      ],
       "consumer_roles": [
         "bbk_worker_orchestrator",
         "bbk_validator_orchestrator"
@@ -288,16 +271,18 @@
       "enforcement": "Target object for exact finding-bound repair authority and successor-candidate lineage.",
       "limitations": [
         "Current BBK uses structured companion artifacts and durable handoffs."
-      ]
+      ],
+      "owner_roles": [
+        "bbk_territory_orchestrator"
+      ],
+      "source_refs": [
+        "spec/method-content.json"
+      ],
+      "status": "TARGET_ONLY"
     },
     {
       "capability_id": "ClosureTransition",
       "category": "REPAIR_AND_CLOSURE",
-      "status": "TARGET_ONLY",
-      "source_refs": [
-        "spec/method-content.json"
-      ],
-      "owner_roles": [],
       "consumer_roles": [
         "bbk_root_orchestrator",
         "bbk_territory_orchestrator",
@@ -306,7 +291,22 @@
       "enforcement": "Target authority-bearing closure transition distinct from role report completion.",
       "limitations": [
         "No role return, passing gate, aggregate, transport receipt, or confident claim is an equivalent closure or release transition."
-      ]
+      ],
+      "owner_roles": [],
+      "source_refs": [
+        "spec/method-content.json"
+      ],
+      "status": "TARGET_ONLY"
     }
+  ],
+  "package_version": "0.1.0-alpha.17.0.2",
+  "schema": "bbk.capability-status-inventory.v1",
+  "status_vocabulary": [
+    "IMPLEMENTED_DETERMINISTIC",
+    "IMPLEMENTED_BOOTSTRAP",
+    "SCHEMA_DEFINED_COMPANION",
+    "HOST_PROVIDED_OPTIONAL",
+    "TARGET_ONLY",
+    "RETIRED_NOT_IMPLEMENTED"
   ]
 }

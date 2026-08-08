@@ -31,7 +31,9 @@
     "state_decision_effect_state",
     "tool_profile_environment_state",
     "work_unit_refs",
-    "worker_invocation_refs"
+    "worker_invocation_refs",
+    "planning_readiness",
+    "deferred_refinements"
   ],
   "properties": {
     "accepted_source_refs": {
@@ -137,6 +139,14 @@
     "worker_invocation_refs": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
       "description": "Current Worker Designer contracts for every executable phase-local work unit, or an explicit not-ready or blocked disposition for each missing contract."
+    },
+    "planning_readiness": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Phase frontier readiness and deferred successor refinement state."
+    },
+    "deferred_refinements": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Stable future phase-local work deliberately deferred until a later frontier."
     }
   },
   "x-bbk-role": "bbk_phase_wayfinder",

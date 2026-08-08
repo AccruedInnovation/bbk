@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-role-return-yield-admission-v1.schema.json",
+  "title": "BBK role-return yield admission result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "bbk.role-return-yield-admission.v1"
+    },
+    "status": {
+      "const": "ADMITTED"
+    },
+    "return_ref": {
+      "type": "string",
+      "pattern": "^return:[0-9a-f]{64}$"
+    },
+    "binding_ref": {
+      "type": "string",
+      "pattern": "^binding:[0-9a-f]{64}$"
+    },
+    "role": {
+      "type": "string",
+      "pattern": "^bbk_[a-z][a-z0-9_]*$"
+    },
+    "document_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "admission_receipt_ref": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "tool_call_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "yield_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "result": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "type": "object",
+              "minProperties": 1
+            }
+          },
+          "required": [
+            "data"
+          ]
+        }
+      },
+      "required": [
+        "result"
+      ]
+    },
+    "binding_identity_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "prepared_return_verified": {
+      "const": true
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "return_ref",
+    "binding_ref",
+    "role",
+    "document_digest",
+    "admission_receipt_ref",
+    "tool_call_id",
+    "yield_input",
+    "binding_identity_digest",
+    "prepared_return_verified"
+  ]
+}

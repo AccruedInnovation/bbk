@@ -1,0 +1,454 @@
+{
+  "assertion_id": "VER-036",
+  "assertions": {
+    "VER-036": "PASS"
+  },
+  "assurance": [
+    {
+      "assurance_record_ref": "sha256:35611db95fa3468547aefcb234251f9acb00ae28d4e12a18b85fafa1cef31195",
+      "blocked_write_reason": "ROLE_CAPABILITY_FORBIDDEN",
+      "blocked_write_receipt": "sha256:47eff8ab5ed8d6a57c1b27d52e43210fcd6ab34250ef4bf06549e07e41dab799",
+      "candidate_digest": "sha256:5e3276c090855623cad48d7a13901262f1b5f9d81631d489a55c926059b6bf5a",
+      "kind": "REVIEW",
+      "read_receipts": [
+        "sha256:2097df41592ad13b001087588bd77785ae9406c4ca15a6c13a60340999fb3b67",
+        "sha256:606a5f47dcb1698cc1c242868499c6ed28d5829ee1909c9e5d0dbc27ebf9789d"
+      ],
+      "role": "bbk_reviewer",
+      "status": "PASS",
+      "write_surface_attestation": "READ_ONLY_CONFIRMED"
+    },
+    {
+      "assurance_record_ref": "sha256:562239e9412a0b901c686c8fbd9b9c59feeb20b8c2c6530d2cb313482c6d2923",
+      "blocked_write_reason": "ROLE_CAPABILITY_FORBIDDEN",
+      "blocked_write_receipt": "sha256:8f1ba6b4bd609f5d0c077da2afaf9d19f3eb5630502ea486b7f6678b4438f82f",
+      "candidate_digest": "sha256:5e3276c090855623cad48d7a13901262f1b5f9d81631d489a55c926059b6bf5a",
+      "kind": "VALIDATION",
+      "read_receipts": [
+        "sha256:db960bbabbd371bac62896bf206061a936ec64a0f0f56ef1d196b2207c653263",
+        "sha256:f4216bff0a31290616c7b282d93b745a8188681923bcbf5ea5205dfa134ee097"
+      ],
+      "role": "bbk_validator",
+      "status": "PASS",
+      "write_surface_attestation": "READ_ONLY_CONFIRMED"
+    }
+  ],
+  "checks": [
+    {
+      "evidence": {
+        "git_commit": "14093576070e9239acc0d32284b58accc145bf19",
+        "jj_parent_commit": "14093576070e9239acc0d32284b58accc145bf19"
+      },
+      "id": "A17-001-real-colocated-git-jj-baseline",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "distinct_invocations": 2,
+        "distinct_jj_changes": 2,
+        "distinct_sessions": 2,
+        "distinct_workspaces": 2
+      },
+      "id": "A17-002-two-isolated-workers",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "assignment_projection_ids": [
+          "sha256:89a55849e76b6ebbf86ab89482d791d6e1aca35095454b2b372c8a4dd2f73f46",
+          "sha256:8b1f3b2487d9c6adba48690f02299abfd15e73ec796c1471363205a72534690a"
+        ]
+      },
+      "id": "A17-003-orchestrator-control-plane-only",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "reason_code": "ROLE_CAPABILITY_FORBIDDEN",
+        "receipt_ref": "sha256:dd44b5795a5eb546866ce7617e84f3a5c78dce7aaa888ef190528ac6b8de585d"
+      },
+      "id": "A17-004-root-orchestrator-product-write-blocked",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "changed_paths": [
+          "backend/result.json"
+        ],
+        "cross_worker_reason": "WORKSPACE_SCOPE_ESCAPE",
+        "cross_worker_receipt": "sha256:6c93ebd61a153c41959135d82c8e5901ecd5e386de21551b1fc8ca9e99e17910",
+        "mutation_receipt": "sha256:5119933a7805a05996fcca5d961b0696aeb4e130e33487ee158dbbdc77d2da67",
+        "path_escape_reason": "MUTATION_PATH_TRAVERSAL_FORBIDDEN"
+      },
+      "id": "A17-005-backend-scoped-write",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "changed_paths": [
+          "frontend/result.json"
+        ],
+        "cross_worker_reason": "WORKSPACE_SCOPE_ESCAPE",
+        "cross_worker_receipt": "sha256:06614045230d37cafd1d00956fc73835f9a99c2eaf7f1c38c1a5e0f5d74c1dfc",
+        "mutation_receipt": "sha256:9c8b85fc9872447c33bb507e148d858774b84e9786342dfb3215c2864b3a5bab",
+        "path_escape_reason": "MUTATION_PATH_TRAVERSAL_FORBIDDEN"
+      },
+      "id": "A17-005-frontend-scoped-write",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "projection_id": "sha256:051b829e54a14e79fdcc73fa74d19e6bd357dc396d52312d2fc5e48f7c3ba9f9",
+        "route": "CONTENT_NEUTRAL_INTEGRATION_ADAPTER"
+      },
+      "id": "A17-006-content-neutral-route-requested",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "candidate_digest": "sha256:5e3276c090855623cad48d7a13901262f1b5f9d81631d489a55c926059b6bf5a",
+        "integrated_paths": [
+          "backend/result.json",
+          "frontend/result.json"
+        ],
+        "integration_digest": "sha256:ba6c51a0abae176612d7c00ec007033df98184b2e72c2916475ed583ed0829e8"
+      },
+      "id": "A17-007-disjoint-candidates-integrated",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "candidate_digest": "sha256:5e3276c090855623cad48d7a13901262f1b5f9d81631d489a55c926059b6bf5a",
+        "mise_version": "2026.8.1 linux-x64 (2026-08-03)",
+        "qualified_task_receipt": "sha256:655b3f23e27b5934b7a39fafff1d2fcc5678cee7de23d8691383556a418a168b",
+        "surface": "bbk_task_run",
+        "task": "fixture:verify",
+        "task_receipt": "sha256:9d2e4e38a3ca7c0b479f46c2716481db912e42c3c148cfc18643a592ebdde5ae"
+      },
+      "id": "A17-008-real-mise-task-preserves-candidate",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "assurance_record_refs": [
+          "sha256:35611db95fa3468547aefcb234251f9acb00ae28d4e12a18b85fafa1cef31195",
+          "sha256:562239e9412a0b901c686c8fbd9b9c59feeb20b8c2c6530d2cb313482c6d2923"
+        ],
+        "candidate_digest": "sha256:5e3276c090855623cad48d7a13901262f1b5f9d81631d489a55c926059b6bf5a",
+        "read_only_binding_refs": [
+          {
+            "activation_ref": "sha256:fb805cdadbea4090ab397dfe187b10a05e3ef7b9a1a0d02daaac54ed2a1a8933",
+            "admission_ref": "sha256:19bfa951acab9b4893c257ce28f35da47dd82595d662d7e60dbbab3eb7621ce5",
+            "binding_ref": "binding:46c15ec2c47e8bab6721e2d2767b46890a291e7a1d9956807cd97f87e2f56aa7",
+            "registration_ref": "sha256:703f79eeae181f3113f8c0b37b3f209d20220c73d4d08a4f17cbfb5d8332911d"
+          },
+          {
+            "activation_ref": "sha256:8ad6a2ecc01d7e634fbd4f3baecbc6a7fb83f645628dd95d3514cf5eec171da5",
+            "admission_ref": "sha256:c80b5953825571b8600dfe833b20c9be94897b1e77ecadc7e290bd66c5198a52",
+            "binding_ref": "binding:e33f7f376d57b433a894e8aad2b5f80505e3629ac2e6662576558ce209bc6040",
+            "registration_ref": "sha256:7a72ea452a8b287730c8414dbc8a1f9773db92e01cf9c249477772dbc7a6ba68"
+          }
+        ],
+        "surface": "bbk_control_bind"
+      },
+      "id": "A17-009-read-only-review-and-validation",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "actual_mutated_paths": [
+          "backend/result.json",
+          "frontend/result.json"
+        ],
+        "expected_mutated_paths": [
+          "backend/result.json",
+          "frontend/result.json"
+        ],
+        "receipt_counts": {
+          "ASSURANCE_RECORD": 2,
+          "ASSURANCE_REQUEST": 2,
+          "BEADS_COMMAND": 8,
+          "BEADS_PROJECTION": 8,
+          "BINDING_SUPERSESSION": 4,
+          "BOUND_QUALIFIED_TASK": 1,
+          "CANDIDATE_INTEGRATION": 1,
+          "COORDINATION_COMMAND": 8,
+          "FILESYSTEM_MUTATION": 11,
+          "GATE_DECISION": 11,
+          "QUALIFIED_TASK": 1,
+          "READ_ONLY_TASK_REGISTRATION": 2,
+          "SPAWN_ADMISSION": 4,
+          "SPAWN_RESERVATION": 4,
+          "SPAWN_SESSION_ACTIVATION": 4,
+          "VCS_MUTATION": 2,
+          "WORK_UNIT_ATTEMPT_REGISTRATION": 2
+        }
+      },
+      "id": "A17-010-mutation-and-coordination-receipt-accounting",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "candidate_digest": "sha256:5e3276c090855623cad48d7a13901262f1b5f9d81631d489a55c926059b6bf5a",
+        "forbidden_files_absent": 4
+      },
+      "id": "A17-011-no-prohibited-role-product-mutation",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "direct_beads_write_authority": "DENIED",
+        "issue_ids": [
+          "WU-FIXTURE-BACKEND",
+          "WU-FIXTURE-FRONTEND",
+          "WU-FIXTURE-INTEGRATION"
+        ]
+      },
+      "id": "A17-012-beads-single-writer-projection-visible",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "assertion": "VER-035",
+        "evidence_digest": "sha256:68be1742cb37735b9917bed5bb5045c19a46ab3d5c1b1695a5bbabbbafa1000f",
+        "evidence_path": "evidence/qualification/session-inspector-oracle-alpha17.json",
+        "status": "PASS"
+      },
+      "id": "A17-013-session-inspector-oracle-bound",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "binding_count": 11,
+        "bound_task_receipt": "sha256:9d2e4e38a3ca7c0b479f46c2716481db912e42c3c148cfc18643a592ebdde5ae",
+        "journal_digest": "sha256:0250c16028c1ae743a3c9b65f3016cfca1adb9487f6b850bb7f8084c51384366",
+        "queried_roles": [
+          "bbk_reviewer",
+          "bbk_validator",
+          "bbk_validator_orchestrator",
+          "bbk_worker"
+        ],
+        "read_only_registration_refs": [
+          "sha256:703f79eeae181f3113f8c0b37b3f209d20220c73d4d08a4f17cbfb5d8332911d",
+          "sha256:7a72ea452a8b287730c8414dbc8a1f9773db92e01cf9c249477772dbc7a6ba68"
+        ],
+        "receipt_count": 75,
+        "status_query_mutated_journal": false,
+        "surfaces": [
+          "bbk_control_bind",
+          "bbk_governance_status",
+          "bbk_task_run"
+        ]
+      },
+      "id": "A17-014-advertised-governance-surfaces-bound",
+      "status": "PASS"
+    },
+    {
+      "evidence": {
+        "assertion": "VER-036",
+        "gate": "GATE-017-AUTOMATED",
+        "prior_check_count": 15
+      },
+      "id": "A17-015-report-inputs-complete",
+      "status": "PASS"
+    }
+  ],
+  "claim_limit": "This automated keyless report establishes VER-036 only. It does not establish the real-provider manual gate, Alpha.17 final release, deployment, publication, or live acceptance.",
+  "fixture": {
+    "baseline_git_commit": "14093576070e9239acc0d32284b58accc145bf19",
+    "name": "alpha17-governed-vertical-slice",
+    "source_digest": "sha256:63268cb3c070b8ae67c3dc220ffc2d361004ee9e665f3c4a5c60cb56953b1f2e"
+  },
+  "gate": {
+    "decision": "RC_ELIGIBLE",
+    "gate_id": "GATE-017-AUTOMATED",
+    "manual_provider_gate": "PENDING_WU_018",
+    "pass_criteria": [
+      "all invariants pass",
+      "orchestrator/reviewer/validator prohibited writes blocked",
+      "two worker changes integrated"
+    ],
+    "required_inputs": [
+      "automated vertical-slice evidence",
+      "Session Inspector oracle results"
+    ]
+  },
+  "integration": {
+    "candidate": {
+      "candidate_id": "candidate:fixture:integrated",
+      "changed_paths": [
+        "backend/result.json",
+        "frontend/result.json"
+      ],
+      "digest": "sha256:5e3276c090855623cad48d7a13901262f1b5f9d81631d489a55c926059b6bf5a",
+      "git_commit": "14093576070e9239acc0d32284b58accc145bf19",
+      "git_tree": "6221b641ac30e5eec8e1c7f4c54c8ab2950313b2",
+      "identity_kind": "GIT_TREE",
+      "jj_change_id": "swmpnovsxznnzrzwkrmsosyqoqvxwvlt",
+      "workspace_ref": "$CAMPAIGN/workspaces/integrated"
+    },
+    "completion_projection_id": "sha256:2298223cdf1eb8e5170ef9fb5955569689889dcb2b2219534cbfc4628ceef412",
+    "control_projection_id": "sha256:051b829e54a14e79fdcc73fa74d19e6bd357dc396d52312d2fc5e48f7c3ba9f9",
+    "integrated_paths": [
+      "backend/result.json",
+      "frontend/result.json"
+    ],
+    "integration_digest": "sha256:ba6c51a0abae176612d7c00ec007033df98184b2e72c2916475ed583ed0829e8",
+    "integration_receipt_ref": "sha256:959f9edb59c10e77ab8e1909cd1855a2fdb1e6fc7acd66f80ef9aef51bd99580",
+    "mode": "CONTENT_NEUTRAL_DISJOINT_PATHS",
+    "source_change_ids": [
+      "zpmkmyxpnxwnrspoptmyorolmllorqow",
+      "orzrnnkoqmnprvtpvvxlvkutzknwypow"
+    ],
+    "source_commit_ids": [
+      "4f196b100a5d9ccdb40a45e1323540d33c6bb598",
+      "481e8c30c7709cd425f14b4fd3d065fffaf2f636"
+    ]
+  },
+  "mode": "AUTOMATED_KEYLESS_LOCAL",
+  "observed_at": "2026-08-05T17:30:11.985940Z",
+  "qualification": "AUTOMATED_PASS",
+  "qualification_id": "alpha17:5226c16e810e3c8eda23065853b28d016a5837290c23b7ee9e7a1f2ce924b879",
+  "qualified_task": {
+    "candidate_digest": "sha256:5e3276c090855623cad48d7a13901262f1b5f9d81631d489a55c926059b6bf5a",
+    "candidate_unchanged": true,
+    "exit_status": 0,
+    "mise_version": "2026.8.1 linux-x64 (2026-08-03)",
+    "output_digest": "sha256:fcd0dfc21feb08390ab27d1b9c548143b42895be52edaeda5c1f3b63bcff1744",
+    "receipt_ref": "sha256:9d2e4e38a3ca7c0b479f46c2716481db912e42c3c148cfc18643a592ebdde5ae",
+    "status": "PASS",
+    "task": "fixture:verify",
+    "toolchain_definition_digest": "sha256:5d3577e22b5eff7ea9feefe552f01c28b98a4f3e0259f3c0967829046b0eaceb"
+  },
+  "receipt_accounting": {
+    "all_candidate_changes_receipted": true,
+    "beads_backend_writes_via_adapter": true,
+    "changed_paths": [
+      "backend/result.json",
+      "frontend/result.json"
+    ],
+    "counts": {
+      "ASSURANCE_RECORD": 2,
+      "ASSURANCE_REQUEST": 2,
+      "BEADS_COMMAND": 8,
+      "BEADS_PROJECTION": 8,
+      "BINDING_SUPERSESSION": 4,
+      "BOUND_QUALIFIED_TASK": 1,
+      "CANDIDATE_INTEGRATION": 1,
+      "COORDINATION_COMMAND": 8,
+      "FILESYSTEM_MUTATION": 11,
+      "GATE_DECISION": 11,
+      "QUALIFIED_TASK": 1,
+      "READ_ONLY_TASK_REGISTRATION": 2,
+      "SPAWN_ADMISSION": 4,
+      "SPAWN_RESERVATION": 4,
+      "SPAWN_SESSION_ACTIVATION": 4,
+      "VCS_MUTATION": 2,
+      "WORK_UNIT_ATTEMPT_REGISTRATION": 2
+    }
+  },
+  "release": "0.1.0-alpha.17",
+  "report_digest": "sha256:ad840bd47e1a9290f8c02f323a02e3033e8f37d834de4b0f979365353dc5235d",
+  "schema": "bbk.alpha17-qualification-report.v1",
+  "security": {
+    "credentials_used": false,
+    "dependency_installation_performed": false,
+    "external_provider_used": false,
+    "network_used": false,
+    "waivers": []
+  },
+  "session_inspector_oracle": {
+    "assertions": {
+      "VER-035": "PASS"
+    },
+    "evidence_digest": "sha256:68be1742cb37735b9917bed5bb5045c19a46ab3d5c1b1695a5bbabbbafa1000f",
+    "evidence_path": "evidence/qualification/session-inspector-oracle-alpha17.json",
+    "qualification": "AUTOMATED_PASS",
+    "work_unit": "WU-016"
+  },
+  "smallest_next_action": "Build the exact Alpha.17 release candidate and operator-run real-provider qualification packet for VER-037 through VER-039.",
+  "status": "PASS",
+  "tools": {
+    "bd": {
+      "adapter_class": "REAL_LOCAL_TOOL_MISE_MANAGED",
+      "executable": "bd",
+      "execution_mode": "MISE_MANAGED",
+      "launcher_basename": "mise",
+      "launcher_sha256": "sha256:961b1fcc78830e861ab887abd19d9b961478bcf252e37881fdd61c81388308d4",
+      "tool_key": "github:gastownhall/beads",
+      "tool_spec": "github:gastownhall/beads@1.1.0",
+      "version": "bd version 1.1.0 (8e4e59d39)"
+    },
+    "git": {
+      "adapter_class": "REAL_LOCAL_TOOL",
+      "path_basename": "git",
+      "sha256": "sha256:356db14e102d68a1a37d8a1ac577dfd678d45d46e92f468bef8b7154e7bfdc60",
+      "version": "git version 2.47.3"
+    },
+    "host_contract": {
+      "mode": "QUALIFIED_SYNTHETIC_EVENT_BRIDGE",
+      "version": "omp/16.4.8"
+    },
+    "jj": {
+      "adapter_class": "REAL_LOCAL_TOOL_MISE_MANAGED",
+      "executable": "jj",
+      "execution_mode": "MISE_MANAGED",
+      "launcher_basename": "mise",
+      "launcher_sha256": "sha256:961b1fcc78830e861ab887abd19d9b961478bcf252e37881fdd61c81388308d4",
+      "tool_key": "jj",
+      "tool_spec": "jj@0.43.0",
+      "version": "jj 0.43.0-89f62ede8c1c611eaf134c0c49252efd65c7945d"
+    },
+    "mise": {
+      "adapter_class": "REAL_LOCAL_TOOL",
+      "path_basename": "mise",
+      "sha256": "sha256:961b1fcc78830e861ab887abd19d9b961478bcf252e37881fdd61c81388308d4",
+      "version": "2026.8.1 linux-x64 (2026-08-03)"
+    }
+  },
+  "work_unit": "WU-017",
+  "workers": [
+    {
+      "attempt_id": "backend-1",
+      "candidate_ref": "candidate:fixture:backend",
+      "changed_paths": [
+        "backend/result.json"
+      ],
+      "completion_projection_id": "sha256:b717eb81183b7c77e1f9d8f9203492865d5b14c0aa9ed6a75246f823ce76d5cf",
+      "cross_worker_block_receipt": "sha256:6c93ebd61a153c41959135d82c8e5901ecd5e386de21551b1fc8ca9e99e17910",
+      "cross_worker_reason": "WORKSPACE_SCOPE_ESCAPE",
+      "filesystem_mutation_receipt": "sha256:5119933a7805a05996fcca5d961b0696aeb4e130e33487ee158dbbdc77d2da67",
+      "invocation_id": "invocation:1b63c148a1c39fa191ae7cfe9e645d62250da9c71cc282cac2e99ae5e0e5fda5",
+      "jj_change_id": "zpmkmyxpnxwnrspoptmyorolmllorqow",
+      "path_escape_reason": "MUTATION_PATH_TRAVERSAL_FORBIDDEN",
+      "scope": [
+        "backend"
+      ],
+      "session_id": "session-alpha17-worker-backend",
+      "vcs_mutation_receipt": "sha256:6ec8f4a0a94e513d021932adfccf1398206ad68c49c68134493ae117fbf3f068",
+      "work_unit_id": "WU-FIXTURE-BACKEND",
+      "workspace_label": "$CAMPAIGN/workspaces/bbk-wu-fixture-backend-backend-1-232e8aa4b0"
+    },
+    {
+      "attempt_id": "frontend-1",
+      "candidate_ref": "candidate:fixture:frontend",
+      "changed_paths": [
+        "frontend/result.json"
+      ],
+      "completion_projection_id": "sha256:e149a3948e36c4a99394279a2fd9c2137bbac8da5c38b17e2e30233466e9eb51",
+      "cross_worker_block_receipt": "sha256:06614045230d37cafd1d00956fc73835f9a99c2eaf7f1c38c1a5e0f5d74c1dfc",
+      "cross_worker_reason": "WORKSPACE_SCOPE_ESCAPE",
+      "filesystem_mutation_receipt": "sha256:9c8b85fc9872447c33bb507e148d858774b84e9786342dfb3215c2864b3a5bab",
+      "invocation_id": "invocation:fd2d9ab2d514b9b1ab2276800cf87147365ab5b304470c4952bf87951d11c82a",
+      "jj_change_id": "orzrnnkoqmnprvtpvvxlvkutzknwypow",
+      "path_escape_reason": "MUTATION_PATH_TRAVERSAL_FORBIDDEN",
+      "scope": [
+        "frontend"
+      ],
+      "session_id": "session-alpha17-worker-frontend",
+      "vcs_mutation_receipt": "sha256:586f40f9ce2bfc9ee84e51299f23d8b63d3f36ca5244b48d5abe6935a7393485",
+      "work_unit_id": "WU-FIXTURE-FRONTEND",
+      "workspace_label": "$CAMPAIGN/workspaces/bbk-wu-fixture-frontend-frontend-1-93ae12c923"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "$id": "bbk-governance-status-query-result-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BBK binding-aware governance status result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const": "bbk.governance-status-query-result.v1"},
+    "status": {"const": "PASS"},
+    "authority": {"const": "CANONICAL_BINDINGS_AND_RECEIPTS"},
+    "enforcement": {"type": "object"},
+    "binding": {
+      "type": "object",
+      "required": ["binding_ref", "capability_ref", "session_id", "invocation_id", "role", "workspace_ref"]
+    },
+    "journal": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "binding_count": {"type": "integer", "minimum": 1},
+        "active_binding_count": {"type": "integer", "minimum": 1},
+        "superseded_binding_count": {"type": "integer", "minimum": 0},
+        "receipt_count": {"type": "integer", "minimum": 0},
+        "receipt_kinds": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 1}},
+        "canonical_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      },
+      "required": ["binding_count", "active_binding_count", "superseded_binding_count", "receipt_count", "receipt_kinds", "canonical_digest"]
+    }
+  },
+  "required": ["schema", "status", "authority", "enforcement", "binding", "journal"]
+}

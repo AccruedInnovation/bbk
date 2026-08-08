@@ -6,46 +6,122 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "return_ref",
-    "branch_ref",
-    "questioning_wayfinder_ref",
-    "root_outcome_ref",
-    "root_decision_disposition",
-    "authority_state",
-    "decision_frame",
-    "proposal_history",
-    "user_request_response_refs",
     "accepted_decision_packet",
-    "non_resolution_packet",
-    "related_decision_packets",
-    "independent_questions",
+    "affected_scope_and_interfaces",
+    "authority_state",
+    "blockers",
+    "branch_ref",
+    "changed_coordination_records",
+    "continuation_state",
+    "decision_frame",
     "evidence_state",
     "exposure_history",
-    "affected_scope_and_interfaces",
-    "outward_impacts",
+    "independent_questions",
     "invalidated_or_superseded_refs",
+    "non_resolution_packet",
+    "outward_impacts",
+    "proposal_history",
+    "questioning_wayfinder_ref",
+    "related_decision_packets",
     "residual_uncertainty",
+    "return_ref",
+    "root_decision_disposition",
+    "root_outcome_ref",
     "stopping_and_readiness_assessment",
-    "continuation_state",
-    "changed_coordination_records",
-    "blockers"
+    "user_request_response_refs"
   ],
   "properties": {
-    "return_ref": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
-      "description": "Unique checkpoint or final-result identity, predecessor or supersession link, idempotency key when available, creation time, and content digest or durable reference."
+    "accepted_decision_packet": {
+      "anyOf": [
+        {
+          "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+          "description": "ADR-ready root-decision packet with exact authority evidence, rationale, alternatives, consequences, exposure history, affected objects, residual uncertainty, and invalidation triggers; null with a reason when unresolved or explicitly non-resolved."
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "ADR-ready root-decision packet with exact authority evidence, rationale, alternatives, consequences, exposure history, affected objects, residual uncertainty, and invalidation triggers; null with a reason when unresolved or explicitly non-resolved."
+    },
+    "affected_scope_and_interfaces": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Affected needs, territories, actors, responsibilities, interfaces, state and effect ownership, quality attributes, migration, compatibility, recovery, observability, and downstream work."
+    },
+    "authority_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Decision posture, authority mode and accountable holder, current grants or governing constraints, protected floors, excluded powers, and authority actually exercised or still missing."
+    },
+    "blockers": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Typed context, factual, technical, authority, decision, controller-relay, host, evidence, or parent-action blockers and the smallest sufficient resolution path."
     },
     "branch_ref": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
       "description": "Logical Question Guide branch ID, revision or context digest, physical invocation identity, predecessor or continuation identity, and checkpoint or final-result identity."
     },
+    "changed_coordination_records": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Attempt-local checkpoints or result artifacts created or updated, with path, byte count, and SHA-256 when material; canonical branch and ADR state remain owned by the Questioning Wayfinder."
+    },
+    "continuation_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Pending request or parent dependency, logical branch and physical invocation mapping, resumable checkpoint, exact resumption handle, stale-response fence, and next permitted interaction."
+    },
+    "decision_frame": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Exact root decision, current highest-value unresolved point, current recommendation, credible alternatives, material consequences, affected objects and interfaces, assumptions, evidence, and residual uncertainty."
+    },
+    "evidence_state": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Facts and evidence supplied or trivially inspected, provenance and freshness, declared omissions, contradictions, discoverable gaps returned for research, and accepted unknowns."
+    },
+    "exposure_history": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Recommendations, alternatives, consequences, evidence, uncertainty, pressure-test results, and corrections actually exposed through each authoritative user request."
+    },
+    "independent_questions": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "New decisions or uncertainties that do not belong inside the root branch, with affected parent scope and recommended Questioning Wayfinder action."
+    },
+    "invalidated_or_superseded_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Requests, responses, proposals, evidence, assumptions, checkpoints, decisions, and downstream objects invalidated, expired, cancelled, reopened, or superseded during the invocation."
+    },
+    "non_resolution_packet": {
+      "anyOf": [
+        {
+          "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+          "description": "Explicit deferred, parked, blocked, insufficient-evidence, out-of-scope, cancelled, or superseded disposition with authority or governing rationale; null with a reason when resolved or still unresolved."
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Explicit deferred, parked, blocked, insufficient-evidence, out-of-scope, cancelled, or superseded disposition with authority or governing rationale; null with a reason when resolved or still unresolved."
+    },
+    "outward_impacts": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Parent or sibling decisions, architecture, interface contracts, investigations, work graphs, assurance, authority, dependencies, and invalidation obligations affected by this branch."
+    },
+    "proposal_history": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every current, rejected, revised, superseded, or otherwise material recommendation and proposal identity with its rationale and response interpretation."
+    },
     "questioning_wayfinder_ref": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
       "description": "Owning `bbk_questioning_wayfinder` role and peer, decision-cluster and branch references, invocation request, and exact return target."
     },
-    "root_outcome_ref": {
+    "related_decision_packets": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Authority-bound related decisions discovered inside the branch, each with separate identity, exact response or authority evidence, scope, and relationship to the root decision."
+    },
+    "residual_uncertainty": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Known uncertainty, accepted unknowns, consequence, owner, confidence limits, expiry, monitoring need, and reopening triggers."
+    },
+    "return_ref": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
-      "description": "Exact operational outcome or parent planning objective and revision that the decision must serve."
+      "description": "Unique checkpoint or final-result identity, predecessor or supersession link, idempotency key when available, creation time, and content digest or durable reference."
     },
     "root_decision_disposition": {
       "type": "string",
@@ -62,93 +138,17 @@
       ],
       "description": "One allowed root-decision-disposition value."
     },
-    "authority_state": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Decision posture, authority mode and accountable holder, current grants or governing constraints, protected floors, excluded powers, and authority actually exercised or still missing."
-    },
-    "decision_frame": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Exact root decision, current highest-value unresolved point, current recommendation, credible alternatives, material consequences, affected objects and interfaces, assumptions, evidence, and residual uncertainty."
-    },
-    "proposal_history": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Every current, rejected, revised, superseded, or otherwise material recommendation and proposal identity with its rationale and response interpretation."
-    },
-    "user_request_response_refs": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
-      "description": "Every controller request and matching authoritative host response, including branch, request and proposal IDs, exact submitted answer, source such as `omp.ask`, native receipt identity when exposed, status, expiry, and invalidation state."
-    },
-    "accepted_decision_packet": {
-      "anyOf": [
-        {
-          "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-          "description": "ADR-ready root-decision packet with exact authority evidence, rationale, alternatives, consequences, exposure history, affected objects, residual uncertainty, and invalidation triggers; null with a reason when unresolved or explicitly non-resolved."
-        },
-        {
-          "type": "null"
-        }
-      ],
-      "description": "ADR-ready root-decision packet with exact authority evidence, rationale, alternatives, consequences, exposure history, affected objects, residual uncertainty, and invalidation triggers; null with a reason when unresolved or explicitly non-resolved."
-    },
-    "non_resolution_packet": {
-      "anyOf": [
-        {
-          "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-          "description": "Explicit deferred, parked, blocked, insufficient-evidence, out-of-scope, cancelled, or superseded disposition with authority or governing rationale; null with a reason when resolved or still unresolved."
-        },
-        {
-          "type": "null"
-        }
-      ],
-      "description": "Explicit deferred, parked, blocked, insufficient-evidence, out-of-scope, cancelled, or superseded disposition with authority or governing rationale; null with a reason when resolved or still unresolved."
-    },
-    "related_decision_packets": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Authority-bound related decisions discovered inside the branch, each with separate identity, exact response or authority evidence, scope, and relationship to the root decision."
-    },
-    "independent_questions": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "New decisions or uncertainties that do not belong inside the root branch, with affected parent scope and recommended Questioning Wayfinder action."
-    },
-    "evidence_state": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Facts and evidence supplied or trivially inspected, provenance and freshness, declared omissions, contradictions, discoverable gaps returned for research, and accepted unknowns."
-    },
-    "exposure_history": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Recommendations, alternatives, consequences, evidence, uncertainty, pressure-test results, and corrections actually exposed through each authoritative user request."
-    },
-    "affected_scope_and_interfaces": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Affected needs, territories, actors, responsibilities, interfaces, state and effect ownership, quality attributes, migration, compatibility, recovery, observability, and downstream work."
-    },
-    "outward_impacts": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Parent or sibling decisions, architecture, interface contracts, investigations, work graphs, assurance, authority, dependencies, and invalidation obligations affected by this branch."
-    },
-    "invalidated_or_superseded_refs": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
-      "description": "Requests, responses, proposals, evidence, assumptions, checkpoints, decisions, and downstream objects invalidated, expired, cancelled, reopened, or superseded during the invocation."
-    },
-    "residual_uncertainty": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
-      "description": "Known uncertainty, accepted unknowns, consequence, owner, confidence limits, expiry, monitoring need, and reopening triggers."
+    "root_outcome_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Exact operational outcome or parent planning objective and revision that the decision must serve."
     },
     "stopping_and_readiness_assessment": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
       "description": "Decision-readiness criteria, expected value of another question or parent action, user-attention state, and why the current return is proportionate."
     },
-    "continuation_state": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Pending request or parent dependency, logical branch and physical invocation mapping, resumable checkpoint, exact resumption handle, stale-response fence, and next permitted interaction."
-    },
-    "changed_coordination_records": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
-      "description": "Attempt-local checkpoints or result artifacts created or updated, with path, byte count, and SHA-256 when material; canonical branch and ADR state remain owned by the Questioning Wayfinder."
-    },
-    "blockers": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
-      "description": "Typed context, factual, technical, authority, decision, controller-relay, host, evidence, or parent-action blockers and the smallest sufficient resolution path."
+    "user_request_response_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Every controller request and matching authoritative host response, including branch, request and proposal IDs, exact submitted answer, source such as `omp.ask`, native receipt identity when exposed, status, expiry, and invalidation state."
     }
   },
   "x-bbk-role": "bbk_question_guide",

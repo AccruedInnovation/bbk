@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-admission-certificate-v1.schema.json",
+  "title": "BBK reusable admission certificate v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "certificate_id", "kind", "subject", "status", "facts", "blockers", "invalidation_keys", "issued_at", "smallest_next_action", "integrity"],
+  "properties": {
+    "schema": {"const": "bbk.admission-certificate.v1"},
+    "certificate_id": {"$ref": "#/$defs/digest"},
+    "kind": {"enum": ["CAMPAIGN", "BOUNDARY", "CANDIDATE"]},
+    "subject": {"type": "object", "minProperties": 1, "additionalProperties": true},
+    "status": {"enum": ["ADMITTED", "BLOCKED"]},
+    "facts": {"type": "object", "minProperties": 1, "additionalProperties": true},
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["fact", "reason_code", "message"],
+        "properties": {
+          "fact": {"type": "string", "minLength": 1},
+          "reason_code": {"type": "string", "minLength": 1},
+          "message": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "invalidation_keys": {"type": "array", "items": {"type": "object", "additionalProperties": true}},
+    "issued_at": {"type": "string", "format": "date-time"},
+    "smallest_next_action": {"type": "string", "minLength": 1},
+    "integrity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["certificate_digest"],
+      "properties": {"certificate_digest": {"$ref": "#/$defs/digest"}}
+    }
+  },
+  "$defs": {"digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}}
+}

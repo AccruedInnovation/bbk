@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-worker-design-trigger-v1.schema.json",
+  "title": "BBK Worker Design Trigger v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "work_unit_ref", "trigger", "material_ambiguity", "why_template_is_insufficient", "required_designer_output", "unaffected_work_may_continue"],
+  "properties": {
+    "schema": {"const": "bbk.worker-design-trigger.v1"},
+    "work_unit_ref": {"type": "string", "minLength": 1},
+    "trigger": {"enum": ["AUTHORITY_OR_OWNERSHIP_AMBIGUITY", "NONSTANDARD_HOST_OR_TOOL_PROJECTION", "CROSS_INTERFACE_MULTI_OWNER_MUTATION", "UNUSUAL_EFFECTS_OR_RECOVERY", "EXCEPTIONAL_MODEL_OR_CONTEXT_ROUTING", "REUSABLE_CROSS_PHASE_WORKER_CLASS"]},
+    "material_ambiguity": {"type": "string", "minLength": 1},
+    "why_template_is_insufficient": {"type": "string", "minLength": 1},
+    "required_designer_output": {"type": "string", "minLength": 1},
+    "unaffected_work_may_continue": {"type": "boolean"}
+  }
+}

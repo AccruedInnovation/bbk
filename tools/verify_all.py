@@ -31,6 +31,16 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Sequence, TextIO
 
+TOOLS_DIR = Path(__file__).resolve().parent
+if str(TOOLS_DIR) not in sys.path:
+    sys.path.insert(0, str(TOOLS_DIR))
+
+from runtime_requirements import enforce_supported_python
+
+enforce_supported_python(program="BBK verification")
+
+import dependencies
+
 ROOT = Path(__file__).resolve().parents[1]
 SUBPROCESS_OUTPUT_ENCODING = "utf-8"
 SUBPROCESS_OUTPUT_ERRORS = "backslashreplace"
@@ -44,6 +54,7 @@ class CheckSpec:
     trust_gate: bool = False
     cwd: Path = ROOT
     in_process: bool = False
+    include_node: bool = False
 
 
 @dataclass(frozen=True)
@@ -98,12 +109,20 @@ def _configure_standard_stream(stream: TextIO) -> None:
         pass
 
 
-def _subprocess_environment() -> dict[str, str]:
-    """Force Python verification children to emit the encoding we decode."""
-    environment = os.environ.copy()
+def _subprocess_environment(*, include_node: bool = False) -> dict[str, str]:
+    """Return a deterministic, non-mutating verification environment."""
+    environment = dependencies.verification_environment(
+        os.environ,
+        include_node=include_node,
+        strict=False,
+    )
     environment["PYTHONIOENCODING"] = (
         f"{SUBPROCESS_OUTPUT_ENCODING}:{SUBPROCESS_OUTPUT_ERRORS}"
     )
+    # Product tests exercise setup/install behavior with isolated fake tools.
+    # This explicit runner-only hook prevents those tests from depending on the
+    # qualification host's real toolchain.
+    environment["BBK_TEST_ALLOW_MISSING_DEPENDENCIES"] = "1"
     return environment
 
 
@@ -173,7 +192,13 @@ def verification_steps(
             test_command.extend(["--timing-report", timing_report])
         elif no_timing_report:
             test_command.append("--no-timing-report")
-        steps.append(CheckSpec(suite_name, tuple(test_command)))
+        steps.append(
+            CheckSpec(
+                suite_name,
+                tuple(test_command),
+                include_node=selected_profile in {"standard", "release"},
+            )
+        )
     elif selected_profile == "omp":
         omp_test_command = [
             python, "tools/run_tests.py", test_output_flag,
@@ -184,7 +209,7 @@ def verification_steps(
             omp_test_command.extend(["--timing-report", timing_report])
         elif no_timing_report:
             omp_test_command.append("--no-timing-report")
-        steps.append(CheckSpec("OMP-focused unittest suite", tuple(omp_test_command)))
+        steps.append(CheckSpec("OMP-focused unittest suite", tuple(omp_test_command), include_node=True))
     elif selected_profile == "codex":
         steps.append(
             CheckSpec(
@@ -196,16 +221,36 @@ def verification_steps(
                     "-v",
                     "tests.test_core_contracts.Alpha10ModelRoutingTests",
                     "tests.test_installation_portability.Alpha116CodexWorkspaceTests",
+                    "tests.test_codex_manual_qualification_kit.CodexManualQualificationKitTests",
+                    "tests.test_artifact_skill.BbkArtifactSkillTests",
                 ),
                 cwd=ROOT,
             )
         )
-    if selected_profile in {"fast", "standard", "release", "omp"}:
-        node = shutil.which("node")
+    if selected_profile in {"standard", "release", "omp"}:
+        node = os.environ.get("BBK_TEST_NODE") or shutil.which("node")
+        if not node:
+            try:
+                _command, node_environment = dependencies.command_with_node_runtime((), environment=os.environ)
+                node = node_environment.get("BBK_TEST_NODE")
+            except dependencies.DependencyError:
+                node = None
         if node:
-            steps.append(CheckSpec("OMP extension JavaScript syntax", (node, "--check", "omp/extension/index.js")))
+            steps.append(
+                CheckSpec(
+                    "OMP extension JavaScript syntax",
+                    (node, "--check", "omp/extension/index.js"),
+                    include_node=True,
+                )
+            )
         elif require_node:
-            steps.append(CheckSpec("OMP extension JavaScript syntax", ("node", "--check", "omp/extension/index.js")))
+            steps.append(
+                CheckSpec(
+                    "OMP extension JavaScript syntax",
+                    ("node", "--check", "omp/extension/index.js"),
+                    include_node=True,
+                )
+            )
         else:
             steps.append(
                 CheckSpec(
@@ -325,7 +370,7 @@ def execute_step(spec: CheckSpec, *, stream: TextIO) -> CheckResult:
             text=True,
             encoding=SUBPROCESS_OUTPUT_ENCODING,
             errors=SUBPROCESS_OUTPUT_ERRORS,
-            env=_subprocess_environment(),
+            env=_subprocess_environment(include_node=spec.include_node),
         )
     except OSError as exc:
         cause = f"{type(exc).__name__}: {exc}"

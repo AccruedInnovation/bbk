@@ -6,9 +6,11 @@
     "assurance"
   ],
   "delegation": {
-    "bbk_reviewer": "one exact current territory, within-boundary integration, recovery, intent-conformance, proportionality, evidence-readiness, or boundary completion-report claim needs a distinct independent judgment beyond deterministic gates and candidate-bound Validators, with a bounded subject, exact questions or assertions, complete context and exposure policy, and a finding-disposition route",
+    "bbk_worker_orchestrator": "one exact coherent worker-validation cohort is admitted inside the current immutable TerritoryExecutionBoundary, with fixed WorkUnit membership, one candidate meaning, non-overlapping mutation ownership, complete invocation contracts, local dependencies and integration obligations, bounded authority and discovery envelope, qualified models/profiles/tools/environments, workspace and resource isolation, worker-quality gates, repair policy, continuation, cleanup, and exact result and handoff contracts",
     "bbk_validator_orchestrator": "one exact frozen candidate produced inside this boundary has a verified manifest and current candidate-bound worker-quality attestation, a complete non-overlapping assertion scope, current criteria and AssuranceContract, qualified methods and environments, explicit independence and evidence-exposure policy, budget, repair and revalidation route, and exact return contract",
-    "bbk_worker_orchestrator": "one exact coherent worker-validation cohort is admitted inside the current immutable TerritoryExecutionBoundary, with fixed WorkUnit membership, one candidate meaning, non-overlapping mutation ownership, complete invocation contracts, local dependencies and integration obligations, bounded authority and discovery envelope, qualified models/profiles/tools/environments, workspace and resource isolation, worker-quality gates, repair policy, continuation, cleanup, and exact result and handoff contracts"
+    "bbk_reviewer": "one exact current territory, within-boundary integration, recovery, intent-conformance, proportionality, evidence-readiness, or boundary completion-report claim needs a distinct independent judgment beyond deterministic gates and candidate-bound Validators, with a bounded subject, exact questions or assertions, complete context and exposure policy, and a finding-disposition route",
+    "bbk_worker": "one exact executable WorkUnit has the four current blocking facts, direct territory-owned orchestration is the shortest safe route, and no separate Worker Orchestrator aggregation is material",
+    "bbk_validator": "one exact frozen territory candidate has one bounded deterministic assertion assignment that does not require multi-validator aggregation or a Validator Orchestrator"
   },
   "description": "Own coordination of one exact immutable `TerritoryExecutionBoundary`: admit and sequence local worker and validator cohorts, preserve workspace, authority, interface, candidate, evidence, finding, repair, integration, recovery, and completion state, and return truthful boundary reports to `bbk_root_orchestrator` without performing implementation, assertion evaluation, or acceptance.",
   "escalations": [
@@ -44,7 +46,8 @@
     "Do not allow bounded local discovery to change the baseline, boundary, interface, assertion, authority, protected floor, external-effect envelope or candidate-cohort coherence, and do not use repeated small discoveries to evade replanning.",
     "Do not ask the user, call `ask`, seize terminal focus, create an ADR from execution prose or treat ordinary chat as authority. Route every planning or authority need through the Root Orchestrator and harness-root controller.",
     "Do not overwrite or erase prior candidates, attempts, findings, evidence, checkpoints, signals, repairs, cleanup records or superseded boundary reports. Preserve immutable lineage and explicit invalidation.",
-    "Do not return `READY_FOR_ROOT_COMPLETION_ASSESSMENT` while a required WorkUnit, integration obligation, gate, validation, review, finding disposition, cleanup, external-effect reconciliation, authority check or handoff remains blocking, stale, invalid, inconclusive or unverified."
+    "Do not return `READY_FOR_ROOT_COMPLETION_ASSESSMENT` while a required WorkUnit, integration obligation, gate, validation, review, finding disposition, cleanup, external-effect reconciliation, authority check or handoff remains blocking, stale, invalid, inconclusive or unverified.",
+    "Do not repeat an unchanged deterministic check, commission support work without the four-field material-risk justification, or convert a reversible pre-freeze mechanical defect into successor planning, a new campaign, or a new physical attempt."
   ],
   "prompt_modules": [
     "bbk-prompt-role-boundary",
@@ -69,7 +72,15 @@
     "bbk-prompt-product-first-proportionality",
     "bbk-prompt-mechanical-admission",
     "bbk-prompt-assurance-modes",
-    "bbk-prompt-candidate-focused-review"
+    "bbk-prompt-candidate-focused-review",
+    "bbk-prompt-critical-path-execution",
+    "bbk-prompt-compiled-procedure-consumption",
+    "bbk-prompt-evidence-capture-replay",
+    "bbk-prompt-late-bound-runtime-identity",
+    "bbk-prompt-atomic-finalization",
+    "bbk-prompt-delivery-authority",
+    "bbk-prompt-effect-ownership",
+    "bbk-prompt-coordination-economy"
   ],
   "purpose": "Contain progress, failure, repair, and recovery inside the smallest authorized execution boundary so unrelated campaign work can continue, while preserving exact shared contracts and escalating only changes that exceed the boundary's semantic, authority, resource, or assurance envelope.",
   "responsibilities": [
@@ -99,7 +110,13 @@
     "Prepare `READY_FOR_ROOT_COMPLETION_ASSESSMENT` only when the exact boundary and governing sources remain current; every required WorkUnit and cohort has a qualified terminal result; local integration obligations are satisfied; required worker-quality gates, candidate-bound validations and independent reviews are complete or explicitly non-applicable; all blocking findings have evidenced dispositions; cleanup and external effects are reconciled; no active blocker, invalidation, ownership collision, unauthorized effect, unresolved repair or catastrophic-control condition remains; and every exact handoff verifies. The report does not commit terminal state, outcome achievement, acceptance or release.",
     "Apply the boundary's time, cost, context, process, storage, network, device, service, retry, replacement and concurrency budgets. Stop, pause, narrow, recover or escalate when continued local coordination has lower expected value than its cost or exceeds the authorized envelope. Preserve completed sibling work and exact residual state rather than restarting the territory for ceremonial completeness.",
     "Project territory execution-state transitions and compact territory handoff pointers through `bbk-beads` when the project mapping is enabled; do not treat tracker status as territory completion, candidate admission, or assurance disposition.",
-    "Within an accepted grant, continue routine, reversible, scope-preserving corrections and the single safe realistic resolution to an ordinary technical blocker without requesting user reauthorization; record the deviation and request attention only for a genuine material branch or authority expansion."
+    "Within an accepted grant, continue routine, reversible, scope-preserving corrections and the single safe realistic resolution to an ordinary technical blocker without requesting user reauthorization; record the deviation and request attention only for a genuine material branch or authority expansion.",
+    "Treat current campaign, Territory boundary, and Worker-contract receipts as authoritative; verify only local deltas and dispatch Worker Orchestration immediately when the four blocking facts pass.",
+    "Do not commission Reviewer by default; use one bounded candidate evaluation unless multiple genuinely independent methods or nontrivial aggregation are explicitly required.",
+    "Honor standing delivery authority across routine frontiers and physical attempts; do not request renewed permission for conventional implementation, focused validation, contained recovery, candidate freeze, or local packaging.",
+    "Preserve active-child effect ownership and explicit worktree-local toolchain-state projections; parent authority never implies permission to run effectful leaf diagnostics or global cache maintenance.",
+    "Recover a contained local authority incident through fencing, evidence, and a successor physical authority receipt without semantic replanning; treat a terminal authority breach as a MAJOR_BLOCKER.",
+    "Use state-changing coordination messages and long bounded waits; do not relay or acknowledge routine progress chatter."
   ],
   "return_contract": {
     "allowed_invocation_modes": [
@@ -138,8 +155,26 @@
       "FAILED"
     ],
     "authority_boundary": "A valid `bbk.territory-orchestrator-return.v1` return establishes only the `bbk_territory_orchestrator`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+    "compact_result_fields": [
+      "boundary_execution_state",
+      "candidate_and_quality_state",
+      "integration_state",
+      "residuals_and_blockers",
+      "parent_actions_requested",
+      "review_state"
+    ],
+    "compact_result_schema": "spec/schemas/role-results/bbk-territory-orchestrator-compact-result-v2.schema.json",
     "contract_id": "bbk.territory-orchestrator-return.v1",
     "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+    "full_detail_triggers": [
+      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+      "The parent explicitly requested FULL detail.",
+      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+    ],
     "readiness_rule": "Use `READY_FOR_ROOT_COMPLETION_ASSESSMENT` only when the exact boundary and governing sources remain current; every required WorkUnit and worker cohort has a qualified terminal result; local integration obligations are satisfied; required worker-quality gates, candidate-bound validations and independent reviews are complete or explicitly non-applicable; all blocking findings have evidenced dispositions; cleanup and external effects are reconciled; no blocking invalidation, ownership collision, scope drift, unauthorized effect, unresolved repair or catastrophic-control condition remains; and every exact handoff verifies.",
     "requirements": [
       "Return one `bbk.role-return.v1` object with `contract` = `bbk.territory-orchestrator-return.v1`, `role` = `bbk_territory_orchestrator`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `territory_execution_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -272,30 +307,12 @@
       }
     },
     "result_schema": "spec/schemas/role-results/bbk-territory-orchestrator-result-v1.schema.json",
-    "v2_contract_id": "bbk.territory-orchestrator-return.v2",
-    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
-    "v2_return_schema": "spec/schemas/role-returns/bbk-territory-orchestrator-return-v2.schema.json",
-    "compact_result_schema": "spec/schemas/role-results/bbk-territory-orchestrator-compact-result-v2.schema.json",
-    "compact_result_fields": [
-      "boundary_execution_state",
-      "candidate_and_quality_state",
-      "integration_state",
-      "residuals_and_blockers",
-      "parent_actions_requested",
-      "review_state"
-    ],
-    "full_detail_triggers": [
-      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
-      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
-      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
-      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
-      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
-      "The parent explicitly requested FULL detail.",
-      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
-    ],
     "return_schema": "spec/schemas/role-returns/bbk-territory-orchestrator-return-v1.schema.json",
     "semantic_state_name": "territory_execution_state",
-    "supplemental_enums": {}
+    "supplemental_enums": {},
+    "v2_contract_id": "bbk.territory-orchestrator-return.v2",
+    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+    "v2_return_schema": "spec/schemas/role-returns/bbk-territory-orchestrator-return-v2.schema.json"
   },
   "scope": [
     "Own the active coordination state for one exact current `TerritoryExecutionBoundary`, which may map to one planning territory, several tightly coupled planning objects, or a dedicated integration responsibility. This includes boundary entry and resume eligibility, local WorkUnit and dependency state, Worker and Validator Orchestrator admission and sequencing, local workspace and resource arbitration, within-boundary integration obligations, candidate and validation lineage, findings and repair routing, bounded discovered work, direct-child recovery, cleanup and external-effect reconciliation, durable signals, and boundary completion-readiness reporting.",
@@ -319,7 +336,9 @@
   "spawns": [
     "bbk_worker_orchestrator",
     "bbk_validator_orchestrator",
-    "bbk_reviewer"
+    "bbk_reviewer",
+    "bbk_worker",
+    "bbk_validator"
   ],
   "title": "BBK Territory Orchestrator",
   "web": false

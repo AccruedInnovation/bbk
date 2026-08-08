@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-logical-child-compiled-procedure-state-v2.schema.json",
+  "title": "BBK Logical Child Compiled Procedure State v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "manifest",
+    "prompt",
+    "prompt_tail",
+    "external_catalog",
+    "plan",
+    "source_map"
+  ],
+  "properties": {
+    "schema": {
+      "const": "bbk.logical-child-compiled-procedure-state.v2"
+    },
+    "manifest": {
+      "type": "object"
+    },
+    "prompt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "prompt_tail": {
+      "type": "string",
+      "minLength": 1
+    },
+    "external_catalog": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "plan": {
+      "type": "object"
+    },
+    "source_map": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "$id": "bbk-qualified-task-result-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "candidate_digest": {
+      "pattern": "^(?:sha256:)?[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "command": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "environment": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "exit_status": {
+      "type": "integer"
+    },
+    "finished_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "mise_path": {
+      "maxLength": 4096,
+      "minLength": 1,
+      "type": "string"
+    },
+    "mise_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "output_digest": {
+      "pattern": "^(?:sha256:)?[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "receipt_id": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.qualified-task-result.v1"
+    },
+    "started_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "BLOCK"
+      ],
+      "type": "string"
+    },
+    "task": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "toolchain_definition_digest": {
+      "pattern": "^(?:sha256:)?[0-9a-f]{64}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "receipt_id",
+    "task",
+    "candidate_digest",
+    "mise_path",
+    "mise_version",
+    "environment",
+    "exit_status",
+    "output_digest",
+    "started_at",
+    "finished_at"
+  ],
+  "title": "BBK qualified task result v1",
+  "type": "object"
+}

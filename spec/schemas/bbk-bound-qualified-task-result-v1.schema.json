@@ -1,0 +1,142 @@
+{
+  "$id": "bbk-bound-qualified-task-result-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BBK bound qualified task result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "bbk.bound-qualified-task-result.v1"
+    },
+    "status": {
+      "enum": [
+        "PASS",
+        "FAIL"
+      ]
+    },
+    "reason_code": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "message": {
+      "type": "string",
+      "minLength": 1
+    },
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "request_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "binding_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "capability_ref": {
+      "type": "string",
+      "pattern": "^role:bbk_[A-Za-z0-9_]+@[^#]+#sha256:[0-9a-f]{64}$"
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "invocation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "role": {
+      "type": "string",
+      "pattern": "^bbk_[A-Za-z0-9_]+$"
+    },
+    "task": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workspace_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "jj_change_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "candidate_before": {
+      "type": "object"
+    },
+    "candidate_after": {
+      "type": "object"
+    },
+    "candidate_unchanged": {
+      "type": "boolean"
+    },
+    "toolchain_definition_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "qualified_task_receipt_ref": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "mise_path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mise_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "exit_status": {
+      "type": "integer"
+    },
+    "output_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "idempotent_reuse": {
+      "type": "boolean"
+    },
+    "effect_boundary": {
+      "const": "DETECT_ONLY_NO_OS_SANDBOX"
+    },
+    "receipt_ref": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "receipt_created": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "reason_code",
+    "message",
+    "idempotency_key",
+    "request_digest",
+    "binding_ref",
+    "capability_ref",
+    "session_id",
+    "invocation_id",
+    "role",
+    "task",
+    "workspace_ref",
+    "jj_change_id",
+    "candidate_before",
+    "candidate_after",
+    "candidate_unchanged",
+    "toolchain_definition_digest",
+    "qualified_task_receipt_ref",
+    "mise_path",
+    "mise_version",
+    "exit_status",
+    "output_digest",
+    "idempotent_reuse",
+    "effect_boundary",
+    "receipt_ref",
+    "receipt_created"
+  ]
+}

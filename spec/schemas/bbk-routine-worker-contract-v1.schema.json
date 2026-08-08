@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": true,
+  "$id": "https://bbk.local/schemas/bbk-routine-worker-contract-v1.schema.json",
+  "title": "BBK Routine Worker Contract v1",
+  "required": [
+    "schema",
+    "contract_id",
+    "work_unit_ref",
+    "scope",
+    "authority_ref",
+    "workspace_receipt_ref",
+    "owned_roots",
+    "mutation_owner",
+    "profile_constraints",
+    "completion_checks",
+    "return_contract",
+    "return_route",
+    "invalidation_keys"
+  ],
+  "properties": {
+    "schema": {
+      "const": "bbk.routine-worker-contract.v1"
+    },
+    "contract_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "work_unit_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "array"
+    },
+    "authority_ref": {
+      "type": "string"
+    },
+    "workspace_receipt_ref": {
+      "type": "string"
+    },
+    "owned_roots": {
+      "type": "array",
+      "minItems": 1
+    },
+    "mutation_owner": {
+      "type": "string",
+      "minLength": 1
+    },
+    "profile_constraints": {
+      "type": "object"
+    },
+    "completion_checks": {
+      "type": "array"
+    },
+    "return_contract": {
+      "type": "string"
+    },
+    "return_route": {
+      "type": "string"
+    },
+    "invalidation_keys": {
+      "type": "array",
+      "uniqueItems": true
+    }
+  }
+}

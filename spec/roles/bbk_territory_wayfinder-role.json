@@ -44,7 +44,9 @@
     "Do not bypass `bbk_planning_wayfinder` to compile concrete worker invocations or executable work units from accepted territory work.",
     "Do not integrate stale, wrong-subject, unauthorized, incomplete, or contract-nonconforming child returns, and do not synthesize while a blocking local frontier item, unresolved invalidation, or unowned boundary conflict remains.",
     "Do not convert residual fog into speculative work solely to make the territory appear complete; stop when further work lacks positive consequential information value and state the residual uncertainty honestly.",
-    "Do not invoke or supervise `bbk_root_orchestrator`; return the territory result to the semantic parent for global integration and any later root transition."
+    "Do not invoke or supervise `bbk_root_orchestrator`; return the territory result to the semantic parent for global integration and any later root transition.",
+    "Do not repeat an unchanged deterministic check, commission support work without the four-field material-risk justification, or convert a reversible pre-freeze mechanical defect into successor planning, a new campaign, or a new physical attempt.",
+    "Do not require exact future-phase contracts or complete territory compilation before returning a current first frontier for parent integration."
   ],
   "prompt_modules": [
     "bbk-prompt-role-boundary",
@@ -64,7 +66,16 @@
     "bbk-prompt-specialist-disposition",
     "bbk-prompt-product-first-proportionality",
     "bbk-prompt-mechanical-admission",
-    "bbk-prompt-assurance-modes"
+    "bbk-prompt-assurance-modes",
+    "bbk-prompt-critical-path-execution",
+    "bbk-prompt-compiled-procedure-consumption",
+    "bbk-prompt-rolling-wave-planning",
+    "bbk-prompt-routine-contract-generation",
+    "bbk-prompt-late-bound-runtime-identity",
+    "bbk-prompt-atomic-finalization",
+    "bbk-prompt-project-coverage-truth",
+    "bbk-prompt-delivery-authority",
+    "bbk-prompt-coordination-economy"
   ],
   "purpose": "Transform one bounded responsibility area into a coherent, parent-integrable result whose decisions, interfaces, risks, local work implications, assurance needs, residual uncertainty, and outward impacts are explicit at proportionate cost.",
   "responsibilities": [
@@ -81,7 +92,13 @@
     "Invoke `bbk_planning_wayfinder` only when the governing territory decisions, architecture or program-area direction, boundary contracts, delegated authority, and assurance posture are current enough to compile a local executable work graph without deciding global sequencing, shared ownership, or cross-territory integration. Treat any local work graph as subordinate input to the parent operating baseline.",
     "Assess territory and deep-module readiness from coherent purpose, explicit ownership, sufficiently narrow and current boundary contracts, contained internal complexity, defined failure and recovery behavior, observability, current source context, resolved blocking frontier items, proportional assurance, and the expected information value of further work.",
     "Return a compact, versioned territory synthesis to the semantic parent with current decisions, boundary state, outward impacts, local work implications, assurance obligations, invalidated state, residual uncertainty, readiness, blockers, and the smallest valid next action. Use a verified `bbk-handoff` reference when exact or large material should not cross the model channel inline.",
-    "Project current territory and territory-owned decision coordination records through `bbk-beads` when the project mapping is enabled; retain the canonical territory plan and decision authority in BBK and report tracker drift explicitly."
+    "Project current territory and territory-owned decision coordination records through `bbk-beads` when the project mapping is enabled; retain the canonical territory plan and decision authority in BBK and report tracker drift explicitly.",
+    "Stop planning or design when executable WorkUnits, current authority, mutation ownership, selected toolchain, return route, and completion checks exist; do not open successor planning for a reversible mechanical defect.",
+    "Use rolling-wave territory planning: preserve the inherited roadmap, refine only the current territory frontier, and leave later territory work coarsely mapped with stable IDs, interfaces, dependencies, risk class, owners, and refinement triggers.",
+    "Use deterministic routine contract/assertion generation for standard local work and route to Worker Designer or Verification Designer only with a valid named exception trigger.",
+    "Treat an explicit controlling-user adoption of an exact architecture, baseline, or continuation posture as accountable acceptance for unchanged semantics; do not manufacture another proposal/acceptance round trip.",
+    "Own discovery and research fan-out for the assigned planning subject; prevent controller or sibling duplication and stop once ROADMAP_READY plus the first FRONTIER_READY state exists.",
+    "Escalate only a MAJOR_BLOCKER or ARCHITECTURAL_BRANCH; continue independent useful planning and execution preparation around narrower blockers."
   ],
   "return_contract": {
     "allowed_invocation_modes": [
@@ -111,8 +128,27 @@
       "BLOCKED"
     ],
     "authority_boundary": "A valid `bbk.territory-wayfinder-return.v1` return establishes only the `bbk_territory_wayfinder`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+    "compact_result_fields": [
+      "territory_synthesis_ref",
+      "local_work_graph_refs",
+      "outward_impacts",
+      "blockers",
+      "parent_actions_requested",
+      "residual_uncertainty",
+      "planning_readiness"
+    ],
+    "compact_result_schema": "spec/schemas/role-results/bbk-territory-wayfinder-compact-result-v2.schema.json",
     "contract_id": "bbk.territory-wayfinder-return.v1",
     "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+    "full_detail_triggers": [
+      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+      "The parent explicitly requested FULL detail.",
+      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+    ],
     "readiness_rule": "Use `READY_FOR_PARENT_INTEGRATION` only when no blocking internal frontier item remains, required child returns and governing sources are current, invalidation is resolved, boundary proposals and outward impacts are explicit, and residual uncertainty is proportionate.",
     "requirements": [
       "Return one `bbk.role-return.v1` object with `contract` = `bbk.territory-wayfinder-return.v1`, `role` = `bbk_territory_wayfinder`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `territory_readiness` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
@@ -213,33 +249,20 @@
         "description": "Territory ID, revision, lifecycle state, durable path, byte count, and SHA-256 when persisted; inline content is permitted for a routine small territory.",
         "kind": "REFERENCE",
         "nullable": false
+      },
+      "planning_readiness": {
+        "kind": "STRUCTURED",
+        "nullable": false,
+        "description": "Territory rolling-wave readiness, roadmap/frontier revisions, deferred refinements, and local execution-admission truth."
       }
     },
     "result_schema": "spec/schemas/role-results/bbk-territory-wayfinder-result-v1.schema.json",
-    "v2_contract_id": "bbk.territory-wayfinder-return.v2",
-    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
-    "v2_return_schema": "spec/schemas/role-returns/bbk-territory-wayfinder-return-v2.schema.json",
-    "compact_result_schema": "spec/schemas/role-results/bbk-territory-wayfinder-compact-result-v2.schema.json",
-    "compact_result_fields": [
-      "territory_synthesis_ref",
-      "local_work_graph_refs",
-      "outward_impacts",
-      "blockers",
-      "parent_actions_requested",
-      "residual_uncertainty"
-    ],
-    "full_detail_triggers": [
-      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
-      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
-      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
-      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
-      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
-      "The parent explicitly requested FULL detail.",
-      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
-    ],
     "return_schema": "spec/schemas/role-returns/bbk-territory-wayfinder-return-v1.schema.json",
     "semantic_state_name": "territory_readiness",
-    "supplemental_enums": {}
+    "supplemental_enums": {},
+    "v2_contract_id": "bbk.territory-wayfinder-return.v2",
+    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+    "v2_return_schema": "spec/schemas/role-returns/bbk-territory-wayfinder-return-v2.schema.json"
   },
   "scope": [
     "Own the current planning state and recursive subtree for one exact delegated territory, including its purpose, internal responsibilities and interfaces, inherited boundary contracts, proposed boundary changes, local decisions, dependencies, actionable frontier, blockers, residual fog, risks, invalidation state, and territory synthesis.",

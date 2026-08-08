@@ -7,7 +7,7 @@ The files in this directory are the canonical BBK role source.
 - `../method-content.json` is the sole canonical procedure source. Generated `shared/skills/*/SKILL.md` files are projections and must not be edited independently.
 - `../prompt-modules/catalog.json` and its module files own reusable cross-role behavior. A role's ordered `prompt_modules` list selects only the modules applicable to that responsibility.
 - `../roles.json` is a deterministic compatibility projection. Do not edit it directly.
-- `../contracts/catalog.json` owns the related contract-package catalogue. Role-specific result and return schemas are generated from each role's `return_contract`; see `../contracts/README.md`.
+- `../contracts/catalog.json` owns the related contract-package catalogue. Role-specific result and return schemas are generated from each role's `return_contract`; see [`../contracts/README.md`](../contracts/README.md).
 
 ## Prompt and procedure composition
 
@@ -19,26 +19,28 @@ The assembler also verifies exact ownership for behavior-specific modules, inclu
 
 ## Validation
 
-During staged alpha.13 work, validate without writing release projections:
+Validate the canonical role package and its generated contract surfaces without writing changes:
 
 ```console
-BBK_ALLOW_STAGED_ROLE_PACKAGE=1 python tools/assemble_roles.py --check
-BBK_ALLOW_STAGED_ROLE_PACKAGE=1 python tools/return_contracts.py --check
-BBK_ALLOW_STAGED_ROLE_PACKAGE=1 python tools/validate_contract_package.py --check
+python tools/assemble_roles.py --check
+python tools/return_contracts.py --check
+python tools/validate_contract_package.py --check
 ```
 
-Regenerate only the compatibility role projection after an intentional canonical-source change:
+Regenerate the role compatibility projection after an intentional canonical-source change:
 
 ```console
-BBK_ALLOW_STAGED_ROLE_PACKAGE=1 python tools/assemble_roles.py
+python tools/assemble_roles.py
 ```
 
 The legacy command remains an exact compatibility wrapper:
 
 ```console
-BBK_ALLOW_STAGED_ROLE_PACKAGE=1 python tools/create_role_spec.py --check
+python tools/create_role_spec.py --check
 ```
+
+`BBK_ALLOW_STAGED_ROLE_PACKAGE=1` is reserved for deliberate development states in which canonical package versions have not yet been reconciled. It is not part of normal validation or release qualification.
 
 Assembly fails for schema violations, noncanonical JSON serialization, catalog/file drift, unknown skills or modules, stale mandatory-procedure measurements, inappropriate module ownership, one-sided delegation edges, invalid parent modes, controller-root drift, human-request-routing drift, or roles unreachable from the declared controller roots.
 
-Generated agent prompts, generated skills, installers, release documentation, package manifests, and release archives are reconciled at release integration rather than in this canonical source package.
+After canonical changes, regenerate and verify shared skills, host projections, documentation, package manifests, and release archives through the workflow in [`docs/DEVELOPMENT.md`](../../docs/DEVELOPMENT.md).

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-identity-receipt-v1.schema.json",
+  "title": "BBK Identity Receipt v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "subject_ref",
+    "subject_kind",
+    "byte_count",
+    "sha256",
+    "canonicalization_profile",
+    "finalizer",
+    "generated_at",
+    "invalidation_keys"
+  ],
+  "properties": {
+    "schema": {"const": "bbk.identity-receipt.v1"},
+    "subject_ref": {"type": "string", "minLength": 1},
+    "subject_kind": {"enum": ["ROLE_RETURN", "MANIFEST", "HANDOFF", "PROJECTION", "ARTIFACT", "OTHER"]},
+    "byte_count": {"type": "integer", "minimum": 0},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "canonicalization_profile": {"type": "string", "minLength": 1},
+    "schema_id": {"type": ["string", "null"]},
+    "schema_validation": {"enum": ["PASS", "NOT_APPLICABLE"]},
+    "referenced_artifact_identities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["ref", "byte_count", "sha256"],
+        "properties": {
+          "ref": {"type": "string", "minLength": 1},
+          "byte_count": {"type": "integer", "minimum": 0},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "finalizer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "sha256"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "generated_at": {"type": "string", "format": "date-time"},
+    "invalidation_keys": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+  }
+}

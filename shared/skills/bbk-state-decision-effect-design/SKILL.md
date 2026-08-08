@@ -1,6 +1,8 @@
 ---
 name: bbk-state-decision-effect-design
 description: Design or review canonical state, deterministic decisions, controlled effects, recovery semantics, and proportionate transition evidence inside an ImplementationStructureContract.
+requires_prompt_modules: []
+standalone_prompt_modules: []
 ---
 
 # BBK State–Decision–Effect Design

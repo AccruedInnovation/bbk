@@ -1,57 +1,57 @@
 {
-  "schema": "bbk.handoff.v1",
-  "bbk_version": "0.1.0-alpha.16.1",
-  "id": "HO-WORK-ATTEMPT-1",
-  "project_id": "BBK-PROJECT",
-  "work_unit_id": "WU-WORK",
+  "artifacts": [],
   "attempt": 1,
-  "producer": {
-    "role": "bbk_worker",
-    "invocation_id": null,
-    "thread_id": null
-  },
-  "subject": {
-    "kind": "work-unit",
-    "id": "WU-WORK",
-    "revision": null
-  },
   "authority": {
-    "source": "standing user authorization recorded in the work unit",
     "scope": [
       "assigned workspace and declared work-unit paths"
     ],
+    "source": "standing user authorization recorded in the work unit",
     "standing": true
   },
+  "bbk_version": "0.1.0-alpha.17.0.2",
+  "blockers": [],
   "capability_zones_used": [
     {
       "kind": "protected-worktree",
-      "path": ".",
       "operations": [
         "read",
         "replace owned paths"
-      ]
+      ],
+      "path": "."
     }
   ],
-  "interrupt": null,
+  "changed_paths": [],
+  "checks": [],
+  "commands": [],
+  "continuation": {
+    "checkpoint_path": null,
+    "completed_step": null,
+    "next_step": null,
+    "resume_same_thread": true,
+    "state": "READY"
+  },
+  "created_at": "1970-01-01T00:00:00Z",
+  "discoveries": [],
   "disposition": "PAUSED_HOST_WINDOW",
+  "evidence": [],
+  "findings": [],
+  "id": "HO-WORK-ATTEMPT-1",
+  "interrupt": null,
+  "producer": {
+    "invocation_id": null,
+    "role": "bbk_worker",
+    "thread_id": null
+  },
+  "project_id": "BBK-PROJECT",
+  "residual_uncertainty": [],
+  "schema": "bbk.handoff.v1",
+  "smallest_next_action": "Verify this handoff and continue the declared work unit.",
+  "subject": {
+    "id": "WU-WORK",
+    "kind": "work-unit",
+    "revision": null
+  },
   "summary": "Replace with a concise status; authoritative large outputs are referenced below.",
   "work_performed": [],
-  "changed_paths": [],
-  "commands": [],
-  "checks": [],
-  "findings": [],
-  "discoveries": [],
-  "residual_uncertainty": [],
-  "blockers": [],
-  "artifacts": [],
-  "evidence": [],
-  "continuation": {
-    "state": "READY",
-    "checkpoint_path": null,
-    "resume_same_thread": true,
-    "completed_step": null,
-    "next_step": null
-  },
-  "smallest_next_action": "Verify this handoff and continue the declared work unit.",
-  "created_at": "1970-01-01T00:00:00Z"
+  "work_unit_id": "WU-WORK"
 }

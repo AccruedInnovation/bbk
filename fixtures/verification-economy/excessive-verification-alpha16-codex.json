@@ -1,0 +1,34 @@
+{
+  "schema": "bbk.verification-economy-event-log.v1",
+  "run_id": "alpha16-codex-excessive-verification-pattern",
+  "started_at": "2026-08-05T00:00:00Z",
+  "executable_work_at": "2026-08-05T00:05:00Z",
+  "source": {
+    "kind": "USER_REPORTED_ANALYSIS",
+    "claim_limit": "Compact replay of the reported counts and failure pattern; not a replacement for the original JSONL logs."
+  },
+  "events": [
+    {"type": "session_started", "role_class": "planning", "count": 30},
+    {"type": "session_started", "role_class": "coordination", "count": 25},
+    {"type": "session_started", "role_class": "assurance", "count": 20},
+    {"type": "session_started", "role_class": "worker", "count": 4},
+    {"type": "shell_call", "count": 7343},
+    {"type": "shell_call", "exact_within_session_duplicate": true, "count": 219},
+    {"type": "handoff_verification", "subject_key": "package:A", "count": 94},
+    {"type": "handoff_verification", "subject_key": "package:B", "count": 94},
+    {"type": "handoff_verification", "subject_key": "package:C", "count": 94},
+    {"type": "handoff_verification", "subject_key": "package:D", "count": 94},
+    {"type": "handoff_verification", "subject_key": "package:E", "count": 94},
+    {"type": "repository_validator", "subject_key": "candidate:planning", "origin_class": "planning", "changed_relevant_inputs": false, "broad_final": false, "count": 30},
+    {"type": "repository_validator", "subject_key": "candidate:final", "origin_class": "worker", "changed_relevant_inputs": true, "broad_final": true, "count": 3},
+    {"type": "support_role_commissioned", "after_executable_work": true, "named_material_blocker_or_risk": false, "count": 60},
+    {"type": "attempt_transition", "cause_class": "UNAUTHORIZED_TEMPORARY_CARRIER", "mechanical": false, "successor_plan": true},
+    {"type": "attempt_transition", "cause_class": "OUT_OF_FENCE_PROFILE_PROBE", "mechanical": true, "successor_plan": true},
+    {"type": "attempt_transition", "cause_class": "LEDGER_CHECKPOINT_CONTRADICTION", "mechanical": true, "successor_plan": true},
+    {"type": "attempt_transition", "cause_class": "TERMINAL_NEWLINE_MATERIALIZATION", "mechanical": true, "successor_plan": true},
+    {"type": "child_poll", "count": 42},
+    {"type": "child_list", "count": 18},
+    {"type": "worker_action", "observed_at": "2026-08-05T00:42:00Z"},
+    {"type": "failed_assertion_preserved", "count": 4}
+  ]
+}

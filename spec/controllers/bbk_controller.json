@@ -1,0 +1,19 @@
+{
+  "schema": "bbk.controller-procedure-declaration.v1",
+  "name": "bbk_controller",
+  "primary_procedure": "bbk",
+  "required_procedures": [
+    "bbk-context-routing",
+    "bbk"
+  ],
+  "available_procedures": [
+    "bbk",
+    "bbk-context-routing",
+    "bbk-plan",
+    "bbk-wayfind",
+    "bbk-handoff",
+    "bbk-recover",
+    "bbk-evidence",
+    "bbk-artifact"
+  ]
+}

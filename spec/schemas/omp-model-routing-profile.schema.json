@@ -3,28 +3,64 @@
   "$id": "https://bbk.local/schemas/omp-model-routing-profile.schema.json",
   "title": "BBK OMP model-routing profile",
   "type": "object",
-  "required": ["schema_version", "package_version", "id", "description", "default", "roles"],
+  "required": [
+    "schema_version",
+    "id",
+    "description",
+    "default",
+    "roles"
+  ],
   "additionalProperties": false,
   "properties": {
-    "schema_version": {"const": "bbk.omp-model-routing-profile.v1"},
-    "package_version": {"type": "string", "minLength": 1},
-    "id": {"type": "string", "pattern": "^[a-z][a-z0-9_-]*$"},
-    "description": {"type": "string", "minLength": 1},
-    "default": {"$ref": "#/$defs/route"},
+    "schema_version": {
+      "const": "bbk.omp-model-routing-profile.v1"
+    },
+    "package_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]*$"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "default": {
+      "$ref": "#/$defs/route"
+    },
     "roles": {
       "type": "object",
-      "additionalProperties": {"$ref": "#/$defs/route"}
+      "additionalProperties": {
+        "$ref": "#/$defs/route"
+      }
     }
   },
   "$defs": {
     "route": {
       "type": "object",
-      "required": ["model", "thinkingLevel"],
+      "required": [
+        "model",
+        "thinkingLevel"
+      ],
       "additionalProperties": false,
       "properties": {
-        "model": {"type": "string", "minLength": 1},
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
         "thinkingLevel": {
-          "enum": ["auto", "off", "minimal", "low", "medium", "high", "xhigh", "max"]
+          "enum": [
+            "auto",
+            "off",
+            "minimal",
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max"
+          ]
         }
       }
     }

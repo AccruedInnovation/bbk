@@ -6,8 +6,8 @@
   ],
   "delegation": {
     "bbk_reviewer": "an exact bounded phase-plan review charter and distinct independence reason can retire a material decomposition, dependency, integration, mutation-ownership, assertion-coverage, worker-readiness, authority, proportionality, or execution-feasibility risk before the phase plan returns to the Planning Wayfinder",
-    "bbk_verification_designer": "one coherent phase-local claim set, phase-exit behavior, integration obligation, feared event, recovery behavior, or evidence gate lacks a current exact assertion, method, environment, acceptance threshold, evidence requirement, applicability boundary, independence rationale, or unambiguous completing-work-unit owner; the Phase Wayfinder owns identification, commissioning, return validation, integration, and readiness, while Verification Designer owns exact assertion and evidence-method design",
-    "bbk_worker_designer": "one semantically complete concrete phase-local WorkUnit needs a current exact least-privilege invocation contract covering task and language profiles, tools, authority, capability zones, isolation, runtime, continuation, payload, result, and handoff; the Phase Wayfinder owns WorkUnit semantics, commissioning, return validation, integration, and readiness, while Worker Designer owns exact invocation-contract design and must not invent missing purpose, scope, ownership, interfaces, or assertions"
+    "bbk_verification_designer": "a valid `bbk.verification-design-trigger.v1` records a material evidence-method, environment, observability, or independence ambiguity that prevents safe deterministic assertion generation",
+    "bbk_worker_designer": "a valid `bbk.worker-design-trigger.v1` records a material multi-owner mutation, unusual effect, novel runtime/toolchain, cross-interface, isolation, or transport ambiguity that prevents safe deterministic routine contract generation"
   },
   "description": "Own detailed planning for one current phase charter: refine or define phase-local execution slices within delegated bounds, decompose the phase into leaf work units, establish internal sequencing, mutation and workspace ownership, phase-local integration obligations and assertion coverage, commission and integrate specialist assertion designs and Worker invocation contracts, coordinate bounded plan review, and return the exact phase plan to the Planning Wayfinder.",
   "escalations": [
@@ -40,7 +40,9 @@
     "Do not freeze a global candidate, bind evidence to a moving subject, or treat phase-exit criteria as candidate acceptance. Candidate identity and release remain downstream responsibilities governed by the accepted global plan.",
     "Do not integrate stale, wrong-subject, unauthorized, incomplete, overlapping, or schema-nonconforming child returns, and do not silently repair them while preserving the child's attribution.",
     "Do not treat host-turn exhaustion, context pressure, scheduling delay, a wait timeout, or a missing heartbeat as work failure, approval, cancellation, or semantic completion when a valid checkpoint and continuation route exist.",
-    "Do not overwrite a stale or superseded phase plan. Preserve history, bind the invalidation cause and affected objects, and create a successor revision."
+    "Do not overwrite a stale or superseded phase plan. Preserve history, bind the invalidation cause and affected objects, and create a successor revision.",
+    "Do not repeat an unchanged deterministic check, commission support work without the four-field material-risk justification, or convert a reversible pre-freeze mechanical defect into successor planning, a new campaign, or a new physical attempt.",
+    "Do not invoke Worker Designer or Verification Designer for routine profile-covered work, and do not require later-phase exact contracts before the current frontier can execute."
   ],
   "prompt_modules": [
     "bbk-prompt-role-boundary",
@@ -62,7 +64,13 @@
     "bbk-prompt-product-first-proportionality",
     "bbk-prompt-mechanical-admission",
     "bbk-prompt-assurance-modes",
-    "bbk-prompt-candidate-focused-review"
+    "bbk-prompt-candidate-focused-review",
+    "bbk-prompt-critical-path-execution",
+    "bbk-prompt-compiled-procedure-consumption",
+    "bbk-prompt-rolling-wave-planning",
+    "bbk-prompt-routine-contract-generation",
+    "bbk-prompt-late-bound-runtime-identity",
+    "bbk-prompt-atomic-finalization"
   ],
   "purpose": "Produce the smallest self-contained, dependency-valid, integration-complete, assertion-covered, worker-ready phase plan that preserves the phase's capability contribution and cross-phase contracts and is ready for Planning Wayfinder integration, without inventing upstream decisions, performing validation, authorizing execution, or claiming that the phase has run.",
   "responsibilities": [
@@ -78,7 +86,7 @@
     "Apply accepted State–Decision–Effect design where applicable: preserve canonical state and decision ownership, legal transitions, observation boundaries, typed effect intents, authorized executors, acknowledgement and commitment semantics, recovery behavior, transition fixtures, and formalization decisions. Place complete input–decision–state–effect–observation verticals at the earliest coherent slice boundary, but return any missing governing state, authority, or recovery decision to the Planning Wayfinder.",
     "Bind all current phase-local assertions and identify missing, ambiguous, duplicated, method-sensitive, or environment-sensitive claims. Invoke `bbk_verification_designer` for the exact unresolved assertion set. Require every active assertion to have exactly one completing leaf work unit, while allowing one work unit to complete several related assertions and a justified foundational unit to complete none. Keep integration checking, requirement verification, operational validation, outcome evidence, and independent review distinct.",
     "Define phase-planning gates and later execution gates without pretending to execute them: entry preconditions, pre-mutation deterministic checks, earliest integration checks, phase-exit evidence, review applicability, and invalidation conditions. A planned phase-exit or acceptance criterion is not proof that the phase passed, candidate acceptance, baseline acceptance, release, or execution authority.",
-    "After a work unit is semantically complete, invoke `bbk_worker_designer` for its exact phase-local least-privilege invocation contract. Supply the unit's accepted scope, interfaces, mutation ownership, assertions, authority requirements, capability zones, profile needs, isolation, logical runtime and continuation needs, payload and evidence expectations, and handoff. The Worker Designer owns host-specific model, tool, executable-path, version, activation, runtime, checkpoint, payload, result-channel, and interruption compilation; the Phase Wayfinder owns whether the returned contract satisfies the unit.",
+    "After a work unit is semantically complete, generate its routine least-privilege invocation contract deterministically when it is profile-covered and single-owner. Invoke `bbk_worker_designer` only when a valid `bbk.worker-design-trigger.v1` names a material ambiguity. The Phase Wayfinder owns WorkUnit semantics, generation inputs, integration, and readiness.",
     "Classify each work unit as bounded or extended-resumable and define its logical execution window, checkpoint meaning, continuation identity, same-thread preference, durable state and handoff need, and permitted semantic stop conditions. Use `bbk-procedure-design` when a multi-step, recurring, adaptive, interactive, or assurance-sensitive unit needs an explicit procedure. A poll timeout, silence, missing heartbeat, host-window limit, or context pressure is not work failure or cancellation.",
     "Invoke `bbk_reviewer` only with an exact bounded phase-plan charter and a distinct independence reason that can retire a material decomposition, dependency, integration, mutation-ownership, assertion-coverage, worker-readiness, authority, proportionality, or execution-feasibility risk. Review does not replace missing assertions, accept the plan, waive findings, or authorize execution.",
     "Validate every Verification Designer, Worker Designer, and Reviewer return for exact subject and revision, freshness, provenance, delegated authority, declared effects, schema completeness, evidence exposure, contradictions, and unresolved blockers before integration. Return stale, unauthorized, overlapping, incomplete, or contract-nonconforming work to its owner rather than silently rewriting it and attributing the repair to that child.",
@@ -86,7 +94,10 @@
     "Apply proportionality to phase decomposition. Avoid work units created only for tracking, duplicate gates, speculative scaffolding, or independent review without a distinct property. Stop when the phase plan is dependency-valid, integration-complete, mutation-safe, assertion-covered, worker-ready, authority- and environment-feasible, and exact enough for parent integration; preserve residual uncertainty and reopening triggers rather than manufacturing detail.",
     "Calculate phase-plan readiness from current charter and source bindings, work-unit bounds, dependency and integration closure, mutation and workspace ownership, assertion coverage, worker-contract coverage, authority and environment feasibility, child-return freshness, review dispositions, invalidation closure, and exact handoff integrity. Return the versioned phase plan to the Planning Wayfinder; never claim global baseline acceptance, phase completion, or readiness to execute.",
     "Project current phase and phase-owned WorkUnit coordination records through `bbk-beads` when the project mapping is enabled; preserve exact WorkUnit semantics, ownership, and readiness in BBK and treat tracker divergence as coordination drift.",
-    "Within an accepted grant, continue routine, reversible, scope-preserving corrections and the single safe realistic resolution to an ordinary technical blocker without requesting user reauthorization; record the deviation and request attention only for a genuine material branch or authority expansion."
+    "Within an accepted grant, continue routine, reversible, scope-preserving corrections and the single safe realistic resolution to an ordinary technical blocker without requesting user reauthorization; record the deviation and request attention only for a genuine material branch or authority expansion.",
+    "Stop planning or design when executable WorkUnits, current authority, mutation ownership, selected toolchain, return route, and completion checks exist; do not open successor planning for a reversible mechanical defect.",
+    "Compile only the current phase frontier to exact executable slices. Keep later phase work stable but deferred, and do not mutate the admitted current frontier while preparing its successor.",
+    "Generate routine Worker and assertion contracts from standard templates. Route to Worker Designer or Verification Designer only when a typed specialist trigger identifies a material ambiguity not safely resolved by deterministic generation."
   ],
   "return_contract": {
     "allowed_invocation_modes": [
@@ -119,9 +130,29 @@
       "BLOCKED"
     ],
     "authority_boundary": "A valid `bbk.phase-wayfinder-return.v1` return establishes only the `bbk_phase_wayfinder`-owned result for the exact subject, parent, invocation mode, and attempt. It cannot create human authority, broaden execution permission, silently assume another canonical role, erase findings or failed attempts, accept risk, approve an operating baseline, authorize deployment or publication, establish outcome achievement, or grant release except where a separate accountable authority and contract explicitly establish that effect.",
+    "compact_result_fields": [
+      "phase_plan_ref",
+      "work_unit_refs",
+      "execution_slice_refs",
+      "dependency_and_parallelism_state",
+      "blockers",
+      "parent_actions_requested",
+      "planning_readiness",
+      "deferred_refinements"
+    ],
+    "compact_result_schema": "spec/schemas/role-results/bbk-phase-wayfinder-compact-result-v2.schema.json",
     "contract_id": "bbk.phase-wayfinder-return.v1",
     "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
-    "readiness_rule": "Use `READY_FOR_PARENT_INTEGRATION` only when the phase charter and governing sources are current; every required slice and leaf work unit is bounded and traceable; dependencies, mutation ownership, workspaces, and integration obligations are closed; every active assertion has exactly one completing leaf work unit and sufficient evidence design; every executable work unit has a current Worker Designer contract; required authority, profiles, tools, and environments are feasible; required review findings are dispositioned; no blocking invalidation remains; and the exact handoff verifies.",
+    "full_detail_triggers": [
+      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+      "The parent explicitly requested FULL detail.",
+      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+    ],
+    "readiness_rule": "Use `READY_FOR_PARENT_INTEGRATION` when the current phase frontier is exact, authority-bound, routine contracts/assertions are generated or valid typed specialist blockers exist, and later work is explicitly deferred. Full future-phase compilation is not required.",
     "requirements": [
       "Return one `bbk.role-return.v1` object with `contract` = `bbk.phase-wayfinder-return.v1`, `role` = `bbk_phase_wayfinder`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `phase_plan_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
       "Keep every required field present. Use null or an empty collection only with an explicit reason where the contract permits absence.",
@@ -272,33 +303,25 @@
         "description": "Current Worker Designer contracts for every executable phase-local work unit, or an explicit not-ready or blocked disposition for each missing contract.",
         "kind": "REFERENCE_LIST",
         "nullable": false
+      },
+      "planning_readiness": {
+        "kind": "STRUCTURED",
+        "nullable": false,
+        "description": "Phase frontier readiness and deferred successor refinement state."
+      },
+      "deferred_refinements": {
+        "kind": "STRUCTURED_LIST",
+        "nullable": false,
+        "description": "Stable future phase-local work deliberately deferred until a later frontier."
       }
     },
     "result_schema": "spec/schemas/role-results/bbk-phase-wayfinder-result-v1.schema.json",
-    "v2_contract_id": "bbk.phase-wayfinder-return.v2",
-    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
-    "v2_return_schema": "spec/schemas/role-returns/bbk-phase-wayfinder-return-v2.schema.json",
-    "compact_result_schema": "spec/schemas/role-results/bbk-phase-wayfinder-compact-result-v2.schema.json",
-    "compact_result_fields": [
-      "phase_plan_ref",
-      "work_unit_refs",
-      "execution_slice_refs",
-      "dependency_and_parallelism_state",
-      "blockers",
-      "parent_actions_requested"
-    ],
-    "full_detail_triggers": [
-      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
-      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
-      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
-      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
-      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
-      "The parent explicitly requested FULL detail.",
-      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
-    ],
     "return_schema": "spec/schemas/role-returns/bbk-phase-wayfinder-return-v1.schema.json",
     "semantic_state_name": "phase_plan_state",
-    "supplemental_enums": {}
+    "supplemental_enums": {},
+    "v2_contract_id": "bbk.phase-wayfinder-return.v2",
+    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+    "v2_return_schema": "spec/schemas/role-returns/bbk-phase-wayfinder-return-v2.schema.json"
   },
   "scope": [
     "Own the current phase charter's local decomposition: execution slices, leaf work units, internal dependencies and ordering, mutation and workspace ownership, phase-local integration obligations, assertion-to-work-unit coverage, concrete worker-contract coverage, phase gates, continuation and handoffs, invalidation state, readiness assessment, and exact return to the Planning Wayfinder.",

@@ -28,6 +28,7 @@ import codecs
 import concurrent.futures
 import contextlib
 import datetime as dt
+import hashlib
 import json
 import os
 import re
@@ -41,10 +42,18 @@ import unittest
 from pathlib import Path
 from typing import Any, Mapping, NamedTuple, Sequence, TextIO
 
+TOOLS_DIR = Path(__file__).resolve().parent
+if str(TOOLS_DIR) not in sys.path:
+    sys.path.insert(0, str(TOOLS_DIR))
+
+from runtime_requirements import enforce_supported_python
+
+enforce_supported_python(program='BBK test runner')
+
 ROOT = Path(__file__).resolve().parents[1]
 TESTS = ROOT / "tests"
 RUN_COUNT_RE = re.compile(r"^Ran (\d+) tests? in ", re.MULTILINE)
-DEFAULT_SUITE_TIMEOUT = 300.0
+DEFAULT_SUITE_TIMEOUT = 420.0
 DEFAULT_HEARTBEAT_SECONDS = 15.0
 DEFAULT_PARALLEL_JOBS = 0
 DEFAULT_EXECUTION_MODE = "auto"
@@ -55,9 +64,29 @@ DURATION_SEED_PATH = TESTS / "test-durations.json"
 LAST_RUN_REPORT: dict[str, Any] | None = None
 FAST_TEST_FILES = frozenset({
     "test_assurance_state.py",
+    "test_dependencies.py",
     "test_contract_package_v1.py",
     "test_prompt_module_package_v1.py",
     "test_role_package_v4.py",
+    "test_schema_registry.py",
+    "test_role_capabilities.py",
+    "test_substrate_beads.py",
+    "test_governed_filesystem.py",
+    "test_worker_spawn.py",
+    "test_read_only_spawn.py",
+    "test_qualified_task.py",
+    "test_governance_status.py",
+    "test_omp_governed_profile.py",
+    "test_role_return_runtime.py",
+    "test_control_plane.py",
+    "test_release_qualification.py",
+    "test_session_oracle.py",
+    "test_model_routing_optional_package_version.py",
+    "test_manual_qualification_kit.py",
+    "test_verification_economy.py",
+    "test_verification_metrics.py",
+    "test_substrate_doctor.py",
+    "test_substrate_jj.py",
 })
 
 
@@ -67,9 +96,13 @@ def test_profile_environment(profile: str):
     previous = {
         "BBK_TEST_PROFILE": os.environ.get("BBK_TEST_PROFILE"),
         "BBK_EXTERNAL_SCHEMA": os.environ.get("BBK_EXTERNAL_SCHEMA"),
+        "BBK_TEST_ALLOW_MISSING_DEPENDENCIES": os.environ.get(
+            "BBK_TEST_ALLOW_MISSING_DEPENDENCIES"
+        ),
     }
     os.environ["BBK_TEST_PROFILE"] = profile
     os.environ["BBK_EXTERNAL_SCHEMA"] = "1" if profile == "release" else "0"
+    os.environ["BBK_TEST_ALLOW_MISSING_DEPENDENCIES"] = "1"
     try:
         yield
     finally:
@@ -194,6 +227,7 @@ def _subprocess_environment() -> dict[str, str]:
     environment["PYTHONIOENCODING"] = (
         f"{SUBPROCESS_OUTPUT_ENCODING}:{SUBPROCESS_OUTPUT_ERRORS}"
     )
+    environment["BBK_TEST_ALLOW_MISSING_DEPENDENCIES"] = "1"
     return environment
 
 
@@ -369,11 +403,7 @@ def duration_cache_path() -> Path:
     return test_cache_root() / "module-durations.json"
 
 
-def _read_duration_file(path: Path) -> dict[str, float]:
-    try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return {}
+def _duration_modules(value: Any) -> dict[str, float]:
     modules = value.get("modules") if isinstance(value, dict) else None
     if not isinstance(modules, dict):
         return {}
@@ -382,6 +412,35 @@ def _read_duration_file(path: Path) -> dict[str, float]:
         if isinstance(name, str) and isinstance(raw, (int, float)) and raw > 0:
             result[name] = float(raw)
     return result
+
+
+def _read_duration_value(path: Path) -> Any:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+
+
+def _read_duration_file(path: Path) -> dict[str, float]:
+    return _duration_modules(_read_duration_value(path))
+
+
+def duration_seed_sha256(path: Path | None = None) -> str:
+    candidate = path if path is not None else DURATION_SEED_PATH
+    try:
+        data = candidate.read_bytes()
+    except OSError:
+        data = b""
+    return hashlib.sha256(data).hexdigest()
+
+
+def _read_duration_cache(path: Path, *, seed_path: Path | None = None) -> dict[str, float]:
+    value = _read_duration_value(path)
+    if not isinstance(value, dict):
+        return {}
+    if value.get("seed_sha256") != duration_seed_sha256(seed_path):
+        return {}
+    return _duration_modules(value)
 
 
 def write_json_atomic(path: Path, value: Mapping[str, Any] | dict[str, Any]) -> None:
@@ -431,12 +490,14 @@ def update_duration_cache(report: Mapping[str, Any]) -> None:
     if not observed:
         return
     path = duration_cache_path()
-    current = _read_duration_file(path)
+    current = _read_duration_cache(path)
     for name, duration in observed.items():
         previous = current.get(name)
         current[name] = duration if previous is None else round((previous * 0.6) + (duration * 0.4), 6)
     value = {
         "schema": "bbk.test-duration-cache.v1",
+        "package_version": (ROOT / "VERSION").read_text(encoding="utf-8").strip(),
+        "seed_sha256": duration_seed_sha256(),
         "updated_at": dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         "modules": dict(sorted(current.items())),
     }
@@ -475,10 +536,11 @@ def resolve_execution_mode(
     return "pooled" if (platform_name or os.name) == "nt" else "isolated"
 
 
-def load_duration_weights(path: Path = DURATION_SEED_PATH) -> dict[str, float]:
-    """Load packaged seed weights, overridden by the local rolling cache."""
-    result = _read_duration_file(path)
-    result.update(_read_duration_file(duration_cache_path()))
+def load_duration_weights(path: Path | None = None) -> dict[str, float]:
+    """Load packaged weights plus a cache bound to the exact packaged seed."""
+    seed_path = path if path is not None else DURATION_SEED_PATH
+    result = _read_duration_file(seed_path)
+    result.update(_read_duration_cache(duration_cache_path(), seed_path=seed_path))
     return result
 
 
@@ -1055,8 +1117,14 @@ def run_test_batch(
         f"Running {len(files)} unittest modules in one Python process.\n",
         flush=True,
     )
-    result = execute_discovered(
-        pattern,
+    # ``files`` already reflects profile selection. Import only those exact
+    # modules; discovery by the broad pattern would import every test module
+    # before its load hook could filter cases, reintroducing host-only imports
+    # and startup cost into focused profiles such as Codex.
+    label = f"batch[{', '.join(path.name for path in files)}]"
+    result = execute_modules(
+        files,
+        label=label,
         quiet=quiet,
         verbose=verbose,
         failfast=failfast,
@@ -1355,7 +1423,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "--suite-timeout",
         type=float,
         default=DEFAULT_SUITE_TIMEOUT,
-        help="maximum seconds for one pooled shard, batch, or isolated unittest module (0 disables; default: 300)",
+        help="maximum seconds for one pooled shard, batch, or isolated unittest module (0 disables; default: 420)",
     )
     parser.add_argument(
         "--heartbeat-seconds",

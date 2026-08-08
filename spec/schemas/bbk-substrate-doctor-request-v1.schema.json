@@ -1,0 +1,60 @@
+{
+  "$id": "bbk-substrate-doctor-request-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "approved_tool_roots": {
+      "items": {
+        "maxLength": 4096,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "profile": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "project_root": {
+      "maxLength": 4096,
+      "minLength": 1,
+      "type": "string"
+    },
+    "required_tools": {
+      "items": {
+        "enum": [
+          "git",
+          "jj",
+          "bd",
+          "mise"
+        ],
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "schema": {
+      "const": "bbk.substrate-doctor-request.v1"
+    },
+    "search_policy": {
+      "enum": [
+        "PATH_AND_APPROVED_OFFLINE_ROOTS",
+        "PATH_ONLY"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "project_root",
+    "profile",
+    "required_tools",
+    "search_policy"
+  ],
+  "title": "BBK substrate doctor request v1",
+  "type": "object"
+}

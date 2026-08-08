@@ -11,7 +11,9 @@
     "dependency_and_parallelism_state",
     "interface_readiness_state",
     "blockers",
-    "parent_actions_requested"
+    "parent_actions_requested",
+    "planning_readiness",
+    "frontier_ref"
   ],
   "properties": {
     "work_graph_ref": {
@@ -37,6 +39,22 @@
     "parent_actions_requested": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
       "description": "Exact upstream decisions, acceptances, resynthesis, authority grants, interface dispositions, waivers, or integration actions requested from the semantic parent."
+    },
+    "planning_readiness": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Current roadmap/frontier readiness with planning mode, architecture mode, deferred refinements, and execution-admissible state."
+    },
+    "frontier_ref": {
+      "anyOf": [
+        {
+          "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/reference",
+          "description": "Exact current executable frontier reference, null only with a typed blocker."
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Exact current executable frontier reference, null only with a typed blocker."
     }
   },
   "x-bbk-role": "bbk_planning_wayfinder",

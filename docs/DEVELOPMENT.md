@@ -1,13 +1,22 @@
 # Development and repository workflow
 
-The extracted BBK package root is the canonical BBK source tree and is intended
-to be committed directly to the BBK Git repository. No repository-extraction script
-or generated `bbk/` staging directory is required.
+The extracted BBK package root is the canonical BBK source tree and is intended to be committed directly to the BBK Git repository. No repository-extraction script or generated `bbk/` staging directory is required.
 
+## Development dependencies
+
+Use Python 3.11 or newer. Check or install the dependency set before running generators or tests:
+
+```bash
+python tools/setup.py --check-dependencies
+python tools/setup.py --install-dependencies --dry-run
+python tools/setup.py --install-dependencies
+```
+
+No host flag selects the complete development surface, including OMP and Node. For Codex-only work without Node, add `--codex` to each command. The non-installing check disables mise downloads and automatic installation. The root `mise.toml` declares only pinned jj and Beads; the non-default `tools/omp-runtime.mise.toml` owns the OMP Node pin so ordinary root tasks do not load it. The opt-in installer handles Git, mise, those managed tools, compatible runtime schema packages, and the OMP Node runtime when selected; it does not install agent hosts or project language toolchains.
 
 ## Canonical generation graph
 
-Alpha.16.1 uses a one-way generation graph:
+BBK uses a one-way generation graph:
 
 ```text
 spec/roles/catalog.json + spec/roles/bbk_*-role.json
@@ -16,14 +25,22 @@ spec/roles/catalog.json + spec/roles/bbk_*-role.json
 
 canonical role return metadata
   → tools/return_contracts.py
-  → role result/return schemas + role-return registry
+  → role result/return schemas + role-return registries
 
-spec/method-content.json + spec/prompt-modules/ + spec/model-routing.json + generated roles.json
+spec/prompt-modules/catalog.json + spec/prompt-modules/*.json
+  → tools/prompt_modules.py
+  → prompt-module compatibility package
+
+spec/method-content.json
+  → tools/create_method_content.py
+  → generated shared SKILL.md files and method references
+
+split roles + return contracts + prompt modules + method content + spec/model-routing.json
   → tools/generate_agents.py
-  → shared SKILL.md files + Codex/OMP/Claude/generic projections + projections/manifest.json
+  → Codex/OMP/Pi/Claude Code/generic projections + projections/manifest.json
 
 shared/skills/bbk-artifact/{agents,assets,references,scripts}
-  → source-owned auxiliary skill package installed beside its generated SKILL.md
+  → source-owned auxiliary skill files installed beside the generated SKILL.md
 ```
 
 Provider-bound prompt integrity is qualified against the actual object returned by `before_provider_request`, not `ctx.getSystemPrompt()` or the earlier `before_agent_start` value. Tests must cover ordinary non-BBK pass-through, controller and child prompts, the IRC-wake contamination regression, every supported provider adapter, unsupported payload blocking, absent/failed host abort behavior, per-request receipts, session recovery, and the documented extension-order finality boundary. Raw prompt and provider payload content must not be persisted in receipts.
@@ -38,45 +55,60 @@ Edit only canonical inputs for generated outputs. `spec/method-content.json#skil
 
 1. Extract the new BBK release into a clean directory.
 2. Review the release notes and run the complete verification sequence.
-3. Replace the contents of the local BBK repository with the verified package
-   tree, preserving `.git/` and any intentionally maintained repository-only
-   files such as the public-facing root README.
-4. Review the Git diff, commit, and tag or publish through the normal repository
-   workflow.
+3. Replace the repository worktree with the verified package tree while preserving `.git/` and only deliberate repository-local files that the package does not own. The root `README.md` is package-owned and must not be carried forward from an older release.
+4. Review the Git diff, rerun drift checks and tests, then commit and tag or publish through the normal repository workflow.
 
 The package tree already contains `.gitignore`, `.gitattributes`, `LICENSE`,
 `CHANGELOG.md`, source, generated projections, tests, bundled profile archives,
-and durable documentation. Release qualification reports, archive audits, test
-transcripts, and pre-public history are distributed as separate release
-artifacts rather than mixed into `docs/`.
+and durable documentation. Candidate-specific qualification records that are needed to explain the shipped host boundary live under `docs/qualification/`. Large test transcripts, archive audits, and other release evidence remain outside the source tree and may be attached to the release.
 
 The separate `bbk-language-profiles` repository is distributed as an expanded
 repository tree with independently manifested profile packages beneath
-`packages/`. Update that repository directly from the matching repository
-archive; BBK does not need to extract it.
+`packages/`. For this release it publishes the same Go, Python, Rust, and
+TypeScript/JavaScript profile set as the public BBK bundle. Update that
+repository directly from the matching repository archive; BBK does not
+need to extract it.
 
 ## Verification
 
-Alpha.16.1 exposes three explicit profiles. Use the smallest profile that matches the decision being made:
+Use the smallest setup profile that matches the surface under review. Setup runs the declared dependency preflight before any test process starts:
 
 ```bash
-# Canonical contracts and deterministic transformations
+# Canonical contracts and deterministic transformations; no Node requirement
 python tools/setup.py --test-fast
 
-# Routine product, integration, and platform verification
-python tools/setup.py --test --require-node
+# Codex-only package and adapter checks; no Node requirement
+python tools/setup.py --test --codex
+
+# OMP-only package and runtime checks; Node.js 22+ required
+python tools/setup.py --test --omp
+
+# Routine cross-host product, integration, and platform verification
+python tools/setup.py --test
 
 # Exhaustive release qualification
-python tools/setup.py --release-test --require-node
+python tools/setup.py --release-test
 ```
 
-The lower-level ordered verifier accepts `fast`, `standard`, and `release` directly. Historical `quick` and `full` spellings remain aliases for `fast` and `release` where supported:
+The ordered verifier also exposes focused OMP and Codex profiles. The low-level unittest runner exposes `fast`, `standard`, and `release` because host-focused selection belongs to the ordered verifier:
 
 ```bash
+python tools/verify_all.py --profile codex
+python tools/verify_all.py --profile omp --require-node
 python tools/verify_all.py --profile fast
 python tools/verify_all.py --profile standard --require-node
 python tools/verify_all.py --profile release --require-node
+
+python tools/run_tests.py --profile fast -v
+python tools/run_tests.py --profile standard -v
+python tools/run_tests.py --profile release --all --require-node -v
 ```
+
+Historical `quick` and `full` spellings remain aliases for `fast` and `release` where supported.
+
+The Codex profile contains no Node command and must pass even when Node is absent from `PATH`. The OMP profile owns OMP JavaScript and runtime checks. Standard and release cover all hosts, so they declare the OMP Node requirement instead of discovering it by accident. Git, mise, jj, Beads, `jsonschema`, and `referencing` are declared core dependencies. Test child processes set explicit fixture paths for substrate commands, so their results do not vary with unrelated global jj or Beads installs.
+
+The native Windows workflow uses the official mise action to install the root `mise.toml` pins, then runs BBK's own opt-in dependency bootstrap and non-installing dependency check for Codex plus OMP. CI therefore exercises the same contract as a new user instead of relying on tools that happen to be preinstalled on the runner image.
 
 The standard profile keeps every product, installer, Git, Node/OMP, Beads, routing, platform, and user-facing schema-command test. Release adds only test-runner self-tests and duplicate optional whole-package Draft 2020-12 cross-checks. Release publication and `tools/build_release.py` always select release explicitly.
 
@@ -94,18 +126,16 @@ Timing reports and the rolling duration cache live outside the package tree so t
 
 The ordered profiles verify the applicable package trust gates, canonical method and role projections, model routing, generated agents, Python and JSON sanity, semantic/schema fixtures, selected unittests, OMP syntax, and post-test package integrity. OMP-only and Codex-only tested updates retain their corresponding targeted profiles.
 
-Alpha.16.1 has eight release-specific regression boundaries:
+Current regression coverage includes:
 
-- `tests/test_omp_runtime.py` mirrors the exact IRC-wake contamination path, verifies/reconstructs every supported provider payload adapter, blocks unsupported shapes without retaining user content, records one v2 receipt per request, and exposes the extension-order finality boundary.
-- `tests/test_omp_runtime.py` also separates native-`ask` wait from elapsed time and carries the current `WAITING_ON_USER` state into `/bbk:agents` while preserving independent child visibility.
-- `tests/test_omp_runtime.py` retains the observed post-completion wake and five-peer roster shapes. Successful `injected`, `woken`, and `revived` receipts or newer live rosters reactivate a completed peer without duplicate identities; later task/roster evidence and failed receipts remain authoritative.
-- `tests/test_artifact_packages_v1.py` proves draft-mode finalization, default project-local sealed output, external publication/current metadata, mutable-coordination rejection, post-publication verification, and rollback after an injected publication failure.
-- `tests/test_artifact_packages_v1.py` additionally proves one-shot Python/HTML software publication without package internals, deterministic exclusions and symlink rejection, ephemeral-draft removal, exact source binding, current-pointer resolution, and freshness rejection after source mutation.
-- `tests/test_omp_runtime.py` proves that an explicit finalization requirement cannot be satisfied by a handoff, a fresh publication permits completion, a later source mutation blocks it, and a voluntarily observed finalization receives the same freshness check.
-- `tests/test_installation_portability.py` reproduces the alpha.16 OMP-only clean-replacement failure, proves the canonical adjacent import closure is installed and manifest-owned, refreshes predecessor packaged-default routing metadata, executes installed `/bbk:models` status and schema surfaces, and repeats the checks through the dedicated updater.
-- prompt-module/generated-projection and CLI tests prove the WORKSPACE_IMPLEMENTATION / EXTERNAL_EXECUTION / PRODUCE_ONLY split, exact independent completion vocabulary, and machine-readable `bbk.cli-error.v1` diagnostics without uncontrolled argparse output.
+- the Python floor, dependency inventory, offline mise behavior, opt-in bootstrap plan, host-scoped Node rule, and preflight-before-write ordering;
+- role, prompt-module, return-contract, routing, and projection drift;
+- OMP Main/child prompt replacement, provider-payload verification, wake/resume handling, native `ask`, child visibility, routing state, and extension-order limits;
+- candidate identity, artifact finalization, source freshness, publication rollback, and exact completion claims;
+- installation, selective OMP/Codex updates, profile verification and reuse, manifest ownership, Windows paths, console behavior, and UTF-8 handling;
+- governed filesystem effects, WorkUnit ownership, durable handoffs, Beads projection, assurance state, findings, and schema commands.
 
-`tests/test_artifact_skill.py` continues to verify the seven-file canonical skill package, all role/projection references, real Codex and Claude installation, install-manifest ownership, executable modes, wrapper binding without `bbk` on `PATH`, package preflight/finalize/verify, and uninstall. The Codex selective-update test separately proves that an older managed installation acquires the skill without rebinding the shared package or changing OMP agent/extension files.
+Add a focused regression whenever a defect exposes a new contract boundary. Keep release history in [`../CHANGELOG.md`](../CHANGELOG.md) and candidate-specific host evidence in `qualification/`.
 
 ### Native filesystem path assertions
 
@@ -174,16 +204,28 @@ and regenerate:
 
 ```bash
 python tools/assemble_roles.py
+python tools/return_contracts.py --write
 python tools/create_method_content.py
+python tools/create_procedure_registry.py
+python tools/prompt_modules.py --size-report
+python tools/generate_role_capabilities.py
+python tools/model_routing.py --check
 python tools/generate_agents.py
+python tools/prompt_lint.py
 ```
 
 Then prove drift-free generation:
 
 ```bash
 python tools/assemble_roles.py --check
+python tools/return_contracts.py --check
 python tools/create_method_content.py --check
+python tools/create_procedure_registry.py --check
+python tools/prompt_modules.py --check-size-report
+python tools/generate_role_capabilities.py --check
+python tools/model_routing.py --check
 python tools/generate_agents.py --check
+python tools/prompt_lint.py --check
 ```
 
 `create_method_content.py` owns generated `SKILL.md` files and shared method references only. It deliberately does not delete or regenerate the auxiliary files under `shared/skills/bbk-artifact/`; those files are covered by the artifact-skill contract test and package manifest.
@@ -209,8 +251,6 @@ release.
 
 ## Documentation policy
 
-`docs/` contains only current, durable user and developer documentation. Historical
-migration notes, implementation PRDs, decision notes, alignment audits, and
-release-specific qualification reports are not part of the public source tree.
-Their durable public history is `CHANGELOG.md`; complete pre-public records may be
-kept in a separate archival artifact.
+The root `README.md` is the public overview. The 16 current top-level guides under `docs/`, plus `docs/README.md`, cover current operation, method, hosts, assurance, and maintenance. Release-specific files under `docs/qualification/` remain bound to the exact candidate and host combination they record; they are evidence, not general instructions.
+
+Keep migration detail and implementation history in `CHANGELOG.md` or a separate archival artifact unless the current package still depends on it. Update links, counts, commands, versions, host lists, schemas, and generated-surface names whenever their canonical source changes. Run the documentation link and current-facing checks before release.

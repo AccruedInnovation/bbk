@@ -1,8 +1,8 @@
 # OMP child lifetime, callbacks, and revived-agent visibility
 
-## Current alpha.16.1 behavior
+## Current behavior
 
-BBK `0.1.0-alpha.16.1` treats **task execution state** and **live peer state** as separate observations.
+BBK `0.1.0-alpha.17.0.2` treats **task execution state** and **live peer state** as separate observations and adds typed prompt-compilation/reuse state for the same logical child.
 
 A child can finish one OMP task attempt, remain parked in the hub, and later be woken for follow-up work. The earlier task lifecycle may still say `completed`; that does not prove that the peer session is dead or inactive. `/bbk:agents` therefore reconciles two ordered evidence sources:
 
@@ -36,11 +36,11 @@ BaffleRelayWayfinder [bbk_root_wayfinder] · running · task completed · peer r
 
 This is an observability correction. It does not create cancellation authority, guarantee that a peer will make forward progress, or replace OMP's own task/session lifecycle. `/bbk:agents` reports the newest evidence visible to the current Main session; a wake or roster result not observed by that session cannot be invented.
 
-Alpha.16.1 retains the `controller_timing` attachment on `/bbk:agents json`. While native `ask` is open, human output prefixes `WAITING_ON_USER`, request IDs, wait start, and the count of independently active BBK peers. `/bbk:timing` reports the same wait separately from provider, tool, and sub-agent observations; it does not infer compute from unattributed time.
+The current extension includes the `controller_timing` attachment on `/bbk:agents json`. While native `ask` is open, human output prefixes `WAITING_ON_USER`, request IDs, wait start, and the count of independently active BBK peers. `/bbk:timing` reports the same wait separately from provider, tool, and sub-agent observations; it does not infer compute from unattributed time.
 
 ## Exact OMP 16.4.8 child-lifetime cause
 
-BBK alpha.16.1 retains the child-lifetime contract introduced in alpha.13.3 and targets OMP `16.4.8`. That release has two task-execution paths.
+BBK `0.1.0-alpha.17.0.2` retains the child-lifetime contract qualified against OMP `16.4.8`. Changed package or host bytes require separate live qualification. That OMP release has two task-execution paths.
 
 ### Native background path
 
@@ -52,7 +52,7 @@ When all of the following are true:
 
 OMP registers each task spawn as a managed background job and returns control to the parent. The lifecycle event marks the spawn `detached`, a job handle is available for inspect/wait/cancel, and the result is delivered when the child yields.
 
-All generated alpha.16.1 OMP BBK agents explicitly declare:
+All generated OMP BBK agents explicitly declare:
 
 ```yaml
 blocking: false
@@ -68,7 +68,7 @@ An IRC message, user response, or steering wake can interrupt the parent's curre
 
 The ordinary model-facing `task` schema does not expose a per-call `detached`, `preserveOnInterrupt`, or non-cascading wait field. Execution mode is derived from OMP's host setting and agent frontmatter.
 
-## Current scheduling path, introduced in alpha.13.3
+## Current scheduling contract
 
 BBK uses the native OMP path where it is available and a scheduling fallback everywhere else.
 
@@ -81,11 +81,11 @@ BBK uses the native OMP path where it is available and a scheduling fallback eve
 
 This avoids the observed cancellation whether OMP background execution is enabled or not. BBK does not force the user's OMP `async.enabled` setting and does not add a second scheduler.
 
-## Before and after the sequencing correction
+The current extension bounds observation overhead deterministically. OMP background task results and IRC steering deliver themselves. Continue independent work, or when completely blocked use one empty `job` wait or `irc wait`; both wake on completion, messages, steering, or the host wait window. Persistent BBK mode denies specific-job polling and successful nonblocking `job list` / IRC inbox, list, or roster probes before 300 seconds have elapsed since dispatch or the prior probe while children remain active. Five minutes of silence permits one observation but is not child-health evidence, cancellation authority, or a reason to restart. Coordination calls and assurance calls remain separate verification-economy metrics.
 
-Before alpha.13.3, a parent could send a user decision request, immediately enter an inline specialist batch, then have the user response interrupt that task call and cancel the specialists.
+## Why sequencing matters
 
-After alpha.13.3:
+The unsafe sequence sends a user decision request, immediately enters an inline specialist batch, and then lets the response interrupt that task call and cancel the specialists. The current sequence avoids that pattern:
 
 - on the native background path, the request can wake the parent while eligible specialist jobs continue independently and later deliver exactly one result each;
 - on the inline path, BBK does not dispatch decision-dependent specialists until the response is integrated, and it does not combine the callback with the cancellation-sensitive wait.

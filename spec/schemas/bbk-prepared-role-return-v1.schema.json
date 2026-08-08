@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-prepared-role-return-v1.schema.json",
+  "title": "BBK prepared role-return token v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "bbk.prepared-role-return.v1"
+    },
+    "return_ref": {
+      "type": "string",
+      "pattern": "^return:[0-9a-f]{64}$"
+    }
+  },
+  "required": [
+    "schema",
+    "return_ref"
+  ]
+}

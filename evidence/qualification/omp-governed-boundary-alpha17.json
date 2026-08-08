@@ -1,0 +1,37 @@
+{
+  "assertions": {
+    "VER-017": "PASS",
+    "VER-018": "PASS",
+    "VER-019": "PASS",
+    "VER-029": "PASS",
+    "VER-030": "PASS"
+  },
+  "boundaries": {
+    "built_in_write_edit_bash_tool_call": "ENFORCED",
+    "operating_system_sandbox": "UNQUALIFIED",
+    "task_lifecycle_and_session_navigation": "DETECT_ONLY",
+    "task_spawn_tool_call": "ENFORCED",
+    "tool_execution_start_end": "DETECT_ONLY",
+    "unintercepted_subprocess_effects": "DETECT_ONLY"
+  },
+  "evidence": [
+    "tests.test_omp_binding_registry",
+    "tests.test_omp_governed_profile",
+    "evidence/qualification/omp-host-contract-linux.json"
+  ],
+  "host_version": "omp/16.4.8",
+  "notes": [
+    "CWD is observation context only and is never workspace or candidate authority.",
+    "No operating-system sandbox is claimed.",
+    "Raw prompts, credentials, and provider payloads are excluded from receipts."
+  ],
+  "qualification": "QUALIFIED",
+  "qualified_hosts": [
+    "16.4.8",
+    "omp-v16.4.8",
+    "omp/16.4.8"
+  ],
+  "release": "0.1.0-alpha.17+rc.2",
+  "schema": "bbk.omp-enforcement-boundary-status.v1",
+  "work_unit": "WU-012"
+}

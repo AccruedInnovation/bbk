@@ -1,0 +1,69 @@
+{
+  "attempts": {
+    "churn_by_cause": {},
+    "mechanical_defect_successor_plans": 0,
+    "mechanical_repairs_completed_in_place": 2
+  },
+  "budgets": {
+    "status": "PASS",
+    "violation_count": 0,
+    "violations": []
+  },
+  "coordination": {
+    "poll_or_list_calls": 1,
+    "support_roles_after_executable_work": 0
+  },
+  "latency": {
+    "seconds_to_first_outcome_bearing_worker_action": 35.0
+  },
+  "metrics_digest": "sha256:cf8e1071b6fca7c306a59e4fe439048116d4441ffe0f1a5b2d620bdfa4beca86",
+  "product_quality": {
+    "defects_found": 0,
+    "escaped_defects": 0,
+    "failed_assertions_preserved": 1
+  },
+  "prompt": {
+    "compactions": 0,
+    "prompt_bytes": 0,
+    "prompt_tokens": 0
+  },
+  "run_id": "alpha17-critical-path-compliant-pattern",
+  "schema": "bbk.verification-economy-metrics.v1",
+  "sessions": {
+    "by_class": {
+      "planning": 1,
+      "worker": 2
+    },
+    "planning_coordination_assurance": 1,
+    "total": 3,
+    "worker": 2
+  },
+  "source_digest": "sha256:3bf82b40f1d9b7f80329d3d84f00e4ade6731a8e7dc7549f83eb1db85f6fe06e",
+  "status": "PASS",
+  "totals": {
+    "boundary_admission": 2,
+    "campaign_admission": 1,
+    "check_avoided": 3,
+    "child_poll": 1,
+    "failed_assertion_preserved": 1,
+    "handoff_verification": 1,
+    "mechanical_repair_in_place": 2,
+    "receipt_reused": 3,
+    "repository_validator": 1,
+    "session_started": 3,
+    "validator_assignment": 1,
+    "worker_action": 1
+  },
+  "verification": {
+    "avoided_check_count": 3,
+    "duplicate_handoff_verifications": 0,
+    "handoff_subjects": 1,
+    "metadata_only_repository_validator_invocations": 0,
+    "receipt_reuse_count": 3,
+    "rechecks_without_changed_invalidation_key": 0,
+    "repository_validator_invocations": 1,
+    "reviewer_invocations": 0,
+    "reviewer_without_named_qualitative_risk": 0,
+    "underlying_handoff_verifications": 1
+  }
+}

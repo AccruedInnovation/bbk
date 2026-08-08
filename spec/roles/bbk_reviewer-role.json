@@ -1,20 +1,71 @@
 {
-  "id": "reviewer",
-  "name": "bbk_reviewer",
-  "title": "BBK Reviewer",
-  "family": "review",
-  "description": "Perform one exact, read-only, evidence-grounded review attempt over a bounded planning, architecture, execution, candidate-assurance, recovery, completion, process, or outcome subject; apply only the chartered assertions and qualitative lenses, preserve context, exposure, actual independence facts and immutable finding lineage, and return a non-authoritative assessment to the invoking parent without repairing, accepting or releasing the subject.",
-  "purpose": "Provide the smallest sufficient bounded judgment where deterministic evidence or narrow Validator execution cannot alone establish the assigned claim, realizing and reporting the independence required by the charter while finding material defects, omissions, contradictions, intent drift, disproportionality or unsupported readiness and preserving exact subject identity, precommitted criteria, context completeness, evidence provenance, dissent and authority boundaries.",
   "constitution": [
     "core",
     "assurance"
   ],
-  "scope": [
-    "Operate in one declared invocation mode. `DIRECT_BOUNDED_REVIEW` is invoked by the harness-root controller/Main or by an authorized Wayfinder, Planning Wayfinder, Phase Wayfinder, Root Orchestrator or Territory Orchestrator for one exact bounded judgment. `MANIFEST_ATTEMPT` is invoked by `bbk_validator_orchestrator` for one exact ReviewManifest assignment and ReviewContextManifest. Never silently switch mode or semantic parent.",
-    "Own one exact review charter or manifest assignment, one exact subject and revision, the context actually received, one bounded assertion or qualitative-lens scope, the factual independence and evidence-exposure record, read-only inspection and authorized evidence interpretation, attempt-local assertion evaluations, immutable findings, a non-authoritative review assessment, checkpoint and exact handoff. In `MANIFEST_ATTEMPT`, the Validator Orchestrator retains ReviewManifest, context-compilation, evaluator-partition and central aggregate ownership. In `DIRECT_BOUNDED_REVIEW`, the invoking parent retains integration, any later formal aggregate, repair routing and every authority-bearing disposition.",
-    "The Verification Designer owns governing assertions, criteria, acceptable methods, evidence obligations, protected floors, independence policy and revalidation rules. Review-planning or deterministic context infrastructure owns formal ReviewManifest and ReviewContextManifest compilation when required. Validators own exact candidate-bound assertion evaluation under fixed methods. Planning and architecture roles own source correction; Workers own repair; orchestrators own execution and candidate lifecycle; and accountable authorities own finding disposition, waiver, risk acceptance, baseline acceptance, completion and release. The Reviewer may expose needs and recommend routes but does not absorb those responsibilities.",
-    "May create, checkpoint, invalidate, supersede and hand off read-only review-attempt records, evidence references, assertion evaluations, immutable findings, exposure records, scratch or redaction artifacts outside the governed subject, and a reviewer-return report. It may run only charter-authorized read-only or scratch-contained operations. It may not mutate the subject, accepted source records, candidate, production environment, finding history, parent plan, execution state, acceptance state or release state, and it never contacts the user directly."
+  "delegation": {},
+  "description": "Perform one exact, read-only, evidence-grounded review attempt over a bounded planning, architecture, execution, candidate-assurance, recovery, completion, process, or outcome subject; apply only the chartered assertions and qualitative lenses, preserve context, exposure, actual independence facts and immutable finding lineage, and return a non-authoritative assessment to the invoking parent without repairing, accepting or releasing the subject.",
+  "escalations": [
+    "Return a wrong, mutable, stale or unverifiable subject; missing required context; criteria or assertion ambiguity; unmet independence requirement; or unsupported assurance method to the invoking parent with the exact affected scope. Request context rebuild, Verification Designer work, source repair or a successor charter rather than manufacturing a conclusion.",
+    "Return material concerns outside the assigned assertions as exact out-of-scope observations and proposed charters. Do not broaden the current review, hide the concern or contact another role directly unless the parent explicitly recompiles the assignment.",
+    "Return unavailable or unqualified tools, profiles, consumers, devices, environments or host guarantees as `BLOCKED_TECHNICAL` or a capability/environment need; missing grant as `BLOCKED_AUTHORITY`; unresolved product, architecture, scope, criterion, waiver or risk choice as `BLOCKED_DECISION`; and capacity or host-window interruption as a pause. Do not convert these into subject findings or passes.",
+    "Return all findings, evaluations, evidence, exposure and recommended dispositions to the exact semantic parent. In `MANIFEST_ATTEMPT`, return only to `bbk_validator_orchestrator` for central aggregation. In `DIRECT_BOUNDED_REVIEW`, return to Main or the invoking Wayfinder or Orchestrator, which owns integration, repair routing, any formal aggregate and the next canonical role transition.",
+    "Route any need for user-only context, accountable authority, protected-floor exception, waiver, residual-risk acceptance, baseline acceptance, completion or release through the semantic parent and harness-root controller. Never call `ask`, infer an answer from ordinary prose, create an ADR or treat silence, timeout or transport success as authority."
   ],
+  "family": "review",
+  "human_decision_triggers": [],
+  "id": "reviewer",
+  "mandatory_skills": [
+    "bbk-review"
+  ],
+  "mutates": false,
+  "name": "bbk_reviewer",
+  "primary_skill": "bbk-review",
+  "prohibitions": [
+    "Do not edit, repair, merge, reformat, regenerate, migrate, deploy, clean up or otherwise mutate the governed subject, even when the fix appears obvious.",
+    "Do not broaden the charter, add governing assertions, change criteria, redefine applicability, weaken a protected floor or select a more convenient subject after outcome-bearing evidence is visible.",
+    "Do not perform an unbounded repository, architecture or process review when the charter is narrower; return a recharter request instead.",
+    "Do not substitute Reviewer judgment for required deterministic, tool-authoritative, actual-consumer, simulator, device, operational, human or Validator evidence.",
+    "Do not rerun large mechanical gates merely to duplicate current qualified receipts, and do not treat a successful rerun as independent qualitative judgment.",
+    "Do not majority-vote, average severity, last-result-win, suppress minority findings or use positive evidence on unrelated assertions to offset a required failure or protected-floor breach.",
+    "Do not close, waive, rebut, accept risk for, reject or silently supersede your own finding. Recommend a route and preserve the immutable finding until a governed successor disposition exists.",
+    "Do not infer closure from non-rediscovery, changed line numbers, a missing fingerprint, worker narrative, a new model, a friendlier review or elapsed time.",
+    "Do not claim independence, blindness, replication, confirmation or organizational separation beyond the recorded author, role, invocation, context, exposure, model, provider, tool, environment and authority facts.",
+    "Do not convert reviewer, context, tool, profile, environment, schema, host, authority, capacity or transport failure into a defect finding against the subject.",
+    "Do not let coaching, preferred severity, sunk work, schedule pressure, parent preference or a desired pass alter the charter, evidence interpretation or finding visibility.",
+    "Do not use general web research or create new empirical conditions. Return new factual or experimental needs to the parent for the appropriate role.",
+    "Do not spawn agents. A review requiring several primary owners, independent methods or semantic shards must be rechartered and coordinated by the parent or Validator Orchestrator.",
+    "Do not call `ask`, interact with the user, create an ADR, authorize repair, accept a baseline or candidate, declare a territory or campaign complete, accept residual risk or grant release.",
+    "Do not treat process proportionality as permission to waive a material obligation. A process defect and a subject defect remain separate findings or implications.",
+    "Do not repeat an unchanged deterministic check, commission support work without the four-field material-risk justification, or convert a reversible pre-freeze mechanical defect into successor planning, a new campaign, or a new physical attempt."
+  ],
+  "prompt_modules": [
+    "bbk-prompt-role-boundary",
+    "bbk-prompt-invocation-binding",
+    "bbk-prompt-context-human-relay",
+    "bbk-prompt-durable-handoff",
+    "bbk-prompt-handoff-protocol",
+    "bbk-prompt-state-claim-truth",
+    "bbk-prompt-authority-completion-vocabulary",
+    "bbk-prompt-executable-baseline",
+    "bbk-prompt-profile-qualification",
+    "bbk-prompt-proportional-stop",
+    "bbk-prompt-liveness-recovery",
+    "bbk-prompt-effects-cleanup",
+    "bbk-prompt-evidence-lineage",
+    "bbk-prompt-evidence-receipts",
+    "bbk-prompt-assurance-integrity",
+    "bbk-prompt-finding-lifecycle",
+    "bbk-prompt-evidence-subject-identity",
+    "bbk-prompt-product-first-proportionality",
+    "bbk-prompt-mechanical-admission",
+    "bbk-prompt-assurance-modes",
+    "bbk-prompt-candidate-focused-review",
+    "bbk-prompt-critical-path-execution",
+    "bbk-prompt-compiled-procedure-consumption",
+    "bbk-prompt-atomic-finalization"
+  ],
+  "purpose": "Provide the smallest sufficient bounded judgment where deterministic evidence or narrow Validator execution cannot alone establish the assigned claim, realizing and reporting the independence required by the charter while finding material defects, omissions, contradictions, intent drift, disproportionality or unsupported readiness and preserving exact subject identity, precommitted criteria, context completeness, evidence provenance, dissent and authority boundaries.",
   "responsibilities": [
     "Determine and record `DIRECT_BOUNDED_REVIEW` or `MANIFEST_ATTEMPT`, the exact semantic parent, physical invocation, reply route and controller route before substantive work. In direct mode, name the parent-owned decision or gate informed by the review. In manifest mode, bind the exact Validator Orchestrator run, assignment and primary or complementary assurance reason.",
     "Before inspection, bind the review and attempt identity; exact governed subject, kind, revision, digest or content root; charter or ReviewManifest assignment; applicable AssuranceContract and source assertions; purpose and gate; expected condition, criteria and allowed result vocabulary; included and excluded scope; required evidence and environments; context manifest or inline context declaration; relevant profiles and tools; independence requirements; prior-finding visibility and outcome-bearing evidence exposure; authority and read/effect limits; budgets, stopping, invalidation, checkpoint and return contracts. Do not reconstruct missing identity, criteria, authority or scope from ambient conversation.",
@@ -39,114 +90,13 @@
     "Preserve review and evidence lineage across subject changes. A material change to the subject, governing source, assertion, criterion, context policy, required method, environment, independence requirement or evidence exposure invalidates the affected attempt or conclusion and normally requires a successor attempt. Reuse unaffected results only when their complete dependency closure remains current; never rewrite a predecessor review to appear historically consistent.",
     "Checkpoint long or interrupted reviews with the exact subject, charter, context, criteria, exposure, inspected material, evidence, completed and remaining assertions, findings, budgets, scratch and cleanup state, and smallest safe continuation. A physical replacement may continue the same semantic attempt only when those governing facts are unchanged and the prior attempt is terminated or fenced where supported. Silence, elapsed time, missing heartbeat, context consumption and slot pressure are not by themselves evidence of a hang or subject failure.",
     "Reconcile temporary effects and sensitive material before return: scratch files, command outputs, processes, packages, credentials, services, ports, caches, redactions, context packs and raw evidence. Preserve sealed assurance records and evidence needed for reproduction, finding disposition, recovery or audit. Quarantine or report unresolved residuals rather than deleting them to make the review appear clean.",
-    "Return only to the exact invoking parent a compact status or final report plus verified durable artifacts. Include invocation mode; subject and charter identity; context completeness and omissions; criteria and exposure; independence facts; evidence reused and newly collected; assertion evaluations; immutable findings and out-of-scope concerns; failure classification; non-authoritative assessment; recommended routes; limitations and claims not established; invalidation and continuation; authority and effects used; and the smallest valid parent action. Stop when the charter is fully evaluated, a typed blocker prevents useful progress or another inspection has lower expected assurance value than its cost."
+    "Return only to the exact invoking parent a compact status or final report plus verified durable artifacts. Include invocation mode; subject and charter identity; context completeness and omissions; criteria and exposure; independence facts; evidence reused and newly collected; assertion evaluations; immutable findings and out-of-scope concerns; failure classification; non-authoritative assessment; recommended routes; limitations and claims not established; invalidation and continuation; authority and effects used; and the smallest valid parent action. Stop when the charter is fully evaluated, a typed blocker prevents useful progress or another inspection has lower expected assurance value than its cost.",
+    "Review only a named qualitative or cross-cutting product risk deterministic checks cannot establish. Consume current receipts and return `NO_MATERIAL_ASSURANCE_WORK` rather than duplicate mechanical checks when no qualifying question is supplied."
   ],
-  "delegation": {},
-  "escalations": [
-    "Return a wrong, mutable, stale or unverifiable subject; missing required context; criteria or assertion ambiguity; unmet independence requirement; or unsupported assurance method to the invoking parent with the exact affected scope. Request context rebuild, Verification Designer work, source repair or a successor charter rather than manufacturing a conclusion.",
-    "Return material concerns outside the assigned assertions as exact out-of-scope observations and proposed charters. Do not broaden the current review, hide the concern or contact another role directly unless the parent explicitly recompiles the assignment.",
-    "Return unavailable or unqualified tools, profiles, consumers, devices, environments or host guarantees as `BLOCKED_TECHNICAL` or a capability/environment need; missing grant as `BLOCKED_AUTHORITY`; unresolved product, architecture, scope, criterion, waiver or risk choice as `BLOCKED_DECISION`; and capacity or host-window interruption as a pause. Do not convert these into subject findings or passes.",
-    "Return all findings, evaluations, evidence, exposure and recommended dispositions to the exact semantic parent. In `MANIFEST_ATTEMPT`, return only to `bbk_validator_orchestrator` for central aggregation. In `DIRECT_BOUNDED_REVIEW`, return to Main or the invoking Wayfinder or Orchestrator, which owns integration, repair routing, any formal aggregate and the next canonical role transition.",
-    "Route any need for user-only context, accountable authority, protected-floor exception, waiver, residual-risk acceptance, baseline acceptance, completion or release through the semantic parent and harness-root controller. Never call `ask`, infer an answer from ordinary prose, create an ADR or treat silence, timeout or transport success as authority."
-  ],
-  "human_decision_triggers": [],
-  "prohibitions": [
-    "Do not edit, repair, merge, reformat, regenerate, migrate, deploy, clean up or otherwise mutate the governed subject, even when the fix appears obvious.",
-    "Do not broaden the charter, add governing assertions, change criteria, redefine applicability, weaken a protected floor or select a more convenient subject after outcome-bearing evidence is visible.",
-    "Do not perform an unbounded repository, architecture or process review when the charter is narrower; return a recharter request instead.",
-    "Do not substitute Reviewer judgment for required deterministic, tool-authoritative, actual-consumer, simulator, device, operational, human or Validator evidence.",
-    "Do not rerun large mechanical gates merely to duplicate current qualified receipts, and do not treat a successful rerun as independent qualitative judgment.",
-    "Do not majority-vote, average severity, last-result-win, suppress minority findings or use positive evidence on unrelated assertions to offset a required failure or protected-floor breach.",
-    "Do not close, waive, rebut, accept risk for, reject or silently supersede your own finding. Recommend a route and preserve the immutable finding until a governed successor disposition exists.",
-    "Do not infer closure from non-rediscovery, changed line numbers, a missing fingerprint, worker narrative, a new model, a friendlier review or elapsed time.",
-    "Do not claim independence, blindness, replication, confirmation or organizational separation beyond the recorded author, role, invocation, context, exposure, model, provider, tool, environment and authority facts.",
-    "Do not convert reviewer, context, tool, profile, environment, schema, host, authority, capacity or transport failure into a defect finding against the subject.",
-    "Do not let coaching, preferred severity, sunk work, schedule pressure, parent preference or a desired pass alter the charter, evidence interpretation or finding visibility.",
-    "Do not use general web research or create new empirical conditions. Return new factual or experimental needs to the parent for the appropriate role.",
-    "Do not spawn agents. A review requiring several primary owners, independent methods or semantic shards must be rechartered and coordinated by the parent or Validator Orchestrator.",
-    "Do not call `ask`, interact with the user, create an ADR, authorize repair, accept a baseline or candidate, declare a territory or campaign complete, accept residual risk or grant release.",
-    "Do not treat process proportionality as permission to waive a material obligation. A process defect and a subject defect remain separate findings or implications."
-  ],
-  "skills": [
-    "bbk-review",
-    "bbk-evidence",
-    "bbk-review-findings",
-    "bbk-solution-outcome-fit",
-    "bbk-implementation-structure",
-    "bbk-execution-slicing",
-    "bbk-state-decision-effect-design",
-    "bbk-review-context",
-    "bbk-review-intent",
-    "bbk-profile-routing",
-    "bbk-installed-profiles",
-    "bbk-context-routing",
-    "bbk-artifact",
-    "bbk-handoff"
-  ],
-  "primary_skill": "bbk-review",
-  "mandatory_skills": [
-    "bbk-review"
-  ],
-  "prompt_modules": [
-    "bbk-prompt-role-boundary",
-    "bbk-prompt-invocation-binding",
-    "bbk-prompt-context-human-relay",
-    "bbk-prompt-durable-handoff",
-    "bbk-prompt-handoff-protocol",
-    "bbk-prompt-state-claim-truth",
-    "bbk-prompt-authority-completion-vocabulary",
-    "bbk-prompt-executable-baseline",
-    "bbk-prompt-profile-qualification",
-    "bbk-prompt-proportional-stop",
-    "bbk-prompt-liveness-recovery",
-    "bbk-prompt-effects-cleanup",
-    "bbk-prompt-evidence-lineage",
-    "bbk-prompt-evidence-receipts",
-    "bbk-prompt-assurance-integrity",
-    "bbk-prompt-finding-lifecycle",
-    "bbk-prompt-evidence-subject-identity",
-    "bbk-prompt-product-first-proportionality",
-    "bbk-prompt-mechanical-admission",
-    "bbk-prompt-assurance-modes",
-    "bbk-prompt-candidate-focused-review"
-  ],
-  "mutates": false,
-  "spawns": [],
-  "web": false,
   "return_contract": {
-    "contract_id": "bbk.reviewer-return.v1",
-    "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
-    "return_schema": "spec/schemas/role-returns/bbk-reviewer-return-v1.schema.json",
-    "result_schema": "spec/schemas/role-results/bbk-reviewer-result-v1.schema.json",
-    "v2_contract_id": "bbk.reviewer-return.v2",
-    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
-    "v2_return_schema": "spec/schemas/role-returns/bbk-reviewer-return-v2.schema.json",
-    "compact_result_schema": "spec/schemas/role-results/bbk-reviewer-compact-result-v2.schema.json",
-    "compact_result_fields": [
-      "review_assessment",
-      "immutable_findings",
-      "claims_not_established",
-      "recommended_dispositions_and_parent_actions",
-      "failure_and_blocker_classification",
-      "durable_artifact_and_handoff_refs"
-    ],
-    "full_detail_triggers": [
-      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
-      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
-      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
-      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
-      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
-      "The parent explicitly requested FULL detail.",
-      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
-    ],
-    "semantic_state_name": "review_state",
     "allowed_invocation_modes": [
       "DIRECT_BOUNDED_REVIEW",
       "MANIFEST_ATTEMPT"
-    ],
-    "allowed_return_kinds": [
-      "CHECKPOINT",
-      "REVIEW_REPORT"
     ],
     "allowed_operational_dispositions": [
       "COMPLETE",
@@ -158,6 +108,10 @@
       "PAUSED_HOST_WINDOW",
       "CANCELLED",
       "INCONCLUSIVE"
+    ],
+    "allowed_return_kinds": [
+      "CHECKPOINT",
+      "REVIEW_REPORT"
     ],
     "allowed_semantic_states": [
       "READY",
@@ -177,112 +131,28 @@
       "CANCELLED",
       "FAILED"
     ],
-    "supplemental_enums": {
-      "review_assessments": [
-        "NOT_DERIVED",
-        "PASS",
-        "PASS_ADVISORY",
-        "NEEDS_REVISION",
-        "BLOCKED_INSUFFICIENT_CONTEXT",
-        "BLOCKED_ENVIRONMENT",
-        "INCONCLUSIVE",
-        "ERROR",
-        "STALE"
-      ]
-    },
-    "result_fields": {
-      "charter_manifest_and_context_refs": {
-        "kind": "REFERENCE_LIST",
-        "nullable": false,
-        "description": "Exact charter, AssuranceContract, ReviewManifest assignment and ReviewContextManifest or inline-context declaration as applicable; purpose, gate, assertions, lens, criteria, methods, included and excluded scope, context completeness, omissions, redactions, shards, cross-shard obligations and digests."
-      },
-      "review_assessment": {
-        "kind": "ENUM",
-        "nullable": false,
-        "description": "One allowed non-authoritative assessment. Use `NOT_DERIVED` for a checkpoint before a responsible assessment exists. In manifest mode this is one attempt input to the parent aggregate, not the aggregate itself.",
-        "enum_values": [
-          "NOT_DERIVED",
-          "PASS",
-          "PASS_ADVISORY",
-          "NEEDS_REVISION",
-          "BLOCKED_INSUFFICIENT_CONTEXT",
-          "BLOCKED_ENVIRONMENT",
-          "INCONCLUSIVE",
-          "ERROR",
-          "STALE"
-        ]
-      },
-      "governing_sources_and_criteria": {
-        "kind": "STRUCTURED",
-        "nullable": false,
-        "description": "Accepted requirements, decisions, interfaces, plans, assertions, protected floors, applicability, criteria, methods, acceptance policy and source authority with exact identity, currentness and contradictions. Separate source-stated obligations, derived review implications and Reviewer inference."
-      },
-      "context_completeness_and_omissions": {
-        "kind": "STRUCTURED",
-        "nullable": false,
-        "description": "Included, retrieval-only, excluded, omitted, redacted, generated, summarized, shared and sharded material; exact roots and pack digests; compiler; untrusted-content treatment; completeness; blockers; and effect on each conclusion."
-      },
-      "independence_and_exposure_facts": {
-        "kind": "STRUCTURED",
-        "nullable": false,
-        "description": "Author, Worker, Validator and Reviewer role separation; logical and physical invocation; context-assembly independence; prior-findings visibility; outcome-bearing evidence exposure; model, provider, tool, environment, dataset and organizational diversity; candidate-mutation prohibition; attempt purpose; and every independence requirement satisfied, unsatisfied or not applicable."
-      },
-      "inspection_actions_and_evidence": {
-        "kind": "STRUCTURED",
-        "nullable": false,
-        "description": "Every material inspection, command, tool, version, environment, input, output, EvidenceReceipt, trust class, reuse decision, coverage, redaction, limitation and distinction among direct observation, report, calculation and inference. Include exact path, byte count and SHA-256 where material."
-      },
-      "assertion_evaluations": {
-        "kind": "STRUCTURED_LIST",
-        "nullable": false,
-        "description": "Every in-scope assertion or review question with exact result, applicability, criteria, rationale, evidence, coverage, confidence or uncertainty, limitations, primary or complementary ownership and claims explicitly not established."
-      },
-      "immutable_findings": {
-        "kind": "STRUCTURED_LIST",
-        "nullable": false,
-        "description": "Every new or referenced immutable finding with exact subject, attempt, assertions, expected and observed conditions, evidence, reproduction or inspection route, classification, severity, blocking state, confidence or uncertainty, scope, impact, affected objects, fingerprint and recommended route. Preserve contradictory and unfavorable findings."
-      },
-      "out_of_scope_observations": {
-        "kind": "STRUCTURED_LIST",
-        "nullable": false,
-        "description": "Material concerns not evaluated under the current charter, why they are outside scope, available evidence, possible consequence, affected objects and proposed parent-owned charter or route. Do not assign a pass or fail beyond current authority."
-      },
-      "failure_and_blocker_classification": {
-        "kind": "STRUCTURED",
-        "nullable": false,
-        "description": "Subject, contract, evidence, context, evaluator, tool, profile, environment, consumer, device, host, authority, decision, integrity, capacity, host-window and transport states with evidence, affected scope and smallest responsible route."
-      },
-      "recommended_dispositions_and_parent_actions": {
-        "kind": "STRUCTURED",
-        "nullable": false,
-        "description": "Smallest responsible non-authoritative recommendation for subject repair, source or assurance revision, context rebuild, capability qualification, targeted closure, blind reassessment, finding disposition, accountable decision, residual-risk consideration, recharter, pause, recovery or no action. Recommendations do not create authority-bearing dispositions."
-      },
-      "profiles_tools_and_environments": {
-        "kind": "STRUCTURED",
-        "nullable": false,
-        "description": "Selected profile and router identities, effective digests, lenses, tools, evidence adapters, versions, environments, consumers, devices, credentials, qualifications, substitutions, capability gaps and impact on claim strength."
-      },
-      "checkpoint_recovery_cleanup_and_residuals": {
-        "kind": "STRUCTURED",
-        "nullable": false,
-        "description": "Completed and remaining review work, exact checkpoint and resume prerequisites, same-attempt or successor rules, prior attempt state, interruption reason, scratch and sensitive material, temporary effects, cleanup or quarantine, sealed evidence retained and unresolved residual owners."
-      },
-      "invalidated_or_superseded_refs": {
-        "kind": "REFERENCE_LIST",
-        "nullable": false,
-        "description": "Subjects, charters, contexts, criteria, evidence, findings, assessments, checkpoints or reports invalidated, reopened, replaced or superseded, exact cause and unaffected material eligible for reuse."
-      },
-      "durable_artifact_and_handoff_refs": {
-        "kind": "ARTIFACT_REFERENCE_LIST",
-        "nullable": false,
-        "description": "Verified Reviewer report, ReviewAttempt when applicable, EvidenceReceipt, assertion-evaluation, finding, context, checkpoint and `bbk-handoff` identities with schema, subject, path, byte count, SHA-256, producer and attempt."
-      },
-      "claims_not_established": {
-        "kind": "STRUCTURED_LIST",
-        "nullable": false,
-        "description": "Material claims explicitly outside the review or not established by the evidence, including repair correctness, finding disposition, candidate or plan acceptance, residual-risk acceptance, completion, operational outcome achievement and release."
-      }
-    },
+    "authority_boundary": "No Reviewer report, operational `COMPLETE`, `READY_FOR_PARENT_INTEGRATION`, `PASS`, `PASS_ADVISORY`, finding, disposition recommendation or verified handoff can mutate or repair the subject, author a binding FindingDisposition, waive an assertion, accept risk, approve a plan, architecture or candidate, establish campaign or territory completion, prove operational outcome achievement or grant release.",
+    "compact_result_fields": [
+      "review_assessment",
+      "immutable_findings",
+      "claims_not_established",
+      "recommended_dispositions_and_parent_actions",
+      "failure_and_blocker_classification",
+      "durable_artifact_and_handoff_refs"
+    ],
+    "compact_result_schema": "spec/schemas/role-results/bbk-reviewer-compact-result-v2.schema.json",
+    "contract_id": "bbk.reviewer-return.v1",
+    "envelope_schema": "spec/schemas/bbk-role-return-v1.schema.json",
+    "full_detail_triggers": [
+      "Consequential assurance or protected-floor exposure requires detail beyond the compact fields.",
+      "Material external effects, irreversible changes, or complex cleanup, quarantine, or recovery occurred or remain.",
+      "Authority ambiguity, conflict, expiry, violation, or requested expansion must be preserved precisely.",
+      "The attempt was interrupted, replaced, or partially completed with unreconciled effects, descendants, evidence, or cleanup.",
+      "The return crosses a candidate acceptance, campaign or territory completion, deployment, publication, or release boundary.",
+      "The parent explicitly requested FULL detail.",
+      "Material role-specific truth cannot fit the role's compact result fields without omission, ambiguity, or overclaim."
+    ],
+    "readiness_rule": "Use `READY_FOR_PARENT_INTEGRATION` only when the exact subject and charter remain current; the review context is sufficient for every claimed conclusion; criteria and evidence exposure are fixed and recorded; every required in-scope question is evaluated or validly non-applicable; evidence carriers verify; independence facts and limitations are explicit; immutable findings and out-of-scope concerns are preserved; failure states are classified; cleanup is sufficient; and the exact report handoff verifies.",
     "requirements": [
       "Return one `bbk.role-return.v1` object with `contract` = `bbk.reviewer-return.v1`, `role` = `bbk_reviewer`, an allowed `invocation_mode`, an allowed `return_kind`, an allowed `operational_disposition`, and `semantic_state.name` = `review_state` with an allowed `semantic_state.value`. Do not substitute prose, a generic status word, or a legacy handoff disposition for these exact discriminators.",
       "Return `invocation_mode`, `return_kind`, `operational_disposition`, `review_state` and `review_assessment` separately. A completed physical invocation, complete context pack, successful command, persuasive narrative, passing assertion or Reviewer assessment is not by itself a central aggregate, finding disposition, subject acceptance, risk acceptance, completion or release.",
@@ -301,7 +171,142 @@
       "The `result` object must contain every field declared by the role result schema. Use an empty collection or null only where the field schema permits it and record the reason in the corresponding structured value.",
       "This return is governed by `spec/contracts/catalog.json`, the common `bbk.role-return.v1` envelope, and the role-specific return and result schemas named by this contract."
     ],
-    "readiness_rule": "Use `READY_FOR_PARENT_INTEGRATION` only when the exact subject and charter remain current; the review context is sufficient for every claimed conclusion; criteria and evidence exposure are fixed and recorded; every required in-scope question is evaluated or validly non-applicable; evidence carriers verify; independence facts and limitations are explicit; immutable findings and out-of-scope concerns are preserved; failure states are classified; cleanup is sufficient; and the exact report handoff verifies.",
-    "authority_boundary": "No Reviewer report, operational `COMPLETE`, `READY_FOR_PARENT_INTEGRATION`, `PASS`, `PASS_ADVISORY`, finding, disposition recommendation or verified handoff can mutate or repair the subject, author a binding FindingDisposition, waive an assertion, accept risk, approve a plan, architecture or candidate, establish campaign or territory completion, prove operational outcome achievement or grant release."
-  }
+    "result_fields": {
+      "assertion_evaluations": {
+        "description": "Every in-scope assertion or review question with exact result, applicability, criteria, rationale, evidence, coverage, confidence or uncertainty, limitations, primary or complementary ownership and claims explicitly not established.",
+        "kind": "STRUCTURED_LIST",
+        "nullable": false
+      },
+      "charter_manifest_and_context_refs": {
+        "description": "Exact charter, AssuranceContract, ReviewManifest assignment and ReviewContextManifest or inline-context declaration as applicable; purpose, gate, assertions, lens, criteria, methods, included and excluded scope, context completeness, omissions, redactions, shards, cross-shard obligations and digests.",
+        "kind": "REFERENCE_LIST",
+        "nullable": false
+      },
+      "checkpoint_recovery_cleanup_and_residuals": {
+        "description": "Completed and remaining review work, exact checkpoint and resume prerequisites, same-attempt or successor rules, prior attempt state, interruption reason, scratch and sensitive material, temporary effects, cleanup or quarantine, sealed evidence retained and unresolved residual owners.",
+        "kind": "STRUCTURED",
+        "nullable": false
+      },
+      "claims_not_established": {
+        "description": "Material claims explicitly outside the review or not established by the evidence, including repair correctness, finding disposition, candidate or plan acceptance, residual-risk acceptance, completion, operational outcome achievement and release.",
+        "kind": "STRUCTURED_LIST",
+        "nullable": false
+      },
+      "context_completeness_and_omissions": {
+        "description": "Included, retrieval-only, excluded, omitted, redacted, generated, summarized, shared and sharded material; exact roots and pack digests; compiler; untrusted-content treatment; completeness; blockers; and effect on each conclusion.",
+        "kind": "STRUCTURED",
+        "nullable": false
+      },
+      "durable_artifact_and_handoff_refs": {
+        "description": "Verified Reviewer report, ReviewAttempt when applicable, EvidenceReceipt, assertion-evaluation, finding, context, checkpoint and `bbk-handoff` identities with schema, subject, path, byte count, SHA-256, producer and attempt.",
+        "kind": "ARTIFACT_REFERENCE_LIST",
+        "nullable": false
+      },
+      "failure_and_blocker_classification": {
+        "description": "Subject, contract, evidence, context, evaluator, tool, profile, environment, consumer, device, host, authority, decision, integrity, capacity, host-window and transport states with evidence, affected scope and smallest responsible route.",
+        "kind": "STRUCTURED",
+        "nullable": false
+      },
+      "governing_sources_and_criteria": {
+        "description": "Accepted requirements, decisions, interfaces, plans, assertions, protected floors, applicability, criteria, methods, acceptance policy and source authority with exact identity, currentness and contradictions. Separate source-stated obligations, derived review implications and Reviewer inference.",
+        "kind": "STRUCTURED",
+        "nullable": false
+      },
+      "immutable_findings": {
+        "description": "Every new or referenced immutable finding with exact subject, attempt, assertions, expected and observed conditions, evidence, reproduction or inspection route, classification, severity, blocking state, confidence or uncertainty, scope, impact, affected objects, fingerprint and recommended route. Preserve contradictory and unfavorable findings.",
+        "kind": "STRUCTURED_LIST",
+        "nullable": false
+      },
+      "independence_and_exposure_facts": {
+        "description": "Author, Worker, Validator and Reviewer role separation; logical and physical invocation; context-assembly independence; prior-findings visibility; outcome-bearing evidence exposure; model, provider, tool, environment, dataset and organizational diversity; candidate-mutation prohibition; attempt purpose; and every independence requirement satisfied, unsatisfied or not applicable.",
+        "kind": "STRUCTURED",
+        "nullable": false
+      },
+      "inspection_actions_and_evidence": {
+        "description": "Every material inspection, command, tool, version, environment, input, output, EvidenceReceipt, trust class, reuse decision, coverage, redaction, limitation and distinction among direct observation, report, calculation and inference. Include exact path, byte count and SHA-256 where material.",
+        "kind": "STRUCTURED",
+        "nullable": false
+      },
+      "invalidated_or_superseded_refs": {
+        "description": "Subjects, charters, contexts, criteria, evidence, findings, assessments, checkpoints or reports invalidated, reopened, replaced or superseded, exact cause and unaffected material eligible for reuse.",
+        "kind": "REFERENCE_LIST",
+        "nullable": false
+      },
+      "out_of_scope_observations": {
+        "description": "Material concerns not evaluated under the current charter, why they are outside scope, available evidence, possible consequence, affected objects and proposed parent-owned charter or route. Do not assign a pass or fail beyond current authority.",
+        "kind": "STRUCTURED_LIST",
+        "nullable": false
+      },
+      "profiles_tools_and_environments": {
+        "description": "Selected profile and router identities, effective digests, lenses, tools, evidence adapters, versions, environments, consumers, devices, credentials, qualifications, substitutions, capability gaps and impact on claim strength.",
+        "kind": "STRUCTURED",
+        "nullable": false
+      },
+      "recommended_dispositions_and_parent_actions": {
+        "description": "Smallest responsible non-authoritative recommendation for subject repair, source or assurance revision, context rebuild, capability qualification, targeted closure, blind reassessment, finding disposition, accountable decision, residual-risk consideration, recharter, pause, recovery or no action. Recommendations do not create authority-bearing dispositions.",
+        "kind": "STRUCTURED",
+        "nullable": false
+      },
+      "review_assessment": {
+        "description": "One allowed non-authoritative assessment. Use `NOT_DERIVED` for a checkpoint before a responsible assessment exists. In manifest mode this is one attempt input to the parent aggregate, not the aggregate itself.",
+        "enum_values": [
+          "NOT_DERIVED",
+          "PASS",
+          "PASS_ADVISORY",
+          "NEEDS_REVISION",
+          "BLOCKED_INSUFFICIENT_CONTEXT",
+          "BLOCKED_ENVIRONMENT",
+          "INCONCLUSIVE",
+          "ERROR",
+          "STALE"
+        ],
+        "kind": "ENUM",
+        "nullable": false
+      }
+    },
+    "result_schema": "spec/schemas/role-results/bbk-reviewer-result-v1.schema.json",
+    "return_schema": "spec/schemas/role-returns/bbk-reviewer-return-v1.schema.json",
+    "semantic_state_name": "review_state",
+    "supplemental_enums": {
+      "review_assessments": [
+        "NOT_DERIVED",
+        "PASS",
+        "PASS_ADVISORY",
+        "NEEDS_REVISION",
+        "BLOCKED_INSUFFICIENT_CONTEXT",
+        "BLOCKED_ENVIRONMENT",
+        "INCONCLUSIVE",
+        "ERROR",
+        "STALE"
+      ]
+    },
+    "v2_contract_id": "bbk.reviewer-return.v2",
+    "v2_envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
+    "v2_return_schema": "spec/schemas/role-returns/bbk-reviewer-return-v2.schema.json"
+  },
+  "scope": [
+    "Operate in one declared invocation mode. `DIRECT_BOUNDED_REVIEW` is invoked by the harness-root controller/Main or by an authorized Wayfinder, Planning Wayfinder, Phase Wayfinder, Root Orchestrator or Territory Orchestrator for one exact bounded judgment. `MANIFEST_ATTEMPT` is invoked by `bbk_validator_orchestrator` for one exact ReviewManifest assignment and ReviewContextManifest. Never silently switch mode or semantic parent.",
+    "Own one exact review charter or manifest assignment, one exact subject and revision, the context actually received, one bounded assertion or qualitative-lens scope, the factual independence and evidence-exposure record, read-only inspection and authorized evidence interpretation, attempt-local assertion evaluations, immutable findings, a non-authoritative review assessment, checkpoint and exact handoff. In `MANIFEST_ATTEMPT`, the Validator Orchestrator retains ReviewManifest, context-compilation, evaluator-partition and central aggregate ownership. In `DIRECT_BOUNDED_REVIEW`, the invoking parent retains integration, any later formal aggregate, repair routing and every authority-bearing disposition.",
+    "The Verification Designer owns governing assertions, criteria, acceptable methods, evidence obligations, protected floors, independence policy and revalidation rules. Review-planning or deterministic context infrastructure owns formal ReviewManifest and ReviewContextManifest compilation when required. Validators own exact candidate-bound assertion evaluation under fixed methods. Planning and architecture roles own source correction; Workers own repair; orchestrators own execution and candidate lifecycle; and accountable authorities own finding disposition, waiver, risk acceptance, baseline acceptance, completion and release. The Reviewer may expose needs and recommend routes but does not absorb those responsibilities.",
+    "May create, checkpoint, invalidate, supersede and hand off read-only review-attempt records, evidence references, assertion evaluations, immutable findings, exposure records, scratch or redaction artifacts outside the governed subject, and a reviewer-return report. It may run only charter-authorized read-only or scratch-contained operations. It may not mutate the subject, accepted source records, candidate, production environment, finding history, parent plan, execution state, acceptance state or release state, and it never contacts the user directly."
+  ],
+  "skills": [
+    "bbk-review",
+    "bbk-evidence",
+    "bbk-review-findings",
+    "bbk-solution-outcome-fit",
+    "bbk-implementation-structure",
+    "bbk-execution-slicing",
+    "bbk-state-decision-effect-design",
+    "bbk-review-context",
+    "bbk-review-intent",
+    "bbk-profile-routing",
+    "bbk-installed-profiles",
+    "bbk-context-routing",
+    "bbk-artifact",
+    "bbk-handoff"
+  ],
+  "spawns": [],
+  "title": "BBK Reviewer",
+  "web": false
 }

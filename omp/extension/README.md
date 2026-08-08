@@ -1,4 +1,4 @@
-# BBK alpha.16.1 OMP extension
+# BBK OMP extension
 
 This adapter exposes BBK's deterministic project, fit, structure, State–Decision–Effect, slicing, assurance, candidate, gate, review, evidence, profile, workspace, model-routing, and orchestration-entrypoint surfaces.
 
@@ -31,7 +31,7 @@ BBK · 3 active · Root plan › Phase plan › Architecture [ctx 264k/1M 26%]: 
 
 The most recently active BBK job supplies its full Main-to-descendant path and latest public intent, tool/action, or recent public output. The extension recursively consumes OMP `inflightTaskDetails.progress`, finalized task results, lifecycle events, and direct progress events, so synchronous descendants remain visible even when a detached-only host list shows only Main's direct child. Direct and nested observations are deduplicated by stable agent, task, session, and tool-call identities.
 
-Alpha.16.1 retains alpha.15.1's reconciliation of task history with live coordination results. Successful `injected`, `woken`, or `revived` receipts from `hub`/legacy `irc`, authoritative peer rosters, and legacy `job` running-agent reports can make the same completed peer active again. Later task lifecycle or roster evidence supersedes older wake evidence, failed receipts do not activate, and role-bearing rosters can discover nested peers without creating duplicates. JSON/details expose task status, peer status, whether peer status is current, effective source, and the current wake outcome.
+The extension reconciles task history with live coordination results. Successful `injected`, `woken`, or `revived` receipts from `hub`/legacy `irc`, authoritative peer rosters, and legacy `job` running-agent reports can make the same completed peer active again. Later task lifecycle or roster evidence supersedes older wake evidence, failed receipts do not activate, and role-bearing rosters can discover nested peers without creating duplicates. JSON/details expose task status, peer status, whether peer status is current, effective source, and the current wake outcome.
 
 When OMP publishes `contextTokens` and `contextWindow`, BBK shows current context use and percentage; up to three other active jobs receive compact gauges. ANSI/control characters and embedded newlines are removed and non-BBK task events are ignored. Completion returns the line to `BBK · ready` while retaining bounded terminal history unless later live coordination evidence reactivates the peer; session navigation rebuilds it from restored mode state; mode exit and shutdown clear it.
 
@@ -78,7 +78,7 @@ assertion-scoped candidate acceptance
 
 Prefer background/non-blocking root jobs so Main remains available to relay user decisions and steering. `/bbk <request>` forwards only the raw directive through `sendUserMessage`; `/bbk` with no arguments and `/bbk:exit` perform only local state/UI work. `/bbk:exit` restores ordinary OMP prompting for later Main turns.
 
-All generated alpha.16.1 OMP BBK agents declare `blocking: false`. With OMP 16.4.8 and `async.enabled=true`, eligible task spawns use managed background jobs whose lifetime is independent of the parent tool call. When the host uses inline task execution, BBK prompt modules sequence human callbacks ahead of decision-dependent specialist dispatch so an immediate response cannot cascade-cancel useful work. See `docs/OMP-CHILD-LIFETIME.md`.
+All generated OMP BBK agents declare `blocking: false`. With OMP 16.4.8 and `async.enabled=true`, eligible task spawns use managed background jobs whose lifetime is independent of the parent tool call. When the host uses inline task execution, BBK prompt modules sequence human callbacks ahead of decision-dependent specialist dispatch so an immediate response cannot cascade-cancel useful work. See [`docs/OMP-CHILD-LIFETIME.md`](../../docs/OMP-CHILD-LIFETIME.md).
 
 Prompt replacement does not change the parent model, thinking level, active tools, child model routes, filesystem containment, or native host capabilities. It also does not itself exit another OMP mode; leave a conflicting native mode separately when its tool restrictions are inappropriate.
 
@@ -104,7 +104,7 @@ OMP frontmatter intentionally has no `autoloadSkills`. Mandatory procedures are 
 
 ## Provider-bound prompt integrity
 
-`before_agent_start` remains the first replacement layer, but alpha.16.1 no longer treats that earlier hook as sufficient. At every `before_provider_request`, BBK inspects the provider-specific `event.payload` that is about to leave the OMP request pipeline. It binds the exact canonical Main or child prompt to the current session, role, turn, request sequence, package version, provider, and model, then applies one of three actions:
+`before_agent_start` remains the first replacement layer, but BBK does not treat that earlier hook as sufficient. At every `before_provider_request`, BBK inspects the provider-specific `event.payload` that is about to leave the OMP request pipeline. It binds the exact canonical Main or child prompt to the current session, role, turn, request sequence, package version, provider, and model, then applies one of three actions:
 
 ```text
 VERIFIED   exactly one canonical BBK system/developer surface was already present
@@ -123,7 +123,7 @@ On `BLOCKED`, BBK calls the host abort control when available, returns a payload
 
 Every provider request receives a digest-only `bbk.effective-prompt-receipt.v2`; identical requests are not deduplicated. Receipts record the adapter, expected/observed/sent digests and block counts, role, prompt kind, session, request and turn sequence, provider/model identity, surfaces removed, abort result, and `VERIFIED`, `REPAIRED`, or `BLOCKED`. Raw prompts and raw provider payloads are never persisted. `/bbk:prompt-status` reports request counts, unresolved failures, the last provider-bound success/failure, and the current guarantee.
 
-OMP invokes `before_provider_request` handlers in extension load order and exposes no post-chain finalizer to BBK. Alpha.16.1 therefore guarantees the payload at the BBK hook boundary; a later extension can still rewrite it. Installation and qualification must keep the BBK guard last among payload-mutating handlers or treat the ordering as unqualified rather than claiming wire-final prompt integrity.
+OMP invokes `before_provider_request` handlers in extension load order and exposes no post-chain finalizer to BBK. BBK therefore guarantees the payload at the BBK hook boundary; a later extension can still rewrite it. Installation and qualification must keep the BBK guard last among payload-mutating handlers or treat the ordering as unqualified rather than claiming wire-final prompt integrity.
 
 ## Main-mediated `hub`/IRC communication
 
@@ -133,7 +133,7 @@ Main presents the question only through OMP's native `ask` tool and relays the s
 
 ## Atomic artifact finalization and freshness
 
-Alpha.16.1 extends alpha.16's immutable publication path with one-shot software mode:
+The extension exposes one-shot software finalization through the immutable publication path:
 
 ```text
 /bbk:artifact:finalize --root . --package-id my-tool --revision 1 \
@@ -172,13 +172,13 @@ The guard establishes only local byte consistency. It does not decide whether im
 The OMP target installs:
 
 - 19 role agents with native direct-child `spawns` allowlists;
-- 40 generated BBK skills, including `bbk-artifact` and one installation-bound profile registry;
+- 40 shared BBK skill directories, including `bbk-artifact`; installation rewrites the profile registry for the exact installed profile set;
 - complete mandatory-skill injection for every role;
 - explicit `model` and `thinkingLevel` fields;
-- 44 model-facing tools and 48 UI commands; and
+- 58 model-facing tools and 48 UI commands; and
 - the persistent `/bbk`, deterministic `/bbk:status`, scoped `/bbk:models`, hierarchical `/bbk:agents`, observational `/bbk:timing`, normal `/bbk:beads`, schema/artifact utilities including `/bbk:artifact:finalize` and `/bbk:artifact:freshness`, plus `/bbk:prompt-status`.
 
-The canonical install-time v2 policy gives every role its own OMP route. Alpha.16.1 preserves the exact reviewed per-role selections from the split-role update: judgment-heavy roles primarily use `openai-codex/gpt-5.6-sol`, Territory Orchestrator uses `openai-codex/gpt-5.6-luna`, and bounded empirical/mechanical roles use `deepseek/deepseek-v4-flash`, with the reviewed role-specific thinking levels. These are duplicated per-role values rather than shared categories. Model choice is an execution preference, not authority or assurance.
+The canonical install-time v2 policy gives every role its own OMP route. Values are duplicated per role rather than inherited from shared categories, so one route can change without changing another. The exact current table is maintained in [`../../docs/MODEL-ROUTING.md`](../../docs/MODEL-ROUTING.md). Model choice is an execution preference, not authority or assurance.
 
 ```text
 /bbk:models
@@ -224,7 +224,7 @@ Deterministic slash commands are **UI-only**. They notify through `ctx.ui.notify
 python tools/setup.py --test-and-update-omp --scope user
 ```
 
-The updater preserves the active BBK OMP model route, updates future role definitions and the extension, reconciles the install manifest, and **does not modify `.codex`** agent files. Alpha.16.1 uses the same complete adjacent Python runtime inventory as the full installer, refreshes packaged-default routing metadata, proves every runtime module is manifest-owned, and smoke-runs the installed import, `/bbk:models`, and schema surfaces before returning success. A failed smoke restores the previous manifest and targeted files. Run `/reload-plugins` in an existing OMP session afterward.
+The updater preserves the active BBK OMP model route, updates future role definitions and the extension, reconciles the install manifest, and **does not modify `.codex`** agent files. The updater uses the same complete adjacent Python runtime inventory as the full installer, refreshes packaged-default routing metadata, proves every runtime module is manifest-owned, and smoke-runs the installed import, `/bbk:models`, and schema surfaces before returning success. A failed smoke restores the previous manifest and targeted files. Run `/reload-plugins` in an existing OMP session afterward.
 
 ## Qualification boundary
 

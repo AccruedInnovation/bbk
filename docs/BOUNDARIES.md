@@ -26,7 +26,7 @@ host limitations must be surfaced rather than silently represented as equivalent
 
 ## Contract implementation status
 
-Alpha.13 distinguishes implemented deterministic capabilities, bootstrap implementations, schema-defined companions, optional host-provided primitives, target-only concepts, and retired-not-implemented concepts. A schema-defined companion such as `TerritoryExecutionBoundary` establishes exact structure and ownership but does not claim a dedicated commit primitive or lease-backed mutation fence exists. Optional host capabilities and model routes must be qualified at invocation time.
+BBK distinguishes implemented deterministic capabilities, bootstrap implementations, schema-defined companions, optional host-provided primitives, target-only concepts, and retired-not-implemented concepts. A schema-defined companion such as `TerritoryExecutionBoundary` establishes exact structure and ownership but does not claim a dedicated commit primitive or lease-backed mutation fence exists. Optional host capabilities and model routes must be qualified at invocation time.
 
 ## Logical and physical roles
 

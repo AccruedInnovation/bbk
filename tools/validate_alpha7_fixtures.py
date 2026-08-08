@@ -28,6 +28,7 @@ from review_assurance import (  # noqa: E402
     validate_review_manifest,
     validate_review_run,
 )
+from session_oracle import verify_oracle  # noqa: E402
 from state_effect import (  # noqa: E402
     compare_state_effect_inventory,
     validate_slice_v2,
@@ -133,6 +134,16 @@ def semantic_checks() -> list[dict[str, Any]]:
     )
     checks.append(result("wrong-subject-required-evidence-stale", "PASS" if stale_aggregate.get("result") == "STALE" else "FAIL", stale_aggregate))
 
+    session_oracle_report = verify_oracle(
+        load("fixtures/session-inspector-alpha16/source-session-oracle.json"),
+        load("fixtures/session-inspector-alpha16/derived-analysis-contradictions.json"),
+    )
+    checks.append(result(
+        "session-inspector-alpha16-oracle",
+        "PASS" if session_oracle_report.get("status") == "PASS" else "FAIL",
+        session_oracle_report,
+    ))
+
     return checks
 
 
@@ -182,6 +193,14 @@ def schema_checks() -> tuple[list[dict[str, Any]], str | None]:
         ("fixtures/review/finding-disposition-fixed.json", "bbk-finding-disposition-v1.schema.json"),
         ("fixtures/review/learning-candidate.json", "bbk-learning-candidate-v1.schema.json"),
         ("fixtures/review/run-pass.json", "bbk-review-run-v1.schema.json"),
+        (
+            "fixtures/session-inspector-alpha16/source-session-oracle.json",
+            "bbk-session-inspector-oracle-manifest-v1.schema.json",
+        ),
+        (
+            "fixtures/session-inspector-alpha16/derived-analysis-contradictions.json",
+            "bbk-session-inspector-contradictions-v1.schema.json",
+        ),
     ]
     for data_rel, schema_name in pairs:
         data = load(data_rel)

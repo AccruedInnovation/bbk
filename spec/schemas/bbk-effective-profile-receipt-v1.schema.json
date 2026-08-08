@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": true,
+  "$id": "https://bbk.local/schemas/bbk-effective-profile-receipt-v1.schema.json",
+  "title": "BBK Effective Profile Receipt v1",
+  "required": [
+    "schema",
+    "status",
+    "selector",
+    "registry_revision",
+    "required_capabilities",
+    "required_gates",
+    "allowed_families",
+    "resolved_profile_id",
+    "resolved_profile_version",
+    "resolved_profile_sha256",
+    "environment_identity",
+    "constraint_result",
+    "deviations",
+    "semantic_equivalence",
+    "planning_reopen_required",
+    "invalidation_keys",
+    "observed_at"
+  ],
+  "properties": {
+    "schema": {
+      "const": "bbk.effective-profile-receipt.v1"
+    },
+    "status": {
+      "enum": [
+        "PASS",
+        "FAIL"
+      ]
+    },
+    "selector": {
+      "type": "string"
+    },
+    "registry_revision": {
+      "type": "string"
+    },
+    "required_capabilities": {
+      "type": "array"
+    },
+    "required_gates": {
+      "type": "array"
+    },
+    "allowed_families": {
+      "type": "array"
+    },
+    "resolved_profile_id": {
+      "type": "string"
+    },
+    "resolved_profile_version": {
+      "type": "string"
+    },
+    "resolved_profile_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "environment_identity": {
+      "type": "object"
+    },
+    "constraint_result": {
+      "enum": [
+        "PASS",
+        "FAIL"
+      ]
+    },
+    "deviations": {
+      "type": "array"
+    },
+    "semantic_equivalence": {
+      "enum": [
+        "EQUIVALENT",
+        "NOT_EQUIVALENT"
+      ]
+    },
+    "planning_reopen_required": {
+      "type": "boolean"
+    },
+    "invalidation_keys": {
+      "type": "array",
+      "uniqueItems": true
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

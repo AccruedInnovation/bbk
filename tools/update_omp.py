@@ -27,6 +27,11 @@ TOOLS_DIR = Path(__file__).resolve().parent
 if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
+from runtime_requirements import enforce_supported_python
+
+enforce_supported_python(program='BBK OMP updater')
+
+import dependencies as dependency_tool
 import install as install_tool
 from path_compat import path_key
 from generate_agents import MODEL_ROUTING_PATH, rendered_projections
@@ -274,7 +279,7 @@ def make_desired_files(
     state = owned_json(state_path, old_records, "OMP routing state")
 
     try:
-        projections, projection_meta = rendered_projections(MODEL_ROUTING_PATH.resolve())
+        projections, projection_meta = rendered_projections(MODEL_ROUTING_PATH.resolve(), targets=("omp",))
     except (OSError, json.JSONDecodeError, ModelRoutingError, ValueError) as exc:
         raise OmpUpdateError(f"Cannot render current OMP agents: {exc}") from exc
     role_names = sorted(projection_meta.get("agents", {}))
@@ -299,6 +304,11 @@ def make_desired_files(
         )
 
     for filename, data in sorted(projections["omp"].items()):
+        # The generated controller remains inside the installed version
+        # package and is loaded by the OMP extension from there.  It is not a
+        # role agent and has no mutable per-role route to preserve.
+        if filename.startswith("../controllers/"):
+            continue
         role = Path(filename).stem
         if role not in routes:
             raise OmpUpdateError(f"Generated OMP agent has no preserved route: {role}")
@@ -519,7 +529,7 @@ def smoke_installed_runtime(*, extension: Path, package_root: Path) -> dict[str,
     """Execute the installed routing and CLI surfaces after selective replacement."""
     import_probe = (
         "import artifact_packages, bbk_artifact, context_packages, handoff_packages, "
-        "host_preflight, omp_model_routing, strict_json; "
+        "host_preflight, omp_model_routing, strict_json, governed_filesystem; "
         "print('PASS')"
     )
     env = os.environ.copy()
@@ -850,6 +860,30 @@ def merge_manifest(
 
 
 def update_omp(args: argparse.Namespace) -> dict[str, Any]:
+    if os.environ.get("BBK_TEST_ALLOW_MISSING_DEPENDENCIES") == "1":
+        dependency_report: dict[str, Any] = {
+            "schema": "bbk.install-dependency-report.v1",
+            "status": "SKIPPED_TEST",
+            "selected_harnesses": ["omp"],
+            "checks": [],
+            "host_checks": [],
+            "blocking_count": 0,
+            "warning_count": 0,
+            "network_accessed": False,
+            "mutation_performed": False,
+        }
+    else:
+        try:
+            dependency_report = dependency_tool.check_dependencies(("omp",))
+        except dependency_tool.DependencyError as exc:
+            raise OmpUpdateError(f"Dependency preflight could not be evaluated: {exc}") from exc
+        if not args.json:
+            print(dependency_tool.format_report(dependency_report), flush=True)
+        if dependency_report.get("status") != "PASS":
+            remediation = dependency_report.get("remediation_command")
+            suffix = f" Run: {remediation}" if remediation else ""
+            raise OmpUpdateError(f"Dependency preflight failed; update was not started.{suffix}")
+
     verification = None
     if args.verify:
         try:
@@ -942,6 +976,7 @@ def update_omp(args: argparse.Namespace) -> dict[str, Any]:
                 removed_stale=stale_plan,
                 clean=bool(getattr(args, "clean", False)),
             )
+            merged["dependency_preflight"] = dependency_report
             merged_records = record_map(merged)
             for name in install_tool.OMP_EXTENSION_RUNTIME_FILES:
                 runtime_path = extension / name
@@ -978,6 +1013,7 @@ def update_omp(args: argparse.Namespace) -> dict[str, Any]:
         "dry_run": bool(args.dry_run),
         "manifest_path": install_tool.json_path(mpath),
         "package_root": install_tool.json_path(root / "versions" / VERSION),
+        "dependency_preflight": dependency_report,
         "files": update_records,
         "removed_stale_files": stale_records,
         "removed_stale_count": len(stale_records),

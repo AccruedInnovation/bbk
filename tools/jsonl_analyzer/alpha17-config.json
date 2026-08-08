@@ -1,0 +1,74 @@
+{
+  "structured_event_categories": {
+    "compiled_procedure_selected": {
+      "description": "A child prompt compiled a deterministic procedure set.",
+      "pattern": "(?i)(?:bbk\\.compiled-procedure-manifest\\.v1|compiled[_ -]?procedure[_ -]?selected|COMPILED_COMPLETE)"
+    },
+    "compiled_catalog_suppressed": {
+      "description": "Compiled procedure IDs were removed from the effective external catalog.",
+      "pattern": "(?i)(?:suppressed_procedure_ids|external_catalog_excluded|compiled[_ -]?catalog[_ -]?suppressed)"
+    },
+    "compiled_followup_reused": {
+      "description": "An unchanged follow-up reused its logical compiled set without source reads.",
+      "pattern": "(?i)(?:FOLLOWUP_REUSED|compiled[_ -]?followup[_ -]?reused|source_read_count[^0-9]{0,8}0)"
+    },
+    "roadmap_ready": {
+      "description": "Rolling-wave roadmap readiness was established.",
+      "pattern": "ROADMAP_READY"
+    },
+    "frontier_ready": {
+      "description": "An executable frontier was admitted.",
+      "pattern": "FRONTIER_READY"
+    },
+    "future_deferred": {
+      "description": "Future work remained intentionally uncompiled.",
+      "pattern": "DEFERRED_UNTIL_FRONTIER"
+    },
+    "worker_started": {
+      "description": "A Worker began execution.",
+      "pattern": "(?i)worker[_ -]?started"
+    },
+    "specialist_trigger": {
+      "description": "A typed Worker/Verification Designer exception trigger was emitted.",
+      "pattern": "(?i)bbk\\.(?:worker|verification)-design-trigger\\.v1"
+    },
+    "atomic_finalization": {
+      "description": "An atomic result or manifest finalization was recorded.",
+      "pattern": "(?i)(?:bbk\\.identity-receipt\\.v1|atomic[_ -]?finalization)"
+    },
+    "replay_admission": {
+      "description": "A bounded command replay admission decision was recorded.",
+      "pattern": "(?i)(?:bbk\\.command-replay-admission\\.v1|BBK-REPLAY-ADMITTED)"
+    },
+    "workspace_receipt": {
+      "description": "A reusable workspace admission receipt was issued or consumed.",
+      "pattern": "bbk\\.workspace-admission-receipt\\.v1"
+    },
+    "project_coverage": {
+      "description": "Project coverage/completion truth was updated.",
+      "pattern": "bbk\\.project-coverage\\.v1"
+    }
+  },
+  "command_categories": {
+    "compiled_primary_skill_read": {
+      "description": "Filesystem read of a procedure that should have been compiled into the child prompt.",
+      "pattern": "(?is)(?:Get-Content|\\bgc\\b|\\bcat\\b|\\btype\\b|\\bmore\\b|\\bsed\\b|\\bhead\\b|\\btail\\b|ReadAllText|\\brg\\b|Select-String|\\bfindstr\\b)[^\\n]*(?:bbk-work-unit-execution|bbk-validation-orchestration|bbk-work-graph|bbk-phase-plan)[^\\n]*SKILL\\.md"
+    },
+    "compiled_manifest_event": {
+      "description": "Command or trace references a compiled procedure manifest.",
+      "pattern": "(?i)bbk\\.compiled-procedure-manifest\\.v1"
+    },
+    "planning_transaction": {
+      "description": "Transactional planning state operation.",
+      "pattern": "(?i)\\bbb[kq](?:\\.exe)?\\b[^\\n;|&]*\\bplan\\s+transact\\b"
+    },
+    "atomic_finalize": {
+      "description": "Atomic result or manifest finalization.",
+      "pattern": "(?i)\\bbb[kq](?:\\.exe)?\\b[^\\n;|&]*\\b(?:result|manifest)\\s+finalize\\b"
+    },
+    "command_replay": {
+      "description": "Bounded evidence-capture replay evaluation.",
+      "pattern": "(?i)\\bbb[kq](?:\\.exe)?\\b[^\\n;|&]*\\bcommand\\s+replay-evaluate\\b"
+    }
+  }
+}

@@ -1,6 +1,6 @@
-# Language and domain profiles in BBK alpha.12
+# Language and domain profiles
 
-BBK installs five independently manifested profile packages by default: CODESYS `0.1.0-alpha.4`, and Go, Python, Rust, and TypeScript/JavaScript `0.1.0-alpha.3`. Strict manifests bind their metadata, compatibility, OMP launch behavior, structure-validator detection, and consolidated test surfaces. The typed capability protocol is `bbk.profile-capability.v1`.
+BBK installs independently manifested Go, Python, Rust, and TypeScript/JavaScript profile packages at `0.1.0-alpha.3` by default. Strict manifests bind their metadata, compatibility, OMP launch behavior, structure-validator detection, and consolidated test surfaces. The typed capability protocol is `bbk.profile-capability.v1`.
 
 ## Bundled inventory
 
@@ -8,28 +8,24 @@ The verified inner archives live at `bundled-language-profiles/packages/`:
 
 | ID | Package | Version | Router skill | CLI |
 |---|---|---|---|---|
-| `codesys` | `bbk-profile-codesys` | `0.1.0-alpha.4` | `bbk-codesys` | `bbk-codesys` |
 | `go` | `bbk-profile-go` | `0.1.0-alpha.3` | `bbk-go` | `bbk-go` |
 | `python` | `bbk-profile-python` | `0.1.0-alpha.3` | `bbk-python` | `bbk-python` |
 | `rust` | `bbk-profile-rust` | `0.1.0-alpha.3` | `bbk-rust` | `bbk-rust` |
 | `typescript-javascript` | `bbk-profile-typescript-javascript` | `0.1.0-alpha.3` | `bbk-tsjs` | `bbk-tsjs` |
 
-`bundled-language-profiles/RELEASE-MANIFEST.json` binds the exact five archives and their SHA-256 companion files. Each inner archive retains its own `PACKAGE-MANIFEST.json`, root digest, profile contract, and version.
+`bundled-language-profiles/RELEASE-MANIFEST.json` binds the exact archive inventory and SHA-256 companion files. Each inner archive retains its own `PACKAGE-MANIFEST.json`, root digest, profile contract, and version.
 
 ## Default installation
 
-The ordinary setup command installs BBK and all five profiles in one manifest-managed operation:
+The ordinary setup command installs BBK and every bundled profile in one manifest-managed operation:
 
 ```bash
-python tools/setup.py --test-and-install --scope user --omp --codex --claude
+python tools/setup.py --test-and-install --scope user
 ```
 
-No separate bundle path is needed. The installer reports:
+With no host flag, the same operation selects Codex, OMP, Pi, Claude Code, and generic agents. Add host flags to limit the install.
 
-```text
-language_profile_source_mode: bundled-default
-profile_count: 5
-```
+No separate bundle path is needed. The installer reports `language_profile_source_mode: bundled-default` and records the exact installed profile inventory in the unified manifest.
 
 Select a subset from the bundled set:
 
@@ -63,12 +59,12 @@ python tools\setup.py --test-and-install `
 
 Supported extracted layouts include one profile root, immediate child profile roots, and profile roots beneath `packages/`. The published `bbk-language-profiles` repository includes `REPOSITORY-MANIFEST.json`, which binds the exact profile inventory and package-root digests. Every profile package is independently verified whether or not an outer repository manifest exists.
 
-An explicit `--language-profiles` source replaces the built-in source for that invocation. It does not silently merge with the bundled set. Repeat the flag to combine multiple explicit sources.
+For this release, the companion repository and public BBK bundle contain the same Go, Python, Rust, and TypeScript/JavaScript profile set. An explicit `--language-profiles` source replaces the built-in source for that invocation; it does not silently merge with the bundled set. Repeat the flag only to combine two or more explicit sources.
 
 The profile-focused wrapper defaults to the bundled set:
 
 ```bash
-python tools/install_profiles.py --scope user --omp --codex --claude
+python tools/install_profiles.py --scope user
 ```
 
 ## Effective composition
@@ -124,20 +120,19 @@ bbk --json profile list
 
 Project-local profile roots and `BBK_PROFILE_PATH` may change runtime precedence beyond the managed installation.
 
-## Pre-public metadata corrections and CODESYS alpha.4 promotion
+## Bundled versions and lineage
 
-Go, Python, Rust, and TypeScript/JavaScript retain their independently versioned `0.1.0-alpha.3` packages. CODESYS is now `0.1.0-alpha.4`, an immutable successor to the reviewed alpha.3 CI-script and documentation correction. Current-facing metadata agrees across `VERSION`, `PROFILE.json`, README, installation guidance, OMP extension metadata, and each strict package manifest. Historical predecessor, migration, source-binding, and source-change records remain unchanged where they describe actual lineage.
+The public Go, Python, Rust, and TypeScript/JavaScript packages each use the independently versioned `0.1.0-alpha.3` identity. Current package metadata agrees across `VERSION`, `PROFILE.json`, profile README, install guidance, OMP extension metadata, and the strict package manifest.
 
-The bundle therefore carries four distinct identities that must not be conflated:
+The bundle carries separate identities that must not be conflated:
 
 ```text
-CODESYS profile package version:       0.1.0-alpha.4
-other bundled profile versions:        0.1.0-alpha.3
+bundled profile package versions:      0.1.0-alpha.3
 minimum compatible BBK core:           0.1.0-alpha.8
 structure/slice contract dialect:      introduced in 0.1.0-alpha.4
 ```
 
-The four alpha.3 packages remain byte-identical to the corrected `verified-r3` set. The CODESYS package has a new semantic version, package root, archive digest, predecessor binding, and migration record while retaining the reviewed alpha.3 operational behavior and authority boundary.
+Each archive has its own package root and digest. Do not infer package identity or compatibility from a shared release label.
 
 ## Fail-closed preparation
 
@@ -163,7 +158,7 @@ profiles/<profile-id>/<version>/
 profiles/<profile-id>/current.json
 ```
 
-Declared profile skills are copied to selected host skill roots. Declared OMP extensions are copied to the OMP extension root. User-scope installs create profile CLI launchers. Core and profile files are recorded in one manifest, so the normal commands cover the complete installation:
+Declared profile skills are copied to `.agents/skills` for Codex, OMP, Pi, and generic targets, and to `.claude/skills` for Claude Code. Declared OMP extensions are copied to the OMP extension root. User-scope installs create profile CLI launchers. Core and profile files are recorded in one manifest, so the normal commands cover the complete installation:
 
 ```bash
 python tools/install.py status --scope user
@@ -174,7 +169,7 @@ Uninstall is conservative: content or executable-mode divergence is preserved an
 
 ## Verified reuse on update
 
-Alpha.13.4 does not blindly reinstall a profile merely because it is selected again. Preparation and package authentication still run for every selected source. Reuse is permitted only after the existing manifest proves the same profile ID, package version, package-root SHA-256, layout version, harness set, owned file bytes, and executable modes.
+The installer does not reinstall a profile merely because it is selected again. Preparation and package authentication still run for every selected source. Reuse is permitted only after the existing manifest proves the same profile ID, package version, package-root SHA-256, layout version, harness set, owned file bytes, and executable modes.
 
 Two update paths use the same content truth:
 
@@ -185,10 +180,10 @@ The unified manifest records a `language_profile_reuse` summary plus per-profile
 
 ## Capability generations
 
-- Earlier packages may be `legacy-unprojected`, `legacy-summary`, or `legacy-no-review-manifest`.
-- Alpha.7 could declare capability names but had no central typed invocation protocol; those declarations remain `legacy-declared` and are not auto-dispatched.
-- Alpha.8-aware profiles opt into `bbk.profile-capability.v1` and typed request/result handling.
-- All bundled profiles declare minimum BBK alpha.8 and remain compatible with alpha.12 and compatible successors when their exact package and runtime checks pass.
+- Older packages may report `legacy-unprojected`, `legacy-summary`, or `legacy-no-review-manifest`.
+- A profile that declares capability names without `bbk.profile-capability.v1` remains `legacy-declared` and is not auto-dispatched.
+- Profiles that opt into `bbk.profile-capability.v1` use typed request and result records.
+- All bundled profiles declare minimum BBK `0.1.0-alpha.8` and are accepted by the current core only when their exact package and runtime checks pass.
 
 No profile file, skill, compiler, linter, simulator, IDE, or native tool is invoked merely because the package is installed.
 
@@ -209,11 +204,11 @@ Capability fields name entrypoint keys, and `entrypoints` supplies argv arrays. 
 
 The profile lock binds the exact package, resolver result, capability dispatch, and input digests. Runtime diagnostics remain separate so effective identities are not accidentally made machine-path- or duration-dependent.
 
-See `INSTALL.md`, `ASSURANCE.md`, and the schemas under `../spec/schemas/`.
+See [`INSTALL.md`](INSTALL.md), [`ASSURANCE.md`](ASSURANCE.md), and the schemas under [`../spec/schemas/`](../spec/schemas/).
 
 ## Current bundled-profile contract
 
-The bundled package identities are CODESYS `0.1.0-alpha.4` plus Go, Python, Rust, and TypeScript/JavaScript `0.1.0-alpha.3`. All five share the following contract:
+The bundled Go, Python, Rust, and TypeScript/JavaScript packages share the following contract:
 
 - current package metadata agrees across `VERSION`, `PROFILE.json`, README, installation guidance, OMP package metadata, and `PACKAGE-MANIFEST.json`;
 - `PROFILE.json.requires.bbk_minimum` is `0.1.0-alpha.8`;
@@ -232,7 +227,7 @@ The Python profile additionally uses capability-aware structure-validator detect
 
 ### Purpose
 
-Alpha.7 let profiles declare State–Decision–Effect and Review Assurance capabilities but did not define one central execution protocol. Alpha.8 completes that boundary without turning profiles into semantic or effect authorities.
+The typed protocol gives State–Decision–Effect and Review Assurance capabilities one central execution boundary without turning profiles into semantic or effect authorities.
 
 A profile capability is invoked through:
 

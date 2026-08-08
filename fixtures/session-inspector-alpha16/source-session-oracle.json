@@ -1,0 +1,445 @@
+{
+  "expected": {
+    "child_entry_count": 629,
+    "costs": {
+      "cache_read_usd": "0.11071504",
+      "cache_write_usd": "0",
+      "input_usd": "0.24160248",
+      "output_usd": "0.12340863",
+      "total_usd": "0.47572615"
+    },
+    "explicit_user_wait_count": 1,
+    "explicit_user_wait_total_ms": 5217,
+    "inclusive_entry_count": 1319,
+    "main_entry_count": 690,
+    "polling_tool_calls": {
+      "inclusive_irc_calls": 16,
+      "inclusive_job_calls": 30,
+      "inclusive_total": 46,
+      "main_irc_calls": 14,
+      "main_job_calls": 30,
+      "main_total": 44
+    },
+    "prompt_binding_receipt_count": 5,
+    "prompt_integrity_receipt_count": 286,
+    "prompt_provider_verified_receipt_count": 281,
+    "provider_response_count": 281,
+    "provider_response_identity_count": 281,
+    "session_count": 5,
+    "task_invocation_count": 4,
+    "tokens": {
+      "cache_read": 30542080,
+      "cache_write": 0,
+      "input": 555408,
+      "output": 141849,
+      "reasoning": 28496,
+      "total": 31239337
+    }
+  },
+  "fixture_digest": "sha256:8cc80edaee86751cd9d8c417a300e723e6c576915ab31f113851ebdee8fdad63",
+  "fixture_id": "session-inspector-alpha16-source-oracle",
+  "host_events": [
+    {
+      "correlation": {
+        "method": "TASK_NAME_TO_SUBSESSION_LABEL",
+        "status": "CORRELATED"
+      },
+      "enforcement_boundary": "DETECT_ONLY",
+      "event_class": "task-lifecycle",
+      "event_type": "task-spawn-observed",
+      "host_version": "UNOBSERVED_IN_EXPORT",
+      "normalized_identity": {
+        "agent_role": "bbk_root_wayfinder",
+        "child_session_alias": "session:root-wayfinder",
+        "task_alias": "task:root-wayfinder"
+      },
+      "observed_at": "2026-08-04T15:40:07.552Z",
+      "parent_session": "session:main",
+      "payload_digest": "sha256:8786926f44e1bcbc9af3136bf7411d9142d68cb29064e32f1ff5dac214bd1091",
+      "schema": "bbk.host-event.v1",
+      "session_id": "session:root-wayfinder",
+      "task_or_tool_id": "task:root-wayfinder"
+    },
+    {
+      "correlation": {
+        "method": "TASK_NAME_TO_SUBSESSION_LABEL",
+        "status": "CORRELATED"
+      },
+      "enforcement_boundary": "DETECT_ONLY",
+      "event_class": "task-lifecycle",
+      "event_type": "task-spawn-observed",
+      "host_version": "UNOBSERVED_IN_EXPORT",
+      "normalized_identity": {
+        "agent_role": "bbk_root_orchestrator",
+        "child_session_alias": "session:root-orchestrator",
+        "task_alias": "task:root-orchestrator"
+      },
+      "observed_at": "2026-08-04T15:52:39.800Z",
+      "parent_session": "session:main",
+      "payload_digest": "sha256:bb4f14d4c241ab98bb13fd45567e3d7f871a8c073d82e478ee07c4238d18c986",
+      "schema": "bbk.host-event.v1",
+      "session_id": "session:root-orchestrator",
+      "task_or_tool_id": "task:root-orchestrator"
+    },
+    {
+      "correlation": {
+        "method": "TASK_NAME_TO_SUBSESSION_LABEL",
+        "status": "CORRELATED"
+      },
+      "enforcement_boundary": "DETECT_ONLY",
+      "event_class": "task-lifecycle",
+      "event_type": "task-spawn-observed",
+      "host_version": "UNOBSERVED_IN_EXPORT",
+      "normalized_identity": {
+        "agent_role": "bbk_reviewer",
+        "child_session_alias": "session:api-reviewer",
+        "task_alias": "task:api-reviewer"
+      },
+      "observed_at": "2026-08-04T16:08:16.992Z",
+      "parent_session": "session:main",
+      "payload_digest": "sha256:db67d570cf2d0c6e88560a3c30c1d07b34f27adc2948b7fdf5d5844f354d4a33",
+      "schema": "bbk.host-event.v1",
+      "session_id": "session:api-reviewer",
+      "task_or_tool_id": "task:api-reviewer"
+    },
+    {
+      "correlation": {
+        "method": "TASK_NAME_TO_SUBSESSION_LABEL",
+        "status": "CORRELATED"
+      },
+      "enforcement_boundary": "DETECT_ONLY",
+      "event_class": "task-lifecycle",
+      "event_type": "task-spawn-observed",
+      "host_version": "UNOBSERVED_IN_EXPORT",
+      "normalized_identity": {
+        "agent_role": "bbk_reviewer",
+        "child_session_alias": "session:api-rechecker",
+        "task_alias": "task:api-rechecker"
+      },
+      "observed_at": "2026-08-04T16:14:35.157Z",
+      "parent_session": "session:main",
+      "payload_digest": "sha256:eae908eff671c36d09f581c27d7d8f39371898ad5425c07f4f28469ecd0e957c",
+      "schema": "bbk.host-event.v1",
+      "session_id": "session:api-rechecker",
+      "task_or_tool_id": "task:api-rechecker"
+    },
+    {
+      "correlation": {
+        "duration_ms": 5217,
+        "method": "EXACT_TOOL_CALL_ID"
+      },
+      "enforcement_boundary": "DETECT_ONLY",
+      "event_class": "user-wait",
+      "event_type": "user-wait-observed",
+      "host_version": "UNOBSERVED_IN_EXPORT",
+      "normalized_identity": {
+        "mechanism": "ask",
+        "wait_alias": "wait:ask-1"
+      },
+      "observed_at": "2026-08-04T15:51:56.981Z",
+      "parent_session": "",
+      "payload_digest": "sha256:f77f879a56ba655f96ddcd6b21304087d47498b1e08620021602548088491588",
+      "schema": "bbk.host-event.v1",
+      "session_id": "session:main",
+      "task_or_tool_id": "wait:ask-1"
+    }
+  ],
+  "interface_binding": {
+    "enforcement_boundary": "DETECT_ONLY",
+    "host_version": "UNOBSERVED_IN_EXPORT",
+    "host_version_provenance": "NOT_PRESENT_IN_SOURCE_EXPORT",
+    "identity_source": "SESSION_TASK_AND_TOOL_CORRELATION",
+    "interface_id": "IF-014",
+    "provider_response_ids_are_agent_authority": false
+  },
+  "models": [
+    {
+      "model": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "provider_response_count": 281
+    }
+  ],
+  "positive_oracles": [
+    {
+      "expected": 1319,
+      "id": "SOURCE_SESSION_CONSERVATION",
+      "observed": 1319,
+      "status": "PASS"
+    },
+    {
+      "expected": 4,
+      "id": "TASK_SESSION_CORRELATION",
+      "observed": 4,
+      "status": "PASS"
+    },
+    {
+      "expected": 1,
+      "id": "EXPLICIT_ASK_WAIT_CORRELATION",
+      "observed": 1,
+      "status": "PASS"
+    },
+    {
+      "expected": 286,
+      "id": "PROMPT_INTEGRITY_CONSERVATION",
+      "observed": 286,
+      "status": "PASS"
+    },
+    {
+      "expected": 281,
+      "id": "PROVIDER_USAGE_CONSERVATION",
+      "observed": 281,
+      "status": "PASS"
+    }
+  ],
+  "privacy": {
+    "anonymized": true,
+    "credentials_retained": false,
+    "provider_response_ids_retained": false,
+    "raw_paths_retained": false,
+    "raw_prompts_retained": false,
+    "raw_session_ids_retained": false,
+    "raw_task_assignments_retained": false
+  },
+  "release_source": "0.1.0-alpha.16",
+  "schema": "bbk.session-inspector-oracle-manifest.v1",
+  "sessions": [
+    {
+      "alias": "session:main",
+      "costs": {
+        "cache_read_usd": "0.069812976",
+        "cache_write_usd": "0",
+        "input_usd": "0.0728625",
+        "output_usd": "0.03791808",
+        "total_usd": "0.180593556"
+      },
+      "entry_count": 690,
+      "label": "Main",
+      "parent_alias": null,
+      "prompt_integrity": {
+        "binding_receipts": 1,
+        "provider_verified_receipts": 166,
+        "total_receipts": 167
+      },
+      "provider_response_count": 166,
+      "role": "Main",
+      "source_session_id_sha256": "sha256:d5d82dfaa1df4eb07a5ee37332ae7e037a74f451772a88d69f52df97f850ab0d",
+      "start_offset_ms": 0,
+      "structural_digest": "sha256:162c50b349430ebc2793c12d1a78201023e5160db2a1d207daef529a9b384436",
+      "tokens": {
+        "cache_read": 19258752,
+        "cache_write": 0,
+        "input": 167500,
+        "output": 43584,
+        "reasoning": 13301,
+        "total": 19469836
+      }
+    },
+    {
+      "alias": "session:root-wayfinder",
+      "costs": {
+        "cache_read_usd": "0.014036",
+        "cache_write_usd": "0",
+        "input_usd": "0.04902102",
+        "output_usd": "0.03480957",
+        "total_usd": "0.09786659"
+      },
+      "entry_count": 194,
+      "label": "RootWayfinder",
+      "parent_alias": "session:main",
+      "prompt_integrity": {
+        "binding_receipts": 1,
+        "provider_verified_receipts": 38,
+        "total_receipts": 39
+      },
+      "provider_response_count": 38,
+      "role": "bbk_root_wayfinder",
+      "source_session_id_sha256": "sha256:a1416490d33508002123f37919d7f50443bee7118649a621f1a2a5cf86b697dd",
+      "start_offset_ms": 138532,
+      "structural_digest": "sha256:77d8f966be8ebf3a31149723afc70466dbed39095cfd46b09995022ff05b10a3",
+      "tokens": {
+        "cache_read": 3872000,
+        "cache_write": 0,
+        "input": 112692,
+        "output": 40011,
+        "reasoning": 3446,
+        "total": 4024703
+      }
+    },
+    {
+      "alias": "session:root-orchestrator",
+      "costs": {
+        "cache_read_usd": "0.020960272",
+        "cache_write_usd": "0",
+        "input_usd": "0.050107215",
+        "output_usd": "0.03435195",
+        "total_usd": "0.105419437"
+      },
+      "entry_count": 272,
+      "label": "RootOrchestrator",
+      "parent_alias": "session:main",
+      "prompt_integrity": {
+        "binding_receipts": 1,
+        "provider_verified_receipts": 54,
+        "total_receipts": 55
+      },
+      "provider_response_count": 54,
+      "role": "bbk_root_orchestrator",
+      "source_session_id_sha256": "sha256:bdba977d31919bd67732da9e06219d45b67d7db6559063a5c3d25c376818eb8a",
+      "start_offset_ms": 890744,
+      "structural_digest": "sha256:37cf9702bc2dd9a528ac492e7079a4c998172fc2202b4821b54374e65c34f305",
+      "tokens": {
+        "cache_read": 5782144,
+        "cache_write": 0,
+        "input": 115189,
+        "output": 39485,
+        "reasoning": 3664,
+        "total": 5936818
+      }
+    },
+    {
+      "alias": "session:api-reviewer",
+      "costs": {
+        "cache_read_usd": "0.003970448",
+        "cache_write_usd": "0",
+        "input_usd": "0.03925614",
+        "output_usd": "0.01241316",
+        "total_usd": "0.055639748"
+      },
+      "entry_count": 113,
+      "label": "ApiReviewer",
+      "parent_alias": "session:main",
+      "prompt_integrity": {
+        "binding_receipts": 1,
+        "provider_verified_receipts": 14,
+        "total_receipts": 15
+      },
+      "provider_response_count": 14,
+      "role": "bbk_reviewer",
+      "source_session_id_sha256": "sha256:4aa9b43f385b70441f7d3dfafd4f13b3b1f6257009fe1b87012395f6b90107a0",
+      "start_offset_ms": 1827934,
+      "structural_digest": "sha256:2dba32d773d5ff11251dfde8dbb9e9e660a494543fbcfc25d4ff2a4462fd4841",
+      "tokens": {
+        "cache_read": 1095296,
+        "cache_write": 0,
+        "input": 90244,
+        "output": 14268,
+        "reasoning": 6955,
+        "total": 1199808
+      }
+    },
+    {
+      "alias": "session:api-rechecker",
+      "costs": {
+        "cache_read_usd": "0.001935344",
+        "cache_write_usd": "0",
+        "input_usd": "0.030355605",
+        "output_usd": "0.00391587",
+        "total_usd": "0.036206819"
+      },
+      "entry_count": 50,
+      "label": "ApiRechecker",
+      "parent_alias": "session:main",
+      "prompt_integrity": {
+        "binding_receipts": 1,
+        "provider_verified_receipts": 9,
+        "total_receipts": 10
+      },
+      "provider_response_count": 9,
+      "role": "bbk_reviewer",
+      "source_session_id_sha256": "sha256:11811a7187c480da5f2edbf13e7cf675efeda10fcc88231186b916f56d738d72",
+      "start_offset_ms": 2206104,
+      "structural_digest": "sha256:1339e2a03cebaa4b8f0ea0c208144cd5f77ab51c9c2c27712ce5335e329f36f1",
+      "tokens": {
+        "cache_read": 533888,
+        "cache_write": 0,
+        "input": 69783,
+        "output": 4501,
+        "reasoning": 1130,
+        "total": 608172
+      }
+    }
+  ],
+  "source_authority": "RAW_SESSION_EXPORT",
+  "sources": {
+    "derived_analysis": {
+      "byte_count": 904087,
+      "logical_name": "alpha16-derived-analysis.json",
+      "raw_content_retained": false,
+      "sha256": "sha256:2b2ccf00f7a5f51d194f7c226b3281a510a17488738ab8e0dc3f3009491f9e76",
+      "source_path_retained": false,
+      "truth_status": "INCOMPLETE_SECONDARY"
+    },
+    "session_export": {
+      "byte_count": 6369470,
+      "decoded_byte_count": 4492706,
+      "decoded_payload_sha256": "sha256:a4287b871f65dab84c7f2e0b679f555ab2dffeeea1404019ce601ea9828e8e78",
+      "logical_name": "alpha16-session-export.html",
+      "raw_content_retained": false,
+      "sha256": "sha256:938defea020e642eb78e9dac7fb95021909619a111046ebbbc444b5f2eefe1a4",
+      "source_path_retained": false
+    }
+  },
+  "tasks": [
+    {
+      "agent_role": "bbk_root_wayfinder",
+      "alias": "task:root-wayfinder",
+      "assignment_sha256": "sha256:8786926f44e1bcbc9af3136bf7411d9142d68cb29064e32f1ff5dac214bd1091",
+      "child_session_alias": "session:root-wayfinder",
+      "invocation_offset_ms": 138465,
+      "name": "RootWayfinder",
+      "observed_at": "2026-08-04T15:40:07.552Z",
+      "parent_session_alias": "session:main",
+      "source_tool_call_id_sha256": "sha256:5370f0c920fbf75c67e34933a8df7c96a5bbf1d549b1a546065106867bff743f",
+      "status": "CORRELATED"
+    },
+    {
+      "agent_role": "bbk_root_orchestrator",
+      "alias": "task:root-orchestrator",
+      "assignment_sha256": "sha256:bb4f14d4c241ab98bb13fd45567e3d7f871a8c073d82e478ee07c4238d18c986",
+      "child_session_alias": "session:root-orchestrator",
+      "invocation_offset_ms": 890713,
+      "name": "RootOrchestrator",
+      "observed_at": "2026-08-04T15:52:39.800Z",
+      "parent_session_alias": "session:main",
+      "source_tool_call_id_sha256": "sha256:eda80175922ab3245e9200a8dc6d8fed3d1e27e3af8434e1b4969b80fbe29639",
+      "status": "CORRELATED"
+    },
+    {
+      "agent_role": "bbk_reviewer",
+      "alias": "task:api-reviewer",
+      "assignment_sha256": "sha256:db67d570cf2d0c6e88560a3c30c1d07b34f27adc2948b7fdf5d5844f354d4a33",
+      "child_session_alias": "session:api-reviewer",
+      "invocation_offset_ms": 1827905,
+      "name": "ApiReviewer",
+      "observed_at": "2026-08-04T16:08:16.992Z",
+      "parent_session_alias": "session:main",
+      "source_tool_call_id_sha256": "sha256:2077d0be59639f311f93c1db9f4b215eb97f2dee81235dabe0cbc475000cd98a",
+      "status": "CORRELATED"
+    },
+    {
+      "agent_role": "bbk_reviewer",
+      "alias": "task:api-rechecker",
+      "assignment_sha256": "sha256:eae908eff671c36d09f581c27d7d8f39371898ad5425c07f4f28469ecd0e957c",
+      "child_session_alias": "session:api-rechecker",
+      "invocation_offset_ms": 2206070,
+      "name": "ApiRechecker",
+      "observed_at": "2026-08-04T16:14:35.157Z",
+      "parent_session_alias": "session:main",
+      "source_tool_call_id_sha256": "sha256:67ba3ca242c54830ec9002835fac59f29ef5c330389babfda50bca87dff71b12",
+      "status": "CORRELATED"
+    }
+  ],
+  "waits": [
+    {
+      "alias": "wait:ask-1",
+      "correlation": "EXACT_TOOL_CALL_ID",
+      "duration_ms": 5217,
+      "end_offset_ms": 853111,
+      "mechanism": "ask",
+      "observed_at": "2026-08-04T15:51:56.981Z",
+      "question_count": 1,
+      "source_tool_call_id_sha256": "sha256:f77f879a56ba655f96ddcd6b21304087d47498b1e08620021602548088491588",
+      "start_offset_ms": 847894
+    }
+  ]
+}

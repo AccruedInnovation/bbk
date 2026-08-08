@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-project-coverage-v1.schema.json",
+  "title": "BBK Project Coverage v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "project_ref",
+    "master_graph_ref",
+    "delivered_scope",
+    "capabilities",
+    "claims_not_established",
+    "next_executable_frontier",
+    "updated_at"
+  ],
+  "properties": {
+    "schema": {"const": "bbk.project-coverage.v1"},
+    "project_ref": {"type": "string", "minLength": 1},
+    "master_graph_ref": {"$ref": "#/$defs/ref"},
+    "delivered_scope": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "capabilities": {"type": "array", "items": {"$ref": "#/$defs/capability"}},
+    "claims_not_established": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "next_executable_frontier": {"anyOf": [{"$ref": "#/$defs/ref"}, {"type": "null"}]},
+    "updated_at": {"type": "string", "format": "date-time"}
+  },
+  "$defs": {
+    "ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "revision", "digest"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "revision": {"type": ["string", "integer"]},
+        "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "path": {"type": ["string", "null"]}
+      }
+    },
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "statement",
+        "status",
+        "delivered_scope",
+        "remaining_scope",
+        "evidence_refs",
+        "unmet_claims",
+        "invalidation_keys"
+      ],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "statement": {"type": "string", "minLength": 1},
+        "status": {"enum": ["COMPLETED", "PARTIAL", "NOT_STARTED", "BLOCKED", "OUT_OF_SCOPE"]},
+        "delivered_scope": {"type": "array", "items": {"type": "string"}},
+        "remaining_scope": {"type": "array", "items": {"type": "string"}},
+        "evidence_refs": {"type": "array", "items": {"type": "string"}},
+        "unmet_claims": {"type": "array", "items": {"type": "string"}},
+        "next_frontier_or_trigger": {"type": ["string", "null"]},
+        "invalidation_keys": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}
+      }
+    }
+  }
+}

@@ -51,9 +51,11 @@ RELEASE_ONLY = frozenset(
 FAST_MODULES = frozenset(
     {
         "test_assurance_state",
+        "test_dependencies",
         "test_contract_package_v1",
         "test_prompt_module_package_v1",
         "test_role_package_v4",
+        "test_role_return_runtime",
     }
 )
 

@@ -6,7 +6,6 @@
   "additionalProperties": false,
   "required": [
     "schema_version",
-    "package_version",
     "description",
     "profiles",
     "role_profiles"

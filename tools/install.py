@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+from collections import OrderedDict
 import hashlib
 import json
 import os
@@ -21,7 +22,13 @@ TOOLS_DIR = Path(__file__).resolve().parent
 if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
+from runtime_requirements import enforce_supported_python
+
+enforce_supported_python(program="BBK installer")
+
+import dependencies as dependency_tool
 from generate_agents import MODEL_ROUTING_PATH, rendered_projections
+from compiled_procedures import globally_suppressed_procedures, physically_indexed_procedures
 from model_routing import ModelRoutingError
 from path_compat import canonical_path_text, portable_path_key
 from profile_install import (
@@ -56,6 +63,8 @@ OMP_EXTENSION_RUNTIME_FILES: tuple[str, ...] = (
     "review_assurance.py",
     "verify_package.py",
     "path_compat.py",
+    "dependencies.py",
+    "runtime_requirements.py",
     "strict_json.py",
     "artifact_packages.py",
     "bbk_artifact.py",
@@ -64,11 +73,95 @@ OMP_EXTENSION_RUNTIME_FILES: tuple[str, ...] = (
     "handoff_packages.py",
     "artifact_classification.py",
     "omp_model_routing.py",
+    "gate_kernel.py",
+    "governed_state.py",
+    "omp_binding_registry.py",
+    "governed_filesystem.py",
+    "worker_spawn.py",
+    "read_only_spawn.py",
+    "control_plane.py",
+    "qualified_task.py",
+    "governance_status.py",
+    "verification_economy.py",
+    "return_contracts.py",
+    "role_return_runtime.py",
+    "atomic_finalizer.py",
+    "evidence_replay.py",
+    "planning_optimization.py",
+    "runtime_identity.py",
+    "substrate/__init__.py",
+    "substrate/beads_adapter.py",
+    "substrate/git_adapter.py",
+    "substrate/jj_adapter.py",
+    "substrate/mise_adapter.py",
 )
 
 
 class InstallError(RuntimeError):
     pass
+
+
+ProjectionBundle = tuple[Path, dict[str, dict[str, bytes]], dict[str, Any]]
+ProjectionCacheKey = tuple[str, str, str, tuple[str, ...]]
+_PROJECTION_BUNDLE_CACHE: OrderedDict[ProjectionCacheKey, ProjectionBundle] = OrderedDict()
+_PROJECTION_BUNDLE_CACHE_LIMIT = 3
+
+
+class ProjectionBundleCache:
+    """Render the selected model-routing projection at most once per command."""
+
+    def __init__(self, routing_path: Path, targets: Sequence[str]) -> None:
+        self.routing_path = routing_path
+        self.targets = tuple(targets)
+        self._bundle: ProjectionBundle | None = None
+
+    @classmethod
+    def from_args(cls, args: argparse.Namespace) -> "ProjectionBundleCache":
+        routing_path = (
+            Path(args.model_routing).expanduser().resolve()
+            if args.model_routing
+            else MODEL_ROUTING_PATH.resolve()
+        )
+        targets = tuple(
+            name for name in HARNESS_ORDER if name in selected_harness_names(args)
+        )
+        return cls(routing_path, targets)
+
+    def get(self) -> ProjectionBundle:
+        if self._bundle is not None:
+            return self._bundle
+
+        try:
+            routing_digest = hashlib.sha256(self.routing_path.read_bytes()).hexdigest()
+            package_digest = hashlib.sha256(
+                (ROOT / "PACKAGE-MANIFEST.json").read_bytes()
+            ).hexdigest()
+        except OSError as exc:
+            raise InstallError(
+                f"Could not read projection inputs for {self.routing_path}: {exc}"
+            ) from exc
+        key = (str(self.routing_path), routing_digest, package_digest, self.targets)
+        cached = _PROJECTION_BUNDLE_CACHE.get(key)
+        if cached is not None:
+            _PROJECTION_BUNDLE_CACHE.move_to_end(key)
+            self._bundle = cached
+            return cached
+
+        try:
+            projections, routing_meta = rendered_projections(
+                self.routing_path,
+                targets=self.targets,
+            )
+        except (OSError, json.JSONDecodeError, ModelRoutingError, ValueError) as exc:
+            raise InstallError(
+                f"Invalid model-routing policy {self.routing_path}: {exc}"
+            ) from exc
+        self._bundle = (self.routing_path, projections, routing_meta)
+        _PROJECTION_BUNDLE_CACHE[key] = self._bundle
+        _PROJECTION_BUNDLE_CACHE.move_to_end(key)
+        while len(_PROJECTION_BUNDLE_CACHE) > _PROJECTION_BUNDLE_CACHE_LIMIT:
+            _PROJECTION_BUNDLE_CACHE.popitem(last=False)
+        return self._bundle
 
 
 def _stream_text(stream: TextIO, value: str) -> str:
@@ -418,6 +511,24 @@ def copy_tree(
         install_file(path, destination / rel, source_label=label, **kwargs)
 
 
+def compiled_skill_catalog_exclusions(root: Path = ROOT) -> set[str]:
+    """Return shared-skill files that must stay outside automatic catalogs.
+
+    The canonical sources remain present in the installed version package for
+    deterministic prompt compilation and replay.  They are omitted only from
+    host discovery roots such as ``.agents/skills`` and ``.claude/skills``.
+    """
+    excluded: set[str] = set()
+    skill_root = root / "shared" / "skills"
+    for procedure_id in globally_suppressed_procedures(root):
+        source = skill_root / procedure_id
+        if not source.is_dir():
+            raise InstallError(f"Compiled procedure source is missing: {source}")
+        for path in source_files(source):
+            excluded.add((Path(procedure_id) / path.relative_to(source)).as_posix())
+    return excluded
+
+
 def install_rendered_agents(
     files: Mapping[str, bytes],
     destination: Path,
@@ -428,6 +539,12 @@ def install_rendered_agents(
 ) -> None:
     """Install model-routed projections without mutating the package tree."""
     for filename, data in sorted(files.items()):
+        # Controller projections are package-owned runtime inputs.  They are
+        # emitted alongside role projections by the shared compiler using a
+        # relative pseudo-path, but must never escape or be copied into a
+        # host's role-agent discovery directory.
+        if filename.startswith("../controllers/"):
+            continue
         install_bytes(
             data,
             destination / filename,
@@ -436,7 +553,7 @@ def install_rendered_agents(
         )
 
 
-def generic_agent_manifest_bytes(metadata: Mapping[str, Any]) -> bytes:
+def generic_agent_manifest_bytes(metadata: Mapping[str, Any], *, target: str = "generic") -> bytes:
     """Return host-neutral metadata kept outside model-facing agent prompts."""
     agents: dict[str, Any] = {}
     for name, value in sorted((metadata.get("agents") or {}).items()):
@@ -447,23 +564,30 @@ def generic_agent_manifest_bytes(metadata: Mapping[str, Any]) -> bytes:
             "description": value.get("description"),
             "family": value.get("family"),
             "skills": list(value.get("skills") or []),
+            "compiled_procedures": value.get("compiled_procedures"),
+            "effective_external_catalogs": value.get("effective_external_catalogs"),
             "spawns": list(value.get("spawns") or []),
             "may_mutate": bool(value.get("may_mutate")),
             "model_route": value.get("model_route"),
             "model_routing_mode": value.get("model_routing_mode"),
             "model_routing": value.get("model_routing"),
             "return_contract": value.get("return_contract"),
-            "file": files.get("generic") if isinstance(files, Mapping) else None,
+            "file": files.get(target) if isinstance(files, Mapping) else None,
         }
     return json_bytes(
         {
-            "schema": "bbk.installed-generic-agent-manifest.v3",
+            "schema": "bbk.installed-host-neutral-agent-manifest.v4",
+            "target": target,
             "package_version": metadata.get("package_version"),
             "contract_package": metadata.get("contract_package"),
             "role_return_registry": metadata.get("role_return_registry"),
             "projection_source_sha256": metadata.get("source_sha256"),
             "role_source_sha256": metadata.get("role_source_sha256"),
             "model_routing_source_sha256": metadata.get("model_routing_source_sha256"),
+            "procedure_registry_source": metadata.get("procedure_registry_source"),
+            "procedure_registry_revision": metadata.get("procedure_registry_revision"),
+            "procedure_registry_sha256": metadata.get("procedure_registry_sha256"),
+            "globally_suppressed_procedures": list(metadata.get("globally_suppressed_procedures") or []),
             "agents": agents,
         }
     )
@@ -564,9 +688,9 @@ def load_existing_install(args: argparse.Namespace) -> dict[str, Any] | None:
         manifest = json.loads(mpath.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         raise InstallError(f"Cannot read existing BBK install manifest {mpath}: {exc}") from exc
-    if not isinstance(manifest, dict) or manifest.get("schema") != "bbk.install-manifest.v1":
+    if not isinstance(manifest, dict) or manifest.get("schema") not in {"bbk.install-manifest.v1", "bbk.install-manifest.v2"}:
         raise InstallError(f"Unsupported existing BBK install manifest: {mpath}")
-    harnesses = [name for name in ("codex", "omp", "claude", "generic") if manifest.get(name)]
+    harnesses = [name for name in ("codex", "omp", "claude", "pi", "generic") if manifest.get(name)]
     return {
         "project": project,
         "root": root,
@@ -651,20 +775,78 @@ def choose_existing_install_action(args: argparse.Namespace, existing: Mapping[s
     return "keep" if answer.strip().lower() in {"n", "no"} else "replace"
 
 
-def selected_harnesses(args: argparse.Namespace) -> tuple[bool, bool, bool, bool]:
-    codex, omp, claude, generic = bool(args.codex), bool(args.omp), bool(args.claude), bool(args.generic)
-    if not (codex or omp or claude or generic):
-        codex = omp = claude = generic = True
-    return codex, omp, claude, generic
+def selected_harnesses(args: argparse.Namespace) -> tuple[bool, bool, bool, bool, bool]:
+    codex, omp, claude, pi, generic = (
+        bool(args.codex), bool(args.omp), bool(args.claude), bool(args.pi), bool(args.generic)
+    )
+    if not (codex or omp or claude or pi or generic):
+        codex = omp = claude = pi = generic = True
+    return codex, omp, claude, pi, generic
 
 
-HARNESS_ORDER = ("codex", "omp", "claude", "generic")
+HARNESS_ORDER = ("codex", "omp", "claude", "pi", "generic")
 
 
 def selected_harness_names(args: argparse.Namespace) -> set[str]:
-    codex, omp, claude, generic = selected_harnesses(args)
-    values = {"codex": codex, "omp": omp, "claude": claude, "generic": generic}
+    codex, omp, claude, pi, generic = selected_harnesses(args)
+    values = {"codex": codex, "omp": omp, "claude": claude, "pi": pi, "generic": generic}
     return {name for name in HARNESS_ORDER if values[name]}
+
+
+def automatic_verification_profile(args: argparse.Namespace) -> str:
+    """Choose the smallest profile that verifies the selected install surface."""
+    selected = selected_harness_names(args)
+    if selected == {"codex"}:
+        return "codex"
+    if selected == {"omp"}:
+        return "omp"
+    if len(selected) == 1:
+        return "fast"
+    return "standard"
+
+
+def dependency_test_packages_required(args: argparse.Namespace, profile: str) -> bool:
+    return bool(args.verify and profile in {"fast", "standard", "release"})
+
+
+def run_dependency_preflight(
+    args: argparse.Namespace,
+    *,
+    profile: str,
+    echo: bool,
+) -> dict[str, Any]:
+    """Block before writes when declared dependencies are unavailable."""
+    selected = selected_harness_names(args)
+    include_tests = dependency_test_packages_required(args, profile)
+    if os.environ.get("BBK_TEST_ALLOW_MISSING_DEPENDENCIES") == "1":
+        return {
+            "schema": "bbk.install-dependency-report.v1",
+            "status": "SKIPPED_TEST",
+            "selected_harnesses": sorted(selected),
+            "include_test_dependencies": include_tests,
+            "omp_node_required": "omp" in selected,
+            "checks": [],
+            "host_checks": [],
+            "blocking_count": 0,
+            "warning_count": 0,
+            "network_accessed": False,
+            "mutation_performed": False,
+        }
+    try:
+        report = dependency_tool.check_dependencies(
+            selected,
+            include_test_dependencies=include_tests,
+            require_omp_node="omp" in selected,
+        )
+    except dependency_tool.DependencyError as exc:
+        raise InstallError(f"Dependency preflight could not be evaluated: {exc}") from exc
+    if echo:
+        print(dependency_tool.format_report(report), flush=True)
+    if report.get("status") != "PASS":
+        remediation = report.get("remediation_command")
+        suffix = f" Run: {remediation}" if remediation else ""
+        raise InstallError(f"Dependency preflight failed; installation was not started.{suffix}")
+    return report
 
 
 def existing_harness_names(existing: Mapping[str, Any]) -> set[str]:
@@ -718,6 +900,7 @@ def installation_targets(
             "omp_extensions": home / ".omp" / "agent" / "extensions",
             "claude_agents": home / ".claude" / "agents",
             "claude_skills": home / ".claude" / "skills",
+            "pi_agents": home / ".pi" / "agent" / "agents",
             "generic_agents": home / ".agents" / "bbk" / "agents",
             "binaries": bin_dir(),
         }
@@ -729,6 +912,7 @@ def installation_targets(
         "omp_extensions": project / ".omp" / "extensions",
         "claude_agents": project / ".claude" / "agents",
         "claude_skills": project / ".claude" / "skills",
+        "pi_agents": project / ".pi" / "agents",
         "generic_agents": project / ".agents" / "bbk" / "agents",
         "binaries": None,
     }
@@ -752,6 +936,7 @@ def install_language_profile(
     codex: bool,
     omp: bool,
     claude: bool,
+    pi: bool,
     generic: bool,
     common: dict[str, Any],
 ) -> dict[str, Any]:
@@ -776,7 +961,7 @@ def install_language_profile(
 
     skill_source = _profile_subpath(item, "skill_root")
     if skill_source is not None:
-        if codex or omp or generic:
+        if codex or omp or pi or generic:
             assert targets["agent_skills"] is not None
             copy_tree(
                 skill_source,
@@ -1115,6 +1300,14 @@ def run_verification_gate(
         if require_node:
             command.append("--require-node")
         try:
+            environment = dependency_tool.verification_environment(
+                _subprocess_environment(),
+                include_node=require_node,
+                strict=os.environ.get("BBK_TEST_ALLOW_MISSING_DEPENDENCIES") != "1",
+            )
+        except dependency_tool.DependencyError as exc:
+            raise InstallError(f"Verification dependencies are unavailable: {exc}") from exc
+        try:
             process = subprocess.Popen(
                 command,
                 cwd=ROOT,
@@ -1123,7 +1316,7 @@ def run_verification_gate(
                 text=True,
                 encoding=SUBPROCESS_OUTPUT_ENCODING,
                 errors=SUBPROCESS_OUTPUT_ERRORS,
-                env=_subprocess_environment(),
+                env=environment,
             )
         except OSError as exc:
             raise InstallError(f"Verification runner could not start: {exc}") from exc
@@ -1166,16 +1359,54 @@ def run_verification_gate(
 
 
 def verify_command(args: argparse.Namespace) -> dict[str, Any]:
-    return run_verification_gate(
+    raw_profile = str(args.profile)
+    profile = {"full": "release", "quick": "fast"}.get(raw_profile, raw_profile)
+    if profile == "codex":
+        harnesses = ("codex",)
+    elif profile in {"standard", "release"} or profile == "omp" or bool(args.require_node):
+        harnesses = dependency_tool.HARNESS_ORDER if profile in {"standard", "release"} else ("omp",)
+    else:
+        harnesses = ("generic",)
+    if os.environ.get("BBK_TEST_ALLOW_MISSING_DEPENDENCIES") == "1":
+        dependency_report: dict[str, Any] = {
+            "schema": "bbk.install-dependency-report.v1",
+            "status": "SKIPPED_TEST",
+            "selected_harnesses": list(harnesses),
+            "checks": [],
+            "host_checks": [],
+            "blocking_count": 0,
+            "warning_count": 0,
+            "network_accessed": False,
+            "mutation_performed": False,
+        }
+    else:
+        try:
+            dependency_report = dependency_tool.check_dependencies(
+                harnesses,
+                include_test_dependencies=profile in {"fast", "standard", "release"},
+                require_omp_node=profile in {"standard", "release", "omp"} or bool(args.require_node),
+                check_hosts=False,
+            )
+        except dependency_tool.DependencyError as exc:
+            raise InstallError(f"Dependency preflight could not be evaluated: {exc}") from exc
+        if not args.json:
+            print(dependency_tool.format_report(dependency_report), flush=True)
+        if dependency_report.get("status") != "PASS":
+            remediation = dependency_report.get("remediation_command")
+            suffix = f" Run: {remediation}" if remediation else ""
+            raise InstallError(f"Dependency preflight failed; verification was not started.{suffix}")
+    result = run_verification_gate(
         failfast=bool(args.failfast),
-        require_node=bool(args.require_node),
+        require_node=bool(args.require_node or profile in {"standard", "release", "omp"}),
         echo=not args.json,
-        profile=str(args.profile),
+        profile=raw_profile,
         jobs=int(args.test_jobs),
         test_mode=str(args.test_mode),
         timing_report=getattr(args, "timing_report", None),
         no_timing_report=bool(getattr(args, "no_timing_report", False)),
     )
+    result["dependency_preflight"] = dependency_report
+    return result
 
 
 def _perform_install(
@@ -1185,20 +1416,14 @@ def _perform_install(
     verification: dict[str, Any] | None,
     progress: InstallProgress | None = None,
     profile_reuse: Mapping[str, Any] | None = None,
+    projection_cache: ProjectionBundleCache | None = None,
 ) -> dict[str, Any]:
-    codex, omp, claude, generic = selected_harnesses(args)
+    codex, omp, claude, pi, generic = selected_harnesses(args)
     project = selected_project_root(args)
     root = data_root() if args.scope == "user" else project / ".bbk-kit"  # type: ignore[operator]
     mpath = manifest_path(args.scope, project, root)
-    routing_path = (
-        Path(args.model_routing).expanduser().resolve()
-        if args.model_routing
-        else MODEL_ROUTING_PATH.resolve()
-    )
-    try:
-        projections, routing_meta = rendered_projections(routing_path)
-    except (OSError, json.JSONDecodeError, ModelRoutingError, ValueError) as exc:
-        raise InstallError(f"Invalid model-routing policy {routing_path}: {exc}") from exc
+    cache = projection_cache or ProjectionBundleCache.from_args(args)
+    routing_path, projections, routing_meta = cache.get()
 
     backups = root / "backups" / stamp()
     records: list[dict[str, Any]] = []
@@ -1226,12 +1451,14 @@ def _perform_install(
         )
 
     registry_relative = REGISTRY_RELATIVE_PATH.as_posix()
-    if codex or omp or generic:
+    compiled_exclusions = compiled_skill_catalog_exclusions(ROOT)
+    catalog_exclusions = {registry_relative, *compiled_exclusions}
+    if codex or omp or pi or generic:
         assert targets["agent_skills"] is not None
         copy_tree(
             ROOT / "shared" / "skills",
             targets["agent_skills"],
-            exclude={registry_relative},
+            exclude=catalog_exclusions,
             **common,
         )
     routing_digest = routing_meta["model_routing_source_sha256"]
@@ -1285,7 +1512,7 @@ def _perform_install(
         copy_tree(
             ROOT / "shared" / "skills",
             targets["claude_skills"],
-            exclude={registry_relative},
+            exclude=catalog_exclusions,
             **common,
         )
         install_rendered_agents(
@@ -1293,6 +1520,23 @@ def _perform_install(
             targets["claude_agents"],
             target="claude",
             routing_digest=routing_digest,
+            **common,
+        )
+    pi_manifest_path: Path | None = None
+    if pi:
+        assert targets["pi_agents"] is not None
+        install_rendered_agents(
+            projections["pi"],
+            targets["pi_agents"],
+            target="pi",
+            routing_digest=routing_digest,
+            **common,
+        )
+        pi_manifest_path = targets["pi_agents"].parent / "agent-manifest.json"
+        install_bytes(
+            generic_agent_manifest_bytes(routing_meta, target="pi"),
+            pi_manifest_path,
+            source=f"generated:pi-agent-manifest:{routing_digest}",
             **common,
         )
     generic_manifest_path: Path | None = None
@@ -1307,7 +1551,7 @@ def _perform_install(
         )
         generic_manifest_path = targets["generic_agents"].parent / "agent-manifest.json"
         install_bytes(
-            generic_agent_manifest_bytes(routing_meta),
+            generic_agent_manifest_bytes(routing_meta, target="generic"),
             generic_manifest_path,
             source=f"generated:generic-agent-manifest:{routing_digest}",
             **common,
@@ -1347,6 +1591,7 @@ def _perform_install(
                 codex=codex,
                 omp=omp,
                 claude=claude,
+                pi=pi,
                 generic=generic,
                 common=common,
             )
@@ -1354,11 +1599,25 @@ def _perform_install(
             result["reused_file_count"] = 0
             installed_profiles.append(result)
 
+    installed_package_roots = {
+        f"{item.get('id')}@{item.get('version')}": str(item.get("package_root"))
+        for item in installed_profiles
+        if isinstance(item, Mapping)
+        and isinstance(item.get("id"), str)
+        and isinstance(item.get("version"), str)
+        and isinstance(item.get("package_root"), str)
+    }
     registry_json = registry_json_bytes(
-        prepared_profiles, bbk_version=VERSION, bbk_cli=bbk_cli_binding
+        prepared_profiles,
+        bbk_version=VERSION,
+        bbk_cli=bbk_cli_binding,
+        installed_package_roots=installed_package_roots,
     )
     registry_skill = registry_skill_bytes(
-        prepared_profiles, bbk_version=VERSION, bbk_cli=bbk_cli_binding
+        prepared_profiles,
+        bbk_version=VERSION,
+        bbk_cli=bbk_cli_binding,
+        installed_package_roots=installed_package_roots,
     )
     registry_digest = hashlib.sha256(registry_skill).hexdigest()
     effective_profiles = root / "effective-language-profiles.json"
@@ -1369,7 +1628,7 @@ def _perform_install(
         **common,
     )
     registry_paths: list[str] = []
-    if codex or omp or generic:
+    if codex or omp or pi or generic:
         assert targets["agent_skills"] is not None
         path = targets["agent_skills"].joinpath(*REGISTRY_RELATIVE_PATH.parts)
         install_bytes(
@@ -1390,6 +1649,7 @@ def _perform_install(
         )
         registry_paths.append(json_path(path))
 
+    selected_harness_map = {"codex": codex, "omp": omp, "claude": claude, "pi": pi, "generic": generic}
     manifest = {
         "schema": "bbk.install-manifest.v1",
         "version": VERSION,
@@ -1399,7 +1659,9 @@ def _perform_install(
         "codex": codex,
         "omp": omp,
         "claude": claude,
+        "pi": pi,
         "generic": generic,
+        "pi_agent_manifest": json_path(pi_manifest_path) if pi_manifest_path else None,
         "generic_agent_manifest": json_path(generic_manifest_path) if generic_manifest_path else None,
         "dry_run": args.dry_run,
         "verification": verification,
@@ -1409,6 +1671,57 @@ def _perform_install(
             effective_copy=effective_routing,
             routing_meta=routing_meta,
         ),
+        "compiled_procedures": {
+            "schema": "bbk.installed-compiled-procedure-layout.v2",
+            "registry_source": json_path(package_root / "spec" / "procedures" / "catalog.json"),
+            "registry_revision": routing_meta.get("procedure_registry_revision"),
+            "registry_sha256": routing_meta.get("procedure_registry_sha256"),
+            "canonical_source_root": json_path(package_root / "shared" / "skills"),
+            "catalog_projection_mode": "IDENTITY_AWARE_COMPILER_SELECTABLE_SOURCES",
+            "physical_catalog_classes": routing_meta.get("physical_catalog_classes", {}),
+            "suppressed_procedure_ids": sorted(globally_suppressed_procedures(ROOT)),
+            "physically_indexed_procedure_ids": sorted(physically_indexed_procedures(ROOT)),
+            "indexed_skill_roots": [
+                json_path(targets["agent_skills"]) if targets.get("agent_skills") is not None and (codex or omp or pi or generic) else None,
+                json_path(targets["claude_skills"]) if targets.get("claude_skills") is not None and claude else None,
+            ],
+            "source_retained_in_version_package": True,
+        },
+        "harness_prompt_compilation": {
+            target: {
+                "prompt_compiler_revision": routing_meta.get("procedure_registry_revision"),
+                "role_projection_digest": hashlib.sha256(
+                    json.dumps(
+                        {
+                            name: value.get("compiled_procedures", {}).get(target)
+                            for name, value in sorted(routing_meta.get("agents", {}).items())
+                        },
+                        ensure_ascii=False,
+                        sort_keys=True,
+                        separators=(",", ":"),
+                    ).encode("utf-8")
+                ).hexdigest(),
+                "controller_projection_digest": (
+                    routing_meta.get("controllers", {}).get(target, {}).get("compiled_procedures", {}).get("compiled_prompt_sha256")
+                ),
+                "procedure_registry_revision": routing_meta.get("procedure_registry_revision"),
+                "effective_catalog_digest": hashlib.sha256(
+                    json.dumps(
+                        {
+                            name: value.get("effective_external_catalogs", {}).get(target)
+                            for name, value in sorted(routing_meta.get("agents", {}).items())
+                        },
+                        ensure_ascii=False,
+                        sort_keys=True,
+                        separators=(",", ":"),
+                    ).encode("utf-8")
+                ).hexdigest(),
+                "model_routing_digest": routing_meta.get("model_routing_source_sha256"),
+                "adapter_digest": hashlib.sha256(target.encode("utf-8")).hexdigest(),
+            }
+            for target in HARNESS_ORDER
+            if selected_harness_map[target]
+        },
         "omp_runtime_routing": (
             {
                 "schema": "bbk.omp-runtime-routing.v1",
@@ -1540,6 +1853,7 @@ def clean_replace_existing_install(
     prepared_profiles: Sequence[PreparedProfile],
     verification: dict[str, Any] | None,
     progress_enabled: bool,
+    projection_cache: ProjectionBundleCache | None = None,
 ) -> dict[str, Any]:
     """Preflight the successor, then conservatively remove the old install."""
     progress_note(progress_enabled, "==> Preflighting clean replacement against the existing installation...")
@@ -1551,6 +1865,7 @@ def clean_replace_existing_install(
         prepared_profiles=prepared_profiles,
         verification=verification,
         progress=InstallProgress(enabled=False),
+        projection_cache=projection_cache,
     )
     validate_install_plan(replacement_plan)
 
@@ -1778,7 +2093,7 @@ def selective_clean_replace_existing_install(
         raise InstallError(
             f"Selective replacement completed but the unified manifest cannot be read: {mpath}: {exc}"
         ) from exc
-    if not isinstance(manifest, dict) or manifest.get("schema") != "bbk.install-manifest.v1":
+    if not isinstance(manifest, dict) or manifest.get("schema") not in {"bbk.install-manifest.v1", "bbk.install-manifest.v2"}:
         raise InstallError(f"Selective replacement produced an unsupported manifest: {mpath}")
     manifest["preexisting_install"] = preexisting
     manifest["last_selective_clean_replacement"] = {
@@ -1797,6 +2112,21 @@ def selective_clean_replace_existing_install(
 
 def install(args: argparse.Namespace) -> dict[str, Any]:
     progress_enabled = not bool(args.json)
+    verification_profile = (
+        automatic_verification_profile(args)
+        if str(args.verification_profile) == "auto"
+        else str(args.verification_profile)
+    )
+    selected = selected_harness_names(args)
+    if args.verify and verification_profile == "codex" and selected != {"codex"}:
+        raise InstallError("the codex verification profile requires a Codex-only install selection")
+    if args.verify and verification_profile == "omp" and selected != {"omp"}:
+        raise InstallError("the omp verification profile requires an OMP-only install selection")
+    dependency_report = run_dependency_preflight(
+        args,
+        profile=verification_profile,
+        echo=progress_enabled,
+    )
     existing = load_existing_install(args)
     existing_action = choose_existing_install_action(args, existing)
     replacement = replacement_scope(args, existing) if existing is not None else None
@@ -1813,13 +2143,13 @@ def install(args: argparse.Namespace) -> dict[str, Any]:
     }
     verification = None
     if args.verify:
-        progress_note(progress_enabled, f"==> Running {args.verification_profile} BBK verification before installation...")
-        _, omp_selected, _, _ = selected_harnesses(args)
+        progress_note(progress_enabled, f"==> Running {verification_profile} BBK verification before installation...")
+        _, omp_selected, _, _, _ = selected_harnesses(args)
         verification = run_verification_gate(
             failfast=bool(args.verification_failfast),
             require_node=bool(args.require_node or omp_selected),
             echo=not args.json,
-            profile=str(args.verification_profile),
+            profile=verification_profile,
             jobs=int(args.test_jobs),
             test_mode=str(args.test_mode),
             timing_report=getattr(args, "timing_report", None),
@@ -1837,6 +2167,10 @@ def install(args: argparse.Namespace) -> dict[str, Any]:
             existing=existing,
             verification=verification,
         )
+        result["dependency_preflight"] = dependency_report
+        # The selective updater has already written the canonical unified
+        # install manifest. Do not serialize the user-facing result object over
+        # that manifest; it contains summary-only fields and a manifest_path.
         progress_note(progress_enabled, "<== Harness-scoped clean replacement complete.")
         return result
 
@@ -1898,6 +2232,7 @@ def install(args: argparse.Namespace) -> dict[str, Any]:
                 f"{profile_reuse['reused_profile_count']} unchanged language profiles "
                 f"({profile_reuse['reused_file_count']:,} manifest-owned files).",
             )
+        projection_cache = ProjectionBundleCache.from_args(args)
         if args.dry_run:
             planning_args = copy(args)
             if existing_action == "replace":
@@ -1913,6 +2248,7 @@ def install(args: argparse.Namespace) -> dict[str, Any]:
                     verification=verification,
                     progress=dry_progress,
                     profile_reuse=profile_reuse,
+                    projection_cache=projection_cache,
                 )
                 validate_install_plan(plan)
             except Exception:
@@ -1920,6 +2256,7 @@ def install(args: argparse.Namespace) -> dict[str, Any]:
                 raise
             dry_progress.finish()
             plan["preexisting_install"] = existing_result
+            plan["dependency_preflight"] = dependency_report
             return plan
 
         if existing is not None and existing_action == "replace":
@@ -1929,6 +2266,7 @@ def install(args: argparse.Namespace) -> dict[str, Any]:
                 prepared_profiles=prepared,
                 verification=verification,
                 progress_enabled=progress_enabled,
+                projection_cache=projection_cache,
             )
         elif existing is not None:
             progress_note(
@@ -1950,6 +2288,7 @@ def install(args: argparse.Namespace) -> dict[str, Any]:
                 verification=verification,
                 progress=preflight_progress,
                 profile_reuse=profile_reuse,
+                projection_cache=projection_cache,
             )
             validate_install_plan(plan)
         except Exception:
@@ -1969,6 +2308,7 @@ def install(args: argparse.Namespace) -> dict[str, Any]:
                 verification=verification,
                 progress=install_progress,
                 profile_reuse=profile_reuse,
+                projection_cache=projection_cache,
             )
             validate_install_plan(result)
         except Exception:
@@ -1987,6 +2327,7 @@ def install(args: argparse.Namespace) -> dict[str, Any]:
             "language_profile_source_mode": source_mode,
         }
         result["preexisting_install"] = existing_result
+        result["dependency_preflight"] = dependency_report
         project, root, final_manifest_path = install_scope_paths(args)
         progress_note(progress_enabled, "==> Finalizing the unified installation manifest...")
         atomic_write(final_manifest_path, json_bytes({
@@ -2059,6 +2400,7 @@ def status(args: argparse.Namespace) -> dict[str, Any]:
                 "codex": manifest.get("codex"),
                 "omp": manifest.get("omp"),
                 "claude": manifest.get("claude"),
+                "pi": manifest.get("pi"),
                 "generic": manifest.get("generic"),
             },
             "verification": manifest.get("verification"),
@@ -2201,7 +2543,7 @@ def human(value: dict[str, Any]) -> str:
             f"Stale files to remove: {update.get('removed_stale_count', 0)}\n"
             f"Manifest: {value.get('manifest_path')}"
         )
-    if schema == "bbk.install-manifest.v1":
+    if schema in {"bbk.install-manifest.v1", "bbk.install-manifest.v2"}:
         actions: dict[str, int] = {}
         for item in value["files"]:
             actions[item["action"]] = actions.get(item["action"], 0) + 1
@@ -2214,7 +2556,7 @@ def human(value: dict[str, Any]) -> str:
             f"BBK install {'dry run' if value['dry_run'] else 'complete'}\n"
             f"Scope: {value['scope']}\n"
             f"Verification: {verification_text}\n"
-            f"Harnesses: Codex={value['codex']} OMP={value['omp']} Claude={value['claude']} Generic={value['generic']}\n"
+            f"Harnesses: Codex={value['codex']} OMP={value['omp']} Claude={value['claude']} Pi={value.get('pi')} Generic={value['generic']}\n"
             f"Model routing: {routing_kind} — {routing.get('source')} ({routing.get('sha256')})\n"
             f"Language profiles: {profile_text} ({value.get('language_profile_source_mode', 'unknown')})\n"
             f"Files: {actions}\n"
@@ -2256,6 +2598,7 @@ def add_install_selection_flags(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--codex", action="store_true")
     parser.add_argument("--omp", action="store_true")
     parser.add_argument("--claude", action="store_true")
+    parser.add_argument("--pi", action="store_true")
     parser.add_argument("--generic", action="store_true")
     parser.add_argument(
         "--model-routing",
@@ -2278,7 +2621,7 @@ def add_install_selection_flags(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--no-language-profiles",
         action="store_true",
-        help="install BBK core only instead of the five bundled language profiles",
+        help="install BBK core only instead of the bundled language profiles",
     )
     existing = parser.add_mutually_exclusive_group()
     existing.add_argument(
@@ -2325,9 +2668,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     installer.add_argument(
         "--verification-profile",
-        choices=["standard", "release"],
-        default="standard",
-        help="with --verify, select routine preinstallation checks or exhaustive release qualification",
+        choices=["auto", "fast", "standard", "release", "omp", "codex"],
+        default="auto",
+        help="with --verify, select a profile; auto uses the smallest host-aware profile",
     )
     installer.add_argument(
         "--test-mode", choices=["auto", "pooled", "batch", "isolated"], default="auto"

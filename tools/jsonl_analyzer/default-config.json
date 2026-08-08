@@ -1,0 +1,97 @@
+{
+  "command_categories": {
+    "bbk_help": {
+      "description": "BBK CLI help lookup.",
+      "pattern": "(?i)\\bbb[kq](?:\\.exe)?\\b[^\\n;|&]*(?:--help|-h\\b)"
+    },
+    "file_read": {
+      "description": "File content read.",
+      "pattern": "(?i)(?:Get-Content|\\bgc\\b|\\bcat\\b|\\btype\\b|\\bmore\\b|\\bsed\\s+-n\\b|\\bhead\\b|\\btail\\b|ReadAllText)"
+    },
+    "file_search": {
+      "description": "File listing or content search.",
+      "pattern": "(?i)(?:\\brg\\b|\\bripgrep\\b|Get-ChildItem|\\bfind\\b|\\bfindstr\\b|Select-String)"
+    },
+    "get_file_hash": {
+      "description": "PowerShell Get-FileHash invocation.",
+      "pattern": "(?i)\\bGet-FileHash\\b"
+    },
+    "git_diff": {
+      "description": "Git diff inspection.",
+      "pattern": "(?i)\\bgit(?:\\.exe)?\\s+(?:(?:-C|--git-dir|--work-tree)\\s+[^\\s]+\\s+)*diff\\b"
+    },
+    "git_status": {
+      "description": "Git status inspection.",
+      "pattern": "(?i)\\bgit(?:\\.exe)?\\s+(?:(?:-C|--git-dir|--work-tree)\\s+[^\\s]+\\s+)*status\\b"
+    },
+    "handoff_create": {
+      "description": "BBK handoff creation.",
+      "pattern": "(?i)(?:\\bbb[kq](?:\\.exe)?\\b[^\\n;|&]*\\bhandoff\\s+create\\b|\\bhandoff\\s+create\\b)"
+    },
+    "handoff_verify": {
+      "description": "BBK handoff verification.",
+      "pattern": "(?i)(?:\\bbb[kq](?:\\.exe)?\\b[^\\n;|&]*\\bhandoff\\s+verify\\b|\\bhandoff\\s+verify\\b)"
+    },
+    "handoff_verify_help": {
+      "description": "Help lookup for handoff verification.",
+      "pattern": "(?i)\\bhandoff\\s+verify\\b[^\\n;|&]*(?:--help|-h\\b)"
+    },
+    "process_poll": {
+      "description": "Process inspection or polling.",
+      "pattern": "(?i)(?:Get-Process|Wait-Process|\\btasklist\\b|\\bps\\s+(?:aux|ef)\\b|Get-CimInstance\\s+Win32_Process)"
+    },
+    "repo_validator": {
+      "description": "Repository-wide generated-code validator.",
+      "pattern": "(?i)(?:^|[\\s'\\\"\\\\/])validate_generated_code\\.py(?:[\\s'\\\"]|$)"
+    },
+    "schema_validate": {
+      "description": "Schema validation command.",
+      "pattern": "(?i)(?:\\bbb[kq](?:\\.exe)?\\b[^\\n;|&]*\\bschema\\s+validate\\b|\\bschema\\s+validate\\b|jsonschema[^\\n;|&]*validate)"
+    },
+    "schema_validate_cli": {
+      "description": "Strict BBK schema validate CLI invocation.",
+      "pattern": "(?i)\\bbb[kq](?:\\.exe)?\\b[^\\n;|&]*\\bschema\\s+validate\\b"
+    },
+    "sha256_hash": {
+      "description": "SHA-256 calculation or verification.",
+      "pattern": "(?i)(?:Get-FileHash|sha256sum|shasum\\s+-a\\s+256|certutil[^\\n]*-hashfile[^\\n]*sha256|hashlib\\.sha256)"
+    },
+    "skill_read": {
+      "description": "A shell command that appears to read an indexed skill file.",
+      "pattern": "(?is)(?:Get-Content|\\bgc\\b|\\bcat\\b|\\btype\\b|\\bmore\\b|\\bsed\\b|\\bhead\\b|\\btail\\b|ReadAllText|\\brg\\b|Select-String|\\bfindstr\\b)[^\\n]*(?:SKILL\\.md|skills[\\\\/])"
+    },
+    "test_or_build": {
+      "description": "Common test or build invocation.",
+      "pattern": "(?i)(?:\\bpytest\\b|\\bpython(?:\\.exe)?\\s+-m\\s+unittest\\b|\\bdotnet\\s+test\\b|\\bcargo\\s+(?:test|check|build)\\b|\\b(?:npm|pnpm|yarn)\\s+(?:test|run\\s+test|build)\\b|\\bgo\\s+test\\b|\\bctest\\b|\\bmsbuild\\b)"
+    }
+  },
+  "read_verbs_pattern": "(?i)(?:Get-Content|\\bgc\\b|\\bcat\\b|\\btype\\b|\\bmore\\b|\\bsed\\b|\\bhead\\b|\\btail\\b|ReadAllText|\\brg\\b|Select-String|\\bfindstr\\b)",
+  "redaction": {
+    "long_literal_threshold": 180,
+    "secret_name_pattern": "(?i)(?:api[_-]?key|token|secret|password|passwd|authorization|credential)"
+  },
+  "role_classes": {
+    "assurance": [
+      "^bbk_reviewer$",
+      "^bbk_validator(?:_orchestrator)?$"
+    ],
+    "controller": [
+      "^(?:controller_root|root|unknown)$"
+    ],
+    "execution": [
+      "^bbk_root_orchestrator$",
+      "^bbk_territory_orchestrator$",
+      "^bbk_worker_orchestrator$",
+      "^bbk_worker$"
+    ],
+    "planning_design_research": [
+      "^bbk_(?:root|territory|planning|phase)_wayfinder$",
+      "^bbk_(?:architect|researcher|prototyper|synthesizer|worker_designer|verification_designer|question_guide|questioning_wayfinder)$"
+    ]
+  },
+  "skill_path_patterns": [
+    "(?i)(?:\\.agents|agents)[\\\\/]+skills[\\\\/]+(?P<skill>[^\\\\/]+)[\\\\/]+SKILL\\.md",
+    "(?i)skills://(?P<skill>[^/]+)/SKILL\\.md",
+    "(?i)[\\\\/](?P<skill>bbk[^\\\\/]*)[\\\\/]+SKILL\\.md"
+  ]
+}

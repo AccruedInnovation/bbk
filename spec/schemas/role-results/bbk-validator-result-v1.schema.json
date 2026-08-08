@@ -6,90 +6,34 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "parent_run_assignment_and_attempt",
-    "subject_candidate_and_immutability",
-    "baseline_and_prerequisite_eligibility",
-    "assurance_charter_and_assertions",
-    "context_and_completeness",
-    "criteria_timing_purpose_and_exposure",
-    "independence_facts",
-    "method_profile_tool_and_environment",
-    "authority_effect_and_read_only_fence",
-    "operations_and_evidence",
     "assertion_evaluations",
-    "findings_and_nonfinding_states",
-    "outside_scope_and_parent_referrals",
-    "cleanup_and_residuals",
-    "continuation_and_recovery",
-    "claims_established_and_not_established",
+    "assurance_charter_and_assertions",
     "attempt_completion_state",
+    "authority_effect_and_read_only_fence",
+    "baseline_and_prerequisite_eligibility",
+    "claims_established_and_not_established",
+    "cleanup_and_residuals",
+    "context_and_completeness",
+    "continuation_and_recovery",
+    "criteria_timing_purpose_and_exposure",
     "durable_artifacts_and_handoff",
-    "invalidation_and_supersession"
+    "findings_and_nonfinding_states",
+    "independence_facts",
+    "invalidation_and_supersession",
+    "method_profile_tool_and_environment",
+    "operations_and_evidence",
+    "outside_scope_and_parent_referrals",
+    "parent_run_assignment_and_attempt",
+    "subject_candidate_and_immutability"
   ],
   "properties": {
-    "parent_run_assignment_and_attempt": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Exact `bbk_validator_orchestrator` parent, ReviewRun and assignment references, semantic attempt, physical invocation or session, reply route, budgets, predecessor or replacement identity, and current checkpoint or final-report reason."
-    },
-    "subject_candidate_and_immutability": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Exact governed subject and candidate identity, revision and digest, candidate manifest and content root, freeze or immutability receipt, predecessor and successor lineage, verified handoff, post-freeze mutation check, candidate read-only fence and any identity, integrity or staleness blocker."
-    },
-    "baseline_and_prerequisite_eligibility": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Applicable operating and execution baseline, execution or assurance-run authority, TerritoryExecutionBoundary, cohort, WorkUnits and prerequisite worker-quality attestation or explicit non-applicability; identity, currentness and eligibility checks without treating a parent summary as evidence."
-    },
-    "assurance_charter_and_assertions": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Current AssuranceContract and assignment identity, every assigned assertion, source trace, exact criterion, falsifier or threshold, applicability, acceptable and prohibited methods, required evidence, environment, blocking consequence, protected floor, independence, reuse, repair and revalidation rules, plus any contradiction or missing design."
-    },
-    "context_and_completeness": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "ReviewContextManifest and context-pack identity and digest; included and retrieval-only objects; exclusions, omissions, redactions, generated summaries, source closure, shards, compiler and completeness; required missing or stale context and affected assertions."
-    },
-    "criteria_timing_purpose_and_exposure": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "One allowed attempt purpose, one prior-findings visibility state, criteria commitment time, append-only exposure to worker narrative, prior findings, expected answers, deterministic results and other outcome-bearing evidence, and any post-exposure change that limits confirmation claims."
-    },
-    "independence_facts": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Producer, logical-role, physical-session, context-assembly, candidate-mutation, model, provider, method, tool, environment, data, consumer or device and organizational independence facts; required dimensions achieved or missing; and limitations on blind, replicated or confirmatory claims."
-    },
-    "method_profile_tool_and_environment": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Assigned method; profile identity, version, effective digest, router and procedure; tool, adapter and version; environment activation, fixtures, data, consumer, device or facility; credentials and endpoints; qualification, fallback and limitation; and any unapproved substitution attempt."
-    },
-    "authority_effect_and_read_only_fence": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Authority source and holder; allowed and prohibited filesystem, process, package, credential, network, service, database, device, facility and external-system effects; scratch or isolated-copy identity; pre-state, rollback, cleanup and actual effects used; and every denied, uncovered or unauthorized effect."
-    },
-    "operations_and_evidence": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Every material operation or observation with assertion link, sanitized argv or method, working context, tool and environment, inputs and fixtures, start and completion, output and raw carriers, EvidenceReceipt, trust class, coverage, redaction, freshness, dependency fingerprint, path/bytes/SHA-256 where material, reuse decision and limitations."
-    },
     "assertion_evaluations": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
       "description": "One schema-valid evaluation for every assigned assertion using an allowed assertion status, exact evidence references, rationale, applicability, criterion, coverage and limitations. Preserve partial success without deriving the complete ReviewAggregate."
     },
-    "findings_and_nonfinding_states": {
+    "assurance_charter_and_assertions": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Every immutable candidate or contract finding with exact source attempt, subject digest, affected assertions and objects, classification, severity, blocking state, expected and observed condition, reproduction, evidence, scope, probable impact, route, fingerprint and lifecycle; plus context, evidence, evaluator, tool, environment, authority, capacity and integrity states explicitly not represented as candidate findings."
-    },
-    "outside_scope_and_parent_referrals": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Every material outside-scope observation, requirement or architecture issue, assertion-design gap, authority question, candidate-repair implication, capability need or parent recharter request with exact evidence, affected objects and proposed owner, without broadening the current attempt."
-    },
-    "cleanup_and_residuals": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "One allowed cleanup state plus scratch files, build outputs, caches, processes, packages, credentials, services, ports, locks, databases, networks, devices, facilities, workspaces and remote effects; rollback or quarantine, retained evidence, residual owner and any cleanup blocker."
-    },
-    "continuation_and_recovery": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Completed and remaining operations, exact checkpoint and evidence state, candidate and charter identity, criteria and exposure, method and environment, budgets consumed, same-attempt resume conditions, replacement or successor-attempt need, interruption evidence and smallest safe continuation action."
-    },
-    "claims_established_and_not_established": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Exact bounded claims supported by current assertion evaluations, material limitations and claims explicitly not established. State that this attempt does not derive the central aggregate, close findings, accept the candidate or risk, establish campaign or outcome completion, or grant release."
+      "description": "Current AssuranceContract and assignment identity, every assigned assertion, source trace, exact criterion, falsifier or threshold, applicability, acceptable and prohibited methods, required evidence, environment, blocking consequence, protected floor, independence, reuse, repair and revalidation rules, plus any contradiction or missing design."
     },
     "attempt_completion_state": {
       "type": "string",
@@ -103,13 +47,69 @@
       ],
       "description": "One completion state compatible with `bbk.review-attempt.v1`, with infrastructure and context blockers kept distinct from candidate assertion results."
     },
+    "authority_effect_and_read_only_fence": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Authority source and holder; allowed and prohibited filesystem, process, package, credential, network, service, database, device, facility and external-system effects; scratch or isolated-copy identity; pre-state, rollback, cleanup and actual effects used; and every denied, uncovered or unauthorized effect."
+    },
+    "baseline_and_prerequisite_eligibility": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Applicable operating and execution baseline, execution or assurance-run authority, TerritoryExecutionBoundary, cohort, WorkUnits and prerequisite worker-quality attestation or explicit non-applicability; identity, currentness and eligibility checks without treating a parent summary as evidence."
+    },
+    "claims_established_and_not_established": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Exact bounded claims supported by current assertion evaluations, material limitations and claims explicitly not established. State that this attempt does not derive the central aggregate, close findings, accept the candidate or risk, establish campaign or outcome completion, or grant release."
+    },
+    "cleanup_and_residuals": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "One allowed cleanup state plus scratch files, build outputs, caches, processes, packages, credentials, services, ports, locks, databases, networks, devices, facilities, workspaces and remote effects; rollback or quarantine, retained evidence, residual owner and any cleanup blocker."
+    },
+    "context_and_completeness": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "ReviewContextManifest and context-pack identity and digest; included and retrieval-only objects; exclusions, omissions, redactions, generated summaries, source closure, shards, compiler and completeness; required missing or stale context and affected assertions."
+    },
+    "continuation_and_recovery": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Completed and remaining operations, exact checkpoint and evidence state, candidate and charter identity, criteria and exposure, method and environment, budgets consumed, same-attempt resume conditions, replacement or successor-attempt need, interruption evidence and smallest safe continuation action."
+    },
+    "criteria_timing_purpose_and_exposure": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "One allowed attempt purpose, one prior-findings visibility state, criteria commitment time, append-only exposure to worker narrative, prior findings, expected answers, deterministic results and other outcome-bearing evidence, and any post-exposure change that limits confirmation claims."
+    },
     "durable_artifacts_and_handoff": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
       "description": "Structured Validator result, ReviewAttempt-compatible record, EvidenceReceipts, findings, raw carriers, checkpoint and `bbk-handoff` references with exact subject, path, byte count, SHA-256, producer, attempt, creation time, verification and discovery path."
     },
+    "findings_and_nonfinding_states": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every immutable candidate or contract finding with exact source attempt, subject digest, affected assertions and objects, classification, severity, blocking state, expected and observed condition, reproduction, evidence, scope, probable impact, route, fingerprint and lifecycle; plus context, evidence, evaluator, tool, environment, authority, capacity and integrity states explicitly not represented as candidate findings."
+    },
+    "independence_facts": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Producer, logical-role, physical-session, context-assembly, candidate-mutation, model, provider, method, tool, environment, data, consumer or device and organizational independence facts; required dimensions achieved or missing; and limitations on blind, replicated or confirmatory claims."
+    },
     "invalidation_and_supersession": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
       "description": "Changes that invalidate the candidate, assignment, context, criterion, method, profile, tool, environment, consumer, device, evidence, independence or attempt; stale and superseded objects preserved; and any evidence eligible for reuse under an unchanged dependency closure."
+    },
+    "method_profile_tool_and_environment": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Assigned method; profile identity, version, effective digest, router and procedure; tool, adapter and version; environment activation, fixtures, data, consumer, device or facility; credentials and endpoints; qualification, fallback and limitation; and any unapproved substitution attempt."
+    },
+    "operations_and_evidence": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every material operation or observation with assertion link, sanitized argv or method, working context, tool and environment, inputs and fixtures, start and completion, output and raw carriers, EvidenceReceipt, trust class, coverage, redaction, freshness, dependency fingerprint, path/bytes/SHA-256 where material, reuse decision and limitations."
+    },
+    "outside_scope_and_parent_referrals": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every material outside-scope observation, requirement or architecture issue, assertion-design gap, authority question, candidate-repair implication, capability need or parent recharter request with exact evidence, affected objects and proposed owner, without broadening the current attempt."
+    },
+    "parent_run_assignment_and_attempt": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Exact `bbk_validator_orchestrator` parent, ReviewRun and assignment references, semantic attempt, physical invocation or session, reply route, budgets, predecessor or replacement identity, and current checkpoint or final-report reason."
+    },
+    "subject_candidate_and_immutability": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Exact governed subject and candidate identity, revision and digest, candidate manifest and content root, freeze or immutability receipt, predecessor and successor lineage, verified handoff, post-freeze mutation check, candidate read-only fence and any identity, integrity or staleness blocker."
     }
   },
   "x-bbk-role": "bbk_validator",

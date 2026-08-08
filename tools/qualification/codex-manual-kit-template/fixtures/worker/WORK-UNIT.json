@@ -1,0 +1,1 @@
+{"id":"WU-MH-CODEX-01","scope":["input.txt"],"authority":"WORKSPACE_IMPLEMENTATION","mutation_owner":"bbk_worker","check":"python check.py","return_transport":"STRUCTURED_RETURN_ONLY"}

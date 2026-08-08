@@ -1,0 +1,28 @@
+{
+  "schema_version": "bbk.prompt-module.v1",
+  "id": "bbk-prompt-routine-contract-generation",
+  "title": "Routine contract and assertion generation",
+  "description": "Generate profile-covered Worker and assertion contracts mechanically and reserve specialists for typed material ambiguity.",
+  "clauses": [
+    {
+      "id": "ROUTINE_CONTRACT.WORKER",
+      "text": "Generate routine Worker contracts deterministically from the WorkUnit, standing authority and effect fence, workspace and mutation-ownership policy, profile/runtime constraints, stable interfaces, standard cleanup/checkpoint behavior, and canonical role-return envelope."
+    },
+    {
+      "id": "ROUTINE_CONTRACT.ASSERTION",
+      "text": "Generate routine verification assertions from accepted criteria and profile-owned templates, with exact subject, method, stage, environment, evidence, disposition, independence, and invalidation fields."
+    },
+    {
+      "id": "ROUTINE_CONTRACT.WORKER_TRIGGER",
+      "text": "Invoke Worker Designer only for a named authority or ownership ambiguity, nonstandard host/tool projection, cross-interface multi-owner mutation, unusual effects or recovery, exceptional model/context routing, or deliberate reusable cross-phase Worker design."
+    },
+    {
+      "id": "ROUTINE_CONTRACT.VERIFICATION_TRIGGER",
+      "text": "Invoke Verification Designer only for named method or environment ambiguity, nontrivial independence, a novel protected floor or quality attribute, or a genuinely cross-cutting aggregate."
+    },
+    {
+      "id": "ROUTINE_CONTRACT.NO_CONVENIENCE_TRIGGER",
+      "text": "Formatting preference, desire for completeness, implementation convenience, or availability of a specialist is not an exception trigger."
+    }
+  ]
+}

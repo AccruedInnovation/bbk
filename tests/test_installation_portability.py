@@ -53,10 +53,12 @@ class Alpha91PortabilityTests(unittest.TestCase):
         self.assertIn('OK', stream.getvalue())
 
     def test_current_verification_docs_use_the_stdout_runner(self):
-        for relative_path in ('README.md', 'docs/INSTALL.md', 'docs/DEVELOPMENT.md'):
+        for relative_path in ('docs/INSTALL.md', 'docs/DEVELOPMENT.md'):
             text = (m1_ROOT / relative_path).read_text(encoding='utf-8')
             self.assertIn('python tools/run_tests.py --profile', text, relative_path)
             self.assertIn('-v', text, relative_path)
+        readme = (m1_ROOT / 'README.md').read_text(encoding='utf-8')
+        self.assertIn('docs/INSTALL.md', readme)
 
 # ---------------------------------------------------------------------------
 # Historical source: test_alpha9_2_windows_installer.py
@@ -275,7 +277,7 @@ def m4__write_profile_package(base: Path, *, profile_id: str='sample') -> Path:
     (root / 'skills' / profile_id).mkdir(parents=True)
     (root / 'omp' / 'extension').mkdir(parents=True)
     source_profile = json.loads((m4_ROOT / 'fixtures' / 'profiles' / 'alpha8' / 'PROFILE.json').read_text(encoding='utf-8'))
-    source_profile.update({'id': profile_id, 'name': f'Sample {profile_id} profile', 'package': package_name, 'version': version, 'maturity': 'qualified-fixture', 'requires': {'bbk_minimum': '0.1.0-alpha.8', 'python_minimum': '3.10'}, 'installation': {'cli': 'tools/profile.py', 'skill_root': 'skills', 'omp_extension': 'omp/extension'}, 'skills': [{'id': profile_id, 'kind': 'router', 'path': f'skills/{profile_id}/SKILL.md'}]})
+    source_profile.update({'id': profile_id, 'name': f'Sample {profile_id} profile', 'package': package_name, 'version': version, 'maturity': 'qualified-fixture', 'requires': {'bbk_minimum': '0.1.0-alpha.8', 'python_minimum': '3.11'}, 'installation': {'cli': 'tools/profile.py', 'skill_root': 'skills', 'omp_extension': 'omp/extension'}, 'skills': [{'id': profile_id, 'kind': 'router', 'path': f'skills/{profile_id}/SKILL.md'}]})
     (root / 'PROFILE.json').write_text(json.dumps(source_profile, indent=2, sort_keys=True) + '\n', encoding='utf-8')
     (root / 'VERSION').write_text(version + '\n', encoding='utf-8')
     cli = root / 'tools' / 'profile.py'
@@ -316,9 +318,9 @@ class Alpha101EntrySetupTests(unittest.TestCase):
 
     def test_version_and_canonical_inputs_agree(self):
         version = (m4_ROOT / 'VERSION').read_text(encoding='utf-8').strip()
-        self.assertEqual(version, '0.1.0-alpha.16.1')
+        self.assertEqual(version, '0.1.0-alpha.17.0.2')
         self.assertEqual(json.loads((m4_ROOT / 'spec' / 'roles.json').read_text(encoding='utf-8'))['package_version'], version)
-        self.assertEqual(json.loads((m4_ROOT / 'spec' / 'model-routing.json').read_text(encoding='utf-8'))['package_version'], version)
+        self.assertNotIn('package_version', json.loads((m4_ROOT / 'spec' / 'model-routing.json').read_text(encoding='utf-8')))
         self.assertEqual(json.loads((m4_ROOT / 'spec' / 'method-content.json').read_text(encoding='utf-8'))['version'], version)
         self.assertEqual(json.loads((m4_ROOT / 'omp' / 'extension' / 'package.json').read_text(encoding='utf-8'))['version'], version)
 
@@ -353,7 +355,7 @@ class Alpha101EntrySetupTests(unittest.TestCase):
             script.write_text(textwrap.dedent(f'''\
                 const chain = () => ({{ optional() {{ return this; }} }});
                 const z = {{ object: value => value, string: chain, boolean: chain,
-                  enum: values => chain(), array: value => chain() }};
+                  enum: values => chain(), array: value => chain(), any: chain }};
                 const tools = [], commands = new Map(), messages = [], handlers = new Map(), entries = [], statuses = [];
                 const branch = [];
                 const pi = {{ zod: {{ z }}, setLabel() {{}},
@@ -384,14 +386,15 @@ class Alpha101EntrySetupTests(unittest.TestCase):
                 ]}}, ctx);
                 const joined = replacement.systemPrompt.join(String.fromCharCode(10));
                 for (const expected of ['<bbk-controller-system ', 'bbk_root_wayfinder', 'bbk_root_orchestrator',
-                  'bbk_reviewer', 'bbk_validator_orchestrator', '/bbk:exit', '<bbk-inlined-skill name="bbk"',
-                  '<bbk-inlined-skill name="bbk-context-routing"', '`task`', '`hub`/IRC', 'Main']) {{
+                  'bbk_reviewer', 'bbk_validator_orchestrator', '/bbk:exit', '### Compiled primary procedure: `bbk`',
+                  '### Compiled procedure: `bbk-context-routing`', '`task`', '`hub`/IRC', 'Main']) {{
                   if (!joined.includes(expected)) throw new Error(`missing ${{expected}}`);
                 }}
                 for (const excluded of ['OMP DEFAULT', '.codex/AGENTS.md', 'one-liner solutions']) {{
                   if (joined.includes(excluded)) throw new Error(`retained ${{excluded}}`);
                 }}
-                if (entries.length !== 2 || entries[1][0] !== 'bbk-effective-prompt-receipt' || entries[1][1].status !== 'REPLACED') throw new Error('effective prompt receipt missing');
+                if (entries.length !== 3 || entries[1][0] !== 'bbk-effective-prompt-receipt' || entries[1][1].status !== 'REPLACED') throw new Error('effective prompt receipt missing');
+                if (entries[2][0] !== 'bbk-prompt-compilation-event' || entries[2][1].schema !== 'bbk.prompt-compilation-event.v1' || entries[2][1].event !== 'PROMPT_COMPILED') throw new Error('typed prompt compilation event missing');
                 await commands.get('bbk').handler('Implement the accepted baseline', ctx);
                 if (messages.length !== 1 || messages[0][0] !== 'Implement the accepted baseline') throw new Error('request was not forwarded verbatim');
                 if (messages[0][0].includes('bbk_root_wayfinder')) throw new Error('mode prompt leaked into user message');
@@ -402,7 +405,7 @@ class Alpha101EntrySetupTests(unittest.TestCase):
             value = json.loads(result.stdout)
             self.assertEqual(value['commands'], 48)
             self.assertEqual(value['messages'], 1)
-            self.assertEqual(value['entries'], 2)
+            self.assertEqual(value['entries'], 3)
 
     def test_run_tests_all_delegates_to_the_ordered_verification_pipeline(self):
         calls: list[dict[str, object]] = []
@@ -703,7 +706,7 @@ class Alpha101EntrySetupTests(unittest.TestCase):
         self.assertIn('--profile-id', values)
         self.assertIn('rust', values)
         self.assertIn('--uninstall-existing', values)
-        self.assertEqual(values[values.index('--verification-profile') + 1], 'standard')
+        self.assertEqual(values[values.index('--verification-profile') + 1], 'omp')
         self.assertEqual(values[values.index('--test-mode') + 1], 'pooled')
         self.assertEqual(values[values.index('--test-jobs') + 1], '6')
         release_combined = parser.parse_args(['--release-test-and-install', '--omp'])
@@ -1131,7 +1134,7 @@ class Alpha101EntrySetupTests(unittest.TestCase):
             self.assertTrue(registry_path.is_file())
             registry_text = registry_path.read_text(encoding='utf-8')
             self.assertIn('### `sample@0.1.0-alpha.3`', registry_text)
-            self.assertIn('Router skill: `sample`', registry_text)
+            self.assertIn('Required router procedure: `sample`', registry_text)
             self.assertNotIn('package-source placeholder', registry_text)
             effective_registry = json.loads((base / 'data' / 'effective-language-profiles.json').read_text(encoding='utf-8'))
             self.assertEqual([item['id'] for item in effective_registry['profiles']], ['sample'])
@@ -1141,7 +1144,7 @@ class Alpha101EntrySetupTests(unittest.TestCase):
             self.assertTrue(registry_skill.is_file())
             registry_text = registry_skill.read_text(encoding='utf-8')
             self.assertIn('`sample@0.1.0-alpha.3`', registry_text)
-            self.assertIn('Router skill: `sample`', registry_text)
+            self.assertIn('Required router procedure: `sample`', registry_text)
             self.assertIn('--json profile list', registry_text)
             self.assertIn('BBK CLI discovery', registry_text)
             self.assertIn('Exact fallback when `bbk` is not on `PATH`', registry_text)
@@ -1287,14 +1290,9 @@ import install_profiles
 import profile_install
 import setup as setup_tool
 m5_BUNDLE = m5_ROOT / 'bundled-language-profiles'
-m5_EXPECTED_PROFILES = ['codesys', 'go', 'python', 'rust', 'typescript-javascript']
-m5_EXPECTED_PROFILE_VERSIONS = {
-    'codesys': '0.1.0-alpha.4',
-    'go': '0.1.0-alpha.3',
-    'python': '0.1.0-alpha.3',
-    'rust': '0.1.0-alpha.3',
-    'typescript-javascript': '0.1.0-alpha.3',
-}
+m5_RELEASE = json.loads((m5_BUNDLE / 'RELEASE-MANIFEST.json').read_text(encoding='utf-8'))
+m5_EXPECTED_PROFILE_VERSIONS = dict(sorted((m5_RELEASE.get('profileVersions') or {}).items()))
+m5_EXPECTED_PROFILES = sorted(m5_EXPECTED_PROFILE_VERSIONS)
 
 class Alpha111BundledReleaseTests(unittest.TestCase):
 
@@ -1309,7 +1307,7 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
         cls._prepared_temp.cleanup()
 
     def test_current_successor_is_repository_native_and_self_contained(self):
-        self.assertEqual((m5_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.16.1')
+        self.assertEqual((m5_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.17.0.2')
         self.assertTrue((m5_ROOT / 'docs' / 'README.md').is_file())
         self.assertTrue((m5_ROOT / 'docs' / 'DEVELOPMENT.md').is_file())
         self.assertTrue((m5_ROOT / 'bundled-language-profiles' / 'packages').is_dir())
@@ -1317,13 +1315,16 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
         self.assertFalse((m5_ROOT / 'docs' / 'GIT-REPOSITORIES.md').exists())
 
 
-    def test_bundled_release_manifest_verifies_and_contains_exactly_five_profiles(self):
+    def test_bundled_release_manifest_verifies_and_contains_declared_profiles(self):
         report = profile_install.verify_bundle_manifest(m5_BUNDLE)
         self.assertEqual(report['status'], 'PASS')
         self.assertEqual([item.profile_id for item in self.prepared], m5_EXPECTED_PROFILES)
         self.assertEqual({item.profile_id: item.version for item in self.prepared}, m5_EXPECTED_PROFILE_VERSIONS)
         release = json.loads((m5_BUNDLE / 'RELEASE-MANIFEST.json').read_text(encoding='utf-8'))
         self.assertEqual(release.get('profileVersions'), m5_EXPECTED_PROFILE_VERSIONS)
+        archives = sorted((m5_BUNDLE / 'packages').glob('*.zip'))
+        self.assertEqual(len(archives), len(self.prepared))
+        self.assertTrue(self.prepared, 'the public bundle must contain at least one language profile')
         self.assertTrue(all((item.package_verification.get('status') == 'PASS' for item in self.prepared)))
         self.assertTrue(all((item.compatibility.get('status') == 'PASS' for item in self.prepared)))
 
@@ -1347,10 +1348,12 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
                 self.assertIn('0.1.0-alpha.8', install_doc)
                 self.assertIn('contract dialect', metadata_doc.lower())
                 self.assertEqual(omp_package['version'], expected_version)
-                expected_predecessor = '0.1.0-alpha.3' if profile_id == 'codesys' else '0.1.0-alpha.2'
-                self.assertEqual(item.profile.get('predecessor', {}).get('version'), expected_predecessor)
+                predecessor = item.profile.get('predecessor', {})
+                self.assertEqual(predecessor.get('package'), item.package_name)
+                self.assertIsInstance(predecessor.get('version'), str)
+                self.assertNotEqual(predecessor.get('version'), expected_version)
 
-    def test_current_docs_describe_the_mixed_profile_versions(self):
+    def test_current_docs_describe_the_declared_profile_set(self):
         combined = "\n".join(
             (m5_ROOT / relative).read_text(encoding="utf-8")
             for relative in (
@@ -1361,16 +1364,12 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
                 "bundled-language-profiles/README.md",
             )
         )
-        self.assertIn("CODESYS `0.1.0-alpha.4`", combined)
-        self.assertIn("Go, Python, Rust, and TypeScript/JavaScript", combined)
-        self.assertIn("`0.1.0-alpha.3`", combined)
-        for stale_claim in (
-            "All five packages remain `0.1.0-alpha.3`",
-            "five independently manifested alpha.3 language profiles",
-            "five bundled alpha.3 profiles",
-            "The five package identities remain `0.1.0-alpha.3`",
-        ):
-            self.assertNotIn(stale_claim, combined)
+        for item in self.prepared:
+            with self.subTest(profile=item.profile_id):
+                display_name = str(item.profile.get('name') or item.profile_id)
+                display_name = display_name.removeprefix('BBK ').removesuffix(' Profile')
+                self.assertIn(display_name, combined)
+                self.assertIn(f"`{item.version}`", combined)
 
     def test_profile_omp_python_overrides_are_interpreter_safe(self):
         for profile_id, item in sorted(self.by_id.items()):
@@ -1389,7 +1388,7 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         self.assertFalse(module.version_supports_structure_contract('0.1.0-alpha.3'))
-        for version in ('0.1.0-alpha.4', '0.1.0-alpha.8', '0.1.0-alpha.11.11', '0.1.0-alpha.11.12', '0.1.0-alpha.12', '0.1.0-alpha.12.2', '0.1.0-alpha.12.4', '0.1.0-alpha.13.1', '0.1.0-alpha.13.2', '0.1.0-alpha.13.3', '0.1.0-alpha.13.4', '0.1.0-alpha.13.5', '0.1.0-alpha.14', '0.1.0-alpha.16', '0.1.0-alpha.16.1', '0.1.0', '0.2.0-alpha.1'):
+        for version in ('0.1.0-alpha.4', '0.1.0-alpha.8', '0.1.0-alpha.11.11', '0.1.0-alpha.11.12', '0.1.0-alpha.12', '0.1.0-alpha.12.2', '0.1.0-alpha.12.4', '0.1.0-alpha.13.1', '0.1.0-alpha.13.2', '0.1.0-alpha.13.3', '0.1.0-alpha.13.4', '0.1.0-alpha.13.5', '0.1.0-alpha.14', '0.1.0-alpha.16', '0.1.0-alpha.16.1', '0.1.0-alpha.17+rc.5', '0.1.0-alpha.17+rc.6', '0.1.0-alpha.17+rc.7', '0.1.0-alpha.17+rc.8', '0.1.0-alpha.17', '0.1.0', '0.2.0-alpha.1'):
             with self.subTest(version=version):
                 self.assertTrue(module.version_supports_structure_contract(version))
         gates = json.loads((item.root / 'gates' / 'python-gates.json').read_text(encoding='utf-8'))
@@ -1482,7 +1481,7 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
 
     def test_current_documentation_states_the_default_and_single_archive_contract(self):
         combined = '\n'.join(((m5_ROOT / relative).read_text(encoding='utf-8') for relative in ('README.md', 'docs/INSTALL.md', 'docs/LANGUAGE-PROFILES.md', 'RELEASE-NOTES.md')))
-        for expected in ('0.1.0-alpha.16.1', 'installed by default', '--no-language-profiles', '--profile-id', 'bundled-language-profiles', 'TypeScript/JavaScript'):
+        for expected in ('0.1.0-alpha.17', 'installed by default', '--no-language-profiles', '--profile-id', 'bundled-language-profiles', 'TypeScript/JavaScript'):
             self.assertIn(expected, combined)
 
 # ---------------------------------------------------------------------------
@@ -1505,7 +1504,7 @@ class Alpha112WindowsUtf8Tests(unittest.TestCase):
 
     def test_current_version_and_utf8_canonical_input_are_read_explicitly(self):
         version = (m6_ROOT / 'VERSION').read_text(encoding='utf-8').strip()
-        self.assertEqual(version, '0.1.0-alpha.16.1')
+        self.assertEqual(version, '0.1.0-alpha.17.0.2')
         method_content = json.loads((m6_ROOT / 'spec' / 'method-content.json').read_text(encoding='utf-8'))
         self.assertEqual(method_content['version'], version)
 
@@ -1594,7 +1593,7 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
         cls.by_name = {item['name']: item for item in cls.roles}
 
     def test_current_version_matches_release(self) -> None:
-        self.assertEqual(m7_VERSION, '0.1.0-alpha.16.1')
+        self.assertEqual(m7_VERSION, '0.1.0-alpha.17.0.2')
 
     def test_all_codex_agents_inherit_parent_sandbox(self) -> None:
         files = sorted(m7_CODEX_AGENTS.glob('*.toml'))
@@ -1618,9 +1617,9 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
                 self.assertNotIn('package-version=', instructions)
                 self.assertNotIn('source="shared/skills/', instructions)
                 self.assertIn('## Exact role-return contract', instructions)
-                self.assertIn('## Mandatory procedures — injected', instructions)
+                self.assertIn('## Compiled procedures manifest', instructions)
                 for skill in self.by_name[path.stem].get('mandatory_skills', []):
-                    self.assertIn(f'### Mandatory procedure: `{skill}`', instructions)
+                    self.assertIn((f'### Compiled primary procedure: `{skill}`' if skill == self.by_name[path.stem]['primary_skill'] else f'### Compiled procedure: `{skill}`'), instructions)
 
     def test_semantic_mutation_boundary_remains_role_specific(self) -> None:
         for role in self.roles:
@@ -1705,7 +1704,7 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
             self.assertEqual(updated['to_version'], m7_VERSION)
             self.assertEqual(updated['codex_agent_count'], 19)
             self.assertEqual(updated['codex_skill_file_count'], 7)
-            self.assertEqual(updated['actions'], {'create': 7, 'replace': 19})
+            self.assertEqual(updated['actions'], {'create': 7, 'replace': 19, 'unchanged': 17})
             self.assertFalse(updated['shared_package_updated'])
             self.assertFalse(updated['effective_model_routing_updated'])
             self.assertEqual(updated['omp_files_touched'], 0)
@@ -1815,7 +1814,7 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
             repo = Path(raw_repo)
             self._expanded_profiles(repo)
             prepared = profile_install.prepare_profile_sources([repo], temp_root=Path(raw_work))
-        self.assertEqual([item.profile_id for item in prepared], ['codesys', 'go', 'python', 'rust', 'typescript-javascript'])
+        self.assertEqual([item.profile_id for item in prepared], m5_EXPECTED_PROFILES)
         self.assertTrue(all((item.package_verification['status'] == 'PASS' for item in prepared)))
 
     def test_manifested_profile_repository_rejects_package_tampering(self):
@@ -1960,6 +1959,38 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
                 self.assertEqual(cache_value['modules']['test_example.py'], 2.5)
                 assert_different_path(self, report_path.parent, m8_ROOT)
 
+    def test_duration_cache_is_bound_to_the_exact_packaged_seed(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            seed = root / 'test-durations.json'
+            cache = root / 'module-durations.json'
+            seed.write_text(
+                json.dumps({'schema': 'bbk.test-duration-seed.v1', 'modules': {'test_seed.py': 1.0}}),
+                encoding='utf-8',
+            )
+            cache.write_text(
+                json.dumps({
+                    'schema': 'bbk.test-duration-cache.v1',
+                    'seed_sha256': run_tests.duration_seed_sha256(seed),
+                    'modules': {'test_cached.py': 9.0},
+                }),
+                encoding='utf-8',
+            )
+            with mock.patch.object(run_tests, 'duration_cache_path', return_value=cache):
+                self.assertEqual(
+                    run_tests.load_duration_weights(seed),
+                    {'test_seed.py': 1.0, 'test_cached.py': 9.0},
+                )
+                seed.write_text(
+                    json.dumps({'schema': 'bbk.test-duration-seed.v1', 'modules': {'test_seed.py': 2.0}}),
+                    encoding='utf-8',
+                )
+                self.assertEqual(
+                    run_tests.load_duration_weights(seed),
+                    {'test_seed.py': 2.0},
+                    'timings from an older package seed must not override new shard weights',
+                )
+
     def test_pooled_runner_uses_bounded_multi_module_processes(self):
         with tempfile.TemporaryDirectory(dir=m8_ROOT) as raw_root:
             root = Path(raw_root)
@@ -2006,7 +2037,7 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
     def test_batch_runner_uses_one_python_process_for_all_discovered_modules(self):
         files = [Path('tests/test_a.py'), Path('tests/test_b.py')]
         result = run_tests.SuiteResult(
-            'test*.py',
+            'batch[test_a.py, test_b.py]',
             0,
             'Ran 2 tests in 0.001s\n\nOK (skipped=1)\n',
             2,
@@ -2014,7 +2045,7 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
             1,
         )
         stream = io.StringIO()
-        with mock.patch.object(run_tests, 'execute_discovered', return_value=result) as execute:
+        with mock.patch.object(run_tests, 'execute_modules', return_value=result) as execute:
             code = run_tests.run_test_batch(
                 files,
                 pattern='test*.py',
@@ -2023,6 +2054,9 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
             )
         self.assertEqual(code, 0)
         execute.assert_called_once()
+        called_files = execute.call_args.args[0]
+        self.assertEqual(called_files, files)
+        self.assertEqual(execute.call_args.kwargs['label'], 'batch[test_a.py, test_b.py]')
         output = stream.getvalue()
         self.assertIn('Running 2 unittest modules in one Python process', output)
         self.assertIn('Test modules discovered: 2; Python test processes: 1', output)

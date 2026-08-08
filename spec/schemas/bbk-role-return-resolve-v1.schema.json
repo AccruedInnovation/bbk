@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-role-return-resolve-v1.schema.json",
+  "title": "BBK prepared role-return resolve request v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "bbk.role-return-resolve.v1"
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "binding_ref": {
+      "type": "string",
+      "pattern": "^binding:[0-9a-f]{64}$"
+    },
+    "invocation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "return_ref": {
+      "type": "string",
+      "pattern": "^return:[0-9a-f]{64}$"
+    },
+    "tool_call_id": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "schema",
+    "session_id",
+    "binding_ref",
+    "invocation_id",
+    "return_ref",
+    "tool_call_id"
+  ]
+}

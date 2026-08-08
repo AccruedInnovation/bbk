@@ -1,0 +1,111 @@
+{
+  "$id": "bbk-vcs-mutation-receipt-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "after": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "git_commit": {
+          "type": "string"
+        },
+        "git_tree": {
+          "type": "string"
+        },
+        "jj_change_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "git_tree",
+        "jj_change_id"
+      ],
+      "title": "after identity",
+      "type": "object"
+    },
+    "before": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "git_commit": {
+          "type": "string"
+        },
+        "git_tree": {
+          "type": "string"
+        },
+        "jj_change_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "git_tree",
+        "jj_change_id"
+      ],
+      "title": "before identity",
+      "type": "object"
+    },
+    "binding_ref": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "candidate_ref": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "changed_paths": {
+      "items": {
+        "maxLength": 4096,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "out_of_scope_paths": {
+      "items": {
+        "maxLength": 4096,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "receipt_id": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "recorded_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.vcs-mutation-receipt.v1"
+    },
+    "scope_conformance": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "UNKNOWN"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "receipt_id",
+    "binding_ref",
+    "candidate_ref",
+    "before",
+    "after",
+    "changed_paths",
+    "scope_conformance",
+    "recorded_at"
+  ],
+  "title": "BBK VCS mutation receipt v1",
+  "type": "object"
+}

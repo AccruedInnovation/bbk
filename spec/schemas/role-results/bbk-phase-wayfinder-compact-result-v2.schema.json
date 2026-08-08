@@ -11,7 +11,9 @@
     "execution_slice_refs",
     "dependency_and_parallelism_state",
     "blockers",
-    "parent_actions_requested"
+    "parent_actions_requested",
+    "planning_readiness",
+    "deferred_refinements"
   ],
   "properties": {
     "phase_plan_ref": {
@@ -37,6 +39,14 @@
     "parent_actions_requested": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
       "description": "Exact rechartering, upstream decisions, resynthesis, authority grants, shared-interface dispositions, assertion-policy actions, or global integration actions requested from the Planning Wayfinder."
+    },
+    "planning_readiness": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Phase frontier readiness and deferred successor refinement state."
+    },
+    "deferred_refinements": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
+      "description": "Stable future phase-local work deliberately deferred until a later frontier."
     }
   },
   "x-bbk-role": "bbk_phase_wayfinder",

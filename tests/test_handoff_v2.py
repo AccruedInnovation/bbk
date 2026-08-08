@@ -14,18 +14,15 @@ if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
 from artifact_packages import validate_schema_instance
+from tests._cli_support import run_cli as run_bbk_cli
 from strict_json import load_path
 
 
 class HandoffV2Tests(unittest.TestCase):
     def run_cli(self, *args: str, check: bool = True) -> tuple[subprocess.CompletedProcess[str], dict]:
-        completed = subprocess.run(
+        completed = run_bbk_cli(
             [sys.executable, str(CLI), "--json", *args],
             cwd=ROOT,
-            text=True,
-            encoding="utf-8",
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
             check=False,
         )
         payload = json.loads(completed.stdout) if completed.stdout.strip() else {}

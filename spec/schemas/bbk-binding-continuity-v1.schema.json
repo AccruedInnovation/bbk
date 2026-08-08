@@ -1,0 +1,19 @@
+{
+  "$id": "bbk-binding-continuity-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "binding_ref": {"minLength": 1, "type": "string"},
+    "event_type": {"enum": ["WAKE", "INJECT", "RESUME"], "type": "string"},
+    "immutable_binding_digest": {"pattern": "^sha256:[0-9a-f]{64}$", "type": "string"},
+    "invocation_id": {"minLength": 1, "type": "string"},
+    "payload_digest": {"pattern": "^sha256:[0-9a-f]{64}$", "type": "string"},
+    "receipt_ref": {"pattern": "^sha256:[0-9a-f]{64}$", "type": "string"},
+    "schema": {"const": "bbk.binding-continuity.v1"},
+    "session_id": {"minLength": 1, "type": "string"},
+    "status": {"const": "RETAINED"}
+  },
+  "required": ["schema", "event_type", "binding_ref", "session_id", "invocation_id", "payload_digest", "immutable_binding_digest"],
+  "title": "BBK binding continuity v1",
+  "type": "object"
+}

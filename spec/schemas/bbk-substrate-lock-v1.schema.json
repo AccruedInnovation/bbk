@@ -1,0 +1,150 @@
+{
+  "$id": "bbk-substrate-lock-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "created_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "implementation_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "lock_digest": {
+      "pattern": "^(?:sha256:)?[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "network_bootstrap_performed": {
+      "const": false
+    },
+    "profile": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "project_root": {
+      "maxLength": 4096,
+      "minLength": 1,
+      "type": "string"
+    },
+    "remediation": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "schema": {
+      "const": "bbk.substrate-lock.v1"
+    },
+    "status": {
+      "enum": [
+        "PASS",
+        "BLOCK",
+        "UNQUALIFIED"
+      ],
+      "type": "string"
+    },
+    "tools": {
+      "items": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "capabilities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "configuration_digests": {
+            "additionalProperties": {
+              "pattern": "^(?:sha256:)?[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "name": {
+            "enum": [
+              "git",
+              "jj",
+              "bd",
+              "mise"
+            ],
+            "type": "string"
+          },
+          "path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reason_code": {
+            "type": "string"
+          },
+          "remediation": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "PASS",
+              "BLOCK",
+              "UNQUALIFIED"
+            ],
+            "type": "string"
+          },
+          "version": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "execution_mode": {
+            "enum": [
+              "DIRECT_EXECUTABLE",
+              "MISE_MANAGED"
+            ]
+          },
+          "launcher_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "tool_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "tool_spec": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "name",
+          "status",
+          "path",
+          "version",
+          "capabilities",
+          "configuration_digests"
+        ],
+        "title": "qualified tool",
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema",
+    "profile",
+    "project_root",
+    "tools",
+    "status",
+    "remediation",
+    "lock_digest",
+    "created_at"
+  ],
+  "title": "BBK substrate lock v1",
+  "type": "object"
+}

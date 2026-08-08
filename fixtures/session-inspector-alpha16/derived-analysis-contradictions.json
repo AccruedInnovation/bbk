@@ -1,0 +1,115 @@
+{
+  "contradictions": [
+    {
+      "code": "DERIVED_SESSION_SCOPE_INCOMPLETE",
+      "delta": 629,
+      "derived_value": 690,
+      "id": "INCLUSIVE_ENTRIES_UNDERCOUNTED",
+      "severity": "BLOCKING",
+      "source_value": 1319
+    },
+    {
+      "code": "DERIVED_CHILD_SESSIONS_OMITTED",
+      "delta": 4,
+      "derived_value": 1,
+      "id": "CHILD_SESSIONS_OMITTED",
+      "severity": "BLOCKING",
+      "source_value": 5
+    },
+    {
+      "code": "DERIVED_AGENT_IDENTITY_CONTAMINATED",
+      "derived_agent_count": 170,
+      "id": "PROVIDER_RESPONSE_IDS_MISIDENTIFIED_AS_AGENTS",
+      "provider_response_ids_as_agents": 166,
+      "pseudo_role_agents": 4,
+      "severity": "BLOCKING",
+      "source_valid_session_identities": 5
+    },
+    {
+      "code": "DERIVED_TASK_TOPOLOGY_OMITTED",
+      "delta": 4,
+      "derived_value": 0,
+      "id": "TASK_RECORDS_OMITTED",
+      "severity": "BLOCKING",
+      "source_value": 4
+    },
+    {
+      "code": "DERIVED_WAIT_SEMANTICS_INCORRECT",
+      "derived_matching_explicit_wait_count": 0,
+      "derived_wait_interval_count": 2,
+      "id": "EXPLICIT_ASK_WAIT_OMITTED",
+      "missing_explicit_wait_count": 1,
+      "severity": "BLOCKING",
+      "source_explicit_wait_count": 1
+    },
+    {
+      "code": "DERIVED_PROVIDER_SCOPE_INCOMPLETE",
+      "delta": 115,
+      "derived_value": 166,
+      "id": "PROVIDER_RESPONSES_UNDERCOUNTED",
+      "severity": "BLOCKING",
+      "source_value": 281
+    },
+    {
+      "code": "DERIVED_COST_SCOPE_INCOMPLETE",
+      "derived_value_usd": "0.180593556",
+      "excluded_value_usd": "0.295132594",
+      "id": "INCLUSIVE_COST_UNDERCOUNTED",
+      "severity": "BLOCKING",
+      "source_value_usd": "0.47572615"
+    },
+    {
+      "code": "DERIVED_PROMPT_RECEIPT_SCOPE_INCOMPLETE",
+      "delta": 119,
+      "derived_value": 167,
+      "id": "CHILD_PROMPT_INTEGRITY_OMITTED",
+      "severity": "BLOCKING",
+      "source_value": 286
+    }
+  ],
+  "derived_source": {
+    "byte_count": 904087,
+    "logical_name": "alpha16-derived-analysis.json",
+    "raw_content_retained": false,
+    "sha256": "sha256:2b2ccf00f7a5f51d194f7c226b3281a510a17488738ab8e0dc3f3009491f9e76",
+    "source_path_retained": false,
+    "truth_status": "INCOMPLETE_SECONDARY"
+  },
+  "fixture_digest": "sha256:fa02863df7267d51c7eeadc4f993cf54a9c6c2dc6629419867b15d6965a60333",
+  "fixture_id": "session-inspector-alpha16-source-oracle-derived-contradictions",
+  "positive_controls": [
+    {
+      "derived_value": 690,
+      "id": "MAIN_ENTRY_COUNT_PRESERVED",
+      "source_value": 690,
+      "status": "PASS"
+    },
+    {
+      "derived_cost_total_usd": "0.180593556",
+      "derived_total_tokens": 19469836,
+      "id": "MAIN_PROVIDER_USAGE_PRESERVED",
+      "source_cost_total_usd": "0.180593556",
+      "source_provider_responses": 166,
+      "source_total_tokens": 19469836,
+      "status": "PASS"
+    },
+    {
+      "derived_value": 167,
+      "id": "MAIN_PROMPT_RECEIPTS_PRESERVED",
+      "source_value": 167,
+      "status": "PASS"
+    }
+  ],
+  "schema": "bbk.session-inspector-contradictions.v1",
+  "source_manifest_ref": "sha256:8cc80edaee86751cd9d8c417a300e723e6c576915ab31f113851ebdee8fdad63",
+  "truth_policy": {
+    "authoritative_source": "RAW_SESSION_EXPORT",
+    "derived_analysis_complete_truth": false,
+    "derived_analysis_role": "SECONDARY_OBSERVATION"
+  },
+  "verdict": {
+    "contradiction_count": 8,
+    "derived_analysis_can_establish_complete_truth": false,
+    "status": "NEGATIVE_ORACLE_CONFIRMED"
+  }
+}

@@ -10,6 +10,7 @@ from __future__ import annotations
 # ---------------------------------------------------------------------------
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -19,7 +20,8 @@ import unittest
 from pathlib import Path
 from tests import _cli_support as m1_cli_support
 from tests._cli_support import run_cli as m1_run
-from tests._path_support import assert_exact_path_text, assert_same_path
+from tests._path_support import assert_exact_path_text, assert_same_path, command_arguments_after_launcher, assert_command_invokes
+from tests._fake_executable import write_python_executable
 m1_ROOT = Path(__file__).resolve().parents[1]
 m1_BBK = m1_ROOT / 'tools' / 'bbk.py'
 m1_INSTALL = m1_ROOT / 'tools' / 'install.py'
@@ -92,14 +94,14 @@ class BbkTests(unittest.TestCase):
     def test_agent_generation_and_counts(self):
         manifest = json.loads((m1_ROOT / 'projections' / 'manifest.json').read_text(encoding='utf-8'))
         self.assertEqual(manifest['role_count'], 19)
-        self.assertEqual(manifest['target_count'], 4)
-        self.assertEqual(manifest['projection_count'], 76)
+        self.assertEqual(manifest['target_count'], 5)
+        self.assertEqual(manifest['projection_count'], 100)
         self.assertEqual(manifest['model_routing_schema'], 'bbk.model-routing.v2')
         self.assertEqual(manifest['model_routing_mode'], 'per-role')
         self.assertEqual(manifest['model_route_count'], 19)
         self.assertNotIn('model_profile_count', manifest)
         self.assertNotIn('role_profile_counts', manifest)
-        self.assertEqual(manifest['targets'], ['claude', 'codex', 'generic', 'omp'])
+        self.assertEqual(manifest['targets'], ['claude', 'codex', 'generic', 'omp', 'pi'])
         for target in manifest['targets']:
             self.assertEqual(len(list((m1_ROOT / 'projections' / target / 'agents').glob('*'))), 19)
 
@@ -147,20 +149,25 @@ class BbkTests(unittest.TestCase):
         self.assertTrue(any((tool.startswith('Agent(') for tool in root['tools'])))
         self.assertNotIn('AskUserQuestion', root['tools'])
 
+    @unittest.skipUnless(shutil.which("node"), "Node.js is required for OMP extension behavior")
     def test_omp_extension_parses_and_registers(self):
         m1_run(['node', '--check', m1_ROOT / 'omp' / 'extension' / 'index.js'])
         script = m1_ROOT / 'tests' / '.omp-mock.mjs'
-        script.write_text(textwrap.dedent(f"\n            const chain = () => ({{ optional() {{ return this; }} }});\n            const z = {{\n              object: value => value,\n              string: chain,\n              boolean: chain,\n              enum: values => chain(),\n              array: value => chain(),\n            }};\n            const tools = [], commands = [], handlers = [];\n            const pi = {{\n              zod: {{ z }}, setLabel() {{}},\n              registerTool(value) {{ tools.push(value); }},\n              registerCommand(name, value) {{ commands.push([name, value]); }},\n              on(name, value) {{ handlers.push([name, value]); }},\n              sendMessage() {{}},\n            }};\n            const mod = await import({json.dumps((m1_ROOT / 'omp' / 'extension' / 'index.js').as_uri())});\n            mod.default(pi);\n            if (tools.length !== 44) throw new Error(`tools=${{tools.length}}`);\n            if (commands.length !== 48) throw new Error(`commands=${{commands.length}}`);\n            if (!handlers.some(([n]) => n === 'tool_call')) throw new Error('missing tool_call');\n            if (!handlers.some(([n]) => n === 'session_start')) throw new Error('missing session_start');\n            if (!handlers.some(([n]) => n === 'before_agent_start')) throw new Error('missing before_agent_start');\n            console.log(JSON.stringify({{tools: tools.map(x=>x.name), commands: commands.map(x=>x[0])}}));\n        "), encoding='utf-8')
+        script.write_text(textwrap.dedent(f"\n            const chain = () => ({{ optional() {{ return this; }} }});\n            const z = {{\n              object: value => value,\n              string: chain,\n              boolean: chain,\n              enum: values => chain(),\n              array: value => chain(),\n              any: chain,\n            }};\n            const tools = [], commands = [], handlers = [];\n            const pi = {{\n              zod: {{ z }}, setLabel() {{}},\n              registerTool(value) {{ tools.push(value); }},\n              registerCommand(name, value) {{ commands.push([name, value]); }},\n              on(name, value) {{ handlers.push([name, value]); }},\n              sendMessage() {{}},\n            }};\n            const mod = await import({json.dumps((m1_ROOT / 'omp' / 'extension' / 'index.js').as_uri())});\n            mod.default(pi);\n            if (tools.length !== 58) throw new Error(`tools=${{tools.length}}`);\n            if (commands.length !== 48) throw new Error(`commands=${{commands.length}}`);\n            if (!handlers.some(([n]) => n === 'tool_call')) throw new Error('missing tool_call');\n            if (!handlers.some(([n]) => n === 'session_start')) throw new Error('missing session_start');\n            if (!handlers.some(([n]) => n === 'before_agent_start')) throw new Error('missing before_agent_start');\n            console.log(JSON.stringify({{tools: tools.map(x=>x.name), commands: commands.map(x=>x[0])}}));\n        "), encoding='utf-8')
         try:
             result = m1_run(['node', script])
             value = json.loads(result.stdout)
             self.assertIn('bbk_status', value['tools'])
+            self.assertIn('bbk_governance_status', value['tools'])
+            self.assertIn('bbk_control_bind', value['tools'])
+            self.assertIn('bbk_task_run', value['tools'])
             self.assertIn('bbk:gate', value['commands'])
             self.assertIn('bbk:models', value['commands'])
             self.assertIn('bbk:exit', value['commands'])
         finally:
             script.unlink(missing_ok=True)
 
+    @unittest.skipUnless(shutil.which("node"), "Node.js is required for OMP extension behavior")
     def test_installed_omp_extension_executes_copied_cli(self):
         with tempfile.TemporaryDirectory() as temp:
             base = Path(temp)
@@ -177,7 +184,7 @@ class BbkTests(unittest.TestCase):
             self.assertTrue((extension.parent / 'VERSION').is_file())
             installed_package = Path(installed['package_root'])
             script = base / 'installed-omp-mock.mjs'
-            script.write_text(textwrap.dedent(f"\n                const chain = () => ({{ optional() {{ return this; }} }});\n                const z = {{ object: value => value, string: chain, boolean: chain,\n                  enum: values => chain(), array: value => chain() }};\n                const tools = [], commands = [], handlers = [];\n                const pi = {{ zod: {{ z }}, setLabel() {{}},\n                  registerTool(value) {{ tools.push(value); }},\n                  registerCommand(name, value) {{ commands.push([name, value]); }},\n                  on(name, value) {{ handlers.push([name, value]); }}, sendMessage() {{}} }};\n                const mod = await import({json.dumps(extension.as_uri())});\n                mod.default(pi);\n                const tool = tools.find(value => value.name === 'bbk_status');\n                if (!tool) throw new Error('missing bbk_status');\n                const result = await tool.execute('call-1', {{root: {json.dumps(str(project))}}}, undefined, undefined, {{cwd: {json.dumps(str(project))}}});\n                if (result.isError || result.details?.schema !== 'bbk.status.v1')\n                  throw new Error(JSON.stringify(result.details));\n                const stateEffect = tools.find(value => value.name === 'bbk_state_effect_validate');\n                const sde = await stateEffect.execute('call-2', {{path: {json.dumps(str(installed_package / 'fixtures' / 'state-effect' / 'contract-order.json'))}}}, undefined, undefined, {{cwd: {json.dumps(str(project))}}});\n                if (sde.isError || sde.details?.kind !== 'state-decision-effect-design' || !sde.details?.valid)\n                  throw new Error(JSON.stringify(sde.details));\n                const review = tools.find(value => value.name === 'bbk_review_status');\n                const rr = await review.execute('call-3', {{path: {json.dumps(str(installed_package / 'fixtures' / 'review' / 'run-pass.json'))}}}, undefined, undefined, {{cwd: {json.dumps(str(project))}}});\n                if (rr.isError || rr.details?.kind !== 'review-run' || !rr.details?.valid)\n                  throw new Error(JSON.stringify(rr.details));\n                console.log(JSON.stringify({{schema: result.details.schema, tools: tools.length, sde: sde.details.kind, review: rr.details.kind}}));\n            "), encoding='utf-8')
+            script.write_text(textwrap.dedent(f"\n                const chain = () => ({{ optional() {{ return this; }} }});\n                const z = {{ object: value => value, string: chain, boolean: chain,\n                  enum: values => chain(), array: value => chain(), any: chain }};\n                const tools = [], commands = [], handlers = [];\n                const pi = {{ zod: {{ z }}, setLabel() {{}},\n                  registerTool(value) {{ tools.push(value); }},\n                  registerCommand(name, value) {{ commands.push([name, value]); }},\n                  on(name, value) {{ handlers.push([name, value]); }}, sendMessage() {{}} }};\n                const mod = await import({json.dumps(extension.as_uri())});\n                mod.default(pi);\n                const tool = tools.find(value => value.name === 'bbk_status');\n                if (!tool) throw new Error('missing bbk_status');\n                const result = await tool.execute('call-1', {{root: {json.dumps(str(project))}}}, undefined, undefined, {{cwd: {json.dumps(str(project))}}});\n                if (result.isError || result.details?.schema !== 'bbk.status.v1')\n                  throw new Error(JSON.stringify(result.details));\n                const stateEffect = tools.find(value => value.name === 'bbk_state_effect_validate');\n                const sde = await stateEffect.execute('call-2', {{path: {json.dumps(str(installed_package / 'fixtures' / 'state-effect' / 'contract-order.json'))}}}, undefined, undefined, {{cwd: {json.dumps(str(project))}}});\n                if (sde.isError || sde.details?.kind !== 'state-decision-effect-design' || !sde.details?.valid)\n                  throw new Error(JSON.stringify(sde.details));\n                const review = tools.find(value => value.name === 'bbk_review_status');\n                const rr = await review.execute('call-3', {{path: {json.dumps(str(installed_package / 'fixtures' / 'review' / 'run-pass.json'))}}}, undefined, undefined, {{cwd: {json.dumps(str(project))}}});\n                if (rr.isError || rr.details?.kind !== 'review-run' || !rr.details?.valid)\n                  throw new Error(JSON.stringify(rr.details));\n                console.log(JSON.stringify({{schema: result.details.schema, tools: tools.length, sde: sde.details.kind, review: rr.details.kind}}));\n            "), encoding='utf-8')
             value = json.loads(m1_run(['node', script], env=env).stdout)
             self.assertEqual(value['schema'], 'bbk.status.v1')
             self.assertEqual(value['sde'], 'state-decision-effect-design')
@@ -273,17 +280,25 @@ class BbkTests(unittest.TestCase):
             env = os.environ.copy()
             env.update({'BBK_HOME': str(home), 'HOME': str(home), 'BBK_INSTALL_ROOT': str(home / 'data'), 'BBK_BIN_DIR': str(home / 'bin')})
             installed, _ = m1_run_json([sys.executable, m1_INSTALL, '--json', 'install', '--scope', 'user'], env=env)
-            self.assertTrue(installed['codex'] and installed['omp'] and installed['claude'] and installed['generic'])
+            self.assertTrue(installed['codex'] and installed['omp'] and installed['claude'] and installed['pi'] and installed['generic'])
             self.assertEqual(len(list((home / '.claude' / 'agents').glob('*.md'))), 19)
             self.assertGreater(len(list((home / '.claude' / 'skills').glob('*/SKILL.md'))), 21)
             self.assertEqual(len(list((home / '.codex' / 'agents').glob('*.toml'))), 19)
             registry = (home / '.agents' / 'skills' / 'bbk-installed-profiles' / 'SKILL.md').read_text(encoding='utf-8')
-            expected_profiles = ['codesys', 'go', 'python', 'rust', 'typescript-javascript']
+            release = json.loads((m1_ROOT / 'bundled-language-profiles' / 'RELEASE-MANIFEST.json').read_text(encoding='utf-8'))
+            expected_profiles = sorted((release.get('profileVersions') or {}).keys())
+            self.assertTrue(expected_profiles)
             self.assertEqual([item['id'] for item in installed['language_profiles']], expected_profiles)
             self.assertEqual(installed['language_profile_source_mode'], 'bundled-default')
-            self.assertEqual(installed['language_profile_registry']['profile_count'], 5)
-            for router in ('bbk-codesys', 'bbk-go', 'bbk-python', 'bbk-rust', 'bbk-tsjs'):
-                self.assertIn(f'Router skill: `{router}`', registry)
+            self.assertEqual(installed['language_profile_registry']['profile_count'], len(expected_profiles))
+            required_routers = [
+                procedure
+                for profile in installed['language_profiles']
+                for procedure in profile.get('required_procedures', [])
+            ]
+            self.assertTrue(required_routers)
+            for router in required_routers:
+                self.assertIn(f'Required router procedure: `{router}`', registry)
             self.assertNotIn('package-source placeholder', registry)
             self.assertEqual(len(list((home / '.agents' / 'bbk' / 'agents').glob('*.md'))), 19)
             status, _ = m1_run_json([sys.executable, m1_INSTALL, '--json', 'status', '--scope', 'user'], env=env)
@@ -468,6 +483,7 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
             _, claude_body = m2__frontmatter_and_body(m2_ROOT / 'projections' / 'claude' / 'agents' / f"{role_name.replace('_', '-')}.md")
             paths_and_bodies.append(('claude', claude_body))
             generic_body = (m2_ROOT / 'projections' / 'generic' / 'agents' / f'{role_name}.md').read_text(encoding='utf-8')
+            pi_body = (m2_ROOT / 'projections' / 'pi' / 'agents' / f'{role_name}.md').read_text(encoding='utf-8')
             paths_and_bodies.append(('generic', generic_body))
             for host, body in paths_and_bodies:
                 self.assertIn('## Delegation', body, f'{host}:{role_name}')
@@ -542,6 +558,7 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
                 _, body = m2__frontmatter_and_body(m2_ROOT / 'projections' / host / 'agents' / filename)
                 bodies.append((host, body))
             bodies.append(('generic', (m2_ROOT / 'projections' / 'generic' / 'agents' / f'{role_name}.md').read_text(encoding='utf-8')))
+            bodies.append(('pi', (m2_ROOT / 'projections' / 'pi' / 'agents' / f'{role_name}.md').read_text(encoding='utf-8')))
             for host, body in bodies:
                 expected_prefix = (
                     '<bbk-agent-system '
@@ -561,8 +578,8 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
                     self.assertNotIn(forbidden, body, f'{host}:{role_name}')
                 self.assertNotIn('```json', body, f'{host}:{role_name}')
 
-    def test_projection_manifest_v8_carries_role_module_return_and_inlined_procedure_metadata(self):
-        self.assertEqual(self.manifest['schema'], 'bbk.projection-manifest.v8')
+    def test_projection_manifest_v10_carries_role_module_return_and_compiled_procedure_metadata(self):
+        self.assertEqual(self.manifest['schema'], 'bbk.projection-manifest.v10')
         self.assertEqual(set(self.manifest['agents']), set(self.roles))
         for digest_field in (
             'role_source_sha256', 'model_routing_source_sha256',
@@ -589,16 +606,27 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
             self.assertEqual(value['escalations'], role['escalations'])
             self.assertEqual(value['human_decision_triggers'], role['human_decision_triggers'])
             self.assertFalse(value['user_facing'])
-            self.assertEqual([item['name'] for item in value['inlined_skills']], role['mandatory_skills'])
-            for item in value['inlined_skills']:
-                self.assertRegex(item['sha256'], '^[0-9a-f]{64}$')
-                self.assertGreater(item['bytes'], 0)
-                self.assertEqual(item['source'], f"spec/method-content.json#skills/{item['name']}")
+            self.assertEqual(set(value['compiled_procedures']), {'codex', 'omp', 'claude', 'generic', 'pi'})
+            for host, compiled in value['compiled_procedures'].items():
+                compiled_ids = [item['id'] for item in compiled['procedures']]
+                self.assertEqual(compiled_ids[-1], role['primary_skill'], f"{host}:{role_name}")
+                expected_ids = set(role['mandatory_skills'])
+                if role['primary_skill'] == 'bbk-wayfind':
+                    expected_ids.add('bbk-plan')
+                self.assertEqual(set(compiled_ids), expected_ids, f"{host}:{role_name}")
+                self.assertEqual(set(compiled['catalog_suppression_set']), set(compiled_ids))
+                for item in compiled['procedures']:
+                    self.assertRegex(item['source_sha256'], '^[0-9a-f]{64}$')
+                    self.assertRegex(item['effective_sha256'], '^[0-9a-f]{64}$')
+                    self.assertEqual(item['catalog_visibility'], 'SUPPRESSED')
+                    self.assertEqual(item['state'], 'COMPILED_COMPLETE')
+                external = value['effective_external_catalogs'][host]['available_external_procedures']
+                self.assertFalse(set(compiled_ids) & set(external), f"{host}:{role_name}")
             self.assertEqual(value['model_route'], role_name)
             self.assertEqual(value['model_routing_mode'], 'per-role')
-            self.assertEqual(set(value['files']), {'codex', 'omp', 'claude', 'generic'})
+            self.assertEqual(set(value['files']), {'codex', 'omp', 'claude', 'generic', 'pi'})
 
-    def test_profile_procedures_remain_available_while_mandatory_skills_are_inlined(self):
+    def test_optional_procedures_remain_available_while_compiled_procedures_are_suppressed(self):
         policy = json.loads((m2_ROOT / 'spec' / 'prompt-modules' / 'catalog.json').read_text(encoding='utf-8'))['compilation_policy']
         self.assertIsNone(policy['mandatory_procedure_maximum'])
         for role_name, role in self.roles.items():
@@ -616,12 +644,20 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
             self.assertNotIn('AskUserQuestion', claude.get('tools', []), role_name)
             _, codex_body = m2__codex(m2_ROOT / 'projections' / 'codex' / 'agents' / f'{role_name}.toml')
             generic_body = (m2_ROOT / 'projections' / 'generic' / 'agents' / f'{role_name}.md').read_text(encoding='utf-8')
+            pi_body = (m2_ROOT / 'projections' / 'pi' / 'agents' / f'{role_name}.md').read_text(encoding='utf-8')
             for name in mandatory:
-                marker = f'<bbk-inlined-skill name="{name}" source="spec/method-content.json#skills/{name}"'
-                for body in (omp_body, claude_body, generic_body):
-                    self.assertIn(marker, body, role_name)
-                self.assertIn(f'### Mandatory procedure: `{name}`', codex_body, role_name)
-                self.assertNotIn(marker, codex_body, role_name)
+                heading = (
+                    f'### Compiled primary procedure: `{name}`'
+                    if name == role['primary_skill']
+                    else f'### Compiled procedure: `{name}`'
+                )
+                for body in (omp_body, claude_body, generic_body, pi_body, codex_body):
+                    self.assertEqual(body.count(f'- id: {name}'), 1, role_name)
+                    self.assertEqual(body.count(heading), 1, role_name)
+                    self.assertNotIn(f'<bbk-inlined-skill name="{name}"', body, role_name)
+                for host in ('omp', 'claude', 'generic', 'pi', 'codex'):
+                    catalog = self.manifest['agents'][role_name]['effective_external_catalogs'][host]
+                    self.assertNotIn(name, catalog['available_external_procedures'], role_name)
 
     def test_codex_developer_instructions_contain_no_bbk_metadata_tags(self):
         for role_name in self.roles:
@@ -633,7 +669,8 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
             self.assertNotIn('</bbk-', body, role_name)
             self.assertNotIn('package-version=', body, role_name)
             self.assertNotIn('source="shared/skills/', body, role_name)
-            self.assertIn('## Mandatory procedures — injected', body, role_name)
+            self.assertIn('## Compiled procedures manifest', body, role_name)
+            self.assertIn('## End compiled procedures', body, role_name)
 
     def test_every_generated_role_prompt_explains_profile_selection_and_propagation(self):
         for role_name, role in self.roles.items():
@@ -666,6 +703,7 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
                 _, body = m2__frontmatter_and_body(m2_ROOT / 'projections' / host / 'agents' / filename)
                 bodies.append((host, body))
             bodies.append(('generic', (m2_ROOT / 'projections' / 'generic' / 'agents' / f'{role_name}.md').read_text(encoding='utf-8')))
+            bodies.append(('pi', (m2_ROOT / 'projections' / 'pi' / 'agents' / f'{role_name}.md').read_text(encoding='utf-8')))
             for host, body in bodies:
                 common_headings = (
                     '## Runtime identity and interaction topology',
@@ -676,17 +714,15 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
                     '## Escalation and human relay',
                     '## Prohibitions',
                     '## Invocation contract',
-                    '## Mandatory procedures — injected',
+                    '## Compiled procedures manifest',
+                    '## Compiled procedures',
+                    '## End compiled procedures',
                 )
                 for heading in common_headings:
                     self.assertIn(heading, body, f'{host}:{role_name}')
-                if host == 'omp':
-                    self.assertIn('## Return contract', body, f'{host}:{role_name}')
-                    self.assertIn('injects the exact role-specific return contract', body, f'{host}:{role_name}')
-                else:
-                    self.assertIn('## Exact role-return contract', body, f'{host}:{role_name}')
-                    self.assertIn(role['return_contract']['contract_id'], body, f'{host}:{role_name}')
-                    self.assertIn(role['return_contract']['return_schema'], body, f'{host}:{role_name}')
+                self.assertIn('## Exact role-return contract', body, f'{host}:{role_name}')
+                self.assertIn(role['return_contract']['contract_id'], body, f'{host}:{role_name}')
+                self.assertIn(role['return_contract']['return_schema'], body, f'{host}:{role_name}')
                 for item in role['scope'] + role['escalations'] + role['human_decision_triggers']:
                     self.assertIn(item, body, f'{host}:{role_name}')
                 self.assertIn('Every canonical BBK role is non-user-facing', body, f'{host}:{role_name}')
@@ -795,7 +831,7 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
             self.assertEqual(profile['skill_count'], 2)
             text = profile_registry.registry_skill_text([item], bbk_version='0.1.0-alpha.12.4')
             self.assertIn('### `rust@0.1.0-alpha.3` — Rust', text)
-            self.assertIn('Router skill: `bbk-rust`', text)
+            self.assertIn('Required router procedure: `bbk-rust`', text)
             self.assertIn('test=supported', text)
             self.assertIn('mutation=conditional', text)
             self.assertNotIn('rust-review', text, 'focused skill inventories should not bloat every autoloaded registry')
@@ -984,26 +1020,40 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
             work["work_units"] = [{"id": "WU-1", "purpose": "Implement the runtime adapter", "phase_id": "P-1"}]
             work_path.write_text(a118_json.dumps(work, indent=2) + "\n", encoding="utf-8")
 
+            fake_mise = write_python_executable(
+                A118Path(raw) / "mise",
+                "raise SystemExit(0)\n",
+            )
+
             def args(*, apply: bool = False, kinds: list[str] | None = None) -> A118Namespace:
                 return A118Namespace(
                     root=str(root), work_unit=None, kind=kinds or [], id=[], output=None,
                     apply=apply, initialize=False, timeout=10.0,
                 )
 
-            with a118_mock.patch.object(a118_bbk.shutil, "which", return_value=None):
+            with a118_mock.patch.dict(a118_os.environ, {"BBK_MISE": str(fake_mise)}, clear=False):
                 dry = a118_bbk.cmd_beads_plan(args())
             self.assertTrue(dry["dry_run"])
-            self.assertEqual(dry["capability"]["status"], "NOT_INSTALLED")
+            self.assertEqual(dry["capability"]["status"], "NOT_INITIALIZED")
+            self.assertEqual(dry["capability"]["tool_binding"]["execution_mode"], "MISE_MANAGED")
             self.assertEqual([item["operation"] for item in dry["operations"]], ["create"] * 7)
-            self.assertTrue(any("canonical BBK work may continue" in warning for warning in dry["warnings"]))
+            self.assertTrue(any("not initialized" in warning for warning in dry["warnings"]))
 
             state: dict[str, object] = {"next": 1, "issues": {}}
             calls: list[list[str]] = []
+            real_run = a118_bbk.run
 
             def fake_run(command, cwd, timeout=None, **_kwargs):
                 argv = [str(value) for value in command]
+                if argv and argv[0] == "git":
+                    return real_run(command, cwd, timeout=timeout, **_kwargs)
                 calls.append(argv)
-                bd_args = argv[1:]
+                managed_args = command_arguments_after_launcher(argv, fake_mise)
+                self.assertEqual(
+                    managed_args[:4],
+                    ["exec", "github:gastownhall/beads@1.1.0", "--", "bd"],
+                )
+                bd_args = managed_args[4:]
                 stdout = ""
                 returncode = 0
                 issues = state["issues"]
@@ -1050,7 +1100,7 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
                 }
 
             patches = (
-                a118_mock.patch.object(a118_bbk.shutil, "which", return_value="/fake/bd"),
+                a118_mock.patch.dict(a118_os.environ, {"BBK_MISE": str(fake_mise)}, clear=False),
                 a118_mock.patch.object(a118_bbk, "run", side_effect=fake_run),
             )
             with patches[0], patches[1]:
@@ -1059,7 +1109,16 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
                 self.assertTrue(applied["applied"])
                 self.assertTrue(applied["capability"]["initialized"])
                 self.assertEqual([item["operation"] for item in applied["applied_operations"]], ["create"] * 7)
-                self.assertIn(["/fake/bd", "init", "--quiet", "--skip-agents"], calls)
+                expected_init_arguments = [
+                    "exec", "github:gastownhall/beads@1.1.0", "--",
+                    "bd", "init", "--quiet", "--skip-agents",
+                ]
+                init_calls = [
+                    call for call in calls
+                    if command_arguments_after_launcher(call, fake_mise) == expected_init_arguments
+                ]
+                self.assertEqual(len(init_calls), 1)
+                assert_command_invokes(self, init_calls[0], fake_mise, expected_init_arguments)
 
                 mapping = a118_json.loads(mapping_path.read_text(encoding="utf-8"))
                 bindings = {item["bbk_id"]: item for item in mapping["objects"]}
@@ -1130,7 +1189,12 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
             self.assertTrue(plan["dry_run"])
             self.assertLess(len(plan["note"].encode("utf-8")), 2048)
             self.assertIn(created["handoff"]["sha256"], plan["note"])
-            self.assertEqual(plan["argv"][:4], ["bd", "comments", "add", "bd-123"])
+            self.assertEqual(
+                plan["argv"][1:5],
+                ["exec", "github:gastownhall/beads@1.1.0", "--", "bd"],
+            )
+            self.assertEqual(plan["argv"][5:8], ["comments", "add", "bd-123"])
+            self.assertEqual(plan["capability"]["execution_mode"], "MISE_MANAGED")
             listed = self.run_cli("handoff", "list", "--root", str(root), "--work-unit", "WU-HANDOFF", "--latest")
             self.assertEqual(listed["count"], 1)
             self.assertEqual(listed["latest"]["sha256"], created["handoff"]["sha256"])
@@ -1220,22 +1284,32 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
             bindir = A118Path(raw) / "bin"
             bindir.mkdir()
             log = A118Path(raw) / "bd.log"
-            executable = bindir / "bd"
-            executable.write_text(
-                "#!/usr/bin/env python3\n"
+            bd_executable = write_python_executable(
+                bindir / "bd",
                 "import json, os, pathlib, sys\n"
                 "path = pathlib.Path(os.environ['BBK_TEST_BD_LOG'])\n"
                 "with path.open('a', encoding='utf-8') as stream:\n"
                 "    stream.write('---\\n' + '\\n'.join(sys.argv[1:]) + '\\n')\n"
                 "if len(sys.argv) > 2 and sys.argv[1] == 'show':\n"
                 "    print(json.dumps({'id': sys.argv[2], 'title': 'Bound work unit', 'description': '', 'issue_type': 'task'}))\n",
-                encoding="utf-8",
             )
-            executable.chmod(0o755)
+            mise_executable = write_python_executable(
+                bindir / "mise",
+                "import os, subprocess, sys\n"
+                "expected = ['exec', 'github:gastownhall/beads@1.1.0', '--', 'bd']\n"
+                "if sys.argv[1:5] != expected:\n"
+                "    raise SystemExit('unexpected mise invocation: ' + repr(sys.argv[1:]))\n"
+                "raise SystemExit(subprocess.call([os.environ['BBK_TEST_BD'], *sys.argv[5:]]))\n",
+            )
             applied = self.run_cli(
                 "beads", "handoff-plan", "--root", str(root), "--handoff", str(handoff),
                 "--bead", "bd-apply", "--apply",
-                env={"PATH": str(bindir) + a118_os.pathsep + a118_os.environ.get("PATH", ""), "BBK_TEST_BD_LOG": str(log)},
+                env={
+                    "PATH": a118_os.environ.get("PATH", ""),
+                    "BBK_MISE": str(mise_executable),
+                    "BBK_TEST_BD": str(bd_executable),
+                    "BBK_TEST_BD_LOG": str(log),
+                },
             )
             self.assertTrue(applied["applied"])
             self.assertFalse(applied["dry_run"])
@@ -1357,12 +1431,32 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
             mapping = a118_json.loads((root / ".bbk" / "map.json").read_text(encoding="utf-8"))
             for field in ("posture", "frontier", "blockers", "fog", "stopping_assessment"):
                 self.assertIn(field, mapping)
-        worker_procedure = (A118_ROOT / "shared" / "skills" / "bbk-work-unit-execution" / "SKILL.md").read_text(encoding="utf-8")
-        orchestrator_procedure = (A118_ROOT / "shared" / "skills" / "bbk-worker-execution" / "SKILL.md").read_text(encoding="utf-8")
-        self.assertIn("Do not consume the useful execution window", worker_procedure)
-        self.assertIn("Resume the same logical WorkUnit", worker_procedure)
-        self.assertIn("same semantic run", orchestrator_procedure)
-        self.assertIn("recovery-capable checkpoint", orchestrator_procedure)
+        liveness = a118_json.loads(
+            (A118_ROOT / "spec" / "prompt-modules" / "bbk-prompt-liveness-recovery.json").read_text(encoding="utf-8")
+        )
+        liveness_text = "\n".join(clause["text"] for clause in liveness["clauses"])
+        critical = a118_json.loads(
+            (A118_ROOT / "spec" / "prompt-modules" / "bbk-prompt-critical-path-execution.json").read_text(encoding="utf-8")
+        )
+        critical_text = "\n".join(clause["text"] for clause in critical["clauses"])
+        self.assertIn("same semantic run and physical attempt", liveness_text)
+        self.assertIn("recovery checkpoint binds semantic run", liveness_text)
+        self.assertIn("at least 300 seconds", liveness_text)
+        self.assertIn("blocking empty job wait", liveness_text)
+        self.assertIn("Five minutes of silence", liveness_text)
+        self.assertIn("shortest safe path is Worker execution", critical_text)
+        self.assertIn("dispatch immediately", critical_text)
+        role_map = {
+            "bbk-work-unit-execution": "bbk_worker",
+            "bbk-worker-execution": "bbk_worker_orchestrator",
+        }
+        for skill_name, role_name in role_map.items():
+            skill = (A118_ROOT / "shared" / "skills" / skill_name / "SKILL.md").read_text(encoding="utf-8")
+            self.assertIn("bbk-prompt-liveness-recovery", skill)
+            role = a118_json.loads(
+                (A118_ROOT / "spec" / "roles" / f"{role_name}-role.json").read_text(encoding="utf-8")
+            )
+            self.assertIn("bbk-prompt-critical-path-execution", role["prompt_modules"])
         for path in (A118_ROOT / "projections" / "codex" / "agents").glob("*.toml"):
             text = path.read_text(encoding="utf-8")
             self.assertNotIn("timeout =", text)
@@ -1382,7 +1476,7 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
         self.assertEqual(len(methods["skills"]), 40)
         self.assertEqual(len(methods["references"]), 23)
         prompt_catalog = a118_json.loads((A118_ROOT / "spec" / "prompt-modules" / "catalog.json").read_text(encoding="utf-8"))
-        self.assertEqual(len(prompt_catalog["module_entries"]), 32)
+        self.assertEqual(len(prompt_catalog["module_entries"]), 43)
         for name in ("bbk-wayfind", "bbk-grill", "bbk-handoff", "bbk-work-unit-execution", "bbk-assertion-validation"):
             self.assertIn(name, methods["skills"])
         self.assertIn("handoff.md", methods["references"])
@@ -1402,6 +1496,11 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
             "spec/schemas/bbk-local-discovery-policy-v1.schema.json",
             "spec/schemas/bbk-local-discovery-envelope-v1.schema.json",
             "spec/schemas/bbk-local-discovery-permit-v1.schema.json",
+            "spec/schemas/bbk-verification-receipt-v1.schema.json",
+            "spec/schemas/bbk-admission-certificate-v1.schema.json",
+            "spec/schemas/bbk-verification-budget-v1.schema.json",
+            "spec/schemas/bbk-verification-economy-event-log-v1.schema.json",
+            "spec/schemas/bbk-verification-economy-metrics-v1.schema.json",
             "spec/contracts/catalog.json",
             "spec/contracts/role-return-registry.json",
             "spec/contracts/role-return-registry-v2.json",
@@ -1522,7 +1621,7 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
         top = (A118_ROOT / "RELEASE-NOTES.md").read_text(encoding="utf-8")
         index = (A118_ROOT / "docs" / "README.md").read_text(encoding="utf-8")
         self.assertFalse((A118_ROOT / "docs" / "RELEASE-NOTES.md").exists())
-        for expected in ("Repository-native source", "15 current", "pre-public history", "No `.bbk/` project-record migration"):
+        for expected in ("Repository-native source", "16 current", "pre-public history", "No `.bbk/` project-record migration"):
             self.assertIn(expected, top)
         self.assertIn("[`RELEASE-NOTES.md`](../RELEASE-NOTES.md)", index)
 
@@ -1544,21 +1643,27 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
     def test_execution_procedure_rejects_silence_as_interrupt_evidence(self) -> None:
         execute = (A118_ROOT / "shared" / "skills" / "bbk-execute" / "SKILL.md").read_text(encoding="utf-8")
         handoff = (A118_ROOT / "shared" / "skills" / "bbk-handoff" / "SKILL.md").read_text(encoding="utf-8")
+        liveness = a118_json.loads(
+            (A118_ROOT / "spec" / "prompt-modules" / "bbk-prompt-liveness-recovery.json").read_text(encoding="utf-8")
+        )
+        liveness_text = "\n".join(clause["text"] for clause in liveness["clauses"])
         for expected in (
-            "A wait timeout is a parent polling deadline only",
-            "absence of a heartbeat",
+            "parent polling timeout alone is not evidence",
+            "missing heartbeat",
             "USER_CANCELLED",
             "CONFIRMED_HANG",
-            "completed, failed, or already-interrupted",
-            "bbk manifest create",
-            "bbk candidate freeze",
         ):
-            self.assertIn(expected, execute)
+            self.assertIn(expected, liveness_text)
+        self.assertIn("A wait timeout is a parent polling deadline only", execute)
+        self.assertIn("absence of a heartbeat", execute)
+        self.assertIn("bbk manifest create", execute)
+        self.assertIn("bbk candidate freeze", execute)
         for expected in (
             "BLOCKED_TECHNICAL", "BLOCKED_AUTHORITY", "BLOCKED_DECISION",
-            "PAUSED_CAPACITY", "PAUSED_HOST_WINDOW", "parent polling timeout",
+            "PAUSED_CAPACITY", "PAUSED_HOST_WINDOW",
         ):
-            self.assertIn(expected, handoff)
+            self.assertIn(expected, execute)
+        self.assertIn("parent polling timeout", handoff)
 
 # Deterministic fast/standard/release selection used by tools/run_tests.py.
 from tests._test_profiles import load_profiled_tests as load_tests

@@ -1,0 +1,15 @@
+{
+  "$id": "bbk-governance-status-query-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BBK binding-aware governance status query v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const": "bbk.governance-status-query.v1"},
+    "host_version": {"type": "string", "minLength": 1},
+    "session_id": {"type": "string", "minLength": 1},
+    "invocation_id": {"type": "string"},
+    "binding_ref": {"type": "string"}
+  },
+  "required": ["schema", "host_version", "session_id", "invocation_id", "binding_ref"]
+}

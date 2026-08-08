@@ -1,0 +1,176 @@
+{
+  "schema": "bbk.alpha17-rc-optimization-work-plan.v1",
+  "plan_id": "BBK-A17-RC-OPT-001",
+  "revision": 1,
+  "planning_mode": "FAST_CONTINUATION",
+  "architecture_mode": "ADOPT_AND_GAP",
+  "readiness_target": ["ROADMAP_READY", "FIRST_FRONTIER_READY"],
+  "release_target": "alpha.17-final-release-candidate",
+  "protected_floors": [
+    "authority-bound effects",
+    "mutation ownership and serialization",
+    "external-effect control",
+    "candidate integrity",
+    "product correctness",
+    "truthful evidence and completion claims",
+    "backward compatibility promised by Alpha.17"
+  ],
+  "work_units": [
+    {
+      "id": "WU-A17-OPT-001",
+      "title": "Canonicalize the critical-path policy",
+      "priority": "RC_BLOCKER",
+      "owner": "prompt-compiler",
+      "depends_on": [],
+      "outputs": ["canonical policy source", "generated role/procedure projections", "golden projection tests"]
+    },
+    {
+      "id": "WU-A17-OPT-002",
+      "title": "Build the compiled-procedure registry and compiler",
+      "priority": "RC_BLOCKER",
+      "owner": "prompt-compiler",
+      "depends_on": ["WU-A17-OPT-001"],
+      "outputs": ["procedure registry", "compiler", "manifest generator", "dependency validation"]
+    },
+    {
+      "id": "WU-A17-OPT-003",
+      "title": "Suppress compiled procedures from child catalogs",
+      "priority": "RC_BLOCKER",
+      "owner": "harness-adapters-installer",
+      "depends_on": ["WU-A17-OPT-002"],
+      "outputs": ["Codex suppression/fallback", "OMP projection", "Pi projection", "installer manifest"]
+    },
+    {
+      "id": "WU-A17-OPT-004",
+      "title": "Preserve compiled procedures across follow-ups",
+      "priority": "RC_BLOCKER",
+      "owner": "orchestration-runtime",
+      "depends_on": ["WU-A17-OPT-002", "WU-A17-OPT-003"],
+      "outputs": ["logical-child compiled-set binding", "delta follow-up behavior", "invalidation tests"]
+    },
+    {
+      "id": "WU-A17-OPT-005",
+      "title": "Add planning modes and readiness states",
+      "priority": "RC_BLOCKER",
+      "owner": "planning-core-schemas",
+      "depends_on": [],
+      "outputs": ["planning mode schema", "readiness schema", "roadmap/frontier revision model", "migration reader"]
+    },
+    {
+      "id": "WU-A17-OPT-006",
+      "title": "Update planning roles and procedures",
+      "priority": "RC_BLOCKER",
+      "owner": "prompt-procedure-sources",
+      "depends_on": ["WU-A17-OPT-001", "WU-A17-OPT-005"],
+      "outputs": ["updated canonical planning procedures", "generated role projections", "specialist trigger tests"]
+    },
+    {
+      "id": "WU-A17-OPT-007",
+      "title": "Generate routine Worker and assertion contracts",
+      "priority": "RC_BLOCKER",
+      "owner": "planning-contract-generator",
+      "depends_on": ["WU-A17-OPT-005"],
+      "outputs": ["routine Worker contract generator", "routine assertion generator", "exception routing"]
+    },
+    {
+      "id": "WU-A17-OPT-008",
+      "title": "Add transactional planning state and projections",
+      "priority": "RC_REQUIRED",
+      "owner": "planning-persistence",
+      "depends_on": ["WU-A17-OPT-005"],
+      "outputs": ["plan transaction operation", "semantic event records", "generated projections", "recovery tests"]
+    },
+    {
+      "id": "WU-A17-OPT-009",
+      "title": "Add atomic result and manifest finalizers",
+      "priority": "RC_BLOCKER",
+      "owner": "cli-artifact-subsystem",
+      "depends_on": [],
+      "outputs": ["bbk result finalize", "bbk manifest finalize", "identity receipt", "cross-platform canonicalization tests"]
+    },
+    {
+      "id": "WU-A17-OPT-010",
+      "title": "Add bounded evidence-capture replay",
+      "priority": "RC_BLOCKER",
+      "owner": "execution-evidence-subsystem",
+      "depends_on": [],
+      "outputs": ["command-attempt model", "replay eligibility evaluator", "PowerShell wrapper preflight", "lineage tests"]
+    },
+    {
+      "id": "WU-A17-OPT-011",
+      "title": "Late-bind effective profile/environment identity",
+      "priority": "RC_REQUIRED",
+      "owner": "profile-runtime-admission",
+      "depends_on": [],
+      "outputs": ["effective profile receipt", "semantic equivalence evaluator", "compatibility tests"]
+    },
+    {
+      "id": "WU-A17-OPT-012",
+      "title": "Add project-coverage truth",
+      "priority": "RC_BLOCKER",
+      "owner": "root-candidate-returns",
+      "depends_on": ["WU-A17-OPT-005"],
+      "outputs": ["coverage schema", "coverage projection", "return integration", "completion-truth tests"]
+    },
+    {
+      "id": "WU-A17-OPT-013",
+      "title": "Reduce coordination polling and global workspace checks",
+      "priority": "RC_REQUIRED",
+      "owner": "orchestration-adapter",
+      "depends_on": [],
+      "outputs": ["typed child events", "long-wait fallback", "workspace admission receipt", "polling tests"]
+    },
+    {
+      "id": "WU-A17-OPT-014",
+      "title": "Add structural and behavioral regression tests",
+      "priority": "RC_BLOCKER",
+      "owner": "tests-ci",
+      "depends_on": [
+        "WU-A17-OPT-001",
+        "WU-A17-OPT-002",
+        "WU-A17-OPT-003",
+        "WU-A17-OPT-004",
+        "WU-A17-OPT-005",
+        "WU-A17-OPT-006",
+        "WU-A17-OPT-007",
+        "WU-A17-OPT-009",
+        "WU-A17-OPT-010",
+        "WU-A17-OPT-012"
+      ],
+      "outputs": ["unit tests", "integration fixtures", "golden projections", "compatibility suite"]
+    },
+    {
+      "id": "WU-A17-OPT-015",
+      "title": "Integrate JSONL observability",
+      "priority": "RC_REQUIRED",
+      "owner": "tooling-docs",
+      "depends_on": ["WU-A17-OPT-003", "WU-A17-OPT-004"],
+      "outputs": ["analyzer distribution", "Alpha.17 config", "baseline report", "manual-run comparison procedure"]
+    },
+    {
+      "id": "WU-A17-OPT-016",
+      "title": "Upgrade, rollback, documentation, and release packaging",
+      "priority": "RC_BLOCKER",
+      "owner": "installer-release",
+      "depends_on": ["WU-A17-OPT-014"],
+      "outputs": ["migration", "rollback", "release archives", "checksums", "release notes", "manual test packet"]
+    },
+    {
+      "id": "WU-A17-OPT-017",
+      "title": "Evaluate canonical candidate workspace/overlay redesign",
+      "priority": "POST_RC_CANDIDATE",
+      "owner": "future-architecture",
+      "depends_on": [],
+      "outputs": ["evaluation or Alpha.18 backlog item"]
+    }
+  ],
+  "execution_frontier": [
+    "WU-A17-OPT-001",
+    "WU-A17-OPT-005",
+    "WU-A17-OPT-009",
+    "WU-A17-OPT-010",
+    "WU-A17-OPT-011",
+    "WU-A17-OPT-013"
+  ],
+  "release_gate": "All RC_BLOCKER units complete and passing; every RC_REQUIRED unit implemented or explicitly dispositioned with no hidden impact on the non-negotiable release gates."
+}

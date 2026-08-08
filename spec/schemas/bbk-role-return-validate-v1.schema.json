@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-role-return-validate-v1.schema.json",
+  "title": "BBK role-return validation request v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "bbk.role-return-validate.v1"
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "binding_ref": {
+      "type": "string",
+      "pattern": "^binding:[0-9a-f]{64}$"
+    },
+    "invocation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "document": {
+      "type": "object",
+      "minProperties": 1
+    },
+    "tool_call_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "session_id",
+    "binding_ref",
+    "invocation_id",
+    "document"
+  ]
+}

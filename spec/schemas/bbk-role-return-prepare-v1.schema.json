@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-role-return-prepare-v1.schema.json",
+  "title": "BBK role-return prepare request v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "bbk.role-return-prepare.v1"
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "binding_ref": {
+      "type": "string",
+      "pattern": "^binding:[0-9a-f]{64}$"
+    },
+    "invocation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "invocation_mode": {
+      "type": "string",
+      "minLength": 1
+    },
+    "return_kind": {
+      "type": "string",
+      "minLength": 1
+    },
+    "detail_level": {
+      "enum": [
+        "COMPACT",
+        "FULL"
+      ]
+    },
+    "operational_disposition": {
+      "type": "string",
+      "minLength": 1
+    },
+    "semantic_state_value": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "string"
+    },
+    "result": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": true
+    },
+    "smallest_valid_next_action": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "affected_refs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": true
+          }
+        },
+        "unaffected_work_may_continue": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "action",
+        "owner",
+        "reason"
+      ]
+    },
+    "authority_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "minProperties": 1,
+        "additionalProperties": true
+      }
+    },
+    "allowed_effect_classes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "effects_used": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "minProperties": 1,
+        "additionalProperties": true
+      }
+    },
+    "denied_or_uncovered_effects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "minProperties": 1,
+        "additionalProperties": true
+      }
+    },
+    "violations_or_ambiguities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "minProperties": 1,
+        "additionalProperties": true
+      }
+    },
+    "outputs": {},
+    "checks_and_evidence": {},
+    "effects_and_cleanup": {},
+    "blockers_and_residuals": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "prohibited_claims": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "durable_handoff_refs": {},
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "schema",
+    "session_id",
+    "binding_ref",
+    "invocation_id",
+    "return_kind",
+    "operational_disposition",
+    "semantic_state_value",
+    "summary",
+    "result",
+    "smallest_valid_next_action",
+    "idempotency_key"
+  ]
+}

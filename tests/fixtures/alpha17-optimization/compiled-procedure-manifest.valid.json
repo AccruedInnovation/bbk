@@ -1,0 +1,42 @@
+{
+  "schema": "bbk.compiled-procedure-manifest.v1",
+  "role": "bbk_worker",
+  "logical_child_id": "fixture-child-001",
+  "invocation_id": "fixture-invocation-001",
+  "harness": "CODEX",
+  "compiler": {
+    "id": "bbk-procedure-compiler",
+    "version": "0.1.0-alpha.17",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "registry_revision": "fixture-registry-1",
+  "procedures": [
+    {
+      "id": "bbk-work-unit-execution",
+      "version": "0.1.0-alpha.17",
+      "source_ref": "procedure-src/bbk-work-unit-execution/SKILL.md",
+      "source_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "effective_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "selection_reason": "PRIMARY",
+      "ordering": 0,
+      "catalog_visibility": "SUPPRESSED",
+      "state": "COMPILED_COMPLETE",
+      "dependencies": ["bbk-prompt-critical-path"]
+    }
+  ],
+  "catalog_suppression_set": ["bbk-work-unit-execution"],
+  "compiled_prompt_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+  "invalidation_keys": ["procedure:bbk-work-unit-execution:source", "compiler:bbk-procedure-compiler", "harness:CODEX:projection"],
+  "followup_policy": {
+    "preserve_by_default": true,
+    "recompile_triggers": [
+      "SOURCE_DIGEST_CHANGED",
+      "DEPENDENCY_DIGEST_CHANGED",
+      "COMPILER_CHANGED",
+      "SELECTION_CHANGED",
+      "PROFILE_SELECTION_CHANGED",
+      "HARNESS_PROJECTION_CHANGED",
+      "PROCEDURE_REMOVED"
+    ]
+  }
+}

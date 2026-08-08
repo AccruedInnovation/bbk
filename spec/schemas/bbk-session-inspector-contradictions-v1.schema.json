@@ -1,0 +1,131 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-session-inspector-contradictions-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BBK Session Inspector derived-analysis contradictions v1",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "count": {"type": "integer", "minimum": 0},
+    "usd": {"type": "string", "pattern": "^(?:0|[0-9]+(?:\\.[0-9]{1,12})?)$"}
+  },
+  "properties": {
+    "schema": {"const": "bbk.session-inspector-contradictions.v1"},
+    "fixture_id": {"const": "session-inspector-alpha16-source-oracle-derived-contradictions"},
+    "source_manifest_ref": {"$ref": "#/$defs/digest"},
+    "derived_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "logical_name": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/digest"},
+        "byte_count": {"type": "integer", "minimum": 1},
+        "truth_status": {"const": "INCOMPLETE_SECONDARY"},
+        "raw_content_retained": {"const": false},
+        "source_path_retained": {"const": false}
+      },
+      "required": [
+        "logical_name", "sha256", "byte_count", "truth_status",
+        "raw_content_retained", "source_path_retained"
+      ]
+    },
+    "truth_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "authoritative_source": {"const": "RAW_SESSION_EXPORT"},
+        "derived_analysis_role": {"const": "SECONDARY_OBSERVATION"},
+        "derived_analysis_complete_truth": {"const": false}
+      },
+      "required": ["authoritative_source", "derived_analysis_role", "derived_analysis_complete_truth"]
+    },
+    "positive_controls": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]+$"},
+          "status": {"const": "PASS"},
+          "source_value": {"$ref": "#/$defs/count"},
+          "derived_value": {"$ref": "#/$defs/count"},
+          "source_provider_responses": {"$ref": "#/$defs/count"},
+          "source_total_tokens": {"$ref": "#/$defs/count"},
+          "derived_total_tokens": {"$ref": "#/$defs/count"},
+          "source_cost_total_usd": {"$ref": "#/$defs/usd"},
+          "derived_cost_total_usd": {"$ref": "#/$defs/usd"}
+        },
+        "required": ["id", "status"],
+        "anyOf": [
+          {"required": ["source_value", "derived_value"]},
+          {
+            "required": [
+              "source_provider_responses", "source_total_tokens", "derived_total_tokens",
+              "source_cost_total_usd", "derived_cost_total_usd"
+            ]
+          }
+        ]
+      }
+    },
+    "contradictions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]+$"},
+          "code": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]+$"},
+          "severity": {"const": "BLOCKING"},
+          "source_value": {"$ref": "#/$defs/count"},
+          "derived_value": {"$ref": "#/$defs/count"},
+          "delta": {"type": "integer", "minimum": 1},
+          "source_valid_session_identities": {"$ref": "#/$defs/count"},
+          "derived_agent_count": {"$ref": "#/$defs/count"},
+          "provider_response_ids_as_agents": {"type": "integer", "minimum": 1},
+          "pseudo_role_agents": {"type": "integer", "minimum": 1},
+          "source_explicit_wait_count": {"type": "integer", "minimum": 1},
+          "derived_wait_interval_count": {"$ref": "#/$defs/count"},
+          "derived_matching_explicit_wait_count": {"$ref": "#/$defs/count"},
+          "missing_explicit_wait_count": {"type": "integer", "minimum": 1},
+          "source_value_usd": {"$ref": "#/$defs/usd"},
+          "derived_value_usd": {"$ref": "#/$defs/usd"},
+          "excluded_value_usd": {"$ref": "#/$defs/usd"}
+        },
+        "required": ["id", "code", "severity"],
+        "anyOf": [
+          {"required": ["source_value", "derived_value", "delta"]},
+          {
+            "required": [
+              "source_valid_session_identities", "derived_agent_count",
+              "provider_response_ids_as_agents", "pseudo_role_agents"
+            ]
+          },
+          {
+            "required": [
+              "source_explicit_wait_count", "derived_wait_interval_count",
+              "derived_matching_explicit_wait_count", "missing_explicit_wait_count"
+            ]
+          },
+          {"required": ["source_value_usd", "derived_value_usd", "excluded_value_usd"]}
+        ]
+      }
+    },
+    "verdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {"const": "NEGATIVE_ORACLE_CONFIRMED"},
+        "contradiction_count": {"type": "integer", "minimum": 1},
+        "derived_analysis_can_establish_complete_truth": {"const": false}
+      },
+      "required": ["status", "contradiction_count", "derived_analysis_can_establish_complete_truth"]
+    },
+    "fixture_digest": {"$ref": "#/$defs/digest"}
+  },
+  "required": [
+    "schema", "fixture_id", "source_manifest_ref", "derived_source", "truth_policy",
+    "positive_controls", "contradictions", "verdict", "fixture_digest"
+  ]
+}

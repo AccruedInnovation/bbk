@@ -23,7 +23,7 @@ spec/roles/bbk_*-role.json          19 independently maintained canonical role d
 spec/roles.json                     generated compatibility projection; do not edit
 ```
 
-`tools/assemble_roles.py` validates the split package and regenerates `spec/roles.json`. `tools/create_role_spec.py` is a compatibility wrapper around the same assembler. Generated Codex, OMP, Claude Code, and generic projections must not be edited directly.
+`tools/assemble_roles.py` validates the split package and regenerates `spec/roles.json`. `tools/create_role_spec.py` is a compatibility wrapper around the same assembler. Generated Codex, OMP, Pi, Claude Code, and generic projections must not be edited directly.
 
 The catalogue owns:
 
@@ -40,9 +40,9 @@ The assembler rejects undeclared or one-sided edges, parent-mode drift, return-m
 
 ## Prompt composition and return contracts
 
-A role prompt is compiled from four layers: canonical role contract, selected reusable prompt modules, role-specific mandatory procedures, and host projection instructions. Shared behavior is maintained once under `spec/prompt-modules/`; role-specific algorithms remain in `spec/method-content.json`. There is no fixed mandatory-procedure count. An additional mandatory procedure requires a measured catalogue exception proving distinct behavior and zero duplicated module bodies.
+A role prompt is compiled from four layers: canonical role contract, selected reusable prompt modules, role-specific mandatory procedures, and host projection instructions. Shared behavior is maintained once under `spec/prompt-modules/`; role-specific algorithms remain in `spec/method-content.json`, which currently indexes 40 shared skills. There is no fixed mandatory-procedure count. An additional mandatory procedure requires a measured catalogue exception proving distinct behavior and zero duplicated module bodies.
 
-Every canonical role returns `bbk.role-return.v1` with an exact role-specific payload schema. Operational dispositions describe the physical attempt; semantic states describe readiness for the parent. Neither successful tool access nor operational `COMPLETE` grants acceptance, candidate freeze, validation admission, or release authority.
+Every canonical role returns `bbk.role-return.v2` with an exact role-specific result schema; `bbk.role-return.v1` remains read-compatible during migration. Operational dispositions describe the physical attempt; semantic states describe readiness for the parent. Neither successful tool access nor operational `COMPLETE` grants acceptance, candidate freeze, validation admission, or release authority.
 
 ## Interaction topology
 
@@ -63,7 +63,7 @@ Only the roles declared as human-request originators may construct a controller 
 
 In OMP, live child communication uses `hub`/IRC to the peer whose `kind` is `main`, normally `Main`. Use exact peer IDs from the roster and `replyTo` where available. A send receipt, timeout, silence, or missing heartbeat is non-evidence. Large or authority-bearing material remains in a durable handoff with path, bytes, and SHA-256.
 
-Codex and Claude Code use their native parent/child channels for the same logical packet. When live relay is unavailable, a child returns the typed request through the invocation chain as `BLOCKED_DECISION`, `BLOCKED_AUTHORITY`, or the applicable private-context state.
+Codex, Pi, Claude Code, and other capable hosts use their native parent/child channels for the same logical packet. When live relay is unavailable, a child returns the typed request through the invocation chain as `BLOCKED_DECISION`, `BLOCKED_AUTHORITY`, or the applicable private-context state.
 
 ## Role contract
 
@@ -92,6 +92,7 @@ The canonical role files contain each role's `spawns` list and per-child trigger
 
 - **OMP:** native `spawns` is the enforceable direct-child allowlist. For batch `task`, each task's `agent` is the exact permitted `bbk_*` role, `name` is a stable logical job identity, and `task` is the complete self-contained assignment.
 - **Codex:** generated child names and delegation instructions mirror the same canonical edge set.
+- **Pi:** generated agent definitions carry the same canonical delegation triggers and return contract; the host controls the physical child surface.
 - **Claude Code:** native `Agent(...)` permissions match the exact direct-child allowlist.
 - **Generic:** the prompt carries the same triggers but the host must enforce its own physical child capability.
 
@@ -109,9 +110,9 @@ The five constitution modules remain:
 | `execution` | effectful and execution-contract roles | standing authority, capability zones, checkpoints, candidate identity, durable handoffs |
 | `assurance` | evidence, review, synthesis, and acceptance roles | proportional proof, exposure history, stage separation, non-pass dispositions |
 
-Alpha.16.1 has 32 reusable `bbk.prompt-module.v1` modules under `spec/prompt-modules/`. They carry materially identical behavior—role boundary, invocation binding, human relay, delegation/return, durable handoffs, state-claim truth, workspace/external authority and exact completion vocabulary, profile qualification, liveness/recovery, effects/cleanup, evidence lineage and receipts, finding lifecycle, candidate integrity, execution autonomy, user-attention threshold, planning-to-execution ownership, node-bound evidence, specialist-return disposition, and related concerns—without duplicating the body in every procedure.
+The current package has 43 reusable `bbk.prompt-module.v1` modules under `spec/prompt-modules/`. They carry materially identical behavior—role boundary, invocation binding, human relay, delegation/return, durable handoffs, state-claim truth, workspace/external authority and exact completion vocabulary, profile qualification, liveness/recovery, effects/cleanup, evidence lineage and receipts, finding lifecycle, candidate integrity, execution autonomy, user-attention threshold, planning-to-execution ownership, node-bound evidence, specialist-return disposition, and related concerns—without duplicating the body in every procedure.
 
-Alpha.15 retains the five alpha.14 modules and adds four focused modules for product-first proportionality, mechanical admission, explicit assurance modes, and candidate-focused review. They are guidance and prompt/protocol contracts. They do not create deterministic baseline-acceptance, authority, record-mutation, or release gates; those remain outside BBK's bounded bootstrap role.
+Prompt modules carry guidance and protocol contracts. Deterministic code, not prompt text alone, checks schema, binding, candidate, receipt, finding, and gate state where BBK exposes an exact checker.
 
 Each selected module is embedded once in a compiled role prompt. A primary procedure references the already embedded module instead of restating it.
 
@@ -125,7 +126,7 @@ Optional focused procedures and language/domain profiles remain available on dem
 
 ## Return contracts
 
-Every role returns `bbk.role-return.v1` with a closed role-specific result schema. The common envelope separates physical-attempt disposition from semantic readiness and requires:
+Every role returns `bbk.role-return.v2` with a closed role-specific result schema. The OMP `yield` boundary validates the full document before parent acceptance; `bbk_return_template` and `bbk_return_prepare` are the routine construction path, while existing v1/v2 documents remain consume-compatible outside the OMP producer boundary; governed OMP production requires an immutable prepared record. The common envelope separates physical-attempt disposition from semantic readiness and requires:
 
 - exact subject, parent, attempt, role, and invocation mode;
 - return kind and current operational disposition;
@@ -151,7 +152,7 @@ INCONCLUSIVE
 
 `READY_FOR_VALIDATION`, `BLOCKED`, and `PAUSED` are consume-only legacy `bbk.handoff.v1` values. Candidate admission, parent integration, orchestrator integration, planning readiness, and similar meanings live in the role-specific semantic state rather than masquerading as operational completion.
 
-`tools/return_contracts.py` generates 19 result schemas, 19 complete return schemas, and the digest-bound return registry.
+`tools/return_contracts.py` generates 19 full result schemas, 19 compact result schemas, 19 v1 and 19 v2 complete return schemas, and digest-bound return registries. `tools/role_return_runtime.py` validates tool requests, generated templates, prepared records, validation/admission receipts, and yielded role returns against the recursive schema registry and the active invocation binding.
 
 ## Planning and specialist ownership
 
@@ -165,7 +166,7 @@ Reviewer owns bounded qualitative or interpretive judgment under an exact charte
 
 Main receives a complete controller system-prompt replacement while persistent BBK mode is active. A marked BBK child receives a complete role-specific replacement after the extension authenticates the installed canonical projection. Compatibility-discovered `.codex`, `.claude`, `.gemini`, and other unrelated workflow instructions are excluded unless explicitly supplied as governed project data.
 
-OMP may resume or wake a session without invoking another ordinary `before_agent_start` replacement. Alpha.16.1 retains alpha.16's guard of the actual outgoing provider payload in `before_provider_request`. It verifies exactly one session-bound canonical BBK system surface, repairs recognized OpenAI/DeepSeek, OpenAI Responses, Anthropic, Google, direct-message-array, `systemPrompt`, and one-level nested payload shapes, or blocks an unsupported/unrepairable BBK request. Blocking calls the host abort control and substitutes a payload containing no user request content. Ordinary non-BBK OMP requests pass through unchanged.
+OMP may resume or wake a session without invoking another ordinary `before_agent_start` replacement. BBK therefore also guards the actual outgoing provider payload in `before_provider_request`. It verifies exactly one session-bound canonical BBK system surface, repairs recognized OpenAI/DeepSeek, OpenAI Responses, Anthropic, Google, direct-message-array, `systemPrompt`, and one-level nested payload shapes, or blocks an unsupported/unrepairable BBK request. Blocking calls the host abort control and substitutes a payload containing no user request content. Ordinary non-BBK OMP requests pass through unchanged.
 
 Digest-only `bbk.effective-prompt-receipt.v2` entries record every `VERIFIED`, `REPAIRED`, and `BLOCKED` provider request; raw prompt and provider payload content are not persisted. `/bbk:prompt-status` reports counts, current guarantee, unresolved failures, and the exact extension-order boundary. OMP has no post-chain finalizer, so a later extension handler can still rewrite the payload after BBK's hook; BBK reports but cannot eliminate that host-owned boundary.
 
@@ -213,17 +214,20 @@ Model selection affects execution defaults, not role authority. The exact per-ro
 
 ## Generated metadata and checks
 
-`projections/manifest.json` uses `bbk.projection-manifest.v8`. It externalizes role identity, host filenames, exact model routes, constitution and prompt-module selections, primary and mandatory procedures, mutability, topology, exact return contracts, source paths, and digests without requiring that provenance text to be repeated in every model-facing prompt.
+`projections/manifest.json` uses `bbk.projection-manifest.v10`. It externalizes role identity, host filenames, exact model routes, constitution and prompt-module selections, primary and mandatory procedures, mutability, topology, exact return contracts, source paths, and digests without requiring that provenance text to be repeated in every model-facing prompt.
 
 Run:
 
 ```bash
 python tools/assemble_roles.py --check
 python tools/return_contracts.py --check
-python tools/prompt_modules.py --check
 python tools/create_method_content.py --check
+python tools/create_procedure_registry.py --check
+python tools/prompt_modules.py --check-size-report
+python tools/generate_role_capabilities.py --check
 python tools/model_routing.py --check
 python tools/generate_agents.py --check
+python tools/prompt_lint.py --check
 ```
 
 Any drift is a source or generation failure, not permission to edit a projection manually.

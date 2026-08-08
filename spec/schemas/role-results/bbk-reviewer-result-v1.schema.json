@@ -6,27 +6,83 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
+    "assertion_evaluations",
     "charter_manifest_and_context_refs",
-    "review_assessment",
-    "governing_sources_and_criteria",
+    "checkpoint_recovery_cleanup_and_residuals",
+    "claims_not_established",
     "context_completeness_and_omissions",
+    "durable_artifact_and_handoff_refs",
+    "failure_and_blocker_classification",
+    "governing_sources_and_criteria",
+    "immutable_findings",
     "independence_and_exposure_facts",
     "inspection_actions_and_evidence",
-    "assertion_evaluations",
-    "immutable_findings",
-    "out_of_scope_observations",
-    "failure_and_blocker_classification",
-    "recommended_dispositions_and_parent_actions",
-    "profiles_tools_and_environments",
-    "checkpoint_recovery_cleanup_and_residuals",
     "invalidated_or_superseded_refs",
-    "durable_artifact_and_handoff_refs",
-    "claims_not_established"
+    "out_of_scope_observations",
+    "profiles_tools_and_environments",
+    "recommended_dispositions_and_parent_actions",
+    "review_assessment"
   ],
   "properties": {
+    "assertion_evaluations": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Every in-scope assertion or review question with exact result, applicability, criteria, rationale, evidence, coverage, confidence or uncertainty, limitations, primary or complementary ownership and claims explicitly not established."
+    },
     "charter_manifest_and_context_refs": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
       "description": "Exact charter, AssuranceContract, ReviewManifest assignment and ReviewContextManifest or inline-context declaration as applicable; purpose, gate, assertions, lens, criteria, methods, included and excluded scope, context completeness, omissions, redactions, shards, cross-shard obligations and digests."
+    },
+    "checkpoint_recovery_cleanup_and_residuals": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Completed and remaining review work, exact checkpoint and resume prerequisites, same-attempt or successor rules, prior attempt state, interruption reason, scratch and sensitive material, temporary effects, cleanup or quarantine, sealed evidence retained and unresolved residual owners."
+    },
+    "claims_not_established": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Material claims explicitly outside the review or not established by the evidence, including repair correctness, finding disposition, candidate or plan acceptance, residual-risk acceptance, completion, operational outcome achievement and release."
+    },
+    "context_completeness_and_omissions": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Included, retrieval-only, excluded, omitted, redacted, generated, summarized, shared and sharded material; exact roots and pack digests; compiler; untrusted-content treatment; completeness; blockers; and effect on each conclusion."
+    },
+    "durable_artifact_and_handoff_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/artifactReferenceList",
+      "description": "Verified Reviewer report, ReviewAttempt when applicable, EvidenceReceipt, assertion-evaluation, finding, context, checkpoint and `bbk-handoff` identities with schema, subject, path, byte count, SHA-256, producer and attempt."
+    },
+    "failure_and_blocker_classification": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Subject, contract, evidence, context, evaluator, tool, profile, environment, consumer, device, host, authority, decision, integrity, capacity, host-window and transport states with evidence, affected scope and smallest responsible route."
+    },
+    "governing_sources_and_criteria": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Accepted requirements, decisions, interfaces, plans, assertions, protected floors, applicability, criteria, methods, acceptance policy and source authority with exact identity, currentness and contradictions. Separate source-stated obligations, derived review implications and Reviewer inference."
+    },
+    "immutable_findings": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Every new or referenced immutable finding with exact subject, attempt, assertions, expected and observed conditions, evidence, reproduction or inspection route, classification, severity, blocking state, confidence or uncertainty, scope, impact, affected objects, fingerprint and recommended route. Preserve contradictory and unfavorable findings."
+    },
+    "independence_and_exposure_facts": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Author, Worker, Validator and Reviewer role separation; logical and physical invocation; context-assembly independence; prior-findings visibility; outcome-bearing evidence exposure; model, provider, tool, environment, dataset and organizational diversity; candidate-mutation prohibition; attempt purpose; and every independence requirement satisfied, unsatisfied or not applicable."
+    },
+    "inspection_actions_and_evidence": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Every material inspection, command, tool, version, environment, input, output, EvidenceReceipt, trust class, reuse decision, coverage, redaction, limitation and distinction among direct observation, report, calculation and inference. Include exact path, byte count and SHA-256 where material."
+    },
+    "invalidated_or_superseded_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Subjects, charters, contexts, criteria, evidence, findings, assessments, checkpoints or reports invalidated, reopened, replaced or superseded, exact cause and unaffected material eligible for reuse."
+    },
+    "out_of_scope_observations": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Material concerns not evaluated under the current charter, why they are outside scope, available evidence, possible consequence, affected objects and proposed parent-owned charter or route. Do not assign a pass or fail beyond current authority."
+    },
+    "profiles_tools_and_environments": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Selected profile and router identities, effective digests, lenses, tools, evidence adapters, versions, environments, consumers, devices, credentials, qualifications, substitutions, capability gaps and impact on claim strength."
+    },
+    "recommended_dispositions_and_parent_actions": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Smallest responsible non-authoritative recommendation for subject repair, source or assurance revision, context rebuild, capability qualification, targeted closure, blind reassessment, finding disposition, accountable decision, residual-risk consideration, recharter, pause, recovery or no action. Recommendations do not create authority-bearing dispositions."
     },
     "review_assessment": {
       "type": "string",
@@ -42,62 +98,6 @@
         "STALE"
       ],
       "description": "One allowed non-authoritative assessment. Use `NOT_DERIVED` for a checkpoint before a responsible assessment exists. In manifest mode this is one attempt input to the parent aggregate, not the aggregate itself."
-    },
-    "governing_sources_and_criteria": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Accepted requirements, decisions, interfaces, plans, assertions, protected floors, applicability, criteria, methods, acceptance policy and source authority with exact identity, currentness and contradictions. Separate source-stated obligations, derived review implications and Reviewer inference."
-    },
-    "context_completeness_and_omissions": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Included, retrieval-only, excluded, omitted, redacted, generated, summarized, shared and sharded material; exact roots and pack digests; compiler; untrusted-content treatment; completeness; blockers; and effect on each conclusion."
-    },
-    "independence_and_exposure_facts": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Author, Worker, Validator and Reviewer role separation; logical and physical invocation; context-assembly independence; prior-findings visibility; outcome-bearing evidence exposure; model, provider, tool, environment, dataset and organizational diversity; candidate-mutation prohibition; attempt purpose; and every independence requirement satisfied, unsatisfied or not applicable."
-    },
-    "inspection_actions_and_evidence": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Every material inspection, command, tool, version, environment, input, output, EvidenceReceipt, trust class, reuse decision, coverage, redaction, limitation and distinction among direct observation, report, calculation and inference. Include exact path, byte count and SHA-256 where material."
-    },
-    "assertion_evaluations": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
-      "description": "Every in-scope assertion or review question with exact result, applicability, criteria, rationale, evidence, coverage, confidence or uncertainty, limitations, primary or complementary ownership and claims explicitly not established."
-    },
-    "immutable_findings": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
-      "description": "Every new or referenced immutable finding with exact subject, attempt, assertions, expected and observed conditions, evidence, reproduction or inspection route, classification, severity, blocking state, confidence or uncertainty, scope, impact, affected objects, fingerprint and recommended route. Preserve contradictory and unfavorable findings."
-    },
-    "out_of_scope_observations": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
-      "description": "Material concerns not evaluated under the current charter, why they are outside scope, available evidence, possible consequence, affected objects and proposed parent-owned charter or route. Do not assign a pass or fail beyond current authority."
-    },
-    "failure_and_blocker_classification": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Subject, contract, evidence, context, evaluator, tool, profile, environment, consumer, device, host, authority, decision, integrity, capacity, host-window and transport states with evidence, affected scope and smallest responsible route."
-    },
-    "recommended_dispositions_and_parent_actions": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Smallest responsible non-authoritative recommendation for subject repair, source or assurance revision, context rebuild, capability qualification, targeted closure, blind reassessment, finding disposition, accountable decision, residual-risk consideration, recharter, pause, recovery or no action. Recommendations do not create authority-bearing dispositions."
-    },
-    "profiles_tools_and_environments": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Selected profile and router identities, effective digests, lenses, tools, evidence adapters, versions, environments, consumers, devices, credentials, qualifications, substitutions, capability gaps and impact on claim strength."
-    },
-    "checkpoint_recovery_cleanup_and_residuals": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Completed and remaining review work, exact checkpoint and resume prerequisites, same-attempt or successor rules, prior attempt state, interruption reason, scratch and sensitive material, temporary effects, cleanup or quarantine, sealed evidence retained and unresolved residual owners."
-    },
-    "invalidated_or_superseded_refs": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
-      "description": "Subjects, charters, contexts, criteria, evidence, findings, assessments, checkpoints or reports invalidated, reopened, replaced or superseded, exact cause and unaffected material eligible for reuse."
-    },
-    "durable_artifact_and_handoff_refs": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/artifactReferenceList",
-      "description": "Verified Reviewer report, ReviewAttempt when applicable, EvidenceReceipt, assertion-evaluation, finding, context, checkpoint and `bbk-handoff` identities with schema, subject, path, byte count, SHA-256, producer and attempt."
-    },
-    "claims_not_established": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
-      "description": "Material claims explicitly outside the review or not established by the evidence, including repair correctness, finding disposition, candidate or plan acceptance, residual-risk acceptance, completion, operational outcome achievement and release."
     }
   },
   "x-bbk-role": "bbk_reviewer",

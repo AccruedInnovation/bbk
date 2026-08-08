@@ -1,6 +1,6 @@
 {
   "schema": "bbk.contract-catalog.v1",
-  "package_version": "0.1.0-alpha.16.1",
+  "package_version": "0.1.0-alpha.17.0.2",
   "source_role_catalog": "spec/roles/catalog.json",
   "capability_status_inventory": "spec/capability-status.json",
   "role_return_package": {

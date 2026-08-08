@@ -1,6 +1,8 @@
 ---
 name: bbk-review-plan
 description: Compile the smallest sufficient ReviewManifest from an exact AssuranceContract, subject, risk, profiles, environment capabilities, and review purpose.
+requires_prompt_modules: ["bbk-prompt-assurance-modes"]
+standalone_prompt_modules: ["bbk-prompt-candidate-focused-review"]
 ---
 
 # BBK Review Plan
@@ -25,30 +27,18 @@ Use `bbk-installed-profiles` to discover managed profile lenses, context selecto
 
 ## Product-first proportional workflow
 
-<!-- BBK prompt module bbk-prompt-assurance-modes: expanded from canonical source -->
-
-### Proportional assurance modes
-
-Select INLINE, FOCUSED, or FULL assurance from the exact subject and material risk without creating a global lifecycle gate.
-
-- `ASSURANCE_MODE.INLINE` — Use INLINE by default for routine, reversible, profile-covered work. Worker self-checks and applicable deterministic gates are sufficient; do not commission an independent Reviewer or manually authored review manifest solely because work occurred.
-- `ASSURANCE_MODE.FOCUSED` — Use FOCUSED for one exact material risk, interface, finding, or candidate claim. Record the exact subject and risk rationale, generate the bounded context, commission only the necessary independent focus, and recheck the affected scope after repair.
-- `ASSURANCE_MODE.FULL` — Use FULL for safety or security exposure, irreversible migration, consequential shared interfaces, contractual or compliance obligations, novel high-risk mechanisms, or explicit user request. Broader assertion design and candidate-bound evidence are warranted only to the extent required by those risks.
-- `ASSURANCE_MODE.RECORD` — Represent the selection with `bbk.assurance-mode.v1`: mode, exact subject reference, risk basis, rationale, review focus, recheck scope, and whether independent review is required. FOCUSED and FULL require an explicit material-risk rationale; INLINE must state its routine basis.
-- `ASSURANCE_MODE.NO_LIFECYCLE_ENGINE` — The assurance-mode record guides proportional work and context generation. It does not itself accept a candidate, authorize effects, invalidate prior work automatically, or introduce a global deterministic lifecycle state machine.
-
-<!-- End BBK prompt module bbk-prompt-assurance-modes -->
+> Apply the already embedded `bbk-prompt-assurance-modes` module here.
 
 <!-- BBK prompt module bbk-prompt-candidate-focused-review: expanded from canonical source -->
 
-### Candidate-focused review and delta recheck
+### Candidate-focused qualitative review and scoped recheck
 
-Review the exact integrated candidate or material boundary and return bounded findings instead of rewriting the plan.
+Review a named qualitative risk over an exact candidate without duplicating deterministic mechanics.
 
-- `CANDIDATE_REVIEW.EXACT_SUBJECT` — Independent review normally targets an exact sealed integrated candidate or one exact material risk or interface boundary. Do not default to reviewing an abstract plan or every intermediate artifact when those are not the assurance subject.
-- `CANDIDATE_REVIEW.DELTA_OUTPUT` — Return findings, evidence gaps, concrete deltas, affected scope, reopening triggers, and the smallest valid next action. Do not rewrite the implementation plan or restate unaffected context as the review product.
-- `CANDIDATE_REVIEW.FINDING_SCOPED_RECHECK` — A focused repair recheck consumes the finding, successor candidate, affected scope, relevant evidence, and reopening triggers. Reopen broader review only when the repair materially changes semantics, interfaces, authority, protected floors, or evidence meaning.
-- `CANDIDATE_REVIEW.STOP_RULE` — Stop when the exact review focus is resolved and its required evidence is adequate. Do not expand a bounded review into a general audit, duplicate prior assurance, or continue after the named risk has been retired.
-- `CANDIDATE_REVIEW.INLINE_BOUNDARY` — INLINE work does not commission an independent Reviewer. Apply normal worker self-checks and deterministic gates unless a named material risk changes the assurance mode.
+- `CANDIDATE_REVIEW.NAMED_RISK` — Commission Reviewer only for a named qualitative or cross-cutting product risk deterministic checks cannot establish. If no qualifying question exists, return `NO_MATERIAL_ASSURANCE_WORK`.
+- `CANDIDATE_REVIEW.EXACT_SUBJECT` — Review the exact frozen integrated candidate or one exact material interface boundary and consume current identity, package, environment, test, schema, and evidence receipts.
+- `CANDIDATE_REVIEW.NO_DUPLICATE_MECHANICS` — Do not rerun tests, schema validation, package verification, hashing, profile discovery, or environment qualification merely to appear independent. Independently interpret the current evidence; execute a separate method only when the assurance contract names the risk it controls.
+- `CANDIDATE_REVIEW.DELTA_OUTPUT` — Return findings, evidence gaps, concrete deltas, affected scope, reopening triggers, and the smallest valid next action rather than rewriting the plan or restating unaffected context.
+- `CANDIDATE_REVIEW.SCOPED_RECHECK` — After repair, revalidate failed assertions, direct impact closure, and explicitly invalidated regression gates only. Reopen broader review only for changed semantics, interfaces, authority, protected floors, ownership, or evidence meaning.
 
 <!-- End BBK prompt module bbk-prompt-candidate-focused-review -->

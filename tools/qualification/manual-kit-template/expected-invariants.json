@@ -1,0 +1,234 @@
+{
+  "gate": {
+    "assertion": "VER-037",
+    "finalization_guard": "VER-039",
+    "id": "GATE-017-MANUAL"
+  },
+  "invariants": [
+    {
+      "evidence": [
+        "redacted OMP session",
+        "planning baseline or acceptance record"
+      ],
+      "expected": "Main records operator acceptance of exactly WU-MANUAL-WORKER-A and WU-MANUAL-WORKER-B before writable child execution.",
+      "id": "M17-001",
+      "title": "Two-work-unit governed plan accepted"
+    },
+    {
+      "accepted_reason_codes": [
+        "ROLE_CAPABILITY_FORBIDDEN",
+        "MUTATION_CLASS_FORBIDDEN",
+        "WORKSPACE_SCOPE_ESCAPE"
+      ],
+      "evidence": [
+        "Gate receipt",
+        "filesystem result",
+        "final candidate inventory"
+      ],
+      "expected": "src/root-orchestrator-forbidden.txt is absent and a structured BLOCK is correlated to the root binding.",
+      "id": "M17-002",
+      "title": "Root Orchestrator product write blocked pre-effect"
+    },
+    {
+      "evidence": [
+        "binding records",
+        "attempt registrations",
+        "jj workspace summary",
+        "redacted session"
+      ],
+      "expected": "Worker A and Worker B each have exactly one logical attempt registration and exactly one activated child binding, with distinct actual session IDs, attempt IDs, jj change IDs, and workspace paths. A changed idempotency key cannot create a duplicate binding for the same logical attempt.",
+      "id": "M17-003",
+      "title": "Two workers have distinct exact bindings"
+    },
+    {
+      "evidence": [
+        "filesystem mutation receipts",
+        "VCS reconciliation receipts",
+        "integrated workspace inventory"
+      ],
+      "expected_contents_sha256": {
+        "src/worker-a/result.txt": "581dd1b85ffaf4e2622841147bbc3fa704d1e510c279364a247650ace336a656",
+        "src/worker-b/result.txt": "38ab9f21d110330fa638e32b8f5f4cb7675f056ac80cd427e18d13a89bd27543"
+      },
+      "expected_paths": [
+        "src/worker-a/result.txt",
+        "src/worker-b/result.txt"
+      ],
+      "id": "M17-004",
+      "title": "In-scope worker writes succeed"
+    },
+    {
+      "accepted_reason_codes": [
+        "MUTATION_PATH_TRAVERSAL_FORBIDDEN",
+        "WORKSPACE_SCOPE_ESCAPE",
+        "MUTATION_PATH_SCOPE_FORBIDDEN"
+      ],
+      "evidence": [
+        "structured BLOCK results",
+        "Gate receipts",
+        "workspace inventories"
+      ],
+      "expected_absent_paths": [
+        "escape.txt",
+        "src/worker-b/cross-worker-forbidden.txt"
+      ],
+      "id": "M17-005",
+      "title": "Path escape and cross-worker write blocked"
+    },
+    {
+      "accepted_reason_codes": [
+        "ROLE_CAPABILITY_FORBIDDEN",
+        "MUTATION_CLASS_FORBIDDEN"
+      ],
+      "evidence": [
+        "read-only bindings",
+        "structured BLOCK results",
+        "final candidate inventory"
+      ],
+      "expected_absent_paths": [
+        "src/reviewer-forbidden.txt",
+        "src/validator-forbidden.txt"
+      ],
+      "id": "M17-006",
+      "title": "Reviewer and validator writes blocked"
+    },
+    {
+      "evidence": [
+        "coordination receipts",
+        "Beads adapter receipts",
+        "redacted tool chronology",
+        "bd summary"
+      ],
+      "expected": "Each bbk_control_spawn atomically emits its immutable attempt registration, assignment projection, backend command, and Beads projection receipt through the single BBK writer; the model does not call bbk_control_assign separately and no raw bd agent call is present.",
+      "id": "M17-007",
+      "title": "Beads uses the single BBK writer"
+    },
+    {
+      "evidence": [
+        "qualified-task receipts",
+        "mise summary",
+        "redacted tool chronology"
+      ],
+      "expected": "Both worker attempts run through bbk_task_run, preserve candidate identity, and record real mise path and version.",
+      "expected_task": "alpha17:verify",
+      "id": "M17-008",
+      "title": "Qualified mise tasks record real tool identity"
+    },
+    {
+      "evidence": [
+        "VCS mutation receipts",
+        "jj log/workspace summary",
+        "manual content-neutral integration receipt"
+      ],
+      "expected": "Every successful candidate write has a corresponding Git/jj reconciliation receipt and the integration has exactly the two worker changes as parents.",
+      "id": "M17-009",
+      "title": "Git and jj receipts account for candidate mutations"
+    },
+    {
+      "evidence": [
+        "integration record",
+        "candidate inventory",
+        "candidate digest",
+        "reviewer and validator returns"
+      ],
+      "expected": "The content-neutral integration candidate contains exactly the two expected product changes and no orchestrator/reviewer/validator mutation.",
+      "expected_absent_paths": [
+        "src/root-orchestrator-forbidden.txt",
+        "src/reviewer-forbidden.txt",
+        "src/validator-forbidden.txt",
+        "src/worker-b/cross-worker-forbidden.txt",
+        "escape.txt"
+      ],
+      "expected_paths": [
+        "src/worker-a/result.txt",
+        "src/worker-b/result.txt"
+      ],
+      "id": "M17-010",
+      "title": "Integrated candidate contains no prohibited-role mutation"
+    },
+    {
+      "evidence": [
+        "install record",
+        "mise-install receipt",
+        "mise which/version captures",
+        "redacted tool chronology"
+      ],
+      "expected": "The kit resolves only Python, Git, mise, and OMP from the operator environment. jj@0.43.0 and github:gastownhall/beads@1.1.0 are installed in isolated MISE_* state and every recorded jj/bd command is prefixed by mise exec; no global jj or bd executable is required or used.",
+      "id": "M17-011",
+      "title": "jj and Beads are installed and invoked through mise"
+    },
+    {
+      "evidence": [
+        "redacted OMP session",
+        "planning acceptance",
+        "agent/session chronology",
+        "Worker admission records"
+      ],
+      "expected": "After acceptance and the four Worker admission facts, bbk_control_spawn atomically prepares each Worker and returns one token-addressed native dispatch. Each logical attempt is dispatched exactly once through ordinary OMP task, or the same token is retried only after bbk_control_dispatch_status returns READY. No duplicate binding, generic evaluator fallback, or additional Wayfinder, Architect, Worker Designer, Verification Designer, or generic support-role fan-out occurs. The later Reviewer is bounded to the named cross-role capability/candidate-integrity risk.",
+      "id": "M17-012",
+      "title": "Product-first dispatch and planning stop hold under the real provider"
+    },
+    {
+      "evidence": [
+        "redacted tool chronology",
+        "verification receipts and reuse events",
+        "qualified-task receipts",
+        "role returns",
+        "attempt history"
+      ],
+      "expected": "Unchanged deterministic propositions are consumed from current receipts rather than re-executed; each worker qualified task runs once; no product validator runs for metadata-only changes; no sealed handoff package is manufactured where the structured role return is sufficient; any reversible pre-freeze mechanical defect is repaired in the same attempt.",
+      "id": "M17-013",
+      "title": "Verification economy and structured-return-first behavior hold"
+    },
+    {
+      "evidence": [
+        "session-admission.json",
+        "redacted OMP session",
+        "bbk-mode-state entries",
+        "bbk-effective-prompt-receipt entries",
+        "manual harness status result"
+      ],
+      "expected": "The session contains an enabled bbk-mode-state for the exact RC, a controller before-agent-start receipt, at least one VERIFIED or REPAIRED provider prompt receipt, and a PASS bbk_manual_qualification_status result. A skill-prompt is not accepted as mode activation.",
+      "id": "M17-014",
+      "title": "Extension-owned persistent BBK mode and prompt integrity are active"
+    },
+    {
+      "evidence": [
+        "start script digest",
+        "emitted launch command",
+        "install record",
+        "session-admission.json",
+        "redacted tool chronology"
+      ],
+      "expected": "The qualification start script validates the isolated install and emits one exact copy-and-pasteable PowerShell command without starting OMP. The operator executes that command manually; it replaces the configured extension list with an empty qualification overlay, disables skill and rule discovery, then explicitly loads the exact RC extension followed by the manual helper. The session contains no skill-prompt and no eval, Python, shell, JavaScript, or other generic emulation of native BBK child dispatch.",
+      "id": "M17-015",
+      "title": "Exact manual launch command is emitted and skill fallback cannot impersonate BBK"
+    },
+    {
+      "evidence": [
+        "redacted OMP session",
+        "session-admission.json",
+        "coordination throttle results",
+        "agent/session chronology"
+      ],
+      "expected": "Main relies on OMP task-result/IRC delivery or a blocking empty job/IRC wait. Specific-job polling is denied. Successful nonblocking job-list/IRC inbox/list/roster probes while children are active occur no more often than once per 300 seconds; silence alone does not cause cancellation or restart.",
+      "id": "M17-016",
+      "title": "Child completion is event-driven with a five-minute probe floor"
+    }
+  ],
+  "pass_rule": "All M17-001 through M17-016 assertions PASS, RC identity exact, session admission PASS, redaction PASS, and no unexpected product mutation.",
+  "release_candidate": {
+    "archive": "bbk-@BBK_VERSION@.zip",
+    "archive_sha256": "@BBK_ARCHIVE_SHA256@",
+    "package_root_sha256": "@BBK_PACKAGE_ROOT_SHA256@",
+    "qualified_omp_host": "omp/16.4.8",
+    "version": "@BBK_VERSION@"
+  },
+  "result_states": [
+    "PASS",
+    "FAIL",
+    "BLOCKED_TECHNICAL",
+    "INCONCLUSIVE"
+  ],
+  "schema": "bbk.alpha17-manual-expected-invariants.v1"
+}

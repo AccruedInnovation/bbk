@@ -1,0 +1,77 @@
+{
+  "$id": "bbk-governed-profile-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "network_bootstrap": {
+      "const": "EXPLICIT_USER_AUTHORITY_ONLY"
+    },
+    "profile_id": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "required_host_controls": {
+      "items": {
+        "maxLength": 256,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "required_tools": {
+      "items": {
+        "enum": [
+          "git",
+          "jj",
+          "bd",
+          "mise"
+        ],
+        "type": "string"
+      },
+      "maxItems": 4,
+      "minItems": 4,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "schema": {
+      "const": "bbk.governed-profile.v1"
+    },
+    "status_semantics": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "detect_only": {
+          "const": "POST_EFFECT_OBSERVATION_ONLY"
+        },
+        "enforced": {
+          "const": "PRE_EFFECT_BLOCK_CONFIRMED"
+        },
+        "unqualified": {
+          "const": "REQUIRED_CONTROL_NOT_ESTABLISHED"
+        }
+      },
+      "required": [
+        "enforced",
+        "detect_only",
+        "unqualified"
+      ],
+      "title": "status semantics",
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "profile_id",
+    "required_tools",
+    "network_bootstrap",
+    "required_host_controls",
+    "status_semantics"
+  ],
+  "title": "BBK governed profile v1",
+  "type": "object"
+}

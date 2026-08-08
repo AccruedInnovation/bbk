@@ -1,0 +1,162 @@
+{
+  "allowed_result_states": [
+    "PASS",
+    "FAIL",
+    "BLOCKED_TECHNICAL",
+    "INCONCLUSIVE"
+  ],
+  "candidate_digest": null,
+  "completion_instruction": "The analyzer populates all machine-observable fields and sets template to false. After manual inspection, complete only redaction_attestation. Do not convert a technical failure into semantic PASS or FAIL, and do not include credential values.",
+  "critical_path_observations": {
+    "blocking_wait_or_event_delivery_observed": null,
+    "duplicate_deterministic_checks": null,
+    "extension_owned_mode_active": null,
+    "four_fact_dispatch": null,
+    "metadata_only_product_validator_runs": null,
+    "minimum_nonblocking_probe_interval_seconds": null,
+    "receipt_reuse_observed": null,
+    "same_attempt_mechanical_repairs": null,
+    "skill_fallback_observed": null,
+    "specific_job_poll_attempts": null,
+    "support_role_fanout_after_executable_work": null,
+    "unnecessary_handoff_packages": null
+  },
+  "evidence_files": [],
+  "missing_evidence": [],
+  "observed_invariants": [
+    {
+      "evidence_pointers": [],
+      "id": "M17-001",
+      "operator_note": "",
+      "result": null
+    },
+    {
+      "evidence_pointers": [],
+      "id": "M17-002",
+      "operator_note": "",
+      "result": null
+    },
+    {
+      "evidence_pointers": [],
+      "id": "M17-003",
+      "operator_note": "",
+      "result": null
+    },
+    {
+      "evidence_pointers": [],
+      "id": "M17-004",
+      "operator_note": "",
+      "result": null
+    },
+    {
+      "evidence_pointers": [],
+      "id": "M17-005",
+      "operator_note": "",
+      "result": null
+    },
+    {
+      "evidence_pointers": [],
+      "id": "M17-006",
+      "operator_note": "",
+      "result": null
+    },
+    {
+      "evidence_pointers": [],
+      "id": "M17-007",
+      "operator_note": "",
+      "result": null
+    },
+    {
+      "evidence_pointers": [],
+      "id": "M17-008",
+      "operator_note": "",
+      "result": null
+    },
+    {
+      "evidence_pointers": [],
+      "id": "M17-009",
+      "operator_note": "",
+      "result": null
+    },
+    {
+      "evidence_pointers": [],
+      "id": "M17-010",
+      "operator_note": "",
+      "result": null
+    },
+    {
+      "evidence_pointers": [],
+      "id": "M17-011",
+      "operator_note": "",
+      "result": null
+    },
+    {
+      "evidence_pointers": [],
+      "id": "M17-012",
+      "operator_note": "",
+      "result": null
+    },
+    {
+      "evidence_pointers": [],
+      "id": "M17-013",
+      "operator_note": "",
+      "result": null
+    },
+    {
+      "evidence_pointers": [],
+      "id": "M17-014",
+      "operator_note": "",
+      "result": null
+    },
+    {
+      "evidence_pointers": [],
+      "id": "M17-015",
+      "operator_note": "",
+      "result": null
+    },
+    {
+      "evidence_pointers": [],
+      "id": "M17-016",
+      "operator_note": "",
+      "result": null
+    }
+  ],
+  "operator_result": null,
+  "redaction_attestation": {
+    "completed_at": null,
+    "credential_values_returned": null,
+    "manual_inspection_completed": null,
+    "operator": "",
+    "scanner_status": null,
+    "status": null
+  },
+  "release_candidate": {
+    "archive_sha256": "@BBK_ARCHIVE_SHA256@",
+    "package_root_sha256": "@BBK_PACKAGE_ROOT_SHA256@",
+    "qualified_omp_host": "omp/16.4.8",
+    "version": "@BBK_VERSION@"
+  },
+  "schema": "bbk.manual-qualification-result.v1",
+  "smallest_next_action": "",
+  "template": true,
+  "toolchain": {
+    "bd": {
+      "execution_mode": "MISE_MANAGED",
+      "managed_path": null,
+      "tool_spec": "github:gastownhall/beads@1.1.0",
+      "version": null
+    },
+    "global_jj_or_bd_used": null,
+    "jj": {
+      "execution_mode": "MISE_MANAGED",
+      "managed_path": null,
+      "tool_spec": "jj@0.43.0",
+      "version": null
+    },
+    "mise": {
+      "path": null,
+      "version": null
+    }
+  },
+  "unexpected_candidate_changes": []
+}

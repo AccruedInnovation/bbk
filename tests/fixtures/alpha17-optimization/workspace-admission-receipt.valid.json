@@ -1,0 +1,13 @@
+{
+  "schema": "bbk.workspace-admission-receipt.v1",
+  "receipt_id": "WORKSPACE-RECEIPT-FIXTURE-001",
+  "repository_ref": "repo-fixture@revision-1",
+  "baseline_ref": "baseline-fixture-1",
+  "protected_tree_state": "KNOWN_ACCEPTED_STATE",
+  "known_unrelated_dirt": ["unrelated/example.tmp"],
+  "owned_roots": ["candidate/work-unit-001"],
+  "mutation_owner": "worker-fixture-001",
+  "serialization_state": "EXCLUSIVE",
+  "invalidation_keys": ["repository-head", "protected-tree", "owned-root", "mutation-owner"],
+  "issued_at": "2026-08-05T12:00:00Z"
+}

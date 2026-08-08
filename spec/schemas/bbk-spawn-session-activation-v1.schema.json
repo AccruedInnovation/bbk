@@ -1,0 +1,115 @@
+{
+  "$id": "bbk-spawn-session-activation-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "dispatch_ref"
+        ]
+      },
+      "then": {
+        "required": [
+          "dispatch_payload_removed",
+          "dispatch_envelope_digest",
+          "lease_ref"
+        ]
+      }
+    }
+  ],
+  "properties": {
+    "active_binding_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "actual_session_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "attempt_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "attempt_registration_ref": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "dispatch_envelope_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "dispatch_payload_removed": {
+      "type": "boolean"
+    },
+    "dispatch_ref": {
+      "pattern": "^dispatch:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "host_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "invocation_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "lease_ref": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "packet_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "parent_session_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "planned_binding_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "planned_session_id": {
+      "pattern": "^planned-session:[A-Za-z0-9._:/@+-]+$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.spawn-session-activation.v1"
+    },
+    "spawn_admission_ref": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "status": {
+      "const": "ACTIVATED"
+    },
+    "tool_call_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "work_unit_id": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "planned_binding_ref",
+    "active_binding_ref",
+    "planned_session_id",
+    "actual_session_id",
+    "parent_session_id",
+    "invocation_id",
+    "work_unit_id",
+    "attempt_id",
+    "packet_digest",
+    "attempt_registration_ref",
+    "spawn_admission_ref",
+    "host_version",
+    "status",
+    "tool_call_id"
+  ],
+  "title": "BBK planned-to-actual OMP spawn activation v1",
+  "type": "object"
+}

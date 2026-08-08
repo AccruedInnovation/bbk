@@ -1,0 +1,5 @@
+# OMP 16.4.8 suppresses explicit --extension paths when --no-extensions is
+# present. An empty configured-extension list preserves explicit CLI loading
+# while preventing extensions from the operator's normal OMP configuration
+# from running after the BBK prompt-integrity guard.
+extensions: []

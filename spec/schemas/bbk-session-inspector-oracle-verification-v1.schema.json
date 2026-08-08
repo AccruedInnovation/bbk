@@ -1,0 +1,25 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-session-inspector-oracle-verification-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BBK Session Inspector oracle verification v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const": "bbk.session-inspector-oracle-verification.v1"},
+    "fixture_id": {"const": "session-inspector-alpha16-source-oracle"},
+    "status": {"enum": ["PASS", "FAIL"]},
+    "source_regenerated": {"type": "boolean"},
+    "checks": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"type": "boolean"}
+    },
+    "manifest_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "contradictions_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "smallest_next_action": {"type": "string", "minLength": 1}
+  },
+  "required": [
+    "schema", "fixture_id", "status", "source_regenerated", "checks",
+    "manifest_digest", "contradictions_digest", "smallest_next_action"
+  ]
+}

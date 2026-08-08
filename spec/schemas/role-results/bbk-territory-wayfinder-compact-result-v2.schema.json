@@ -11,7 +11,8 @@
     "outward_impacts",
     "blockers",
     "parent_actions_requested",
-    "residual_uncertainty"
+    "residual_uncertainty",
+    "planning_readiness"
   ],
   "properties": {
     "territory_synthesis_ref": {
@@ -37,6 +38,10 @@
     "residual_uncertainty": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
       "description": "Explicit bounded uncertainty retained after economic stopping and its consequence, owner, expiry, or reopening trigger."
+    },
+    "planning_readiness": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Territory rolling-wave readiness, roadmap/frontier revisions, deferred refinements, and local execution-admission truth."
     }
   },
   "x-bbk-role": "bbk_territory_wayfinder",

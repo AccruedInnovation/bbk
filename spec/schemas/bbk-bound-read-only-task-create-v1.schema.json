@@ -1,0 +1,118 @@
+{
+  "$id": "bbk-bound-read-only-task-create-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BBK read-only child binding request v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "bbk.bound-read-only-task-create.v1"
+    },
+    "host_version": {
+      "const": "omp/16.4.8"
+    },
+    "parent_binding_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "parent_session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "parent_invocation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "role": {
+      "type": "string",
+      "pattern": "^bbk_[A-Za-z0-9_]+$"
+    },
+    "work_unit_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "attempt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "baseline_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "candidate_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authority_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "return_contract": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workspace_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "path_prefixes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "semantic_scope": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "assignment": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 524288
+    },
+    "description": {
+      "type": "string"
+    },
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "candidate_admission_ref": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  },
+  "required": [
+    "schema",
+    "host_version",
+    "parent_binding_ref",
+    "parent_session_id",
+    "parent_invocation_id",
+    "task_name",
+    "role",
+    "work_unit_id",
+    "attempt_id",
+    "baseline_ref",
+    "candidate_id",
+    "authority_ref",
+    "return_contract",
+    "workspace_ref",
+    "path_prefixes",
+    "semantic_scope",
+    "assignment",
+    "description",
+    "idempotency_key"
+  ]
+}

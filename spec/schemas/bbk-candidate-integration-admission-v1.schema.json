@@ -1,0 +1,121 @@
+{
+  "$id": "bbk-candidate-integration-admission-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BBK candidate integration admission v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "bbk.candidate-integration-admission.v1"
+    },
+    "status": {
+      "const": "PASS"
+    },
+    "integration_receipt_ref": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "integration_record_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "candidate_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "candidate_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "workspace_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "jj_change_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "git_tree": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "baseline_revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_change_ids": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "source_commit_ids": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "parent_commit_ids": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "integrated_paths": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "unresolved_conflicts": {
+      "const": false
+    },
+    "conflict_resolution_authority": {
+      "const": "DENIED"
+    },
+    "integration_mode": {
+      "const": "CONTENT_NEUTRAL_DISJOINT_PATHS"
+    },
+    "admission_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "integration_receipt_ref",
+    "integration_record_digest",
+    "candidate_id",
+    "candidate_digest",
+    "workspace_ref",
+    "jj_change_id",
+    "git_tree",
+    "baseline_revision",
+    "source_change_ids",
+    "source_commit_ids",
+    "parent_commit_ids",
+    "integrated_paths",
+    "unresolved_conflicts",
+    "conflict_resolution_authority",
+    "integration_mode",
+    "admission_digest"
+  ]
+}

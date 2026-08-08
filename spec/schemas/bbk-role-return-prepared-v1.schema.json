@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-role-return-prepared-v1.schema.json",
+  "title": "BBK prepared role-return result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "bbk.role-return-prepared.v1"
+    },
+    "status": {
+      "const": "PASS"
+    },
+    "return_ref": {
+      "type": "string",
+      "pattern": "^return:[0-9a-f]{64}$"
+    },
+    "created": {
+      "type": "boolean"
+    },
+    "validation_receipt_ref": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "document_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "yield_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "result": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json"
+            }
+          },
+          "required": [
+            "data"
+          ]
+        }
+      },
+      "required": [
+        "result"
+      ]
+    },
+    "instruction": {
+      "type": "string",
+      "minLength": 1
+    },
+    "binding_identity_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "return_ref",
+    "created",
+    "validation_receipt_ref",
+    "document_digest",
+    "yield_input",
+    "instruction",
+    "binding_identity_digest"
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "$id": "bbk-work-unit-binding-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "binding_id": {
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$",
+      "type": "string"
+    },
+    "capability_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "immutable_digest": {
+      "pattern": "^(?:sha256:)?[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "request": {
+      "$ref": "bbk-invocation-binding-create-v1.schema.json"
+    },
+    "schema": {
+      "const": "bbk.work-unit-binding.v1"
+    },
+    "status": {
+      "enum": [
+        "ACTIVE",
+        "SUPERSEDED",
+        "CLOSED"
+      ],
+      "type": "string"
+    },
+    "superseded_by": {
+      "type": "string"
+    },
+    "supersedes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "binding_id",
+    "status",
+    "immutable_digest",
+    "created_at",
+    "request",
+    "capability_ref"
+  ],
+  "title": "BBK work-unit binding v1",
+  "type": "object"
+}

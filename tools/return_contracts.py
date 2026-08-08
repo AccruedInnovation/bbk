@@ -612,6 +612,7 @@ def render_return_contract_prompt(role: Mapping[str, Any]) -> str:
     lines = [
         "## Exact role-return contract", "",
         f"Return one JSON object governed by `{c['v2_return_schema']}`. New returns use `{c['v2_envelope_schema']}`; v1 remains consume-compatible through `{c['return_schema']}`.", "",
+        "Use `bbk_return_template` when the role-specific payload is not already exact, then call `bbk_return_prepare` and invoke hidden `yield` with the returned complete `yield_input` unchanged. The yield pre-effect hook validates the full document against its immutable prepared record and blocks malformed, misbound, or unprepared data with focused same-attempt repair diagnostics.", "",
         "Use these exact v2 discriminators:", "",
         f"- `schema`: `{V2_ENVELOPE_ID}`",
         f"- `contract`: `{c['v2_contract_id']}`",

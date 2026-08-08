@@ -1,0 +1,22 @@
+{
+  "network_bootstrap": "EXPLICIT_USER_AUTHORITY_ONLY",
+  "profile_id": "governed-software",
+  "required_host_controls": [
+    "SESSION_IDENTITY_BINDING",
+    "PRE_EFFECT_TOOL_BLOCK",
+    "REGISTRY_WORKSPACE_RESOLUTION",
+    "VCS_RECONCILIATION"
+  ],
+  "required_tools": [
+    "git",
+    "jj",
+    "bd",
+    "mise"
+  ],
+  "schema": "bbk.governed-profile.v1",
+  "status_semantics": {
+    "detect_only": "POST_EFFECT_OBSERVATION_ONLY",
+    "enforced": "PRE_EFFECT_BLOCK_CONFIRMED",
+    "unqualified": "REQUIRED_CONTROL_NOT_ESTABLISHED"
+  }
+}

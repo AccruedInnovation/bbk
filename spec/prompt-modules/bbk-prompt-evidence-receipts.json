@@ -39,6 +39,18 @@
     {
       "id": "EVIDENCE.COMMAND_STREAMS",
       "text": "When a configured gate stores only bounded UTF-8 previews in its JSON receipt, preserve authoritative stdout and stderr beside the receipt and bind each by safe project-relative path, byte count, and SHA-256. A reusable PASS remains eligible only while both raw streams match."
+    },
+    {
+      "id": "EVIDENCE.CURRENT_UNTIL_INVALIDATED",
+      "text": "A successful deterministic receipt remains current while its exact subject binding and declared invalidation-key values are unchanged. Consumers validate identity and binding, then reuse it; a role, process, session, host, or orchestration boundary alone is not an invalidation."
+    },
+    {
+      "id": "EVIDENCE.DUPLICATE_CHECK",
+      "text": "Before a deterministic operation, derive claim ID, subject identity, method identity, and invalidation-key values. Return a matching current PASS as `REUSED_RECEIPT`; authorize the smallest check only when no current match exists or an explicit independent-method requirement applies."
+    },
+    {
+      "id": "EVIDENCE.VERIFICATION_BUDGET",
+      "text": "Invocation contracts declare required checks, reusable receipts, independent checks, forbidden duplicates, invalidation triggers, maximum rechecks, and a stop condition. Stop when every required claim has a current adequate receipt; independent judgment does not imply duplicate execution."
     }
   ]
 }

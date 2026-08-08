@@ -19,6 +19,7 @@ if str(TOOLS) not in sys.path:
 
 import artifact_packages
 import strict_json
+from tests._cli_support import run_cli as run_bbk_cli
 from tests._path_support import assert_same_path, create_symlink_or_skip
 
 
@@ -721,12 +722,9 @@ class ArtifactTransactionTests(unittest.TestCase):
 
 class ArtifactCompatibilityAndCliTests(unittest.TestCase):
     def run_cli(self, *args: str, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
-        return subprocess.run(
+        return run_bbk_cli(
             [sys.executable, str(ROOT / "tools" / "bbk.py"), "--json", *args],
             cwd=cwd or ROOT,
-            text=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
             check=False,
         )
 

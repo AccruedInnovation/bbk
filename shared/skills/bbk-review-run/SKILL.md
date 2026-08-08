@@ -1,6 +1,8 @@
 ---
 name: bbk-review-run
 description: Execute or record revision-bound review attempts, evidence, findings, and non-averaging aggregation without conflating infrastructure failure with candidate failure.
+requires_prompt_modules: []
+standalone_prompt_modules: []
 ---
 
 # BBK Review Run

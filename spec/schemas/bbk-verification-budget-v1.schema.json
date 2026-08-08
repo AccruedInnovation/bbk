@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-verification-budget-v1.schema.json",
+  "title": "BBK invocation verification budget v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "required_checks", "reusable_receipts", "independent_checks", "forbidden_duplicate_checks", "invalidation_triggers", "maximum_rechecks", "verification_stop_condition"],
+  "properties": {
+    "schema": {"const": "bbk.verification-budget.v1"},
+    "required_checks": {"$ref": "#/$defs/uniqueStrings"},
+    "reusable_receipts": {"$ref": "#/$defs/uniqueStrings"},
+    "independent_checks": {"$ref": "#/$defs/uniqueStrings"},
+    "forbidden_duplicate_checks": {"$ref": "#/$defs/uniqueStrings"},
+    "invalidation_triggers": {"$ref": "#/$defs/uniqueStrings"},
+    "maximum_rechecks": {
+      "type": "object",
+      "additionalProperties": {"type": "integer", "minimum": 0}
+    },
+    "verification_stop_condition": {"type": "string", "minLength": 1}
+  },
+  "$defs": {
+    "uniqueStrings": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+  }
+}

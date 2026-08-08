@@ -1,6 +1,8 @@
 ---
 name: bbk-review-learn
 description: Create governed LearningCandidate records from recurring review evidence without automatically changing BBK methods, agents, profiles, gates, or policy.
+requires_prompt_modules: []
+standalone_prompt_modules: []
 ---
 
 # BBK Review Learning

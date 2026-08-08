@@ -1,0 +1,1 @@
+{"worker":{"id":"AMB-WORKER-1","mutation_owners":["owner-a","owner-b"],"shared_interface":"unresolved"},"verification":{"id":"AMB-VERIFY-1","methods":["method-a","method-b"],"independence_requirement":"unresolved"}}

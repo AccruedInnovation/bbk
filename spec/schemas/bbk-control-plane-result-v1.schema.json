@@ -1,0 +1,136 @@
+{
+  "$id": "bbk-control-plane-result-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BBK orchestrator control-plane result v1",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "bbk.control-plane-result.v1"
+    },
+    "status": {
+      "enum": [
+        "PASS",
+        "BLOCK"
+      ]
+    },
+    "operation": {
+      "enum": [
+        "ASSIGN",
+        "UPDATE",
+        "INTEGRATE_REQUEST"
+      ]
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "type": "string",
+          "enum": [
+            "bbk_root_orchestrator",
+            "bbk_territory_orchestrator",
+            "bbk_worker_orchestrator",
+            "bbk_validator_orchestrator"
+          ]
+        },
+        "session_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "invocation_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "binding_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "authority_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "capability_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      },
+      "required": [
+        "role",
+        "session_id",
+        "invocation_id",
+        "binding_ref",
+        "authority_ref",
+        "capability_ref"
+      ]
+    },
+    "subject": {
+      "type": "object"
+    },
+    "coordination_command_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "projection": {
+      "$ref": "bbk-beads-projection-receipt-v1.schema.json"
+    },
+    "policy": {
+      "type": "object"
+    },
+    "reason_code": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "smallest_next_action": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "smallest_next_action"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "PASS"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "operation",
+          "actor",
+          "subject",
+          "coordination_command_digest",
+          "projection",
+          "policy"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "BLOCK"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "reason_code",
+          "message"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,683 @@
+{
+  "$defs": {
+    "costs": {
+      "additionalProperties": false,
+      "properties": {
+        "cache_read_usd": {
+          "$ref": "#/$defs/usd"
+        },
+        "cache_write_usd": {
+          "$ref": "#/$defs/usd"
+        },
+        "input_usd": {
+          "$ref": "#/$defs/usd"
+        },
+        "output_usd": {
+          "$ref": "#/$defs/usd"
+        },
+        "total_usd": {
+          "$ref": "#/$defs/usd"
+        }
+      },
+      "required": [
+        "input_usd",
+        "output_usd",
+        "cache_read_usd",
+        "cache_write_usd",
+        "total_usd"
+      ],
+      "type": "object"
+    },
+    "digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "nonNegativeInteger": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "sourceMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "byte_count": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "decoded_byte_count": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "decoded_payload_sha256": {
+          "$ref": "#/$defs/digest"
+        },
+        "logical_name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "raw_content_retained": {
+          "const": false
+        },
+        "sha256": {
+          "$ref": "#/$defs/digest"
+        },
+        "source_path_retained": {
+          "const": false
+        },
+        "truth_status": {
+          "const": "INCOMPLETE_SECONDARY"
+        }
+      },
+      "required": [
+        "logical_name",
+        "sha256",
+        "byte_count",
+        "raw_content_retained",
+        "source_path_retained"
+      ],
+      "type": "object"
+    },
+    "tokens": {
+      "additionalProperties": false,
+      "properties": {
+        "cache_read": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        },
+        "cache_write": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        },
+        "input": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        },
+        "output": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        },
+        "reasoning": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        },
+        "total": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        }
+      },
+      "required": [
+        "input",
+        "output",
+        "cache_read",
+        "cache_write",
+        "reasoning",
+        "total"
+      ],
+      "type": "object"
+    },
+    "usd": {
+      "pattern": "^(?:0|[0-9]+(?:\\.[0-9]{1,12})?)$",
+      "type": "string"
+    }
+  },
+  "$id": "https://bbk.local/schemas/bbk-session-inspector-oracle-manifest-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "expected": {
+      "additionalProperties": false,
+      "properties": {
+        "child_entry_count": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        },
+        "costs": {
+          "$ref": "#/$defs/costs"
+        },
+        "explicit_user_wait_count": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        },
+        "explicit_user_wait_total_ms": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        },
+        "inclusive_entry_count": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        },
+        "main_entry_count": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        },
+        "polling_tool_calls": {
+          "additionalProperties": false,
+          "properties": {
+            "inclusive_irc_calls": {
+              "$ref": "#/$defs/nonNegativeInteger"
+            },
+            "inclusive_job_calls": {
+              "$ref": "#/$defs/nonNegativeInteger"
+            },
+            "inclusive_total": {
+              "$ref": "#/$defs/nonNegativeInteger"
+            },
+            "main_irc_calls": {
+              "$ref": "#/$defs/nonNegativeInteger"
+            },
+            "main_job_calls": {
+              "$ref": "#/$defs/nonNegativeInteger"
+            },
+            "main_total": {
+              "$ref": "#/$defs/nonNegativeInteger"
+            }
+          },
+          "required": [
+            "main_job_calls",
+            "main_irc_calls",
+            "main_total",
+            "inclusive_job_calls",
+            "inclusive_irc_calls",
+            "inclusive_total"
+          ],
+          "type": "object"
+        },
+        "prompt_binding_receipt_count": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        },
+        "prompt_integrity_receipt_count": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        },
+        "prompt_provider_verified_receipt_count": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        },
+        "provider_response_count": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        },
+        "provider_response_identity_count": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        },
+        "session_count": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "task_invocation_count": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        },
+        "tokens": {
+          "$ref": "#/$defs/tokens"
+        }
+      },
+      "required": [
+        "session_count",
+        "main_entry_count",
+        "child_entry_count",
+        "inclusive_entry_count",
+        "task_invocation_count",
+        "explicit_user_wait_count",
+        "explicit_user_wait_total_ms",
+        "provider_response_count",
+        "provider_response_identity_count",
+        "prompt_binding_receipt_count",
+        "prompt_provider_verified_receipt_count",
+        "prompt_integrity_receipt_count",
+        "polling_tool_calls",
+        "tokens",
+        "costs"
+      ],
+      "type": "object"
+    },
+    "fixture_digest": {
+      "$ref": "#/$defs/digest"
+    },
+    "fixture_id": {
+      "const": "session-inspector-alpha16-source-oracle"
+    },
+    "host_events": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "correlation": {
+            "additionalProperties": {},
+            "minProperties": 2,
+            "type": "object"
+          },
+          "enforcement_boundary": {
+            "const": "DETECT_ONLY"
+          },
+          "event_class": {
+            "enum": [
+              "task-lifecycle",
+              "user-wait"
+            ]
+          },
+          "event_type": {
+            "enum": [
+              "task-spawn-observed",
+              "user-wait-observed"
+            ]
+          },
+          "host_version": {
+            "const": "UNOBSERVED_IN_EXPORT"
+          },
+          "normalized_identity": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "minProperties": 2,
+            "type": "object"
+          },
+          "observed_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "parent_session": {
+            "pattern": "^(?:|session:[a-z0-9-]+)$",
+            "type": "string"
+          },
+          "payload_digest": {
+            "$ref": "#/$defs/digest"
+          },
+          "schema": {
+            "const": "bbk.host-event.v1"
+          },
+          "session_id": {
+            "pattern": "^session:[a-z0-9-]+$",
+            "type": "string"
+          },
+          "task_or_tool_id": {
+            "pattern": "^(?:task|wait):[a-z0-9-]+$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "schema",
+          "host_version",
+          "event_type",
+          "session_id",
+          "task_or_tool_id",
+          "parent_session",
+          "payload_digest",
+          "observed_at",
+          "normalized_identity",
+          "correlation",
+          "event_class",
+          "enforcement_boundary"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "interface_binding": {
+      "additionalProperties": false,
+      "properties": {
+        "enforcement_boundary": {
+          "const": "DETECT_ONLY"
+        },
+        "host_version": {
+          "const": "UNOBSERVED_IN_EXPORT"
+        },
+        "host_version_provenance": {
+          "const": "NOT_PRESENT_IN_SOURCE_EXPORT"
+        },
+        "identity_source": {
+          "const": "SESSION_TASK_AND_TOOL_CORRELATION"
+        },
+        "interface_id": {
+          "const": "IF-014"
+        },
+        "provider_response_ids_are_agent_authority": {
+          "const": false
+        }
+      },
+      "required": [
+        "interface_id",
+        "host_version",
+        "host_version_provenance",
+        "identity_source",
+        "provider_response_ids_are_agent_authority",
+        "enforcement_boundary"
+      ],
+      "type": "object"
+    },
+    "models": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "model": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "provider": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "provider_response_count": {
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "provider",
+          "model",
+          "provider_response_count"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "positive_oracles": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "expected": {
+            "$ref": "#/$defs/nonNegativeInteger"
+          },
+          "id": {
+            "pattern": "^[A-Z][A-Z0-9_]+$",
+            "type": "string"
+          },
+          "observed": {
+            "$ref": "#/$defs/nonNegativeInteger"
+          },
+          "status": {
+            "const": "PASS"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "observed",
+          "expected"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "privacy": {
+      "additionalProperties": false,
+      "properties": {
+        "anonymized": {
+          "const": true
+        },
+        "credentials_retained": {
+          "const": false
+        },
+        "provider_response_ids_retained": {
+          "const": false
+        },
+        "raw_paths_retained": {
+          "const": false
+        },
+        "raw_prompts_retained": {
+          "const": false
+        },
+        "raw_session_ids_retained": {
+          "const": false
+        },
+        "raw_task_assignments_retained": {
+          "const": false
+        }
+      },
+      "required": [
+        "anonymized",
+        "raw_prompts_retained",
+        "raw_task_assignments_retained",
+        "raw_paths_retained",
+        "raw_session_ids_retained",
+        "provider_response_ids_retained",
+        "credentials_retained"
+      ],
+      "type": "object"
+    },
+    "release_source": {
+      "const": "0.1.0-alpha.16"
+    },
+    "schema": {
+      "const": "bbk.session-inspector-oracle-manifest.v1"
+    },
+    "sessions": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "alias": {
+            "pattern": "^session:[a-z0-9-]+$",
+            "type": "string"
+          },
+          "costs": {
+            "$ref": "#/$defs/costs"
+          },
+          "entry_count": {
+            "$ref": "#/$defs/nonNegativeInteger"
+          },
+          "label": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "parent_alias": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "pattern": "^session:[a-z0-9-]+$",
+                "type": "string"
+              }
+            ]
+          },
+          "prompt_integrity": {
+            "additionalProperties": false,
+            "properties": {
+              "binding_receipts": {
+                "$ref": "#/$defs/nonNegativeInteger"
+              },
+              "provider_verified_receipts": {
+                "$ref": "#/$defs/nonNegativeInteger"
+              },
+              "total_receipts": {
+                "$ref": "#/$defs/nonNegativeInteger"
+              }
+            },
+            "required": [
+              "binding_receipts",
+              "provider_verified_receipts",
+              "total_receipts"
+            ],
+            "type": "object"
+          },
+          "provider_response_count": {
+            "$ref": "#/$defs/nonNegativeInteger"
+          },
+          "role": {
+            "pattern": "^(?:Main|unknown|bbk_[A-Za-z0-9_]+)$",
+            "type": "string"
+          },
+          "source_session_id_sha256": {
+            "$ref": "#/$defs/digest"
+          },
+          "start_offset_ms": {
+            "$ref": "#/$defs/nonNegativeInteger"
+          },
+          "structural_digest": {
+            "$ref": "#/$defs/digest"
+          },
+          "tokens": {
+            "$ref": "#/$defs/tokens"
+          }
+        },
+        "required": [
+          "alias",
+          "label",
+          "role",
+          "parent_alias",
+          "source_session_id_sha256",
+          "start_offset_ms",
+          "entry_count",
+          "structural_digest",
+          "provider_response_count",
+          "tokens",
+          "costs",
+          "prompt_integrity"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "source_authority": {
+      "const": "RAW_SESSION_EXPORT"
+    },
+    "sources": {
+      "additionalProperties": false,
+      "properties": {
+        "derived_analysis": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/sourceMetadata"
+            },
+            {
+              "required": [
+                "truth_status"
+              ]
+            }
+          ]
+        },
+        "session_export": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/sourceMetadata"
+            },
+            {
+              "required": [
+                "decoded_payload_sha256",
+                "decoded_byte_count"
+              ]
+            }
+          ]
+        }
+      },
+      "required": [
+        "session_export",
+        "derived_analysis"
+      ],
+      "type": "object"
+    },
+    "tasks": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_role": {
+            "pattern": "^bbk_[A-Za-z0-9_]+$",
+            "type": "string"
+          },
+          "alias": {
+            "pattern": "^task:[a-z0-9-]+$",
+            "type": "string"
+          },
+          "assignment_sha256": {
+            "$ref": "#/$defs/digest"
+          },
+          "child_session_alias": {
+            "pattern": "^session:[a-z0-9-]+$",
+            "type": "string"
+          },
+          "invocation_offset_ms": {
+            "$ref": "#/$defs/nonNegativeInteger"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "observed_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "parent_session_alias": {
+            "pattern": "^session:[a-z0-9-]+$",
+            "type": "string"
+          },
+          "source_tool_call_id_sha256": {
+            "$ref": "#/$defs/digest"
+          },
+          "status": {
+            "const": "CORRELATED"
+          }
+        },
+        "required": [
+          "alias",
+          "name",
+          "agent_role",
+          "parent_session_alias",
+          "child_session_alias",
+          "observed_at",
+          "invocation_offset_ms",
+          "source_tool_call_id_sha256",
+          "assignment_sha256",
+          "status"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "waits": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "alias": {
+            "pattern": "^wait:ask-[1-9][0-9]*$",
+            "type": "string"
+          },
+          "correlation": {
+            "const": "EXACT_TOOL_CALL_ID"
+          },
+          "duration_ms": {
+            "$ref": "#/$defs/nonNegativeInteger"
+          },
+          "end_offset_ms": {
+            "$ref": "#/$defs/nonNegativeInteger"
+          },
+          "mechanism": {
+            "const": "ask"
+          },
+          "observed_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "question_count": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "source_tool_call_id_sha256": {
+            "$ref": "#/$defs/digest"
+          },
+          "start_offset_ms": {
+            "$ref": "#/$defs/nonNegativeInteger"
+          }
+        },
+        "required": [
+          "alias",
+          "mechanism",
+          "source_tool_call_id_sha256",
+          "observed_at",
+          "start_offset_ms",
+          "end_offset_ms",
+          "duration_ms",
+          "question_count",
+          "correlation"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema",
+    "fixture_id",
+    "release_source",
+    "source_authority",
+    "privacy",
+    "sources",
+    "interface_binding",
+    "expected",
+    "sessions",
+    "tasks",
+    "waits",
+    "models",
+    "host_events",
+    "positive_oracles",
+    "fixture_digest"
+  ],
+  "title": "BBK Session Inspector source oracle manifest v1",
+  "type": "object"
+}

@@ -11,7 +11,9 @@
     "completion_assessment",
     "blockers_and_pauses",
     "parent_actions_requested",
-    "residuals"
+    "residuals",
+    "planning_readiness_ref",
+    "project_coverage"
   ],
   "properties": {
     "campaign_state": {
@@ -37,6 +39,14 @@
     "residuals": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structuredList",
       "description": "Remaining work, findings, risks, debt, unknowns, deferred items, unavailable environments, monitoring needs, accepted or unaccepted residuals, owners, expiry, and reopening triggers."
+    },
+    "planning_readiness_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/reference",
+      "description": "Exact planning-readiness record that admitted the execution frontier."
+    },
+    "project_coverage": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v2.schema.json#/$defs/structured",
+      "description": "Current whole-project coverage ledger; candidate success must not imply unimplemented project completion."
     }
   },
   "x-bbk-role": "bbk_root_orchestrator",

@@ -293,17 +293,17 @@ class ContractPackageV1Tests(unittest.TestCase):
 
     def test_generic_and_omp_prompt_sources_use_the_correct_projection_strategy(self) -> None:
         role = copy.deepcopy(next(item for item in self.spec["roles"] if item["name"] == "bbk_worker"))
-        # Gate 3 deliberately does not regenerate shared SKILL.md projections.
-        # Clear the mandatory-body list to exercise only the host-specific
-        # return-contract projection branch from canonical source.
-        role["mandatory_skills"] = []
+        # The compiled-procedure contract is now a release gate. Keep the
+        # canonical mandatory set while exercising the host-specific return-
+        # contract projection branch.
         generic = instruction_text(self.spec, role, host="generic")
         omp = instruction_text(self.spec, role, host="omp")
         self.assertIn("## Exact role-return contract", generic)
         self.assertIn("bbk.worker-return.v2", generic)
         self.assertIn("COMPACT", generic)
-        self.assertNotIn("## Exact role-return contract", omp)
-        self.assertIn("injects the exact role-specific return contract", omp)
+        self.assertIn("## Exact role-return contract", omp)
+        self.assertIn("bbk.worker-return.v2", omp)
+        self.assertIn("COMPACT", omp)
 
     def test_host_adapter_and_manifest_sources_are_contract_aware(self) -> None:
         omp = (ROOT / "omp" / "extension" / "index.js").read_text(encoding="utf-8")

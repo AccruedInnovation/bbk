@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-command-attempt-v1.schema.json",
+  "title": "BBK Command Attempt v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "semantic_command_id",
+    "execution_attempt_ref",
+    "physical_command_attempt",
+    "invocation_identity",
+    "effect_class",
+    "disposition",
+    "effects_observed",
+    "cleanup",
+    "replay"
+  ],
+  "properties": {
+    "schema": {"const": "bbk.command-attempt.v1"},
+    "semantic_command_id": {"type": "string", "minLength": 1},
+    "execution_attempt_ref": {"type": "string", "minLength": 1},
+    "physical_command_attempt": {"type": "integer", "minimum": 1},
+    "invocation_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["executable", "arguments_sha256", "inputs_sha256", "environment_constraints_sha256"],
+      "properties": {
+        "executable": {"type": "string", "minLength": 1},
+        "arguments_sha256": {"$ref": "#/$defs/sha256"},
+        "inputs_sha256": {"$ref": "#/$defs/sha256"},
+        "environment_constraints_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "effect_class": {"enum": ["READ_ONLY", "IDEMPOTENT_DISPOSABLE", "MUTATING", "EXTERNAL", "UNKNOWN"]},
+    "disposition": {"enum": ["PLANNED", "STARTED", "PASS", "FAIL", "INCONCLUSIVE", "EVIDENCE_CAPTURE_FAILED"]},
+    "effects_observed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["product_mutation", "external_effect"],
+      "properties": {
+        "product_mutation": {"enum": ["NONE", "PRESENT", "UNKNOWN"]},
+        "external_effect": {"enum": ["NONE", "PRESENT", "UNKNOWN"]}
+      }
+    },
+    "cleanup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "remaining_processes_or_handles"],
+      "properties": {
+        "state": {"enum": ["COMPLETE", "INCOMPLETE", "UNKNOWN"]},
+        "remaining_processes_or_handles": {"type": "boolean"}
+      }
+    },
+    "replay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eligible", "reason", "maximum_replays", "replay_of_physical_attempt"],
+      "properties": {
+        "eligible": {"type": "boolean"},
+        "reason": {"type": "string"},
+        "maximum_replays": {"const": 1},
+        "replay_of_physical_attempt": {"type": ["integer", "null"], "minimum": 1}
+      }
+    },
+    "evidence_refs": {"type": "array", "items": {"type": "string"}}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "schema": "bbk.project-coverage.v1",
+  "project_ref": "project-fixture",
+  "master_graph_ref": {
+    "id": "master-graph-fixture",
+    "revision": 4,
+    "digest": "7777777777777777777777777777777777777777777777777777777777777777",
+    "path": ".bbk/master-graph.json"
+  },
+  "delivered_scope": [
+    "CAP-01 slice A"
+  ],
+  "capabilities": [
+    {
+      "id": "CAP-01",
+      "statement": "Provide the first actor-visible capability",
+      "status": "PARTIAL",
+      "delivered_scope": [
+        "slice A"
+      ],
+      "remaining_scope": [
+        "slice B"
+      ],
+      "evidence_refs": [
+        "candidate-fixture-001"
+      ],
+      "unmet_claims": [
+        "CLAIM-CAP01-E2E"
+      ],
+      "next_frontier_or_trigger": "frontier-fixture-2",
+      "invalidation_keys": [
+        "candidate-fixture-001"
+      ]
+    },
+    {
+      "id": "CAP-02",
+      "statement": "Provide the second actor-visible capability",
+      "status": "NOT_STARTED",
+      "delivered_scope": [],
+      "remaining_scope": [
+        "all"
+      ],
+      "evidence_refs": [],
+      "unmet_claims": [
+        "CLAIM-CAP02-ALL"
+      ],
+      "next_frontier_or_trigger": "CAP-01 slice B complete",
+      "invalidation_keys": []
+    }
+  ],
+  "claims_not_established": [
+    "CLAIM-CAP01-E2E",
+    "CLAIM-CAP02-ALL"
+  ],
+  "next_executable_frontier": {
+    "id": "frontier-fixture-2",
+    "revision": 1,
+    "digest": "8888888888888888888888888888888888888888888888888888888888888888",
+    "path": ".bbk/frontiers/frontier-2.json"
+  },
+  "updated_at": "2026-08-05T12:00:00Z"
+}

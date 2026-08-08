@@ -1,0 +1,108 @@
+{
+  "$id": "bbk-control-assign-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BBK bound orchestrator assignment request v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "bbk.control-assign.v1"
+    },
+    "host_version": {
+      "const": "omp/16.4.8"
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "binding_ref": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "invocation_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "command_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+\\-]*$",
+      "maxLength": 512
+    },
+    "work_unit_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+\\-]*$",
+      "maxLength": 512
+    },
+    "attempt_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+\\-]*$",
+      "maxLength": 512
+    },
+    "correlation_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+\\-]*$",
+      "maxLength": 512
+    },
+    "payload_summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "^[^\\r\\n\\u0000]+$"
+    },
+    "expected_revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "idempotency_key": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/@+\\-]*$",
+      "maxLength": 512
+    },
+    "evidence_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512
+      }
+    },
+    "finding_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512
+      }
+    },
+    "worker_binding_ref": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "attempt_registration_ref": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  },
+  "required": [
+    "schema",
+    "host_version",
+    "session_id",
+    "binding_ref",
+    "invocation_id",
+    "command_id",
+    "work_unit_id",
+    "attempt_id",
+    "correlation_id",
+    "payload_summary",
+    "expected_revision",
+    "idempotency_key",
+    "worker_binding_ref",
+    "attempt_registration_ref"
+  ]
+}

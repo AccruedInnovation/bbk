@@ -396,7 +396,7 @@ m2_BBK = m2_ROOT / 'tools' / 'bbk.py'
 class Alpha7CongruenceTests(unittest.TestCase):
 
     def test_release_is_additive_over_alpha6(self):
-        self.assertEqual((m2_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.16.1')
+        self.assertEqual((m2_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.17.0.2')
         help_text = test_run_cli([sys.executable, m2_BBK, '--help'], cwd=m2_ROOT).stdout
         for command in ('fit', 'structure', 'slice', 'profile', 'manifest', 'candidate', 'gate', 'workspace', 'worktree', 'package'):
             self.assertIn(command, help_text)
@@ -495,16 +495,17 @@ class Alpha7CongruenceTests(unittest.TestCase):
                 for token in expected:
                     self.assertIn(token, text, str(path))
 
-        omp_source = (m2_ROOT / 'omp' / 'extension' / 'index.js').read_text(encoding='utf-8')
+        omp_controller = (m2_ROOT / 'projections' / 'omp' / 'controllers' / 'bbk_controller.md').read_text(encoding='utf-8')
+        omp_worker = (m2_ROOT / 'projections' / 'omp' / 'agents' / 'bbk_worker.md').read_text(encoding='utf-8')
         for token in expected:
-            self.assertIn(token, omp_source)
+            self.assertIn(token, omp_controller + omp_worker)
 
     def test_omp_surface_is_additive(self):
         source = (m2_ROOT / 'omp' / 'extension' / 'index.js').read_text(encoding='utf-8')
         tools = re.findall('name: "(bbk_[^"]+)"', source)
         commands = re.findall('registerCommand\\(pi, "(bbk(?::[^"]*)?)"', source)
         commands += re.findall('pi\\.registerCommand\\("(bbk(?::[^"]*)?)"', source)
-        self.assertEqual(len(tools), 44)
+        self.assertEqual(len(tools), 58)
         self.assertEqual(len(commands), 48)
         for name in (
             'bbk_manifest', 'bbk_candidate', 'bbk_gate', 'bbk_workspace',
@@ -512,6 +513,9 @@ class Alpha7CongruenceTests(unittest.TestCase):
             'bbk_artifact_preflight', 'bbk_artifact_seal', 'bbk_artifact_finalize', 'bbk_artifact_successor',
             'bbk_host_preflight', 'bbk_context_worker', 'bbk_context_review',
             'bbk_handoff_create', 'bbk_handoff_verify', 'bbk_handoff_list',
+            'bbk_control_spawn', 'bbk_control_assign', 'bbk_control_update',
+            'bbk_control_integrate_request', 'bbk_control_bind', 'bbk_control_dispatch_status',
+            'bbk_governance_status', 'bbk_task_run',
         ):
             self.assertIn(name, tools)
         self.assertIn('bbk:artifact:finalize', commands)
@@ -529,7 +533,8 @@ class Alpha7CongruenceTests(unittest.TestCase):
             'AGENTS.md', 'WAYFINDING-AND-GRILL.md', 'SOLUTION-OUTCOME-FIT.md',
             'EXECUTION-DESIGN.md', 'DURABLE-HANDOFFS.md', 'ASSURANCE.md',
             'LANGUAGE-PROFILES.md', 'MODEL-ROUTING.md', 'BOUNDARIES.md',
-            'OMP-CHILD-LIFETIME.md',
+            'OMP-CHILD-LIFETIME.md', 'CRITICAL-PATH-EXECUTION-ALPHA17.md',
+            'PROMPT-COMPILATION-ALPHA17.0.1.md',
         }
         actual = {path.name for path in (m2_ROOT / 'docs').iterdir() if path.is_file()}
         self.assertEqual(actual, expected)
@@ -675,6 +680,32 @@ class Alpha8ProfileDispatchTests(unittest.TestCase):
                 for binding in item['request']['inputs']:
                     self.assertFalse(Path(binding['path']).is_absolute())
 
+    def test_manifest_git_status_is_scoped_to_the_requested_source_tree(self):
+        # Build the repository fixture explicitly instead of relying on the BBK
+        # source tree itself being a Git checkout. Release archives intentionally
+        # exclude ``.git`` and must be able to run the complete suite after
+        # extraction.
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            subprocess.run(['git', 'init', '--quiet'], cwd=base, check=True)
+            subprocess.run(['git', 'config', 'user.name', 'BBK Tests'], cwd=base, check=True)
+            subprocess.run(['git', 'config', 'user.email', 'bbk-tests@example.invalid'], cwd=base, check=True)
+            seed = base / 'seed.txt'
+            seed.write_text('seed\n', encoding='utf-8')
+            subprocess.run(['git', 'add', 'seed.txt'], cwd=base, check=True)
+            subprocess.run(['git', 'commit', '--quiet', '-m', 'seed'], cwd=base, check=True)
+            source = base / 'source'
+            source.mkdir()
+            (source / 'bounded.txt').write_text('bounded\n', encoding='utf-8')
+            unrelated = base / 'unrelated.txt'
+            unrelated.write_text('outside source\n', encoding='utf-8')
+
+            manifest = m1_bbk.collect_manifest(source)
+
+        self.assertTrue(manifest['git']['available'])
+        self.assertEqual(manifest['git']['status_porcelain'], ['?? bounded.txt'])
+        self.assertNotIn('unrelated.txt', '\n'.join(manifest['git']['status_porcelain']))
+
     def test_profile_lock_binds_stable_dispatch(self):
         with tempfile.TemporaryDirectory() as temp:
             project = Path(temp) / 'project'
@@ -692,7 +723,7 @@ class Alpha8ProfileDispatchTests(unittest.TestCase):
             self.assertEqual(lock['effective_sha256'], value['effective_sha256'])
 
     def test_alpha8_package_surface_is_present(self):
-        self.assertEqual((m3_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.16.1')
+        self.assertEqual((m3_ROOT / 'VERSION').read_text(encoding='utf-8').strip(), '0.1.0-alpha.17.0.2')
         for rel in ['docs/LANGUAGE-PROFILES.md', 'spec/schemas/bbk-profile-capability-request-v1.schema.json', 'spec/schemas/bbk-profile-capability-result-v1.schema.json', 'spec/schemas/bbk-profile-dispatch-v1.schema.json', 'templates/profile-capability-request.json']:
             self.assertTrue((m3_ROOT / rel).is_file(), rel)
 
@@ -748,14 +779,14 @@ class PublicRepositoryBoundaryTests(unittest.TestCase):
 
     def test_context_and_procedure_methods_are_canonical_and_projected(self):
         method = m4_load('spec/method-content.json')
-        self.assertEqual(method['version'], '0.1.0-alpha.16.1')
+        self.assertEqual(method['version'], '0.1.0-alpha.17.0.2')
         self.assertIn('bbk-context-routing', method['skills'])
         self.assertIn('bbk-procedure-design', method['skills'])
         self.assertIn('context-routing.md', method['references'])
         self.assertIn('procedure-design.md', method['references'])
         manifest = m4_load('projections/manifest.json')
         self.assertEqual(manifest['role_count'], 19)
-        self.assertEqual(manifest['projection_count'], 76)
+        self.assertEqual(manifest['projection_count'], 100)
         for target in manifest['targets']:
             names = [path.name for path in (m4_ROOT / 'projections' / target / 'agents').glob('*')]
             self.assertTrue(any(('questioning' in name and 'wayfinder' in name for name in names)), target)
@@ -868,15 +899,16 @@ class Alpha10ModelRoutingTests(unittest.TestCase):
         self.assertEqual(stats['profile_count'], 0)
         self.assertEqual(stats['role_profile_counts'], {})
 
-    def test_alpha13_defaults_match_the_reviewed_per_role_routing_selection(self):
+    def test_alpha17_defaults_match_the_user_supplied_per_role_routing_selection(self):
         reviewed = json.loads(
-            (m5_ROOT / 'tests' / 'fixtures' / 'alpha14-default-model-routing.json').read_text(
+            (m5_ROOT / 'tests' / 'fixtures' / 'alpha17-default-model-routing.json').read_text(
                 encoding='utf-8'
             )
         )
-        self.assertEqual(reviewed['package_version'], '0.1.0-alpha.14')
+        self.assertNotIn('package_version', reviewed)
+        self.assertEqual(reviewed['schema_version'], 'bbk.model-routing.v2')
         self.assertEqual(set(reviewed['roles']), self.role_names)
-        self.assertEqual(self.routing['roles'], reviewed['roles'])
+        self.assertEqual(self.routing, reviewed)
 
         profiles = json.loads(
             (m5_ROOT / 'spec' / 'omp-model-routing-profiles.json').read_text(encoding='utf-8')
@@ -886,22 +918,29 @@ class Alpha10ModelRoutingTests(unittest.TestCase):
             {name: route['omp'] for name, route in reviewed['roles'].items()},
         )
 
-        for relative in ('README.md', 'docs/MODEL-ROUTING.md'):
-            text = (m5_ROOT / relative).read_text(encoding='utf-8')
-            for expected_fragment in (
-                '`deepseek/deepseek-v4-flash`, `thinkingLevel: max`',
-                '`openai-codex/gpt-5.6-luna`, `thinkingLevel: xhigh`',
-                '`gpt-5.6-luna`, `model_reasoning_effort: xhigh`',
-                '`gpt-5.6-sol`, `model_reasoning_effort: medium`',
-                '`haiku`, `effort: high`',
-                '`sonnet`, `effort: medium`',
-                '`opus`, `effort: high`',
-            ):
-                self.assertIn(expected_fragment, text, relative)
+        relative = 'docs/MODEL-ROUTING.md'
+        text = (m5_ROOT / relative).read_text(encoding='utf-8')
+        for expected_fragment in (
+            '`openai-codex/gpt-5.6-sol`, `thinkingLevel: high`',
+            '`deepseek/deepseek-v4-pro`, `thinkingLevel: high`',
+            '`deepseek/deepseek-v4-flash`, `thinkingLevel: max`',
+            '`gpt-5.6-luna`, `model_reasoning_effort: medium`',
+            '`gpt-5.6-luna`, `model_reasoning_effort: high`',
+            '`gpt-5.6-luna`, `model_reasoning_effort: xhigh`',
+            '`gpt-5.6-sol`, `model_reasoning_effort: medium`',
+            '`haiku`, `effort: high`',
+            '`sonnet`, `effort: medium`',
+            '`opus`, `effort: high`',
+        ):
+            self.assertIn(expected_fragment, text, relative)
+        self.assertIn('`package_version` is optional provenance', text, relative)
+        readme = (m5_ROOT / 'README.md').read_text(encoding='utf-8')
+        self.assertIn('docs/MODEL-ROUTING.md', readme)
+
 
     def test_generated_host_fields_match_each_direct_role_route(self):
         manifest = json.loads((m5_ROOT / 'projections' / 'manifest.json').read_text(encoding='utf-8'))
-        self.assertEqual(manifest['schema'], 'bbk.projection-manifest.v8')
+        self.assertEqual(manifest['schema'], 'bbk.projection-manifest.v10')
         self.assertEqual(manifest['model_routing_schema'], 'bbk.model-routing.v2')
         self.assertEqual(manifest['model_routing_mode'], 'per-role')
         self.assertEqual(manifest['model_route_count'], 19)
@@ -1019,7 +1058,7 @@ class Alpha10ModelRoutingTests(unittest.TestCase):
             self.assertNotIn('<bbk-model-routing', generic_text)
             self.assertNotIn('```json', generic_text)
             generic_manifest = json.loads((project / '.agents' / 'bbk' / 'agent-manifest.json').read_text(encoding='utf-8'))
-            self.assertEqual(generic_manifest['schema'], 'bbk.installed-generic-agent-manifest.v3')
+            self.assertEqual(generic_manifest['schema'], 'bbk.installed-host-neutral-agent-manifest.v4')
             self.assertEqual(generic_manifest['agents']['bbk_worker']['model_routing']['omp']['model'], '@tiny')
             empty_registry = (project / '.agents' / 'skills' / 'bbk-installed-profiles' / 'SKILL.md').read_text(encoding='utf-8')
             self.assertIn('No language or domain profile is managed', empty_registry)
@@ -1057,7 +1096,7 @@ class Alpha10ModelRoutingTests(unittest.TestCase):
         checked = m5_run([sys.executable, m5_ROOT / 'tools' / 'model_routing.py', '--check'])
         self.assertIn('19 roles have individual model routes', checked.stdout)
         generated = m5_run([sys.executable, m5_GENERATOR, '--check'])
-        self.assertIn('19 roles, 19 direct model routes, 4 targets, and 76 projections', generated.stdout)
+        self.assertIn('19 roles, 19 direct model routes, 5 targets, and 100 projections', generated.stdout)
 
 
 

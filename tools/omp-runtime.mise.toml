@@ -1,0 +1,9 @@
+# OMP-only managed runtime pin.
+#
+# This file deliberately does not use a default mise configuration name. Root
+# BBK tasks therefore cannot auto-install Node when Codex, fast, or other
+# non-OMP workflows invoke `mise run`. BBK reads this file only when OMP is an
+# explicit dependency target.
+
+[tools]
+node = "22.23.2"

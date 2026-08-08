@@ -11,17 +11,17 @@ if not errorlevel 1 goto use_python3
 exit /b 127
 
 :use_env
-"%BBK_PYTHON%" -B -X utf8 "%~dp0bbk_artifact.py" %*
+"%BBK_PYTHON%" -S -B -X utf8 "%~dp0bbk_artifact.py" %*
 exit /b %errorlevel%
 
 :use_py
-py -3 -B -X utf8 "%~dp0bbk_artifact.py" %*
+py -3 -S -B -X utf8 "%~dp0bbk_artifact.py" %*
 exit /b %errorlevel%
 
 :use_python
-python -B -X utf8 "%~dp0bbk_artifact.py" %*
+python -S -B -X utf8 "%~dp0bbk_artifact.py" %*
 exit /b %errorlevel%
 
 :use_python3
-python3 -B -X utf8 "%~dp0bbk_artifact.py" %*
+python3 -S -B -X utf8 "%~dp0bbk_artifact.py" %*
 exit /b %errorlevel%

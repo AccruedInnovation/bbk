@@ -26,7 +26,7 @@ def write_json(path: Path, value: object) -> None:
 def profile_lock() -> dict:
     return {
         "schema": "bbk.profile-lock.v1",
-        "bbkVersion": "0.1.0-alpha.16.1",
+        "bbkVersion": "0.1.0-alpha.17",
         "profileId": "python",
         "profileVersion": "1",
         "profileRootDigest": "1" * 64,

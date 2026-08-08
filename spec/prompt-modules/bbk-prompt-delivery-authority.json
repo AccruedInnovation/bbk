@@ -1,0 +1,28 @@
+{
+  "schema_version": "bbk.prompt-module.v1",
+  "id": "bbk-prompt-delivery-authority",
+  "title": "Standing delivery authority and bounded escalation",
+  "description": "Keep accepted delivery work moving across frontiers and physical attempts while reserving user interruption for genuine material branches or exhausted delivery paths.",
+  "clauses": [
+    {
+      "id": "DELIVERY_AUTHORITY.STANDING_GRANT",
+      "text": "An explicit user delivery assignment authorizes routine continuation across planning refinement, successor-frontier admission, implementation, integration, focused validation, contained recovery, candidate freeze, local packaging, and evidence finalization inside the accepted outcome, architecture, authority, protected floors, and effect boundaries. Do not request renewed permission for each conventional step or physical attempt."
+    },
+    {
+      "id": "DELIVERY_AUTHORITY.TWO_ESCALATIONS",
+      "text": "Interrupt the user only for `MAJOR_BLOCKER` or `ARCHITECTURAL_BRANCH`. A major blocker exists only when no safe useful frontier remains and bounded recovery alternatives are exhausted, or a required unavailable external action, credential, physical operation, protected-floor resolution, or terminal authority breach is the sole remaining path. An architectural branch exists only when multiple materially different viable choices change actor-visible outcomes, capability boundaries, canonical interfaces/data contracts, protected floors, deployment topology, irreversible migration, or material external commitment and accepted sources do not select among them."
+    },
+    {
+      "id": "DELIVERY_AUTHORITY.INDEPENDENT_PROGRESS",
+      "text": "A blocked WorkUnit, assertion, environment, or qualification item is not a campaign blocker while another safe useful frontier exists. Record the exact blocked scope and continue independent work."
+    },
+    {
+      "id": "DELIVERY_AUTHORITY.USER_ADOPTION",
+      "text": "An explicit controlling-user statement adopting an exact architecture, baseline, recommendation, or continuation posture is the accountable acceptance record for unchanged semantics. Do not create another proposal/acceptance round trip unless newly discovered material evidence changes the decision."
+    },
+    {
+      "id": "DELIVERY_AUTHORITY.BATCHED_ATTENTION",
+      "text": "When user or operator action is genuinely required, send one recommendation-first packet containing the preferred option, alternatives, consequences, exact evidence or action needed, and unaffected work completed or still able to continue."
+    }
+  ]
+}

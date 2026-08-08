@@ -1,0 +1,25 @@
+{
+  "$id": "bbk-spawn-dispatch-terminal-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const": "bbk.spawn-dispatch-terminal.v1"},
+    "dispatch_ref": {"type": "string", "pattern": "^dispatch:[0-9a-f]{64}$"},
+    "activation_ref": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "active_binding_ref": {"type": "string", "minLength": 1},
+    "actual_session_id": {"type": "string", "minLength": 1},
+    "outcome": {"enum": ["COMPLETED", "FAILED", "CANCELLED"]},
+    "reason": {"type": "string", "maxLength": 512},
+    "terminal_at": {"type": "string", "format": "date-time"},
+    "status": {"const": "TERMINAL"},
+    "receipt_ref": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "idempotent_reuse": {"type": "boolean"}
+  },
+  "required": [
+    "schema", "dispatch_ref", "activation_ref", "active_binding_ref",
+    "actual_session_id", "outcome", "reason", "terminal_at", "status",
+    "receipt_ref", "idempotent_reuse"
+  ],
+  "title": "BBK spawn dispatch terminal lifecycle record v1",
+  "type": "object"
+}

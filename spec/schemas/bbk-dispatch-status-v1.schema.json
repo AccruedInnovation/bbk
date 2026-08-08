@@ -1,0 +1,103 @@
+{
+  "$id": "bbk-dispatch-status-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "activation_ref": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "active_binding_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "actual_session_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "agent": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "attempt_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "binding_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "dispatch_ref": {
+      "pattern": "^dispatch:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "lease_ref": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "leased_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "parent_session_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "reservation_ref": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "bbk.dispatch-status.v1"
+    },
+    "status": {
+      "enum": [
+        "READY",
+        "LEASED",
+        "ACTIVATED",
+        "TERMINAL"
+      ]
+    },
+    "task_name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "terminal": {
+      "type": "object"
+    },
+    "terminal_outcome": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "terminal_ref": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "tool_call_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "work_unit_id": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "dispatch_ref",
+    "reservation_ref",
+    "binding_ref",
+    "parent_session_id",
+    "work_unit_id",
+    "attempt_id",
+    "task_name",
+    "agent",
+    "status"
+  ],
+  "title": "BBK spawn dispatch lifecycle status v1",
+  "type": "object"
+}

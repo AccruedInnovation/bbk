@@ -19,7 +19,9 @@
     "planning_state",
     "recommended_next_root",
     "residual_uncertainty",
-    "work_graph_refs"
+    "work_graph_refs",
+    "planning_readiness",
+    "project_coverage"
   ],
   "properties": {
     "acceptance_ref": {
@@ -109,6 +111,14 @@
     "work_graph_refs": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
       "description": "Current capability, phase, work-unit, and worker-invocation references or an explicit not-ready disposition."
+    },
+    "planning_readiness": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Current rolling-wave planning readiness record, including planning and architecture mode, roadmap/frontier identities, deferred refinements, and execution-admission truth."
+    },
+    "project_coverage": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Current whole-project capability coverage ledger separating delivered candidate claims from incomplete, blocked, deferred, or out-of-scope project work."
     }
   },
   "x-bbk-role": "bbk_root_wayfinder",

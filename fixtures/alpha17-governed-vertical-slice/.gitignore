@@ -1,0 +1,5 @@
+.jj/
+.bbk/
+.beads/
+__pycache__/
+*.pyc

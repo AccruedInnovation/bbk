@@ -1,6 +1,8 @@
 ---
 name: bbk-execute
 description: Execute a BBK operating plan through bounded workers, isolated workspaces, deterministic gates, late candidate freeze, assertion-scoped validation, repair, and structured handoff. Use for multi-part implementation or other effectful work.
+requires_prompt_modules: []
+standalone_prompt_modules: []
 ---
 
 # BBK Execute

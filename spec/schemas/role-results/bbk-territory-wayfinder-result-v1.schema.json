@@ -22,7 +22,8 @@
     "residual_uncertainty",
     "root_outcome_ref",
     "territory_state",
-    "territory_synthesis_ref"
+    "territory_synthesis_ref",
+    "planning_readiness"
   ],
   "properties": {
     "assurance_refs": {
@@ -92,6 +93,10 @@
     "territory_synthesis_ref": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
       "description": "Territory ID, revision, lifecycle state, durable path, byte count, and SHA-256 when persisted; inline content is permitted for a routine small territory."
+    },
+    "planning_readiness": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Territory rolling-wave readiness, roadmap/frontier revisions, deferred refinements, and local execution-admission truth."
     }
   },
   "x-bbk-role": "bbk_territory_wayfinder",

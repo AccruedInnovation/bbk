@@ -1,6 +1,6 @@
 {
   "schema_version": "bbk.roles.v4",
-  "package_version": "0.1.0-alpha.16.1",
+  "package_version": "0.1.0-alpha.17.0.2",
   "catalog_schema": "spec/schemas/bbk-role-catalog-v4.schema.json",
   "role_schema": "spec/schemas/bbk-role-v4.schema.json",
   "projection_schema": "spec/schemas/bbk-roles-v4.schema.json",
@@ -378,9 +378,11 @@
           "mode": "CANDIDATE_PRODUCTION",
           "parent_kind": "canonical_role",
           "parents": [
+            "bbk_root_orchestrator",
+            "bbk_territory_orchestrator",
             "bbk_worker_orchestrator"
           ],
-          "purpose": "Execute one exact candidate-producing WorkUnit inside a Worker cohort."
+          "purpose": "Execute one exact candidate-producing WorkUnit through the shortest accepted orchestration path."
         },
         {
           "mode": "PROTOTYPE_SUPPORT",
@@ -400,9 +402,11 @@
           "mode": "ASSERTION_ATTEMPT",
           "parent_kind": "canonical_role",
           "parents": [
+            "bbk_root_orchestrator",
+            "bbk_territory_orchestrator",
             "bbk_validator_orchestrator"
           ],
-          "purpose": "Execute one fixed candidate-bound assertion assignment under supplied criteria and method."
+          "purpose": "Execute one fixed candidate-bound assertion directly or under a Validator Orchestrator when aggregation is material."
         }
       ]
     }

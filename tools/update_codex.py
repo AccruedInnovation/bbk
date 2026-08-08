@@ -2,8 +2,9 @@
 """Update BBK's Codex custom-agent and Codex-facing skill surface.
 
 This command is intended for an existing BBK installation. It updates BBK's
-installed Codex custom-agent definitions, the canonical ``bbk-artifact`` skill
-under Codex's shared skill root, and the unified installation manifest. It
+installed Codex custom-agent definitions, the effective optional external-skill
+catalog (excluding compiled primary procedures), and the unified installation
+manifest. It
 deliberately preserves the installed package copy, current pointer, launcher,
 effective model-routing file, OMP agent/extension state, Claude Code, generic
 agent files, language-profile packages, and OMP runtime model-routing state.
@@ -26,6 +27,11 @@ TOOLS_DIR = Path(__file__).resolve().parent
 if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
+from runtime_requirements import enforce_supported_python
+
+enforce_supported_python(program='BBK Codex updater')
+
+import dependencies as dependency_tool
 import install as install_tool
 from path_compat import path_key
 from generate_agents import rendered_projections
@@ -177,7 +183,7 @@ def render_preserved_codex(
     candidate = temp_root / "effective-model-routing.json"
     candidate.write_bytes(install_tool.json_bytes(policy))
     try:
-        projections, projection_meta = rendered_projections(candidate)
+        projections, projection_meta = rendered_projections(candidate, targets=("codex",))
     except (OSError, json.JSONDecodeError, ModelRoutingError, ValueError) as exc:
         raise CodexUpdateError(f"Cannot render current Codex agents with the preserved routing policy: {exc}") from exc
     codex = projections.get("codex")
@@ -204,6 +210,10 @@ def make_desired_files(
         old_manifest, old_records, temp_root
     )
     for filename, data in sorted(codex.items()):
+        # Controller projections are package-owned runtime inputs, not Codex
+        # role definitions.  Keep them out of the host agent directory.
+        if filename.startswith("../controllers/"):
+            continue
         add_desired(
             desired,
             codex_agents / filename,
@@ -214,14 +224,19 @@ def make_desired_files(
     agent_skills = targets.get("agent_skills")
     if agent_skills is None:
         raise CodexUpdateError("Cannot resolve Codex skill installation target")
-    skill_source = ROOT / "shared" / "skills" / "bbk-artifact"
+    skill_source = ROOT / "shared" / "skills"
     if not skill_source.is_dir():
-        raise CodexUpdateError(f"Canonical bbk-artifact skill is missing: {skill_source}")
+        raise CodexUpdateError(f"Canonical shared skill source is missing: {skill_source}")
+    exclusions = install_tool.compiled_skill_catalog_exclusions(ROOT)
+    registry_rel = install_tool.REGISTRY_RELATIVE_PATH.as_posix()
     for source_path in install_tool.source_files(skill_source):
         relative = source_path.relative_to(skill_source)
+        rel_text = relative.as_posix()
+        if rel_text in exclusions or rel_text == registry_rel:
+            continue
         add_desired(
             desired,
-            agent_skills / "bbk-artifact" / relative,
+            agent_skills / relative,
             source_path.read_bytes(),
             source=install_tool.json_path(source_path),
             is_executable=bool(source_path.stat().st_mode & 0o111),
@@ -293,6 +308,7 @@ def plan_stale_files(
     desired: Mapping[str, DesiredFile],
     *,
     codex_agents: Path,
+    agent_skills: Path,
     force: bool,
     backup_root: Path,
 ) -> list[StaleFile]:
@@ -300,7 +316,16 @@ def plan_stale_files(
     problems: list[str] = []
     for key, raw in sorted(old_records.items()):
         path = Path(str(raw["path"]))
-        if key in desired or not path_is_within(path, codex_agents):
+        if key in desired:
+            continue
+        source = str(raw.get("source") or "")
+        in_codex_agents = path_is_within(path, codex_agents)
+        in_bbk_skills = path_is_within(path, agent_skills) and (
+            source.startswith("shared/skills/")
+            or source.startswith("generated:installed-profile-registry-skill")
+            or "/shared/skills/" in source.replace("\\", "/")
+        )
+        if not (in_codex_agents or in_bbk_skills):
             continue
         record = dict(raw)
         if not path.exists():
@@ -494,6 +519,30 @@ def merge_manifest(
 
 
 def update_codex(args: argparse.Namespace) -> dict[str, Any]:
+    if os.environ.get("BBK_TEST_ALLOW_MISSING_DEPENDENCIES") == "1":
+        dependency_report: dict[str, Any] = {
+            "schema": "bbk.install-dependency-report.v1",
+            "status": "SKIPPED_TEST",
+            "selected_harnesses": ["codex"],
+            "checks": [],
+            "host_checks": [],
+            "blocking_count": 0,
+            "warning_count": 0,
+            "network_accessed": False,
+            "mutation_performed": False,
+        }
+    else:
+        try:
+            dependency_report = dependency_tool.check_dependencies(("codex",))
+        except dependency_tool.DependencyError as exc:
+            raise CodexUpdateError(f"Dependency preflight could not be evaluated: {exc}") from exc
+        if not args.json:
+            print(dependency_tool.format_report(dependency_report), flush=True)
+        if dependency_report.get("status") != "PASS":
+            remediation = dependency_report.get("remediation_command")
+            suffix = f" Run: {remediation}" if remediation else ""
+            raise CodexUpdateError(f"Dependency preflight failed; update was not started.{suffix}")
+
     verification = None
     if args.verify:
         try:
@@ -524,13 +573,15 @@ def update_codex(args: argparse.Namespace) -> dict[str, Any]:
         plan = plan_files(desired, old_records, force=bool(args.force), backup_root=backup_root)
         targets = install_tool.installation_targets(scope=args.scope, project=project)
         codex_agents = targets.get("codex_agents")
-        if codex_agents is None:
-            raise CodexUpdateError("Cannot resolve Codex installation target")
+        agent_skills = targets.get("agent_skills")
+        if codex_agents is None or agent_skills is None:
+            raise CodexUpdateError("Cannot resolve Codex installation targets")
         stale_plan = (
             plan_stale_files(
                 old_records,
                 desired,
                 codex_agents=codex_agents,
+                agent_skills=agent_skills,
                 force=bool(args.force),
                 backup_root=backup_root,
             )
@@ -554,6 +605,7 @@ def update_codex(args: argparse.Namespace) -> dict[str, Any]:
             removed_stale=stale_plan,
             clean=bool(getattr(args, "clean", False)),
         )
+        merged["dependency_preflight"] = dependency_report
         if not args.dry_run:
             install_tool.atomic_write(mpath, install_tool.json_bytes(merged), 0o600)
 
@@ -580,6 +632,7 @@ def update_codex(args: argparse.Namespace) -> dict[str, Any]:
         "shared_package_updated": False,
         "effective_model_routing_updated": False,
         "source_release_root": install_tool.json_path(ROOT),
+        "dependency_preflight": dependency_report,
         "files": update_records,
         "removed_stale_files": stale_records,
         "removed_stale_count": len(stale_records),

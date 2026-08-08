@@ -1,0 +1,2242 @@
+{
+  "errors": [],
+  "identity_count": 20,
+  "package_version": "0.1.0-alpha.17.0.2",
+  "projection_count": 100,
+  "records": [
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-state-decision-effect-design",
+        "bbk-procedure-design",
+        "bbk-profile-routing",
+        "bbk-installed-profiles"
+      ],
+      "identity": "bbk_architect",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-architecture"
+      ],
+      "prompt_characters": 95874,
+      "prompt_sha256": "64f55ba42b2d125249768b5fbbce0de91d5455e4d8f9a1bbbbf7079b069a9804",
+      "target": "codex"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-state-decision-effect-design",
+        "bbk-procedure-design",
+        "bbk-profile-routing",
+        "bbk-installed-profiles"
+      ],
+      "identity": "bbk_architect",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-architecture"
+      ],
+      "prompt_characters": 98014,
+      "prompt_sha256": "de43907f5e3d90a9aac0d241151dd490c2f19a3a2f2261aa85bc350c74e9d358",
+      "target": "omp"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-state-decision-effect-design",
+        "bbk-procedure-design",
+        "bbk-profile-routing",
+        "bbk-installed-profiles"
+      ],
+      "identity": "bbk_architect",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-architecture"
+      ],
+      "prompt_characters": 97386,
+      "prompt_sha256": "8fa74ae92eaa5ff2d1524cc42cbb02c47fccd3dd3704419de4a55bbe3279ce62",
+      "target": "claude"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-state-decision-effect-design",
+        "bbk-procedure-design",
+        "bbk-profile-routing",
+        "bbk-installed-profiles"
+      ],
+      "identity": "bbk_architect",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-architecture"
+      ],
+      "prompt_characters": 97066,
+      "prompt_sha256": "0e646f107ce85a44e95319003742e4ac24cc206656c7423cca88c76b354d9b05",
+      "target": "pi"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-state-decision-effect-design",
+        "bbk-procedure-design",
+        "bbk-profile-routing",
+        "bbk-installed-profiles"
+      ],
+      "identity": "bbk_architect",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-architecture"
+      ],
+      "prompt_characters": 97066,
+      "prompt_sha256": "0e646f107ce85a44e95319003742e4ac24cc206656c7423cca88c76b354d9b05",
+      "target": "generic"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-execution-slicing",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-procedure-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_phase_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-phase-plan"
+      ],
+      "prompt_characters": 92190,
+      "prompt_sha256": "95906364344a20e54d39c3191f879c1f14d1c6b80e42ff64473b36de3fcc103d",
+      "target": "codex"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-execution-slicing",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-procedure-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_phase_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-phase-plan"
+      ],
+      "prompt_characters": 94960,
+      "prompt_sha256": "9426ea3fdd9013ccf36fbd5e9b4b0980610fadafa9696b66ee343c6de2566fe6",
+      "target": "omp"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-execution-slicing",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-procedure-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_phase_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-phase-plan"
+      ],
+      "prompt_characters": 94105,
+      "prompt_sha256": "4d62d4c2a3bb150140b48059de5d490851864276e8edff8b49ccd590422483f6",
+      "target": "claude"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-execution-slicing",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-procedure-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_phase_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-phase-plan"
+      ],
+      "prompt_characters": 93684,
+      "prompt_sha256": "057d66b7164ab216da90c773a6f29a8bf95e7b94d38d098ba42fc67adc5cab76",
+      "target": "pi"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-execution-slicing",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-procedure-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_phase_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-phase-plan"
+      ],
+      "prompt_characters": 93684,
+      "prompt_sha256": "057d66b7164ab216da90c773a6f29a8bf95e7b94d38d098ba42fc67adc5cab76",
+      "target": "generic"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-review-plan",
+        "bbk-review-intent",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_planning_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-work-graph"
+      ],
+      "prompt_characters": 85742,
+      "prompt_sha256": "aadfb44c208fb916ba566c0797880fdcb1f78a8e66d43ab5d02d396c9835d47c",
+      "target": "codex"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-review-plan",
+        "bbk-review-intent",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_planning_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-work-graph"
+      ],
+      "prompt_characters": 88595,
+      "prompt_sha256": "8b744af0b59f69b3de5fa5eab3230ba1e16ce42f2d274ac168e904b5df0fc61c",
+      "target": "omp"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-review-plan",
+        "bbk-review-intent",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_planning_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-work-graph"
+      ],
+      "prompt_characters": 87774,
+      "prompt_sha256": "76bdd8e4ffd3fad4084fe6ca31150c5eb24acd7db5b84e63c553ab105f157db1",
+      "target": "claude"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-review-plan",
+        "bbk-review-intent",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_planning_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-work-graph"
+      ],
+      "prompt_characters": 87319,
+      "prompt_sha256": "3ceb54fa90c0bc3a2bf647b8c786af9870d2e7fb93698eae891237f9a2c3a37c",
+      "target": "pi"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-review-plan",
+        "bbk-review-intent",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_planning_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-work-graph"
+      ],
+      "prompt_characters": 87319,
+      "prompt_sha256": "3ceb54fa90c0bc3a2bf647b8c786af9870d2e7fb93698eae891237f9a2c3a37c",
+      "target": "generic"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-evidence",
+        "bbk-recover",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_prototyper",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-prototype"
+      ],
+      "prompt_characters": 93126,
+      "prompt_sha256": "3764afe86cc38c461751dd24e0763c53295cfa626f34f637a55db7c434538db5",
+      "target": "codex"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-evidence",
+        "bbk-recover",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_prototyper",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-prototype"
+      ],
+      "prompt_characters": 95596,
+      "prompt_sha256": "c00152b464811281ca65ff77eccf993fc4e5183b62e404acab7541a4e44a591d",
+      "target": "omp"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-evidence",
+        "bbk-recover",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_prototyper",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-prototype"
+      ],
+      "prompt_characters": 94699,
+      "prompt_sha256": "c1b7659d8c0ec457704f2e22720dbacfaaad8cc08b42472780c93fae706f8a6b",
+      "target": "claude"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-evidence",
+        "bbk-recover",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_prototyper",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-prototype"
+      ],
+      "prompt_characters": 94320,
+      "prompt_sha256": "d29a28de3c4fd302d293f42adeff3c29e0f8854f8eeaa87bd9b047787e1198a5",
+      "target": "pi"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-evidence",
+        "bbk-recover",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_prototyper",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-prototype"
+      ],
+      "prompt_characters": 94320,
+      "prompt_sha256": "d29a28de3c4fd302d293f42adeff3c29e0f8854f8eeaa87bd9b047787e1198a5",
+      "target": "generic"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-solution-outcome-fit",
+        "bbk-state-decision-effect-design",
+        "bbk-procedure-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_question_guide",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-grill"
+      ],
+      "prompt_characters": 66363,
+      "prompt_sha256": "2d8df457ca91564e4d47405cc1f3fa12a9043633027a7914e77d53ec3edaab22",
+      "target": "codex"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-solution-outcome-fit",
+        "bbk-state-decision-effect-design",
+        "bbk-procedure-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_question_guide",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-grill"
+      ],
+      "prompt_characters": 68284,
+      "prompt_sha256": "f0fb72f78ec2069c9ed83bf6f7f2f657fc4ef40dae43f63d0db010f01d20a1fa",
+      "target": "omp"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-solution-outcome-fit",
+        "bbk-state-decision-effect-design",
+        "bbk-procedure-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_question_guide",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-grill"
+      ],
+      "prompt_characters": 67584,
+      "prompt_sha256": "514b6afb693c440bc19386367173767b8407ec1a0191f96ca1486e85090a37b5",
+      "target": "claude"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-solution-outcome-fit",
+        "bbk-state-decision-effect-design",
+        "bbk-procedure-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_question_guide",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-grill"
+      ],
+      "prompt_characters": 67314,
+      "prompt_sha256": "940b3a8e027d564ff99f62d49a4fdf787fafc9d3390b1e45b765535179b54e73",
+      "target": "pi"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-solution-outcome-fit",
+        "bbk-state-decision-effect-design",
+        "bbk-procedure-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_question_guide",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-grill"
+      ],
+      "prompt_characters": 67314,
+      "prompt_sha256": "940b3a8e027d564ff99f62d49a4fdf787fafc9d3390b1e45b765535179b54e73",
+      "target": "generic"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-beads",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_questioning_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-question-branch"
+      ],
+      "prompt_characters": 66326,
+      "prompt_sha256": "e2608bd87b61e658c293ad7c62ea954fc2dd5573cd897b6d9abc25587c3b5738",
+      "target": "codex"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-beads",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_questioning_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-question-branch"
+      ],
+      "prompt_characters": 68478,
+      "prompt_sha256": "bc900273a8146c614b33bc6573323b288366dfb93fb6f3b3d3d5d328d08acbb3",
+      "target": "omp"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-beads",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_questioning_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-question-branch"
+      ],
+      "prompt_characters": 67512,
+      "prompt_sha256": "f464d36782fcb14ea69a4fd219e08b9d655b6d7f5f5f86a54685195e835ada0b",
+      "target": "claude"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-beads",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_questioning_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-question-branch"
+      ],
+      "prompt_characters": 67180,
+      "prompt_sha256": "292b443ac82a4f418995e67dfafddd03ad841b1e8bdbbc316bc97a666ec94e6f",
+      "target": "pi"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-beads",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_questioning_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-question-branch"
+      ],
+      "prompt_characters": 67180,
+      "prompt_sha256": "292b443ac82a4f418995e67dfafddd03ad841b1e8bdbbc316bc97a666ec94e6f",
+      "target": "generic"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_researcher",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-research"
+      ],
+      "prompt_characters": 60318,
+      "prompt_sha256": "4768e615b98845e1c46f6f1d0f4af0547aeb6bdebe897beb651a6169c8ff34dd",
+      "target": "codex"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_researcher",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-research"
+      ],
+      "prompt_characters": 61991,
+      "prompt_sha256": "bb3b6880c57a07216e9feb9c42acaac7c972a4b001ac572316e8772e49af6765",
+      "target": "omp"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_researcher",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-research"
+      ],
+      "prompt_characters": 61363,
+      "prompt_sha256": "9cf6744e5bd705b369a355867e2bde474c5a1576912a358f11adc0b8cdf60577",
+      "target": "claude"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_researcher",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-research"
+      ],
+      "prompt_characters": 61043,
+      "prompt_sha256": "8ffb9ce01df5a202a648b7778243da5bf8ed005a5f88f7711e6ef4daeb889cae",
+      "target": "pi"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_researcher",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-research"
+      ],
+      "prompt_characters": 61043,
+      "prompt_sha256": "8ffb9ce01df5a202a648b7778243da5bf8ed005a5f88f7711e6ef4daeb889cae",
+      "target": "generic"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-evidence",
+        "bbk-review-findings",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-review-context",
+        "bbk-review-intent",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_reviewer",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-review"
+      ],
+      "prompt_characters": 87145,
+      "prompt_sha256": "297d5fbf73d41d959301239d7088c1d36d88247c7baeb8c7542b22cb7dec65e4",
+      "target": "codex"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-evidence",
+        "bbk-review-findings",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-review-context",
+        "bbk-review-intent",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_reviewer",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-review"
+      ],
+      "prompt_characters": 89575,
+      "prompt_sha256": "282ec75822f72c88f1aa14b22594b1fd3774ec74f575b885e027aff0798ad9ba",
+      "target": "omp"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-evidence",
+        "bbk-review-findings",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-review-context",
+        "bbk-review-intent",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_reviewer",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-review"
+      ],
+      "prompt_characters": 88947,
+      "prompt_sha256": "9abadb170151edc37933ba8c7282677ab9493f5b313f3f3f99c70d0b3fce66a7",
+      "target": "claude"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-evidence",
+        "bbk-review-findings",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-review-context",
+        "bbk-review-intent",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_reviewer",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-review"
+      ],
+      "prompt_characters": 88627,
+      "prompt_sha256": "b97fe5af58c26477803b1dc75b3da9e984bde3004801b6e1aa1922481e82475e",
+      "target": "pi"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-evidence",
+        "bbk-review-findings",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-review-context",
+        "bbk-review-intent",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_reviewer",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-review"
+      ],
+      "prompt_characters": 88627,
+      "prompt_sha256": "b97fe5af58c26477803b1dc75b3da9e984bde3004801b6e1aa1922481e82475e",
+      "target": "generic"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-execution-slicing",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_root_orchestrator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-root-execution"
+      ],
+      "prompt_characters": 113349,
+      "prompt_sha256": "6baaab8b342d34994e33a486a55539bddb146aec72790b527bbd3f51b5d83a77",
+      "target": "codex"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-execution-slicing",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_root_orchestrator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-root-execution"
+      ],
+      "prompt_characters": 116722,
+      "prompt_sha256": "9ae7e80675f23700f73b55588ea1bf02d3bad58040cf3ea8b4215804679371b0",
+      "target": "omp"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-execution-slicing",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_root_orchestrator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-root-execution"
+      ],
+      "prompt_characters": 115887,
+      "prompt_sha256": "0d09ea46415c83c67b5ac653a156b5d6ac6f560fede26710f0394b854b563e79",
+      "target": "claude"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-execution-slicing",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_root_orchestrator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-root-execution"
+      ],
+      "prompt_characters": 115446,
+      "prompt_sha256": "bf43dd6d924ee97b4c8edcbdccd7389b673193706e990e45524041e5e4b40158",
+      "target": "pi"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-execution-slicing",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_root_orchestrator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-root-execution"
+      ],
+      "prompt_characters": 115446,
+      "prompt_sha256": "bf43dd6d924ee97b4c8edcbdccd7389b673193706e990e45524041e5e4b40158",
+      "target": "generic"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-review-intent",
+        "bbk-procedure-design",
+        "bbk-beads",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_root_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-plan",
+        "bbk-wayfind"
+      ],
+      "prompt_characters": 82408,
+      "prompt_sha256": "fc537777df9b768995735cf5e0d780c67cb1052a84c88d7220f3586914cbe49a",
+      "target": "codex"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-review-intent",
+        "bbk-procedure-design",
+        "bbk-beads",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_root_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-plan",
+        "bbk-wayfind"
+      ],
+      "prompt_characters": 85433,
+      "prompt_sha256": "28a8d7b7b9f31358b0ea3e832f6fe2f92ea34f5933db1946bc4e39869b814bfd",
+      "target": "omp"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-review-intent",
+        "bbk-procedure-design",
+        "bbk-beads",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_root_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-plan",
+        "bbk-wayfind"
+      ],
+      "prompt_characters": 84703,
+      "prompt_sha256": "172f45ff4fccf961eeb5663ed6fe6729127342e9f1790f1bcdcdf5ea67aee130",
+      "target": "claude"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-review-intent",
+        "bbk-procedure-design",
+        "bbk-beads",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_root_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-plan",
+        "bbk-wayfind"
+      ],
+      "prompt_characters": 84135,
+      "prompt_sha256": "4fcdd47e92132eb13b0811976239724696bb6f5549b941094a6c20d340e59e17",
+      "target": "pi"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-review-intent",
+        "bbk-procedure-design",
+        "bbk-beads",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_root_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-plan",
+        "bbk-wayfind"
+      ],
+      "prompt_characters": 84135,
+      "prompt_sha256": "4fcdd47e92132eb13b0811976239724696bb6f5549b941094a6c20d340e59e17",
+      "target": "generic"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-evidence",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-profile-routing",
+        "bbk-installed-profiles"
+      ],
+      "identity": "bbk_synthesizer",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-synthesize"
+      ],
+      "prompt_characters": 66820,
+      "prompt_sha256": "916440f531854a4a24f34e4abd3033de2c778ee6ab985b3c127c452a60b1263d",
+      "target": "codex"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-evidence",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-profile-routing",
+        "bbk-installed-profiles"
+      ],
+      "identity": "bbk_synthesizer",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-synthesize"
+      ],
+      "prompt_characters": 68651,
+      "prompt_sha256": "1ae449f062061b1615767c97cfc681b4b3dfcb9873bdc39747089d41603d2579",
+      "target": "omp"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-evidence",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-profile-routing",
+        "bbk-installed-profiles"
+      ],
+      "identity": "bbk_synthesizer",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-synthesize"
+      ],
+      "prompt_characters": 68023,
+      "prompt_sha256": "01a0d08d6e83b5a2688c0b28f197590bab9e52ae4680be8d231c0ac76a37b435",
+      "target": "claude"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-evidence",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-profile-routing",
+        "bbk-installed-profiles"
+      ],
+      "identity": "bbk_synthesizer",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-synthesize"
+      ],
+      "prompt_characters": 67703,
+      "prompt_sha256": "b250af4d25b62b624188c20da11ef436c8bdfa511f44454dd702bdd70ae7d556",
+      "target": "pi"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-evidence",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-profile-routing",
+        "bbk-installed-profiles"
+      ],
+      "identity": "bbk_synthesizer",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-synthesize"
+      ],
+      "prompt_characters": 67703,
+      "prompt_sha256": "b250af4d25b62b624188c20da11ef436c8bdfa511f44454dd702bdd70ae7d556",
+      "target": "generic"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-execution-slicing",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_territory_orchestrator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-territory-execution"
+      ],
+      "prompt_characters": 115723,
+      "prompt_sha256": "d26dcb57e1a0082a4abe80f679f4c85447567210e4ca15d23b98cb0a6a7bf4d4",
+      "target": "codex"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-execution-slicing",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_territory_orchestrator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-territory-execution"
+      ],
+      "prompt_characters": 118865,
+      "prompt_sha256": "1c00d7bf4a99397081bc4062cdfdcf37eb0a25713b598498d1dbbcbadc2bcc50",
+      "target": "omp"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-execution-slicing",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_territory_orchestrator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-territory-execution"
+      ],
+      "prompt_characters": 118068,
+      "prompt_sha256": "2432563c37d84b1357fcc321ff7e76f7a5a465e230a3f6c4b67116be8b91dd59",
+      "target": "claude"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-execution-slicing",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_territory_orchestrator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-territory-execution"
+      ],
+      "prompt_characters": 117589,
+      "prompt_sha256": "ca1ddcdab2af5b854849b4207416fc8a73992f458e66662cb4c6c9912fae5e10",
+      "target": "pi"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-execution-slicing",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_territory_orchestrator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-territory-execution"
+      ],
+      "prompt_characters": 117589,
+      "prompt_sha256": "ca1ddcdab2af5b854849b4207416fc8a73992f458e66662cb4c6c9912fae5e10",
+      "target": "generic"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-review-intent",
+        "bbk-procedure-design",
+        "bbk-beads",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_territory_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-plan",
+        "bbk-wayfind"
+      ],
+      "prompt_characters": 81032,
+      "prompt_sha256": "ca5eee20279bec58210851461b6b81aac7d619c690dcfb9957a9a0f0ff71fadd",
+      "target": "codex"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-review-intent",
+        "bbk-procedure-design",
+        "bbk-beads",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_territory_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-plan",
+        "bbk-wayfind"
+      ],
+      "prompt_characters": 83882,
+      "prompt_sha256": "3dceafead8ae1d26076ac207c6f44e29e756875d1c03435b8f45275d4bdd96cc",
+      "target": "omp"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-review-intent",
+        "bbk-procedure-design",
+        "bbk-beads",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_territory_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-plan",
+        "bbk-wayfind"
+      ],
+      "prompt_characters": 83224,
+      "prompt_sha256": "e729bdc24aa7907e8d83b8561350af9e03027ab35e63df6918e15a1669175a19",
+      "target": "claude"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-review-intent",
+        "bbk-procedure-design",
+        "bbk-beads",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_territory_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-plan",
+        "bbk-wayfind"
+      ],
+      "prompt_characters": 82606,
+      "prompt_sha256": "7238d558ec6a8a33f1a300cbcfdbd96af4601fecbea117da80386ee489e2b19a",
+      "target": "pi"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-review-intent",
+        "bbk-procedure-design",
+        "bbk-beads",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_territory_wayfinder",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-plan",
+        "bbk-wayfind"
+      ],
+      "prompt_characters": 82606,
+      "prompt_sha256": "7238d558ec6a8a33f1a300cbcfdbd96af4601fecbea117da80386ee489e2b19a",
+      "target": "generic"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-evidence",
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-recover",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-review-findings",
+        "bbk-review-intent"
+      ],
+      "identity": "bbk_validator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-assertion-validation"
+      ],
+      "prompt_characters": 89950,
+      "prompt_sha256": "b2f33a621f5b8cfe38e3e2c33af86355636d68815424b35c8ca16f07e7dd024b",
+      "target": "codex"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-evidence",
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-recover",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-review-findings",
+        "bbk-review-intent"
+      ],
+      "identity": "bbk_validator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-assertion-validation"
+      ],
+      "prompt_characters": 92545,
+      "prompt_sha256": "78736394297ca3c114988fc4cee2d03c3d27ed56278a06d6c5e9d7f34889883d",
+      "target": "omp"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-evidence",
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-recover",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-review-findings",
+        "bbk-review-intent"
+      ],
+      "identity": "bbk_validator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-assertion-validation"
+      ],
+      "prompt_characters": 91917,
+      "prompt_sha256": "312861daaa355b7395b35f197a498d74f98e90ee9732c83802ba34c5c837411f",
+      "target": "claude"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-evidence",
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-recover",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-review-findings",
+        "bbk-review-intent"
+      ],
+      "identity": "bbk_validator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-assertion-validation"
+      ],
+      "prompt_characters": 91597,
+      "prompt_sha256": "dd56a353590785867c648a8e8b0c436f2d08f7594c6511819c92586508cbb7d0",
+      "target": "pi"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-evidence",
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-recover",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-review-findings",
+        "bbk-review-intent"
+      ],
+      "identity": "bbk_validator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-assertion-validation"
+      ],
+      "prompt_characters": 91597,
+      "prompt_sha256": "dd56a353590785867c648a8e8b0c436f2d08f7594c6511819c92586508cbb7d0",
+      "target": "generic"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-review-plan",
+        "bbk-review-context",
+        "bbk-review-run",
+        "bbk-review-findings",
+        "bbk-review-intent",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_validator_orchestrator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-validation-orchestration"
+      ],
+      "prompt_characters": 109195,
+      "prompt_sha256": "51f9bb3b7a8df7d271725d6cc9fc4e67ce3d5efd46499e8ac12cc5f193e871db",
+      "target": "codex"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-review-plan",
+        "bbk-review-context",
+        "bbk-review-run",
+        "bbk-review-findings",
+        "bbk-review-intent",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_validator_orchestrator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-validation-orchestration"
+      ],
+      "prompt_characters": 112182,
+      "prompt_sha256": "caea8a1688871675df2ca36afb9ecbc95fdaa2b5cdca060b109e8ae72643a447",
+      "target": "omp"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-review-plan",
+        "bbk-review-context",
+        "bbk-review-run",
+        "bbk-review-findings",
+        "bbk-review-intent",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_validator_orchestrator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-validation-orchestration"
+      ],
+      "prompt_characters": 111281,
+      "prompt_sha256": "c65f69784869b5d07e546685e2b9f8a7655a824f169a03c6cc033c084c9f5b93",
+      "target": "claude"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-review-plan",
+        "bbk-review-context",
+        "bbk-review-run",
+        "bbk-review-findings",
+        "bbk-review-intent",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_validator_orchestrator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-validation-orchestration"
+      ],
+      "prompt_characters": 110906,
+      "prompt_sha256": "218ffec257f180e9d3a80ef69e21a593c5605f73e8c884d03750449b25377532",
+      "target": "pi"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-review-plan",
+        "bbk-review-context",
+        "bbk-review-run",
+        "bbk-review-findings",
+        "bbk-review-intent",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_validator_orchestrator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-validation-orchestration"
+      ],
+      "prompt_characters": 110906,
+      "prompt_sha256": "218ffec257f180e9d3a80ef69e21a593c5605f73e8c884d03750449b25377532",
+      "target": "generic"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-evidence",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-procedure-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_verification_designer",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-verification-design"
+      ],
+      "prompt_characters": 94256,
+      "prompt_sha256": "58773cb13ebcc52f71c66e5d68404a43391ebbddfcb7d2fb427cccf7887c595c",
+      "target": "codex"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-evidence",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-procedure-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_verification_designer",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-verification-design"
+      ],
+      "prompt_characters": 96875,
+      "prompt_sha256": "ebb6ee8a1b0636fedc2c906f9312c16b32ea8ef95f9b32956e83e16f01e772c2",
+      "target": "omp"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-evidence",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-procedure-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_verification_designer",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-verification-design"
+      ],
+      "prompt_characters": 96247,
+      "prompt_sha256": "dbeda5011ec78438d669f150407a0a646aa1fa424c44d8ba162af508e843d3be",
+      "target": "claude"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-evidence",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-procedure-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_verification_designer",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-verification-design"
+      ],
+      "prompt_characters": 95927,
+      "prompt_sha256": "8f34780f9d1d25d3ddf77aed51023c75072696fd2d766e8b6d46be4eb2e3db3c",
+      "target": "pi"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-evidence",
+        "bbk-solution-outcome-fit",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-review-plan",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-procedure-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_verification_designer",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-verification-design"
+      ],
+      "prompt_characters": 95927,
+      "prompt_sha256": "8f34780f9d1d25d3ddf77aed51023c75072696fd2d766e8b6d46be4eb2e3db3c",
+      "target": "generic"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-evidence",
+        "bbk-recover",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-procedure-design"
+      ],
+      "identity": "bbk_worker",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-work-unit-execution"
+      ],
+      "prompt_characters": 95924,
+      "prompt_sha256": "3cd2056fa7094105c4fdc5fb7994553898c1c9d2cc1c4cf7291066473a7f6e44",
+      "target": "codex"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-evidence",
+        "bbk-recover",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-procedure-design"
+      ],
+      "identity": "bbk_worker",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-work-unit-execution"
+      ],
+      "prompt_characters": 98722,
+      "prompt_sha256": "7b0060e8a4d21a69c555832be3701470151d7e62f23a9d93bd386676d1cfa5bc",
+      "target": "omp"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-evidence",
+        "bbk-recover",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-procedure-design"
+      ],
+      "identity": "bbk_worker",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-work-unit-execution"
+      ],
+      "prompt_characters": 98094,
+      "prompt_sha256": "ee2edc2a1f4e2884a60cf5e2b879fe1bbd65c2ae16db5e7c3d2ece196ce0c043",
+      "target": "claude"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-evidence",
+        "bbk-recover",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-procedure-design"
+      ],
+      "identity": "bbk_worker",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-work-unit-execution"
+      ],
+      "prompt_characters": 97774,
+      "prompt_sha256": "1f5d5c62e3195488756d46191eb6f351befd00e9077d9f6b214ee9d33377ee0a",
+      "target": "pi"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-evidence",
+        "bbk-recover",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-procedure-design"
+      ],
+      "identity": "bbk_worker",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-work-unit-execution"
+      ],
+      "prompt_characters": 97774,
+      "prompt_sha256": "1f5d5c62e3195488756d46191eb6f351befd00e9077d9f6b214ee9d33377ee0a",
+      "target": "generic"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-evidence",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-procedure-design"
+      ],
+      "identity": "bbk_worker_designer",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-worker-design"
+      ],
+      "prompt_characters": 96995,
+      "prompt_sha256": "1c5912aa40049b636c70d7d9031da0c5313bea55d44321731115ec331b532187",
+      "target": "codex"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-evidence",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-procedure-design"
+      ],
+      "identity": "bbk_worker_designer",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-worker-design"
+      ],
+      "prompt_characters": 99605,
+      "prompt_sha256": "d20ba315b6faf830b9e2e102c131e38d0373eea01e46cabce63be17f2fcb0578",
+      "target": "omp"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-evidence",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-procedure-design"
+      ],
+      "identity": "bbk_worker_designer",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-worker-design"
+      ],
+      "prompt_characters": 98977,
+      "prompt_sha256": "eaec92513b888170d145b898670c4451ce22372b5814064754552be1e7d0c49a",
+      "target": "claude"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-evidence",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-procedure-design"
+      ],
+      "identity": "bbk_worker_designer",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-worker-design"
+      ],
+      "prompt_characters": 98657,
+      "prompt_sha256": "4dcbaa7090c9c63c6193b3a62c5e0ab7e7a326316c162349a7833b520f8aa9ca",
+      "target": "pi"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-artifact",
+        "bbk-handoff",
+        "bbk-evidence",
+        "bbk-implementation-structure",
+        "bbk-execution-slicing",
+        "bbk-state-decision-effect-design",
+        "bbk-procedure-design"
+      ],
+      "identity": "bbk_worker_designer",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-worker-design"
+      ],
+      "prompt_characters": 98657,
+      "prompt_sha256": "4dcbaa7090c9c63c6193b3a62c5e0ab7e7a326316c162349a7833b520f8aa9ca",
+      "target": "generic"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-execution-slicing",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_worker_orchestrator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-worker-execution"
+      ],
+      "prompt_characters": 108310,
+      "prompt_sha256": "03cb87183116dd4ced63a9d1f95ac682417a08e106bf6db98dad72e4b1ebb602",
+      "target": "codex"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-execution-slicing",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_worker_orchestrator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-worker-execution"
+      ],
+      "prompt_characters": 111526,
+      "prompt_sha256": "cf9ad66bf707d6c334fb25d8a9258c2e9c492e49014e8c5ed932cef27618df6e",
+      "target": "omp"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-execution-slicing",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_worker_orchestrator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-worker-execution"
+      ],
+      "prompt_characters": 110595,
+      "prompt_sha256": "4491e576571b0e8037f918b53268d74df08645aaa9c0562cf1e45f21b9e4ea18",
+      "target": "claude"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-execution-slicing",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_worker_orchestrator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-worker-execution"
+      ],
+      "prompt_characters": 110250,
+      "prompt_sha256": "43c483af18d50bdf53d249a61b3d7bb77ec3930b3e6cbd37ed01126506913ac5",
+      "target": "pi"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-beads",
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-execution-slicing",
+        "bbk-implementation-structure",
+        "bbk-profile-routing",
+        "bbk-installed-profiles",
+        "bbk-state-decision-effect-design",
+        "bbk-artifact",
+        "bbk-handoff"
+      ],
+      "identity": "bbk_worker_orchestrator",
+      "identity_kind": "ROLE",
+      "procedures": [
+        "bbk-worker-execution"
+      ],
+      "prompt_characters": 110250,
+      "prompt_sha256": "43c483af18d50bdf53d249a61b3d7bb77ec3930b3e6cbd37ed01126506913ac5",
+      "target": "generic"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-handoff",
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-artifact"
+      ],
+      "identity": "bbk_controller",
+      "identity_kind": "CONTROLLER",
+      "procedures": [
+        "bbk-context-routing",
+        "bbk"
+      ],
+      "prompt_characters": 12443,
+      "prompt_sha256": "ecefcbd4b14cdc909592f45bd9adae8257eb6191d4170cead4e03d40c2c483d4",
+      "target": "codex"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-handoff",
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-artifact"
+      ],
+      "identity": "bbk_controller",
+      "identity_kind": "CONTROLLER",
+      "procedures": [
+        "bbk-context-routing",
+        "bbk"
+      ],
+      "prompt_characters": 12868,
+      "prompt_sha256": "b979bf692415954679df1e370ddf13a5b9794cc1fb5bb7bdca955f50871717cf",
+      "target": "omp"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-handoff",
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-artifact"
+      ],
+      "identity": "bbk_controller",
+      "identity_kind": "CONTROLLER",
+      "procedures": [
+        "bbk-context-routing",
+        "bbk"
+      ],
+      "prompt_characters": 12444,
+      "prompt_sha256": "d4217f1643b4776c31c1a6075966ff080349557f43dd30d46823dfe026049227",
+      "target": "claude"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-handoff",
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-artifact"
+      ],
+      "identity": "bbk_controller",
+      "identity_kind": "CONTROLLER",
+      "procedures": [
+        "bbk-context-routing",
+        "bbk"
+      ],
+      "prompt_characters": 12440,
+      "prompt_sha256": "270102e8b9d0b7d76c44d6a375e7fbd4a2a02032c73c0d93cd08e63ede4b876b",
+      "target": "pi"
+    },
+    {
+      "errors": 0,
+      "external_catalog": [
+        "bbk-handoff",
+        "bbk-recover",
+        "bbk-evidence",
+        "bbk-artifact"
+      ],
+      "identity": "bbk_controller",
+      "identity_kind": "CONTROLLER",
+      "procedures": [
+        "bbk-context-routing",
+        "bbk"
+      ],
+      "prompt_characters": 12445,
+      "prompt_sha256": "10703c55f3983ee4ca0975b7408ad696e42a71ad8428120170a4bf00e504d005",
+      "target": "generic"
+    }
+  ],
+  "schema": "bbk.prompt-compilation-lint-report.v1",
+  "status": "PASS",
+  "targets": [
+    "codex",
+    "omp",
+    "claude",
+    "pi",
+    "generic"
+  ]
+}

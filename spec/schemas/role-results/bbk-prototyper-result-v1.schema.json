@@ -6,91 +6,31 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
+    "apparatus_and_environment",
+    "artifact_dispositions",
+    "blockers",
+    "charter_and_authority",
+    "child_coordination",
+    "cleanup_and_residuals",
+    "discrimination_assessment",
+    "evaluation_commitment",
+    "evidence_and_applicability",
+    "experiment_artifact_ref",
     "experiment_ref",
     "hypothesis_and_alternatives",
-    "evaluation_commitment",
-    "charter_and_authority",
-    "apparatus_and_environment",
-    "child_coordination",
+    "invalidated_or_superseded_refs",
+    "limitations_and_not_demonstrated",
+    "observations_and_inferences",
+    "performance_or_statistical_method",
     "run_inventory",
     "run_validity",
-    "observations_and_inferences",
-    "discrimination_assessment",
-    "performance_or_statistical_method",
     "state_and_effect_trace",
-    "evidence_and_applicability",
-    "unexpected_findings",
-    "limitations_and_not_demonstrated",
-    "cleanup_and_residuals",
-    "artifact_dispositions",
-    "invalidated_or_superseded_refs",
-    "blockers",
-    "experiment_artifact_ref"
+    "unexpected_findings"
   ],
   "properties": {
-    "experiment_ref": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
-      "description": "Stable experiment ID, logical attempt ID, physical invocation ID where known, predecessor or supersession links, exact governed subject and revision, experiment-charter revision, and content or artifact digest."
-    },
-    "hypothesis_and_alternatives": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Exact empirical or experiential uncertainty, causal or structural hypothesis, credible alternatives or comparison conditions, and the named parent decision or assumption the result can change."
-    },
-    "evaluation_commitment": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Pre-result question, candidates or conditions, discrimination and falsification criteria, controls, variables, fixtures, instrumentation, evidence format, expected resource use, permitted deviations, and stop rules, plus its identity, timestamp or ordering evidence, and digest when persisted."
-    },
-    "charter_and_authority": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Included and excluded scope, allowed mutations and effects, capability zones, protected floors, data and credential authority, external targets, budgets, safety and abort conditions, cleanup owner, excluded powers, and authority actually used."
-    },
     "apparatus_and_environment": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
       "description": "Prototype artifact and apparatus identities, versions, configuration, dependencies, topology, isolation, workspace, services, devices, network conditions, datasets, fixtures, seeds where applicable, instrumentation, pre-state, rollback point, and material differences from the intended production context."
-    },
-    "child_coordination": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Direct-execution or bounded-cohort choice and rationale; declared logical-child limits by role type, maximum concurrent physical attempts, retry or continuation budget, actual use, and any exhausted limit; permitted Worker Designer and Worker identities; experimental WorkUnit and invocation-contract references; mutation, effect and integration ownership; state, checkpoints and prior-result exposure; child-return validation; apparatus assembly; rejected or invalidated child work; nested-delegation prohibition; and coordination cost. Use an explicit not-used rationale when no child was invoked."
-    },
-    "run_inventory": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
-      "description": "Every material declared and exploratory run or attempt with exact command or operation, working context, tool and environment identity, inputs, start and end state, exit or termination state, outputs, logs, resource use, observed effects, deviations, and evidence references. Negative, invalid, interrupted, and unfavorable runs remain present."
-    },
-    "run_validity": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "For each material run, whether the apparatus and method were valid for the declared question, with setup, harness, tool, profile, environment, contamination, completeness, timeout, interruption, and confounder analysis."
-    },
-    "observations_and_inferences": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Direct observations, source-reported facts, calculations, and inferences kept distinct, with exact evidence references, assumptions, contrary observations, qualitative confidence and basis, and no unsupported extrapolation."
-    },
-    "discrimination_assessment": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "How the preregistered criteria were applied; which hypotheses or alternatives were supported, falsified, distinguished, not distinguished, or left unresolved; and why the selected experiment state follows without making the parent decision."
-    },
-    "performance_or_statistical_method": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "When applicable, baselines, warm-up, sample count, trial ordering, variability, resource contention, measurement uncertainty, analysis method, and limits. Otherwise an explicit not-applicable rationale."
-    },
-    "state_and_effect_trace": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "When applicable, explicit inputs, pre-state, transitions, decisions, effect intents, acknowledgements or commitments, retries, duplicates, cancellation, timeout, faults, partial completion, recovery or compensation, post-state, and model limitations; otherwise an explicit not-applicable rationale."
-    },
-    "evidence_and_applicability": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "Evidence inventory and class, exact paths or locators, byte counts and SHA-256 values where material, subject and version binding, reproduction recipe, completeness, exposure, freshness horizon, external-validity limits, differences from production, and conditions requiring repetition or re-evaluation."
-    },
-    "unexpected_findings": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
-      "description": "Useful anomalies, adjacent discoveries, newly exposed uncertainties, contradictions, incidents, and decisions exposed but not made, each labeled exploratory unless separately chartered and tied to the affected parent objects."
-    },
-    "limitations_and_not_demonstrated": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
-      "description": "What the prototype did not test or establish, unavailable conditions, omitted candidates, instrumentation and method limits, residual uncertainty, and claims that remain prohibited."
-    },
-    "cleanup_and_residuals": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
-      "description": "One allowed cleanup state, cleanup actions and receipts, terminated processes, closed resources, revoked credentials, disposed data and workspaces, rollback or uninstall verification, quarantined artifacts, residual external state, unresolved ambiguity, owner, containment, and follow-up obligation."
     },
     "artifact_dispositions": {
       "type": "array",
@@ -106,17 +46,77 @@
       "uniqueItems": true,
       "description": "Every prototype code, configuration, data, package, schema, fixture, service asset, binary, branch, workspace, trace, and retained output with exactly one allowed artifact disposition, owner, location, purpose, retention or deletion state, and promotion-review need. `REVIEW_FOR_PRODUCTION_PROMOTION` remains non-approval."
     },
-    "invalidated_or_superseded_refs": {
-      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
-      "description": "Prior charters, criteria, runs, assumptions, evidence, artifacts, decisions, work objects, or handoffs invalidated, expired, quarantined, reopened, or superseded during the attempt."
-    },
     "blockers": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
       "description": "Exact technical, authority, decision, profile, environment, data, credential, effect, budget, cleanup, recovery, or parent-recharter blockers and the least costly valid remediation."
     },
+    "charter_and_authority": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Included and excluded scope, allowed mutations and effects, capability zones, protected floors, data and credential authority, external targets, budgets, safety and abort conditions, cleanup owner, excluded powers, and authority actually used."
+    },
+    "child_coordination": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Direct-execution or bounded-cohort choice and rationale; declared logical-child limits by role type, maximum concurrent physical attempts, retry or continuation budget, actual use, and any exhausted limit; permitted Worker Designer and Worker identities; experimental WorkUnit and invocation-contract references; mutation, effect and integration ownership; state, checkpoints and prior-result exposure; child-return validation; apparatus assembly; rejected or invalidated child work; nested-delegation prohibition; and coordination cost. Use an explicit not-used rationale when no child was invoked."
+    },
+    "cleanup_and_residuals": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "One allowed cleanup state, cleanup actions and receipts, terminated processes, closed resources, revoked credentials, disposed data and workspaces, rollback or uninstall verification, quarantined artifacts, residual external state, unresolved ambiguity, owner, containment, and follow-up obligation."
+    },
+    "discrimination_assessment": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "How the preregistered criteria were applied; which hypotheses or alternatives were supported, falsified, distinguished, not distinguished, or left unresolved; and why the selected experiment state follows without making the parent decision."
+    },
+    "evaluation_commitment": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Pre-result question, candidates or conditions, discrimination and falsification criteria, controls, variables, fixtures, instrumentation, evidence format, expected resource use, permitted deviations, and stop rules, plus its identity, timestamp or ordering evidence, and digest when persisted."
+    },
+    "evidence_and_applicability": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Evidence inventory and class, exact paths or locators, byte counts and SHA-256 values where material, subject and version binding, reproduction recipe, completeness, exposure, freshness horizon, external-validity limits, differences from production, and conditions requiring repetition or re-evaluation."
+    },
     "experiment_artifact_ref": {
       "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/artifactReference",
       "description": "Durable structured experiment-result path, byte count, and SHA-256 when persisted, including the evaluation commitment, run inventory, evidence, interpretation, cleanup, and artifact-disposition records."
+    },
+    "experiment_ref": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/reference",
+      "description": "Stable experiment ID, logical attempt ID, physical invocation ID where known, predecessor or supersession links, exact governed subject and revision, experiment-charter revision, and content or artifact digest."
+    },
+    "hypothesis_and_alternatives": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Exact empirical or experiential uncertainty, causal or structural hypothesis, credible alternatives or comparison conditions, and the named parent decision or assumption the result can change."
+    },
+    "invalidated_or_superseded_refs": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/referenceList",
+      "description": "Prior charters, criteria, runs, assumptions, evidence, artifacts, decisions, work objects, or handoffs invalidated, expired, quarantined, reopened, or superseded during the attempt."
+    },
+    "limitations_and_not_demonstrated": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "What the prototype did not test or establish, unavailable conditions, omitted candidates, instrumentation and method limits, residual uncertainty, and claims that remain prohibited."
+    },
+    "observations_and_inferences": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "Direct observations, source-reported facts, calculations, and inferences kept distinct, with exact evidence references, assumptions, contrary observations, qualitative confidence and basis, and no unsupported extrapolation."
+    },
+    "performance_or_statistical_method": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "When applicable, baselines, warm-up, sample count, trial ordering, variability, resource contention, measurement uncertainty, analysis method, and limits. Otherwise an explicit not-applicable rationale."
+    },
+    "run_inventory": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Every material declared and exploratory run or attempt with exact command or operation, working context, tool and environment identity, inputs, start and end state, exit or termination state, outputs, logs, resource use, observed effects, deviations, and evidence references. Negative, invalid, interrupted, and unfavorable runs remain present."
+    },
+    "run_validity": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "For each material run, whether the apparatus and method were valid for the declared question, with setup, harness, tool, profile, environment, contamination, completeness, timeout, interruption, and confounder analysis."
+    },
+    "state_and_effect_trace": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structured",
+      "description": "When applicable, explicit inputs, pre-state, transitions, decisions, effect intents, acknowledgements or commitments, retries, duplicates, cancellation, timeout, faults, partial completion, recovery or compensation, post-state, and model limitations; otherwise an explicit not-applicable rationale."
+    },
+    "unexpected_findings": {
+      "$ref": "https://bbk.local/schemas/bbk-role-return-v1.schema.json#/$defs/structuredList",
+      "description": "Useful anomalies, adjacent discoveries, newly exposed uncertainties, contradictions, incidents, and decisions exposed but not made, each labeled exploratory unless separately chartered and tied to the affected parent objects."
     }
   },
   "x-bbk-role": "bbk_prototyper",
