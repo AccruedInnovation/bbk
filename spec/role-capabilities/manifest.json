@@ -1,6 +1,6 @@
 {
   "generator": "tools/generate_role_capabilities.py",
-  "manifest_digest": "sha256:6f089e25d3e90b383115389c1dd72ec36bb15f50ab47992074516cc4d452f23a",
+  "manifest_digest": "sha256:dd7e51749cfac67b13646c59a4e64db793b93f605d4abc41dc1c2bffcb99ce9f",
   "policy_version": "1.0.0-alpha.17",
   "profile": "governed-software",
   "role_count": 19,
@@ -121,6 +121,6 @@
     }
   ],
   "schema": "bbk.role-capability-manifest.v1",
-  "source_catalog_digest": "sha256:e774262029cf88298db3cc5031a0ae0b71eaf00ab81615cb37832758d5dd30fe",
+  "source_catalog_digest": "sha256:64cafa31d6ee8d7191eab0499f6a5d9352d76489c2af3c881990c93b91c35ccd",
   "source_policy_digest": "sha256:0ab97bacd60ddc7b27524eb5b30bcc33b45fc9c432e1c0d83d7d490ee24ddcc7"
 }

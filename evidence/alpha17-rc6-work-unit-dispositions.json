@@ -12,7 +12,6 @@
         "projections/"
       ],
       "evidence_refs": [
-        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
         "evidence/alpha17-rc6-project-coverage.json",
         "tests/test_compiled_procedures_alpha17.py"
       ],
@@ -29,7 +28,6 @@
         "spec/schemas/bbk-compiled-procedure-manifest-v1.schema.json"
       ],
       "evidence_refs": [
-        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
         "evidence/alpha17-rc6-project-coverage.json",
         "tests/test_compiled_procedures_alpha17.py"
       ],
@@ -46,7 +44,6 @@
         "projections/manifest.json"
       ],
       "evidence_refs": [
-        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
         "evidence/alpha17-rc6-project-coverage.json",
         "tests/test_compiled_procedures_alpha17.py"
       ],
@@ -61,7 +58,6 @@
         "tests/test_compiled_procedures_alpha17.py"
       ],
       "evidence_refs": [
-        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
         "evidence/alpha17-rc6-project-coverage.json",
         "tests/test_compiled_procedures_alpha17.py"
       ],
@@ -76,7 +72,6 @@
         "spec/schemas/bbk-planning-readiness-v1.schema.json"
       ],
       "evidence_refs": [
-        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
         "evidence/alpha17-rc6-project-coverage.json",
         "tests/test_planning_optimization_alpha17.py"
       ],
@@ -92,7 +87,6 @@
         "projections/"
       ],
       "evidence_refs": [
-        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
         "evidence/alpha17-rc6-project-coverage.json",
         "tests/test_planning_optimization_alpha17.py"
       ],
@@ -108,7 +102,6 @@
         "spec/schemas/bbk-routine-assertion-contract-v1.schema.json"
       ],
       "evidence_refs": [
-        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
         "evidence/alpha17-rc6-project-coverage.json",
         "tests/test_planning_optimization_alpha17.py"
       ],
@@ -124,7 +117,6 @@
         "spec/schemas/bbk-plan-transaction-receipt-v1.schema.json"
       ],
       "evidence_refs": [
-        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
         "evidence/alpha17-rc6-project-coverage.json",
         "tests/test_planning_optimization_alpha17.py"
       ],
@@ -140,7 +132,6 @@
         "tools/bbk.py"
       ],
       "evidence_refs": [
-        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
         "evidence/alpha17-rc6-project-coverage.json",
         "tests/test_atomic_finalizer_alpha17.py"
       ],
@@ -156,7 +147,6 @@
         "tools/bbk.py"
       ],
       "evidence_refs": [
-        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
         "evidence/alpha17-rc6-project-coverage.json",
         "tests/test_evidence_replay_alpha17.py"
       ],
@@ -171,7 +161,6 @@
         "spec/schemas/bbk-effective-profile-receipt-v1.schema.json"
       ],
       "evidence_refs": [
-        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
         "evidence/alpha17-rc6-project-coverage.json",
         "tests/test_planning_optimization_alpha17.py"
       ],
@@ -188,7 +177,6 @@
         "spec/schemas/role-returns/"
       ],
       "evidence_refs": [
-        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
         "evidence/alpha17-rc6-project-coverage.json",
         "tests/test_planning_optimization_alpha17.py"
       ],
@@ -205,7 +193,6 @@
         "omp/extension/index.js"
       ],
       "evidence_refs": [
-        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
         "evidence/alpha17-rc6-project-coverage.json",
         "tests/test_planning_optimization_alpha17.py"
       ],
@@ -224,7 +211,6 @@
         "tools/jsonl_analyzer/tests/"
       ],
       "evidence_refs": [
-        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
         "evidence/alpha17-rc6-project-coverage.json",
         "delivery/evidence/release-profile-rc6.log"
       ],
@@ -239,7 +225,6 @@
         "implementation/release/MANUAL-CODEX-QUALIFICATION-ALPHA17-RC6.md"
       ],
       "evidence_refs": [
-        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
         "evidence/alpha17-rc6-project-coverage.json",
         "delivery/evidence/analyzer-synthetic/alpha17-gate-report.json"
       ],
@@ -260,7 +245,6 @@
         "PACKAGE-MANIFEST.json"
       ],
       "evidence_refs": [
-        "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md",
         "evidence/alpha17-rc6-project-coverage.json",
         "delivery/ALPHA17-RC6-RELEASE-CANDIDATE-REPORT.json"
       ],

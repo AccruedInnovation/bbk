@@ -8,7 +8,7 @@
     "source": "standing user authorization recorded in the work unit",
     "standing": true
   },
-  "bbk_version": "0.1.0-alpha.17.0.2",
+  "bbk_version": "0.1.0-alpha.17.0.2.1",
   "blockers": [],
   "capability_zones_used": [
     {

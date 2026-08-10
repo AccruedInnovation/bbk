@@ -82,6 +82,17 @@ def _reap_in_process_cycles() -> None:
 
 
 @contextlib.contextmanager
+def _redirect_stdin(stream: io.TextIOBase) -> Iterable[None]:
+    """Temporarily bind ``sys.stdin`` for child-like in-process execution."""
+    previous = sys.stdin
+    try:
+        sys.stdin = stream
+        yield
+    finally:
+        sys.stdin = previous
+
+
+@contextlib.contextmanager
 def process_context(*, cwd: str | os.PathLike[str] | None, env: Mapping[str, str] | None):
     """Temporarily apply subprocess-equivalent cwd and environment state."""
     previous_cwd = Path.cwd()
@@ -284,6 +295,10 @@ def run_cli(
         with (
             process_context(cwd=cwd or ROOT, env=env),
             accelerate_nested_profile_python(),
+            # ``subprocess.run(..., stdin=DEVNULL)`` gives every child CLI an
+            # immediate EOF.  Mirror that contract for in-process entrypoints
+            # so an install prompt cannot consume the test runner's console.
+            _redirect_stdin(io.StringIO()),
             contextlib.redirect_stdout(stdout),
             contextlib.redirect_stderr(stderr),
         ):

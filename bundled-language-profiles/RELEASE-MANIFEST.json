@@ -2,9 +2,9 @@
   "fileCount": 10,
   "files": [
     {
-      "bytes": 1042,
+      "bytes": 1044,
       "path": "README.md",
-      "sha256": "eda7e359bd687f56ed72e6fa8b6a024af7369b1dac9a65ff40daccc565fc5b7e"
+      "sha256": "808d40e45f4df0615e30dd0340166899de43970cd19cac2046620822d3ddfb10"
     },
     {
       "bytes": 461,
@@ -59,9 +59,9 @@
     "rust": "0.1.0-alpha.3",
     "typescript-javascript": "0.1.0-alpha.3"
   },
-  "release": "bbk-0.1.0-alpha.17.0.2-language-profiles",
+  "release": "bbk-0.1.0-alpha.17.0.2.1-language-profiles",
   "schema": "bbk.language-profiles-release-bundle-manifest.v1",
   "status": "PASS",
   "timezone": "America/Edmonton",
-  "variant": "bundled-with-bbk-0.1.0-alpha.17.0.2"
+  "variant": "bundled-with-bbk-0.1.0-alpha.17.0.2.1"
 }

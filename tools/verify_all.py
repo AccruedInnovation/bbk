@@ -202,7 +202,7 @@ def verification_steps(
     elif selected_profile == "omp":
         omp_test_command = [
             python, "tools/run_tests.py", test_output_flag,
-            "--profile", "standard", "--pattern", "test_omp_runtime.py",
+            "--profile", "standard", "--pattern", "test_omp_runtime_*.py",
             "--jobs", "1",
         ]
         if timing_report:
@@ -220,7 +220,7 @@ def verification_steps(
                     "unittest",
                     "-v",
                     "tests.test_core_contracts.Alpha10ModelRoutingTests",
-                    "tests.test_installation_portability.Alpha116CodexWorkspaceTests",
+                    "tests.test_installation_codex_workspace.Alpha116CodexWorkspaceTests",
                     "tests.test_codex_manual_qualification_kit.CodexManualQualificationKitTests",
                     "tests.test_artifact_skill.BbkArtifactSkillTests",
                 ),
@@ -674,3 +674,4 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

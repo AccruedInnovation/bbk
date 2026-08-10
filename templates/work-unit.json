@@ -191,7 +191,7 @@
     "tools": [
       {
         "command": "bbk",
-        "expectedVersion": "0.1.0-alpha.17.0.2",
+        "expectedVersion": "0.1.0-alpha.17.0.2.1",
         "fallbackCommand": "<python> <installed-bbk-root>/tools/bbk.py version",
         "id": "bbk",
         "versionCommand": "bbk version"

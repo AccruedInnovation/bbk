@@ -217,7 +217,7 @@ class PromptCompilationV2Tests(unittest.TestCase):
             ).hexdigest()
             registry = {
                 "schema": "bbk.installed-profile-registry.v1",
-                "bbk_version": "0.1.0-alpha.17.0.2",
+                "bbk_version": "0.1.0-alpha.17.0.2.1",
                 "bbk_cli": {},
                 "profiles": [
                     {

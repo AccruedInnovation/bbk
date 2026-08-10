@@ -1,6 +1,6 @@
 # Using BBK
 
-This is the operating guide for BBK `0.1.0-alpha.17.0.2`. Installation and update details are in [`INSTALL.md`](INSTALL.md); role contracts are in [`AGENTS.md`](AGENTS.md); and qualification limits are in [`BOUNDARIES.md`](BOUNDARIES.md).
+This is the operating guide for BBK `0.1.0-alpha.17.0.2.1`. Installation and update details are in [`INSTALL.md`](INSTALL.md); role contracts are in [`AGENTS.md`](AGENTS.md); and qualification limits are in [`BOUNDARIES.md`](BOUNDARIES.md).
 
 BBK uses the harness-root session as the sole user-facing controller and exposes four controller-selectable canonical roots. All 19 roles are non-user-facing children compiled from split v4 role sources, 43 prompt modules, exact role-specific procedures, and generated v2 return contracts. Codex, OMP, Pi, Claude Code, and generic projections are generated from the same host-neutral compilation plan; OMP additionally replaces Main and child system prompts so conflicting generic or client-specific instructions cannot govern BBK work.
 
@@ -236,6 +236,8 @@ python tools/run_tests.py --profile release --all --require-node -v
 ```
 
 `auto` uses a bounded worker pool on Windows and isolated modules on POSIX. Timing reports are stored outside the package. Use `--mode isolated --jobs 1` only for fresh-process diagnosis. `tools/verify_all.py` remains the ordered verification wrapper used by `tools/setup.py`.
+
+Native Windows singleton calibration is explicit and fail-closed: use `--calibrate-windows-singleton` with `--profile standard --mode isolated --jobs 1`, an explicit `--timing-report`, and an isolated `BBK_TEST_CACHE_DIR`. It records complete provenance and requires passing singleton coverage, but never promotes timing weights or mutates the packaged seed/cache.
 
 For a selective OMP or Codex update, the `--test-and-update-*` commands run the matching trust-gated profile. Direct equivalents remain:
 

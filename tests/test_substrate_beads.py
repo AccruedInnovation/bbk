@@ -7,9 +7,9 @@ import subprocess
 import sys
 import tempfile
 import threading
-import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOLS = ROOT / "tools"
@@ -19,6 +19,7 @@ if str(TOOLS) not in sys.path:
 from tests._path_support import assert_same_path, assert_command_invokes  # noqa: E402
 from tests._fake_executable import write_python_executable  # noqa: E402
 from substrate import beads_adapter  # noqa: E402
+from tests._vcs_fixture import init_beads, prepare_git_seed  # noqa: E402
 
 
 BD = os.environ.get("BBK_TEST_BD") or shutil.which("bd")
@@ -28,20 +29,9 @@ BD = os.environ.get("BBK_TEST_BD") or shutil.which("bd")
 class BeadsAdapterIntegrationTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
-        self.project = Path(self.temporary.name) / "project"
-        self.project.mkdir()
-        subprocess.run(["git", "init", "-q"], cwd=self.project, check=True)
-        subprocess.run(["git", "config", "user.name", "BBK Test"], cwd=self.project, check=True)
-        subprocess.run(["git", "config", "user.email", "bbk@example.invalid"], cwd=self.project, check=True)
-        subprocess.run(
-            [str(BD), "init", "--non-interactive", "--prefix", "bbkt", "--skip-agents", "--skip-hooks", "--stealth"],
-            cwd=self.project,
-            check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            env={**os.environ, "BEADS_DISABLE_METRICS": "1"},
-        )
+        self.seed = prepare_git_seed(Path(self.temporary.name) / "project", fixture_id="beads-adapter")
+        self.project = self.seed.root
+        init_beads(self.seed, bd_path=BD)
 
     def tearDown(self):
         self.temporary.cleanup()
@@ -93,11 +83,24 @@ class BeadsAdapterIntegrationTests(unittest.TestCase):
             beads_adapter.execute(self.project, self.project, changed, bd_path=BD)
         self.assertEqual(1, beads_adapter.current_revision(self.project, "WU-1"))
 
-    def test_single_writer_serializes_parallel_entry(self):
+class BeadsLockOnlyTests(unittest.TestCase):
+    """Exercise only BBK's lock projection; no Git or bd subprocess is needed."""
+
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.project = Path(self.temporary.name) / "lock-project"
+        self.project.mkdir()
+
+    def tearDown(self):
+        self.temporary.cleanup()
+
+    def test_single_writer_serializes_parallel_entry_without_sleep(self):
+        contender_started = threading.Event()
         entered = threading.Event()
         completed = threading.Event()
 
         def contender():
+            contender_started.set()
             with beads_adapter.single_writer(self.project):
                 entered.set()
             completed.set()
@@ -105,20 +108,21 @@ class BeadsAdapterIntegrationTests(unittest.TestCase):
         with beads_adapter.single_writer(self.project):
             thread = threading.Thread(target=contender, daemon=True)
             thread.start()
-            time.sleep(0.1)
+            self.assertTrue(contender_started.wait(timeout=2))
             self.assertFalse(entered.is_set())
+        self.assertTrue(completed.wait(timeout=2))
         thread.join(timeout=2)
         self.assertTrue(entered.is_set())
-        self.assertTrue(completed.is_set())
 
-    def test_single_writer_timeout_remains_fail_closed(self):
+    def test_single_writer_timeout_is_deterministic_with_fake_monotonic(self):
         prior = os.environ.get("BBK_BEADS_WRITER_WAIT_SECONDS")
-        os.environ["BBK_BEADS_WRITER_WAIT_SECONDS"] = "0.01"
+        os.environ["BBK_BEADS_WRITER_WAIT_SECONDS"] = "0"
         try:
             with beads_adapter.single_writer(self.project):
-                with self.assertRaisesRegex(beads_adapter.BeadsAdapterError, "SINGLE_WRITER_TIMEOUT"):
-                    with beads_adapter.single_writer(self.project):
-                        pass
+                with mock.patch.object(beads_adapter.time, "monotonic", side_effect=[0.0, 0.0, 0.0, 1.0]):
+                    with self.assertRaisesRegex(beads_adapter.BeadsAdapterError, "SINGLE_WRITER_TIMEOUT"):
+                        with beads_adapter.single_writer(self.project):
+                            pass
         finally:
             if prior is None:
                 os.environ.pop("BBK_BEADS_WRITER_WAIT_SECONDS", None)

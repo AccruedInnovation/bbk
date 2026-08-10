@@ -1,6 +1,6 @@
 {
   "schema": "bbk.role-return-registry.v2",
-  "package_version": "0.1.0-alpha.17.0.2",
+  "package_version": "0.1.0-alpha.17.0.2.1",
   "source_role_catalog": "spec/roles/catalog.json",
   "envelope_schema": "spec/schemas/bbk-role-return-v2.schema.json",
   "v1_registry": "spec/contracts/role-return-registry.json",

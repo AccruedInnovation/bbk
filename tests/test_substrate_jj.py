@@ -16,6 +16,7 @@ if str(TOOLS) not in sys.path:
 
 from tests._path_support import assert_same_path  # noqa: E402
 from tests._fake_executable import write_python_executable  # noqa: E402
+from tests._vcs_fixture import init_jj, prepare_git_seed, assert_isolated  # noqa: E402
 from substrate import jj_adapter  # noqa: E402
 
 
@@ -26,15 +27,12 @@ JJ = os.environ.get("BBK_TEST_JJ") or shutil.which("jj")
 class JjAdapterIntegrationTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
-        self.root = Path(self.temporary.name) / "repo"
-        self.root.mkdir()
-        self.git("init")
-        self.git("config", "user.name", "BBK Test")
-        self.git("config", "user.email", "bbk@example.invalid")
-        (self.root / "base.txt").write_text("base\n", encoding="utf-8")
-        self.git("add", ".")
-        self.git("commit", "-m", "baseline")
-        self.jj("git", "init", "--colocate", ".")
+        self.seed = prepare_git_seed(
+            Path(self.temporary.name) / "repo",
+            files={"base.txt": b"base\n"}, fixture_id="jj-adapter",
+        )
+        self.root = self.seed.root
+        init_jj(self.seed, jj_path=JJ)
 
     def tearDown(self):
         self.temporary.cleanup()
@@ -59,6 +57,19 @@ class JjAdapterIntegrationTests(unittest.TestCase):
         self.assertNotEqual(first["workspace_path"], second["workspace_path"])
         self.assertEqual("CREATED", first["status"])
         self.assertEqual("CREATED", second["status"])
+
+    def test_jj_store_is_local_and_workspace_roots_are_distinct(self):
+        baseline = self.jj("log", "-r", "@-", "--no-graph", "-T", 'commit_id ++ "\\n"').stdout.strip()
+        first = jj_adapter.allocate_workspace(
+            self.root, Path(self.temporary.name) / "one", work_unit_id="WU-ONE", attempt_id="A-1",
+            parent_revision=baseline, description="one", jj_path=JJ,
+        )
+        second = jj_adapter.allocate_workspace(
+            self.root, Path(self.temporary.name) / "two", work_unit_id="WU-TWO", attempt_id="A-1",
+            parent_revision=baseline, description="two", jj_path=JJ,
+        )
+        self.assertNotEqual(first["workspace_path"], second["workspace_path"])
+        assert_isolated(self.root, Path(first["workspace_path"]), Path(second["workspace_path"]))
 
     def test_exact_retry_reuses_workspace_but_collision_blocks(self):
         baseline = self.jj("log", "-r", "@-", "--no-graph", "-T", 'commit_id ++ "\\n"').stdout.strip()

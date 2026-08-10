@@ -16,9 +16,11 @@ back to BBK's tested canonical-path algorithm for planned or missing leaves.
 from __future__ import annotations
 
 import ast
+import hashlib
 import os
 import sys
 import unittest
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Sequence, TypeAlias
 
@@ -57,6 +59,60 @@ PHYSICAL_PATH_LABELS = frozenset(
     }
 )
 RAW_ASSERTION_ESCAPE = "BBK_TEST_ALLOW_RAW_PATH_IDENTITY"
+
+
+@dataclass(frozen=True, slots=True)
+class SourceSnapshot:
+    """Content-bound source text and AST used by static test guards.
+
+    The snapshot is keyed by the exact source bytes, rather than mtime.  This
+    keeps repeated guards cheap while still invalidating immediately when a
+    concurrent edit changes a file in place.  The AST is never reparsed for
+    unchanged bytes during one test process.
+    """
+
+    path: Path
+    source: str
+    digest: str
+    tree: ast.Module
+
+
+_SOURCE_SNAPSHOT_CACHE: dict[tuple[str, str], SourceSnapshot] = {}
+
+
+def source_snapshot(path: Path) -> SourceSnapshot:
+    """Read and parse *path* once per content revision.
+
+    Callers should use the returned ``source`` and ``tree`` together so that
+    source diagnostics and AST analysis cannot accidentally observe different
+    revisions.  Cache keys include the canonical path and SHA-256 of the
+    bytes; stale entries are harmless and remain available for diagnostics.
+    """
+
+    selected = Path(path).resolve()
+    raw = selected.read_bytes()
+    digest = hashlib.sha256(raw).hexdigest()
+    key = (str(selected), digest)
+    cached = _SOURCE_SNAPSHOT_CACHE.get(key)
+    if cached is not None:
+        return cached
+    source = raw.decode("utf-8")
+    tree = ast.parse(source, filename=str(selected))
+    snapshot = SourceSnapshot(selected, source, digest, tree)
+    _SOURCE_SNAPSHOT_CACHE[key] = snapshot
+    return snapshot
+
+
+def source_ast(path: Path) -> ast.Module:
+    """Return the content-bound AST for *path*, reusing :func:`source_snapshot`."""
+
+    return source_snapshot(path).tree
+
+
+def source_inventory(paths: Iterable[Path]) -> tuple[SourceSnapshot, ...]:
+    """Return a deterministic immutable inventory for a set of source paths."""
+
+    return tuple(source_snapshot(path) for path in sorted(paths, key=lambda item: str(Path(item).resolve())))
 
 
 def _path_text(value: PathValue) -> str:
@@ -335,9 +391,10 @@ def find_unsafe_path_assertions(path: Path) -> list[str]:
     fields, and interpolation of labelled native paths into notification text.
     Exact portable-relative serialization assertions remain valid.
     """
-    source = path.read_text(encoding="utf-8")
+    snapshot = source_snapshot(path)
+    source = snapshot.source
     lines = source.splitlines()
-    tree = ast.parse(source, filename=str(path))
+    tree = snapshot.tree
     findings: list[str] = []
 
     for node in ast.walk(tree):
@@ -444,7 +501,7 @@ def find_unguarded_symlink_creations(path: Path) -> list[str]:
     be inside a capability guard that catches ``OSError`` (or a broader
     exception), or go through :func:`create_symlink_or_skip`.
     """
-    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    tree = source_ast(path)
     findings: list[str] = []
     capability_exceptions = {
         "BaseException",

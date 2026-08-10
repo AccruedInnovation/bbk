@@ -1,6 +1,6 @@
 {
   "description": "Bundled OMP runtime routing profiles for BBK sub-agents. These profiles affect future OMP spawns only and do not change role authority or assurance obligations.",
-  "package_version": "0.1.0-alpha.17.0.2",
+  "package_version": "0.1.0-alpha.17.0.2.1",
   "profiles": {
     "deepseek-economy": {
       "description": "DeepSeek-only economy profile: V4 Pro for broader and coordination-heavy roles, V4 Flash for bounded leaf roles.",

@@ -8,7 +8,6 @@ import unittest
 from pathlib import Path
 
 from jsonschema import Draft202012Validator
-from referencing import Registry, Resource
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOLS = ROOT / "tools"
@@ -16,6 +15,7 @@ if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
 import session_oracle
+from tests._alpha17_surface_support import schema_validator as cached_schema_validator
 
 FIXTURE_ROOT = ROOT / "fixtures" / "session-inspector-alpha16"
 MANIFEST_PATH = FIXTURE_ROOT / "source-session-oracle.json"
@@ -32,14 +32,7 @@ def write_json(path: Path, value: object) -> None:
 
 
 def schema_validator(schema_name: str) -> Draft202012Validator:
-    schema_root = ROOT / "spec" / "schemas"
-    resources = []
-    for path in sorted(schema_root.rglob("*.json")):
-        value = read_json(path)
-        if isinstance(value, dict) and value.get("$id"):
-            resources.append((value["$id"], Resource.from_contents(value)))
-    registry = Registry().with_resources(resources)
-    return Draft202012Validator(read_json(schema_root / schema_name), registry=registry)
+    return cached_schema_validator(schema_name)
 
 
 def message_entry(

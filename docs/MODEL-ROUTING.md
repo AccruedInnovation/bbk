@@ -1,6 +1,6 @@
 # Sub-agent model routing
 
-BBK `0.1.0-alpha.17.0.2` separates each role's stable responsibility from the model used to perform it. The effective prompt compiler binds the selected route digest into the logical-child invalidation vector, so a route or reasoning-effort change recompiles the child without being misrepresented as a product-semantic change.
+BBK `0.1.0-alpha.17.0.2.1` separates each role's stable responsibility from the model used to perform it. The effective prompt compiler binds the selected route digest into the logical-child invalidation vector, so a route or reasoning-effort change recompiles the child without being misrepresented as a product-semantic change.
 
 The canonical install-time policy is `spec/model-routing.json`. It uses `"schema_version": "bbk.model-routing.v2"` and contains one complete OMP, Codex, and Claude Code route for every canonical role. Exact coverage is required: a missing role and an unknown role both fail validation.
 

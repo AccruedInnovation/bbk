@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-alpha17-qualification-report-v2.schema.json",
+  "title": "BBK Alpha.17 automated qualification report v2",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "schema": {"const": "bbk.alpha17-qualification-report.v2"},
+    "release": {"const": "0.1.0-alpha.17.0.2.1"},
+    "release_source": {"const": "0.1.0-alpha.17.0.2"},
+    "status": {"enum": ["PASS", "FAIL"]},
+    "qualification": {"enum": ["AUTOMATED_PASS", "AUTOMATED_FAIL"]},
+    "report_digest": {"pattern": "^sha256:[0-9a-f]{64}$"},
+    "session_inspector_oracle": {
+      "type": "object",
+      "properties": {
+        "current_release": {"const": "0.1.0-alpha.17.0.2.1"},
+        "release_source": {"const": "0.1.0-alpha.17.0.2"},
+        "reuse_status": {"const": "PREDECESSOR_RELEASE_EVIDENCE"}
+      },
+      "required": ["current_release", "release_source", "reuse_status"]
+    }
+  },
+  "required": ["schema", "release", "release_source", "status", "qualification", "report_digest"]
+}

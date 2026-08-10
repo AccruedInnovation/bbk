@@ -348,7 +348,7 @@ class OmpGovernedProfileTests(unittest.TestCase):
         self.assertEqual(value["status"]["active_count"], 1)
 
 
-    def test_generic_dispatch_fallback_is_blocked_before_effect(self):
+    def test_generic_dispatch_fallback_is_blocked_before_effect_early(self):
         environment = {**self.environment, "BBK_GOVERNED_PROFILE": "governed-software"}
         marker = '<bbk-spawn-dispatch ref="dispatch:' + ('a' * 64) + '"/>'
         value = run_node(
@@ -877,8 +877,8 @@ class OmpGovernedProfileTests(unittest.TestCase):
         subprocess.run(["git", "init", "-b", "main"], cwd=self.project, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         subprocess.run(["git", "config", "user.name", "BBK Test"], cwd=self.project, check=True)
         subprocess.run(["git", "config", "user.email", "bbk@example.invalid"], cwd=self.project, check=True)
-        subprocess.run(["git", "config", "core.autocrlf", "false"], cwd=self, check=True)
-        subprocess.run(["git", "config", "core.eol", "lf"], cwd=self, check=True)
+        subprocess.run(["git", "config", "core.autocrlf", "false"], cwd=self.project, check=True)
+        subprocess.run(["git", "config", "core.eol", "lf"], cwd=self.project, check=True)
         subprocess.run(["git", "add", "."], cwd=self.project, check=True)
         subprocess.run(["git", "commit", "-m", "baseline"], cwd=self.project, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         subprocess.run([str(JJ), "--no-pager", "--color=never", "git", "init", "--colocate", "."], cwd=self.project, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

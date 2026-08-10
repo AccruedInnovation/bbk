@@ -68,7 +68,8 @@ CAPABILITY_ROOT = ROOT / "spec" / "role-capabilities"
 ORACLE_QUALIFICATION = ROOT / "evidence" / "qualification" / "session-inspector-oracle-alpha17.json"
 OMP_HOST_CONTRACT = ROOT / "evidence" / "qualification" / "omp-host-contract-rc9.json"
 HOST_VERSION = "omp/16.4.8"
-RELEASE = "0.1.0-alpha.17.0.2"
+RELEASE = "0.1.0-alpha.17.0.2.1"
+ORACLE_RELEASE_SOURCE = "0.1.0-alpha.17.0.2"
 WORK_UNIT_ID = "WU-017"
 GATE_ID = "GATE-017-AUTOMATED"
 GATE_REQUIRED_INPUTS = [
@@ -1387,7 +1388,7 @@ def _run_alpha17_automated_bound(
         _check(
             checks,
             "A17-013-session-inspector-oracle-bound",
-            oracle_qualification.get("release") == RELEASE
+            oracle_qualification.get("release") == ORACLE_RELEASE_SOURCE
             and oracle_qualification.get("work_unit") == "WU-016"
             and oracle_qualification.get("qualification") == "AUTOMATED_PASS"
             and oracle_qualification.get("assertions", {}).get("VER-035") == "PASS",
@@ -1395,6 +1396,8 @@ def _run_alpha17_automated_bound(
             evidence_digest=oracle_file_digest,
             assertion="VER-035",
             status=oracle_qualification.get("assertions", {}).get("VER-035"),
+            current_release=RELEASE,
+            release_source=ORACLE_RELEASE_SOURCE,
         )
         host_contract = _read_json(OMP_HOST_CONTRACT)
         host_contract_digest = _sha256_file(OMP_HOST_CONTRACT)
@@ -1484,9 +1487,10 @@ def _run_alpha17_automated_bound(
         )
 
         report_core = {
-            "schema": "bbk.alpha17-qualification-report.v1",
+            "schema": "bbk.alpha17-qualification-report.v2",
             "qualification_id": f"alpha17:{canonical_digest({'fixture': fixture_digest, 'candidate': frozen_after_task['digest'], 'assertion': ASSERTION_ID})}",
             "release": RELEASE,
+            "release_source": ORACLE_RELEASE_SOURCE,
             "work_unit": WORK_UNIT_ID,
             "qualification": "AUTOMATED_PASS",
             "assertion_id": ASSERTION_ID,
@@ -1512,6 +1516,10 @@ def _run_alpha17_automated_bound(
                 "work_unit": "WU-016",
                 "assertions": {"VER-035": "PASS"},
                 "qualification": "AUTOMATED_PASS",
+                "current_release": RELEASE,
+                "release_source": ORACLE_RELEASE_SOURCE,
+                "reuse_status": "PREDECESSOR_RELEASE_EVIDENCE",
+                "claim_limit": "Reused predecessor .2 evidence does not requalify current .2.1 VER-035 or provider behavior.",
             },
             "tools": {
                 "git": _tool_identity(git_executable, ("--version",)),
@@ -1565,7 +1573,7 @@ def _run_alpha17_automated_bound(
                 "dependency_installation_performed": False,
                 "waivers": [],
             },
-            "claim_limit": "This automated keyless report establishes VER-036 only. It does not establish the real-provider manual gate, Alpha.17 final release, deployment, publication, or live acceptance.",
+            "claim_limit": "This automated keyless report establishes VER-036 only. The Session Inspector evidence source is predecessor .2 and does not establish current .2.1 VER-035/provider requalification, the real-provider manual gate, deployment, publication, or live acceptance.",
             "smallest_next_action": "Build the exact Alpha.17 release candidate and operator-run real-provider qualification packet for VER-037 through VER-039.",
         }
         return {
@@ -1584,9 +1592,10 @@ def _error_result(error: BaseException) -> dict[str, Any]:
         message = str(error)
         details = {}
     core = {
-        "schema": "bbk.alpha17-qualification-report.v1",
+        "schema": "bbk.alpha17-qualification-report.v2",
         "qualification_id": f"alpha17:failed:{canonical_digest({'code': code, 'message': message})}",
         "release": RELEASE,
+        "release_source": ORACLE_RELEASE_SOURCE,
         "work_unit": WORK_UNIT_ID,
         "assertion_id": ASSERTION_ID,
         "assertions": {ASSERTION_ID: "FAIL"},
@@ -1651,6 +1660,7 @@ def render_human_report(report: Mapping[str, Any]) -> str:
         "# BBK Alpha.17 automated qualification",
         "",
         f"- Release: `{report.get('release', RELEASE)}`",
+        f"- Evidence source release: `{report.get('release_source', ORACLE_RELEASE_SOURCE)}`",
         f"- Work unit: `{report.get('work_unit', WORK_UNIT_ID)}`",
         f"- Qualification: `{report.get('qualification', 'UNKNOWN')}`",
         f"- Gate: `{report.get('gate', {}).get('gate_id', GATE_ID)}` → `{report.get('gate', {}).get('decision', 'UNKNOWN')}`",
@@ -1718,6 +1728,7 @@ def render_human_report(report: Mapping[str, Any]) -> str:
             "## Qualification boundary",
             "",
             str(report.get("claim_limit", "No claim limit was recorded.")),
+            f"Session Inspector source: `{report.get('session_inspector_oracle', {}).get('release_source', ORACLE_RELEASE_SOURCE)}`; current report release: `{report.get('release', RELEASE)}`.",
             "",
             f"Smallest next action: {report.get('smallest_next_action', 'None recorded.')}",
             "",

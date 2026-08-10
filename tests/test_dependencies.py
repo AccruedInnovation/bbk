@@ -13,7 +13,7 @@ from contextlib import redirect_stdout
 from pathlib import Path, PureWindowsPath
 from unittest import mock
 
-from tests._path_support import assert_same_path
+from tests._path_support import assert_same_path, source_ast
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOLS = ROOT / "tools"
@@ -208,7 +208,7 @@ class DependencyContractTests(unittest.TestCase):
         local_modules.update(path.name for path in (ROOT / "tools").iterdir() if path.is_dir())
         external: dict[str, set[str]] = {}
         for path in python_files:
-            tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+            tree = source_ast(path)
             imports: set[str] = set()
             for node in ast.walk(tree):
                 if isinstance(node, ast.Import):
@@ -375,7 +375,7 @@ class DependencyContractTests(unittest.TestCase):
         external = {"git", "node", "mise", "jj", "bd"}
         bypasses: list[str] = []
         for path in sorted((ROOT / "tools").rglob("*.py")):
-            tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+            tree = source_ast(path)
             for node in ast.walk(tree):
                 if not isinstance(node, ast.Call) or not node.args:
                     continue
@@ -584,7 +584,7 @@ class DependencyRoutingTests(unittest.TestCase):
             if not relative.endswith(".py"):
                 continue
             path = tools / relative
-            tree = __import__("ast").parse(path.read_text(encoding="utf-8"), filename=str(path))
+            tree = source_ast(path)
             required: set[str] = set()
             for node in __import__("ast").walk(tree):
                 if isinstance(node, __import__("ast").Import):

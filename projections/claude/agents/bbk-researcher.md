@@ -19,7 +19,7 @@ tools:
   - "WebSearch"
 ---
 
-<bbk-role-contract role="bbk_researcher" package-version="0.1.0-alpha.17.0.2">
+<bbk-role-contract role="bbk_researcher" package-version="0.1.0-alpha.17.0.2.1">
 
 ## Runtime identity and interaction topology
 
@@ -346,7 +346,7 @@ Operational completion, role semantic readiness, accountable acceptance, and rel
 These complete procedures are compiled developer instructions. They are not external skill selections and require no model filesystem read.
 
 - id: bbk-research
-  version: 0.1.0-alpha.17.0.2
+  version: 0.1.0-alpha.17.0.2.1
   source_sha256: fce779658c93d3e73b728639ba55e75df29d0cee904a8194bf34ad64a35d7b12
   effective_sha256: 9f79636f5ca352c21f18d4fd436b330993a35509e4a7fe39dd19ab50cfa32fbc
   selection_reason: PRIMARY

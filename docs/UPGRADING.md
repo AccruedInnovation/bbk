@@ -1,8 +1,8 @@
 # Upgrading BBK
 
-## Upgrade to `0.1.0-alpha.17.0.2`
+## Upgrade to `0.1.0-alpha.17.0.2.1`
 
-`0.1.0-alpha.17.0.2` supersedes `0.1.0-alpha.17.0.1` as the public Alpha.17 successor. It keeps the Alpha.17.0.1 delivery-first, prompt-compiler, public-profile, Windows-portability, and test-runtime changes, then makes installation dependencies explicit and host-scoped. It does not alter the immutable Alpha.17 final archive or rewrite existing `.bbk` project records.
+`0.1.0-alpha.17.0.2.1` supersedes `0.1.0-alpha.17.0.2` as the public Alpha.17 source successor. It keeps the accepted dependency, host-integration, and qualification contracts while removing the obsolete hotfix companion note and aligning source metadata. It does not alter the immutable Alpha.17 or Alpha.17.0.2 archives or rewrite existing `.bbk` project records.
 
 Use Python 3.11 or newer. Check the dependencies for the host you plan to install:
 
@@ -49,7 +49,7 @@ Status records include the dependency preflight plus per-harness prompt compiler
 
 The package-owned canonical sources classified `COMPILED_ONLY` or `COMPILER_SELECTABLE` must remain outside model-discoverable skill directories. Do not copy the package's complete `shared/skills/` tree into `.agents/skills` or another host autoload root. The installer places only `EXTERNAL_OPTIONAL` procedures in those roots.
 
-Rollback is a clean replacement with a preserved predecessor package. The approved Alpha.17 OMP 16.4.8 provider campaign applies only to those exact predecessor bytes; changed Alpha.17.0.2 bytes need their own live-provider evidence when that claim is required.
+Rollback is a clean replacement with a preserved predecessor package. Qualification evidence applies only to the exact package bytes it records; changed Alpha.17.0.2.1 bytes need their own live-provider evidence when that claim is required.
 
 ## Upgrade to `0.1.0-alpha.17`
 

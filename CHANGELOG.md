@@ -1,8 +1,21 @@
 # Changelog
 
+## 0.1.0-alpha.17.0.2.1 — 2026-08-09
+
+- Publish the Windows qualification hotfix as a clean source successor to Alpha.17.0.2.
+- Fix the PowerShell clean-replacement path using native `GetConsoleMode` detection; redirected and `NUL` stdin now fail safe without entering `msvcrt`.
+- Decompose the qualification suite into focused modules with structured ledgers and receipts.
+- Record authoritative Windows calibration and pooled execution coverage across 61 modules and 756 outcomes.
+- Remove the obsolete `HOTFIX-ALPHA17.0.2-WINDOWS.md` companion note from the package surface while retaining release history and external evidence.
+- Align canonical version metadata, generated projections, templates, qualification-kit identity, and exact-version regression fixtures on `0.1.0-alpha.17.0.2.1`.
+
 ## 0.1.0-alpha.17.0.2
 
+- Removed the retired internal `IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md` artifact and its stale evidence references from the public package.
+
 - Corrected native Windows qualification isolation: runtime mise resolution is now explicit/PATH-only, batch-launcher assertions understand `cmd.exe /c`, byte-exact fixtures force LF, and real-mise qualification uses isolated Windows and mise state directories with network/auto-install/lockfile effects disabled.
+- Corrected the PowerShell clean-replacement prompt: native input now requires a real `GetConsoleMode` console handle, redirected or `NUL` stdin never enters `msvcrt`, setup preserves genuine interactive stdin, and unreadable confirmation fails safe to reconciliation.
+- Added native Windows module-duration weights, kept high-core hotspots separated across six pooled processes, bound retained timings to their operating system, and excluded failed or timed-out singleton runs from the cache.
  — 2026-08-07
 
 - Set Python 3.11 as the package-wide minimum; enforce it at the setup, install, update, CLI, verification, test-runner, release, and package entry points, and declare it for the standalone JSONL analyzer.

@@ -7,9 +7,9 @@ blocking: false
 spawns: bbk_territory_wayfinder, bbk_questioning_wayfinder, bbk_researcher, bbk_prototyper, bbk_synthesizer, bbk_architect, bbk_verification_designer, bbk_reviewer, bbk_planning_wayfinder
 ---
 
-<bbk-agent-system role="bbk_root_wayfinder" package-version="0.1.0-alpha.17.0.2">
+<bbk-agent-system role="bbk_root_wayfinder" package-version="0.1.0-alpha.17.0.2.1">
 
-<bbk-role-contract role="bbk_root_wayfinder" package-version="0.1.0-alpha.17.0.2">
+<bbk-role-contract role="bbk_root_wayfinder" package-version="0.1.0-alpha.17.0.2.1">
 
 ## Runtime identity and interaction topology
 
@@ -499,7 +499,7 @@ Operational completion, role semantic readiness, accountable acceptance, and rel
 These complete procedures are compiled developer instructions. They are not external skill selections and require no model filesystem read.
 
 - id: bbk-plan
-  version: 0.1.0-alpha.17.0.2
+  version: 0.1.0-alpha.17.0.2.1
   source_sha256: ecdc78e23bdafdb107870901dc8d2ce18ee4244e388dbfb02661e6c679abd286
   effective_sha256: 41844871d71d8b64d7a9d2942fa7c1d62131daaf4f1c2d2eb255c754fd5860ea
   selection_reason: DEPENDENCY_OF:bbk-wayfind
@@ -508,7 +508,7 @@ These complete procedures are compiled developer instructions. They are not exte
   state: COMPILED_COMPLETE
 
 - id: bbk-wayfind
-  version: 0.1.0-alpha.17.0.2
+  version: 0.1.0-alpha.17.0.2.1
   source_sha256: ef003b5bf14ec8d9983c38c6a219252eb2027ba22ce517d249f2db743e843c6c
   effective_sha256: f5b36e4d257d9dbd595b0e320dd934945eaeead6bb2b2bb855a1d6e95e17fca5
   selection_reason: PRIMARY

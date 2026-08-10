@@ -7,9 +7,9 @@ blocking: false
 spawns: bbk_worker_designer, bbk_worker
 ---
 
-<bbk-agent-system role="bbk_prototyper" package-version="0.1.0-alpha.17.0.2">
+<bbk-agent-system role="bbk_prototyper" package-version="0.1.0-alpha.17.0.2.1">
 
-<bbk-role-contract role="bbk_prototyper" package-version="0.1.0-alpha.17.0.2">
+<bbk-role-contract role="bbk_prototyper" package-version="0.1.0-alpha.17.0.2.1">
 
 ## Runtime identity and interaction topology
 
@@ -456,7 +456,7 @@ Operational completion, role semantic readiness, accountable acceptance, and rel
 These complete procedures are compiled developer instructions. They are not external skill selections and require no model filesystem read.
 
 - id: bbk-prototype
-  version: 0.1.0-alpha.17.0.2
+  version: 0.1.0-alpha.17.0.2.1
   source_sha256: 26c857b30890c85751ca67ba9a2258cbadaa97b042ba77e4952c82137d3a33a9
   effective_sha256: 3606ba38f1b06f4d5f039166fc23f5892bf35181c59e0e888695f81a270fabe3
   selection_reason: PRIMARY

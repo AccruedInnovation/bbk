@@ -2,7 +2,7 @@
 
 ## Current behavior
 
-BBK `0.1.0-alpha.17.0.2` treats **task execution state** and **live peer state** as separate observations and adds typed prompt-compilation/reuse state for the same logical child.
+BBK `0.1.0-alpha.17.0.2.1` treats **task execution state** and **live peer state** as separate observations and adds typed prompt-compilation/reuse state for the same logical child.
 
 A child can finish one OMP task attempt, remain parked in the hub, and later be woken for follow-up work. The earlier task lifecycle may still say `completed`; that does not prove that the peer session is dead or inactive. `/bbk:agents` therefore reconciles two ordered evidence sources:
 
@@ -40,7 +40,7 @@ The current extension includes the `controller_timing` attachment on `/bbk:agent
 
 ## Exact OMP 16.4.8 child-lifetime cause
 
-BBK `0.1.0-alpha.17.0.2` retains the child-lifetime contract qualified against OMP `16.4.8`. Changed package or host bytes require separate live qualification. That OMP release has two task-execution paths.
+BBK `0.1.0-alpha.17.0.2.1` retains the child-lifetime contract qualified against OMP `16.4.8`. Changed package or host bytes require separate live qualification. That OMP release has two task-execution paths.
 
 ### Native background path
 

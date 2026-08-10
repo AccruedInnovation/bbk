@@ -18,6 +18,7 @@ if str(TOOLS) not in sys.path:
 import governed_filesystem as filesystem  # noqa: E402
 import governed_state  # noqa: E402
 import omp_binding_registry as registry  # noqa: E402
+from tests._vcs_fixture import prepare_git_seed  # noqa: E402
 
 
 class GovernedFilesystemTests(unittest.TestCase):
@@ -25,19 +26,13 @@ class GovernedFilesystemTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.base = Path(self.temporary.name)
         self.project = self.base / "campaign"
-        self.workspace = self.base / "attempt-workspace"
         self.project.mkdir()
-        self.workspace.mkdir()
-        self.git("init")
-        self.git("config", "user.name", "BBK Test")
-        self.git("config", "user.email", "bbk@example.invalid")
-        self.git("config", "core.autocrlf", "false")
-        self.git("config", "core.eol", "lf")
-        (self.workspace / "src").mkdir()
+        self.seed = prepare_git_seed(
+            self.base / "attempt-workspace",
+            files={"src/a.txt": b"before\n"}, fixture_id="governed-filesystem",
+        )
+        self.workspace = self.seed.root
         (self.workspace / "docs").mkdir()
-        (self.workspace / "src" / "a.txt").write_bytes(b"before\n")
-        self.git("add", ".")
-        self.git("commit", "-m", "baseline")
         baseline_commit = self.git("rev-parse", "HEAD").stdout.strip()
         self.jj_identity = {
             "jj_change_id": "change-1",

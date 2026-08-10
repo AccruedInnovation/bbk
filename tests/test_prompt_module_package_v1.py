@@ -32,6 +32,7 @@ from prompt_modules import (  # noqa: E402
     source_manifest,
     validate_skill_templates,
 )
+from tests._role_spec_fixture import materialize_role_assembly_fixture
 
 
 EXCLUSIVE_MODULE_ROLES = {
@@ -346,15 +347,6 @@ class PromptModulePackageV1Tests(unittest.TestCase):
             (ROOT / "tests" / "fixtures" / "alpha13-gate3-prompt-baseline.json")
             .read_text(encoding="utf-8")
         )
-
-    def _minimal_copy(self, target: Path) -> None:
-        (target / "spec").mkdir(parents=True)
-        shutil.copy2(self.method_path, target / "spec" / "method-content.json")
-        shutil.copytree(ROOT / "spec" / "roles", target / "spec" / "roles")
-        shutil.copytree(ROOT / "spec" / "prompt-modules", target / "spec" / "prompt-modules")
-        shutil.copytree(ROOT / "spec" / "schemas", target / "spec" / "schemas")
-        shutil.copytree(ROOT / "spec" / "contracts", target / "spec" / "contracts")
-        shutil.copy2(ROOT / "spec" / "roles.json", target / "spec" / "roles.json")
 
     def test_catalog_and_module_schemas_are_valid_draft_2020_12(self) -> None:
         try:
@@ -1027,7 +1019,7 @@ class PromptModulePackageV1Tests(unittest.TestCase):
     def test_unknown_role_module_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            self._minimal_copy(root)
+            materialize_role_assembly_fixture(ROOT, root)
             path = root / "spec" / "roles" / "bbk_worker-role.json"
             role = json.loads(path.read_text(encoding="utf-8"))
             role["prompt_modules"].append("bbk-prompt-does-not-exist")
@@ -1039,7 +1031,7 @@ class PromptModulePackageV1Tests(unittest.TestCase):
     def test_misordered_role_modules_are_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            self._minimal_copy(root)
+            materialize_role_assembly_fixture(ROOT, root)
             path = root / "spec" / "roles" / "bbk_worker-role.json"
             role = json.loads(path.read_text(encoding="utf-8"))
             role["prompt_modules"][0], role["prompt_modules"][1] = (
@@ -1053,7 +1045,7 @@ class PromptModulePackageV1Tests(unittest.TestCase):
     def test_exclusive_module_assigned_to_wrong_role_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            self._minimal_copy(root)
+            materialize_role_assembly_fixture(ROOT, root)
             path = root / "spec" / "roles" / "bbk_worker-role.json"
             role = json.loads(path.read_text(encoding="utf-8"))
             selected = set(role["prompt_modules"]) | {"bbk-prompt-human-request"}
@@ -1068,7 +1060,7 @@ class PromptModulePackageV1Tests(unittest.TestCase):
     def test_additional_mandatory_procedure_requires_measured_exception(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            self._minimal_copy(root)
+            materialize_role_assembly_fixture(ROOT, root)
             role_path = root / "spec" / "roles" / "bbk_worker-role.json"
             role = json.loads(role_path.read_text(encoding="utf-8"))
             role["mandatory_skills"].append("bbk-handoff")
@@ -1080,7 +1072,7 @@ class PromptModulePackageV1Tests(unittest.TestCase):
     def test_measured_exception_can_authorize_more_than_three_mandatory_procedures(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            self._minimal_copy(root)
+            materialize_role_assembly_fixture(ROOT, root)
             role_path = root / "spec" / "roles" / "bbk_worker-role.json"
             role = json.loads(role_path.read_text(encoding="utf-8"))
             additions = ["bbk-handoff", "bbk-recover", "bbk-implementation-structure"]
@@ -1121,7 +1113,7 @@ class PromptModulePackageV1Tests(unittest.TestCase):
     def test_stale_mandatory_procedure_measurement_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            self._minimal_copy(root)
+            materialize_role_assembly_fixture(ROOT, root)
             role_path = root / "spec" / "roles" / "bbk_worker-role.json"
             role = json.loads(role_path.read_text(encoding="utf-8"))
             role["mandatory_skills"] = [role["primary_skill"], "bbk-handoff"]
@@ -1154,7 +1146,7 @@ class PromptModulePackageV1Tests(unittest.TestCase):
     def test_missing_module_required_by_primary_procedure_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            self._minimal_copy(root)
+            materialize_role_assembly_fixture(ROOT, root)
             path = root / "spec" / "roles" / "bbk_worker-role.json"
             role = json.loads(path.read_text(encoding="utf-8"))
             required = next(iter(role_skill_module_requirements(
@@ -1200,3 +1192,4 @@ if __name__ == "__main__":
 
 # Deterministic fast/standard/release selection used by tools/run_tests.py.
 from tests._test_profiles import load_profiled_tests as load_tests
+

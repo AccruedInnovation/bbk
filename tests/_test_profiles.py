@@ -20,19 +20,19 @@ DEFAULT_PROFILE = "release"
 # qualification but are not required for ordinary development/preinstall runs.
 RELEASE_ONLY = frozenset(
     {
-        "test_installation_portability.Alpha93VerificationReportingTests.test_runner_end_to_end_repeats_failure_and_error_at_the_end",
-        "test_installation_portability.Alpha93VerificationReportingTests.test_runner_end_to_end_prints_clean_final_summary",
-        "test_installation_portability.Alpha117GitRepositoryTests.test_pooled_runner_uses_bounded_multi_module_processes",
-        "test_installation_portability.Alpha117GitRepositoryTests.test_batch_runner_uses_one_python_process_for_all_discovered_modules",
-        "test_installation_portability.Alpha117GitRepositoryTests.test_test_runner_emits_suite_progress_and_quiet_heartbeat",
-        "test_installation_portability.Alpha117GitRepositoryTests.test_parallel_runner_heartbeat_names_the_current_test",
-        "test_installation_portability.Alpha117GitRepositoryTests.test_suite_children_cannot_read_the_developer_console",
-        "test_installation_portability.Alpha117GitRepositoryTests.test_test_runner_survives_cp1252_console_and_non_utf8_child_bytes",
-        "test_installation_portability.Alpha117GitRepositoryTests.test_output_stream_failure_terminates_child_before_capture_cleanup",
-        "test_installation_portability.Alpha117GitRepositoryTests.test_windows_process_tree_cleanup_bounds_taskkill",
-        "test_installation_portability.Alpha117GitRepositoryTests.test_capture_cleanup_retries_and_suppresses_windows_sharing_violation",
-        "test_installation_portability.Alpha117GitRepositoryTests.test_ordered_verifier_survives_cp1252_console_with_unicode_child_output",
-        "test_installation_portability.Alpha117GitRepositoryTests.test_install_verification_gate_survives_cp1252_console_mirroring",
+        "test_installation_portability_contracts.Alpha93VerificationReportingTests.test_runner_end_to_end_repeats_failure_and_error_at_the_end",
+        "test_installation_portability_contracts.Alpha93VerificationReportingTests.test_runner_end_to_end_prints_clean_final_summary",
+        "test_installation_profile_packages.Alpha117GitRepositoryTests.test_pooled_runner_uses_bounded_multi_module_processes",
+        "test_installation_profile_packages.Alpha117GitRepositoryTests.test_batch_runner_uses_one_python_process_for_all_discovered_modules",
+        "test_installation_profile_packages.Alpha117GitRepositoryTests.test_test_runner_emits_suite_progress_and_quiet_heartbeat",
+        "test_installation_profile_packages.Alpha117GitRepositoryTests.test_parallel_runner_heartbeat_names_the_current_test",
+        "test_installation_profile_packages.Alpha117GitRepositoryTests.test_suite_children_cannot_read_the_developer_console",
+        "test_installation_profile_packages.Alpha117GitRepositoryTests.test_test_runner_survives_cp1252_console_and_non_utf8_child_bytes",
+        "test_installation_profile_packages.Alpha117GitRepositoryTests.test_output_stream_failure_terminates_child_before_capture_cleanup",
+        "test_installation_profile_packages.Alpha117GitRepositoryTests.test_windows_process_tree_cleanup_bounds_taskkill",
+        "test_installation_profile_packages.Alpha117GitRepositoryTests.test_capture_cleanup_retries_and_suppresses_windows_sharing_violation",
+        "test_installation_profile_packages.Alpha117GitRepositoryTests.test_ordered_verifier_survives_cp1252_console_with_unicode_child_output",
+        "test_installation_profile_packages.Alpha117GitRepositoryTests.test_install_verification_gate_survives_cp1252_console_mirroring",
         "test_contract_package_v1.ContractPackageV1Tests.test_declared_nullability_matches_role_contract_prose_and_schema",
         "test_contract_package_v1.ContractPackageV1Tests.test_representative_return_for_every_role_validates",
         "test_contract_package_v1.ContractPackageV1Tests.test_exact_role_contract_discriminators_reject_drift_for_every_role",
@@ -122,3 +122,4 @@ def profile_counts(test_ids: Iterable[str]) -> dict[str, int]:
         profile: sum(1 for test_id in values if selected(test_id, profile))
         for profile in PROFILES
     }
+

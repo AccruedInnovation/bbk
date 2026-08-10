@@ -18,7 +18,7 @@ import release_qualification  # noqa: E402
 from gate_kernel import canonical_digest  # noqa: E402
 from jsonschema import Draft202012Validator  # noqa: E402
 
-SCHEMA_PATH = ROOT / "spec" / "schemas" / "bbk-alpha17-qualification-report-v1.schema.json"
+SCHEMA_PATH = ROOT / "spec" / "schemas" / "bbk-alpha17-qualification-report-v2.schema.json"
 ORACLE_PATH = ROOT / "evidence" / "qualification" / "session-inspector-oracle-alpha17.json"
 HOST_CONTRACT_PATH = ROOT / "evidence" / "qualification" / "omp-host-contract-rc9.json"
 JJ = os.environ.get("BBK_TEST_JJ") or shutil.which("jj")
@@ -40,6 +40,19 @@ def assert_report_digest(test: unittest.TestCase, report: dict[str, object]) -> 
 class ReleaseQualificationPureTests(unittest.TestCase):
     def test_qualification_schema_is_valid_draft_2020_12(self) -> None:
         validator()
+
+    def test_public_release_excludes_completed_implementation_mapping_checklist(self) -> None:
+        retired = ROOT / "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md"
+        self.assertFalse(retired.exists(), "the retired internal implementation checklist must not ship")
+        dispositions = json.loads(
+            (ROOT / "evidence" / "alpha17-rc6-work-unit-dispositions.json").read_text(encoding="utf-8")
+        )
+        dangling = [
+            unit.get("id")
+            for unit in dispositions.get("work_units", [])
+            if "IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md" in unit.get("evidence_refs", [])
+        ]
+        self.assertEqual([], dangling, "release evidence must not reference the retired checklist")
 
     def test_structured_failure_is_schema_valid_digest_bound_and_blocks_gate(self) -> None:
         report = release_qualification._error_result(  # noqa: SLF001 - release failure contract
@@ -83,12 +96,18 @@ class ReleaseQualificationVerticalSliceTests(unittest.TestCase):
         validator().validate(report)
         assert_report_digest(self, report)
         self.assertEqual("PASS", report["status"])
+        self.assertEqual("0.1.0-alpha.17.0.2.1", report["release"])
+        self.assertEqual("0.1.0-alpha.17.0.2", report["release_source"])
         self.assertEqual("AUTOMATED_PASS", report["qualification"])
         self.assertEqual("RC_ELIGIBLE", report["gate"]["decision"])
         self.assertEqual("PENDING_WU_018", report["gate"]["manual_provider_gate"])
         self.assertEqual("PASS", report["assertions"]["VER-036"])
 
         oracle = report["session_inspector_oracle"]
+        self.assertEqual("0.1.0-alpha.17.0.2.1", oracle["current_release"])
+        self.assertEqual("0.1.0-alpha.17.0.2", oracle["release_source"])
+        self.assertEqual("PREDECESSOR_RELEASE_EVIDENCE", oracle["reuse_status"])
+        self.assertIn("does not requalify", oracle["claim_limit"])
         self.assertEqual("PASS", oracle["assertions"]["VER-035"])
         self.assertEqual(
             f"sha256:{__import__('hashlib').sha256(ORACLE_PATH.read_bytes()).hexdigest()}",

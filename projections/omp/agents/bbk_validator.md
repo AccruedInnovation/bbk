@@ -6,9 +6,9 @@ thinkingLevel: "high"
 blocking: false
 ---
 
-<bbk-agent-system role="bbk_validator" package-version="0.1.0-alpha.17.0.2">
+<bbk-agent-system role="bbk_validator" package-version="0.1.0-alpha.17.0.2.1">
 
-<bbk-role-contract role="bbk_validator" package-version="0.1.0-alpha.17.0.2">
+<bbk-role-contract role="bbk_validator" package-version="0.1.0-alpha.17.0.2.1">
 
 ## Runtime identity and interaction topology
 
@@ -489,7 +489,7 @@ Operational completion, role semantic readiness, accountable acceptance, and rel
 These complete procedures are compiled developer instructions. They are not external skill selections and require no model filesystem read.
 
 - id: bbk-assertion-validation
-  version: 0.1.0-alpha.17.0.2
+  version: 0.1.0-alpha.17.0.2.1
   source_sha256: cc1e0b58d0dd32edec4178eefe9d97962a51f2ead58c77cc6b656c855f0e9423
   effective_sha256: ecf8a204b8d42b0fe51be856b78a7dc5cea4080067a6c8542ca64cb670739dc6
   selection_reason: PRIMARY

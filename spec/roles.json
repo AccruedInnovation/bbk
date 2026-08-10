@@ -1,6 +1,6 @@
 {
   "schema_version": "bbk.roles.v4",
-  "package_version": "0.1.0-alpha.17.0.2",
+  "package_version": "0.1.0-alpha.17.0.2.1",
   "projection_schema": "spec/schemas/bbk-roles-v4.schema.json",
   "source_catalog": "spec/roles/catalog.json",
   "prompt_module_package": "spec/prompt-modules/catalog.json",
@@ -8,8 +8,8 @@
   "source_manifest": {
     "catalog": {
       "path": "spec/roles/catalog.json",
-      "bytes": 17153,
-      "sha256": "e774262029cf88298db3cc5031a0ae0b71eaf00ab81615cb37832758d5dd30fe"
+      "bytes": 17155,
+      "sha256": "64cafa31d6ee8d7191eab0499f6a5d9352d76489c2af3c881990c93b91c35ccd"
     },
     "roles": [
       {
@@ -130,8 +130,8 @@
     "prompt_modules": [
       {
         "path": "spec/prompt-modules/catalog.json",
-        "bytes": 6618,
-        "sha256": "260e0bc2cdab3afa8f89d74236d69d43e4f319e2eb54e1ac895de46ccddf2763"
+        "bytes": 6620,
+        "sha256": "58a8d4d15a9c0487b501e741cf4697984323b4c8e28e62282fe6f2bacd13833b"
       },
       {
         "path": "spec/prompt-modules/bbk-prompt-role-boundary.json",

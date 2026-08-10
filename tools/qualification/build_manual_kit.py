@@ -47,8 +47,8 @@ def canonical(value: Any) -> bytes:
 def rc_identity() -> tuple[str, str]:
     if VERSION == "0.1.0-alpha.17":
         return "FINAL", "final"
-    if VERSION == "0.1.0-alpha.17.0.2":
-        return "ALPHA17.0.2", "0-2"
+    if VERSION == "0.1.0-alpha.17.0.2.1":
+        return "ALPHA17.0.2.1", "0-2-1"
     match = re.search(r"\+rc\.(\d+)$", VERSION)
     if not match:
         raise ValueError(f"VERSION is not an Alpha.17 candidate, final, or supported successor release: {VERSION}")

@@ -1,6 +1,6 @@
 # Install and qualify BBK
 
-This guide applies to BBK `0.1.0-alpha.17.0.2`. Use a clean extraction for each release; do not overlay one extracted package on another.
+This guide applies to BBK `0.1.0-alpha.17.0.2.1`. Use a clean extraction for each release; do not overlay one extracted package on another.
 
 The release contains BBK core plus independently versioned Go, Python, Rust, and TypeScript/JavaScript profiles at `0.1.0-alpha.3`.
 
@@ -285,6 +285,19 @@ $BbkArtifact = "$HOME\.agents\skills\bbk-artifact\scripts\bbk-artifact.cmd"
 A passing artifact operation establishes the recorded package bytes and declared closure only. It does not establish acceptance, authorization, validation, deployment readiness, or release authority.
 
 ## Existing installs
+
+### PowerShell clean-replacement confirmation
+
+Interactive Windows installs read the clean-replacement answer through the
+native console input buffer rather than `sys.stdin.readline()`. This avoids a
+PowerShell/Windows Terminal state where the prompt is visible but keyboard input
+cannot reach Python's text stream. Press Enter for the default clean replacement,
+or enter `n` and press Enter to preserve and reconcile the existing installation.
+
+Automation should remain explicit: use `--uninstall-existing` to clean-replace or
+`--keep-existing` to reconcile without a prompt. If native console input cannot
+be opened, BBK fails safe by preserving the existing installation and prints the
+explicit clean-replacement command-line option.
 
 When BBK finds an existing managed install, interactive setup asks whether to clean-replace the selected surface or keep and reconcile it. For automation, choose explicitly:
 

@@ -72,7 +72,7 @@ const versionPath = (() => {
   try { readFileSync(path.join(extensionDir, "VERSION")); return path.join(extensionDir, "VERSION"); }
   catch { return path.join(sourceRoot, "VERSION"); }
 })();
-let version = "0.1.0-alpha.17.0.2";
+let version = "0.1.0-alpha.17.0.2.1";
 try { version = readFileSync(versionPath, "utf8").trim() || version; } catch {}
 
 function normalizedFsPath(value) {

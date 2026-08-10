@@ -436,7 +436,7 @@ Operational completion, role semantic readiness, accountable acceptance, and rel
 These complete procedures are compiled developer instructions. They are not external skill selections and require no model filesystem read.
 
 - id: bbk-work-unit-execution
-  version: 0.1.0-alpha.17.0.2
+  version: 0.1.0-alpha.17.0.2.1
   source_sha256: 83ea002190f02f8747f5bfd9087de78a5e3ff6aca1113756d9521bb6e16cf14b
   effective_sha256: 4adaae557be416da59bc00ae9cf66350fe43ae6bf48283cb172438591f03115e
   selection_reason: PRIMARY

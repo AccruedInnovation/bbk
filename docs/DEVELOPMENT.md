@@ -112,17 +112,26 @@ The native Windows workflow uses the official mise action to install the root `m
 
 The standard profile keeps every product, installer, Git, Node/OMP, Beads, routing, platform, and user-facing schema-command test. Release adds only test-runner self-tests and duplicate optional whole-package Draft 2020-12 cross-checks. Release publication and `tools/build_release.py` always select release explicitly.
 
-The default `auto` strategy uses six workers on hosts with at least 12 logical CPUs, four on medium hosts, and a smaller bound on low-core hosts. Windows groups modules into bounded pooled Python processes; POSIX retains module-isolated parallelism. `--jobs` changes only the worker count. Retained per-module durations drive later shards; source size is used only when no duration exists. For example:
+The default `auto` strategy uses six workers on hosts with at least 12 logical CPUs, four on medium hosts, and a smaller bound on low-core hosts. Windows groups modules into bounded pooled Python processes; POSIX retains module-isolated parallelism. `--jobs` changes only the worker count. Retained per-module durations drive later shards; source size is used only when no duration exists. The packaged `tests/test-durations.json` keeps generic weights plus an optional `platforms.windows` map with provenance; missing native data falls back to the generic map. For example:
 
 ```bash
 python tools/run_tests.py --profile standard -v
 python tools/run_tests.py --profile release -v --mode pooled --jobs 6
-python tools/run_tests.py --profile release -v --mode isolated --jobs 1 -p test_installation_portability.py --suite-timeout 300
+python tools/run_tests.py --profile release -v --mode isolated --jobs 1 -p 'test_installation_*.py' --suite-timeout 420
 ```
 
 Canonical BBK CLI assertions and package-local deterministic verifier commands execute in-process after the immutable package trust gate. The adapters restore current directory, `sys.argv`, `sys.path`, environment, and temporary module state. Real process boundaries remain for package trust, Node, Git, interpreter flags, stdin/encoding and process-tree tests, installed copies, and unittest shard isolation.
 
 Timing reports and the rolling duration cache live outside the package tree so test execution cannot mutate a qualified release. Defaults are `%LOCALAPPDATA%\BBK\test-runs` on Windows and `~/.cache/bbk/test-runs` on POSIX. Set `BBK_TEST_CACHE_DIR` for an isolated benchmark or CI workspace.
+
+Native Windows duration calibration is explicit and fail-closed. Use native Windows, the standard profile, isolated mode, one job, an explicit report path, and a fresh isolated `BBK_TEST_CACHE_DIR`:
+
+```powershell
+$env:BBK_TEST_CACHE_DIR = (Join-Path $PWD '.bbk-windows-calibration-cache')
+python tools/run_tests.py --calibrate-windows-singleton --profile standard --mode isolated --jobs 1 --timing-report .\evidence\windows-standard-singleton-calibration.json
+```
+
+Reports record module inventory and runtime/tool/CPU provenance. Every module must be a passing singleton with a positive duration and matching Windows/standard/runtime/inventory identity; timeout, partial, duplicate, missing, stale, or wrong-subject evidence is rejected. Calibration never writes `tests/test-durations.json`, updates the rolling cache, or promotes weights.
 
 The ordered profiles verify the applicable package trust gates, canonical method and role projections, model routing, generated agents, Python and JSON sanity, semantic/schema fixtures, selected unittests, OMP syntax, and post-test package integrity. OMP-only and Codex-only tested updates retain their corresponding targeted profiles.
 
@@ -177,7 +186,7 @@ $env:PYTHONUTF8 = "0"
 $env:PYTHONIOENCODING = "cp1252:strict"
 python -m unittest -v `
   tests.test_core_contracts.Alpha6CongruenceTests.test_unicode_initialization_examples_and_uninitialized_status_are_truthful `
-  tests.test_omp_runtime.Alpha113OmpModelMenuTests.test_installed_omp_tool_transport_round_trips_utf8_strictly
+  tests.test_omp_runtime_model_menu.Alpha113OmpModelMenuTests.test_installed_omp_tool_transport_round_trips_utf8_strictly
 python tools/run_tests.py --profile release -v --mode isolated --jobs 1
 ```
 

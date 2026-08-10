@@ -28,7 +28,7 @@
   "controller_source": "spec/controllers/bbk_controller.json",
   "controller_source_sha256": "06ed74eb07c1ec2e6c576079f00e891d7592312d8141037eb41a6325b790f076",
   "dependency_source": "spec/procedures/dependencies.json",
-  "dependency_source_sha256": "07b0a1506482233b39efbee6be4e8688f2c3645e380b1b37da8223eab15d870a",
+  "dependency_source_sha256": "646c198f916fe9026ba344be84be86cd2cecdd32a1855945da61d54502df0c77",
   "global_non_indexed_compiled_set": [
     "bbk",
     "bbk-architecture",
@@ -52,7 +52,7 @@
     "bbk-worker-design",
     "bbk-worker-execution"
   ],
-  "package_version": "0.1.0-alpha.17.0.2",
+  "package_version": "0.1.0-alpha.17.0.2.1",
   "physical_catalog_classes": {
     "COMPILED_ONLY": [
       "bbk"
@@ -124,7 +124,7 @@
       ],
       "source": "shared/skills/bbk/SKILL.md",
       "source_sha256": "a840b12ac87c3b83f958aa424d83243aa54722b0eb7b621b9dc00b2d3bf260dc",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "COMPILER_SELECTABLE",
@@ -147,7 +147,7 @@
       ],
       "source": "shared/skills/bbk-architecture/SKILL.md",
       "source_sha256": "a0e97d2d8801e7ff24e83417f0e61f8c34dd42c33479c8d7c7863ba153cec557",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "EXTERNAL_OPTIONAL",
@@ -157,7 +157,7 @@
       "prompt_module_dependencies": [],
       "source": "shared/skills/bbk-artifact/SKILL.md",
       "source_sha256": "6c6cbe2f3f6a6cd38d19170c8d02e8e11796a21a82fff65d25c10bb9ee241774",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "COMPILER_SELECTABLE",
@@ -186,7 +186,7 @@
       ],
       "source": "shared/skills/bbk-assertion-validation/SKILL.md",
       "source_sha256": "cc1e0b58d0dd32edec4178eefe9d97962a51f2ead58c77cc6b656c855f0e9423",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "EXTERNAL_OPTIONAL",
@@ -196,7 +196,7 @@
       "prompt_module_dependencies": [],
       "source": "shared/skills/bbk-beads/SKILL.md",
       "source_sha256": "209117fe291bd4a336b544f983914ceaec0bacd00494432bdd9ae759bd98dc7a",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "COMPILER_SELECTABLE",
@@ -210,7 +210,7 @@
       ],
       "source": "shared/skills/bbk-context-routing/SKILL.md",
       "source_sha256": "9d17c48254093203d0a753c40bbb7e0be57973296a9c70d3d7fd64aefbfeb065",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "EXTERNAL_OPTIONAL",
@@ -226,7 +226,7 @@
       ],
       "source": "shared/skills/bbk-evidence/SKILL.md",
       "source_sha256": "1ff382e9ebd3dd11989d036d0a914a7867b61d9dbeb454dd2e94f16e463f413a",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "EXTERNAL_OPTIONAL",
@@ -236,7 +236,7 @@
       "prompt_module_dependencies": [],
       "source": "shared/skills/bbk-execute/SKILL.md",
       "source_sha256": "07550acf9a11cdb86f698966107176231dd6f0de14b196c1b08cf29eeeedcb5b",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "EXTERNAL_OPTIONAL",
@@ -251,7 +251,7 @@
       ],
       "source": "shared/skills/bbk-execution-slicing/SKILL.md",
       "source_sha256": "3fc2e1449fdf0e37789eb0caf7069dc7907c51ba97e9e2eafc34213b72766c3a",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "COMPILER_SELECTABLE",
@@ -270,7 +270,7 @@
       ],
       "source": "shared/skills/bbk-grill/SKILL.md",
       "source_sha256": "b03963b1db9b4e9ba6d455e689ccd24d43480573815713eec30491f62e712fc3",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "EXTERNAL_OPTIONAL",
@@ -287,7 +287,7 @@
       ],
       "source": "shared/skills/bbk-handoff/SKILL.md",
       "source_sha256": "8260097e6770df1ddc70c0e28ca4902b2fbec6c29a6e355584398c20d0759721",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "EXTERNAL_OPTIONAL",
@@ -301,7 +301,7 @@
       ],
       "source": "shared/skills/bbk-implementation-structure/SKILL.md",
       "source_sha256": "5d50f74827bc0aec7b7ea2489f2003a3d2cf43a4ade6b5d6f90ac6a98a71aff8",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "EXTERNAL_OPTIONAL",
@@ -311,7 +311,7 @@
       "prompt_module_dependencies": [],
       "source": "shared/skills/bbk-installed-profiles/SKILL.md",
       "source_sha256": "e5bee6c331ecc5bf482249f282c58520211d74b2b5da034c072831bce861dc12",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "COMPILER_SELECTABLE",
@@ -336,7 +336,7 @@
       ],
       "source": "shared/skills/bbk-phase-plan/SKILL.md",
       "source_sha256": "7d702a6f819fa54a3f4453b364a1aa18bdb14dd1fe995cd8a5334e8e9db2be8d",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "COMPILER_SELECTABLE",
@@ -346,7 +346,7 @@
       "prompt_module_dependencies": [],
       "source": "shared/skills/bbk-plan/SKILL.md",
       "source_sha256": "ecdc78e23bdafdb107870901dc8d2ce18ee4244e388dbfb02661e6c679abd286",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "EXTERNAL_OPTIONAL",
@@ -356,7 +356,7 @@
       "prompt_module_dependencies": [],
       "source": "shared/skills/bbk-procedure-design/SKILL.md",
       "source_sha256": "ce62b94ec110abac392850753507608ff4f6935a3485a0ede63d4de20abf9ff2",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "EXTERNAL_OPTIONAL",
@@ -369,7 +369,7 @@
       ],
       "source": "shared/skills/bbk-profile-routing/SKILL.md",
       "source_sha256": "01aef22db7f0bab4ea7047c93c0e8797dd08447fefb13f76a8676e0094315d28",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "COMPILER_SELECTABLE",
@@ -395,7 +395,7 @@
       ],
       "source": "shared/skills/bbk-prototype/SKILL.md",
       "source_sha256": "26c857b30890c85751ca67ba9a2258cbadaa97b042ba77e4952c82137d3a33a9",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "COMPILER_SELECTABLE",
@@ -415,7 +415,7 @@
       ],
       "source": "shared/skills/bbk-question-branch/SKILL.md",
       "source_sha256": "cf0ee29794f55bb6ae1c5c383b920cb248b423308c7ecbf9aa3cfb077d94268c",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "EXTERNAL_OPTIONAL",
@@ -425,7 +425,7 @@
       "prompt_module_dependencies": [],
       "source": "shared/skills/bbk-recover/SKILL.md",
       "source_sha256": "e1bd4594af59a13003abb4c31a07d9db5a4c0b0e0c49298daeeecf9c295a01b5",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "COMPILER_SELECTABLE",
@@ -445,7 +445,7 @@
       ],
       "source": "shared/skills/bbk-research/SKILL.md",
       "source_sha256": "fce779658c93d3e73b728639ba55e75df29d0cee904a8194bf34ad64a35d7b12",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "COMPILER_SELECTABLE",
@@ -473,7 +473,7 @@
       ],
       "source": "shared/skills/bbk-review/SKILL.md",
       "source_sha256": "efefbf82f418c5655483f5e1ab904545c6b79d8a4523e74ce8e15ac4f03113bf",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "EXTERNAL_OPTIONAL",
@@ -486,7 +486,7 @@
       ],
       "source": "shared/skills/bbk-review-context/SKILL.md",
       "source_sha256": "43f33b47ef2de7e3a56cd8f349c8659e372f479a859b06155b5faa30d5aaa0ca",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "EXTERNAL_OPTIONAL",
@@ -501,7 +501,7 @@
       ],
       "source": "shared/skills/bbk-review-findings/SKILL.md",
       "source_sha256": "0bb39b5af02631e37459f5c8f9202144de914d3d2b612675577a28a1d89eda58",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "EXTERNAL_OPTIONAL",
@@ -511,7 +511,7 @@
       "prompt_module_dependencies": [],
       "source": "shared/skills/bbk-review-intent/SKILL.md",
       "source_sha256": "d48e76b51fbfbc009bc5c33c2a3f22e11516ebaef7ab18ba956e59509f59e78f",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "EXTERNAL_OPTIONAL",
@@ -521,7 +521,7 @@
       "prompt_module_dependencies": [],
       "source": "shared/skills/bbk-review-learn/SKILL.md",
       "source_sha256": "e4c96cc66b3e1c46f16782553077eea0e990a2162f12f9d9d106055b353f74c7",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "EXTERNAL_OPTIONAL",
@@ -534,7 +534,7 @@
       ],
       "source": "shared/skills/bbk-review-plan/SKILL.md",
       "source_sha256": "63993244877d0d1ee1c8668431e06d49f05a2ee9aaf79c681ec0c05d732578da",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "EXTERNAL_OPTIONAL",
@@ -544,7 +544,7 @@
       "prompt_module_dependencies": [],
       "source": "shared/skills/bbk-review-run/SKILL.md",
       "source_sha256": "f241f3ad1306537e39cded802def4e8d86934d8f7c279a850a8a5fec1fead753",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "COMPILER_SELECTABLE",
@@ -574,7 +574,7 @@
       ],
       "source": "shared/skills/bbk-root-execution/SKILL.md",
       "source_sha256": "998b01b8be41811b9d4479162c5d3805b1dbc0647fa69e949e3739842b9b7cdc",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "EXTERNAL_OPTIONAL",
@@ -584,7 +584,7 @@
       "prompt_module_dependencies": [],
       "source": "shared/skills/bbk-solution-outcome-fit/SKILL.md",
       "source_sha256": "4dffd4b126a5d6cfec2dfebbf5593ca3d0403448bf659df48c0773d17679f265",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "EXTERNAL_OPTIONAL",
@@ -594,7 +594,7 @@
       "prompt_module_dependencies": [],
       "source": "shared/skills/bbk-state-decision-effect-design/SKILL.md",
       "source_sha256": "e56450cdabc202fa7f55f74901431fa3fffe2f872c21eb413fbac51ce70893a8",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "COMPILER_SELECTABLE",
@@ -615,7 +615,7 @@
       ],
       "source": "shared/skills/bbk-synthesize/SKILL.md",
       "source_sha256": "a4491ddf93e004c8ff8a4c1549dcff8dffbbf03b8bdb7450efb9f87a6f1be50b",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "COMPILER_SELECTABLE",
@@ -640,7 +640,7 @@
       ],
       "source": "shared/skills/bbk-territory-execution/SKILL.md",
       "source_sha256": "d953161af477fa4473dcf160da3bfbcc3d0d418e390590a7a896219218aae6f4",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "COMPILER_SELECTABLE",
@@ -671,7 +671,7 @@
       ],
       "source": "shared/skills/bbk-validation-orchestration/SKILL.md",
       "source_sha256": "3a9fb9710d481c4908c90c8aeca74be3eaf56ea693dae1f3cfe753be184f9421",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "COMPILER_SELECTABLE",
@@ -700,7 +700,7 @@
       ],
       "source": "shared/skills/bbk-verification-design/SKILL.md",
       "source_sha256": "c98f5ec6bc1ecbeb9d4dd7319430c950c342acef4ef223826367af7da23617a0",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "COMPILER_SELECTABLE",
@@ -729,7 +729,7 @@
       ],
       "source": "shared/skills/bbk-wayfind/SKILL.md",
       "source_sha256": "ef003b5bf14ec8d9983c38c6a219252eb2027ba22ce517d249f2db743e843c6c",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "COMPILER_SELECTABLE",
@@ -754,7 +754,7 @@
       ],
       "source": "shared/skills/bbk-work-graph/SKILL.md",
       "source_sha256": "f94f63b550e694cc7cb16b046bae31aa20a16feb788b8c9a48752a717d04d3da",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "COMPILER_SELECTABLE",
@@ -779,7 +779,7 @@
       ],
       "source": "shared/skills/bbk-work-unit-execution/SKILL.md",
       "source_sha256": "83ea002190f02f8747f5bfd9087de78a5e3ff6aca1113756d9521bb6e16cf14b",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "COMPILER_SELECTABLE",
@@ -809,7 +809,7 @@
       ],
       "source": "shared/skills/bbk-worker-design/SKILL.md",
       "source_sha256": "dd07c9319d1ca7aa9421f12d31c15cea4f042154fe4676d0a912403331c450e9",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     },
     {
       "catalog_classification": "COMPILER_SELECTABLE",
@@ -838,11 +838,11 @@
       ],
       "source": "shared/skills/bbk-worker-execution/SKILL.md",
       "source_sha256": "2d5fb4285f61b6f0d9c53a09a19a392a5bc1e307f4e8b114c4e9d9c466248a20",
-      "version": "0.1.0-alpha.17.0.2"
+      "version": "0.1.0-alpha.17.0.2.1"
     }
   ],
-  "registry_revision": "50f3db56d1067944fabb5f0b9a98faafcdab3035a009cc4a5203d19ada78347e",
-  "role_source_sha256": "e774262029cf88298db3cc5031a0ae0b71eaf00ab81615cb37832758d5dd30fe",
+  "registry_revision": "ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
+  "role_source_sha256": "64cafa31d6ee8d7191eab0499f6a5d9352d76489c2af3c881990c93b91c35ccd",
   "roles": {
     "bbk_architect": {
       "available": [
@@ -1473,5 +1473,5 @@
   },
   "schema": "bbk.procedure-registry.v2",
   "source": "spec/method-content.json",
-  "source_sha256": "ab3a1aded4292f6911e1858afba2847debb9fa43594187a74396826c14b981ba"
+  "source_sha256": "102a53156b8ca7da1558e6dd4f8949a66f4d620ab4f2bfe1c5a128c1cab8f8b8"
 }

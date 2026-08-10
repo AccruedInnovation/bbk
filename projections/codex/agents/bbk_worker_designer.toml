@@ -419,7 +419,7 @@ Operational completion, role semantic readiness, accountable acceptance, and rel
 These complete procedures are compiled developer instructions. They are not external skill selections and require no model filesystem read.
 
 - id: bbk-worker-design
-  version: 0.1.0-alpha.17.0.2
+  version: 0.1.0-alpha.17.0.2.1
   source_sha256: dd07c9319d1ca7aa9421f12d31c15cea4f042154fe4676d0a912403331c450e9
   effective_sha256: d9631b7705e9ed15a4c18cac2816871962d9dce453ff94f97cc7978d987169fe
   selection_reason: PRIMARY

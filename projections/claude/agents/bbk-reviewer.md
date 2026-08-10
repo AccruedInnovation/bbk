@@ -17,7 +17,7 @@ tools:
   - "NotebookEdit"
 ---
 
-<bbk-role-contract role="bbk_reviewer" package-version="0.1.0-alpha.17.0.2">
+<bbk-role-contract role="bbk_reviewer" package-version="0.1.0-alpha.17.0.2.1">
 
 ## Runtime identity and interaction topology
 
@@ -470,7 +470,7 @@ Operational completion, role semantic readiness, accountable acceptance, and rel
 These complete procedures are compiled developer instructions. They are not external skill selections and require no model filesystem read.
 
 - id: bbk-review
-  version: 0.1.0-alpha.17.0.2
+  version: 0.1.0-alpha.17.0.2.1
   source_sha256: efefbf82f418c5655483f5e1ab904545c6b79d8a4523e74ce8e15ac4f03113bf
   effective_sha256: 67c17422708e0ec80450c64cfdb65168b05e62ea951c6e55a75b0b94eea1cb32
   selection_reason: PRIMARY

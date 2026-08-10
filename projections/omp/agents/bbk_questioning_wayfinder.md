@@ -7,9 +7,9 @@ blocking: false
 spawns: bbk_question_guide, bbk_researcher
 ---
 
-<bbk-agent-system role="bbk_questioning_wayfinder" package-version="0.1.0-alpha.17.0.2">
+<bbk-agent-system role="bbk_questioning_wayfinder" package-version="0.1.0-alpha.17.0.2.1">
 
-<bbk-role-contract role="bbk_questioning_wayfinder" package-version="0.1.0-alpha.17.0.2">
+<bbk-role-contract role="bbk_questioning_wayfinder" package-version="0.1.0-alpha.17.0.2.1">
 
 ## Runtime identity and interaction topology
 
@@ -389,7 +389,7 @@ Operational completion, role semantic readiness, accountable acceptance, and rel
 These complete procedures are compiled developer instructions. They are not external skill selections and require no model filesystem read.
 
 - id: bbk-question-branch
-  version: 0.1.0-alpha.17.0.2
+  version: 0.1.0-alpha.17.0.2.1
   source_sha256: cf0ee29794f55bb6ae1c5c383b920cb248b423308c7ecbf9aa3cfb077d94268c
   effective_sha256: fc8e62f6aa99d1f04909e2aac95de65b64b3d6046d9d406954144c7a88f52b66
   selection_reason: PRIMARY

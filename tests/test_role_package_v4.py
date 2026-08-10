@@ -21,6 +21,7 @@ from assemble_roles import (  # noqa: E402
     canonical_bytes,
     projection_drift,
 )
+from tests._role_spec_fixture import materialize_role_assembly_fixture
 
 
 class SplitRolePackageV4Tests(unittest.TestCase):
@@ -32,15 +33,6 @@ class SplitRolePackageV4Tests(unittest.TestCase):
         self.entries = {
             entry["name"]: entry for entry in self.catalog["role_entries"]
         }
-
-    def _minimal_copy(self, target: Path) -> None:
-        (target / "spec").mkdir(parents=True)
-        shutil.copy2(ROOT / "spec" / "method-content.json", target / "spec" / "method-content.json")
-        shutil.copytree(ROOT / "spec" / "roles", target / "spec" / "roles")
-        shutil.copytree(ROOT / "spec" / "prompt-modules", target / "spec" / "prompt-modules")
-        shutil.copytree(ROOT / "spec" / "schemas", target / "spec" / "schemas")
-        shutil.copytree(ROOT / "spec" / "contracts", target / "spec" / "contracts")
-        shutil.copy2(ROOT / "spec" / "roles.json", target / "spec" / "roles.json")
 
     def test_catalog_is_the_canonical_ordered_source(self) -> None:
         names = [entry["name"] for entry in self.catalog["role_entries"]]
@@ -274,7 +266,7 @@ class SplitRolePackageV4Tests(unittest.TestCase):
     def test_projection_drift_is_detected(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            self._minimal_copy(root)
+            materialize_role_assembly_fixture(ROOT, root, include_projection=True)
             package = assemble(root)
             projection = root / "spec" / "roles.json"
             projection.write_bytes(projection.read_bytes() + b"\n")
@@ -283,7 +275,7 @@ class SplitRolePackageV4Tests(unittest.TestCase):
     def test_noncanonical_split_source_serialization_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            self._minimal_copy(root)
+            materialize_role_assembly_fixture(ROOT, root)
             role_path = root / "spec" / "roles" / "bbk_worker-role.json"
             role_path.write_bytes(role_path.read_bytes() + b"\n")
             with self.assertRaises(RolePackageError) as caught:
@@ -293,7 +285,7 @@ class SplitRolePackageV4Tests(unittest.TestCase):
     def test_uncatalogued_split_role_file_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            self._minimal_copy(root)
+            materialize_role_assembly_fixture(ROOT, root)
             shutil.copy2(
                 root / "spec" / "roles" / "bbk_worker-role.json",
                 root / "spec" / "roles" / "bbk_uncatalogued-role.json",
@@ -305,7 +297,7 @@ class SplitRolePackageV4Tests(unittest.TestCase):
     def test_role_schema_violation_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            self._minimal_copy(root)
+            materialize_role_assembly_fixture(ROOT, root)
             role_path = root / "spec" / "roles" / "bbk_worker-role.json"
             role = json.loads(role_path.read_text(encoding="utf-8"))
             del role["purpose"]
@@ -317,7 +309,7 @@ class SplitRolePackageV4Tests(unittest.TestCase):
     def test_method_content_version_drift_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            self._minimal_copy(root)
+            materialize_role_assembly_fixture(ROOT, root)
             path = root / "spec" / "method-content.json"
             method = json.loads(path.read_text(encoding="utf-8"))
             method["version"] = "0.1.0-alpha.12.4"
@@ -329,7 +321,7 @@ class SplitRolePackageV4Tests(unittest.TestCase):
     def test_controller_entrypoint_drift_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            self._minimal_copy(root)
+            materialize_role_assembly_fixture(ROOT, root)
             path = root / "spec" / "roles" / "catalog.json"
             catalog = json.loads(path.read_text(encoding="utf-8"))
             catalog["controller_entrypoints"][0]["invocation_mode"] = "WRONG_ROOT_MODE"
@@ -341,7 +333,7 @@ class SplitRolePackageV4Tests(unittest.TestCase):
     def test_human_request_originator_drift_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            self._minimal_copy(root)
+            materialize_role_assembly_fixture(ROOT, root)
             path = root / "spec" / "roles" / "catalog.json"
             catalog = json.loads(path.read_text(encoding="utf-8"))
             catalog["interaction_topology"]["human_request_originators"] = [
@@ -357,7 +349,7 @@ class SplitRolePackageV4Tests(unittest.TestCase):
     def test_role_return_mode_drift_from_catalog_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            self._minimal_copy(root)
+            materialize_role_assembly_fixture(ROOT, root)
             path = root / "spec" / "roles" / "bbk_reviewer-role.json"
             role = json.loads(path.read_text(encoding="utf-8"))
             role["return_contract"]["allowed_invocation_modes"] = [
@@ -374,7 +366,7 @@ class SplitRolePackageV4Tests(unittest.TestCase):
     def test_unintended_delegation_cycle_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            self._minimal_copy(root)
+            materialize_role_assembly_fixture(ROOT, root)
 
             worker_path = root / "spec" / "roles" / "bbk_worker-role.json"
             worker = json.loads(worker_path.read_text(encoding="utf-8"))
@@ -412,7 +404,7 @@ class SplitRolePackageV4Tests(unittest.TestCase):
     def test_one_sided_spawn_edge_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            self._minimal_copy(root)
+            materialize_role_assembly_fixture(ROOT, root)
             catalog_path = root / "spec" / "roles" / "catalog.json"
             catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
             worker = next(

@@ -7,9 +7,9 @@ blocking: false
 spawns: bbk_territory_orchestrator, bbk_reviewer, bbk_worker, bbk_validator
 ---
 
-<bbk-agent-system role="bbk_root_orchestrator" package-version="0.1.0-alpha.17.0.2">
+<bbk-agent-system role="bbk_root_orchestrator" package-version="0.1.0-alpha.17.0.2.1">
 
-<bbk-role-contract role="bbk_root_orchestrator" package-version="0.1.0-alpha.17.0.2">
+<bbk-role-contract role="bbk_root_orchestrator" package-version="0.1.0-alpha.17.0.2.1">
 
 ## Runtime identity and interaction topology
 
@@ -581,7 +581,7 @@ Operational completion, role semantic readiness, accountable acceptance, and rel
 These complete procedures are compiled developer instructions. They are not external skill selections and require no model filesystem read.
 
 - id: bbk-root-execution
-  version: 0.1.0-alpha.17.0.2
+  version: 0.1.0-alpha.17.0.2.1
   source_sha256: 998b01b8be41811b9d4479162c5d3805b1dbc0647fa69e949e3739842b9b7cdc
   effective_sha256: d26a298e252f40cead8b6a86eff76e18ef6cee5a4eb341d927116f326563c6f3
   selection_reason: PRIMARY

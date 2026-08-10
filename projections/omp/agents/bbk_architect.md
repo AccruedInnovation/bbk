@@ -6,9 +6,9 @@ thinkingLevel: "high"
 blocking: false
 ---
 
-<bbk-agent-system role="bbk_architect" package-version="0.1.0-alpha.17.0.2">
+<bbk-agent-system role="bbk_architect" package-version="0.1.0-alpha.17.0.2.1">
 
-<bbk-role-contract role="bbk_architect" package-version="0.1.0-alpha.17.0.2">
+<bbk-role-contract role="bbk_architect" package-version="0.1.0-alpha.17.0.2.1">
 
 ## Runtime identity and interaction topology
 
@@ -417,7 +417,7 @@ Operational completion, role semantic readiness, accountable acceptance, and rel
 These complete procedures are compiled developer instructions. They are not external skill selections and require no model filesystem read.
 
 - id: bbk-architecture
-  version: 0.1.0-alpha.17.0.2
+  version: 0.1.0-alpha.17.0.2.1
   source_sha256: a0e97d2d8801e7ff24e83417f0e61f8c34dd42c33479c8d7c7863ba153cec557
   effective_sha256: 53dfe7909dd732b21197ca5da21cab747bf42ea14d0d6ae852d0b1e783ee5a21
   selection_reason: PRIMARY

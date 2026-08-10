@@ -1,4 +1,4 @@
-<bbk-role-contract role="bbk_synthesizer" package-version="0.1.0-alpha.17.0.2">
+<bbk-role-contract role="bbk_synthesizer" package-version="0.1.0-alpha.17.0.2.1">
 
 ## Runtime identity and interaction topology
 
@@ -345,7 +345,7 @@ Operational completion, role semantic readiness, accountable acceptance, and rel
 These complete procedures are compiled developer instructions. They are not external skill selections and require no model filesystem read.
 
 - id: bbk-synthesize
-  version: 0.1.0-alpha.17.0.2
+  version: 0.1.0-alpha.17.0.2.1
   source_sha256: a4491ddf93e004c8ff8a4c1549dcff8dffbbf03b8bdb7450efb9f87a6f1be50b
   effective_sha256: 58fa0f0e006edde1be6b2de212c3ed8fea1d45dcb1f28692dcdcee2b71681fbe
   selection_reason: PRIMARY

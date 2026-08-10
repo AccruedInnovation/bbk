@@ -1,6 +1,6 @@
 {
   "schema_version": "bbk.prompt-modules.v1",
-  "package_version": "0.1.0-alpha.17.0.2",
+  "package_version": "0.1.0-alpha.17.0.2.1",
   "module_schema": "spec/schemas/bbk-prompt-module-v1.schema.json",
   "catalog_schema": "spec/schemas/bbk-prompt-module-catalog-v1.schema.json",
   "module_entries": [

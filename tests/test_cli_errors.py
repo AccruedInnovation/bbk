@@ -1,24 +1,22 @@
 from __future__ import annotations
 
 import json
-import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+
+from tests._cli_support import run_cli as pooled_run_cli
 
 ROOT = Path(__file__).resolve().parents[1]
 BBK = ROOT / "tools" / "bbk.py"
 
 
 class StructuredCliErrorTests(unittest.TestCase):
-    def run_cli(self, *args: str, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
-        return subprocess.run(
+    def run_cli(self, *args: str, cwd: Path | None = None):
+        return pooled_run_cli(
             [sys.executable, str(BBK), *args],
             cwd=cwd or ROOT,
-            text=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
             check=False,
         )
 

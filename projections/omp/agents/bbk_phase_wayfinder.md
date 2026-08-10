@@ -7,9 +7,9 @@ blocking: false
 spawns: bbk_verification_designer, bbk_worker_designer, bbk_reviewer
 ---
 
-<bbk-agent-system role="bbk_phase_wayfinder" package-version="0.1.0-alpha.17.0.2">
+<bbk-agent-system role="bbk_phase_wayfinder" package-version="0.1.0-alpha.17.0.2.1">
 
-<bbk-role-contract role="bbk_phase_wayfinder" package-version="0.1.0-alpha.17.0.2">
+<bbk-role-contract role="bbk_phase_wayfinder" package-version="0.1.0-alpha.17.0.2.1">
 
 ## Runtime identity and interaction topology
 
@@ -477,7 +477,7 @@ Operational completion, role semantic readiness, accountable acceptance, and rel
 These complete procedures are compiled developer instructions. They are not external skill selections and require no model filesystem read.
 
 - id: bbk-phase-plan
-  version: 0.1.0-alpha.17.0.2
+  version: 0.1.0-alpha.17.0.2.1
   source_sha256: 7d702a6f819fa54a3f4453b364a1aa18bdb14dd1fe995cd8a5334e8e9db2be8d
   effective_sha256: 92f42b5b97dcf97e66ecb19a2af446b0da7ea883d0549072e1d0d0d0fa0e5208
   selection_reason: PRIMARY

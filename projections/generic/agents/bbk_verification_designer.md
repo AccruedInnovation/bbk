@@ -1,4 +1,4 @@
-<bbk-role-contract role="bbk_verification_designer" package-version="0.1.0-alpha.17.0.2">
+<bbk-role-contract role="bbk_verification_designer" package-version="0.1.0-alpha.17.0.2.1">
 
 ## Runtime identity and interaction topology
 
@@ -466,7 +466,7 @@ Operational completion, role semantic readiness, accountable acceptance, and rel
 These complete procedures are compiled developer instructions. They are not external skill selections and require no model filesystem read.
 
 - id: bbk-verification-design
-  version: 0.1.0-alpha.17.0.2
+  version: 0.1.0-alpha.17.0.2.1
   source_sha256: c98f5ec6bc1ecbeb9d4dd7319430c950c342acef4ef223826367af7da23617a0
   effective_sha256: a84fe559d489adbf7bc79586aaf28e0c4c73694c81e1b795704c0df4ca637b44
   selection_reason: PRIMARY

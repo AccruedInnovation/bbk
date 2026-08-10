@@ -56,7 +56,7 @@ python -m unittest -v \
   tests.test_governed_filesystem \
   tests.test_gate_kernel \
   tests.test_omp_governed_profile \
-  tests.test_installation_portability.SharedPathAssertionSupportTests
+  tests.test_installation_repository_sources.SharedPathAssertionSupportTests
 ```
 
 The suite covers all four operations, real Git reconciliation, supplied jj

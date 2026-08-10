@@ -18,7 +18,7 @@ tools:
   - "NotebookEdit"
 ---
 
-<bbk-role-contract role="bbk_validator_orchestrator" package-version="0.1.0-alpha.17.0.2">
+<bbk-role-contract role="bbk_validator_orchestrator" package-version="0.1.0-alpha.17.0.2.1">
 
 ## Runtime identity and interaction topology
 
@@ -539,7 +539,7 @@ Operational completion, role semantic readiness, accountable acceptance, and rel
 These complete procedures are compiled developer instructions. They are not external skill selections and require no model filesystem read.
 
 - id: bbk-validation-orchestration
-  version: 0.1.0-alpha.17.0.2
+  version: 0.1.0-alpha.17.0.2.1
   source_sha256: 3a9fb9710d481c4908c90c8aeca74be3eaf56ea693dae1f3cfe753be184f9421
   effective_sha256: 313c3f64c0d511c2077e5188c2d4f0eac53accecb595d43de8b19d303a120842
   selection_reason: PRIMARY

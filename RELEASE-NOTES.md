@@ -1,11 +1,19 @@
-# BBK 0.1.0-alpha.17.0.2
+# BBK 0.1.0-alpha.17.0.2.1
+
+- Removed the retired internal `IMPLEMENTATION-MAPPING-CHECKLIST-COMPLETED.md` artifact and its stale evidence references from the public package.
 
 - Corrected native Windows qualification isolation: runtime mise resolution is now explicit/PATH-only, batch-launcher assertions understand `cmd.exe /c`, byte-exact fixtures force LF, and real-mise qualification uses isolated Windows and mise state directories with network/auto-install/lockfile effects disabled.
+- Corrected the PowerShell clean-replacement prompt: native Windows console input bypasses the stalled `sys.stdin.readline()` path, setup preserves stdin, and unreadable confirmation fails safe to reconciliation.
  release notes
 
 ## Release relationship
 
-Alpha.17.0.2 is a corrective successor to `0.1.0-alpha.17.0.1`. It keeps the accepted Alpha.17 planning, execution, prompt-compilation, host-integration, record, and public-profile contracts. No `.bbk/` record migration is required. Install from a clean extraction rather than overlaying an older package tree.
+Alpha.17.0.2.1 is a source successor to `0.1.0-alpha.17.0.2`. It keeps the accepted Alpha.17 planning, execution, prompt-compilation, host-integration, record, and public-profile contracts while publishing the Windows qualification hotfix as ordinary release-source metadata. No `.bbk/` record migration is required. Install from a clean extraction rather than overlaying an older package tree. The predecessor `.2` qualification evidence remains immutable and is explicitly limited to predecessor-source evidence; it does not requalify current `.2.1` VER-035 or provider behavior.
+
+## Source successor corrections
+
+- Remove the obsolete `HOTFIX-ALPHA17.0.2-WINDOWS.md` package companion; historical release notes and external qualification evidence remain preserved outside the current package surface.
+- Align canonical metadata, generated projections, templates, qualification-kit identity, and exact-version regression fixtures on `0.1.0-alpha.17.0.2.1`.
 
 ## Dependency setup
 

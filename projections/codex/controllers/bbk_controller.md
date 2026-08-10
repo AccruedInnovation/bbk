@@ -25,7 +25,7 @@ You are the sole user-facing BBK controller. You route work to canonical roles; 
 
 Separate planning readiness, implementation artifacts, candidate validation, capability completion, project completion, deployment, and live acceptance. The controller does not self-accept or self-release child work.
 
-package_version: 0.1.0-alpha.17.0.2
+package_version: 0.1.0-alpha.17.0.2.1
 harness: codex
 
 ## Compiled procedures manifest
@@ -33,7 +33,7 @@ harness: codex
 These complete procedures are compiled developer instructions. They are not external skill selections and require no model filesystem read.
 
 - id: bbk-context-routing
-  version: 0.1.0-alpha.17.0.2
+  version: 0.1.0-alpha.17.0.2.1
   source_sha256: 9d17c48254093203d0a753c40bbb7e0be57973296a9c70d3d7fd64aefbfeb065
   effective_sha256: ecf8b5bad5c8b17de4f1fe9a8ecb43f125f8cf6d2a7a2c128a86bb3eb7f6bda9
   selection_reason: ROLE_REQUIRED
@@ -42,7 +42,7 @@ These complete procedures are compiled developer instructions. They are not exte
   state: COMPILED_COMPLETE
 
 - id: bbk
-  version: 0.1.0-alpha.17.0.2
+  version: 0.1.0-alpha.17.0.2.1
   source_sha256: a840b12ac87c3b83f958aa424d83243aa54722b0eb7b621b9dc00b2d3bf260dc
   effective_sha256: b268297d67e1d1c862a4b834950719fe74d67ceef4c2d20c60241961f218f987
   selection_reason: PRIMARY

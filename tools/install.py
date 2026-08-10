@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import ctypes
 import datetime as dt
 from collections import OrderedDict
 import hashlib
@@ -702,15 +703,90 @@ def load_existing_install(args: argparse.Namespace) -> dict[str, Any] | None:
     }
 
 
-def choose_existing_install_action(args: argparse.Namespace, existing: Mapping[str, Any] | None) -> str:
-    """Return ``replace`` or ``keep`` without making noninteractive runs hang.
+def _native_windows_console_input() -> bool:
+    """Return whether the unwrapped Windows stdin is a real console handle."""
+    # Only use the console API for the unwrapped process stdin.  ``isatty`` is
+    # not authoritative under PowerShell/Windows Terminal, where a console
+    # stream can report a misleading result while ``readline`` still stalls.
+    if os.name != "nt" or sys.stdin is not getattr(sys, "__stdin__", None):
+        return False
+    try:
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        handle = kernel32.GetStdHandle(-10)  # STD_INPUT_HANDLE
+        handle_value = getattr(handle, "value", handle)
+        if handle_value in (0, -1, None):
+            return False
+        mode = ctypes.c_ulong()
+        return bool(kernel32.GetConsoleMode(handle, ctypes.byref(mode)))
+    except (AttributeError, OSError, TypeError, ValueError, OverflowError, ctypes.ArgumentError):
+        return False
 
-    Human installs prompt with a default-Yes replacement. JSON, dry-run, and
-    noninteractive invocations preserve the existing install unless the caller
-    explicitly passes ``--uninstall-existing``. This keeps automation
-    deterministic and prevents an implicit destructive action hidden behind a
-    machine-readable command.
-    """
+
+def _interactive_stdin() -> bool:
+    """Use native console truth, retaining ``isatty`` for wrapped streams."""
+    if _native_windows_console_input():
+        return True
+    # An unwrapped Windows stream was checked by the native detector.  Do not
+    # fall back to ``isatty`` after a failed/negative console probe: doing so
+    # would route back to the blocking text reader that this guard avoids.
+    if os.name == "nt" and sys.stdin is getattr(sys, "__stdin__", None):
+        return False
+    try:
+        return bool(sys.stdin.isatty())
+    except (AttributeError, OSError, ValueError):
+        return False
+
+
+def _read_windows_console_line(*, read_key: Any = None) -> str | None:
+    # Read and echo one line directly from the Windows console input buffer.
+    if read_key is None:
+        try:
+            import msvcrt
+        except ImportError:
+            return None
+        read_key = msvcrt.getwch
+    characters: list[str] = []
+    try:
+        while True:
+            value = read_key()
+            if not isinstance(value, str) or value == "":
+                return None
+            if value in {"\r", "\n"}:
+                _write_text(sys.stdout, "\n", flush=True)
+                return "".join(characters)
+            if value in {"\x00", "\xe0"}:
+                # Consume the scan code paired with a special key.
+                read_key()
+                continue
+            if value == "\x03":
+                raise KeyboardInterrupt
+            if value == "\x1a":
+                return None
+            if value == "\b":
+                if characters:
+                    characters.pop()
+                    _write_text(sys.stdout, "\b \b", flush=True)
+                continue
+            if value.isprintable():
+                characters.append(value)
+                _write_text(sys.stdout, value, flush=True)
+    except (OSError, UnicodeError):
+        return None
+
+
+def _read_interactive_confirmation() -> str | None:
+    # Avoid the PowerShell TextIO path when a native console is available.
+    if _native_windows_console_input():
+        return _read_windows_console_line()
+    try:
+        return input()
+    except (EOFError, OSError, UnicodeError):
+        return None
+
+def choose_existing_install_action(args: argparse.Namespace, existing: Mapping[str, Any] | None) -> str:
+    # Return ``replace`` or ``keep`` without hanging interactive shells.
+    # Native Windows confirmation uses ``msvcrt`` instead of the text
+    # stream path that can stall under PowerShell/Windows Terminal.
     if existing is None:
         return "none"
     if bool(getattr(args, "uninstall_existing", False)):
@@ -719,11 +795,7 @@ def choose_existing_install_action(args: argparse.Namespace, existing: Mapping[s
         return "keep"
     if bool(getattr(args, "json", False)) or bool(getattr(args, "dry_run", False)):
         return "keep"
-    is_interactive = False
-    try:
-        is_interactive = bool(sys.stdin.isatty())
-    except (AttributeError, OSError):
-        pass
+    is_interactive = _interactive_stdin()
     if not is_interactive:
         progress_note(
             True,
@@ -757,20 +829,18 @@ def choose_existing_install_action(args: argparse.Namespace, existing: Mapping[s
         f"  files: {existing.get('file_count')}\n"
         f"  manifest: {existing.get('manifest_path')}\n"
         f"{replacement_text}"
-        # Terminate the prompt line. Windows PowerShell can mediate native
-        # stdout through a line-oriented pipe even while stdin remains an
-        # interactive console. A prompt without a trailing newline may stay
-        # buffered and invisible while the installer waits for input.
+        # Preserve the newline: PowerShell may mediate native stdout
+        # through a line-oriented host while stdin remains a console.
         f"{question_text}"
     )
     _write_text(sys.stdout, prompt_text, flush=True)
-    try:
-        answer = sys.stdin.readline()
-    except (OSError, UnicodeError):
-        answer = "n"
-    if answer == "":
-        # EOF is not an affirmative user decision, even though a blank entered
-        # response is. Avoid destructive behavior in a detached shell.
+    answer = _read_interactive_confirmation()
+    if answer is None:
+        progress_note(
+            True,
+            "Interactive confirmation could not be read; preserving the existing installation. "
+            "Use --uninstall-existing for an explicit clean replacement.",
+        )
         return "keep"
     return "keep" if answer.strip().lower() in {"n", "no"} else "replace"
 

@@ -19,9 +19,8 @@ import gate_kernel  # noqa: E402
 import governed_state  # noqa: E402
 import omp_binding_registry as registry  # noqa: E402
 import worker_spawn  # noqa: E402
-from jsonschema import Draft202012Validator  # noqa: E402
-from referencing import Registry, Resource  # noqa: E402
 from tests._path_support import assert_different_path  # noqa: E402
+from tests._alpha17_surface_support import schema_validate  # noqa: E402
 
 JJ = (
     os.environ.get("BBK_TEST_JJ")
@@ -116,15 +115,7 @@ class WorkerSpawnTests(unittest.TestCase):
         )
 
     def assert_schema_valid(self, instance, schema_name):
-        schema_root = ROOT / "spec" / "schemas"
-        resources = []
-        for path in sorted(schema_root.rglob("*.json")):
-            value = json.loads(path.read_text(encoding="utf-8"))
-            if isinstance(value, dict) and value.get("$id"):
-                resources.append((value["$id"], Resource.from_contents(value)))
-        registry_value = Registry().with_resources(resources)
-        schema = json.loads((schema_root / schema_name).read_text(encoding="utf-8"))
-        Draft202012Validator(schema, registry=registry_value).validate(instance)
+        schema_validate(instance, schema_name)
 
     def test_compile_allocates_one_workspace_binding_packet_and_reservation(self):
         self.assert_schema_valid(self.request(), "bbk-bound-worker-spawn-create-v1.schema.json")

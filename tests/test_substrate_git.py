@@ -9,6 +9,7 @@ import unittest
 from pathlib import Path
 
 from tests._path_support import assert_same_path
+from tests._vcs_fixture import assert_isolated, prepare_git_seed
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOLS = ROOT / "tools"
@@ -23,15 +24,11 @@ JJ = os.environ.get("BBK_TEST_JJ") or shutil.which("jj")
 class GitAdapterTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
-        self.root = Path(self.temporary.name) / "repo"
-        self.root.mkdir()
-        self.git("init")
-        self.git("config", "user.name", "BBK Test")
-        self.git("config", "user.email", "bbk@example.invalid")
-        (self.root / "src").mkdir()
-        (self.root / "src" / "a.txt").write_text("a\n", encoding="utf-8")
-        self.git("add", ".")
-        self.git("commit", "-m", "baseline")
+        self.seed = prepare_git_seed(
+            Path(self.temporary.name) / "repo",
+            files={"src/a.txt": b"a\n"}, fixture_id="git-adapter",
+        )
+        self.root = self.seed.root
 
     def tearDown(self):
         self.temporary.cleanup()
@@ -49,6 +46,15 @@ class GitAdapterTests(unittest.TestCase):
         self.assertNotEqual(baseline_tree, changed_tree)
         self.assertEqual(staged_before, staged_after)
         self.assertEqual([], self.git("show-ref", "--heads").stderr.splitlines())
+
+    def test_seeds_use_exact_lf_bytes_and_distinct_metadata_roots(self):
+        second = prepare_git_seed(Path(self.temporary.name) / "repo-two", files={"src/a.txt": b"a\n"}, fixture_id="git-adapter")
+        self.assertEqual(b"a\n", (self.root / "src/a.txt").read_bytes())
+        self.assertEqual("false", self.git("config", "--get", "core.autocrlf").stdout.strip())
+        self.assertEqual("lf", self.git("config", "--get", "core.eol").stdout.strip())
+        self.assertNotEqual(self.seed.branch, second.branch)
+        self.assertNotEqual(self.seed.head, second.head)
+        assert_isolated(self.root, second.root)
 
     def test_freeze_candidate_is_exact_and_repeatable(self):
         (self.root / "src" / "a.txt").write_text("candidate\n", encoding="utf-8")

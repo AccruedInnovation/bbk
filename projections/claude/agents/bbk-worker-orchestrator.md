@@ -18,7 +18,7 @@ tools:
   - "NotebookEdit"
 ---
 
-<bbk-role-contract role="bbk_worker_orchestrator" package-version="0.1.0-alpha.17.0.2">
+<bbk-role-contract role="bbk_worker_orchestrator" package-version="0.1.0-alpha.17.0.2.1">
 
 ## Runtime identity and interaction topology
 
@@ -549,7 +549,7 @@ Operational completion, role semantic readiness, accountable acceptance, and rel
 These complete procedures are compiled developer instructions. They are not external skill selections and require no model filesystem read.
 
 - id: bbk-worker-execution
-  version: 0.1.0-alpha.17.0.2
+  version: 0.1.0-alpha.17.0.2.1
   source_sha256: 2d5fb4285f61b6f0d9c53a09a19a392a5bc1e307f4e8b114c4e9d9c466248a20
   effective_sha256: 5d01ea930c9051e60a45b593ed40c75357d2a9aeaec72acfeb23be855102443b
   selection_reason: PRIMARY

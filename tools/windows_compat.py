@@ -136,19 +136,38 @@ def _locked_cleanup_probe(root: Path) -> dict[str, Any]:
     if handle == invalid_handle:
         raise OSError(ctypes.get_last_error(), "CreateFileW could not acquire an exclusive handle")
 
+    release_requested = threading.Event()
+    released = threading.Event()
+
     def release() -> None:
-        time.sleep(0.20)
+        if not release_requested.wait(timeout=2):
+            return
         close_handle(handle)
+        released.set()
 
     thread = threading.Thread(target=release, daemon=True)
     thread.start()
     started = time.monotonic()
-    run_tests._remove_capture_file(capture, attempts=40, delay=0.025)
+    # Coordinate the first retry explicitly instead of relying on a wall-clock
+    # sleep.  The cleanup helper still owns retry semantics; this probe merely
+    # releases the native handle at its first retry boundary.
+    original_sleep = run_tests.time.sleep
+
+    def request_release(_delay: float) -> None:
+        release_requested.set()
+        if not released.wait(timeout=2):
+            raise RuntimeError("exclusive handle release did not complete")
+
+    run_tests.time.sleep = request_release
+    try:
+        run_tests._remove_capture_file(capture, attempts=40, delay=0.025)
+    finally:
+        run_tests.time.sleep = original_sleep
     thread.join(timeout=2)
     elapsed = time.monotonic() - started
     if capture.exists():
         raise RuntimeError("capture file remained after the exclusive handle was released")
-    return {"elapsed_seconds": round(elapsed, 3), "retries_exercised": elapsed >= 0.15}
+    return {"elapsed_seconds": round(elapsed, 3), "retries_exercised": released.is_set()}
 
 
 def probe() -> dict[str, Any]:

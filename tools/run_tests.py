@@ -113,6 +113,8 @@ def test_profile_environment(profile: str):
                 os.environ[name] = value
 ISSUE_HEADING_RE = re.compile(r"^(ERROR|FAIL): (.+)$")
 SKIP_COUNT_RE = re.compile(r"(?:OK|FAILED) \([^\n]*?skipped=(\d+)")
+STRUCTURED_REPORT_RE = re.compile(r"^BBK_TEST_REPORT_JSON:(\{.*\})$", re.MULTILINE)
+STRUCTURED_REPORT_ENV = "BBK_TEST_REPORT_JSON"
 SUBPROCESS_OUTPUT_ENCODING = "utf-8"
 SUBPROCESS_OUTPUT_ERRORS = "backslashreplace"
 
@@ -134,6 +136,10 @@ class SuiteResult(NamedTuple):
     tests_run: int | None
     issues: tuple[TestIssue, ...]
     skipped: int = 0
+    selected_ids: tuple[str, ...] = ()
+    executed_ids: tuple[str, ...] = ()
+    skipped_ids: tuple[str, ...] = ()
+    not_run_ids: tuple[str, ...] = ()
 
     @property
     def passed(self) -> bool:
@@ -221,13 +227,20 @@ def _configure_standard_stream(stream: TextIO) -> None:
         pass
 
 
-def _subprocess_environment() -> dict[str, str]:
+def _subprocess_environment(*, report_path: Path | None = None) -> dict[str, str]:
     """Return an environment that makes Python child output deterministic."""
     environment = os.environ.copy()
     environment["PYTHONIOENCODING"] = (
         f"{SUBPROCESS_OUTPUT_ENCODING}:{SUBPROCESS_OUTPUT_ERRORS}"
     )
     environment["BBK_TEST_ALLOW_MISSING_DEPENDENCIES"] = "1"
+    if report_path is not None:
+        # Every child receives a fresh parent-owned carrier.  Overriding an
+        # inherited value prevents nested BBK runners from writing into an
+        # outer pool/batch/isolated ledger.
+        environment[STRUCTURED_REPORT_ENV] = str(report_path)
+    else:
+        environment.pop(STRUCTURED_REPORT_ENV, None)
     return environment
 
 
@@ -269,16 +282,7 @@ def unittest_command(
     buffer: bool = False,
 ) -> list[str]:
     """Return the standard-library unittest discovery command."""
-    command = [
-        sys.executable,
-        "-m",
-        "unittest",
-        "discover",
-        "-s",
-        "tests",
-        "-p",
-        pattern,
-    ]
+    command = [sys.executable, str(TOOLS_DIR / "test_module_runner.py"), "--discover", pattern]
     if verbose:
         command.append("-v")
     elif quiet:
@@ -299,7 +303,7 @@ def unittest_modules_command(
     buffer: bool = False,
 ) -> list[str]:
     """Return one unittest command for an exact set of package test modules."""
-    command = [sys.executable, "-m", "unittest"]
+    command = [sys.executable, str(TOOLS_DIR / "test_module_runner.py")]
     if verbose:
         command.append("-v")
     elif quiet:
@@ -308,10 +312,8 @@ def unittest_modules_command(
         command.append("-f")
     if buffer:
         command.append("-b")
-    root = ROOT.resolve()
     for path in files:
-        relative = path.resolve().relative_to(root)
-        command.append(".".join(relative.with_suffix("").parts))
+        command.append(str(path.resolve()))
     return command
 
 
@@ -383,6 +385,50 @@ def parse_skip_count(output: str) -> int:
     return int(matches[-1].group(1)) if matches else 0
 
 
+def parse_structured_test_report(output: str) -> dict[str, tuple[str, ...]]:
+    """Read callback-derived test identities emitted by the child runner."""
+    matches = list(STRUCTURED_REPORT_RE.finditer(output.replace("\r\n", "\n")))
+    if not matches:
+        return {key: () for key in ("selected", "executed", "skipped", "not_run")}
+    try:
+        value = json.loads(matches[-1].group(1))
+    except json.JSONDecodeError:
+        return {key: () for key in ("selected", "executed", "skipped", "not_run")}
+    return {
+        key: tuple(item for item in value.get(key, []) if isinstance(item, str))
+        for key in ("selected", "executed", "skipped", "not_run")
+    }
+
+
+def _empty_structured_test_report() -> dict[str, tuple[str, ...]]:
+    return {key: () for key in ("selected", "executed", "skipped", "not_run")}
+
+
+def read_structured_test_report(path: Path) -> dict[str, tuple[str, ...]]:
+    """Read and minimally validate a parent-owned child report sidecar."""
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return _empty_structured_test_report()
+    if not isinstance(value, dict):
+        return _empty_structured_test_report()
+    result: dict[str, tuple[str, ...]] = {}
+    for key in ("selected", "executed", "skipped", "not_run"):
+        raw = value.get(key)
+        if not isinstance(raw, list) or not all(isinstance(item, str) for item in raw):
+            return _empty_structured_test_report()
+        result[key] = tuple(dict.fromkeys(raw))
+    selected = set(result["selected"])
+    executed = set(result["executed"])
+    skipped = set(result["skipped"])
+    not_run = set(result["not_run"])
+    if (executed & skipped) or (executed & not_run) or (skipped & not_run):
+        return _empty_structured_test_report()
+    if (executed | skipped | not_run) != selected:
+        return _empty_structured_test_report()
+    return result
+
+
 
 def test_cache_root() -> Path:
     """Return a package-external cache root suitable for immutable releases."""
@@ -403,14 +449,37 @@ def duration_cache_path() -> Path:
     return test_cache_root() / "module-durations.json"
 
 
-def _duration_modules(value: Any) -> dict[str, float]:
+def _duration_platform_key(platform_name: str | None = None) -> str:
+    platform = (platform_name or os.name).lower()
+    if platform in {"nt", "windows"}:
+        return "windows"
+    if platform in {"posix", "linux", "darwin"}:
+        return "posix"
+    return platform
+
+
+def _duration_modules(value: Any, *, platform_name: str | None = None) -> dict[str, float]:
     modules = value.get("modules") if isinstance(value, dict) else None
-    if not isinstance(modules, dict):
-        return {}
     result: dict[str, float] = {}
-    for name, raw in modules.items():
-        if isinstance(name, str) and isinstance(raw, (int, float)) and raw > 0:
-            result[name] = float(raw)
+    if isinstance(modules, dict):
+        for name, raw in modules.items():
+            if isinstance(name, str) and isinstance(raw, (int, float)) and raw > 0:
+                result[name] = float(raw)
+    if isinstance(value, dict) and platform_name:
+        key = _duration_platform_key(platform_name)
+        platform_values = value.get("platforms")
+        platform_value = platform_values.get(key) if isinstance(platform_values, dict) else None
+        if platform_value is None and isinstance(platform_values, dict):
+            aliases = {"windows": ("nt",), "posix": ("linux", "darwin")}
+            platform_value = next(
+                (platform_values[name] for name in aliases.get(key, ()) if name in platform_values),
+                None,
+            )
+        platform_modules = platform_value.get("modules") if isinstance(platform_value, dict) else platform_value
+        if isinstance(platform_modules, dict):
+            for name, raw in platform_modules.items():
+                if isinstance(name, str) and isinstance(raw, (int, float)) and raw > 0:
+                    result[name] = float(raw)
     return result
 
 
@@ -421,8 +490,8 @@ def _read_duration_value(path: Path) -> Any:
         return None
 
 
-def _read_duration_file(path: Path) -> dict[str, float]:
-    return _duration_modules(_read_duration_value(path))
+def _read_duration_file(path: Path, *, platform_name: str | None = None) -> dict[str, float]:
+    return _duration_modules(_read_duration_value(path), platform_name=platform_name)
 
 
 def duration_seed_sha256(path: Path | None = None) -> str:
@@ -434,11 +503,19 @@ def duration_seed_sha256(path: Path | None = None) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def _read_duration_cache(path: Path, *, seed_path: Path | None = None) -> dict[str, float]:
+def _read_duration_cache(
+    path: Path,
+    *,
+    seed_path: Path | None = None,
+    platform_name: str | None = None,
+) -> dict[str, float]:
     value = _read_duration_value(path)
     if not isinstance(value, dict):
         return {}
     if value.get("seed_sha256") != duration_seed_sha256(seed_path):
+        return {}
+    recorded_platform = value.get("platform")
+    if recorded_platform is not None and recorded_platform != _duration_platform_key(platform_name):
         return {}
     return _duration_modules(value)
 
@@ -471,8 +548,20 @@ def _store_run_report(report: dict[str, Any], path: Path | None) -> None:
         report["report_write_error"] = f"{type(exc).__name__}: {exc}"
 
 
-def update_duration_cache(report: Mapping[str, Any]) -> None:
+def update_duration_cache(
+    report: Mapping[str, Any],
+    *,
+    seed_path: Path | None = None,
+    platform_name: str | None = None,
+) -> None:
     """Update retained module weights only from one-module process timings."""
+    # Authoritative calibration is observational.  Its report may be handed
+    # to this helper by generic callers, but it must never promote weights.
+    if isinstance(report, Mapping) and (
+        report.get("schema") == WINDOWS_CALIBRATION_SCHEMA
+        or (isinstance(report.get("calibration"), Mapping) and report["calibration"].get("authoritative"))
+    ):
+        return
     observed: dict[str, float] = {}
     for group in report.get("groups", []) if isinstance(report, Mapping) else []:
         if not isinstance(group, Mapping):
@@ -483,6 +572,7 @@ def update_duration_cache(report: Mapping[str, Any]) -> None:
             isinstance(modules, list)
             and len(modules) == 1
             and isinstance(modules[0], str)
+            and group.get("status") == "PASS"
             and isinstance(duration, (int, float))
             and duration > 0
         ):
@@ -490,14 +580,21 @@ def update_duration_cache(report: Mapping[str, Any]) -> None:
     if not observed:
         return
     path = duration_cache_path()
-    current = _read_duration_cache(path)
+    selected_seed = seed_path if seed_path is not None else DURATION_SEED_PATH
+    selected_platform = platform_name or os.name
+    current = _read_duration_cache(
+        path,
+        seed_path=selected_seed,
+        platform_name=selected_platform,
+    )
     for name, duration in observed.items():
         previous = current.get(name)
         current[name] = duration if previous is None else round((previous * 0.6) + (duration * 0.4), 6)
     value = {
         "schema": "bbk.test-duration-cache.v1",
         "package_version": (ROOT / "VERSION").read_text(encoding="utf-8").strip(),
-        "seed_sha256": duration_seed_sha256(),
+        "seed_sha256": duration_seed_sha256(selected_seed),
+        "platform": _duration_platform_key(selected_platform),
         "updated_at": dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         "modules": dict(sorted(current.items())),
     }
@@ -507,9 +604,117 @@ def update_duration_cache(report: Mapping[str, Any]) -> None:
         pass
 
 
-def automatic_parallel_jobs(cpu_count: int | None = None) -> int:
+WINDOWS_CALIBRATION_SCHEMA = "bbk.windows-singleton-calibration.v1"
+
+
+def calibration_rejection_reason(
+    report: Mapping[str, Any],
+    *,
+    expected_modules: Sequence[str] | None = None,
+    expected_subject: str = "BBK",
+    expected_runtime: str | None = None,
+    expected_seed_sha256: str | None = None,
+) -> str | None:
+    """Return a fail-closed reason for authoritative Windows calibration.
+
+    This validator deliberately accepts only an explicitly isolated, standard
+    profile run.  It is also used by tests and by callers consuming a report;
+    no cache or packaged seed is modified here.
+    """
+    if not isinstance(report, Mapping):
+        return "invalid-report"
+    if report.get("schema") not in {"bbk.test-run.v1", WINDOWS_CALIBRATION_SCHEMA}:
+        return "wrong-schema"
+    if report.get("status") != "PASS" or report.get("exit_code", 0) != 0:
+        return "non-pass"
+    if report.get("platform", report.get("platform_name")) not in {"windows", "nt"}:
+        return "wrong-platform"
+    if report.get("profile") != "standard":
+        return "wrong-profile"
+    if report.get("mode") != "isolated" or report.get("requested_jobs") != 1:
+        return "non-singleton"
+    if report.get("subject", expected_subject) != expected_subject:
+        return "wrong-subject"
+    groups = report.get("groups")
+    if not isinstance(groups, list) or not groups:
+        return "missing-coverage"
+    expected = list(expected_modules) if expected_modules is not None else None
+    seen: list[str] = []
+    for group in groups:
+        if not isinstance(group, Mapping) or group.get("status") != "PASS":
+            return "non-pass"
+        modules = group.get("modules")
+        duration = group.get("duration_seconds")
+        if not isinstance(modules, list) or len(modules) != 1 or not isinstance(modules[0], str):
+            return "non-singleton"
+        if modules[0] in seen:
+            return "duplicate-coverage"
+        seen.append(modules[0])
+        if not isinstance(duration, (int, float)) or duration <= 0:
+            return "non-positive-duration"
+        if group.get("timed_out") or group.get("partial") or group.get("not_run"):
+            return "partial-coverage"
+    if expected is not None and sorted(seen) != sorted(expected):
+        return "missing-coverage" if len(seen) < len(expected) else "wrong-inventory"
+    provenance = report.get("provenance")
+    if not isinstance(provenance, Mapping):
+        return "missing-provenance"
+    for key in ("candidate", "runtime", "tool", "cpu", "inventory", "test"):
+        if not provenance.get(key):
+            return f"missing-{key}-provenance"
+    if expected_runtime is not None:
+        runtime = provenance.get("runtime", report.get("runtime"))
+        runtime_value = runtime.get("python") if isinstance(runtime, Mapping) else runtime
+        if runtime_value != expected_runtime:
+            return "wrong-runtime"
+    if expected_seed_sha256 is not None and report.get("seed_sha256") != expected_seed_sha256:
+        return "stale-evidence"
+    return None
+
+
+def calibration_eligible(report: Mapping[str, Any], **kwargs: Any) -> bool:
+    """Boolean convenience wrapper around :func:`calibration_rejection_reason`."""
+    return calibration_rejection_reason(report, **kwargs) is None
+
+
+# Descriptive aliases retained for callers that treat the report validator as
+# a public runner interface.
+validate_windows_singleton_calibration = calibration_rejection_reason
+is_windows_singleton_calibration_eligible = calibration_eligible
+
+
+def _calibration_provenance(files: Sequence[Path]) -> dict[str, Any]:
+    """Capture non-authoritative runtime provenance for a calibration report."""
+    inventory = [path.name for path in files]
+    candidate = hashlib.sha256(
+        json.dumps({"version": (ROOT / "VERSION").read_text(encoding="utf-8").strip(), "modules": inventory}, sort_keys=True).encode("utf-8")
+    ).hexdigest()
+    return {
+        "candidate": {"sha256": candidate},
+        "runtime": {"python": sys.version.split()[0], "executable": sys.executable},
+        "tool": {"runner": str(Path(__file__).name), "version": (ROOT / "VERSION").read_text(encoding="utf-8").strip()},
+        "cpu": {"count": os.cpu_count() or 1},
+        "inventory": {"modules": inventory, "count": len(files)},
+        "test": {"profile": "standard", "module_count": len(files)},
+    }
+
+
+def automatic_parallel_jobs(
+    cpu_count: int | None = None,
+    *,
+    platform_name: str | None = None,
+) -> int:
     """Return a conservative worker count for this process/I/O-heavy suite."""
     count = max(1, int(cpu_count if cpu_count is not None else (os.cpu_count() or 1)))
+    # Windows process startup and handle sharing are materially more expensive,
+    # but native duration weights keep its six high-core pools from combining
+    # the slowest modules. Medium hosts remain bounded at four workers.
+    if (platform_name or os.name).lower() == "nt":
+        if count >= 12:
+            return 6
+        if count >= 6:
+            return 4
+        return min(3, count)
     if count >= 12:
         return 6
     if count >= 6:
@@ -536,11 +741,22 @@ def resolve_execution_mode(
     return "pooled" if (platform_name or os.name) == "nt" else "isolated"
 
 
-def load_duration_weights(path: Path | None = None) -> dict[str, float]:
+def load_duration_weights(
+    path: Path | None = None,
+    *,
+    platform_name: str | None = None,
+) -> dict[str, float]:
     """Load packaged weights plus a cache bound to the exact packaged seed."""
+    selected_platform = platform_name or os.name
     seed_path = path if path is not None else DURATION_SEED_PATH
-    result = _read_duration_file(seed_path)
-    result.update(_read_duration_cache(duration_cache_path(), seed_path=seed_path))
+    result = _read_duration_file(seed_path, platform_name=selected_platform)
+    result.update(
+        _read_duration_cache(
+            duration_cache_path(),
+            seed_path=seed_path,
+            platform_name=selected_platform,
+        )
+    )
     return result
 
 
@@ -630,11 +846,21 @@ def _execute_unittest_command(
         creation["start_new_session"] = True
 
     capture_path: Path | None = None
+    report_path: Path | None = None
+    structured = _empty_structured_test_report()
     process: subprocess.Popen[bytes] | None = None
     try:
         fd, raw_capture = tempfile.mkstemp(prefix="bbk-test-suite-", suffix=".log")
         os.close(fd)
         capture_path = Path(raw_capture)
+        # Derive a sibling carrier from the already private capture name so
+        # test doubles (and restricted hosts) need only one temp-file create.
+        # ``x`` keeps an accidental pre-existing path from being overwritten.
+        report_path = capture_path.with_suffix(".json")
+        report_fd = os.open(
+            str(report_path), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600
+        )
+        os.close(report_fd)
         with capture_path.open("wb") as writer:
             process = subprocess.Popen(
                 list(command),
@@ -642,7 +868,7 @@ def _execute_unittest_command(
                 stdin=subprocess.DEVNULL,
                 stdout=writer,
                 stderr=subprocess.STDOUT,
-                env=_subprocess_environment(),
+                env=_subprocess_environment(report_path=report_path),
                 **creation,
             )
 
@@ -700,6 +926,10 @@ def _execute_unittest_command(
                     _write_text(stream, tail, flush=True)
                 output = "".join(chunks)
 
+        # A supplied sidecar is authoritative.  Do not fall back to stdout
+        # when it is missing or malformed: nested child markers are precisely
+        # the contamination boundary this carrier prevents.
+        structured = read_structured_test_report(report_path)
         if timed_out:
             diagnostic = (
                 f"\nBBK test runner: suite {label} exceeded "
@@ -723,7 +953,11 @@ def _execute_unittest_command(
                 pass
         if capture_path is not None:
             _remove_capture_file(capture_path)
+        if report_path is not None:
+            _remove_capture_file(report_path)
 
+    # Prefer the private sidecar.  Stdout marker parsing remains a compatibility
+    # fallback for older/standalone child runners and synthetic callers.
     return SuiteResult(
         name=label,
         returncode=returncode,
@@ -731,6 +965,10 @@ def _execute_unittest_command(
         tests_run=parse_test_count(output),
         issues=parse_issues(output),
         skipped=parse_skip_count(output),
+        selected_ids=structured["selected"],
+        executed_ids=structured["executed"],
+        skipped_ids=structured["skipped"],
+        not_run_ids=structured["not_run"],
     )
 
 
@@ -832,6 +1070,30 @@ def _fallback_issue(result: SuiteResult) -> TestIssue:
     return TestIssue("PROCESS ERROR", result.name, f"exit code {result.returncode}: {cause}")
 
 
+def _identity_report(results: Sequence[SuiteResult]) -> dict[str, Any]:
+    selected = tuple(item for result in results for item in result.selected_ids)
+    skipped = tuple(item for result in results for item in result.skipped_ids)
+    skipped_set = set(skipped)
+    executed = tuple(item for result in results for item in result.executed_ids if item not in skipped_set)
+    not_run = tuple(item for result in results for item in result.not_run_ids)
+    return {
+        "selected": list(dict.fromkeys(selected)),
+        "executed": list(dict.fromkeys(executed)),
+        "skipped_ids": list(dict.fromkeys(skipped)),
+        "not_run": list(dict.fromkeys(not_run)),
+        "test_ids": {
+            "selected": list(dict.fromkeys(selected)),
+            "executed": list(dict.fromkeys(executed)),
+            "skipped": list(dict.fromkeys(skipped)),
+            "not_run": list(dict.fromkeys(not_run)),
+        },
+        "selected_count": len(selected),
+        "executed_count": len(executed),
+        "skipped_count": len(skipped),
+        "not_run_count": len(not_run),
+    }
+
+
 def summary_issues(results: Sequence[SuiteResult]) -> list[tuple[str, TestIssue]]:
     """Return every reportable issue, including fallbacks for opaque failures."""
     values: list[tuple[str, TestIssue]] = []
@@ -911,13 +1173,18 @@ def partition_test_files(
     processes: int,
     *,
     duration_weights: dict[str, float] | None = None,
+    platform_name: str | None = None,
 ) -> list[list[Path]]:
     """Partition modules by retained measured duration, then source size."""
     count = min(len(files), max(1, int(processes)))
     if count == 0:
         return []
     original_order = {path.resolve(): index for index, path in enumerate(files)}
-    measured = duration_weights if duration_weights is not None else load_duration_weights()
+    measured = (
+        duration_weights
+        if duration_weights is not None
+        else load_duration_weights(platform_name=platform_name)
+    )
 
     def weight(path: Path) -> float:
         if path.name in measured:
@@ -962,7 +1229,7 @@ def run_test_pool(
     )
     if failfast:
         process_count = 1
-    groups = partition_test_files(files, process_count)
+    groups = partition_test_files(files, process_count, platform_name=os.name)
     results_by_index: dict[int, SuiteResult] = {}
     elapsed_by_index: dict[int, float] = {}
     progress_by_index: dict[int, SuiteProgressStream] = {}
@@ -1079,6 +1346,7 @@ def run_test_pool(
         "execution_processes": len(groups),
         "tests_reported": sum(result.tests_run or 0 for result in results),
         "skipped": sum(result.skipped for result in results),
+        **_identity_report(results),
         "groups": [
             {
                 "label": _shard_label(index, groups[index - 1]),
@@ -1155,6 +1423,7 @@ def run_test_batch(
         "execution_processes": 1,
         "tests_reported": result.tests_run or 0,
         "skipped": result.skipped,
+        **_identity_report([result]),
         "groups": [{
             "label": result.name,
             "modules": [path.name for path in files],
@@ -1249,6 +1518,7 @@ def run_test_files(
         "execution_processes": 1,
         "tests_reported": sum(result.tests_run or 0 for result in results),
         "skipped": sum(result.skipped for result in results),
+        **_identity_report(results),
         "groups": [
             {
                 "label": path.name,
@@ -1381,6 +1651,7 @@ def _run_test_files_parallel(
         "execution_processes": len(files),
         "tests_reported": sum(result.tests_run or 0 for result in results),
         "skipped": sum(result.skipped for result in results),
+        **_identity_report(results),
         "groups": [
             {
                 "label": files[index - 1].name,
@@ -1464,6 +1735,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         action="store_true",
         help="do not write the default package-external timing report",
     )
+    parser.add_argument(
+        "--calibrate-windows-singleton", "--windows-singleton-calibration",
+        action="store_true",
+        help="run an explicit native-Windows standard isolated jobs=1 calibration (never promotes weights)",
+    )
     args = parser.parse_args(argv)
     if args.verbose and args.quiet:
         parser.error("--verbose and --quiet are mutually exclusive")
@@ -1475,6 +1751,15 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.error("--jobs must be zero or positive")
     if args.timing_report and args.no_timing_report:
         parser.error("--timing-report and --no-timing-report are mutually exclusive")
+    if args.calibrate_windows_singleton:
+        if os.name != "nt":
+            parser.error("Windows singleton calibration requires native Windows")
+        if args.profile != "standard" or args.mode != "isolated" or args.jobs != 1:
+            parser.error("Windows singleton calibration requires --profile standard --mode isolated --jobs 1")
+        if not args.timing_report or args.no_timing_report:
+            parser.error("Windows singleton calibration requires an explicit --timing-report path")
+        if not os.environ.get("BBK_TEST_CACHE_DIR"):
+            parser.error("Windows singleton calibration requires an isolated BBK_TEST_CACHE_DIR")
     with test_profile_environment(args.profile):
         if args.all:
             if args.quiet or args.buffer or args.pattern != "test*.py" or args.heartbeat_seconds != DEFAULT_HEARTBEAT_SECONDS:
@@ -1554,9 +1839,22 @@ def main(argv: Sequence[str] | None = None) -> int:
             "wall_seconds": round(time.monotonic() - started, 6),
             "completed_at": dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         })
+        if args.calibrate_windows_singleton:
+            report["schema"] = WINDOWS_CALIBRATION_SCHEMA
+            report["subject"] = "BBK"
+            report["platform"] = "windows"
+            report["seed_sha256"] = duration_seed_sha256(DURATION_SEED_PATH)
+            report["provenance"] = _calibration_provenance(files)
+            report["calibration"] = {
+                "authoritative": True,
+                "cache_mutated": False,
+                "seed_promoted": False,
+                "eligibility": calibration_rejection_reason(report, expected_modules=[path.name for path in files]),
+            }
         report_path = None if args.no_timing_report else Path(args.timing_report).expanduser() if args.timing_report else default_timing_report_path()
         _store_run_report(report, report_path)
-        update_duration_cache(report)
+        if not args.calibrate_windows_singleton:
+            update_duration_cache(report, platform_name=os.name)
         if report_path is not None:
             _write_text(sys.stdout, f"Timing report: {report_path}\n", flush=True)
         return exit_code

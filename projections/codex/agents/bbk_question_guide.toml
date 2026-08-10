@@ -321,7 +321,7 @@ Operational completion, role semantic readiness, accountable acceptance, and rel
 These complete procedures are compiled developer instructions. They are not external skill selections and require no model filesystem read.
 
 - id: bbk-grill
-  version: 0.1.0-alpha.17.0.2
+  version: 0.1.0-alpha.17.0.2.1
   source_sha256: b03963b1db9b4e9ba6d455e689ccd24d43480573815713eec30491f62e712fc3
   effective_sha256: a30061526616b9809319a5f9d4ab817f7b699ad520116afeda0bd532c565359e
   selection_reason: PRIMARY
