@@ -123,7 +123,7 @@
         "bbk-prompt-coordination-economy"
       ],
       "source": "shared/skills/bbk/SKILL.md",
-      "source_sha256": "a840b12ac87c3b83f958aa424d83243aa54722b0eb7b621b9dc00b2d3bf260dc",
+      "source_sha256": "3725994f357f2a2e0abae19b3408ddeeb34966565ff751c97dbbcb833233a1fa",
       "version": "0.1.0-alpha.17.0.2.1"
     },
     {
@@ -841,7 +841,7 @@
       "version": "0.1.0-alpha.17.0.2.1"
     }
   ],
-  "registry_revision": "ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
+  "registry_revision": "9afc833b3e61e8a104364a4544de4d30bd7facca7f09b4a0945f108b6e42471f",
   "role_source_sha256": "64cafa31d6ee8d7191eab0499f6a5d9352d76489c2af3c881990c93b91c35ccd",
   "roles": {
     "bbk_architect": {

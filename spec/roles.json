@@ -15,14 +15,14 @@
       {
         "name": "bbk_root_wayfinder",
         "path": "spec/roles/bbk_root_wayfinder-role.json",
-        "bytes": 24596,
-        "sha256": "a2674ee46acbef0307028d72fd25b7e84531e56e45b14c73a205af4fb8cc560e"
+        "bytes": 24633,
+        "sha256": "f110f61c5db4b1bb75ac80d665dda119fb986d37343c174c6af601a0358ed29f"
       },
       {
         "name": "bbk_territory_wayfinder",
         "path": "spec/roles/bbk_territory_wayfinder-role.json",
-        "bytes": 27538,
-        "sha256": "10c2157cc9867e5f33eaf802b14a1d08159f91a55d37068efc891f92535ddccb"
+        "bytes": 27575,
+        "sha256": "f92acfafc4d25023bb5e927aea78335d9b260d9766cd25f243ba466a5a456534"
       },
       {
         "name": "bbk_questioning_wayfinder",
@@ -250,8 +250,8 @@
       },
       {
         "path": "spec/prompt-modules/bbk-prompt-execution-autonomy.json",
-        "bytes": 2330,
-        "sha256": "822eaf252318c992272caf4a589cfdf8cc843f987d492cbc7e39c66584cd71d7"
+        "bytes": 3054,
+        "sha256": "517c317fcf81431f8d8b77ddcc75f06c1165df531acbe8157d7d7dc67078b85e"
       },
       {
         "path": "spec/prompt-modules/bbk-prompt-user-attention.json",
@@ -821,6 +821,7 @@
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
         "bbk-prompt-planning-source-integrity",
+        "bbk-prompt-execution-autonomy",
         "bbk-prompt-user-attention",
         "bbk-prompt-baseline-transition",
         "bbk-prompt-evidence-subject-identity",
@@ -1110,6 +1111,7 @@
         "bbk-prompt-profile-qualification",
         "bbk-prompt-proportional-stop",
         "bbk-prompt-planning-source-integrity",
+        "bbk-prompt-execution-autonomy",
         "bbk-prompt-user-attention",
         "bbk-prompt-baseline-transition",
         "bbk-prompt-evidence-subject-identity",

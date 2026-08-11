@@ -128,8 +128,8 @@
       "procedures": [
         "bbk-phase-plan"
       ],
-      "prompt_characters": 92192,
-      "prompt_sha256": "f19e024b0946ed1f8fd6048a5ba91dcd1df388ea6c0e494450e9962c83d0cbcd",
+      "prompt_characters": 92843,
+      "prompt_sha256": "54a93d9754e79365d0424a1f040fbdc2f2684fc7e86e76f83ecbe112b6591539",
       "target": "codex"
     },
     {
@@ -151,8 +151,8 @@
       "procedures": [
         "bbk-phase-plan"
       ],
-      "prompt_characters": 94964,
-      "prompt_sha256": "e5b77131afc86746bd544c7de54d4dd0c53aaab7348342946103f0100b6b62ae",
+      "prompt_characters": 95615,
+      "prompt_sha256": "8ac185927ea3e7c6988c995207ae775355933379fcd62ee31157a5b3b64d54df",
       "target": "omp"
     },
     {
@@ -174,8 +174,8 @@
       "procedures": [
         "bbk-phase-plan"
       ],
-      "prompt_characters": 94109,
-      "prompt_sha256": "fdc10d8c5e08c027e2c142d7144be4adfdfcc8b5adc87176e7700014358099e5",
+      "prompt_characters": 94760,
+      "prompt_sha256": "f4c7cc0a34c6ce5ef11fd9a1c5496aabc59d29d219f55168200b214f6e54fc43",
       "target": "claude"
     },
     {
@@ -197,8 +197,8 @@
       "procedures": [
         "bbk-phase-plan"
       ],
-      "prompt_characters": 93688,
-      "prompt_sha256": "5ff79ca607d7be581bc8a50da193ac37336c9b05b462effb145fc73f36581107",
+      "prompt_characters": 94339,
+      "prompt_sha256": "eab07856905872c07e249675482205e411b4034cfb960059547491366c62289b",
       "target": "pi"
     },
     {
@@ -220,8 +220,8 @@
       "procedures": [
         "bbk-phase-plan"
       ],
-      "prompt_characters": 93688,
-      "prompt_sha256": "5ff79ca607d7be581bc8a50da193ac37336c9b05b462effb145fc73f36581107",
+      "prompt_characters": 94339,
+      "prompt_sha256": "eab07856905872c07e249675482205e411b4034cfb960059547491366c62289b",
       "target": "generic"
     },
     {
@@ -241,8 +241,8 @@
       "procedures": [
         "bbk-work-graph"
       ],
-      "prompt_characters": 85744,
-      "prompt_sha256": "b4f00eb7eddf72eb052960f119db26884db90653aa27a0eb9af2c6b610071a5e",
+      "prompt_characters": 86395,
+      "prompt_sha256": "7848000970ea711567e928fc375f8851914f5bd1ba846497e8750d234051d979",
       "target": "codex"
     },
     {
@@ -262,8 +262,8 @@
       "procedures": [
         "bbk-work-graph"
       ],
-      "prompt_characters": 88599,
-      "prompt_sha256": "5d6ff5f0d841ab33f9c85b1282ea4077c51a4bffbbc78734cfd663c6760c2950",
+      "prompt_characters": 89250,
+      "prompt_sha256": "dd889b140890ed709ec486562b9fc486485f36adf3a19653be313939654f4efc",
       "target": "omp"
     },
     {
@@ -283,8 +283,8 @@
       "procedures": [
         "bbk-work-graph"
       ],
-      "prompt_characters": 87778,
-      "prompt_sha256": "465d82961c5108711056bc389c07080320a1aafaa3b5f7db4f8d5d6049e16595",
+      "prompt_characters": 88429,
+      "prompt_sha256": "fd24acde99dff5f9afffaa64e17e76a8d851cd7a4a762328b676ec76ca656134",
       "target": "claude"
     },
     {
@@ -304,8 +304,8 @@
       "procedures": [
         "bbk-work-graph"
       ],
-      "prompt_characters": 87323,
-      "prompt_sha256": "c4897f0224ef96e857c68cf007afd300565682793503b77680cdac4a2c3f9002",
+      "prompt_characters": 87974,
+      "prompt_sha256": "0c8cd282deb0eed65a970d0b45846a4def606f0008e2602ff2af9f56a78728a1",
       "target": "pi"
     },
     {
@@ -325,8 +325,8 @@
       "procedures": [
         "bbk-work-graph"
       ],
-      "prompt_characters": 87323,
-      "prompt_sha256": "c4897f0224ef96e857c68cf007afd300565682793503b77680cdac4a2c3f9002",
+      "prompt_characters": 87974,
+      "prompt_sha256": "0c8cd282deb0eed65a970d0b45846a4def606f0008e2602ff2af9f56a78728a1",
       "target": "generic"
     },
     {
@@ -347,8 +347,8 @@
       "procedures": [
         "bbk-prototype"
       ],
-      "prompt_characters": 93128,
-      "prompt_sha256": "d34a166cd01c5fabc7e80cedff9833609b924a35d0866b14d8107c0a5699f0e6",
+      "prompt_characters": 93779,
+      "prompt_sha256": "9d828e4c858a695b646a47c24b6275b8e9250409c107588793cb773f5510c987",
       "target": "codex"
     },
     {
@@ -369,8 +369,8 @@
       "procedures": [
         "bbk-prototype"
       ],
-      "prompt_characters": 95600,
-      "prompt_sha256": "284242eafdbe024800a491af301a8d8ae52cb90b1e9a9f278a93201945246f6a",
+      "prompt_characters": 96251,
+      "prompt_sha256": "8e2d8e821076c72d43557ba1bf89c1557188f09b1d7e480794f2da90cd11272d",
       "target": "omp"
     },
     {
@@ -391,8 +391,8 @@
       "procedures": [
         "bbk-prototype"
       ],
-      "prompt_characters": 94703,
-      "prompt_sha256": "dd7f2907514dd06ab09091f6222847f7035f139c7eb56cb7033332cac4d30e48",
+      "prompt_characters": 95354,
+      "prompt_sha256": "c36618016a23bc365a22b7c656f682b9920c2328bb7c1d53dba3808f405e9888",
       "target": "claude"
     },
     {
@@ -413,8 +413,8 @@
       "procedures": [
         "bbk-prototype"
       ],
-      "prompt_characters": 94324,
-      "prompt_sha256": "e2d864ffcc93ab96b0a9e24680d0543dfd44d630eb81a31537cb1da3e3ac5b9f",
+      "prompt_characters": 94975,
+      "prompt_sha256": "005d85a02c2c2372fdc8a71e25990b46f672dc76c34b60ef19302aad39eb154d",
       "target": "pi"
     },
     {
@@ -435,8 +435,8 @@
       "procedures": [
         "bbk-prototype"
       ],
-      "prompt_characters": 94324,
-      "prompt_sha256": "e2d864ffcc93ab96b0a9e24680d0543dfd44d630eb81a31537cb1da3e3ac5b9f",
+      "prompt_characters": 94975,
+      "prompt_sha256": "005d85a02c2c2372fdc8a71e25990b46f672dc76c34b60ef19302aad39eb154d",
       "target": "generic"
     },
     {
@@ -838,8 +838,8 @@
       "procedures": [
         "bbk-root-execution"
       ],
-      "prompt_characters": 113351,
-      "prompt_sha256": "6f4e6a7461ebcaae4cca71400d2536d53fe65a9f6e246214e2f140910615d795",
+      "prompt_characters": 114002,
+      "prompt_sha256": "018fd5e2967e3b5e60f712fb4e42dc0eaca086ab5623d91d404b304552272403",
       "target": "codex"
     },
     {
@@ -861,8 +861,8 @@
       "procedures": [
         "bbk-root-execution"
       ],
-      "prompt_characters": 116726,
-      "prompt_sha256": "97fc2c84708deaa0a2095c3170d75b3b4404f9500b05ac8a6c64c3a5a73da928",
+      "prompt_characters": 117377,
+      "prompt_sha256": "d40274c46245615844c95d0affb251ed08e42b4f75a9d9b314c9336c81e21cee",
       "target": "omp"
     },
     {
@@ -884,8 +884,8 @@
       "procedures": [
         "bbk-root-execution"
       ],
-      "prompt_characters": 115891,
-      "prompt_sha256": "fab13a1201962f64cbd90de368767fd9d5391cc592c3eea6b4d536a965ba6203",
+      "prompt_characters": 116542,
+      "prompt_sha256": "88048cfe6e476d46ba270f31fcaf4cf52dab59c9aa2b4a513ee3996c8fccf946",
       "target": "claude"
     },
     {
@@ -907,8 +907,8 @@
       "procedures": [
         "bbk-root-execution"
       ],
-      "prompt_characters": 115450,
-      "prompt_sha256": "b9675cc46a91e164a2d47019263f2ffb9cd51f87152a1ea7703a952e82a61e3a",
+      "prompt_characters": 116101,
+      "prompt_sha256": "193a30070c486901361abac9843dcad319e058fbc69937f1d01a0aa9242726b3",
       "target": "pi"
     },
     {
@@ -930,8 +930,8 @@
       "procedures": [
         "bbk-root-execution"
       ],
-      "prompt_characters": 115450,
-      "prompt_sha256": "b9675cc46a91e164a2d47019263f2ffb9cd51f87152a1ea7703a952e82a61e3a",
+      "prompt_characters": 116101,
+      "prompt_sha256": "193a30070c486901361abac9843dcad319e058fbc69937f1d01a0aa9242726b3",
       "target": "generic"
     },
     {
@@ -956,8 +956,8 @@
         "bbk-plan",
         "bbk-wayfind"
       ],
-      "prompt_characters": 82412,
-      "prompt_sha256": "ef7d7e9965f177f537ac1305c8cf28b1135ab03b0d6c6a4edb5064fc822f2dc6",
+      "prompt_characters": 84808,
+      "prompt_sha256": "03c863d226d9cdcc4719bdb3e25d8cc7f638fcab3f6e60e95f4e40362cc3e2c6",
       "target": "codex"
     },
     {
@@ -982,8 +982,8 @@
         "bbk-plan",
         "bbk-wayfind"
       ],
-      "prompt_characters": 85439,
-      "prompt_sha256": "41b6628854b14ab226dfa62d3e0645ce85da680cdb3e93bb121044674ff80e9e",
+      "prompt_characters": 87911,
+      "prompt_sha256": "d8671a73e2a4d6f785aa95b3f0aa43051b513c5edb806b0a1cd9d0aa269fa279",
       "target": "omp"
     },
     {
@@ -1008,8 +1008,8 @@
         "bbk-plan",
         "bbk-wayfind"
       ],
-      "prompt_characters": 84709,
-      "prompt_sha256": "7f61f58340c8169bae8c5eab8933a7b51d7415e758711e653c3202b3f5d03bb8",
+      "prompt_characters": 87181,
+      "prompt_sha256": "c481fd2ad1854bcc063dcb5b7e91d1964b26087da3799a536cd4156618298f75",
       "target": "claude"
     },
     {
@@ -1034,8 +1034,8 @@
         "bbk-plan",
         "bbk-wayfind"
       ],
-      "prompt_characters": 84141,
-      "prompt_sha256": "40a5e1f7a3ed1065f518bbce8c76adce72991b1609bfc31e25441e0b933ce02e",
+      "prompt_characters": 86613,
+      "prompt_sha256": "a2b5f35b454b2416f6f5fabb1f25f2f3d35021d5dae0e320ca321ca678cfb938",
       "target": "pi"
     },
     {
@@ -1060,8 +1060,8 @@
         "bbk-plan",
         "bbk-wayfind"
       ],
-      "prompt_characters": 84141,
-      "prompt_sha256": "40a5e1f7a3ed1065f518bbce8c76adce72991b1609bfc31e25441e0b933ce02e",
+      "prompt_characters": 86613,
+      "prompt_sha256": "a2b5f35b454b2416f6f5fabb1f25f2f3d35021d5dae0e320ca321ca678cfb938",
       "target": "generic"
     },
     {
@@ -1193,8 +1193,8 @@
       "procedures": [
         "bbk-territory-execution"
       ],
-      "prompt_characters": 115725,
-      "prompt_sha256": "c745ec2a1ad56bad7bf697438426e692255a7fd8b1e79abec11a9648e18ca76d",
+      "prompt_characters": 116376,
+      "prompt_sha256": "c0365833b17f8686834333a895fc4de3abfb5045706257b1c06617b874fe40b4",
       "target": "codex"
     },
     {
@@ -1216,8 +1216,8 @@
       "procedures": [
         "bbk-territory-execution"
       ],
-      "prompt_characters": 118869,
-      "prompt_sha256": "3b68d0a60c58bb8ca463d5e0566d6aa374882495f7cba8c961b12ff58344f133",
+      "prompt_characters": 119520,
+      "prompt_sha256": "cf9f8f7d6fb92833c728812029eee24aac762ae404c7fe3e4b576bd3718b6c8c",
       "target": "omp"
     },
     {
@@ -1239,8 +1239,8 @@
       "procedures": [
         "bbk-territory-execution"
       ],
-      "prompt_characters": 118072,
-      "prompt_sha256": "3bf0ddbb32334b8723c7579bac6403a3a3f6bcc06b2b712578ccde6bfbb29e43",
+      "prompt_characters": 118723,
+      "prompt_sha256": "4cd628314a513a62b0e3b5f98f00c4c9446f6fb6710ef17d3c7a38a155b72d6b",
       "target": "claude"
     },
     {
@@ -1262,8 +1262,8 @@
       "procedures": [
         "bbk-territory-execution"
       ],
-      "prompt_characters": 117593,
-      "prompt_sha256": "3563b748dc537012e35869f14a3247b4271b9073699f5fb48db0e0f59eaea6b9",
+      "prompt_characters": 118244,
+      "prompt_sha256": "8839ce643f5451970368dfc7afaaa3e05c7a6d029545e4983686aaeed7be4465",
       "target": "pi"
     },
     {
@@ -1285,8 +1285,8 @@
       "procedures": [
         "bbk-territory-execution"
       ],
-      "prompt_characters": 117593,
-      "prompt_sha256": "3563b748dc537012e35869f14a3247b4271b9073699f5fb48db0e0f59eaea6b9",
+      "prompt_characters": 118244,
+      "prompt_sha256": "8839ce643f5451970368dfc7afaaa3e05c7a6d029545e4983686aaeed7be4465",
       "target": "generic"
     },
     {
@@ -1310,8 +1310,8 @@
         "bbk-plan",
         "bbk-wayfind"
       ],
-      "prompt_characters": 81036,
-      "prompt_sha256": "d977be1b3f9da32f9da56e6437a79cdf852d60d535bb2dd5a0790fed4c6e1976",
+      "prompt_characters": 83432,
+      "prompt_sha256": "24beff2aecb0afc83f5dfacfa084d8a940268737692a1424484534746e39e688",
       "target": "codex"
     },
     {
@@ -1335,8 +1335,8 @@
         "bbk-plan",
         "bbk-wayfind"
       ],
-      "prompt_characters": 83888,
-      "prompt_sha256": "687f46d6993aded0f94aaf2c5e9a9c2a59124f1590679a91ad9f83b1d86468cb",
+      "prompt_characters": 86360,
+      "prompt_sha256": "489541270ef5949b9d3129b1d86bbf079d362b6e98589662e67e6e87d93849b2",
       "target": "omp"
     },
     {
@@ -1360,8 +1360,8 @@
         "bbk-plan",
         "bbk-wayfind"
       ],
-      "prompt_characters": 83230,
-      "prompt_sha256": "8a8bdb202efd91edcd5ee953f51c8fc252ee31d3ed5237aee8f945756fa5b26a",
+      "prompt_characters": 85702,
+      "prompt_sha256": "1e5e6acca5fe3a1ab4a429982985d136e66da1fe31561c59861f1ebfa9eb5ca3",
       "target": "claude"
     },
     {
@@ -1385,8 +1385,8 @@
         "bbk-plan",
         "bbk-wayfind"
       ],
-      "prompt_characters": 82612,
-      "prompt_sha256": "6af53a505fdffbd1358b9edbf8a98f64a1d412282a2b59e956757eb3793392bc",
+      "prompt_characters": 85084,
+      "prompt_sha256": "a513327a8616a98fc365551fab86a9ae0a610e2d658f55b90c36084f2d875228",
       "target": "pi"
     },
     {
@@ -1410,8 +1410,8 @@
         "bbk-plan",
         "bbk-wayfind"
       ],
-      "prompt_characters": 82612,
-      "prompt_sha256": "6af53a505fdffbd1358b9edbf8a98f64a1d412282a2b59e956757eb3793392bc",
+      "prompt_characters": 85084,
+      "prompt_sha256": "a513327a8616a98fc365551fab86a9ae0a610e2d658f55b90c36084f2d875228",
       "target": "generic"
     },
     {
@@ -1818,8 +1818,8 @@
       "procedures": [
         "bbk-work-unit-execution"
       ],
-      "prompt_characters": 95926,
-      "prompt_sha256": "335200caedb0613326245e527a0e18d933f4e0f304d43cc4948d00bd411f7fdb",
+      "prompt_characters": 96577,
+      "prompt_sha256": "8c52e4b37ce495cdea5948a5a08ed720458eb2199f97eef3911d5feb6b1ef822",
       "target": "codex"
     },
     {
@@ -1841,8 +1841,8 @@
       "procedures": [
         "bbk-work-unit-execution"
       ],
-      "prompt_characters": 98726,
-      "prompt_sha256": "0d671d37297dde09543fbe7d36aba382824206815500ffd4900615651af2e4ea",
+      "prompt_characters": 99377,
+      "prompt_sha256": "8777b6f158eeee79422eb79d2096ef155f63d07aac40c902513a85445ceab5b0",
       "target": "omp"
     },
     {
@@ -1864,8 +1864,8 @@
       "procedures": [
         "bbk-work-unit-execution"
       ],
-      "prompt_characters": 98098,
-      "prompt_sha256": "b16410b8ad43975d192444748a290bd5193fafefee65770f0d157e14900a23fd",
+      "prompt_characters": 98749,
+      "prompt_sha256": "88527681b078f08bc6f63ee850435067db63ea31386982cea937008d673564fb",
       "target": "claude"
     },
     {
@@ -1887,8 +1887,8 @@
       "procedures": [
         "bbk-work-unit-execution"
       ],
-      "prompt_characters": 97778,
-      "prompt_sha256": "7f03aef0e1f8f8c60baa934cdb195d6dcd4968d4b537550fddacab8df8422c4f",
+      "prompt_characters": 98429,
+      "prompt_sha256": "ed25be9f897de5ec950651eeec521edd39aba27ad0ceb425d5d9f03d6ef9850b",
       "target": "pi"
     },
     {
@@ -1910,8 +1910,8 @@
       "procedures": [
         "bbk-work-unit-execution"
       ],
-      "prompt_characters": 97778,
-      "prompt_sha256": "7f03aef0e1f8f8c60baa934cdb195d6dcd4968d4b537550fddacab8df8422c4f",
+      "prompt_characters": 98429,
+      "prompt_sha256": "ed25be9f897de5ec950651eeec521edd39aba27ad0ceb425d5d9f03d6ef9850b",
       "target": "generic"
     },
     {
@@ -1932,8 +1932,8 @@
       "procedures": [
         "bbk-worker-design"
       ],
-      "prompt_characters": 96997,
-      "prompt_sha256": "25046f177afede90f6312961eef9014e19ea6d5813b3f92136043ac1f8365c3d",
+      "prompt_characters": 97648,
+      "prompt_sha256": "ced148ddf2744921378f89e4f2e79807dd1a1fefbd1af5824cc03862d5f83eed",
       "target": "codex"
     },
     {
@@ -1954,8 +1954,8 @@
       "procedures": [
         "bbk-worker-design"
       ],
-      "prompt_characters": 99609,
-      "prompt_sha256": "70c9a1bf52d08acbecaf08c385e27af9a9cfa942f0bd5bed29ad526ef5340f56",
+      "prompt_characters": 100260,
+      "prompt_sha256": "ffec8f32451489d9719342304baf2a4b601c23b2d48c70b8ed822ff02e6785f1",
       "target": "omp"
     },
     {
@@ -1976,8 +1976,8 @@
       "procedures": [
         "bbk-worker-design"
       ],
-      "prompt_characters": 98981,
-      "prompt_sha256": "dd365cf01025ae67388414089243d2145e81191dd9dc0b021d8b6f9eb354d50a",
+      "prompt_characters": 99632,
+      "prompt_sha256": "c22a6e7eeb21a03ec1bb74d177bdf1cc1f637c905010cf779fb910a756146d03",
       "target": "claude"
     },
     {
@@ -1998,8 +1998,8 @@
       "procedures": [
         "bbk-worker-design"
       ],
-      "prompt_characters": 98661,
-      "prompt_sha256": "9e2c0c49c162d95cbc7c38b7a1d5d3a78887778fbc63163fcbb4b78b4787e123",
+      "prompt_characters": 99312,
+      "prompt_sha256": "4b47fc329362732360fff0b287872d717459b868e8c76b2cdb2a1a7448240adc",
       "target": "pi"
     },
     {
@@ -2020,8 +2020,8 @@
       "procedures": [
         "bbk-worker-design"
       ],
-      "prompt_characters": 98661,
-      "prompt_sha256": "9e2c0c49c162d95cbc7c38b7a1d5d3a78887778fbc63163fcbb4b78b4787e123",
+      "prompt_characters": 99312,
+      "prompt_sha256": "4b47fc329362732360fff0b287872d717459b868e8c76b2cdb2a1a7448240adc",
       "target": "generic"
     },
     {
@@ -2043,8 +2043,8 @@
       "procedures": [
         "bbk-worker-execution"
       ],
-      "prompt_characters": 108312,
-      "prompt_sha256": "73ee74051912a4ee26fcc69be9726e5eea0e788e22879d2d548d1b82b7b31e31",
+      "prompt_characters": 108963,
+      "prompt_sha256": "7cf7025f1ed5e5827950e215e9ecaeb033636a96d82f257e37569c88fd6bcb1f",
       "target": "codex"
     },
     {
@@ -2066,8 +2066,8 @@
       "procedures": [
         "bbk-worker-execution"
       ],
-      "prompt_characters": 111530,
-      "prompt_sha256": "b24509085dd4f2749f1c5b851dba95fa93301b2627a82c20e8f27a97e34ee346",
+      "prompt_characters": 112181,
+      "prompt_sha256": "00156e534213305cb42211e864c717a52f9fa141daf86276fa8ec8dbbd464e35",
       "target": "omp"
     },
     {
@@ -2089,8 +2089,8 @@
       "procedures": [
         "bbk-worker-execution"
       ],
-      "prompt_characters": 110599,
-      "prompt_sha256": "c8a8a893707f1493d8d35a35e8796b9a8a88bdb39a51c8a1fa9c644660d7d3f2",
+      "prompt_characters": 111250,
+      "prompt_sha256": "9429c642ab8506b2e2b296fdd777e81cea4504f2ee9661364b66fe5a6ae7c11d",
       "target": "claude"
     },
     {
@@ -2112,8 +2112,8 @@
       "procedures": [
         "bbk-worker-execution"
       ],
-      "prompt_characters": 110254,
-      "prompt_sha256": "7dcf0d6f47f0abf189400fb99bebdd46395973290f6bf85749174dd455777b0f",
+      "prompt_characters": 110905,
+      "prompt_sha256": "b62f5749af92f76a203e28ccac564199dfdbd8b228302693acb102c06054ba35",
       "target": "pi"
     },
     {
@@ -2135,8 +2135,8 @@
       "procedures": [
         "bbk-worker-execution"
       ],
-      "prompt_characters": 110254,
-      "prompt_sha256": "7dcf0d6f47f0abf189400fb99bebdd46395973290f6bf85749174dd455777b0f",
+      "prompt_characters": 110905,
+      "prompt_sha256": "b62f5749af92f76a203e28ccac564199dfdbd8b228302693acb102c06054ba35",
       "target": "generic"
     },
     {
@@ -2153,8 +2153,8 @@
         "bbk-context-routing",
         "bbk"
       ],
-      "prompt_characters": 51303,
-      "prompt_sha256": "87d7b158f2a80883fcb42b702bebbd09453250bb7d051a37630f70468463ac65",
+      "prompt_characters": 51989,
+      "prompt_sha256": "fafce8333829cf8ec4ffb73c493e599481e8853db35b558f4fd84c531991a5fa",
       "target": "codex"
     },
     {
@@ -2171,8 +2171,8 @@
         "bbk-context-routing",
         "bbk"
       ],
-      "prompt_characters": 51728,
-      "prompt_sha256": "4cf5d829bec5f5fb6c2a51349d901b5d9d4a2ccfa23517cd5f447117ac4bdd54",
+      "prompt_characters": 52414,
+      "prompt_sha256": "261d8a68af484b45f214f381f285d724db35723e5c63154102cd14d33f0aa832",
       "target": "omp"
     },
     {
@@ -2189,8 +2189,8 @@
         "bbk-context-routing",
         "bbk"
       ],
-      "prompt_characters": 51304,
-      "prompt_sha256": "65e4356c1c2eb1408123c1e1c076bfd1a0779e314cc654211e18ec27ec0b4111",
+      "prompt_characters": 51990,
+      "prompt_sha256": "27dcaaa4e95df07f8d43a9d2580e40d839d5b66a445165edc3af38c51912e63a",
       "target": "claude"
     },
     {
@@ -2207,8 +2207,8 @@
         "bbk-context-routing",
         "bbk"
       ],
-      "prompt_characters": 51300,
-      "prompt_sha256": "bacea046314551649b4cb0b988ad186cd531e7534f3e34ead339e37fd064d58f",
+      "prompt_characters": 51986,
+      "prompt_sha256": "d849d6c20632de34a857d95c33567702d1f8ef27814b2baa5e294a0570d30b99",
       "target": "pi"
     },
     {
@@ -2225,8 +2225,8 @@
         "bbk-context-routing",
         "bbk"
       ],
-      "prompt_characters": 51305,
-      "prompt_sha256": "25ec89078baf7a714447037fa5009a0103862ffc3ff267f059f5f62a2e6282ae",
+      "prompt_characters": 51991,
+      "prompt_sha256": "786a287a17f313bcb2e2d96dd399ec1de39c168c994aa6ab57ac2a99763420a2",
       "target": "generic"
     }
   ],

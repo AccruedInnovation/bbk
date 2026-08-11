@@ -67,7 +67,8 @@ EXCLUSIVE_MODULE_ROLES = {
     },
     "bbk-prompt-execution-autonomy": {
         "bbk_phase_wayfinder", "bbk_planning_wayfinder", "bbk_prototyper",
-        "bbk_root_orchestrator", "bbk_territory_orchestrator", "bbk_worker",
+        "bbk_root_orchestrator", "bbk_root_wayfinder",
+        "bbk_territory_orchestrator", "bbk_territory_wayfinder", "bbk_worker",
         "bbk_worker_designer", "bbk_worker_orchestrator",
     },
     "bbk-prompt-user-attention": {
@@ -494,6 +495,8 @@ class PromptModulePackageV1Tests(unittest.TestCase):
         autonomy = {clause["id"]: clause["text"] for clause in self.package.by_id["bbk-prompt-execution-autonomy"]["clauses"]}
         self.assertIn("exactly one safe, realistic", autonomy["AUTONOMY.SINGLE_PATH"])
         self.assertIn("inside current authority", autonomy["AUTONOMY.SINGLE_PATH"])
+        self.assertIn("local execution deltas by default", autonomy["AUTONOMY.CHANGE_CLASSIFICATION"])
+        self.assertIn("smallest local correction first", autonomy["AUTONOMY.CHANGE_CLASSIFICATION"])
         self.assertIn("at least two viable, materially different paths", autonomy["AUTONOMY.GENUINE_BRANCH"])
         self.assertIn("authority expansion", autonomy["AUTONOMY.AUTHORITY_BOUNDARY"])
 

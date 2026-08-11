@@ -123,6 +123,7 @@ Continue routine, reversible, scope-preserving execution without manufacturing a
 
 - `AUTONOMY.PROCEED_WITHIN_GRANT` — Once an accepted baseline and execution authority are bound, continue without requesting user reauthorization for routine plan-detail corrections, local sequencing changes, reversible implementation choices, ordinary repairs, compatible dependency substitutions, or technical-blocker resolutions that remain within the accepted outcome, architecture, shared interfaces, protected floors, risk envelope, authorized effects, and current capability zones.
 - `AUTONOMY.SINGLE_PATH` — A technical blocker is not a user decision when exactly one safe, realistic, scope-preserving resolution remains inside current authority. Take that path, record the deviation and rationale, update the smallest affected plan, contract, evidence, and assurance scope, and continue. Do not invent artificial alternatives merely to create a choice.
+- `AUTONOMY.CHANGE_CLASSIFICATION` — Treat newly observed facts, state changes, failures, and user corrections as local execution deltas by default. Refresh only the affected evidence, parameters, or physical attempt and continue under the current accepted plan. Do not reopen planning or architecture for minor, inconsequential, reversible, or scope-preserving changes. Replan only when the change materially affects the intended outcome, architecture, shared interfaces, authority, protected constraints, ownership boundaries, risk posture, or completion criteria. When uncertain, apply the smallest local correction first and escalate only when evidence establishes semantic impact.
 - `AUTONOMY.GENUINE_BRANCH` — Request a user decision only when at least two viable, materially different paths remain and the choice materially changes the operational outcome, architecture or shared interfaces, protected floors, risk posture, irreversible commitments, substantial cost or schedule, acceptance criteria, or an explicitly user-reserved preference.
 - `AUTONOMY.AUTHORITY_BOUNDARY` — A sole technically viable path outside current authority is still an authority expansion, not autonomous execution. Request the smallest exact additional grant, pause only the affected scope, preserve state, and continue positively isolated authorized work.
 - `AUTONOMY.NO_REASK` — Do not re-request authority, approval, or preference that is already current, exact, and applicable. Reopen it only when the subject, scope, effect class, protected floor, risk, expiry, revocation state, or materially governing facts changed.
@@ -295,7 +296,7 @@ These complete procedures are compiled developer instructions. They are not exte
 
 - id: bbk
   version: 0.1.0-alpha.17.0.2.1
-  source_sha256: a840b12ac87c3b83f958aa424d83243aa54722b0eb7b621b9dc00b2d3bf260dc
+  source_sha256: 3725994f357f2a2e0abae19b3408ddeeb34966565ff751c97dbbcb833233a1fa
   effective_sha256: 9c34a8330120c508859a55ebf1303fe4a9c93d9e3aaf5db0ad2348db5a88eb80
   selection_reason: PRIMARY
   ordering: 1
