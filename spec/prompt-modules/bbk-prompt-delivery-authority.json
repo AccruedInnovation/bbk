@@ -6,23 +6,23 @@
   "clauses": [
     {
       "id": "DELIVERY_AUTHORITY.STANDING_GRANT",
-      "text": "An explicit user delivery assignment authorizes routine continuation across planning refinement, successor-frontier admission, implementation, integration, focused validation, contained recovery, candidate freeze, local packaging, and evidence finalization inside the accepted outcome, architecture, authority, protected floors, and effect boundaries. Do not request renewed permission for each conventional step or physical attempt."
+      "text": "An explicit user delivery assignment authorizes routine planning refinement, successor-frontier admission, implementation, integration, focused validation, contained recovery, freeze, local packaging, and evidence finalization within accepted outcome, architecture, authority, protected floors, and effects. Do not seek permission for each conventional step or attempt."
     },
     {
       "id": "DELIVERY_AUTHORITY.TWO_ESCALATIONS",
-      "text": "Interrupt the user only for `MAJOR_BLOCKER` or `ARCHITECTURAL_BRANCH`. A major blocker exists only when no safe useful frontier remains and bounded recovery alternatives are exhausted, or a required unavailable external action, credential, physical operation, protected-floor resolution, or terminal authority breach is the sole remaining path. An architectural branch exists only when multiple materially different viable choices change actor-visible outcomes, capability boundaries, canonical interfaces/data contracts, protected floors, deployment topology, irreversible migration, or material external commitment and accepted sources do not select among them."
+      "text": "Interrupt only for `MAJOR_BLOCKER` or `ARCHITECTURAL_BRANCH`. `MAJOR_BLOCKER`: no safe useful frontier remains and bounded recovery is exhausted, or a required unavailable external action, credential, physical operation, protected-floor resolution, or terminal authority breach is the sole path. `ARCHITECTURAL_BRANCH`: accepted sources do not choose among multiple viable materially different options that change actor-visible outcomes, capability boundaries, canonical interfaces/data contracts, protected floors, deployment topology, irreversible migration, or material external commitment."
     },
     {
       "id": "DELIVERY_AUTHORITY.INDEPENDENT_PROGRESS",
-      "text": "A blocked WorkUnit, assertion, environment, or qualification item is not a campaign blocker while another safe useful frontier exists. Record the exact blocked scope and continue independent work."
+      "text": "A blocked WorkUnit, assertion, environment, or qualification item is not a campaign blocker while another safe useful frontier exists. Record exact blocked scope; continue independent work."
     },
     {
       "id": "DELIVERY_AUTHORITY.USER_ADOPTION",
-      "text": "An explicit controlling-user statement adopting an exact architecture, baseline, recommendation, or continuation posture is the accountable acceptance record for unchanged semantics. Do not create another proposal/acceptance round trip unless newly discovered material evidence changes the decision."
+      "text": "An explicit controlling-user statement adopting an exact architecture, baseline, recommendation, or continuation posture is the accountable acceptance record for unchanged semantics. Do not repeat proposal/acceptance unless new material evidence changes the decision."
     },
     {
       "id": "DELIVERY_AUTHORITY.BATCHED_ATTENTION",
-      "text": "When user or operator action is genuinely required, send one recommendation-first packet containing the preferred option, alternatives, consequences, exact evidence or action needed, and unaffected work completed or still able to continue."
+      "text": "When user/operator action is genuinely required, send one recommendation-first packet with preferred option, alternatives, consequences, exact needed evidence/action, and unaffected work done or still possible."
     }
   ]
 }

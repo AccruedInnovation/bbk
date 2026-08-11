@@ -21,6 +21,7 @@ from typing import Any, Iterable, Mapping, Sequence
 DEFAULT_ROOT = Path(__file__).resolve().parents[1]
 MODULE_ID_RE = re.compile(r"^bbk-prompt-[a-z0-9]+(?:-[a-z0-9]+)*$")
 CLAUSE_ID_RE = re.compile(r"^[A-Z][A-Z0-9_]*(?:\.[A-Z][A-Z0-9_]*)+$")
+PROMPT_HARNESSES = ("claude", "codex", "generic", "omp", "pi")
 DIRECTIVE_RE = re.compile(r"\{\{bbk-module:(bbk-prompt-[a-z0-9]+(?:-[a-z0-9]+)*)\}\}")
 SKILL_NAME_RE = re.compile(r"^bbk(?:-[a-z0-9]+)+$")
 
@@ -187,8 +188,8 @@ def load_prompt_modules(root: Path = DEFAULT_ROOT) -> PromptModulePackage:
         local_clause_ids: set[str] = set()
         for clause_index, clause in enumerate(clauses):
             where = f"{file_name}/clauses/{clause_index}"
-            if not isinstance(clause, dict) or set(clause) != {"id", "text"}:
-                errors.append(f"{where}: clause must contain exactly id and text")
+            if not isinstance(clause, dict) or not {"id", "text"} <= set(clause) or set(clause) - {"id", "text", "hosts"}:
+                errors.append(f"{where}: clause must contain id and text, with optional hosts")
                 continue
             clause_id = clause.get("id")
             if not isinstance(clause_id, str) or not CLAUSE_ID_RE.fullmatch(clause_id):
@@ -200,6 +201,15 @@ def load_prompt_modules(root: Path = DEFAULT_ROOT) -> PromptModulePackage:
                 seen_clause_ids.add(clause_id)
             if not isinstance(clause.get("text"), str) or not clause.get("text", "").strip():
                 errors.append(f"{where}: clause text must be non-empty")
+            hosts = clause.get("hosts")
+            if hosts is not None and (
+                not isinstance(hosts, list)
+                or not hosts
+                or len(hosts) != len(set(hosts))
+                or not all(isinstance(value, str) and value in PROMPT_HARNESSES for value in hosts)
+                or hosts != [value for value in PROMPT_HARNESSES if value in set(hosts)]
+            ):
+                errors.append(f"{where}: hosts must be a unique non-empty list in canonical order")
         raw = path.read_bytes() if path.is_file() else b""
         if raw and raw != canonical_bytes(module):
             errors.append(f"{file_name}: prompt-module source is not canonically serialized")
@@ -446,6 +456,27 @@ def render_module(module: Mapping[str, Any], *, tagged: bool = False) -> str:
             "</bbk-prompt-module>"
         )
     return body
+
+
+def clauses_for_harness(module: Mapping[str, Any], harness: str) -> tuple[Mapping[str, Any], ...]:
+    """Return the module clauses applicable to one canonical harness projection."""
+    normalized = harness.lower()
+    return tuple(
+        clause
+        for clause in module["clauses"]
+        if "hosts" not in clause or normalized in clause["hosts"]
+    )
+
+
+def excluded_clause_ids(package: PromptModulePackage, harness: str) -> tuple[str, ...]:
+    """Return canonically ordered clause IDs excluded from one harness."""
+    normalized = harness.lower()
+    return tuple(
+        str(clause["id"])
+        for module in package.modules
+        for clause in module["clauses"]
+        if "hosts" in clause and normalized not in clause["hosts"]
+    )
 
 
 def expand_skill_template(template: str, package: PromptModulePackage) -> str:

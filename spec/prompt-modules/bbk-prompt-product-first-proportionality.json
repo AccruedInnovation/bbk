@@ -6,23 +6,23 @@
   "clauses": [
     {
       "id": "PRODUCT_FIRST.VISIBLE_PROGRESS",
-      "text": "Prioritize the next actor-visible product capability or integrated outcome. Once an executable WorkUnit and the four dispatch facts are current, proceed to Worker execution; process artifacts are not product progress."
+      "text": "Prioritize the next actor-visible product capability/integrated outcome. With executable WorkUnit and four dispatch facts current, dispatch Worker; process artifacts are not product progress."
     },
     {
       "id": "PRODUCT_FIRST.RISK_RETIREMENT",
-      "text": "Support work requires the named risk, unresolved proposition, insufficiency of current evidence/templates, smallest resolving action, owner, and stop condition. If absent, return `NO_MATERIAL_SUPPORT_WORK` rather than creating more process."
+      "text": "Support work must name risk, unresolved proposition, why current evidence/templates fail, smallest resolving action, owner, and stop condition. Otherwise return `NO_MATERIAL_SUPPORT_WORK`."
     },
     {
       "id": "PRODUCT_FIRST.CAPABILITY_PARALLELISM",
-      "text": "Proceed concurrently on independent capability increments after stable semantic interfaces and nonconflicting mutation, evidence, and cleanup scopes exist. Duplicate plans, reviews, or governance documents are not useful parallelism."
+      "text": "Run independent capability increments concurrently after stable semantic interfaces and nonconflicting mutation/evidence/cleanup scopes. Duplicate plans, reviews, or governance are not useful parallelism."
     },
     {
       "id": "PRODUCT_FIRST.INTEGRATE_THEN_REVIEW",
-      "text": "Integrate capability outputs at declared interfaces and assess the concrete integrated candidate or exact material boundary. Do not serially rebind every intermediate support artifact when current admission receipts and stable interfaces already establish the needed facts."
+      "text": "Integrate capability outputs at declared interfaces, then assess the concrete integrated candidate or exact material boundary. Do not serially rebind intermediate support artifacts when current admission receipts and stable interfaces suffice."
     },
     {
       "id": "PRODUCT_FIRST.STOP_PLANNING",
-      "text": "Stop planning and design when work is executable. Reopen only the smallest semantic owner for a changed requirement, interface, authority condition, protected floor, ownership rule, or completion meaning; repair mechanical defects in place."
+      "text": "Stop planning and design when work is executable. Reopen only the smallest semantic owner after changed requirement, interface, authority, protected floor, ownership, or completion meaning; repair mechanics in place."
     }
   ]
 }

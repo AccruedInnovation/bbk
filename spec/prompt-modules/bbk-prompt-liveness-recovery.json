@@ -6,19 +6,22 @@
   "clauses": [
     {
       "id": "LIVENESS.NON_EVIDENCE",
-      "text": "A heartbeat proves participation, not progress. Silence, elapsed time, slowness, missing heartbeat, or parent polling timeout alone is not evidence of failure or hang."
+      "text": "A heartbeat proves participation, not progress. Silence, elapsed time, slowness, or a missing heartbeat does not prove failure or hang; parent polling timeout alone is not evidence of either."
     },
     {
       "id": "LIVENESS.EVENT_DELIVERY",
-      "text": "OMP task results and IRC messages auto-deliver. Do not poll or list merely for status. Continue other authorized work; if blocked, use one blocking empty job wait or IRC wait, waking on completion, messages, steering, or host timeout."
+      "text": "OMP task results and IRC messages auto-deliver. Do not poll/list for status. Continue other authorized work; if blocked, use one blocking empty job wait or IRC wait, waking on completion, message, steering, or host timeout.",
+      "hosts": [
+        "omp"
+      ]
     },
     {
       "id": "LIVENESS.PROBE_INTERVAL",
-      "text": "Permit a nonblocking list, inbox, or roster probe only after at least 300 seconds since dispatch or the prior probe while a child is active. Forbid specific job polls. Restart the 300-second floor after an allowed probe unless concrete interruption evidence arrives."
+      "text": "While a child is active, allow a nonblocking list/inbox/roster probe only after at least 300 seconds since dispatch or the last probe. Never poll a specific job. Reset the 300-second floor after a probe unless concrete interruption evidence arrives."
     },
     {
       "id": "LIVENESS.NO_STATUS_INTERROGATION",
-      "text": "Do not alternate probes or wake Main after short waits. Five minutes of silence permits one observation, not a failure claim, cancellation, restart, duplicate assignment, or assurance cycle."
+      "text": "Do not alternate probes or wake Main after short waits. Five minutes of silence permits one observation—not failure, cancellation, restart, duplicate assignment, or assurance cycle."
     },
     {
       "id": "LIVENESS.INTERRUPT_REASONS",
@@ -30,11 +33,11 @@
     },
     {
       "id": "RECOVERY.SAME_RUN",
-      "text": "Continue the same semantic run and physical attempt through reversible pre-freeze mechanical repair. A physical restart may resume the same semantic run while immutable subject, authority, criteria, ownership, context policy, and completion meaning remain unchanged and the prior mutating process is fenced."
+      "text": "Keep the same semantic run and physical attempt through reversible pre-freeze mechanical repair. A physical restart may resume that run only if immutable subject, authority, criteria, ownership, context policy, and completion meaning are unchanged and the prior mutating process is fenced."
     },
     {
       "id": "RECOVERY.NO_BLIND_RETRY",
-      "text": "Do not blindly retry an ambiguous non-idempotent, irreversible, or externally consequential effect. Reconcile actual state or return for authority and direction."
+      "text": "Never blindly retry an ambiguous non-idempotent, irreversible, or externally consequential effect. Reconcile actual state or return for authority/direction."
     }
   ]
 }

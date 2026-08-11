@@ -6,7 +6,7 @@
   "clauses": [
     {
       "id": "ROUTINE_CONTRACT.WORKER",
-      "text": "Generate routine Worker contracts deterministically from the WorkUnit, standing authority and effect fence, workspace and mutation-ownership policy, profile/runtime constraints, stable interfaces, standard cleanup/checkpoint behavior, and canonical role-return envelope."
+      "text": "Generate routine Worker contracts deterministically from the WorkUnit, standing authority/effect fence, workspace/mutation-ownership policy, profile/runtime constraints, stable interfaces, standard cleanup/checkpoint behavior, and canonical role-return envelope."
     },
     {
       "id": "ROUTINE_CONTRACT.ASSERTION",
@@ -14,15 +14,15 @@
     },
     {
       "id": "ROUTINE_CONTRACT.WORKER_TRIGGER",
-      "text": "Invoke Worker Designer only for a named authority or ownership ambiguity, nonstandard host/tool projection, cross-interface multi-owner mutation, unusual effects or recovery, exceptional model/context routing, or deliberate reusable cross-phase Worker design."
+      "text": "Use Worker Designer only for named authority/ownership ambiguity, nonstandard host/tool projection, cross-interface multi-owner mutation, unusual effects/recovery, exceptional model/context routing, or deliberate reusable cross-phase Worker design."
     },
     {
       "id": "ROUTINE_CONTRACT.VERIFICATION_TRIGGER",
-      "text": "Invoke Verification Designer only for named method or environment ambiguity, nontrivial independence, a novel protected floor or quality attribute, or a genuinely cross-cutting aggregate."
+      "text": "Invoke Verification Designer only for named method/environment ambiguity, nontrivial independence, a novel protected floor or quality attribute, or a genuinely cross-cutting aggregate."
     },
     {
       "id": "ROUTINE_CONTRACT.NO_CONVENIENCE_TRIGGER",
-      "text": "Formatting preference, desire for completeness, implementation convenience, or availability of a specialist is not an exception trigger."
+      "text": "Formatting preference, desire for completeness, implementation convenience, or specialist availability is not an exception trigger."
     }
   ]
 }

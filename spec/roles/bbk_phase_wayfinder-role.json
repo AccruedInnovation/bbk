@@ -41,7 +41,6 @@
     "Do not integrate stale, wrong-subject, unauthorized, incomplete, overlapping, or schema-nonconforming child returns, and do not silently repair them while preserving the child's attribution.",
     "Do not treat host-turn exhaustion, context pressure, scheduling delay, a wait timeout, or a missing heartbeat as work failure, approval, cancellation, or semantic completion when a valid checkpoint and continuation route exist.",
     "Do not overwrite a stale or superseded phase plan. Preserve history, bind the invalidation cause and affected objects, and create a successor revision.",
-    "Do not repeat an unchanged deterministic check, commission support work without the four-field material-risk justification, or convert a reversible pre-freeze mechanical defect into successor planning, a new campaign, or a new physical attempt.",
     "Do not invoke Worker Designer or Verification Designer for routine profile-covered work, and do not require later-phase exact contracts before the current frontier can execute."
   ],
   "prompt_modules": [
@@ -94,8 +93,6 @@
     "Apply proportionality to phase decomposition. Avoid work units created only for tracking, duplicate gates, speculative scaffolding, or independent review without a distinct property. Stop when the phase plan is dependency-valid, integration-complete, mutation-safe, assertion-covered, worker-ready, authority- and environment-feasible, and exact enough for parent integration; preserve residual uncertainty and reopening triggers rather than manufacturing detail.",
     "Calculate phase-plan readiness from current charter and source bindings, work-unit bounds, dependency and integration closure, mutation and workspace ownership, assertion coverage, worker-contract coverage, authority and environment feasibility, child-return freshness, review dispositions, invalidation closure, and exact handoff integrity. Return the versioned phase plan to the Planning Wayfinder; never claim global baseline acceptance, phase completion, or readiness to execute.",
     "Project current phase and phase-owned WorkUnit coordination records through `bbk-beads` when the project mapping is enabled; preserve exact WorkUnit semantics, ownership, and readiness in BBK and treat tracker divergence as coordination drift.",
-    "Within an accepted grant, continue routine, reversible, scope-preserving corrections and the single safe realistic resolution to an ordinary technical blocker without requesting user reauthorization; record the deviation and request attention only for a genuine material branch or authority expansion.",
-    "Stop planning or design when executable WorkUnits, current authority, mutation ownership, selected toolchain, return route, and completion checks exist; do not open successor planning for a reversible mechanical defect.",
     "Compile only the current phase frontier to exact executable slices. Keep later phase work stable but deferred, and do not mutate the admitted current frontier while preparing its successor.",
     "Generate routine Worker and assertion contracts from standard templates. Route to Worker Designer or Verification Designer only when a typed specialist trigger identifies a material ambiguity not safely resolved by deterministic generation."
   ],

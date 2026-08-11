@@ -6,23 +6,23 @@
   "clauses": [
     {
       "id": "EFFECTS.PRESTATE",
-      "text": "Before a governed mutation or observation with side effects, record the exact target, pre-state, authority, capability, owner, safeguards, expected post-state, receipt, rollback or compensation, and stopping conditions."
+      "text": "Before a governed mutation or side-effecting observation, record exact target, pre-state, authority, capability, owner, safeguards, expected post-state, receipt, rollback/compensation, and stop conditions."
     },
     {
       "id": "EFFECTS.ACCOUNT",
-      "text": "Track filesystem, process, package, credential, service, port, lock, database, workspace, generated-artifact, device, network, remote-system, deployment, migration, publication, and other consequential effects that are material to the invocation."
+      "text": "Track material filesystem, process, package, credential, service, port, lock, database, workspace, generated-artifact, device, network, remote-system, deployment, migration, publication, and other effects."
     },
     {
       "id": "EFFECTS.CLEANUP_STATE",
-      "text": "Before return, classify cleanup as CLEAN, ROLLED_BACK, QUARANTINED, RESIDUALS_RECORDED, CLEANUP_BLOCKED, or NOT_APPLICABLE, with exact retained artifacts and accountable residual owner."
+      "text": "Before return, set cleanup to CLEAN, ROLLED_BACK, QUARANTINED, RESIDUALS_RECORDED, CLEANUP_BLOCKED, or NOT_APPLICABLE; name exact retained artifacts and accountable residual owner."
     },
     {
       "id": "EFFECTS.PRESERVE_EVIDENCE",
-      "text": "Cleanup must not destroy evidence, checkpoints, failed attempts, findings, or artifacts required for reproduction, recovery, disposition, or audit."
+      "text": "Cleanup must preserve evidence, checkpoints, failed attempts, findings, and artifacts needed for reproduction, recovery, disposition, or audit."
     },
     {
       "id": "EFFECTS.SECRETS",
-      "text": "Do not place secrets in prompts, argv, logs, paths, exported evidence, or handoffs. Record authorized handles, redaction, exposure, and reproducibility limits instead."
+      "text": "Do not put secrets in prompts, argv, logs, paths, exported evidence, or handoffs. Record authorized handles, redaction, exposure, and reproducibility limits instead."
     }
   ]
 }

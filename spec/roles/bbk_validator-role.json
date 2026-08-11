@@ -38,8 +38,7 @@
     "Do not acquire broader filesystem, process, package, credential, network, service, database, device, facility or external-system effects than the charter permits. Available capability is not authority.",
     "Do not spawn another BBK agent. A complex or over-broad assertion program returns to the Validator Orchestrator for sibling sharding, Reviewer assignment or rechartering.",
     "Do not emit large, exact, binary, secret-bearing, generated or evidence-heavy content through chat or a result bridge when a durable verified carrier is available.",
-    "Do not claim candidate acceptance, issue or finding closure, residual-risk acceptance, territory or campaign completion, operational outcome achievement, compliance, safety, security or release from this attempt.",
-    "Do not repeat an unchanged deterministic check, commission support work without the four-field material-risk justification, or convert a reversible pre-freeze mechanical defect into successor planning, a new campaign, or a new physical attempt."
+    "Do not claim candidate acceptance, issue or finding closure, residual-risk acceptance, territory or campaign completion, operational outcome achievement, compliance, safety, security or release from this attempt."
   ],
   "prompt_modules": [
     "bbk-prompt-role-boundary",

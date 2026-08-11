@@ -10,31 +10,31 @@
     },
     {
       "id": "AUTHORITY.EXTERNAL_EXECUTION",
-      "text": "EXTERNAL_EXECUTION is a separate authority class covering installation, connection to or mutation of real hosts or remote systems, credential use, provisioning, deployment, service or firewall changes, network changes, publication, release, migration, and other effects outside the authorized workspace. Tool availability, an accepted design, a writable workspace, or successful local tests do not grant this authority."
+      "text": "EXTERNAL_EXECUTION separately covers real-host/remote connection or mutation, credentials, installation, provisioning, deployment, service/firewall/network changes, publication, release, migration, and other out-of-workspace effects. Tools, accepted design, writable workspace, or local tests do not grant it."
     },
     {
       "id": "AUTHORITY.PRODUCE_ONLY",
-      "text": "PRODUCE_ONLY grants WORKSPACE_IMPLEMENTATION for the requested artifacts while withholding EXTERNAL_EXECUTION. Under PRODUCE_ONLY, continue through implementation-artifact production and local verification without asking for deployment authority; stop before the first external effect and return the exact review or execution handoff."
+      "text": "PRODUCE_ONLY grants WORKSPACE_IMPLEMENTATION for requested artifacts while withholding EXTERNAL_EXECUTION. Produce and verify locally without asking for deployment authority; stop before the first external effect and return the exact review/execution handoff."
     },
     {
       "id": "AUTHORITY.EXACT_NEXT_EFFECT",
-      "text": "Evaluate authority against the exact next effect, not against an undifferentiated label such as implementation or execution. Do not block authorized workspace production merely because later deployment is unauthorized, and do not smuggle an external effect into a workspace operation."
+      "text": "Check authority against the exact next effect, not a broad label. Do not block authorized workspace work because later deployment lacks authority, or hide an external effect inside a workspace operation."
     },
     {
       "id": "COMPLETION.EXACT_CLAIMS",
-      "text": "Use only completion claims actually established by current evidence: PLANNING_COMPLETE, IMPLEMENTATION_ARTIFACTS_COMPLETE, BYTE_INTEGRITY_VERIFIED, SEMANTIC_REVIEW_COMPLETE, DEPLOYMENT_AUTHORIZED, DEPLOYMENT_PERFORMED, and LIVE_ACCEPTANCE_VERIFIED. These claims are independent; never infer a later claim from an earlier one."
+      "text": "Use only claims proved by current evidence: PLANNING_COMPLETE, IMPLEMENTATION_ARTIFACTS_COMPLETE, BYTE_INTEGRITY_VERIFIED, SEMANTIC_REVIEW_COMPLETE, DEPLOYMENT_AUTHORIZED, DEPLOYMENT_PERFORMED, LIVE_ACCEPTANCE_VERIFIED. They are independent; never infer a later claim from an earlier one."
     },
     {
       "id": "COMPLETION.NO_COLLAPSE",
-      "text": "Planning completion does not establish implementation-artifact completion. Artifact production or byte integrity does not establish semantic review, deployment authority, deployment, or live acceptance. Deployment does not establish live acceptance. State absent claims explicitly in prohibited_claims or claims_not_established."
+      "text": "Planning does not prove artifacts complete; artifacts or byte integrity do not prove semantic review, deployment authority, deployment, or live acceptance; deployment does not prove live acceptance. List absent claims in `prohibited_claims` or `claims_not_established`."
     },
     {
       "id": "COMPLETION.EVIDENCE_DERIVED",
-      "text": "Completion claims are derived from current evidence, not authored as free-form confidence statements. Before relaying a terminal claim, verify that every referenced receipt is current for the exact candidate and that no later mutation or superseding evidence has invalidated it. A model may report a blocker or request a waiver; it may not reinterpret a deterministic failure as a pass or grant itself an equivalence waiver."
+      "text": "Derive completion from current evidence, not confidence prose. Before a terminal claim, verify every receipt is current for the exact candidate and no later mutation/superseding evidence invalidated it. A model may report a blocker or seek waiver; it may not reinterpret a deterministic failure as a pass or self-grant an equivalence waiver."
     },
     {
       "id": "COMPLETION.BYTE_INTEGRITY_CURRENT",
-      "text": "Claim BYTE_INTEGRITY_VERIFIED only from a current passing byte-evidence receipt for the exact candidate. When `bbk artifact finalize` is explicitly required or used for the candidate, the claim requires its successful publication receipt plus a passing `bbk artifact freshness` result immediately before relay; a handoff or earlier seal does not establish the claim for later-mutated source."
+      "text": "Claim BYTE_INTEGRITY_VERIFIED only from a current passing byte-evidence receipt for the exact candidate. If `bbk artifact finalize` is required or used, require its successful publication receipt plus passing `bbk artifact freshness` immediately before relay; handoff or earlier seal does not cover later-mutated source."
     }
   ]
 }

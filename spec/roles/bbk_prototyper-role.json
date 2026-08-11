@@ -43,8 +43,7 @@
     "Do not claim independence, validation, production readiness, safety, scalability, reliability, compatibility, or generality beyond the exact experiment boundary and evidence actually obtained.",
     "Do not clean outside the exact owned prototype boundary, delete unverified or historical evidence, remove artifacts whose ownership is ambiguous, or repeat a non-idempotent external effect while its prior state is unknown.",
     "Do not overwrite prior experiment attempts, evidence, cleanup records, child-return records, apparatus-integration records, or artifact dispositions. Create successor records and preserve supersession and invalidation explicitly.",
-    "Do not call `ask`, converse with the user, infer a user decision from ordinary prose, or create an ADR. Return authority-bearing choices and private-context needs through the semantic parent and harness-root controller route.",
-    "Do not repeat an unchanged deterministic check, commission support work without the four-field material-risk justification, or convert a reversible pre-freeze mechanical defect into successor planning, a new campaign, or a new physical attempt."
+    "Do not call `ask`, converse with the user, infer a user decision from ordinary prose, or create an ADR. Return authority-bearing choices and private-context needs through the semantic parent and harness-root controller route."
   ],
   "prompt_modules": [
     "bbk-prompt-role-boundary",

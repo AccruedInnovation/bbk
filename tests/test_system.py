@@ -497,9 +497,9 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
                         else:
                             expected_line = f"- `{child_name}` — when {trigger}."
                         self.assertIn(expected_line, body, f'{host}:{role_name}')
-                    self.assertIn('Use only these direct child agents', body, f'{host}:{role_name}')
+                    self.assertIn('Invoke only these direct children, and only for the listed trigger', body, f'{host}:{role_name}')
                 else:
-                    self.assertIn('has no child-agent authority', body, f'{host}:{role_name}')
+                    self.assertIn('No child authority', body, f'{host}:{role_name}')
 
     def test_beads_is_on_demand_for_exact_record_owners(self):
         expected = {
@@ -563,12 +563,13 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
                 expected_prefix = (
                     '<bbk-agent-system '
                     if host == 'omp'
-                    else '## Runtime identity and interaction topology'
+                    else '## Role'
                     if host == 'codex'
                     else '<bbk-role-contract '
                 )
                 self.assertTrue(body.startswith(expected_prefix), f'{host}:{role_name}')
-                self.assertIn('## Purpose\n', body, f'{host}:{role_name}')
+                self.assertIn(f"You are the canonical `{role_name}` BBK child role.", body, f'{host}:{role_name}')
+                self.assertIn(self.roles[role_name]['purpose'], body, f'{host}:{role_name}')
                 if host != 'codex':
                     self.assertIn(f'role="{role_name}"', body, f'{host}:{role_name}')
                 else:
@@ -683,15 +684,15 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
             bodies.append((m2_ROOT / 'projections' / 'generic' / 'agents' / f'{role_name}.md').read_text(encoding='utf-8'))
             qualified = 'bbk-prompt-profile-qualification' in role.get('prompt_modules', [])
             for body in bodies:
-                self.assertIn('## Language, domain, toolchain, and model qualification', body, role_name)
+                self.assertIn('## Profiles', body, role_name)
                 if qualified:
                     self.assertIn('bbk-prompt-profile-qualification', body, role_name)
                     self.assertIn('Use only a profile explicitly supplied or selected', body, role_name)
-                    self.assertIn('Carry profile identity, version or digest', body, role_name)
+                    self.assertIn('Carry profile ID, version/digest', body, role_name)
                     self.assertIn('cannot broaden scope, effects, authority, or acceptance', body, role_name)
                 else:
                     self.assertNotIn('bbk-prompt-profile-qualification', body, role_name)
-                    self.assertIn('Use only a profile or focused procedure supplied by the invocation', body, role_name)
+                    self.assertIn('Use only invocation-supplied profiles/procedures', body, role_name)
                     self.assertIn('profile-resolution blocker', body, role_name)
 
     def test_every_projection_contains_scope_delegation_escalation_and_controller_relay_boundary(self):
@@ -706,14 +707,16 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
             bodies.append(('pi', (m2_ROOT / 'projections' / 'pi' / 'agents' / f'{role_name}.md').read_text(encoding='utf-8')))
             for host, body in bodies:
                 common_headings = (
-                    '## Runtime identity and interaction topology',
+                    '## Role',
                     '## Constitution',
                     '## Scope',
-                    '## Responsibilities',
+                    '## Duties',
+                    '## Shared modules',
                     '## Delegation',
-                    '## Escalation and human relay',
+                    '## Escalation',
                     '## Prohibitions',
-                    '## Invocation contract',
+                    '## Procedures',
+                    '## Profiles',
                     '## Compiled procedures manifest',
                     '## Compiled procedures',
                     '## End compiled procedures',
@@ -725,21 +728,21 @@ class Alpha102DelegationProfileTests(unittest.TestCase):
                 self.assertIn(role['return_contract']['return_schema'], body, f'{host}:{role_name}')
                 for item in role['scope'] + role['escalations'] + role['human_decision_triggers']:
                     self.assertIn(item, body, f'{host}:{role_name}')
-                self.assertIn('Every canonical BBK role is non-user-facing', body, f'{host}:{role_name}')
-                self.assertIn('sole user-facing controller', body, f'{host}:{role_name}')
-                self.assertIn('Never ask the user directly', body, f'{host}:{role_name}')
+                self.assertIn('Roles are non-user-facing', body, f'{host}:{role_name}')
+                self.assertIn('structured host inter-agent request to the controller', body, f'{host}:{role_name}')
                 if role['human_decision_triggers']:
-                    self.assertIn('controller-mediated human request', body, f'{host}:{role_name}')
+                    self.assertIn('Controller-mediated human-request triggers', body, f'{host}:{role_name}')
                 else:
-                    self.assertIn('no ordinary user-gateway branch', body, f'{host}:{role_name}')
+                    self.assertIn('No ordinary human-request branch', body, f'{host}:{role_name}')
                 if host == 'omp':
-                    self.assertIn('## OMP hub/IRC communication contract', body, role_name)
-                    self.assertIn('whose `kind` is `main`', body, role_name)
+                    self.assertIn('## OMP', body, role_name)
+                    self.assertIn('hub/IRC', body, role_name)
+                    self.assertIn('`kind: "main"`', body, role_name)
                     if role['spawns']:
-                        self.assertIn("set each task's `agent` to the exact permitted canonical `bbk_*` role", body, role_name)
+                        self.assertIn('set `agent` to the exact allowed `bbk_*` role', body, role_name)
                         self.assertIn('use a stable logical `name`', body, role_name)
-                        self.assertIn('provide a complete self-contained `task`', body, role_name)
-                        self.assertIn('When spawning, carry the main peer', body, role_name)
+                        self.assertIn('supply a self-contained `task`', body, role_name)
+                        self.assertIn('When spawning, pass Main peer', body, role_name)
 
     def test_constitution_is_modular_and_top_level_controller_skill_is_not_a_child_skill(self):
         self.assertEqual(self.spec['schema_version'], 'bbk.roles.v4')
@@ -1444,8 +1447,8 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
         self.assertIn("at least 300 seconds", liveness_text)
         self.assertIn("blocking empty job wait", liveness_text)
         self.assertIn("Five minutes of silence", liveness_text)
-        self.assertIn("shortest safe path is Worker execution", critical_text)
-        self.assertIn("dispatch immediately", critical_text)
+        self.assertIn("shortest safe Worker path", critical_text)
+        self.assertIn("dispatch it immediately", critical_text)
         role_map = {
             "bbk-work-unit-execution": "bbk_worker",
             "bbk-worker-execution": "bbk_worker_orchestrator",

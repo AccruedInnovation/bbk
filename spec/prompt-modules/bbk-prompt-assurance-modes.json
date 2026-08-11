@@ -6,15 +6,15 @@
   "clauses": [
     {
       "id": "ASSURANCE_MODE.INLINE",
-      "text": "Use INLINE by default for routine, reversible, profile-covered work. Worker checks and applicable deterministic gates suffice; do not commission Reviewer or a separate manifest merely because work occurred."
+      "text": "Use INLINE by default for routine, reversible, profile-covered work. Worker checks plus applicable deterministic gates suffice; do not dispatch Reviewer or a separate manifest merely because work occurred."
     },
     {
       "id": "ASSURANCE_MODE.GROUP",
-      "text": "Group compatible assertions sharing the same candidate, method/toolchain, environment, fixtures, exposure, and independence requirement into one Validator assignment and one evidence-producing operation. One Validator per assertion is not the default."
+      "text": "Group compatible assertions with the same candidate, method/toolchain, environment, fixtures, exposure, and independence need into one Validator assignment and evidence operation. One Validator per assertion is not the default."
     },
     {
       "id": "ASSURANCE_MODE.FOCUSED",
-      "text": "Use FOCUSED for one named material product risk, interface, finding, or candidate claim not resolved by current deterministic evidence. Commission the smallest independent focus and recheck only the failed/directly affected assertion closure after repair."
+      "text": "Use FOCUSED for one named material product risk, interface, finding, or candidate claim unresolved by current deterministic evidence. Commission the smallest independent focus; after repair, recheck only failed or directly affected assertion closure."
     },
     {
       "id": "ASSURANCE_MODE.FULL",
@@ -22,11 +22,11 @@
     },
     {
       "id": "ASSURANCE_MODE.REVIEWER_GATE",
-      "text": "Reviewer dispatch requires a named qualitative or cross-cutting product risk deterministic checks cannot establish. Without it, return `NO_MATERIAL_ASSURANCE_WORK`. Independent judgment may consume current receipts and evidence without rerunning mechanics."
+      "text": "Dispatch Reviewer only for a named qualitative or cross-cutting product risk deterministic checks cannot establish; otherwise return `NO_MATERIAL_ASSURANCE_WORK`. Independent judgment may use current receipts/evidence without rerunning mechanics."
     },
     {
       "id": "ASSURANCE_MODE.NO_LIFECYCLE_ENGINE",
-      "text": "Assurance selection guides proportional work; it does not accept a candidate, authorize effects, invalidate current receipts without a declared key change, or introduce a global lifecycle gate."
+      "text": "Assurance mode guides proportional work only; it does not accept a candidate, authorize effects, invalidate a current receipt without a declared key change, or add a global lifecycle gate."
     }
   ]
 }

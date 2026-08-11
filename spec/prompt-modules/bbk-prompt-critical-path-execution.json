@@ -1,68 +1,78 @@
 {
   "schema_version": "bbk.prompt-module.v1",
   "id": "bbk-prompt-critical-path-execution",
-  "title": "Critical-path execution and verification economy",
-  "description": "Make useful execution the default once work is executable while retaining authority, safety, candidate-integrity, and truthful-claim floors.",
+  "title": "Execution bias and critical-path economy",
+  "description": "Dispatch executable work immediately, resolve scope-preserving blockers locally, and reuse current assurance while retaining authority, safety, candidate-integrity, and truthful-claim floors.",
   "clauses": [
     {
       "id": "CRITICAL_PATH.EXECUTION_PRECEDENCE",
-      "text": "When a current executable WorkUnit, applicable authority, mutation ownership, required inputs, toolchain, return route, and completion checks exist, the shortest safe path is Worker execution. Additional planning, design, context packaging, handoff production, review, or verification design is prohibited unless a named material risk remains unresolved."
+      "text": "When a current executable WorkUnit has exact scope, applicable authority, mutation ownership, required inputs, selected toolchain, return route, and completion checks, dispatch it immediately by the shortest safe Worker path. No extra planning, design, context package, handoff, review, or verification design unless a named material risk remains unresolved."
     },
     {
       "id": "CRITICAL_PATH.SUPPORT_WORK_TEST",
-      "text": "Before commissioning support work, state: (1) the material product, authority, safety, interface, environment, or completion risk; (2) the unresolved proposition; (3) why current deterministic evidence or a standard template cannot resolve it; and (4) the smallest bounded action that will resolve it. If these four fields cannot be supplied, execute the admitted work or return `NO_MATERIAL_SUPPORT_WORK`."
+      "text": "Before support work, state: (1) material product/authority/safety/interface/environment/completion risk; (2) unresolved proposition; (3) why current deterministic evidence or a standard template cannot resolve it; (4) smallest resolving action. Without all four, execute admitted work or return `NO_MATERIAL_SUPPORT_WORK`."
     },
     {
       "id": "CRITICAL_PATH.FOUR_FACT_DISPATCH",
-      "text": "Worker dispatch has exactly four blocking facts: exact work/scope and parent return route; current authority/effect fence; workspace/mutation ownership or positive serialization; and required inputs, selected profile/toolchain, output carrier, and completion checks. When all four are current, dispatch immediately and do not reconstruct global admission."
+      "text": "Worker dispatch has exactly four blocking facts: exact work/scope plus parent return route; current authority/effect fence; workspace/mutation ownership or positive serialization; required inputs, selected profile/toolchain, output carrier, and completion checks. When all four are current, dispatch at once; do not rebuild global admission."
     },
     {
       "id": "CRITICAL_PATH.ATOMIC_BOUND_SPAWN",
-      "text": "For writable OMP children, call `bbk_control_spawn` once per logical `(parent binding, WorkUnit, attempt)` identity. Spawn atomically allocates or reuses the jj workspace/change and binding, registers the immutable packet, and projects the Beads assignment through the single writer. Do not call `bbk_control_assign` separately for a normal spawn and do not change an idempotency key to manufacture a second binding for the same attempt."
+      "text": "For an authorized writable OMP child, call `bbk_control_spawn` once per logical `(parent binding, WorkUnit, attempt)`. It allocates/reuses jj workspace/change and binding, registers the immutable packet, and projects Beads through the single writer. Do not also call `bbk_control_assign` for a normal spawn or change the idempotency key to create a second binding.",
+      "hosts": [
+        "omp"
+      ]
     },
     {
       "id": "CRITICAL_PATH.TOKEN_DISPATCH",
-      "text": "Treat the returned `dispatch_ref` as authoritative. Invoke the returned compact native OMP `dispatch_input` once without reconstructing the private task payload. On uncertain launch state, call `bbk_control_dispatch_status`: READY may retry the same token, LEASED must wait, ACTIVATED must consume the existing child, and TERMINAL requires the recorded outcome. Never respawn the same logical attempt and never use eval, shell, Python, JavaScript, or another generic surface to emulate task dispatch."
+      "text": "The returned `dispatch_ref` is authoritative. Invoke its compact native OMP `dispatch_input` once without rebuilding the private payload. If launch state is uncertain, call `bbk_control_dispatch_status`: READY may retry the same token; LEASED must wait; ACTIVATED must consume the existing child; TERMINAL requires the recorded outcome. Never respawn that logical attempt or emulate dispatch with eval, shell, Python, JavaScript, or another generic surface.",
+      "hosts": [
+        "omp"
+      ]
     },
     {
       "id": "CRITICAL_PATH.CONTROL_SERIALIZATION",
-      "text": "Serialize canonical control-plane and Beads mutations while allowing independently admitted child execution to run in parallel. A transient writer lease is not authority to create another attempt; wait for the bounded serializer or return its typed blocker."
+      "text": "Serialize canonical control-plane and Beads mutations; parallelize independently admitted child execution. A writer lease does not authorize another attempt: wait for the bounded serializer or return its typed blocker."
     },
     {
       "id": "CRITICAL_PATH.ONE_CHECK",
-      "text": "A successful deterministic receipt is current while its exact subject binding and declared invalidation-key values are unchanged. Reuse is mandatory. Re-executing the underlying check without a changed invalidation key, missing or mismatched receipt, observed transfer corruption, or an explicit independent-method requirement is a contract defect; record `REUSED_RECEIPT` rather than creating recovery work."
+      "text": "A successful deterministic validation or review receipt is current while its exact subject binding and declared invalidation-key values are unchanged. Reuse is mandatory. Do not repeat the underlying validation or review unless a declared invalidation key changed, the receipt is missing, mismatched or corrupt, or the contract explicitly requires an independent method; otherwise record `REUSED_RECEIPT` rather than creating recovery work."
     },
     {
       "id": "CRITICAL_PATH.MECHANICAL_REPAIR",
-      "text": "Before candidate freeze or any irreversible/external effect, preserve and locally repair a reversible mechanical materialization, schema-shape, canonicalization, path, digest, byte-count, manifest, package, carrier, locator, ledger, profile-projection, or tool-projection defect in the same semantic run and physical attempt. Regenerate only the affected material, rerun only the affected mechanical gate, and continue; do not create a successor plan, WorkUnit, campaign, authority package, review cycle, or zero-credit lineage unless semantics, authority, protected floors, interfaces, ownership, or completion meaning changed."
+      "text": "Before candidate freeze or irreversible/external effect, preserve and locally fix any reversible materialization, schema-shape, canonicalization, path, digest, byte-count, manifest, package, carrier, locator, ledger, profile-projection, or tool-projection defect in the same semantic run and physical attempt. Regenerate only affected material, rerun only its mechanical gate, and continue. Create no successor plan, WorkUnit, campaign, authority package, review cycle, or zero-credit lineage unless semantics, authority, protected floors, interfaces, ownership, or completion meaning changed."
+    },
+    {
+      "id": "CRITICAL_PATH.LOCAL_BLOCKER_REPAIR",
+      "text": "Treat missing inputs, wrong or stale paths, new runtime facts, environment mismatch, and other scope-preserving technical failures as local execution blockers. Fix them in the same physical attempt when authority/ownership allow; otherwise admit the smallest successor WorkUnit or physical attempt that supplies/corrects the fact/effect. Do not reopen planning unless evidence establishes a material change to intended outcome/semantics, architecture/shared interfaces, authority, protected floors, ownership boundaries, risk posture, or completion meaning. Report the exact blocked scope; continue all independent useful frontiers."
     },
     {
       "id": "CRITICAL_PATH.STRUCTURED_RETURN",
-      "text": "Use the structured role result directly when it safely carries the result without truncation or loss. Create a sealed handoff package only for large or truncation-sensitive output, binary content, durable cross-session/process/host recovery, a schema-mandated package, or an exact artifact/evidence closure that cannot be represented safely inline."
+      "text": "Use the structured role result directly when it carries the result without loss/truncation. Seal a handoff package only for large/truncation-sensitive output, binary content, durable cross-session/process/host recovery, a schema-required package, or exact artifact/evidence closure unsafe inline."
     },
     {
       "id": "CRITICAL_PATH.VALIDATOR_SCOPE",
-      "text": "Run targeted checks during implementation. Run each applicable broad product validator at most once against the final frozen candidate and only when one of its declared inspected inputs, implementation, configuration, tool identity, or environment invalidation keys changed. Metadata-only planning, evidence, coordination, log, or handoff changes do not trigger unrelated product validators."
+      "text": "Run targeted checks during implementation. Run each applicable broad product validator at most once against the final frozen candidate and only when a declared inspected input, implementation, configuration, tool identity, or environment invalidation key changes. Planning/evidence/coordination/log/handoff metadata alone does not trigger unrelated product validators."
     },
     {
       "id": "CRITICAL_PATH.ASSURANCE_ECONOMY",
-      "text": "Default routine assurance to INLINE. Group compatible assertions that share candidate, method/toolchain, environment, fixtures, exposure, and independence requirements into one evidence-producing assignment. Commission Reviewer only for a named qualitative or cross-cutting product risk deterministic checks cannot establish; independent judgment does not imply duplicate mechanics."
+      "text": "Default routine assurance to INLINE. Group compatible assertions sharing candidate, method/toolchain, environment, fixtures, exposure, and independence requirements into one evidence-producing assignment. Commission Reviewer only for a named qualitative or cross-cutting product risk deterministic checks cannot establish; independent judgment does not require duplicate mechanics."
     },
     {
       "id": "CRITICAL_PATH.PLANNING_STOP",
-      "text": "Wayfinding, architecture, Worker design, and verification design stop when executable WorkUnits, authority, ownership, selected toolchain, return route, and completion checks exist. A mechanical defect is repaired locally; only a changed semantic assumption, shared interface, authority condition, protected floor, ownership rule, or completion meaning reopens the appropriate semantic owner."
+      "text": "Stop wayfinding, architecture, Worker design, and verification design when executable WorkUnits, authority, ownership, selected toolchain, return route, and completion checks exist. Fix local blockers without replanning. Only evidence of material change to intended outcome/semantics, architecture/shared interfaces, authority, protected floors, ownership boundaries, risk posture, or completion meaning reopens the right semantic owner."
     },
     {
       "id": "CRITICAL_PATH.ROUTING_EFFORT",
-      "text": "An effort-only routing change within an already qualified model/provider family is runtime cost tuning, not semantic invalidation. Record runtime-policy provenance without regenerating planning or invalidating evidence whose declared method, subject, configuration, environment, and qualification keys remain current."
+      "text": "An effort-only routing change within an already qualified model/provider family is runtime cost tuning, not semantic invalidation. Record runtime-policy provenance; do not regenerate planning or invalidate evidence whose declared method, subject, configuration, environment, and qualification keys remain current."
     },
     {
       "id": "CRITICAL_PATH.GOVERNANCE_FLOORS",
-      "text": "Optimization never weakens exact WorkUnit identity and scope, write/effect authority, single mutation ownership or positive serialization, protected floors and fixed interfaces, external/destructive/secret-bearing effect controls, candidate immutability after freeze, applicable completion checks, preservation of failed evidence and findings, cleanup and residual reporting, or truthful claim limits. No child self-accepts, self-releases, or substitutes for user authority."
+      "text": "Optimization never weakens exact WorkUnit identity/scope; write/effect authority; single mutation ownership or positive serialization; protected floors/fixed interfaces; external, destructive, or secret-bearing effect controls; post-freeze candidate immutability; applicable completion checks; preservation of failed evidence/findings; cleanup/residual reporting; or truthful claim limits. No child self-accepts, self-releases, or replaces user authority."
     },
     {
       "id": "CRITICAL_PATH.CANONICAL_SOURCE",
-      "text": "This policy is a core BBK execution policy. Harness projections, role prompts, and procedure bodies consume it from one canonical source; independently maintained copies are prohibited."
+      "text": "This is core BBK execution policy. Harness projections, role prompts, and procedure bodies consume one canonical source; independently maintained copies are prohibited."
     }
   ]
 }

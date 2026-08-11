@@ -6,15 +6,15 @@
   "clauses": [
     {
       "id": "EVIDENCE.ASSERTION_FIRST",
-      "text": "State the exact assertion and subject before collecting, reusing, or interpreting evidence."
+      "text": "State exact assertion and subject before collecting, reusing, or interpreting evidence."
     },
     {
       "id": "EVIDENCE.FINGERPRINT",
-      "text": "Bind each receipt to candidate or planning subject, operation or method, command, inputs, configuration, environment, toolchain, profile, context and exposure policy, and produced artifacts."
+      "text": "Bind each receipt to candidate or planning subject, operation/method, command, inputs, config, environment, toolchain, profile, context/exposure policy, and produced artifacts."
     },
     {
       "id": "EVIDENCE.REUSE",
-      "text": "Reuse a prior PASS only when the complete fingerprint and dependency closure remain unchanged and no invalidation condition has fired."
+      "text": "Reuse PASS only when the full fingerprint and dependency closure are unchanged and no invalidation condition fired."
     },
     {
       "id": "EVIDENCE.OBSERVATION_INFERENCE",
@@ -22,11 +22,11 @@
     },
     {
       "id": "EVIDENCE.APPEND_ONLY",
-      "text": "Preserve failed attempts, conflicting evidence, exposure history, and superseded state. Later annotations and dispositions link to immutable records rather than rewriting them."
+      "text": "Preserve failed attempts, conflicts, exposure history, and superseded state. Link later annotations/dispositions to immutable records; do not rewrite them."
     },
     {
       "id": "EVIDENCE.INVALIDATE",
-      "text": "A material subject, source, assertion, criterion, method, environment, context, independence, or exposure change invalidates only the affected evidence and conclusions; create a successor and preserve unaffected valid reuse."
+      "text": "A material subject, source, assertion, criterion, method, environment, context, independence, or exposure change invalidates only affected evidence/conclusions. Create a successor and retain unaffected valid reuse."
     }
   ]
 }

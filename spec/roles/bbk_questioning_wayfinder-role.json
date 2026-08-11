@@ -45,7 +45,6 @@
     "Do not integrate stale, wrong-subject, unauthorized, incomplete, or contract-nonconforming Researcher or Guide returns, or preserve a branch as current after an upstream fact, decision, interface, authority, or subject revision invalidates it.",
     "Do not treat one exact accepted proposal as broad standing authority, acceptance of sibling decisions, approval of the parent plan, or authorization of downstream effects.",
     "Do not claim cluster completion while an in-scope root decision lacks either an authority-bound accepted decision or an explicit non-resolution disposition, or while stale requests, unprocessed invalidation, or unowned parent impacts remain.",
-    "Do not repeat an unchanged deterministic check, commission support work without the four-field material-risk justification, or convert a reversible pre-freeze mechanical defect into successor planning, a new campaign, or a new physical attempt.",
     "Do not ask for exact future-phase choices merely to make the whole roadmap fully compiled."
   ],
   "prompt_modules": [
@@ -85,7 +84,6 @@
     "Persist branch state proportionately and return a compact, versioned cluster result to the semantic parent. Include resolved and explicitly non-resolved branches, pending requests, parked or active state, decision and ADR references, research and Guide packets, exposure history, outward impacts, residual uncertainty, stopping assessment, and requested parent actions. Use a verified `bbk-handoff` reference for exact or large material.",
     "Project current question-branch and decision-request coordination records through `bbk-beads` when the project mapping is enabled; preserve request identity, authoritative responses, accepted decisions, and branch closure in BBK rather than tracker workflow state.",
     "Classify each unresolved item by user-attention need before opening a branch. Do not turn discoverable facts, ordinary parameters, or reversible implementation choices into user decisions; use authorized inspection, safe defaults, parameterization, pre-execution confirmation, or delegated conventional judgment where responsible.",
-    "Batch coherent independent requests into the smallest adequate controller interaction and accept a coherent response packet that preserves every stable request ID, subject, answer, and authority receipt; integrate the packet without one callback interruption per field.",
     "Batch only material questions that block the current frontier; preserve future refinement triggers without interrupting current authorized work."
   ],
   "return_contract": {

@@ -485,7 +485,7 @@ class Alpha7CongruenceTests(unittest.TestCase):
                 text = path.read_text(encoding='utf-8')
                 if path.suffix == '.toml':
                     self.assertIn(
-                        f'### Shared module: `{module_id}` — {module["title"]}',
+                        f'### `{module_id}`',
                         text,
                         str(path),
                     )
@@ -809,9 +809,9 @@ class PublicRepositoryBoundaryTests(unittest.TestCase):
         self.assertNotIn('c0–c11', lowered)
         self.assertNotIn('blueprint', lowered)
         self.assertNotIn('tenex', lowered)
-        self.assertIn('logical responsibility', constitution)
-        self.assertIn('append-only evidence exposure', constitution)
-        self.assertIn('does not create authority', constitution)
+        self.assertIn('Separate logical role, reusable procedure', constitution)
+        self.assertIn('Keep evidence exposure append-only', constitution)
+        self.assertIn('define capability, not authority', constitution)
 
 # ---------------------------------------------------------------------------
 # Historical source: test_alpha10_model_routing.py
@@ -967,7 +967,8 @@ class Alpha10ModelRoutingTests(unittest.TestCase):
                 {'omp': route['omp'], 'codex': route['codex'], 'claude': route['claude']},
             )
             generic_text = (m5_ROOT / 'projections' / 'generic' / 'agents' / f'{role_name}.md').read_text(encoding='utf-8')
-            self.assertIn('## Purpose', generic_text)
+            self.assertIn('## Role', generic_text)
+            self.assertIn(f"You are the canonical `{role_name}` BBK child role.", generic_text)
             self.assertNotIn('```json', generic_text)
 
     def test_v2_policy_validator_rejects_missing_and_unknown_roles(self):
@@ -1054,7 +1055,8 @@ class Alpha10ModelRoutingTests(unittest.TestCase):
             claude = m5_frontmatter(project / '.claude' / 'agents' / 'bbk-worker.md')
             self.assertEqual(claude['model'], 'sonnet')
             generic_text = (project / '.agents' / 'bbk' / 'agents' / 'bbk_worker.md').read_text(encoding='utf-8')
-            self.assertIn('## Purpose', generic_text)
+            self.assertIn('## Role', generic_text)
+            self.assertIn("You are the canonical `bbk_worker` BBK child role.", generic_text)
             self.assertNotIn('<bbk-model-routing', generic_text)
             self.assertNotIn('```json', generic_text)
             generic_manifest = json.loads((project / '.agents' / 'bbk' / 'agent-manifest.json').read_text(encoding='utf-8'))

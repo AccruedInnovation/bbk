@@ -20,6 +20,7 @@ from create_method_content import expected as expected_method_assets  # noqa: E4
 from generate_agents import expected_files, instruction_text  # noqa: E402
 from prompt_modules import (  # noqa: E402
     PromptModuleError,
+    clauses_for_harness,
     compact_skill_template,
     compile_standalone_skill,
     expand_skill_template,
@@ -419,6 +420,24 @@ class PromptModulePackageV1Tests(unittest.TestCase):
                 self.assertIn("requires_prompt_modules:", frontmatter)
                 self.assertIn("standalone_prompt_modules:", frontmatter)
 
+    def test_execution_entrypoints_embed_canonical_execution_bias(self) -> None:
+        entrypoints = (
+            "bbk-wayfind",
+            "bbk-work-graph",
+            "bbk-phase-plan",
+            "bbk-plan",
+            "bbk-root-execution",
+            "bbk-territory-execution",
+            "bbk-worker-execution",
+        )
+        for name in entrypoints:
+            with self.subTest(skill=name):
+                policy = skill_module_dependency(self.method, name)
+                self.assertIn(
+                    "bbk-prompt-critical-path-execution",
+                    policy["standalone_prompt_modules"],
+                )
+
     def test_compact_skill_templates_reference_but_do_not_duplicate_module_bodies(self) -> None:
         for name, template in self.method["skills"].items():
             with self.subTest(skill=name):
@@ -644,21 +663,25 @@ class PromptModulePackageV1Tests(unittest.TestCase):
                 self.assertNotIn("blocking: true", frontmatter)
 
     def test_tagged_hosts_embed_each_assigned_module_once(self) -> None:
-        for host in ("omp", "claude", "generic"):
+        for host in ("omp", "claude", "generic", "pi"):
             for role in self.roles:
                 with self.subTest(host=host, role=role["name"]):
                     rendered = instruction_text(self.spec, role, host=host)
                     self.assertNotIn("{{bbk-module:", rendered)
-                    self.assertEqual(
-                        rendered.count('<bbk-prompt-module id="'),
-                        len(role["prompt_modules"]),
-                    )
                     for module_id in role["prompt_modules"]:
                         self.assertEqual(
                             rendered.count(f'<bbk-prompt-module id="{module_id}">'), 1,
                         )
-                        for clause in self.package.by_id[module_id]["clauses"]:
-                            self.assertEqual(rendered.count(clause["text"]), 1)
+                        opening = f'<bbk-prompt-module id="{module_id}">'
+                        closing = "</bbk-prompt-module>"
+                        module_body = rendered.split(opening, 1)[1].split(closing, 1)[0]
+                        module = self.package.by_id[module_id]
+                        applicable = {clause["id"] for clause in clauses_for_harness(module, host)}
+                        for clause in module["clauses"]:
+                            self.assertEqual(
+                                module_body.count(clause["text"]),
+                                1 if clause["id"] in applicable else 0,
+                            )
 
     def test_codex_embeds_module_bodies_once_without_xml_like_tags(self) -> None:
         for role in self.roles:
@@ -667,10 +690,31 @@ class PromptModulePackageV1Tests(unittest.TestCase):
                 self.assertNotIn("<bbk-prompt-module", rendered)
                 for module_id in role["prompt_modules"]:
                     module = self.package.by_id[module_id]
-                    heading = f'### Shared module: `{module_id}` — {module["title"]}'
+                    heading = f'### `{module_id}`'
                     self.assertEqual(rendered.count(heading), 1)
+                    module_body = rendered.split(heading, 1)[1].split("\n### `", 1)[0]
+                    applicable = {clause["id"] for clause in clauses_for_harness(module, "codex")}
                     for clause in module["clauses"]:
-                        self.assertEqual(rendered.count(clause["text"]), 1)
+                        self.assertEqual(
+                            module_body.count(clause["text"]),
+                            1 if clause["id"] in applicable else 0,
+                        )
+
+    def test_exactly_five_clauses_are_canonical_omp_only(self) -> None:
+        expected = {
+            "CONTEXT.HOST_EDGE",
+            "CRITICAL_PATH.ATOMIC_BOUND_SPAWN",
+            "CRITICAL_PATH.TOKEN_DISPATCH",
+            "HUMAN.REQUEST_TRANSPORT",
+            "LIVENESS.EVENT_DELIVERY",
+        }
+        scoped = {
+            clause["id"]: tuple(clause.get("hosts", ()))
+            for module in self.package.modules
+            for clause in module["clauses"]
+            if "hosts" in clause
+        }
+        self.assertEqual({clause_id: ("omp",) for clause_id in expected}, scoped)
 
     def test_every_role_prompt_compiles_declared_mandatory_procedures_once_at_tail(self) -> None:
         for host in ("omp", "claude", "generic", "codex"):
@@ -816,10 +860,36 @@ class PromptModulePackageV1Tests(unittest.TestCase):
         self.assertLess(compiled_total, naive_duplicate_total)
 
     def test_alpha17_critical_path_execution_modules_are_exact(self) -> None:
-        critical = "\n".join(
-            clause["text"] for clause in
+        critical_clauses = {
+            clause["id"]: clause["text"] for clause in
             self.package.by_id["bbk-prompt-critical-path-execution"]["clauses"]
+        }
+        critical = "\n".join(critical_clauses.values())
+        self.assertIn(
+            "dispatch it immediately",
+            critical_clauses["CRITICAL_PATH.EXECUTION_PRECEDENCE"],
         )
+        one_check = critical_clauses["CRITICAL_PATH.ONE_CHECK"]
+        self.assertIn("validation or review", one_check)
+        self.assertIn("declared invalidation key changed", one_check)
+        blocker_repair = critical_clauses["CRITICAL_PATH.LOCAL_BLOCKER_REPAIR"]
+        for fragment in (
+            "missing inputs",
+            "wrong or stale paths",
+            "smallest successor WorkUnit",
+            "Do not reopen planning unless evidence establishes a material change",
+            "exact blocked scope",
+            "independent useful frontiers",
+        ):
+            self.assertIn(fragment, blocker_repair)
+        governance = critical_clauses["CRITICAL_PATH.GOVERNANCE_FLOORS"]
+        for fragment in (
+            "write/effect authority",
+            "single mutation ownership",
+            "candidate immutability",
+            "truthful claim limits",
+        ):
+            self.assertIn(fragment, governance)
         for fragment in (
             "NO_MATERIAL_SUPPORT_WORK",
             "exactly four blocking facts",
@@ -900,6 +970,19 @@ class PromptModulePackageV1Tests(unittest.TestCase):
                 "bbk-prompt-coordination-economy",
             },
         )
+
+    def test_repair_count_triggers_diagnosis_not_replanning(self) -> None:
+        roles = {role["name"]: role for role in self.roles}
+        for role_name in (
+            "bbk_territory_orchestrator",
+            "bbk_worker_orchestrator",
+        ):
+            with self.subTest(role=role_name):
+                text = "\n".join(roles[role_name]["responsibilities"])
+                self.assertNotIn("planning review by the third unresolved cycle", text)
+                self.assertIn("parent diagnosis by the third unresolved cycle", text)
+                self.assertIn("Cycle count alone does not reopen planning", text)
+                self.assertIn("request replanning only when evidence establishes", text)
 
     def test_alpha16_authority_and_completion_vocabulary_is_universal_and_exact(self) -> None:
         module_id = "bbk-prompt-authority-completion-vocabulary"

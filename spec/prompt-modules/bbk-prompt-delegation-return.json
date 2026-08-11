@@ -6,31 +6,31 @@
   "clauses": [
     {
       "id": "DELEGATION.ALLOWLIST",
-      "text": "Invoke only declared direct children and only when the role-specific trigger is satisfied. An allowlist is not an instruction to spawn every permitted child."
+      "text": "Invoke only declared direct children when their role trigger holds; an allowlist does not require every child."
     },
     {
       "id": "DELEGATION.CHARTER",
-      "text": "Bind each child to one exact subject, purpose, revision-bound context, authority, effects, capability zones, resources, assurance, stopping conditions, semantic parent, controller route, and return schema."
+      "text": "Bind each child to one exact subject, purpose, revision-bound context, authority, allowed effects, capability zones, resources, assurance, stop conditions, semantic parent, controller route, and return schema."
     },
     {
       "id": "DELEGATION.LOGICAL_PHYSICAL",
-      "text": "Keep logical responsibility distinct from physical invocation. Co-location, continuation, sharding, retries, or several physical attempts do not erase role, evidence, or return boundaries."
+      "text": "Keep logical responsibility separate from physical invocation. Co-location, continuation, sharding, retries, or multiple attempts do not erase role, evidence, or return boundaries."
     },
     {
       "id": "DELEGATION.VALIDATE_RETURN",
-      "text": "Before integration, validate child subject and revision, freshness, provenance, delegated authority, effects, schema, evidence exposure, contradictions, blockers, and durable references."
+      "text": "Before integration, validate subject/revision, freshness, provenance, delegated authority, effects, schema, evidence exposure, contradictions, blockers, and durable references."
     },
     {
       "id": "DELEGATION.PARENT_INTEGRATION",
-      "text": "The parent owns acceptance, reconciliation, invalidation, retry or replacement, and integration of child work. Return nonconforming work to its owner rather than silently rewriting it."
+      "text": "The parent owns child acceptance, reconciliation, invalidation, retry/replacement, and integration. Return nonconforming work to its owner; do not rewrite it silently."
     },
     {
       "id": "DELEGATION.INTERRUPT_SAFE_LIFETIME",
-      "text": "A steering message, user response, IRC wake, or other parent-turn interruption is not by itself authority to cancel independently useful child work. Use a host-proven detached or non-cascading child lifetime when useful work may continue across the parent wake. When the host exposes only a cancellation-sensitive blocking wait, sequence the callback and child dispatch safely instead. Cancel a child or cohort only through an explicit request, declared parent-abort policy, session or process termination, or unrecoverable runtime failure."
+      "text": "A steering message, user reply, IRC wake, or parent-turn interruption does not authorize cancelling useful child work. Use a proven detached/non-cascading lifetime across parent wakes; if waits cascade-cancel, sequence callbacks and dispatch safely. Cancel only by explicit request, declared parent-abort policy, session/process termination, or unrecoverable runtime failure."
     },
     {
       "id": "DELEGATION.CANCELLED_PARTIAL",
-      "text": "Bind every physical child attempt to a stable attempt identity. A cancelled, interrupted, failed, or incomplete attempt remains provisional even when it wrote plausible files: file existence is not a complete specialist return. A successor must record whether it resumed, adopted and repaired, replaced, or discarded the partial attempt, and the parent may claim specialist completion only from the successful validated return and its attempt identity."
+      "text": "Give each physical child attempt a stable attempt identity. Cancelled, interrupted, failed, or incomplete work stays provisional despite plausible files. A successor records whether it resumed, adopted/repaired, replaced, or discarded the partial attempt; the parent claims specialist completion only from the validated successful return and its attempt identity."
     }
   ]
 }

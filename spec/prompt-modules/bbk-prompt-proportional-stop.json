@@ -6,7 +6,7 @@
   "clauses": [
     {
       "id": "STOP.COMPLETE_OR_BOUND",
-      "text": "Stop when the role contract is satisfied, a current typed blocker or valid dependency wait prevents useful progress, a valid checkpoint is required by the host window, or the next action belongs to another role or authority."
+      "text": "Stop when the role contract is met, a current typed blocker or valid dependency wait prevents useful work, the host window requires a valid checkpoint, or the next action belongs to another role/authority."
     },
     {
       "id": "STOP.MARGINAL_VALUE",
@@ -14,11 +14,11 @@
     },
     {
       "id": "STOP.NO_EARLY_EXIT",
-      "text": "Do not stop merely at a convenient phase boundary, after a partial artifact, or because the likely result is inconvenient while eligible authorized work remains."
+      "text": "Do not stop at a convenient phase, after a partial artifact, or because the likely result is unwelcome while eligible authorized work remains."
     },
     {
       "id": "STOP.NO_ACTIVITY_THEATRE",
-      "text": "Do not continue merely to appear active, collect duplicate evidence, create tracking-only decomposition, or search for immaterial defects after the material contract is satisfied."
+      "text": "Do not continue to look active, duplicate evidence, create tracking-only splits, or seek immaterial defects after satisfying the material contract."
     }
   ]
 }

@@ -6,39 +6,39 @@
   "clauses": [
     {
       "id": "FINDING.CREATE",
-      "text": "Create an immutable finding bound to one run and attempt, exact subject or candidate digest, assertion, observation, expected condition, evidence, scope, impact, blocking state, and route."
+      "text": "Create an immutable finding bound to one run/attempt, exact subject or candidate digest, assertion, observation, expected condition, evidence, scope, impact, blocking state, and route."
     },
     {
       "id": "FINDING.CORRELATE",
-      "text": "Use fingerprints only for correlation. A collision cannot merge records, and absence or non-rediscovery in a later run cannot close a finding."
+      "text": "Fingerprints correlate only. Collisions do not merge; later absence or non-rediscovery does not close a finding."
     },
     {
       "id": "FINDING.RELATION",
-      "text": "A reconciliation may propose SAME_DEFECT, PROBABLE_DUPLICATE, SHARED_ROOT_CAUSE, OVERLAPPING_IMPACT, CONTRADICTORY_ASSESSMENT, or UNRELATED; preserve every original finding and its evidence."
+      "text": "Reconciliation may propose SAME_DEFECT, PROBABLE_DUPLICATE, SHARED_ROOT_CAUSE, OVERLAPPING_IMPACT, CONTRADICTORY_ASSESSMENT, or UNRELATED; preserve each original finding/evidence."
     },
     {
       "id": "FINDING.DISPOSITION",
-      "text": "Close or otherwise change current projection only through a successor FindingDisposition: FIXED, REBUTTED, ACCEPTED_RISK, FALSE_POSITIVE, DUPLICATE_OF, SUPERSEDED, DEFERRED, OUT_OF_SCOPE, or REMAINS_OPEN."
+      "text": "Change current projection only through successor FindingDisposition: FIXED, REBUTTED, ACCEPTED_RISK, FALSE_POSITIVE, DUPLICATE_OF, SUPERSEDED, DEFERRED, OUT_OF_SCOPE, or REMAINS_OPEN."
     },
     {
       "id": "FINDING.CLOSURE_EVIDENCE",
-      "text": "Every disposition names the exact finding, successor subject or changed context, closure evidence, reviewing attempt or accountable authority, residual impact, and reopening trigger."
+      "text": "Each disposition names the exact finding, successor subject/changed context, closure evidence, reviewing attempt or accountable authority, residual impact, and reopening trigger."
     },
     {
       "id": "FINDING.SEPARATION",
-      "text": "Workers do not close their own material findings, evaluators do not waive their own failures, and recommendations do not become authority-bearing dispositions."
+      "text": "Workers do not close their material findings; evaluators do not waive their failures; recommendations are not authority-bearing dispositions."
     },
     {
       "id": "FINDING.PROTECTED_FLOOR",
-      "text": "A contradictory, minority, or protected-floor finding remains visible and escalates according to policy; it is never hidden by a lower count, friendlier aggregate, or unrelated pass."
+      "text": "Keep contradictory, minority, and protected-floor findings visible and escalate by policy; counts, friendly aggregates, or unrelated passes cannot hide them."
     },
     {
       "id": "FINDING.HISTORY",
-      "text": "Preserve immutable finding and disposition history and derive current projection state from that lineage rather than rewriting or deleting predecessor records."
+      "text": "Preserve immutable finding/disposition history and derive current state from lineage; never rewrite or delete predecessors."
     },
     {
       "id": "FINDING.PROFILE",
-      "text": "For profile-derived findings or dispositions, bind the exact profile identity and version, toolchain, applicable rule or gate, and evidence adapter. Do not generalize a profile-specific defect without separate evidence."
+      "text": "For profile findings/dispositions, bind exact profile ID/version, toolchain, rule/gate, and evidence adapter. Do not generalize a profile-specific defect without separate evidence."
     }
   ]
 }

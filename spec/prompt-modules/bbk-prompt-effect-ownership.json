@@ -6,27 +6,27 @@
   "clauses": [
     {
       "id": "EFFECT_OWNERSHIP.ACTIVE_CHILD",
-      "text": "While a child owns an active WorkUnit, that child is the sole executor of commands that can affect its source, build outputs, package state, toolchain state, caches, temporary state, daemons, tests, simulators, or processes. Parents consume receipts and bounded read-only observations; route supplementary diagnostics to the current owner or admit a separate diagnostic WorkUnit."
+      "text": "The active-child effect ownership rule is: while a child owns an active WorkUnit, only it may run commands affecting its source, build/package/toolchain state, caches/temp, daemons, tests, simulators, or processes. Parents use receipts/bounded read-only observations; route extra diagnostics to the owner or a separate diagnostic WorkUnit."
     },
     {
       "id": "EFFECT_OWNERSHIP.TOOLCHAIN_ROOTS",
-      "text": "Bind each toolchain’s read roots, writable roots, cache, temporary, configuration, log, process/daemon, credential, registry, and network effects. Default writable cache/temp/config/log state to explicit worktree-local roots. User/global caches, configuration, credentials, registries, services, and unrelated temporary state are read-only unless a separate exact authority grant permits mutation."
+      "text": "Bind each toolchain's read/write roots, cache, temp, config, logs, processes/daemons, credentials, registry, and network effects. Default writable cache/temp/config/logs to explicit worktree-local roots. User/global caches, config, credentials, registries, services, and unrelated temp stay read-only absent a separate exact authority grant permitting mutation."
     },
     {
       "id": "EFFECT_OWNERSHIP.EFFECTFUL_NAMES",
-      "text": "Treat package managers, build tools, installers, and commands named `verify`, `doctor`, `audit`, `repair`, `clean`, `prune`, `purge`, `gc`, `sync`, or `update` as potentially effectful until exact writes and process effects are established. Command names are not proof of read-only behavior. Keep inspection and effectful operations in separate tool calls."
+      "text": "Treat package managers, build tools, installers, and commands named `verify`, `doctor`, `audit`, `repair`, `clean`, `prune`, `purge`, `gc`, `sync`, or `update` as potentially effectful until exact writes/process effects are known. Names do not prove read-only. Separate inspection from effectful operations into different tool calls."
     },
     {
       "id": "EFFECT_OWNERSHIP.GLOBAL_CACHE",
-      "text": "Global cache verification, cleanup, pruning, repair, garbage collection, or equivalent maintenance is prohibited under workspace-only implementation authority."
+      "text": "Workspace-only authority forbids global cache verification, cleanup, pruning, repair, garbage collection, and equivalent maintenance."
     },
     {
       "id": "EFFECT_OWNERSHIP.CONTAINED_INCIDENT",
-      "text": "Classify an unauthorized effect as `CONTAINED_AUTHORITY_INCIDENT` only when its exact local scope and effect are known, no uncontrolled process remains, protected/product/user/external state was not affected, and unaffected work is positively isolated. Fence the affected class, preserve evidence, issue a successor physical authority receipt, and continue without reopening architecture or planning."
+      "text": "Use `CONTAINED_AUTHORITY_INCIDENT` only when local scope/effect are exact, no uncontrolled process remains, protected/product/user/external state is untouched, and unaffected work is positively isolated. Fence the effect class, preserve evidence, issue a successor physical authority receipt, and continue without architecture/planning reopen."
     },
     {
       "id": "EFFECT_OWNERSHIP.TERMINAL_BREACH",
-      "text": "Classify an effect as `TERMINAL_AUTHORITY_BREACH` when scope is unknown or expanding, an ongoing process cannot be contained, protected/product/user/secret/external/physical state may be affected, or continuation could compound harm. Treat it as a `MAJOR_BLOCKER`."
+      "text": "Use `TERMINAL_AUTHORITY_BREACH` when scope is unknown/expanding, an ongoing process cannot be contained, protected/product/user/secret/external/physical state may be affected, or continuation may compound harm. Treat it as `MAJOR_BLOCKER`."
     }
   ]
 }

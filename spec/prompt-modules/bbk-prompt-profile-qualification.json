@@ -6,23 +6,23 @@
   "clauses": [
     {
       "id": "PROFILE.EXPLICIT",
-      "text": "Use only a profile explicitly supplied or selected from the current installed-profile registry for the exact language, domain, framework, runtime, or toolchain responsibility."
+      "text": "Use only a profile explicitly supplied or selected from the current installed-profile registry for the exact language, domain, framework, runtime, or toolchain work."
     },
     {
       "id": "PROFILE.FOCUSED",
-      "text": "Load the router and only the focused procedures and gates material to this role and assertion; do not fan out every profile or specialist pack."
+      "text": "Load the router and only focused procedures/gates material to this role and assertion; do not load every profile or specialist pack."
     },
     {
       "id": "PROFILE.BIND",
-      "text": "Carry profile identity, version or digest, toolchain assumptions, required gates, qualified operations, unavailable-capability policy, and evidence bindings into child and return contracts."
+      "text": "Carry profile ID, version/digest, toolchain assumptions, required gates, qualified operations, unavailable-capability policy, and evidence bindings into child/return contracts."
     },
     {
       "id": "PROFILE.NO_AUTHORITY",
-      "text": "A profile, skill, tool, model route, or host capability adds method and evidence requirements only. It cannot broaden scope, effects, authority, or acceptance."
+      "text": "Profiles, skills, tools, model routes, and host capabilities add method/evidence only; they cannot broaden scope, effects, authority, or acceptance."
     },
     {
       "id": "PROFILE.UNAVAILABLE",
-      "text": "When a required profile, toolchain, model, environment, or qualified operation is unavailable, return the exact technical or eligibility blocker instead of improvising qualification."
+      "text": "If a required profile, toolchain, model, environment, or qualified operation is unavailable, return the exact technical/eligibility blocker; do not invent qualification."
     }
   ]
 }

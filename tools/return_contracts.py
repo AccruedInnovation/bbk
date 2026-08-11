@@ -610,21 +610,26 @@ def check_or_write(root: Path, write: bool) -> list[str]:
 def render_return_contract_prompt(role: Mapping[str, Any]) -> str:
     c = role["return_contract"]
     lines = [
-        "## Exact role-return contract", "",
-        f"Return one JSON object governed by `{c['v2_return_schema']}`. New returns use `{c['v2_envelope_schema']}`; v1 remains consume-compatible through `{c['return_schema']}`.", "",
-        "Use `bbk_return_template` when the role-specific payload is not already exact, then call `bbk_return_prepare` and invoke hidden `yield` with the returned complete `yield_input` unchanged. The yield pre-effect hook validates the full document against its immutable prepared record and blocks malformed, misbound, or unprepared data with focused same-attempt repair diagnostics.", "",
-        "Use these exact v2 discriminators:", "",
+        "## Exact role-return contract",
+        "",
+        f"New returns: one JSON object governed by `{c['v2_return_schema']}` in `{c['v2_envelope_schema']}`; v1 remains consume-compatible only through `{c['return_schema']}`.",
+        "",
+        "If the payload is not exact, call `bbk_return_template`, then `bbk_return_prepare`; pass its complete `yield_input` unchanged to hidden `yield`. The pre-effect hook validates the full document against its immutable prepared record and blocks malformed, misbound, or unprepared data with same-attempt repair details.",
+        "",
+        "Exact v2 discriminators:",
         f"- `schema`: `{V2_ENVELOPE_ID}`",
         f"- `contract`: `{c['v2_contract_id']}`",
         f"- `role` and `executor.role`: `{role['name']}`",
-        "- `detail_level`: `COMPACT` by default; use `FULL` only when a trigger below applies",
+        "- `detail_level`: `COMPACT` by default; `FULL` only when a trigger below applies",
         "- `invocation_mode`: " + ", ".join(f"`{x}`" for x in c["allowed_invocation_modes"]),
         "- `return_kind`: " + ", ".join(f"`{x}`" for x in c["allowed_return_kinds"]),
         "- `operational_disposition`: " + ", ".join(f"`{x}`" for x in c["allowed_operational_dispositions"]),
         f"- `semantic_state.name`: `{c['semantic_state_name']}`",
-        "- `semantic_state.value`: " + ", ".join(f"`{x}`" for x in c["allowed_semantic_states"]), "",
-        "The v2 envelope requires exact subject, parent, attempt, executor, disposition, semantic state, summary, authority/effect truth, result, and smallest valid next action. Include material outputs, checks/evidence, effects/cleanup, blockers/residuals, prohibited claims, and durable handoff references; omit only irrelevant empty sections.", "",
-        f"COMPACT uses `{c['compact_result_schema']}` and requires:", "",
+        "- `semantic_state.value`: " + ", ".join(f"`{x}`" for x in c["allowed_semantic_states"]),
+        "",
+        "Required envelope: exact subject, parent, attempt, executor, disposition, semantic state, summary, authority/effect truth, result, and smallest valid next action. Include material outputs, checks/evidence, effects/cleanup, blockers/residuals, prohibited claims, and durable handoff references; omit only irrelevant empty sections.",
+        "",
+        f"COMPACT `{c['compact_result_schema']}` requires:",
     ]
     for name in c["compact_result_fields"]:
         field = c["result_fields"][name]
@@ -632,9 +637,16 @@ def render_return_contract_prompt(role: Mapping[str, Any]) -> str:
         if field["kind"] in {"ENUM", "ENUM_LIST"}:
             details += "; " + ", ".join(field["enum_values"])
         lines.append(f"- `{name}` ({details}) — {field['description']}")
-    lines += ["", f"FULL uses the existing complete payload `{c['result_schema']}`. Use FULL when:", ""]
+    lines += ["", f"FULL `{c['result_schema']}` applies when:"]
     lines.extend(f"- {item}" for item in c["full_detail_triggers"])
-    lines += ["", "Readiness rule:", "", c["readiness_rule"], "", "Authority boundary:", "", c["authority_boundary"], "", "Operational completion, role semantic readiness, accountable acceptance, and release remain separate. Do not emit `READY_FOR_VALIDATION`, `BLOCKED`, or `PAUSED` as current operational dispositions."]
+    lines += [
+        "",
+        "Readiness: " + c["readiness_rule"],
+        "",
+        "Authority: " + c["authority_boundary"],
+        "",
+        "Keep operational completion, semantic readiness, accountable acceptance, and release separate. Never emit `READY_FOR_VALIDATION`, `BLOCKED`, or `PAUSED` as a current operational disposition.",
+    ]
     return "\n".join(lines)
 
 

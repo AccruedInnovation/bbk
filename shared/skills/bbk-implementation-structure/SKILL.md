@@ -15,11 +15,11 @@ Use this between architecture and execution when realization shape is material. 
 
 Preserve accepted decisions and exact source lineage while planning, decomposing, or proposing designs.
 
-- `PLANNING.SOURCE_BINDING` — Bind each planning claim, decision, requirement, architecture element, interface, work item, assertion, authority source, and profile assumption to the exact accepted subject and revision.
-- `PLANNING.NO_UPSTREAM_REPAIR` — Do not silently repair, reinterpret, approve, or overwrite a missing, contradictory, stale, wrong-subject, or insufficiently accepted upstream source inside a downstream plan or design.
-- `PLANNING.SPECIALIST_AUTHORITY` — Commission exact specialist work through its owning role, validate and integrate the return, and preserve the distinction between semantic commissioning and specialist design ownership.
-- `PLANNING.SUCCESSOR` — When a governing source changes, preserve the predecessor, identify the deterministic impact set, invalidate only affected graph, assertion, worker-contract, evidence, and handoff dependencies, and request the smallest sufficient successor work.
-- `PLANNING.NO_EXECUTION_AUTHORITY` — Planning may describe required authority, effects, environments, checks, and recovery, but it does not authorize execution, accept risk, validate a candidate, or release a result.
+- `PLANNING.SOURCE_BINDING` — Bind every planning claim, decision, requirement, architecture element, interface, work item, assertion, authority source, and profile assumption to the exact accepted subject/revision.
+- `PLANNING.NO_UPSTREAM_REPAIR` — Do not silently repair, reinterpret, approve, or overwrite a missing, conflicting, stale, wrong-subject, or insufficiently accepted upstream source in downstream planning/design.
+- `PLANNING.SPECIALIST_AUTHORITY` — Commission exact specialist work through its owning role, validate/integrate the return, and keep semantic commissioning separate from specialist design ownership.
+- `PLANNING.SUCCESSOR` — When a governing source changes, preserve the predecessor, derive the deterministic impact set, invalidate only affected graph/assertion/worker-contract/evidence/handoff dependencies, and request the smallest sufficient successor work.
+- `PLANNING.NO_EXECUTION_AUTHORITY` — Planning may specify authority, effects, environments, checks, and recovery; it cannot authorize execution, accept risk, validate a candidate, or release a result.
 
 <!-- End BBK prompt module bbk-prompt-planning-source-integrity -->
 
@@ -31,10 +31,10 @@ Preserve accepted decisions and exact source lineage while planning, decomposing
 
 Explicitly disposition specialist review requests, unresolved decisions, blockers, and successor requirements before treating integrated planning or execution state as current.
 
-- `SPECIALIST.DISPOSITION` — For every material specialist-requested review, unresolved blocker, open decision, conditional branch, successor requirement, or recommended follow-up, record one explicit disposition: COMMISSIONED with reference, INTEGRATED, DEFERRED with owner and trigger, SUPERSEDED with successor, REJECTED with rationale, or REMAINS_OPEN with impact.
-- `SPECIALIST.CONDITIONAL_CURRENTNESS` — Do not describe an artifact or baseline as current, complete, or decision-closed while its producing specialist says it is conditional on an unresolved material decision or successor work. Preserve the conditional state and affected scope.
-- `SPECIALIST.RECONFIRM_BRANCH` — When a material decision resolves a branch that was open during specialist work, obtain a bounded confirmation, amendment, or successor from the owning specialist before treating the selected branch as current, unless the original return explicitly delegated that exact integration choice to the parent.
-- `SPECIALIST.REVIEW_NOT_SILENTLY_DROPPED` — A specialist request for independent review may be accepted, proportionately deferred, or rejected with rationale, but it must not disappear from the parent result. State the review owner, exact focus, timing trigger, and residual risk.
+- `SPECIALIST.DISPOSITION` — Give every material specialist review request, blocker, open decision, conditional branch, successor need, or follow-up one explicit disposition: COMMISSIONED with ref, INTEGRATED, DEFERRED with owner/trigger, SUPERSEDED with successor, REJECTED with rationale, or REMAINS_OPEN with impact.
+- `SPECIALIST.CONDITIONAL_CURRENTNESS` — Do not call an artifact/baseline current, complete, or decision-closed while its producing specialist makes it conditional on an unresolved material decision or successor work. Preserve the condition and affected scope.
+- `SPECIALIST.RECONFIRM_BRANCH` — When a later material decision resolves an open specialist branch, obtain bounded confirmation, amendment, or successor from the owning specialist before treating it current, unless the original return explicitly delegated that exact integration choice.
+- `SPECIALIST.REVIEW_NOT_SILENTLY_DROPPED` — A requested independent review may be accepted, proportionately deferred, or rejected with rationale, but not omitted. State review owner, exact focus, timing trigger, and residual risk.
 
 <!-- End BBK prompt module bbk-prompt-specialist-disposition -->
 

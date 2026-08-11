@@ -17,6 +17,7 @@ if str(TOOLS_DIR) not in sys.path:
 
 from model_routing import load_model_routing, route_for_role, routing_statistics
 from prompt_modules import (
+    clauses_for_harness,
     PromptModuleError,
     compact_skill_template,
     load_prompt_modules,
@@ -159,21 +160,18 @@ def load_skill(name: str) -> dict[str, Any]:
 def mandatory_skill_metadata(role: dict[str, Any]) -> list[dict[str, Any]]:
     return [load_skill(name) for name in role.get("mandatory_skills", [])]
 
-def render_role_prompt_module(module: Mapping[str, Any], *, tagged: bool) -> str:
+def render_role_prompt_module(module: Mapping[str, Any], *, host: str, tagged: bool) -> str:
     """Render one behavior-bearing module exactly once.
 
     OMP retains authenticated markers. Codex keeps the model-facing body free of
     BBK XML-like metadata while preserving the module identity in Markdown.
     """
-    heading = f'### Shared module: `{module["id"]}` — {module["title"]}'
-    body = "\n".join([heading, "", *[f'- {clause["text"]}' for clause in module["clauses"]]])
-    if not tagged:
-        return body
-    return (
-        f'<bbk-prompt-module id="{module["id"]}">\n'
-        f'{body}\n'
-        '</bbk-prompt-module>'
+    clauses = "\n".join(
+        f'- {clause["text"]}' for clause in clauses_for_harness(module, host)
     )
+    if not tagged:
+        return f'### `{module["id"]}`\n\n{clauses}'
+    return f'<bbk-prompt-module id="{module["id"]}">\n{clauses}\n</bbk-prompt-module>'
 
 def base_instruction_text(
     spec: dict[str, Any],
@@ -181,197 +179,190 @@ def base_instruction_text(
     *,
     host: str,
 ) -> str:
-    """Render one self-contained role prompt from canonical contracts.
-
-    Role-specific purpose, scope, responsibility, topology, and return contracts
-    remain explicit. Shared cross-role behavior is embedded once per assigned
-    prompt module. Mandatory procedure templates retain only compact references
-    to those already embedded modules.
-    """
+    """Render one self-contained role prompt from canonical contracts."""
     constitution = spec["constitution_modules"]
-    constitution_clauses: list[str] = []
-    for module_name in role["constitution"]:
-        constitution_clauses.extend(constitution[module_name])
+    constitution_clauses = [
+        clause
+        for module_name in role["constitution"]
+        for clause in constitution[module_name]
+    ]
 
-    package = prompt_module_package()
-    mandatory_skills = role.get("mandatory_skills", [])
+    mandatory = role.get("mandatory_skills", [])
     skills = role.get("skills", [])
-    on_demand = [name for name in skills if name not in mandatory_skills]
-    assigned_modules = ordered_modules(package, role.get("prompt_modules", []))
-    human_request_originators = set(spec["interaction_topology"]["human_request_originators"])
-    may_originate_human_request = role["name"] in human_request_originators
+    on_demand = [name for name in skills if name not in mandatory]
+    originators = set(spec["interaction_topology"]["human_request_originators"])
+    may_request_human = role["name"] in originators
 
     lines: list[str] = []
-    tagged_contract = host != "codex"
-    if tagged_contract:
+    tagged = host != "codex"
+    if tagged:
         lines += [
             f'<bbk-role-contract role="{role["name"]}" package-version="{spec["package_version"]}">',
             "",
         ]
 
     lines += [
-        "## Runtime identity and interaction topology",
+        "## Role",
         "",
         f"You are the canonical `{role['name']}` BBK child role.",
         "",
-        "Apply the role contract, embedded modules, and mandatory procedures as one instruction set.",
-        "",
-        "## Purpose",
-        "",
         role["purpose"],
+        "",
+        "Apply all sections as one contract.",
         "",
         "## Constitution",
         "",
-    ]
-    lines.extend(f"- {item}" for item in constitution_clauses)
-
-    lines += ["", "## Scope", ""]
-    lines.extend(f"- {item}" for item in role["scope"])
-
-    lines += ["", "## Responsibilities", ""]
-    lines.extend(f"- {item}" for item in role["responsibilities"])
-
-    lines += [
+        *[f"- {item}" for item in constitution_clauses],
         "",
-        "## Shared behavior modules — embedded once",
+        "## Scope",
         "",
-        "Each module is active once for the whole invocation.",
+        *[f"- {item}" for item in role["scope"]],
+        "",
+        "## Duties",
+        "",
+        *[f"- {item}" for item in role["responsibilities"]],
+        "",
+        "## Shared modules",
+        "",
+        "The compiler embeds the complete host-applicable module closure below.",
     ]
-    for module in assigned_modules:
-        lines += ["", render_role_prompt_module(module, tagged=host != "codex")]
 
     lines += ["", "## Delegation", ""]
     delegation = role.get("delegation", {})
     if delegation:
-        if host == "omp":
-            lines.append("The native `spawns` allowlist constrains direct children. Use a child only for its declared trigger:")
-        else:
-            lines.append("Use only these direct child agents, and only for their declared trigger:")
+        lines.append(
+            "Direct children are limited by native `spawns`; invoke only for the listed trigger:"
+            if host == "omp"
+            else "Invoke only these direct children, and only for the listed trigger:"
+        )
         lines.append("")
         role_index = {item["name"]: item for item in spec["roles"]}
         for child_name in role.get("spawns", []):
-            trigger = delegation[child_name]
             child = role_index[child_name]
-            if host == "claude":
-                label = f"`{claude_name(child)}` (canonical `{child_name}`)"
-            else:
-                label = f"`{child_name}`"
-            lines.append(f"- {label} — when {trigger}.")
+            label = (
+                f"`{claude_name(child)}` (canonical `{child_name}`)"
+                if host == "claude"
+                else f"`{child_name}`"
+            )
+            lines.append(f"- {label} — when {delegation[child_name]}.")
         if host == "omp":
             lines += [
                 "",
-                "For the OMP batch `task` form, set each task's `agent` to the exact permitted canonical `bbk_*` role, use a stable logical `name`, and provide a complete self-contained `task`. For the flat form, follow the advertised schema and use a durable `local://` context file for reusable shared background.",
+                "OMP batch `task`: set `agent` to the exact allowed `bbk_*` role, use a stable logical `name`, and supply a self-contained `task`. For flat dispatch, follow its schema and put reusable shared context in durable `local://` content.",
             ]
     else:
         lines.append(
-            "This role has no child-agent authority. Return work requiring another responsibility to the invoking parent rather than spawning, impersonating, or silently absorbing an unlisted role."
+            "No child authority. Return out-of-role work to the invoking parent; do not spawn, impersonate, or absorb it."
         )
 
-    lines += ["", "## Escalation and human relay", ""]
-    lines.extend(f"- {item}" for item in role["escalations"])
+    lines += [
+        "",
+        "## Escalation",
+        "",
+        *[f"- {item}" for item in role["escalations"]],
+    ]
     human_triggers = role.get("human_decision_triggers", [])
     if human_triggers:
         lines += [
             "",
-            "These conditions trigger a controller-mediated human request, never direct user interaction:",
+            "Controller-mediated human-request triggers:",
             "",
+            *[f"- {item}" for item in human_triggers],
         ]
-        lines.extend(f"- {item}" for item in human_triggers)
     else:
         lines += [
             "",
-            "This role has no ordinary user-gateway branch. Report typed blockers or findings through its parent/controller route.",
+            "No ordinary human-request branch. Return typed human needs through the parent/controller route.",
         ]
 
-    lines += ["", "## Prohibitions", ""]
-    lines.extend(f"- {item}" for item in role["prohibitions"])
-
-    lines += ["", "## Procedure skills", ""]
-    lines.append(f"Primary procedure: `{role['primary_skill']}`.")
-    if mandatory_skills:
-        lines.append(
-            "Mandatory procedures embedded below: "
-            + ", ".join(f"`{name}`" for name in mandatory_skills)
-            + "."
-        )
+    lines += [
+        "",
+        "## Prohibitions",
+        "",
+        *[f"- {item}" for item in role["prohibitions"]],
+        "",
+        "## Procedures",
+        "",
+        f"Compiled primary: `{role['primary_skill']}`.",
+    ]
+    extra_mandatory = [name for name in mandatory if name != role["primary_skill"]]
+    if extra_mandatory:
+        lines.append("Also compiled: " + ", ".join(f"`{name}`" for name in extra_mandatory) + ".")
     if on_demand:
         lines.append(
-            "Additional procedures available on demand: "
+            "On demand: "
             + ", ".join(f"`{name}`" for name in on_demand)
-            + ". Load one only when its method is material to the assigned responsibility."
+            + ". Load only when material to this responsibility."
         )
 
     profile_aware = "bbk-profile-routing" in skills or "bbk-installed-profiles" in skills
-    lines += ["", "## Language, domain, toolchain, and model qualification", ""]
+    lines += ["", "## Profiles", ""]
     if profile_aware:
         lines.append(
-            "Use the embedded `bbk-prompt-profile-qualification` module and the current installed-profile registry to select only the applicable focused procedures and gates."
+            "Use the embedded `bbk-prompt-profile-qualification` module and current installed-profile registry; select only material focused procedures and gates."
         )
     else:
         lines.append(
-            "Use only a profile or focused procedure supplied by the invocation. Return a profile-resolution blocker when a material specialized method is required but absent."
+            "Use only invocation-supplied profiles/procedures. Return a profile-resolution blocker if a material specialized method is absent."
         )
 
     if host == "omp":
         lines += [
             "",
-            "## OMP hub/IRC communication contract",
+            "## OMP",
             "",
-            "- Run as an OMP task subagent. Use `hub`/IRC for live inter-agent communication and the task/yield channel for the final governed result.",
-            "- Resolve the harness-root controller with `hub` `op: \"list\"` and the peer whose `kind` is `main`; never infer or invent a peer ID.",
-        ]
-        if may_originate_human_request:
-            lines.append("- This role is a declared human-request originator. Send only its exact controller-mediated request packet to the `main` peer and bind the reply to the stable request; send ordinary coordination to the invoking parent.")
-        else:
-            lines.append("- This role is not a human-request originator. Send decision, authority, private-context, or acceptance needs as typed blockers to the invoking parent; do not send a direct user request to `main`.")
-        lines += [
-            "- Wait only when no other authorized work remains, and resume the same logical role after a valid bound response or parent continuation.",
-            "- When spawning, carry the main peer, invoking-parent peer, logical parent, branch identity, and exact reply target in the child context edge.",
-            "- This replacement prompt excludes OMP generic workflow policy and compatibility-discovered cross-harness instructions unless supplied as governed project data.",
+            "- Run as an OMP task subagent. Use hub/IRC for live coordination and task/yield for the governed final result.",
+            "- Resolve Main with hub `op: \"list\"` and `kind: \"main\"`; never invent a peer ID.",
+            (
+                "- You may originate only exact declared controller-request packets to Main; send ordinary coordination to the invoking parent."
+                if may_request_human
+                else "- You may not originate human requests. Return decision, authority, private-context, and acceptance needs to the invoking parent."
+            ),
+            "- Wait only when no authorized work remains; resume the same logical role after a bound reply or parent continuation.",
+            "- When spawning, pass Main peer, invoking-parent peer, logical parent, branch identity, and exact reply target in the child context edge.",
+            "- Ignore generic OMP workflow policy and discovered cross-harness instructions unless supplied as governed project data.",
         ]
 
     if host == "codex":
         lines += [
             "",
-            "## Codex workspace and parent-channel behavior",
+            "## Codex",
             "",
-            ("- This Codex child cannot converse with the user. Use the declared controller route for exact human requests." if may_originate_human_request else "- This Codex child cannot converse with the user and is not a human-request originator. Return material human needs to the invoking parent through the inter-agent channel or typed terminal result."),
+            (
+                "- This child cannot speak to the user. Send exact human requests through the declared controller route."
+                if may_request_human
+                else "- This child cannot speak to the user or originate human requests. Return material human needs to the parent by inter-agent channel or typed result."
+            ),
             "- Inherit the parent turn's active sandbox and approval settings. Persist bounded BBK coordination artifacts inside the permitted workspace.",
+            "- Host capability does not create authority.",
+            (
+                "- Modify subject or product artifacts only within the exact invocation scope, effects, safeguards, and stop conditions."
+                if role.get("mutates")
+                else "- Writable host tools do not authorize subject or product mutation for this non-mutating role."
+            ),
         ]
-        if role.get("mutates"):
-            lines.append("- Modify subject or product artifacts only within the exact invocation scope, effects, safeguards, and stopping conditions.")
-        else:
-            lines.append("- Writable host tools do not authorize subject or product mutation for this non-mutating role.")
         if role.get("spawns"):
-            lines += [
-                "- Use host continuation/follow-up for the same logical child when possible. The embedded liveness module controls polling, interruption, replacement, and preservation of partial work.",
-            ]
+            lines.append(
+                "- Prefer host continuation for the same logical child; the liveness module governs polling, interruption, replacement, and partial work."
+            )
 
     if host == "claude":
         lines += [
             "",
-            "## Claude Code operating notes",
+            "## Claude Code",
             "",
-            ("- This Claude Code child has no `AskUserQuestion` authority. Use the declared controller route for exact human requests." if may_originate_human_request else "- This Claude Code child has no `AskUserQuestion` authority and is not a human-request originator. Return material human needs through the parent channel or typed result."),
-            "- Agent, Edit, Write, and worktree affordances do not broaden the role's declared delegation or mutation authority.",
+            (
+                "- No `AskUserQuestion` authority. Send exact human requests through the declared controller route."
+                if may_request_human
+                else "- No `AskUserQuestion` authority and no human-request originator role. Return human needs through the parent or typed result."
+            ),
+            "- Agent, Edit, Write, and worktree access do not widen delegation or mutation authority.",
         ]
 
-    lines += [
-        "",
-        "## Invocation contract",
-        "",
-        "Apply the embedded `bbk-prompt-invocation-binding` module before substantive work. Invocation-, organization-, session-, sandbox-, and runtime-level controls take precedence over a generated default; unavailable or materially downgraded capabilities must be reported truthfully.",
-    ]
-
-    # The exact return contract is compiled before the procedure tail for every
-    # harness.  Adapters may add invocation data but may not append semantic
-    # instructions after the compiled primary procedure.
     lines += ["", render_return_contract_prompt(role)]
-
-    if tagged_contract:
+    if tagged:
         lines += ["", "</bbk-role-contract>"]
     return "\n".join(lines).strip() + "\n"
-
 
 def compiled_instruction(
     spec: dict[str, Any],
@@ -536,22 +527,8 @@ def controller_base_prompt(spec: Mapping[str, Any], *, host: str) -> str:
     """Canonical semantic controller contract shared by every harness."""
     lines = [
         "# BBK harness-root controller", "",
-        "You are the sole user-facing BBK controller. You route work to canonical roles; you do not absorb Wayfinder, Orchestrator, Worker, Reviewer, Validator, or Architect responsibilities.", "",
-        "## Routing", "",
-        "- Inspect current child/state before launching a root. Resume the same logical child whenever its subject and compiled state remain current.",
-        "- Planning, architecture, uncertainty, or missing/stale readiness routes to `bbk_root_wayfinder`.",
-        "- Execution or recovery routes to `bbk_root_orchestrator` after an accepted executable frontier and authority exist.",
-        "- Bounded qualitative review routes to `bbk_reviewer`; assertion-scoped candidate acceptance routes to `bbk_validator_orchestrator`.",
-        "- Once a Root Wayfinder owns a subject, do not commission overlapping controller-side discovery.", "",
-        "## Delivery authority", "",
-        "- Treat the user’s explicit delivery assignment and exact architecture/baseline adoption as standing authority for routine continuation inside its bounds.",
-        "- Ask the user only for `MAJOR_BLOCKER` or `ARCHITECTURAL_BRANCH`; continue independent work around narrower blockers.",
-        "- Relay one recommendation-first request with exact IDs and consequences when attention is genuinely required.", "",
-        "## Coordination", "",
-        "- Use state-changing messages, durable receipts, and long bounded waits. Do not acknowledge routine progress chatter or recreate checks already established for unchanged subjects.",
-        "- Preserve active-child effect ownership. The controller does not run package, build, test, cache, cleanup, or process commands on a child-owned surface.", "",
-        "## Claim limits", "",
-        "Separate planning readiness, implementation artifacts, candidate validation, capability completion, project completion, deployment, and live acceptance. The controller does not self-accept or self-release child work.",
+        "Sole user-facing BBK controller. Route to canonical roles; never absorb their planning, design, execution, review, validation, or acceptance work.", "",
+        "Inspect current child/state before root dispatch. Resume the same logical child while subject and compiled state remain current. The compiled modules and `bbk` procedure below define routing, delivery authority, relay, coordination, effect ownership, and claim limits.",
         "", f"package_version: {spec['package_version']}", f"harness: {host}",
     ]
     if host == "omp":

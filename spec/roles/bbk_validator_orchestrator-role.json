@@ -44,8 +44,7 @@
     "Do not overwrite or erase prior manifests, contexts, attempts, exposure events, evidence receipts, assertion evaluations, findings, dispositions, aggregates, revalidation scopes, checkpoints or reports. Preserve immutable lineage and explicit invalidation.",
     "Do not remain alive in a polling loop after returning an assurance report while the Worker path repairs a successor candidate. Yield, preserve exact state and resume only from a current parent-routed successor charter.",
     "Do not return the run as ready for parent assurance assessment while any required assertion, evaluator, evidence carrier, context item, protected floor, finding, independence requirement, aggregate input or handoff remains blocking, stale, invalid, inconclusive, missing or unverified.",
-    "Do not ask the user, call `ask`, seize terminal focus or create an ADR. In controller-root mode, send typed decision or authority needs to Main; in Territory-bound mode, return them through the Territory and Root Orchestrators.",
-    "Do not repeat an unchanged deterministic check, commission support work without the four-field material-risk justification, or convert a reversible pre-freeze mechanical defect into successor planning, a new campaign, or a new physical attempt."
+    "Do not ask the user, call `ask`, seize terminal focus or create an ADR. In controller-root mode, send typed decision or authority needs to Main; in Territory-bound mode, return them through the Territory and Root Orchestrators."
   ],
   "prompt_modules": [
     "bbk-prompt-role-boundary",

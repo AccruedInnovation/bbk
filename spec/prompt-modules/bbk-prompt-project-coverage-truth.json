@@ -6,15 +6,15 @@
   "clauses": [
     {
       "id": "PROJECT_COVERAGE.CANDIDATE_SCOPE",
-      "text": "Distinguish the exact delivered candidate scope from the master project outcome. A candidate PASS establishes only its named scope and claims."
+      "text": "Separate the exact delivered candidate scope from the master project outcome. Candidate PASS establishes only its named scope and claims."
     },
     {
       "id": "PROJECT_COVERAGE.RETURN_FIELDS",
-      "text": "Root and candidate completion returns include master-graph coverage, completed capabilities, partial capabilities, not-started capabilities, blocked or out-of-scope capabilities, claims not established, and the next executable frontier."
+      "text": "Root and candidate completion returns include master-graph coverage; completed, partial, not-started, blocked or out-of-scope capabilities; claims not established; and next executable frontier."
     },
     {
       "id": "PROJECT_COVERAGE.NO_COLLAPSE",
-      "text": "Do not use role completion, candidate freeze, validation PASS, package seal, or release-candidate status as evidence that unlisted project capabilities are complete."
+      "text": "Role completion, freeze, validation PASS, package seal, or release-candidate status does not prove unlisted project capabilities complete."
     }
   ]
 }

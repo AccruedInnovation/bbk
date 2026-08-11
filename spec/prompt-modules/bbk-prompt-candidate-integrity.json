@@ -6,31 +6,31 @@
   "clauses": [
     {
       "id": "CANDIDATE.IDENTITY",
-      "text": "Bind one candidate to an exact subject, revision, complete inventory or manifest, byte or semantic digests, producer lineage, environment, and freeze event."
+      "text": "Bind each candidate to exact subject/revision, complete inventory/manifest, byte or semantic digests, producer lineage, environment, and freeze event."
     },
     {
       "id": "CANDIDATE.FREEZE_LATE",
-      "text": "Freeze only after expected implementation and integration work for that candidate is complete. Draft checks do not create a frozen assurance subject."
+      "text": "Freeze only after expected implementation and integration finish; draft checks do not create a frozen assurance subject."
     },
     {
       "id": "CANDIDATE.READ_ONLY",
-      "text": "Candidate-bound assurance is read-only except explicitly authorized scratch or observation effects. Evaluators never repair the candidate they are evaluating."
+      "text": "Candidate-bound assurance is read-only except explicitly authorized scratch/observation effects. Evaluators never repair their candidate."
     },
     {
       "id": "CANDIDATE.SUCCESSOR",
-      "text": "Any governed candidate mutation creates a successor identity and invalidates evidence according to declared dependency closure; predecessor candidate, findings, and evidence remain preserved."
+      "text": "Any governed candidate mutation creates a successor identity and invalidates evidence by declared dependency closure; preserve predecessor candidate, findings, and evidence."
     },
     {
       "id": "CANDIDATE.SEPARATE_LIFECYCLES",
-      "text": "Candidate-producing cohorts and candidate-bound assurance runs are separate lifecycles linked by exact candidate identity, not by shared mutable status."
+      "text": "Candidate production and candidate-bound assurance are separate lifecycles linked by exact candidate identity, not shared mutable status."
     },
     {
       "id": "CANDIDATE.REQUIRED_FINALIZATION_EXACT",
-      "text": "When the controlling request explicitly requires `bbk artifact finalize`, satisfy that exact operation with a successful publication receipt. A handoff package, passing tests, a raw implementation directory, `artifact seal`, an archive, or an ad hoc digest is not an equivalent substitute. Report the requirement as blocked until the exact finalization operation succeeds or the user explicitly changes it."
+      "text": "If the request explicitly requires `bbk artifact finalize`, require its successful publication receipt. Handoff, tests, raw directory, `artifact seal`, archive, or ad hoc digest are not equivalent. Stay blocked until exact finalization succeeds or the user explicitly changes the requirement."
     },
     {
       "id": "CANDIDATE.FINALIZATION_FRESHNESS",
-      "text": "Finalization evidence is bound to the exact source selection and source snapshot that produced it. Any later selected-source addition, removal, or byte change makes that evidence stale. Run deterministic artifact freshness against the publication receipt immediately before a completion relay; stale evidence requires current verification and a successor revision rather than reuse of the predecessor claim."
+      "text": "Finalization evidence binds its exact source selection/snapshot. Any later selected-source add, remove, or byte change makes it stale. Run deterministic artifact freshness against the publication receipt immediately before completion relay; stale evidence needs current verification and a successor revision, not predecessor-claim reuse."
     }
   ]
 }

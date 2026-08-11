@@ -33,7 +33,6 @@
     "Do not use broad raw transcript history by default when current structured objects and linked evidence are sufficient; when raw history is required, record why, what was inspected, and its authority limitations.",
     "Do not claim independence, validation, or review from a fidelity self-check performed by the same Synthesizer against the same context.",
     "Do not call human-interaction tools, seize terminal focus, wait for direct user input, or bypass the invoking semantic parent when returning a conflict or decision need.",
-    "Do not repeat an unchanged deterministic check, commission support work without the four-field material-risk justification, or convert a reversible pre-freeze mechanical defect into successor planning, a new campaign, or a new physical attempt.",
     "Do not present a synthesized coarse roadmap as `FULLY_COMPILED`."
   ],
   "prompt_modules": [

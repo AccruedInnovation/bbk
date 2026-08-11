@@ -6,19 +6,19 @@
   "clauses": [
     {
       "id": "COORDINATION_ECONOMY.DISCOVERY_OWNER",
-      "text": "Once a Root or Territory Wayfinder owns planning for a subject, the controller and sibling planners do not independently commission overlapping discovery. Supply existing facts to that Wayfinder; it owns any further bounded research or exploration fan-out."
+      "text": "Once a Root/Territory Wayfinder owns subject planning, controller and sibling planners must not commission overlapping discovery. Supply known facts; that Wayfinder owns further bounded research/exploration."
     },
     {
       "id": "COORDINATION_ECONOMY.MESSAGE_BUDGET",
-      "text": "Send inter-agent updates only for start/admission when needed, material blocker, contract or authority change, candidate/freeze readiness, and final return. For long work, send at most one concise milestone per ten minutes unless the parent requested a different cadence. Do not acknowledge routine progress messages."
+      "text": "Send inter-agent updates only for needed start/admission, material blocker, contract/authority change, candidate/freeze readiness, or final return. For long work, at most one concise milestone per ten minutes unless parent sets another cadence. Do not acknowledge routine progress."
     },
     {
       "id": "COORDINATION_ECONOMY.EVENT_WAIT",
-      "text": "Use the longest bounded wait available and wake on state-changing events. Use agent listing or short polling only after timeout, routing failure, completion notification, or actual state ambiguity."
+      "text": "Use the longest bounded wait and wake on state-changing events. List agents or short-poll only after timeout, routing failure, completion notice, or real state ambiguity."
     },
     {
       "id": "COORDINATION_ECONOMY.BROAD_VALIDATOR_RECEIPT",
-      "text": "When a broad validator failure is bound solely to an unchanged out-of-scope subject, publish and reuse one blocker receipt while focused owned-path checks continue. Rerun the broad validator only at candidate freeze, when the blocking subject changes, or when a declared global invalidation key changes."
+      "text": "If a broad validator fails only on an unchanged out-of-scope subject, publish/reuse one blocker receipt while focused owned-path checks continue. Rerun only at freeze, after that subject changes, or after a declared global invalidation key changes."
     }
   ]
 }

@@ -6,19 +6,19 @@
   "clauses": [
     {
       "id": "HANDOFF.STRUCTURED_RETURN_FIRST",
-      "text": "Use the structured role result directly when the result fits safely in the return channel and no exact state can be lost. Do not convert every role return into a package."
+      "text": "Use the structured role result when the channel carries it losslessly; do not package every return."
     },
     {
       "id": "HANDOFF.MATERIAL_PACKAGE",
-      "text": "Create `bbk.handoff.v2` only for large or truncation-sensitive output, binary content, cross-process/session/host or durable recovery, a schema or external-interface requirement, or exact artifact/evidence closure that cannot be represented safely in the role result."
+      "text": "Create `bbk.handoff.v2` only for large/truncation-sensitive output, binary content, cross-process/session/host transfer or durable recovery, schema/external-interface need, or exact artifact/evidence closure unsafe in the role result."
     },
     {
       "id": "HANDOFF.BIND",
-      "text": "For a material package, bind safe project-relative paths, exact subject and revision, producer attempt, disposition, canonicalization, manifests, hashes, byte counts, and receipt through the BBK package engine. Do not reconstruct generated identity fields with shell commands."
+      "text": "For a material package, use the BBK package engine to bind safe project-relative paths, exact subject/revision, producer attempt, disposition, canonicalization, manifests, hashes, byte counts, and receipt. Do not rebuild generated identity fields with shell commands."
     },
     {
       "id": "HANDOFF.VERIFY_ONCE_REUSE",
-      "text": "The producer seals and verifies the package once. Consumers validate the current verifier receipt and expected binding; they do not rerun the underlying verifier merely because the result crossed a role, process, session, or orchestration boundary. Rerun only after changed bytes or declared invalidation keys, a missing or mismatched receipt, observed corruption, or an explicitly justified independent method."
+      "text": "Producer seals and verifies once. Consumers validate the current verifier receipt and expected binding. Crossing role/process/session/orchestration boundaries alone does not trigger a rerun; rerun only after changed bytes/declared keys, missing/mismatched receipt, observed corruption, or an explicitly justified independent method."
     },
     {
       "id": "HANDOFF.SEPARATE_STATE",
@@ -26,11 +26,11 @@
     },
     {
       "id": "HANDOFF.HISTORY",
-      "text": "Preserve partial, failed, blocked, cancelled, stale, superseded, and predecessor state. Never overwrite a published record to make a successor appear originally successful."
+      "text": "Preserve partial, failed, blocked, cancelled, stale, superseded, and predecessor state. Never rewrite a published record to make a successor look originally successful."
     },
     {
       "id": "HANDOFF.CHANNEL_LIMIT",
-      "text": "Use live messages for concise coordination and verified references. A durable package is not required when the structured result is lossless, and chat never substitutes for a required exact carrier."
+      "text": "Use live messages for brief coordination and verified references. A lossless structured result needs no package; chat cannot replace a required exact carrier."
     }
   ]
 }

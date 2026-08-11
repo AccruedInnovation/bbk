@@ -6,27 +6,27 @@
   "clauses": [
     {
       "id": "ROLLING_WAVE.FAST_CONTINUATION",
-      "text": "Use `FAST_CONTINUATION` with architecture mode `ADOPT_AND_GAP` when an accepted outcome and architecture already exist. Bind them, assess only material gaps, update project coverage, and compile the first executable frontier."
+      "text": "Use `FAST_CONTINUATION` with architecture mode `ADOPT_AND_GAP` when accepted outcome and architecture exist. Bind them, assess material gaps only, update coverage, and compile the first executable frontier."
     },
     {
       "id": "ROLLING_WAVE.ROADMAP_READY",
-      "text": "`ROADMAP_READY` requires a coarse whole-project capability and phase map, stable interfaces and owners, dependencies, material risk and authority inventory, coverage, and refinement triggers. It does not require exact future WorkUnits, Worker contracts, assertion methods, commands, or return details."
+      "text": "`ROADMAP_READY` needs a coarse whole-project capability/phase map, stable interfaces/owners, dependencies, material risk/authority inventory, coverage, and refinement triggers—not exact future WorkUnits, Worker contracts, assertion methods, commands, or returns."
     },
     {
       "id": "ROLLING_WAVE.FRONTIER_READY",
-      "text": "`FRONTIER_READY` requires exact scope, ownership, authority and effects, inputs, interfaces, outputs, focused and completion checks, profile/runtime constraints, cleanup, checkpoint, return, and invalidation state for only the next one or two execution slices. `FRONTIER_READY` is sufficient for execution admission."
+      "text": "`FRONTIER_READY` needs exact scope, ownership, authority/effects, inputs, interfaces, outputs, focused/completion checks, profile/runtime constraints, cleanup, checkpoint, return, and invalidation state for only the next one or two slices. It is sufficient for execution admission."
     },
     {
       "id": "ROLLING_WAVE.FULLY_COMPILED_OPTIONAL",
-      "text": "`FULLY_COMPILED` is optional unless an explicit regulated, contractual, fixed-program, or user requirement demands full pre-execution compilation."
+      "text": "`FULLY_COMPILED` is optional unless regulation, contract, fixed program, or explicit user requirement demands full pre-execution compilation."
     },
     {
       "id": "ROLLING_WAVE.FRONTIER_IMMUTABILITY",
-      "text": "Freeze the admitted current frontier. Refine the next frontier concurrently without mutating current WorkUnits or their stable interfaces."
+      "text": "Freeze the admitted frontier. Refine the next frontier concurrently without changing current WorkUnits or stable interfaces."
     },
     {
       "id": "ROLLING_WAVE.STOP_AT_FRONTIER",
-      "text": "Stop planning and return execution-ready state as soon as the first valid frontier exists. Future refinement is not a reason to delay current work."
+      "text": "Return execution-ready state as soon as the first valid frontier exists; future refinement must not delay current work."
     }
   ]
 }

@@ -6,23 +6,23 @@
   "clauses": [
     {
       "id": "EVIDENCE_REPLAY.IDENTITY",
-      "text": "Separate the semantic command identity from its physical execution attempts."
+      "text": "Keep semantic command identity separate from physical execution attempts."
     },
     {
       "id": "EVIDENCE_REPLAY.ELIGIBILITY",
-      "text": "When a command is read-only or idempotent inside a disposable scope, product mutation and external effects are proven `NONE`, cleanup is complete, invocation identity remains exact, the candidate is not frozen, and only evidence capture failed, record `EVIDENCE_CAPTURE_FAILED` and permit one repaired physical replay in the same execution attempt."
+      "text": "Permit one repaired physical replay in the same execution attempt only when the command is read-only or disposable-scope idempotent; mutation/effects are proven `NONE`; cleanup is complete; invocation identity is exact; candidate is not frozen; and only capture failed. Record `EVIDENCE_CAPTURE_FAILED`."
     },
     {
       "id": "EVIDENCE_REPLAY.LINEAGE",
-      "text": "Give the replay a new physical command-attempt ID while retaining the same semantic command ID. Preserve both attempts and the eligibility proof."
+      "text": "Give replay a new physical command-attempt ID and keep the semantic command ID. Preserve both attempts and eligibility proof."
     },
     {
       "id": "EVIDENCE_REPLAY.NO_PLANNING",
-      "text": "Do not route an eligible capture failure to planning or create a successor execution attempt. A second capture failure is a technical blocker owned by the execution/tooling layer."
+      "text": "Do not send an eligible capture failure to planning or create a successor execution attempt. A second capture failure is a technical blocker owned by execution/tooling."
     },
     {
       "id": "EVIDENCE_REPLAY.PROHIBITIONS",
-      "text": "Replay is prohibited after candidate freeze or whenever mutation, effects, cleanup, idempotence, invocation identity, or result semantics are uncertain."
+      "text": "Do not replay after freeze or when mutation, effects, cleanup, idempotence, invocation identity, or result semantics are uncertain."
     }
   ]
 }

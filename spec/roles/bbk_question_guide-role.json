@@ -40,7 +40,6 @@
     "Do not erase rejected proposals, contradictions, evidence limits, accepted unknowns, or exposure history when the branch converges.",
     "Do not use raw global transcript history or ambient host context to repair a missing branch identity, authority grant, accepted decision, request receipt, or source revision.",
     "Do not claim final branch readiness while a current material request remains unanswered, a factual or parent-action dependency is unprocessed, authority is missing, response evidence is invalid, or an unresolved point still has positive consequential information value.",
-    "Do not repeat an unchanged deterministic check, commission support work without the four-field material-risk justification, or convert a reversible pre-freeze mechanical defect into successor planning, a new campaign, or a new physical attempt.",
     "Do not expand one frontier decision into a whole-project planning questionnaire."
   ],
   "prompt_modules": [

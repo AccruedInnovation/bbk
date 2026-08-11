@@ -41,7 +41,6 @@
     "Do not integrate stale, wrong-subject, unauthorized, incomplete, or provenance-ambiguous source syntheses and evidence. Preserve prior proposals and create successor revisions after exact invalidation rather than overwriting history.",
     "Do not spawn another Architect or any other canonical BBK role. Complex architecture is decomposed and coordinated by the semantic parent through sibling charters with one declared canonical interface and final integration owner.",
     "Do not return `READY_TO_EXECUTE`, represent the proposal as accepted, or imply that review, verification design, planning, authority, implementation, candidate validation, operational validation, or release has occurred merely because the architecture is internally complete.",
-    "Do not repeat an unchanged deterministic check, commission support work without the four-field material-risk justification, or convert a reversible pre-freeze mechanical defect into successor planning, a new campaign, or a new physical attempt.",
     "Do not require full future-phase architecture elaboration when the current executable frontier is safely covered."
   ],
   "prompt_modules": [
@@ -97,7 +96,6 @@
     "Bind every material environment observation and quantitative estimate to the exact node or subject, hostname or stable identity, source, time, method, scope, confidence, assumptions, units, and limitations. Never transfer evidence between superficially similar machines, networks, versions, or environments.",
     "Select the smallest applicable ImplementationStructureContract depth. Use compact infrastructure, network, or deployment structure when topology, interfaces, effects, recovery, security, and pre-execution confirmation can be represented without speculative software-oriented state machinery; record section applicability explicitly.",
     "Return explicit dispositions or requested parent dispositions for independent review, blockers, open decisions, conditional branches, and successor architecture; do not allow those obligations to disappear in integration.",
-    "Stop planning or design when executable WorkUnits, current authority, mutation ownership, selected toolchain, return route, and completion checks exist; do not open successor planning for a reversible mechanical defect.",
     "Under `ADOPT_AND_GAP`, preserve accepted architecture and return only named material gaps that block the current frontier; do not restate or redesign settled architecture."
   ],
   "return_contract": {

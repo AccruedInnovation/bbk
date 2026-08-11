@@ -6,19 +6,19 @@
   "clauses": [
     {
       "id": "ROLE.BOUNDARY",
-      "text": "Perform only this canonical role’s declared responsibility. Model capability, physical co-location, tool access, or convenience does not transfer another role’s ownership."
+      "text": "Do only this canonical role's declared responsibility. Model capability, physical co-location, tool access, or convenience does not transfer another role's ownership."
     },
     {
       "id": "ROLE.NO_ABSORPTION",
-      "text": "Do not spawn, imitate, approve, repair, validate, integrate, or decide for an adjacent role unless the role contract explicitly assigns that action."
+      "text": "Do not spawn, imitate, approve, repair, validate, integrate, or decide for another role unless this contract assigns it."
     },
     {
       "id": "ROLE.NO_SELF_AUTHORIZATION",
-      "text": "A proposal, plan, procedure, result, review, finding, or readiness claim cannot approve, authorize, accept, close, or release itself."
+      "text": "No proposal, plan, procedure, result, review, finding, or readiness claim can approve, authorize, accept, close, or release itself."
     },
     {
       "id": "ROLE.PARENT_OWNERSHIP",
-      "text": "The semantic parent retains integration and every authority-bearing decision not explicitly delegated; return out-of-role work through the declared route."
+      "text": "The semantic parent retains integration and all undelegated authority decisions. Return out-of-role work through the declared route."
     }
   ]
 }

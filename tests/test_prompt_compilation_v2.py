@@ -111,6 +111,68 @@ class PromptCompilationV2Tests(unittest.TestCase):
         self.assertTrue(any(key.startswith("tools:") for key in result.manifest["invalidation_keys"]))
         self.assertTrue(any(key.startswith("adapter:") for key in result.manifest["invalidation_keys"]))
 
+    def test_dynamic_role_module_closure_is_host_scoped_without_changing_procedures(self) -> None:
+        role = dict(self.roles["bbk_worker"])
+        package = cp.load_prompt_modules(ROOT)
+        selected = set(role["prompt_modules"]) | {
+            "bbk-prompt-context-human-relay",
+            "bbk-prompt-human-request",
+        }
+        role["prompt_modules"] = [
+            module_id for module_id in package.ordered_ids if module_id in selected
+        ]
+        results = {
+            harness: cp.compile_role_prompt(
+                "base",
+                role,
+                harness=harness,
+                profile_procedures=["bbk-profile-routing"],
+                root=ROOT,
+            )
+            for harness in ("omp", "codex", "claude", "pi", "generic")
+        }
+        procedure_sets = {
+            tuple(item["id"] for item in result.manifest["procedures"])
+            for result in results.values()
+        }
+        self.assertEqual(1, len(procedure_sets))
+        self.assertIn("bbk-prompt-profile-dispatch", results["codex"].prompt)
+        omp_only = [
+            clause["text"]
+            for module in package.modules
+            for clause in module["clauses"]
+            if clause.get("hosts") == ["omp"]
+        ]
+        self.assertEqual(5, len(omp_only))
+        for clause_text in omp_only:
+            self.assertIn(clause_text, results["omp"].prompt)
+            for harness in ("codex", "claude", "pi", "generic"):
+                self.assertNotIn(clause_text, results[harness].prompt)
+
+    def test_controller_module_closure_is_host_scoped_without_changing_procedures(self) -> None:
+        results = {
+            harness: cp.compile_controller_prompt("base", harness=harness, root=ROOT)
+            for harness in ("omp", "codex", "claude", "pi", "generic")
+        }
+        procedure_sets = {
+            tuple(item["id"] for item in result.manifest["procedures"])
+            for result in results.values()
+        }
+        self.assertEqual(1, len(procedure_sets))
+        package = cp.load_prompt_modules(ROOT)
+        scoped_texts = [
+            clause["text"]
+            for module in package.modules
+            if f"<!-- BBK compiled prompt module {module['id']} -->" in results["omp"].prompt
+            for clause in module["clauses"]
+            if clause.get("hosts") == ["omp"]
+        ]
+        self.assertEqual(4, len(scoped_texts))
+        for clause_text in scoped_texts:
+            self.assertIn(clause_text, results["omp"].prompt)
+            for harness in ("codex", "claude", "pi", "generic"):
+                self.assertNotIn(clause_text, results[harness].prompt)
+
     def test_followup_reuse_requires_exact_invalidation_vector(self) -> None:
         role = self.roles["bbk_worker"]
         result = cp.compile_role_prompt(

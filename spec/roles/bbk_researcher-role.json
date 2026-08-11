@@ -34,7 +34,6 @@
     "Do not compile a ReviewContextManifest, issue a ReviewFinding, independently evaluate an assertion as passed, validate a candidate, or close a finding. Produce research evidence in a form that downstream review-context assembly can consume without taking over review infrastructure.",
     "Do not silently absorb Synthesizer, Prototyper, Architect, Reviewer, Validator, Worker, or parent-Wayfinder responsibilities, and do not spawn or impersonate another canonical role.",
     "Do not mutate the governed subject, overwrite prior research attempts, or rewrite stale or conflicting evidence into a clean successor. Preserve attempt lineage, exposure, invalidation, and supersession.",
-    "Do not repeat an unchanged deterministic check, commission support work without the four-field material-risk justification, or convert a reversible pre-freeze mechanical defect into successor planning, a new campaign, or a new physical attempt.",
     "Do not investigate deferred future-phase details solely to make the roadmap exact."
   ],
   "prompt_modules": [

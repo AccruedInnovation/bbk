@@ -6,23 +6,23 @@
   "clauses": [
     {
       "id": "MECHANICAL.CLASSIFY",
-      "text": "Classify encoding, BOM, newline, terminal-newline, canonicalization, serialization, schema shape, controlled vocabulary, generated metadata, path normalization, digest, byte count, manifest, package, carrier, locator, ledger/checkpoint formatting, and deterministic profile/tool projection defects as mechanical unless they alter semantics, authority, interfaces, protected floors, ownership, external effects, or completion meaning."
+      "text": "Encoding, BOM, newline, terminal-newline, canonicalization, serialization, schema shape, controlled vocabulary, generated metadata, path normalization, digest, byte count, manifest, package, carrier, locator, ledger/checkpoint formatting, and deterministic profile/tool projection defects are mechanical unless they change semantics, authority, interfaces, protected floors, ownership, external effects, or completion meaning."
     },
     {
       "id": "MECHANICAL.CANONICAL_IDENTITY",
-      "text": "Canonicalize before assigning raw-byte identity. Declare encoding, BOM, line-ending, terminal-newline, deterministic serialization policy, and whether canonical content, raw bytes, or both govern; record both digests when both matter."
+      "text": "Canonicalize before raw-byte identity. Declare encoding, BOM, line endings, terminal newline, deterministic serialization policy, and whether canonical content, raw bytes, or both govern; record both digests when both matter."
     },
     {
       "id": "MECHANICAL.SAME_ATTEMPT_REPAIR",
-      "text": "For a reversible pre-freeze mechanical failure, preserve the failed materialization and receipt, regenerate only the affected artifact or receipt, rerun only the affected gate, and continue in the same semantic run and physical attempt. Do not create successor planning, architecture, review, WorkUnit, authority package, campaign, or attempt."
+      "text": "For reversible pre-freeze mechanical failure, preserve failed material/receipt, regenerate only the affected artifact/receipt, rerun only the affected gate, and continue the same semantic run and physical attempt. Do not create successor planning, architecture, review, WorkUnit, authority package, campaign, or attempt."
     },
     {
       "id": "MECHANICAL.AFTER_FREEZE",
-      "text": "After candidate freeze, a product-byte repair creates a successor candidate and the smallest affected recheck. It creates successor planning only when a governing semantic assumption, interface, authority condition, protected floor, ownership rule, or completion meaning changed."
+      "text": "After freeze, product-byte repair creates a successor candidate and the smallest affected recheck. Create successor planning only if a governing semantic assumption, interface, authority, protected floor, ownership, or completion meaning changed."
     },
     {
       "id": "MECHANICAL.SEMANTIC_OWNER",
-      "text": "Route contradictions of meaning, interface changes, insufficient semantic evidence, governing-policy questions, safety/security exposure, and authority ambiguity to the exact semantic owner. Name any required additional grant rather than disguising it as technical repair."
+      "text": "Route contradictions of meaning, interface changes, insufficient semantic evidence, governing-policy questions, safety/security exposure, and authority ambiguity to the exact semantic owner. Name any required additional grant; do not disguise it as technical repair."
     }
   ]
 }

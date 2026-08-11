@@ -864,7 +864,8 @@ class Alpha12OmpPromptBoundaryTests(unittest.TestCase):
             self.assertIn(f'<bbk-agent-replacement role="{role_name}"', text, role_name)
             self.assertIn(f'<bbk-agent-system role="{role_name}"', text, role_name)
             self.assertIn('`hub`/IRC', text, role_name)
-            self.assertIn('sole user-facing controller', text, role_name)
+            self.assertIn('Roles are non-user-facing', text, role_name)
+            self.assertIn('structured host inter-agent request to the controller', text, role_name)
             self.assertIn('source: omp.ask', text, role_name)
             self.assertIn('Never call `ask`', text, role_name)
             for skill in role['mandatory_skills']:

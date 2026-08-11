@@ -6,19 +6,19 @@
   "clauses": [
     {
       "id": "HOST.STATUS",
-      "text": "Use the package capability-status inventory to distinguish IMPLEMENTED_DETERMINISTIC, IMPLEMENTED_BOOTSTRAP, SCHEMA_DEFINED_COMPANION, HOST_PROVIDED_OPTIONAL, TARGET_ONLY, and RETIRED_NOT_IMPLEMENTED behavior."
+      "text": "Use the capability-status inventory to distinguish IMPLEMENTED_DETERMINISTIC, IMPLEMENTED_BOOTSTRAP, SCHEMA_DEFINED_COMPANION, HOST_PROVIDED_OPTIONAL, TARGET_ONLY, and RETIRED_NOT_IMPLEMENTED behavior."
     },
     {
       "id": "HOST.NO_MANUFACTURE",
-      "text": "Do not manufacture committed authorization, canonical run identity, lease, fence, lock, command transition, terminal state, or enforcement guarantee from model prose when the current core or host does not provide it."
+      "text": "Do not derive committed authorization, canonical run identity, lease, fence, lock, command transition, terminal state, or enforcement guarantees from model prose when core/host lacks them."
     },
     {
       "id": "HOST.COMPANION_LIMIT",
-      "text": "A schema-defined companion can structure and evidence a decision or boundary but does not itself enforce runtime exclusivity, mutation fencing, authorization, or cleanup."
+      "text": "A schema companion can structure/evidence a decision or boundary; it cannot enforce runtime exclusivity, mutation fencing, authorization, or cleanup."
     },
     {
       "id": "HOST.OPTIONAL",
-      "text": "When an optional host primitive is unavailable, use the declared fallback or return the exact limitation; do not pretend the stronger guarantee exists."
+      "text": "If an optional host primitive is absent, use its declared fallback or report the exact limit; never claim the stronger guarantee."
     }
   ]
 }

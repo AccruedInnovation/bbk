@@ -10,16 +10,17 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 try:
-    from prompt_modules import compact_skill_template, load_prompt_modules, ordered_modules, render_module, strip_frontmatter, validate_skill_templates
+    from prompt_modules import clauses_for_harness, compact_skill_template, load_prompt_modules, ordered_modules, strip_frontmatter, validate_skill_templates
 except ModuleNotFoundError:  # pragma: no cover
     import sys
     sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from prompt_modules import compact_skill_template, load_prompt_modules, ordered_modules, render_module, strip_frontmatter, validate_skill_templates
+    from prompt_modules import clauses_for_harness, compact_skill_template, load_prompt_modules, ordered_modules, strip_frontmatter, validate_skill_templates
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_PATH = ROOT / "spec" / "procedures" / "catalog.json"
@@ -605,13 +606,16 @@ def _project_body(
 
 
 def _resolve_embedded_module_references(body: str, module_ids: Sequence[str]) -> str:
-    """Turn compact procedure placeholders into explicit compiled references."""
+    """Keep each embedded-module dependency visible at its procedure position."""
     for module_id in module_ids:
-        body = body.replace(
-            f"> Apply the already embedded `{module_id}` module here.",
-            f"> The compiled `{module_id}` module above applies at this point.",
+        escaped = re.escape(module_id)
+        body = re.sub(
+            rf"(?m)^[ \t]*> (?:Apply the already embedded|The compiled|Apply embedded|Apply|Apply module) `"
+            rf"{escaped}` (?:module here\.|module above applies at this point\.|here\.|\.)[ \t]*$",
+            f"> Apply `{module_id}`.",
+            body,
         )
-    return body
+    return re.sub(r"\n{3,}", "\n\n", body).strip()
 
 
 def _controller_module_ids(
@@ -629,15 +633,49 @@ def _controller_module_ids(
     return tuple(module["id"] for module in ordered_modules(package, selected))
 
 
-def _embed_controller_modules(base_prompt: str, module_ids: Sequence[str], package: Any) -> str:
-    lines = [base_prompt.rstrip(), "", "## Compiled prompt modules", "", "Every selected procedure dependency is embedded exactly once below."]
+def _embed_role_modules(
+    base_prompt: str,
+    module_ids: Sequence[str],
+    package: Any,
+    harness: str,
+) -> str:
+    lines = [base_prompt.rstrip(), "", "## Compiled prompt modules"]
+    tagged = harness.lower() != "codex"
+    for module in ordered_modules(package, module_ids):
+        module_id = str(module["id"])
+        clauses = clauses_for_harness(module, harness)
+        lines.extend([""])
+        if tagged:
+            lines.extend([
+                f'<bbk-prompt-module id="{module_id}">',
+                *[f"- {clause['text']}" for clause in clauses],
+                "</bbk-prompt-module>",
+            ])
+        else:
+            lines.extend([
+                f"### `{module_id}`",
+                "",
+                *[f"- {clause['text']}" for clause in clauses],
+            ])
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def _embed_controller_modules(
+    base_prompt: str,
+    module_ids: Sequence[str],
+    package: Any,
+    harness: str,
+) -> str:
+    lines = [base_prompt.rstrip(), "", "## Compiled prompt modules"]
     for module in ordered_modules(package, module_ids):
         module_id = str(module["id"])
         lines.extend([
             "",
             f"<!-- BBK compiled prompt module {module_id} -->",
             "",
-            render_module(module),
+            f"### `{module_id}`",
+            "",
+            *[f"- `{clause['id']}` — {clause['text']}" for clause in clauses_for_harness(module, harness)],
             "",
             f"<!-- End BBK compiled prompt module {module_id} -->",
         ])
@@ -645,15 +683,30 @@ def _embed_controller_modules(base_prompt: str, module_ids: Sequence[str], packa
 
 
 def render_compiled_tail(records: Sequence[Mapping[str,Any]], bodies: Mapping[str,str], primary: str) -> str:
-    lines=["## Compiled procedures manifest","","These complete procedures are compiled developer instructions. They are not external skill selections and require no model filesystem read.",""]
+    lines = [
+        "## Compiled procedures manifest",
+        "",
+        "Procedure state and digest details remain in the machine manifest.",
+        "",
+    ]
     for rec in records:
-        lines += [f"- id: {rec['id']}",f"  version: {rec['version']}",f"  source_sha256: {rec['source_sha256']}",f"  effective_sha256: {rec['effective_sha256']}",f"  selection_reason: {rec['selection_reason']}",f"  ordering: {rec['ordering']}","  catalog_visibility: SUPPRESSED","  state: COMPILED_COMPLETE",""]
-    lines += ["## Compiled procedures",""]
+        lines += [
+            f"- id: {rec['id']}",
+            "  state: COMPILED_COMPLETE",
+            "  catalog_visibility: SUPPRESSED",
+        ]
+    lines += [
+        "",
+        "## Compiled procedures",
+        "",
+        "Complete developer instructions in execution order; primary last. All are `COMPILED_COMPLETE`, catalog `SUPPRESSED`; no external selection or model filesystem read.",
+        "",
+    ]
     for rec in records:
-        label="Compiled primary procedure" if rec["id"]==primary else "Compiled procedure"
-        lines += [f"### {label}: `{rec['id']}`","",bodies[str(rec['id'])],""]
+        label = "Compiled primary procedure" if rec["id"] == primary else "Compiled procedure"
+        lines += [f"### {label}: `{rec['id']}`", "", bodies[str(rec["id"])], ""]
     lines.append("## End compiled procedures")
-    return "\n".join(lines).rstrip()+"\n"
+    return "\n".join(lines).rstrip() + "\n"
 
 
 def compile_plan(
@@ -705,11 +758,19 @@ def compile_plan(
     prompt=(base_prompt.rstrip()+"\n\n"+tail).rstrip()+"\n"
     if embedded_prompt_modules:
         if "Apply the already embedded" in prompt:
-            raise CompiledProcedureError("BBK-CP-009", "controller prompt contains unresolved embedded-module placeholders")
+            raise CompiledProcedureError("BBK-CP-009", "compiled prompt contains unresolved embedded-module placeholders")
         for module_id in embedded_prompt_modules:
-            marker = f"<!-- BBK compiled prompt module {module_id} -->"
-            if prompt.count(marker) != 1:
-                raise CompiledProcedureError("BBK-CP-009", f"controller prompt must embed {module_id} exactly once")
+            controller_marker = f"<!-- BBK compiled prompt module {module_id} -->"
+            role_marker = f'<bbk-prompt-module id="{module_id}">'
+            codex_marker = f"### `{module_id}`"
+            if controller_marker in prompt:
+                count = prompt.count(controller_marker)
+            elif role_marker in prompt:
+                count = prompt.count(role_marker)
+            else:
+                count = prompt.count(codex_marker)
+            if count != 1:
+                raise CompiledProcedureError("BBK-CP-009", f"compiled prompt must embed {module_id} exactly once")
     suppression=[str(x["id"]) for x in records]
     classifications={str(x["id"]):str(x.get("catalog_classification")) for x in registry["procedures"]}
     external=tuple(x for x in plan.available_procedures if x not in set(suppression) and classifications.get(x)=="EXTERNAL_OPTIONAL")
@@ -774,6 +835,31 @@ def compile_role_prompt(
         procedure_registry=registry,
         **context,
     )
+    selected_module_ids = _controller_module_ids(plan, registry, package)
+    module_ids = tuple(
+        module["id"]
+        for module in ordered_modules(
+            package,
+            {
+                *[str(value) for value in role.get("prompt_modules") or ()],
+                *selected_module_ids,
+            },
+        )
+    )
+    base_prompt = _embed_role_modules(base_prompt, module_ids, package, harness)
+    plan = build_plan(
+        role,
+        identity_kind="ROLE",
+        harness=harness,
+        base_prompt=base_prompt,
+        logical_child_id=logical_child_id,
+        invocation_id=invocation_id,
+        profile_procedures=profile_procedures,
+        invocation_procedures=invocation_procedures,
+        root=root,
+        procedure_registry=registry,
+        **context,
+    )
     return compile_plan(
         base_prompt,
         plan,
@@ -781,6 +867,7 @@ def compile_role_prompt(
         procedure_registry=registry,
         method_content=method,
         prompt_package=package,
+        embedded_prompt_modules=module_ids,
     )
 
 
@@ -823,7 +910,7 @@ def compile_controller_prompt(
         **context,
     )
     module_ids = _controller_module_ids(plan, registry, package)
-    base_prompt = _embed_controller_modules(base_prompt, module_ids, package)
+    base_prompt = _embed_controller_modules(base_prompt, module_ids, package, harness)
     plan = build_plan(
         identity,
         identity_kind="CONTROLLER",

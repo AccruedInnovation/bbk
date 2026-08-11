@@ -72,8 +72,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_root_wayfinder-role.json",
-        "bytes": 24596,
-        "sha256": "a2674ee46acbef0307028d72fd25b7e84531e56e45b14c73a205af4fb8cc560e"
+        "bytes": 23933,
+        "sha256": "dd4a40e9c0cb8dd04242fc4f6baeb593af2ff636fd8770af50af5202fc6e30bb"
       }
     },
     {
@@ -124,8 +124,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_territory_wayfinder-role.json",
-        "bytes": 27538,
-        "sha256": "10c2157cc9867e5f33eaf802b14a1d08159f91a55d37068efc891f92535ddccb"
+        "bytes": 26875,
+        "sha256": "80992f641f8b431b886cba58f3f812019c1307af49dd05ff927af1b0461411f7"
       }
     },
     {
@@ -175,8 +175,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_questioning_wayfinder-role.json",
-        "bytes": 29593,
-        "sha256": "5318deb299012f377f70fb6f33d1fe39f627e387b8ac77e94be8d852472d7f2b"
+        "bytes": 29064,
+        "sha256": "a9e8add74b73224df5033759472a25939ac4d18e30f9e7c11604f897932f7f20"
       }
     },
     {
@@ -228,8 +228,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_planning_wayfinder-role.json",
-        "bytes": 33455,
-        "sha256": "27715b7a9ec4e8239fba41183f21164e0541c6a6217afc93c08babfc94a7cd16"
+        "bytes": 32667,
+        "sha256": "40f3e5f9c206010503bbefca69db9e3f6ff8a2276e741a87fd0072611d38df44"
       }
     },
     {
@@ -281,8 +281,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_phase_wayfinder-role.json",
-        "bytes": 37958,
-        "sha256": "91f2cfca2ad9c3faad0773223040a7fbba6e6c8267da47fddd66753f195aa25c"
+        "bytes": 37170,
+        "sha256": "ad2110de92736dbb240c001c8ce62271e06346f2f7d27804e82f9a2e43ff1670"
       }
     },
     {
@@ -331,8 +331,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_question_guide-role.json",
-        "bytes": 31394,
-        "sha256": "b12d0544c238b35ad32d2dc5a3a6aaeef5fac948a9c4648f4559034650487243"
+        "bytes": 31142,
+        "sha256": "f6892bb1d679b25e4ebbf4c9d83ed1815c04eb16423d04a079936fd54aa09a9b"
       }
     },
     {
@@ -382,8 +382,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_researcher-role.json",
-        "bytes": 25928,
-        "sha256": "4a73f38c2d703da04cdb0c40c9e091a0f38eba29843581855d7a21b71bedf58a"
+        "bytes": 25676,
+        "sha256": "e539ab5370b811bc18e9aad1368336cf33cbafed385479d0c6d893a880562fc0"
       }
     },
     {
@@ -433,8 +433,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_prototyper-role.json",
-        "bytes": 38922,
-        "sha256": "1aaf7746c7bee5f55f73ce71a0febdfbbcdee41144353f63914736b552d5a7d7"
+        "bytes": 38670,
+        "sha256": "0facff8c909ac7f69db9bb10c8f36308d6395868e86b0b487dbb4a559563454d"
       }
     },
     {
@@ -483,8 +483,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_synthesizer-role.json",
-        "bytes": 25671,
-        "sha256": "b6ddcd74578119fcac2a85c74a9537beb6983b01ea2345daa69d4e4eb2066a45"
+        "bytes": 25419,
+        "sha256": "3b97e30d5653a4b3488608c2e5d580a83922f7295d7fb09fe551e41fab8336a6"
       }
     },
     {
@@ -534,8 +534,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_architect-role.json",
-        "bytes": 44128,
-        "sha256": "d922be3246fff6b6c7463820d97783d0272f1369c57d95b092f05590d161c59f"
+        "bytes": 43649,
+        "sha256": "233a07f783f18bb49c80570c2ca8b61161201665ef75cabb9f72bf21f5d1a77c"
       }
     },
     {
@@ -586,8 +586,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_verification_designer-role.json",
-        "bytes": 37334,
-        "sha256": "ae72ce4f38cdda2c0dad18173227f099bba7e4f072f2c5e60a1f3715142779b6"
+        "bytes": 37082,
+        "sha256": "215b969ca81349cb1adca9842e29d7baf24e4a45740262c9369d2b5d737408e4"
       }
     },
     {
@@ -638,8 +638,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_worker_designer-role.json",
-        "bytes": 43874,
-        "sha256": "3812aadd2d0d017d222309f8e417720f840906a15fe4e78aa516958c4291e984"
+        "bytes": 43313,
+        "sha256": "7627cfb10c6b4f8c9c44d88b153783dfe9009556f9c93d1d96fe9d7b5f69e37f"
       }
     },
     {
@@ -689,8 +689,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_reviewer-role.json",
-        "bytes": 39032,
-        "sha256": "d1e83943559bca97a0a9ccc369714173bfff9510631b7944cef53328526e8859"
+        "bytes": 38526,
+        "sha256": "a2ed3992794fb87ba16b82af956f9088faae94fdbf2c6ee6b647dbdfafc71255"
       }
     },
     {
@@ -742,8 +742,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_root_orchestrator-role.json",
-        "bytes": 46099,
-        "sha256": "f4d395425bc1f2f2ed6ee233e649ac4a6e5af4dfd3c619dad4cfd580a765bd8f"
+        "bytes": 44783,
+        "sha256": "da15d4d3612d0193dcb8e387ef3df164d1daf4a5cf96dbea4023f2917d4ef5e9"
       }
     },
     {
@@ -793,8 +793,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_territory_orchestrator-role.json",
-        "bytes": 46329,
-        "sha256": "435298ace14dc91c86824509308d99ead09c75618d5456baedf0ce28f83589b5"
+        "bytes": 45311,
+        "sha256": "b73daf38c15f67bd7377f9c933e0c1bb0fa4d740715df9b12569f349d4c05c55"
       }
     },
     {
@@ -844,8 +844,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_worker_orchestrator-role.json",
-        "bytes": 44658,
-        "sha256": "6491c868d3ce136d27f57ec74476eeff16514f8408f8901382d0f30a7231e476"
+        "bytes": 44247,
+        "sha256": "18c7f114eb7b5c25a8ded934c8fbd60c64a07118f176bf2212b5a8166dd0e431"
       }
     },
     {
@@ -896,8 +896,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_validator_orchestrator-role.json",
-        "bytes": 47511,
-        "sha256": "3259c5ac61a58624a2f12d2cd23e0c8b5db156753dab20b65ae515125ef18968"
+        "bytes": 47259,
+        "sha256": "4a4428fc55d005541388ac80d8c62eb28acb44ec333a087682504792087d90ec"
       }
     },
     {
@@ -947,8 +947,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_worker-role.json",
-        "bytes": 36156,
-        "sha256": "1a2c462e6e08f418a8fc1a52566a3873de281be5c87a6e9b843b87141e88c70e"
+        "bytes": 34948,
+        "sha256": "9e241d1a9fe906b7bb70723b0fed6c49018061e5a89b4ba4e775ee93b43fb900"
       }
     },
     {
@@ -998,8 +998,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_validator-role.json",
-        "bytes": 37447,
-        "sha256": "e4fcb551d8db09678830a27451929ad3e891c4995b17773ba9eef7548eb6d6f5"
+        "bytes": 37195,
+        "sha256": "b024cbb84d6ac071434518d588a606bebb287b73b85c68c68f77b929d3aa8027"
       }
     }
   ]

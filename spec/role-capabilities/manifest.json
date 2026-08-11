@@ -1,126 +1,126 @@
 {
   "generator": "tools/generate_role_capabilities.py",
-  "manifest_digest": "sha256:dd7e51749cfac67b13646c59a4e64db793b93f605d4abc41dc1c2bffcb99ce9f",
+  "manifest_digest": "sha256:d81f67415eb0628a5e2c05bfc7463a5669e5987e1debc8342a6912b9d5c0f959",
   "policy_version": "1.0.0-alpha.17",
   "profile": "governed-software",
   "role_count": 19,
   "roles": [
     {
-      "manifest_digest": "sha256:436b0920b2cb09b5c12389303312fb2d86be90ca697b699f2d3c1daf35a98db1",
+      "manifest_digest": "sha256:a0c9f7ddd08bfe8cca21ba93029454b153f4a49b83bf00ff4aba508428d21496",
       "path": "spec/role-capabilities/bbk_architect.json",
       "role": "bbk_architect",
-      "source_role_digest": "sha256:d922be3246fff6b6c7463820d97783d0272f1369c57d95b092f05590d161c59f"
+      "source_role_digest": "sha256:233a07f783f18bb49c80570c2ca8b61161201665ef75cabb9f72bf21f5d1a77c"
     },
     {
-      "manifest_digest": "sha256:46ff8ac38101d662f52f8f480caf292f7c6296682866262b7613d75d9d7efab7",
+      "manifest_digest": "sha256:60b8a716254aea442d54b5f973269c067addce81b468b3eb06269ddc8860140c",
       "path": "spec/role-capabilities/bbk_phase_wayfinder.json",
       "role": "bbk_phase_wayfinder",
-      "source_role_digest": "sha256:91f2cfca2ad9c3faad0773223040a7fbba6e6c8267da47fddd66753f195aa25c"
+      "source_role_digest": "sha256:ad2110de92736dbb240c001c8ce62271e06346f2f7d27804e82f9a2e43ff1670"
     },
     {
-      "manifest_digest": "sha256:7bae9de6fcb5f0e030fac4e84e533bfbdd95cee454011823c9f0ee86e52a0f77",
+      "manifest_digest": "sha256:230fca288d47e7357355fc42cda1440e4dc6e83950ae090dc22358fc8e83ec64",
       "path": "spec/role-capabilities/bbk_planning_wayfinder.json",
       "role": "bbk_planning_wayfinder",
-      "source_role_digest": "sha256:27715b7a9ec4e8239fba41183f21164e0541c6a6217afc93c08babfc94a7cd16"
+      "source_role_digest": "sha256:40f3e5f9c206010503bbefca69db9e3f6ff8a2276e741a87fd0072611d38df44"
     },
     {
-      "manifest_digest": "sha256:3cbcf80cd53c38fce8ea2ea5a0bb62bcd6cc8fe71851301293c6851019a348e0",
+      "manifest_digest": "sha256:18e21194688fa9374ee3a1b81c525c55d74653c0e5c086fe3dbe851470b95149",
       "path": "spec/role-capabilities/bbk_prototyper.json",
       "role": "bbk_prototyper",
-      "source_role_digest": "sha256:1aaf7746c7bee5f55f73ce71a0febdfbbcdee41144353f63914736b552d5a7d7"
+      "source_role_digest": "sha256:0facff8c909ac7f69db9bb10c8f36308d6395868e86b0b487dbb4a559563454d"
     },
     {
-      "manifest_digest": "sha256:aa02480a2780f95e699b841cf124a4ffb714621c4c7b62b66045bfba0c15d549",
+      "manifest_digest": "sha256:d2215e4bd987a64345487da6ab5deaa945103138aa41cb8cc884eb7bbe7b5117",
       "path": "spec/role-capabilities/bbk_question_guide.json",
       "role": "bbk_question_guide",
-      "source_role_digest": "sha256:b12d0544c238b35ad32d2dc5a3a6aaeef5fac948a9c4648f4559034650487243"
+      "source_role_digest": "sha256:f6892bb1d679b25e4ebbf4c9d83ed1815c04eb16423d04a079936fd54aa09a9b"
     },
     {
-      "manifest_digest": "sha256:ec03e4def49e66f76099496d93a1fb383e5c04eb9c8c345d2efc356cee093c2b",
+      "manifest_digest": "sha256:531276494e45d083e181a3fb541dec136f609fa3f3622f6f692009e2e5c8e0c8",
       "path": "spec/role-capabilities/bbk_questioning_wayfinder.json",
       "role": "bbk_questioning_wayfinder",
-      "source_role_digest": "sha256:5318deb299012f377f70fb6f33d1fe39f627e387b8ac77e94be8d852472d7f2b"
+      "source_role_digest": "sha256:a9e8add74b73224df5033759472a25939ac4d18e30f9e7c11604f897932f7f20"
     },
     {
-      "manifest_digest": "sha256:ee644aa428f519891315d7eb0d111c846c5a6ca7570d1e32b00d2d47784d69b7",
+      "manifest_digest": "sha256:3cbe31875bbbe879fa0eb055668f49bbf32806ded2148f2578e1e3a4ff2c3b96",
       "path": "spec/role-capabilities/bbk_researcher.json",
       "role": "bbk_researcher",
-      "source_role_digest": "sha256:4a73f38c2d703da04cdb0c40c9e091a0f38eba29843581855d7a21b71bedf58a"
+      "source_role_digest": "sha256:e539ab5370b811bc18e9aad1368336cf33cbafed385479d0c6d893a880562fc0"
     },
     {
-      "manifest_digest": "sha256:35bda32c29be7fa96485284ff63a08b0a7d390be768978196c624814fae5205c",
+      "manifest_digest": "sha256:a1482d48ad9afa9369e2fd189639ee66a7d98761a6dfcae56cbb1480deb7dfd9",
       "path": "spec/role-capabilities/bbk_reviewer.json",
       "role": "bbk_reviewer",
-      "source_role_digest": "sha256:d1e83943559bca97a0a9ccc369714173bfff9510631b7944cef53328526e8859"
+      "source_role_digest": "sha256:a2ed3992794fb87ba16b82af956f9088faae94fdbf2c6ee6b647dbdfafc71255"
     },
     {
-      "manifest_digest": "sha256:de6de7ac4b26fb77bccb9eabdb1dd7f23b994602299b3e1ee04909448cd276c4",
+      "manifest_digest": "sha256:080aabf9be567a0917ee3db08bb07e3c87daca61802010720e2e9362451a2e9d",
       "path": "spec/role-capabilities/bbk_root_orchestrator.json",
       "role": "bbk_root_orchestrator",
-      "source_role_digest": "sha256:f4d395425bc1f2f2ed6ee233e649ac4a6e5af4dfd3c619dad4cfd580a765bd8f"
+      "source_role_digest": "sha256:da15d4d3612d0193dcb8e387ef3df164d1daf4a5cf96dbea4023f2917d4ef5e9"
     },
     {
-      "manifest_digest": "sha256:964ae9ea53c5a81e8d93d96a4b675b326cd00acf8d9c46b0b069bd92fc43580b",
+      "manifest_digest": "sha256:0ade8c002c11dfd6b762482b62edfe9258e34a28dc52bf191c930b4f3b26e620",
       "path": "spec/role-capabilities/bbk_root_wayfinder.json",
       "role": "bbk_root_wayfinder",
-      "source_role_digest": "sha256:a2674ee46acbef0307028d72fd25b7e84531e56e45b14c73a205af4fb8cc560e"
+      "source_role_digest": "sha256:dd4a40e9c0cb8dd04242fc4f6baeb593af2ff636fd8770af50af5202fc6e30bb"
     },
     {
-      "manifest_digest": "sha256:df09b0da862c9811ac51b8d5523981dc5a99f61c7fee716b472da723ac3f08a1",
+      "manifest_digest": "sha256:5d778e636aadc5c62dd49ee66770d691295d05fde0300f5bc369d8e04f48a7d2",
       "path": "spec/role-capabilities/bbk_synthesizer.json",
       "role": "bbk_synthesizer",
-      "source_role_digest": "sha256:b6ddcd74578119fcac2a85c74a9537beb6983b01ea2345daa69d4e4eb2066a45"
+      "source_role_digest": "sha256:3b97e30d5653a4b3488608c2e5d580a83922f7295d7fb09fe551e41fab8336a6"
     },
     {
-      "manifest_digest": "sha256:733e3fcecf8fd218cee495db494704b9cd518ce5152c60ae23a743beda80d9bf",
+      "manifest_digest": "sha256:e1b92061bda4cbb6d9c44bcd40a5abf725070d05f806cf16b430f60fa2d13687",
       "path": "spec/role-capabilities/bbk_territory_orchestrator.json",
       "role": "bbk_territory_orchestrator",
-      "source_role_digest": "sha256:435298ace14dc91c86824509308d99ead09c75618d5456baedf0ce28f83589b5"
+      "source_role_digest": "sha256:b73daf38c15f67bd7377f9c933e0c1bb0fa4d740715df9b12569f349d4c05c55"
     },
     {
-      "manifest_digest": "sha256:be2d9317a4d0daba0f8f6d629b971ab775b6998098534ce4334f1111496a3ce5",
+      "manifest_digest": "sha256:c667dec92c19bd9d7d455e3e6bfb063591d9ac3546fb6d4756ca251b394d72df",
       "path": "spec/role-capabilities/bbk_territory_wayfinder.json",
       "role": "bbk_territory_wayfinder",
-      "source_role_digest": "sha256:10c2157cc9867e5f33eaf802b14a1d08159f91a55d37068efc891f92535ddccb"
+      "source_role_digest": "sha256:80992f641f8b431b886cba58f3f812019c1307af49dd05ff927af1b0461411f7"
     },
     {
-      "manifest_digest": "sha256:57f4a4cb77a73a2d29efddae344c2f890385b6629c43a08733282e94d078594c",
+      "manifest_digest": "sha256:6b10f927f90d37769cb6730f0c64c397b4ee539b18d0762e673aadb3fd2e0520",
       "path": "spec/role-capabilities/bbk_validator.json",
       "role": "bbk_validator",
-      "source_role_digest": "sha256:e4fcb551d8db09678830a27451929ad3e891c4995b17773ba9eef7548eb6d6f5"
+      "source_role_digest": "sha256:b024cbb84d6ac071434518d588a606bebb287b73b85c68c68f77b929d3aa8027"
     },
     {
-      "manifest_digest": "sha256:da4dee0b77532509b6054c927509b1b8251ec4d3a1713bdcf93ef2327ce0a6de",
+      "manifest_digest": "sha256:dbed375d408f7732a96da7a732dfbd126301937b575555999f44217bde8ce0ce",
       "path": "spec/role-capabilities/bbk_validator_orchestrator.json",
       "role": "bbk_validator_orchestrator",
-      "source_role_digest": "sha256:3259c5ac61a58624a2f12d2cd23e0c8b5db156753dab20b65ae515125ef18968"
+      "source_role_digest": "sha256:4a4428fc55d005541388ac80d8c62eb28acb44ec333a087682504792087d90ec"
     },
     {
-      "manifest_digest": "sha256:0f8657f6c0c3ad219f379a344ad14273a718aa73435cbb22476edf36823b926f",
+      "manifest_digest": "sha256:6ebce0c81ecc31ec458b2177c730e3525aa3170be9e88a8397f9db222794506f",
       "path": "spec/role-capabilities/bbk_verification_designer.json",
       "role": "bbk_verification_designer",
-      "source_role_digest": "sha256:ae72ce4f38cdda2c0dad18173227f099bba7e4f072f2c5e60a1f3715142779b6"
+      "source_role_digest": "sha256:215b969ca81349cb1adca9842e29d7baf24e4a45740262c9369d2b5d737408e4"
     },
     {
-      "manifest_digest": "sha256:2f42effa0151752e14d307374edbdac5008fdbafeeb5496e4676d1b248886e96",
+      "manifest_digest": "sha256:0da4db2b25f36def978509bd2e56e7869c7782afc699310f091618494e8d8045",
       "path": "spec/role-capabilities/bbk_worker.json",
       "role": "bbk_worker",
-      "source_role_digest": "sha256:1a2c462e6e08f418a8fc1a52566a3873de281be5c87a6e9b843b87141e88c70e"
+      "source_role_digest": "sha256:9e241d1a9fe906b7bb70723b0fed6c49018061e5a89b4ba4e775ee93b43fb900"
     },
     {
-      "manifest_digest": "sha256:14786c977894bd1e95eb554206b3b95fc1c071e17e74b0a43d74d4a74cc1033f",
+      "manifest_digest": "sha256:7b62d7d512c7f65a185cd969ab5a14761415372737545fe309a3adce8e5eb9b5",
       "path": "spec/role-capabilities/bbk_worker_designer.json",
       "role": "bbk_worker_designer",
-      "source_role_digest": "sha256:3812aadd2d0d017d222309f8e417720f840906a15fe4e78aa516958c4291e984"
+      "source_role_digest": "sha256:7627cfb10c6b4f8c9c44d88b153783dfe9009556f9c93d1d96fe9d7b5f69e37f"
     },
     {
-      "manifest_digest": "sha256:26b711f06be869032fc116c8d64fc194a16bd0e4bc9aca04d412805f52548358",
+      "manifest_digest": "sha256:63413e8d3fe4af1066a25a70ee8da7a8a16cc851f03ef51bf832dae75d86eb5e",
       "path": "spec/role-capabilities/bbk_worker_orchestrator.json",
       "role": "bbk_worker_orchestrator",
-      "source_role_digest": "sha256:6491c868d3ce136d27f57ec74476eeff16514f8408f8901382d0f30a7231e476"
+      "source_role_digest": "sha256:18c7f114eb7b5c25a8ded934c8fbd60c64a07118f176bf2212b5a8166dd0e431"
     }
   ],
   "schema": "bbk.role-capability-manifest.v1",
-  "source_catalog_digest": "sha256:64cafa31d6ee8d7191eab0499f6a5d9352d76489c2af3c881990c93b91c35ccd",
+  "source_catalog_digest": "sha256:17d0c9bbf6c3033ffa58283abc0499975d14f5c8becd369eca9c421458ff482b",
   "source_policy_digest": "sha256:0ab97bacd60ddc7b27524eb5b30bcc33b45fc9c432e1c0d83d7d490ee24ddcc7"
 }

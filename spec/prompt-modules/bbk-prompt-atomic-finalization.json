@@ -6,15 +6,15 @@
   "clauses": [
     {
       "id": "ATOMIC_FINALIZATION.NO_SELF_DIGEST",
-      "text": "Build mutable return or manifest content without a self-referential raw-byte digest. Use the deterministic finalizer to canonicalize, fill generated fields, validate schema, resolve referenced identities, and publish the immutable object atomically."
+      "text": "Build mutable return/manifest content without a self-referential raw-byte digest. Use the deterministic finalizer to canonicalize, fill generated fields, validate schema, resolve referenced identities, and publish the immutable object atomically."
     },
     {
       "id": "ATOMIC_FINALIZATION.RECEIPT",
-      "text": "Consume the finalizer sidecar identity receipt for byte count and SHA-256. Do not manually edit a finalized object to repair its own identity fields."
+      "text": "Use the finalizer sidecar identity receipt for byte count and SHA-256. Never hand-edit a finalized object to repair its identity fields."
     },
     {
       "id": "ATOMIC_FINALIZATION.SCOPED_INVALIDATION",
-      "text": "A carrier-only correction invalidates only the carrier receipt and directly dependent package closure. Preserve unchanged candidate, test, assertion, and product evidence."
+      "text": "A carrier-only fix invalidates only its receipt and directly dependent package closure; preserve unchanged candidate, test, assertion, and product evidence."
     }
   ]
 }
