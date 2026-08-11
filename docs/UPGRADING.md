@@ -37,17 +37,21 @@ python tools/setup.py --install --scope user --codex --uninstall-existing
 python tools/setup.py --install --scope user --omp --codex --pi --claude --generic --uninstall-existing
 ```
 
+After the replacement, start a fresh session in every updated host. Codex enters BBK through `$bbk`; Claude Code uses its installed `/bbk` skill. OMP's identically spelled `/bbk` command activates extension-owned persistent mode instead. A user-scoped Codex upgrade makes `$bbk` available without globally activating BBK.
+
 For project scope:
 
 ```powershell
 python tools/setup.py --install --scope project --root D:\Project --codex --uninstall-existing
 ```
 
+For project-scoped Codex, the installer reconciles a delimited BBK activation block in `AGENTS.md` and preserves all user-authored content outside that block. Start a fresh Codex session in the project after the upgrade.
+
 With no host flag, the installer selects all five targets, which includes OMP and its Node requirement. Missing selected host commands are reported as warnings because BBK may prepare projections before those hosts are installed. Missing core dependencies block before tests, destination reads, or writes and produce the exact bootstrap command.
 
-Status records include the dependency preflight plus per-harness prompt compiler, controller/role projection, catalog, routing, and adapter metadata. Treat mixed package/projection identities as an explicit drift condition rather than assuming semantic parity.
+Status records include the dependency preflight plus per-harness prompt compiler, controller/role projection, catalog, routing, and adapter metadata. Controller projections are not additional child agents: OMP consumes the compiled controller through its extension, while Codex and Claude Code receive it through their installed `$bbk` and `/bbk` skill surfaces respectively. Treat mixed package/projection identities as an explicit drift condition rather than assuming semantic parity.
 
-The package-owned canonical sources classified `COMPILED_ONLY` or `COMPILER_SELECTABLE` must remain outside model-discoverable skill directories. Do not copy the package's complete `shared/skills/` tree into `.agents/skills` or another host autoload root. The installer places only `EXTERNAL_OPTIONAL` procedures in those roots.
+Package-owned canonical sources classified `COMPILED_ONLY` or `COMPILER_SELECTABLE` normally remain outside model-discoverable skill directories. The controller's `$bbk` skill is the deliberate Codex/Claude delivery surface, not permission to copy the package's complete `shared/skills/` tree into `.agents/skills` or another host autoload root. Other installed procedures remain limited to the catalogued external skill surface.
 
 Rollback is a clean replacement with a preserved predecessor package. Qualification evidence applies only to the exact package bytes it records; changed Alpha.17.0.2.1 bytes need their own live-provider evidence when that claim is required.
 

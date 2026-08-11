@@ -241,7 +241,78 @@ def make_desired_files(
             source=install_tool.json_path(source_path),
             is_executable=bool(source_path.stat().st_mode & 0o111),
         )
+    controller_spec = json.loads(install_tool.SPEC_PATH.read_text(encoding="utf-8"))
+    add_desired(
+        desired,
+        agent_skills / "bbk" / "SKILL.md",
+        install_tool.rendered_controller_skill(controller_spec, host="codex").encode("utf-8"),
+        source="generated:codex-controller-skill:update",
+    )
     return desired, projection_meta, effective_path
+
+
+def plan_project_activation(
+    *,
+    project: Path | None,
+    old_manifest: Mapping[str, Any],
+    backup_root: Path,
+) -> tuple[PlannedFile | None, dict[str, Any] | None]:
+    """Plan the separately-owned project AGENTS.md block for this update."""
+    if project is None:
+        return None, None
+    path = project / "AGENTS.md"
+    if path.exists() and not path.is_file():
+        raise CodexUpdateError(f"Project activation target is not a regular file: {path}")
+    existed = path.exists()
+    current = path.read_bytes() if existed else b""
+    prior = old_manifest.get("codex_project_activation")
+    replace_existing = isinstance(prior, Mapping)
+    if replace_existing:
+        if install_tool.portable_path_key(Path(str(prior.get("path")))) != install_tool.portable_path_key(path):
+            raise CodexUpdateError("Existing Codex project activation metadata names a different AGENTS.md")
+        try:
+            span = install_tool._managed_activation_span(current)
+        except install_tool.InstallError as exc:
+            raise CodexUpdateError(str(exc)) from exc
+        if span is None or digest_bytes(current[slice(*span)]) != prior.get("block_sha256"):
+            raise CodexUpdateError("Existing BBK activation block differs from its manifest; restore it before updating Codex")
+    try:
+        desired_bytes = install_tool.render_codex_activation(current, replace_existing=replace_existing)
+    except install_tool.InstallError as exc:
+        raise CodexUpdateError(str(exc)) from exc
+    update_backup = install_tool.backup_path(backup_root, path) if existed and desired_bytes != current else None
+    desired = DesiredFile(path, desired_bytes, install_tool.CODEX_ACTIVATION_SOURCE)
+    plan = PlannedFile(
+        desired=desired,
+        action="unchanged" if desired_bytes == current else ("replace" if existed else "create"),
+        old_record=None,
+        backup=update_backup,
+        original=current if existed else None,
+        original_mode=path.stat().st_mode if existed else None,
+    )
+    original_backup = prior.get("original_backup") if isinstance(prior, Mapping) else (
+        install_tool.json_path(update_backup) if update_backup else None
+    )
+    current_was_manifest_exact = (
+        isinstance(prior, Mapping)
+        and digest_bytes(current) == prior.get("installed_file_sha256")
+    )
+    metadata = {
+        "schema": "bbk.codex-project-activation.v1",
+        "path": install_tool.json_path(path),
+        "source": install_tool.CODEX_ACTIVATION_SOURCE,
+        "block_sha256": digest_bytes(install_tool.codex_activation_block()),
+        "installed_file_sha256": (
+            digest_bytes(desired_bytes)
+            if not isinstance(prior, Mapping) or current_was_manifest_exact
+            else prior.get("installed_file_sha256")
+        ),
+        "created_file": bool(prior.get("created_file")) if isinstance(prior, Mapping) else not existed,
+        "original_sha256": prior.get("original_sha256") if isinstance(prior, Mapping) else (digest_bytes(current) if existed else None),
+        "original_backup": original_backup,
+        "action": plan.action,
+    }
+    return plan, metadata
 
 
 def plan_files(
@@ -323,6 +394,7 @@ def plan_stale_files(
         in_bbk_skills = path_is_within(path, agent_skills) and (
             source.startswith("shared/skills/")
             or source.startswith("generated:installed-profile-registry-skill")
+            or source.startswith("generated:codex-controller-skill")
             or "/shared/skills/" in source.replace("\\", "/")
         )
         if not (in_codex_agents or in_bbk_skills):
@@ -460,6 +532,7 @@ def merge_manifest(
     backup_root: Path,
     removed_stale: Sequence[StaleFile] = (),
     clean: bool = False,
+    codex_project_activation: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Update Codex ownership records without rebinding shared package state."""
     merged_records = record_map(old)
@@ -492,6 +565,40 @@ def merge_manifest(
             "harness_versions": harness_versions,
         }
     )
+    prompt_compilation = dict(old.get("harness_prompt_compilation") or {})
+    codex_controller = (projection_meta.get("controllers") or {}).get("codex") or {}
+    prompt_compilation["codex"] = {
+        "prompt_compiler_revision": projection_meta.get("procedure_registry_revision"),
+        "role_projection_digest": hashlib.sha256(
+            json.dumps(
+                {
+                    name: value.get("compiled_procedures", {}).get("codex")
+                    for name, value in sorted((projection_meta.get("agents") or {}).items())
+                },
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest(),
+        "controller_projection_digest": (codex_controller.get("compiled_procedures") or {}).get("compiled_prompt_sha256"),
+        "procedure_registry_revision": projection_meta.get("procedure_registry_revision"),
+        "effective_catalog_digest": hashlib.sha256(
+            json.dumps(
+                {
+                    name: value.get("effective_external_catalogs", {}).get("codex")
+                    for name, value in sorted((projection_meta.get("agents") or {}).items())
+                },
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest(),
+        "model_routing_digest": projection_meta.get("model_routing_source_sha256"),
+        "adapter_digest": hashlib.sha256(b"codex").hexdigest(),
+    }
+    result["harness_prompt_compilation"] = prompt_compilation
+    if codex_project_activation is not None:
+        result["codex_project_activation"] = dict(codex_project_activation)
     history = [item for item in old.get("update_history", []) if isinstance(item, Mapping)]
     history.append(
         {
@@ -571,6 +678,13 @@ def update_codex(args: argparse.Namespace) -> dict[str, Any]:
             temp_root=Path(raw_temp),
         )
         plan = plan_files(desired, old_records, force=bool(args.force), backup_root=backup_root)
+        activation_plan, activation_metadata = plan_project_activation(
+            project=project,
+            old_manifest=old_manifest,
+            backup_root=backup_root,
+        )
+        if activation_plan is not None:
+            plan.append(activation_plan)
         targets = install_tool.installation_targets(scope=args.scope, project=project)
         codex_agents = targets.get("codex_agents")
         agent_skills = targets.get("agent_skills")
@@ -595,22 +709,27 @@ def update_codex(args: argparse.Namespace) -> dict[str, Any]:
             if not args.dry_run:
                 restore_stale_files(stale_plan)
             raise
+        owned_update_records = [
+            item for item in update_records
+            if item.get("source") != install_tool.CODEX_ACTIVATION_SOURCE
+        ]
         merged = merge_manifest(
             old_manifest,
-            update_records,
+            owned_update_records,
             effective_path=effective_path,
             projection_meta=projection_meta,
             verification=verification,
             backup_root=backup_root,
             removed_stale=stale_plan,
             clean=bool(getattr(args, "clean", False)),
+            codex_project_activation=activation_metadata,
         )
         merged["dependency_preflight"] = dependency_report
         if not args.dry_run:
             install_tool.atomic_write(mpath, install_tool.json_bytes(merged), 0o600)
 
     actions: dict[str, int] = {}
-    for item in update_records:
+    for item in owned_update_records:
         action = str(item.get("action"))
         actions[action] = actions.get(action, 0) + 1
     untouched = [name for name in ("omp", "claude", "generic") if old_manifest.get(name)]
@@ -633,15 +752,20 @@ def update_codex(args: argparse.Namespace) -> dict[str, Any]:
         "effective_model_routing_updated": False,
         "source_release_root": install_tool.json_path(ROOT),
         "dependency_preflight": dependency_report,
-        "files": update_records,
+        "files": owned_update_records,
+        "codex_project_activation": activation_metadata,
         "removed_stale_files": stale_records,
         "removed_stale_count": len(stale_records),
         "clean_replacement": bool(getattr(args, "clean", False)),
         "actions": actions,
         "codex_agent_count": len(projection_meta.get("agents", {})),
         "codex_skill_file_count": sum(
-            1 for item in update_records
+            1 for item in owned_update_records
             if "/.agents/skills/bbk-artifact/" in str(item.get("path", "")).replace("\\", "/")
+        ),
+        "codex_controller_skill_count": sum(
+            1 for item in owned_update_records
+            if str(item.get("path", "")).replace("\\", "/").endswith("/.agents/skills/bbk/SKILL.md")
         ),
         "untouched_harnesses": untouched,
         "omp_files_touched": 0,
@@ -658,10 +782,11 @@ def human(value: Mapping[str, Any]) -> str:
         f"Files: {value.get('actions')}\n"
         f"Codex agents: {value.get('codex_agent_count')}\n"
         f"Codex artifact skill files: {value.get('codex_skill_file_count')}\n"
+        f"Codex controller skills: {value.get('codex_controller_skill_count')}\n"
         f"Stale Codex files removed: {value.get('removed_stale_count', 0)}\n"
         f"Untouched harnesses: {', '.join(value.get('untouched_harnesses') or []) or 'none'}\n"
         f"Manifest: {value.get('manifest_path')}\n"
-        "The update changes BBK's Codex agent files, the canonical bbk-artifact skill under Codex's shared skill root, and manifest metadata. It does not modify the shared package, launcher, model-routing file, OMP agent/extension state, Claude Code, or generic agent files. "
+        "The update changes BBK's Codex agent files, the self-contained bbk controller skill, the canonical bbk-artifact skill under Codex's shared skill root, project activation metadata when applicable, and manifest metadata. It does not modify the shared package, launcher, model-routing file, OMP agent/extension state, Claude Code, or generic agent files. "
         "Start a fresh Codex turn or session if the running host has cached custom-agent definitions or skills."
     )
 

@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 TOOLS = ROOT / "tools"
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
+import install as install_tool
 from tests._cli_support import run_cli as test_run_cli
 from tests._path_support import assert_same_path, path_identity_key
 m7_ROOT = ROOT
@@ -115,6 +116,7 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
             records = {path_identity_key(item['path']): item for item in manifest['files']}
             codex_root = home / '.codex' / 'agents'
             artifact_skill_root = home / '.agents' / 'skills' / 'bbk-artifact'
+            controller_skill = home / '.agents' / 'skills' / 'bbk' / 'SKILL.md'
             artifact_skill_files = sorted(path for path in artifact_skill_root.rglob('*') if path.is_file())
             self.assertEqual(len(artifact_skill_files), 7)
             # Simulate an alpha.15 installation: the shared artifact skill did
@@ -126,9 +128,12 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
                 if directory.is_dir():
                     directory.rmdir()
             artifact_skill_root.rmdir()
+            controller_skill_key = path_identity_key(controller_skill)
+            controller_skill.unlink()
+            controller_skill.parent.rmdir()
             manifest['files'] = [
                 item for item in manifest['files']
-                if path_identity_key(item['path']) not in artifact_skill_keys
+                if path_identity_key(item['path']) not in artifact_skill_keys | {controller_skill_key}
             ]
             records = {path_identity_key(item['path']): item for item in manifest['files']}
             for path in sorted(codex_root.glob('bbk_*.toml')):
@@ -157,7 +162,8 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
             self.assertEqual(updated['to_version'], m7_VERSION)
             self.assertEqual(updated['codex_agent_count'], 19)
             self.assertEqual(updated['codex_skill_file_count'], 7)
-            self.assertEqual(updated['actions'], {'create': 7, 'replace': 19, 'unchanged': 17})
+            self.assertEqual(updated['codex_controller_skill_count'], 1)
+            self.assertEqual(updated['actions'], {'create': 8, 'replace': 19, 'unchanged': 17})
             self.assertFalse(updated['shared_package_updated'])
             self.assertFalse(updated['effective_model_routing_updated'])
             self.assertEqual(updated['omp_files_touched'], 0)
@@ -165,6 +171,7 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
             updated_paths = [item['path'].replace('\\', '/') for item in updated['files']]
             self.assertEqual(sum('/.codex/agents/bbk_' in item for item in updated_paths), 19)
             self.assertEqual(sum('/.agents/skills/bbk-artifact/' in item for item in updated_paths), 7)
+            self.assertEqual(sum(item.endswith('/.agents/skills/bbk/SKILL.md') for item in updated_paths), 1)
             self.assertEqual(omp_before, m7_snapshot(omp_root))
             self.assertEqual(package_before, m7_snapshot(package_root))
             self.assertEqual(launcher_before, m7_snapshot(launcher_root))
@@ -178,6 +185,9 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
                 self.assertNotIn('sandbox_mode', value)
             restored_skill_files = sorted(path for path in artifact_skill_root.rglob('*') if path.is_file())
             self.assertEqual(len(restored_skill_files), 7)
+            controller_text = controller_skill.read_text(encoding='utf-8')
+            self.assertIn('name: bbk', controller_text)
+            self.assertIn('harness: codex', controller_text)
             self.assertEqual(
                 {path.relative_to(artifact_skill_root).as_posix() for path in restored_skill_files},
                 {
@@ -199,11 +209,122 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
             self.assertFalse(current['last_codex_update']['shared_package_updated'])
             current_records = {path_identity_key(item['path']): item for item in current['files']}
             self.assertTrue(all(path_identity_key(path) in current_records for path in restored_skill_files))
+            self.assertIn(controller_skill_key, current_records)
             status, _ = m7_run_json([sys.executable, m7_INSTALL, '--json', 'status', '--scope', 'user'], env=env)
             self.assertEqual(status['summary'], {'current': len(status['files'])})
+
+    def test_controller_skill_delivery_respects_harness_discovery_roots(self) -> None:
+        selections = {
+            'codex': ('.agents/skills/bbk/SKILL.md', 'harness: codex'),
+            'pi': ('.agents/skills/bbk/SKILL.md', 'harness: pi'),
+            'generic': ('.agents/skills/bbk/SKILL.md', 'harness: generic'),
+            'claude': ('.claude/skills/bbk/SKILL.md', 'harness: claude'),
+        }
+        for harness, (relative, host_marker) in selections.items():
+            with self.subTest(harness=harness), tempfile.TemporaryDirectory() as temp:
+                base = Path(temp)
+                home = base / 'home'
+                home.mkdir()
+                env = os.environ.copy()
+                env.update({'BBK_HOME': str(home), 'HOME': str(home), 'BBK_INSTALL_ROOT': str(base / 'data'), 'BBK_BIN_DIR': str(base / 'bin')})
+                m7_run_json([sys.executable, m7_INSTALL, '--json', 'install', '--scope', 'user', f'--{harness}', '--no-language-profiles'], env=env)
+                skill = home / relative
+                text = skill.read_text(encoding='utf-8')
+                self.assertIn('name: bbk', text)
+                self.assertIn(host_marker, text)
+                self.assertIn('Compiled primary procedure', text)
+                self.assertNotIn('{{bbk-module:', text)
+                self.assertFalse((home / 'AGENTS.md').exists())
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            home = base / 'home'
+            home.mkdir()
+            env = os.environ.copy()
+            env.update({'BBK_HOME': str(home), 'HOME': str(home), 'BBK_INSTALL_ROOT': str(base / 'data'), 'BBK_BIN_DIR': str(base / 'bin')})
+            m7_run_json([sys.executable, m7_INSTALL, '--json', 'install', '--scope', 'user', '--omp', '--no-language-profiles'], env=env)
+            self.assertFalse((home / '.agents' / 'skills' / 'bbk' / 'SKILL.md').exists())
+
+    def test_project_codex_created_agents_file_is_removed_on_uninstall(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            project = Path(temp)
+            env = os.environ.copy()
+            env['BBK_TEST_ALLOW_MISSING_DEPENDENCIES'] = '1'
+            installed, _ = m7_run_json([
+                sys.executable, m7_INSTALL, '--json', 'install', '--scope', 'project',
+                '--root', project, '--codex', '--no-language-profiles',
+            ], env=env)
+            agents = project / 'AGENTS.md'
+            self.assertTrue(agents.is_file())
+            activation = installed['codex_project_activation']
+            self.assertTrue(activation['created_file'])
+            self.assertNotIn(path_identity_key(agents), {path_identity_key(item['path']) for item in installed['files']})
+            removed, _ = m7_run_json([sys.executable, m7_INSTALL, '--json', 'uninstall', '--scope', 'project', '--root', project], env=env)
+            self.assertEqual(removed['codex_project_activation']['action'], 'remove-file')
+            self.assertFalse(agents.exists())
+
+    def test_project_codex_clean_replacement_accepts_its_owned_activation_block(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            project = Path(temp)
+            env = os.environ.copy()
+            env['BBK_TEST_ALLOW_MISSING_DEPENDENCIES'] = '1'
+            command = [
+                sys.executable, m7_INSTALL, '--json', 'install', '--scope', 'project',
+                '--root', project, '--codex', '--no-language-profiles',
+            ]
+            m7_run_json(command, env=env)
+            replaced, _ = m7_run_json([*command, '--uninstall-existing'], env=env)
+            activation = replaced['codex_project_activation']
+            self.assertTrue((project / 'AGENTS.md').is_file())
+            self.assertEqual(activation['block_sha256'], hashlib.sha256(
+                install_tool.codex_activation_block()
+            ).hexdigest())
+
+    def test_project_codex_activation_preserves_user_agents_text_through_update_and_uninstall(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            project = Path(temp)
+            agents = project / 'AGENTS.md'
+            agents.write_text('Existing project guidance.\n', encoding='utf-8')
+            env = os.environ.copy()
+            env['BBK_TEST_ALLOW_MISSING_DEPENDENCIES'] = '1'
+            installed, _ = m7_run_json([
+                sys.executable, m7_INSTALL, '--json', 'install', '--scope', 'project',
+                '--root', project, '--codex', '--no-language-profiles',
+            ], env=env)
+            manifest_path = Path(installed['manifest_path'])
+            manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+            activation = manifest['codex_project_activation']
+            self.assertNotIn(path_identity_key(agents), {path_identity_key(item['path']) for item in manifest['files']})
+            self.assertEqual(activation['schema'], 'bbk.codex-project-activation.v1')
+            self.assertFalse(activation['created_file'])
+            original_backup = Path(activation['original_backup'])
+            self.assertEqual(original_backup.read_text(encoding='utf-8'), 'Existing project guidance.\n')
+            old_block = (
+                '<!-- BEGIN BBK CODEX ACTIVATION -->\n'
+                'For old substantive work, invoke `$bbk`.\n'
+                '<!-- END BBK CODEX ACTIVATION -->\n'
+            )
+            current = agents.read_text(encoding='utf-8')
+            begin = current.index('<!-- BEGIN BBK CODEX ACTIVATION -->')
+            agents.write_bytes((current[:begin] + old_block + 'Later user guidance.\n').encode('utf-8'))
+            activation['block_sha256'] = hashlib.sha256(old_block.encode()).hexdigest()
+            activation['installed_file_sha256'] = hashlib.sha256((current[:begin] + old_block).encode()).hexdigest()
+            manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8')
+            update_result = m7_run([sys.executable, m7_UPDATE_CODEX, '--json', '--scope', 'project', '--root', project], env=env, check=False)
+            self.assertEqual(update_result.returncode, 0, update_result.stdout + update_result.stderr)
+            updated = json.loads(update_result.stdout)
+            self.assertEqual(updated['status'], 'PASS')
+            updated_text = agents.read_text(encoding='utf-8')
+            self.assertIn('Existing project guidance.', updated_text)
+            self.assertIn('Later user guidance.', updated_text)
+            self.assertIn('For substantive work in this project, invoke `$bbk`', updated_text)
+            removed, _ = m7_run_json([sys.executable, m7_INSTALL, '--json', 'uninstall', '--scope', 'project', '--root', project], env=env)
+            self.assertEqual(removed['codex_project_activation']['action'], 'remove-block')
+            final_text = agents.read_text(encoding='utf-8')
+            self.assertIn('Existing project guidance.', final_text)
+            self.assertIn('Later user guidance.', final_text)
+            self.assertNotIn('BBK CODEX ACTIVATION', final_text)
 
     def test_current_docs_explain_permission_and_authority_separation(self) -> None:
         corpus = '\n'.join(((m7_ROOT / rel).read_text(encoding='utf-8') for rel in ('README.md', 'docs/AGENTS.md', 'docs/USAGE.md', 'docs/INSTALL.md')))
         for expected in ('inherit the parent', 'sandbox', 'coordination artifacts', 'does not authorize', 'subject or product artifacts', '--update-codex'):
             self.assertIn(expected, corpus)
-

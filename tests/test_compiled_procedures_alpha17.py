@@ -4,6 +4,7 @@ import json
 import sys
 import tempfile
 import unittest
+from dataclasses import replace
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -12,6 +13,7 @@ if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
 import compiled_procedures as cp  # noqa: E402
+import generate_agents as ga  # noqa: E402
 import install as install_tool  # noqa: E402
 
 
@@ -92,6 +94,47 @@ class CompiledProcedureTests(unittest.TestCase):
             self.assertIn(f"{procedure}/SKILL.md", excluded)
             self.assertTrue((ROOT / "shared" / "skills" / procedure / "SKILL.md").is_file())
         self.assertNotIn("bbk-artifact/SKILL.md", excluded)
+
+    def test_controller_projections_embed_every_prompt_module_once(self):
+        spec = json.loads((ROOT / "spec" / "roles.json").read_text(encoding="utf-8"))
+        for host in ("codex", "claude", "pi", "generic"):
+            result = ga.compiled_controller(spec, host=host)
+            dependencies = {
+                dependency
+                for procedure in result.manifest["procedures"]
+                for dependency in procedure["dependencies"]
+                if dependency.startswith("bbk-prompt-")
+            }
+            self.assertNotIn("Apply the already embedded", result.prompt, host)
+            for module_id in dependencies:
+                self.assertEqual(
+                    1,
+                    result.prompt.count(f"<!-- BBK compiled prompt module {module_id} -->"),
+                    (host, module_id),
+                )
+
+    def test_host_facing_controller_skill_has_valid_frontmatter_and_activation(self):
+        spec = json.loads((ROOT / "spec" / "roles.json").read_text(encoding="utf-8"))
+        expected = {
+            "codex": "`$bbk`",
+            "claude": "`/bbk`",
+            "pi": "asks Pi",
+            "generic": "asks the host",
+        }
+        for host, activation in expected.items():
+            result = ga.compiled_controller(spec, host=host)
+            skill = ga.rendered_controller_skill(spec, host=host, compiled=result)
+            frontmatter, body = skill.removeprefix("---\n").split("\n---\n", 1)
+            fields = dict(line.split(": ", 1) for line in frontmatter.splitlines())
+            self.assertEqual("bbk", fields["name"])
+            self.assertIsInstance(json.loads(fields["description"]), str)
+            self.assertIn(activation, fields["description"])
+            self.assertIn("# BBK harness-root controller", body)
+            self.assertNotIn("Apply the already embedded", skill)
+
+        invalid = replace(result, prompt=result.prompt + "Apply the already embedded `missing` module here.\n")
+        with self.assertRaisesRegex(ValueError, "unresolved prompt-module placeholders"):
+            ga.rendered_controller_skill(spec, host="generic", compiled=invalid)
 
 
 if __name__ == "__main__":

@@ -15,11 +15,11 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 try:
-    from prompt_modules import compact_skill_template, load_prompt_modules, strip_frontmatter, validate_skill_templates
+    from prompt_modules import compact_skill_template, load_prompt_modules, ordered_modules, render_module, strip_frontmatter, validate_skill_templates
 except ModuleNotFoundError:  # pragma: no cover
     import sys
     sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from prompt_modules import compact_skill_template, load_prompt_modules, strip_frontmatter, validate_skill_templates
+    from prompt_modules import compact_skill_template, load_prompt_modules, ordered_modules, render_module, strip_frontmatter, validate_skill_templates
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_PATH = ROOT / "spec" / "procedures" / "catalog.json"
@@ -573,6 +573,7 @@ def _project_body(
     method: Mapping[str, Any],
     additional: Mapping[str, Mapping[str, Any]],
     prompt_package: Any | None = None,
+    embedded_prompt_modules: Sequence[str] = (),
 ) -> tuple[str,str,str,list[str]]:
     if skill_id in additional:
         item = additional[skill_id]
@@ -587,7 +588,7 @@ def _project_body(
         if not body:
             raise CompiledProcedureError("BBK-CP-008", f"additional procedure body is empty for {skill_id}")
         return (
-            body,
+            _resolve_embedded_module_references(body, embedded_prompt_modules),
             str(item["source_ref"]),
             observed,
             [str(value) for value in item.get("prompt_module_dependencies") or []],
@@ -600,7 +601,47 @@ def _project_body(
     if not source.is_file(): raise CompiledProcedureError("BBK-CP-008",f"canonical source missing for {skill_id}")
     policy=(method.get("skill_module_dependencies") or {}).get(skill_id) or {}
     prompt_deps=[*[str(x) for x in policy.get("requires_prompt_modules") or []],*[str(x) for x in policy.get("standalone_prompt_modules") or []]]
-    return body,source.relative_to(root).as_posix(),sha256_bytes(source.read_bytes()),prompt_deps
+    return _resolve_embedded_module_references(body, embedded_prompt_modules),source.relative_to(root).as_posix(),sha256_bytes(source.read_bytes()),prompt_deps
+
+
+def _resolve_embedded_module_references(body: str, module_ids: Sequence[str]) -> str:
+    """Turn compact procedure placeholders into explicit compiled references."""
+    for module_id in module_ids:
+        body = body.replace(
+            f"> Apply the already embedded `{module_id}` module here.",
+            f"> The compiled `{module_id}` module above applies at this point.",
+        )
+    return body
+
+
+def _controller_module_ids(
+    plan: PromptCompilationPlan,
+    registry: Mapping[str, Any],
+    package: Any,
+) -> tuple[str, ...]:
+    procedures = {str(item["id"]): item for item in registry["procedures"]}
+    procedures.update({str(item["id"]): item for item in plan.additional_procedures})
+    selected = {
+        str(module_id)
+        for procedure_id in plan.selected_procedure_closure
+        for module_id in procedures[procedure_id].get("prompt_module_dependencies") or []
+    }
+    return tuple(module["id"] for module in ordered_modules(package, selected))
+
+
+def _embed_controller_modules(base_prompt: str, module_ids: Sequence[str], package: Any) -> str:
+    lines = [base_prompt.rstrip(), "", "## Compiled prompt modules", "", "Every selected procedure dependency is embedded exactly once below."]
+    for module in ordered_modules(package, module_ids):
+        module_id = str(module["id"])
+        lines.extend([
+            "",
+            f"<!-- BBK compiled prompt module {module_id} -->",
+            "",
+            render_module(module),
+            "",
+            f"<!-- End BBK compiled prompt module {module_id} -->",
+        ])
+    return "\n".join(lines).rstrip() + "\n"
 
 
 def render_compiled_tail(records: Sequence[Mapping[str,Any]], bodies: Mapping[str,str], primary: str) -> str:
@@ -623,6 +664,7 @@ def compile_plan(
     procedure_registry: Mapping[str, Any] | None = None,
     method_content: Mapping[str, Any] | None = None,
     prompt_package: Any | None = None,
+    embedded_prompt_modules: Sequence[str] = (),
 ) -> CompilationResult:
     root = root.resolve()
     registry = procedure_registry if procedure_registry is not None else load_registry(root)
@@ -649,8 +691,11 @@ def compile_plan(
     bodies:dict[str,str]={}; records=[]; seen={}; source_map=[]
     for order,skill_id in enumerate(plan.selected_procedure_closure):
         body,source_ref,source_digest,prompt_deps=_project_body(
-            root, skill_id, method, additional, package
+            root, skill_id, method, additional, package, embedded_prompt_modules
         )
+        missing_modules = set(prompt_deps) - set(embedded_prompt_modules) if embedded_prompt_modules else set()
+        if missing_modules:
+            raise CompiledProcedureError("BBK-CP-009", f"{skill_id} has unembedded prompt modules {sorted(missing_modules)}")
         effective=sha256_bytes((body.rstrip()+"\n").encode())
         if effective in seen and seen[effective]!=skill_id:
             raise CompiledProcedureError("BBK-CP-002",f"{skill_id} duplicates effective body of {seen[effective]}")
@@ -658,6 +703,13 @@ def compile_plan(
         records.append({"id":skill_id,"version":str(known[skill_id]["version"]),"source_ref":source_ref,"source_sha256":source_digest,"effective_sha256":effective,"selection_reason":plan.selection_reasons.get(skill_id,"DEPENDENCY"),"ordering":order,"catalog_visibility":"SUPPRESSED","state":"COMPILED_COMPLETE","dependencies":[*[str(x) for x in known[skill_id].get("procedure_dependencies") or []],*prompt_deps]})
     tail=render_compiled_tail(records,bodies,plan.primary_procedure)
     prompt=(base_prompt.rstrip()+"\n\n"+tail).rstrip()+"\n"
+    if embedded_prompt_modules:
+        if "Apply the already embedded" in prompt:
+            raise CompiledProcedureError("BBK-CP-009", "controller prompt contains unresolved embedded-module placeholders")
+        for module_id in embedded_prompt_modules:
+            marker = f"<!-- BBK compiled prompt module {module_id} -->"
+            if prompt.count(marker) != 1:
+                raise CompiledProcedureError("BBK-CP-009", f"controller prompt must embed {module_id} exactly once")
     suppression=[str(x["id"]) for x in records]
     classifications={str(x["id"]):str(x.get("catalog_classification")) for x in registry["procedures"]}
     external=tuple(x for x in plan.available_procedures if x not in set(suppression) and classifications.get(x)=="EXTERNAL_OPTIONAL")
@@ -770,6 +822,21 @@ def compile_controller_prompt(
         procedure_registry=registry,
         **context,
     )
+    module_ids = _controller_module_ids(plan, registry, package)
+    base_prompt = _embed_controller_modules(base_prompt, module_ids, package)
+    plan = build_plan(
+        identity,
+        identity_kind="CONTROLLER",
+        harness=harness,
+        base_prompt=base_prompt,
+        logical_child_id=logical_child_id,
+        invocation_id=invocation_id,
+        profile_procedures=profile_procedures,
+        invocation_procedures=invocation_procedures,
+        root=root,
+        procedure_registry=registry,
+        **context,
+    )
     return compile_plan(
         base_prompt,
         plan,
@@ -777,6 +844,7 @@ def compile_controller_prompt(
         procedure_registry=registry,
         method_content=method,
         prompt_package=package,
+        embedded_prompt_modules=module_ids,
     )
 
 

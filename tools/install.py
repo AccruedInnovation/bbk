@@ -28,7 +28,7 @@ from runtime_requirements import enforce_supported_python
 enforce_supported_python(program="BBK installer")
 
 import dependencies as dependency_tool
-from generate_agents import MODEL_ROUTING_PATH, rendered_projections
+from generate_agents import MODEL_ROUTING_PATH, SPEC_PATH, rendered_controller_skill, rendered_projections
 from compiled_procedures import globally_suppressed_procedures, physically_indexed_procedures
 from model_routing import ModelRoutingError
 from path_compat import canonical_path_text, portable_path_key
@@ -52,6 +52,9 @@ BUNDLED_PROFILES_PATH = ROOT / "bundled-language-profiles"
 SUBPROCESS_OUTPUT_ENCODING = "utf-8"
 SUBPROCESS_OUTPUT_ERRORS = "backslashreplace"
 LANGUAGE_PROFILE_LAYOUT_VERSION = 1
+CODEX_ACTIVATION_BEGIN = "<!-- BEGIN BBK CODEX ACTIVATION -->"
+CODEX_ACTIVATION_END = "<!-- END BBK CODEX ACTIVATION -->"
+CODEX_ACTIVATION_SOURCE = "generated:codex-project-activation"
 
 # Canonical adjacent Python runtime installed beside the OMP extension.  Both
 # the full installer and the harness-scoped OMP updater must consume this exact
@@ -381,6 +384,92 @@ def backup_layout(destination: PurePath) -> tuple[str, tuple[str, ...]]:
 def backup_path(backup_root: Path, destination: Path) -> Path:
     namespace, parts = backup_layout(destination)
     return backup_root / namespace / Path(*parts)
+
+
+def codex_activation_block() -> bytes:
+    """Return the small, explicitly bounded project activation block."""
+    return (
+        f"{CODEX_ACTIVATION_BEGIN}\n"
+        "For substantive work in this project, invoke `$bbk` and follow the installed BBK controller skill.\n"
+        f"{CODEX_ACTIVATION_END}\n"
+    ).encode("utf-8")
+
+
+def _managed_activation_span(data: bytes) -> tuple[int, int] | None:
+    """Locate one structurally valid managed block without changing other bytes."""
+    begin = CODEX_ACTIVATION_BEGIN.encode("utf-8")
+    end = CODEX_ACTIVATION_END.encode("utf-8")
+    begins = [match.start() for match in re.finditer(re.escape(begin), data)]
+    ends = [match.start() for match in re.finditer(re.escape(end), data)]
+    if not begins and not ends:
+        return None
+    if len(begins) != 1 or len(ends) != 1 or begins[0] >= ends[0]:
+        raise InstallError("AGENTS.md contains malformed or duplicate BBK activation markers")
+    start = begins[0]
+    finish = ends[0] + len(end)
+    if finish < len(data) and data[finish : finish + 2] == b"\r\n":
+        finish += 2
+    elif finish < len(data) and data[finish : finish + 1] == b"\n":
+        finish += 1
+    return start, finish
+
+
+def render_codex_activation(existing: bytes, *, replace_existing: bool) -> bytes:
+    """Append or replace only BBK's marked activation block."""
+    block = codex_activation_block()
+    span = _managed_activation_span(existing)
+    if span is not None:
+        if not replace_existing:
+            raise InstallError("AGENTS.md already contains a BBK activation block not owned by this install")
+        return existing[: span[0]] + block + existing[span[1] :]
+    if not existing:
+        return block
+    separator = b"" if existing.endswith((b"\n\n", b"\r\n\r\n")) else (b"\n" if existing.endswith((b"\n", b"\r\n")) else b"\n\n")
+    return existing + separator + block
+
+
+def install_codex_activation(
+    project: Path,
+    *,
+    dry_run: bool,
+    backup_root: Path,
+    prior: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Install project activation while keeping AGENTS.md outside file ownership."""
+    path = project / "AGENTS.md"
+    if path.exists() and not path.is_file():
+        raise InstallError(f"Refusing to modify non-file project activation target: {path}")
+    existed = path.exists()
+    original = path.read_bytes() if existed else b""
+    replace_existing = prior is not None
+    if replace_existing:
+        if portable_path_key(Path(str(prior.get("path")))) != portable_path_key(path):
+            raise InstallError("Existing Codex project activation metadata names a different AGENTS.md")
+        span = _managed_activation_span(original)
+        if span is None or hashlib.sha256(original[slice(*span)]).hexdigest() != prior.get("block_sha256"):
+            raise InstallError("Existing BBK activation block differs from its manifest; restore it before reinstalling")
+    desired = render_codex_activation(original, replace_existing=replace_existing)
+    original_backup = (
+        Path(str(prior["original_backup"]))
+        if prior is not None and isinstance(prior.get("original_backup"), str)
+        else (backup_path(backup_root, path) if existed else None)
+    )
+    if not dry_run:
+        if original_backup is not None and prior is None:
+            original_backup.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(path, original_backup)
+        atomic_write(path, desired, 0o644)
+    return {
+        "schema": "bbk.codex-project-activation.v1",
+        "path": json_path(path),
+        "source": CODEX_ACTIVATION_SOURCE,
+        "block_sha256": hashlib.sha256(codex_activation_block()).hexdigest(),
+        "installed_file_sha256": hashlib.sha256(desired).hexdigest(),
+        "created_file": bool(prior.get("created_file")) if prior is not None else not existed,
+        "original_sha256": prior.get("original_sha256") if prior is not None else (hashlib.sha256(original).hexdigest() if existed else None),
+        "original_backup": json_path(original_backup) if original_backup else None,
+        "action": "create" if not existed else ("replace-managed-block" if prior is not None else "update-managed-block"),
+    }
 
 
 def install_bytes(
@@ -1531,6 +1620,16 @@ def _perform_install(
             exclude=catalog_exclusions,
             **common,
         )
+    controller_spec = json.loads(SPEC_PATH.read_text(encoding="utf-8"))
+    shared_controller_host = "codex" if codex else ("pi" if pi else ("generic" if generic else None))
+    if shared_controller_host is not None:
+        assert targets["agent_skills"] is not None
+        install_bytes(
+            rendered_controller_skill(controller_spec, host=shared_controller_host).encode("utf-8"),
+            targets["agent_skills"] / "bbk" / "SKILL.md",
+            source=f"generated:{shared_controller_host}-controller-skill",
+            **common,
+        )
     routing_digest = routing_meta["model_routing_source_sha256"]
     if codex:
         assert targets["codex_agents"] is not None
@@ -1583,6 +1682,12 @@ def _perform_install(
             ROOT / "shared" / "skills",
             targets["claude_skills"],
             exclude=catalog_exclusions,
+            **common,
+        )
+        install_bytes(
+            rendered_controller_skill(controller_spec, host="claude").encode("utf-8"),
+            targets["claude_skills"] / "bbk" / "SKILL.md",
+            source="generated:claude-controller-skill",
             **common,
         )
         install_rendered_agents(
@@ -1719,6 +1824,25 @@ def _perform_install(
         )
         registry_paths.append(json_path(path))
 
+    prior_codex_activation: Mapping[str, Any] | None = None
+    if codex and args.scope == "project" and mpath.is_file():
+        try:
+            prior_manifest = json.loads(mpath.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise InstallError(f"Cannot read existing project install manifest {mpath}: {exc}") from exc
+        candidate_activation = prior_manifest.get("codex_project_activation") if isinstance(prior_manifest, Mapping) else None
+        if isinstance(candidate_activation, Mapping):
+            prior_codex_activation = candidate_activation
+    codex_activation = (
+        install_codex_activation(
+            project,
+            dry_run=bool(args.dry_run),
+            backup_root=backups,
+            prior=prior_codex_activation,
+        )
+        if codex and args.scope == "project" and project is not None
+        else None
+    )
     selected_harness_map = {"codex": codex, "omp": omp, "claude": claude, "pi": pi, "generic": generic}
     manifest = {
         "schema": "bbk.install-manifest.v1",
@@ -1733,6 +1857,7 @@ def _perform_install(
         "generic": generic,
         "pi_agent_manifest": json_path(pi_manifest_path) if pi_manifest_path else None,
         "generic_agent_manifest": json_path(generic_manifest_path) if generic_manifest_path else None,
+        "codex_project_activation": codex_activation,
         "dry_run": args.dry_run,
         "verification": verification,
         "model_routing": model_routing_manifest_metadata(
@@ -2566,6 +2691,51 @@ def uninstall(args: argparse.Namespace) -> dict[str, Any]:
         removals.append(path)
         removed.append(json_path(path))
 
+    activation_result: dict[str, Any] | None = None
+    activation = manifest.get("codex_project_activation")
+    if isinstance(activation, Mapping) and isinstance(activation.get("path"), str):
+        activation_path = Path(str(activation["path"]))
+        activation_result = {
+            "path": json_path(activation_path),
+            "action": "missing",
+        }
+        if activation_path.exists() and not activation_path.is_file():
+            activation_result["action"] = "preserved"
+            activation_result["reason"] = "not a regular file"
+        elif activation_path.is_file():
+            current = activation_path.read_bytes()
+            try:
+                span = _managed_activation_span(current)
+            except InstallError as exc:
+                span = None
+                activation_result["reason"] = str(exc)
+            exact_block = span is not None and hashlib.sha256(current[slice(*span)]).hexdigest() == activation.get("block_sha256")
+            if not exact_block:
+                activation_result["action"] = "preserved"
+                activation_result.setdefault("reason", "managed BBK activation block differs from the manifest")
+            elif hashlib.sha256(current).hexdigest() == activation.get("installed_file_sha256"):
+                if activation.get("created_file"):
+                    activation_result["action"] = "remove-file"
+                    if not args.dry_run:
+                        activation_path.unlink()
+                elif isinstance(activation.get("original_backup"), str):
+                    original_backup = Path(str(activation["original_backup"]))
+                    if not original_backup.is_file() or sha256_file(original_backup) != activation.get("original_sha256"):
+                        activation_result["action"] = "preserved"
+                        activation_result["reason"] = "original AGENTS.md backup is missing or differs"
+                    else:
+                        activation_result["action"] = "restore-original"
+                        if not args.dry_run:
+                            atomic_write(activation_path, original_backup.read_bytes(), 0o644)
+                else:
+                    activation_result["action"] = "remove-block"
+                    if not args.dry_run:
+                        atomic_write(activation_path, current[: span[0]] + current[span[1] :], 0o644)
+            else:
+                activation_result["action"] = "remove-block"
+                if not args.dry_run:
+                    atomic_write(activation_path, current[: span[0]] + current[span[1] :], 0o644)
+
     if not args.dry_run:
         for path in removals:
             path.unlink()
@@ -2592,6 +2762,7 @@ def uninstall(args: argparse.Namespace) -> dict[str, Any]:
         "removed": removed,
         "preserved": preserved,
         "reused": reused,
+        "codex_project_activation": activation_result,
         "manifest_path": json_path(mpath),
     }
 

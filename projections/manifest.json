@@ -10,7 +10,7 @@
           "compiled_tail_sha256": "85d5aa2e86d8e2b23dafc53642a59f4b47a8030c15b16c65b7d1c153b7f45dae",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "98535cd6e00b84ad97b9faf7f478e18d75fd92cd8c57aaeb6a6b76e3a04bce3c",
@@ -38,7 +38,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:claude",
             "plan:52d31f877ea06361bb79bca2943a6eb044ee2177ddac3534563f4fae188d04d1",
             "base:2bf784b0bc1fa725f9a9008c0ba70ea07f8b9b5b108385afbd850a7c9ffa24f2",
@@ -94,7 +94,7 @@
           "compiled_tail_sha256": "85d5aa2e86d8e2b23dafc53642a59f4b47a8030c15b16c65b7d1c153b7f45dae",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "98535cd6e00b84ad97b9faf7f478e18d75fd92cd8c57aaeb6a6b76e3a04bce3c",
@@ -122,7 +122,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:codex",
             "plan:92668b24eddf587b63f3d38099a1d24dc25ca8692a48e4533d2c71f671893e18",
             "base:9d28f9770645cd27f31587e679e58229c769f41bc3a33214a5ec44c643e36fad",
@@ -178,7 +178,7 @@
           "compiled_tail_sha256": "85d5aa2e86d8e2b23dafc53642a59f4b47a8030c15b16c65b7d1c153b7f45dae",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "98535cd6e00b84ad97b9faf7f478e18d75fd92cd8c57aaeb6a6b76e3a04bce3c",
@@ -206,7 +206,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:8746e472d05e569bba9b566854a17bf03d3b3bbd095c440901c94e2443ba613c",
             "base:7332ec0e4f73db351278bdcc2ec887f8f092f4dc8c037ab7f7daf59782810536",
@@ -262,7 +262,7 @@
           "compiled_tail_sha256": "85d5aa2e86d8e2b23dafc53642a59f4b47a8030c15b16c65b7d1c153b7f45dae",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "98535cd6e00b84ad97b9faf7f478e18d75fd92cd8c57aaeb6a6b76e3a04bce3c",
@@ -290,7 +290,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:omp",
             "plan:36ff842956f54e4e05dc049b4fe0f6ed8cd25b4947b99af9f37e5e462b5ac054",
             "base:1444f29aed913fe32b43a3d71e4570e3e70212578acd665ae4b6fca9fb24c11b",
@@ -346,7 +346,7 @@
           "compiled_tail_sha256": "85d5aa2e86d8e2b23dafc53642a59f4b47a8030c15b16c65b7d1c153b7f45dae",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "98535cd6e00b84ad97b9faf7f478e18d75fd92cd8c57aaeb6a6b76e3a04bce3c",
@@ -374,7 +374,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:9bf5a109459e484b79ce3fc2ff1a11872e2c7afd9f4794b9e78bea1db3094806",
             "base:7332ec0e4f73db351278bdcc2ec887f8f092f4dc8c037ab7f7daf59782810536",
@@ -1073,7 +1073,7 @@
           "compiled_tail_sha256": "0f64610e37929e8c42b15c2ff3915e04e22a0902a70a0a697b074461ef30049b",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "42125612daabf943eae30c34001ac316dc8a14d5ab1b11a8f0b9d871cbb5f4e2",
@@ -1101,7 +1101,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:claude",
             "plan:8fe8fd5e5305c93f8af2930d7e591870b9bb01ba95bb8452b53dff4c3d62548d",
             "base:93dc674cfe32f8b28a0fe31098598a7d6e02021550244c462878eef74004bb46",
@@ -1159,7 +1159,7 @@
           "compiled_tail_sha256": "0f64610e37929e8c42b15c2ff3915e04e22a0902a70a0a697b074461ef30049b",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "42125612daabf943eae30c34001ac316dc8a14d5ab1b11a8f0b9d871cbb5f4e2",
@@ -1187,7 +1187,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:codex",
             "plan:a73ddb45130ce6b4a85058669e334f1c426cf7a17b6b263274c71ff4a5eafbab",
             "base:e70ea1411fef802a7f95ae785a28a7cdd8afa7dd3b2a9ac8b8fc48088f93a14e",
@@ -1245,7 +1245,7 @@
           "compiled_tail_sha256": "0f64610e37929e8c42b15c2ff3915e04e22a0902a70a0a697b074461ef30049b",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "42125612daabf943eae30c34001ac316dc8a14d5ab1b11a8f0b9d871cbb5f4e2",
@@ -1273,7 +1273,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:8a2f5d2fbb2d987e0b92dbdce60393d5ae07185e4995329c2fc1b5b0b0a03712",
             "base:3bee40167595ebcf9177d165ca8fd5c65a166e005483f7933c286ecf610cc10e",
@@ -1331,7 +1331,7 @@
           "compiled_tail_sha256": "0f64610e37929e8c42b15c2ff3915e04e22a0902a70a0a697b074461ef30049b",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "42125612daabf943eae30c34001ac316dc8a14d5ab1b11a8f0b9d871cbb5f4e2",
@@ -1359,7 +1359,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:omp",
             "plan:15c692a4746fb3d8415fb2764a64bb79b8517ee9ffe0994a59d35c3d823df5b0",
             "base:d00d97a5a9800c7ef5dd2f1e5d6b38a7210fb997ca0b744d0db1b095d17b166e",
@@ -1417,7 +1417,7 @@
           "compiled_tail_sha256": "0f64610e37929e8c42b15c2ff3915e04e22a0902a70a0a697b074461ef30049b",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "42125612daabf943eae30c34001ac316dc8a14d5ab1b11a8f0b9d871cbb5f4e2",
@@ -1445,7 +1445,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:fff938edb7fa7cb63d44773e5961d626e7b676ee86823f0ae606b79ca01dd693",
             "base:3bee40167595ebcf9177d165ca8fd5c65a166e005483f7933c286ecf610cc10e",
@@ -2193,7 +2193,7 @@
           "compiled_tail_sha256": "e9f8b48b5ad7116d631912e02cef0d1509ad30f2b0c53e60c03d26d0cea921e5",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "cadf4b0fd052dda292c1b141ce77a4c80e71a4ad6fe5ebe44d07e123e21fdd35",
@@ -2221,7 +2221,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:claude",
             "plan:8fc9b56ac07d560c69edc6647327bfa50f43c6d6c4f3cad382874fd1bb3c51b4",
             "base:104b44e5e2c30ae1df376ca8dc295a5cb50c3723ad74ff8f352cce60bb04e4ea",
@@ -2279,7 +2279,7 @@
           "compiled_tail_sha256": "e9f8b48b5ad7116d631912e02cef0d1509ad30f2b0c53e60c03d26d0cea921e5",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "cadf4b0fd052dda292c1b141ce77a4c80e71a4ad6fe5ebe44d07e123e21fdd35",
@@ -2307,7 +2307,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:codex",
             "plan:6b08c15b24e05fdfc09a5e9da32c16d232491980348decdf7dcdcbcbf7f45fe1",
             "base:d80d0275bfee542757c74aa8b1874fa0d6220040ce30e797d992edb835fcbf5c",
@@ -2365,7 +2365,7 @@
           "compiled_tail_sha256": "e9f8b48b5ad7116d631912e02cef0d1509ad30f2b0c53e60c03d26d0cea921e5",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "cadf4b0fd052dda292c1b141ce77a4c80e71a4ad6fe5ebe44d07e123e21fdd35",
@@ -2393,7 +2393,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:56ea519fecf48274e84409f0b5ebfd2b9b97f94b795ede9795a05cce682e9d22",
             "base:76a435175a794ee9649ceea4a5e6c26735a3f9f2d2a4c81c219b026f1ba4c544",
@@ -2451,7 +2451,7 @@
           "compiled_tail_sha256": "e9f8b48b5ad7116d631912e02cef0d1509ad30f2b0c53e60c03d26d0cea921e5",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "cadf4b0fd052dda292c1b141ce77a4c80e71a4ad6fe5ebe44d07e123e21fdd35",
@@ -2479,7 +2479,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:omp",
             "plan:002f272dfcf9299bb3e047887681b2a8ef1b442d17c8ea81cd1c53a7b242f079",
             "base:b623f6fa9f6ee0b89f8bf2c95aba07ebb155be6536536e300c040c8454a8302c",
@@ -2537,7 +2537,7 @@
           "compiled_tail_sha256": "e9f8b48b5ad7116d631912e02cef0d1509ad30f2b0c53e60c03d26d0cea921e5",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "cadf4b0fd052dda292c1b141ce77a4c80e71a4ad6fe5ebe44d07e123e21fdd35",
@@ -2565,7 +2565,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:8642b254caff59372c96ef1bddb06743ef6d75595fb20ee4650efc4bb54a0d19",
             "base:76a435175a794ee9649ceea4a5e6c26735a3f9f2d2a4c81c219b026f1ba4c544",
@@ -3284,7 +3284,7 @@
           "compiled_tail_sha256": "c326d44af107fa99e135611a859318d93f8ab0ddc08382290eae7a7817a7a5d4",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "4b52982605353c62f77699058bbc8801059d1422b14e6d380a36355f6f68b994",
@@ -3312,7 +3312,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:claude",
             "plan:7c4afbf9f4d98395e0270e91c0af53cd35ff11f790e93d3780d9e9a467b935ad",
             "base:7e2410db57c43553155c87400413273a1c9692b793da981ee6e8cad27d0b7c44",
@@ -3371,7 +3371,7 @@
           "compiled_tail_sha256": "c326d44af107fa99e135611a859318d93f8ab0ddc08382290eae7a7817a7a5d4",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "4b52982605353c62f77699058bbc8801059d1422b14e6d380a36355f6f68b994",
@@ -3399,7 +3399,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:codex",
             "plan:026d53f69c48b8b5f865865ab03d2f3fa5747aedeabd4a348d87a3b774e0f00e",
             "base:e9c49aefcd6c1834409ae5d4f85c7f4836e456a85e783346f2da9464200ccc8a",
@@ -3458,7 +3458,7 @@
           "compiled_tail_sha256": "c326d44af107fa99e135611a859318d93f8ab0ddc08382290eae7a7817a7a5d4",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "4b52982605353c62f77699058bbc8801059d1422b14e6d380a36355f6f68b994",
@@ -3486,7 +3486,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:f266ce83297af9aa2beebc3190cbc2a61413ac3a8e7672dc16fcfe0cbe2cbf14",
             "base:50de608b1552e9e8515c213703e02a94fba187cc2efd70db709c305a33a69148",
@@ -3545,7 +3545,7 @@
           "compiled_tail_sha256": "c326d44af107fa99e135611a859318d93f8ab0ddc08382290eae7a7817a7a5d4",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "4b52982605353c62f77699058bbc8801059d1422b14e6d380a36355f6f68b994",
@@ -3573,7 +3573,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:omp",
             "plan:b10687ceb7d87a85c32ef1bad09b80afb6298d13a4382f5d18f3f126c619685e",
             "base:4b1e63445401d52e36a81bf588137501f121a1185583361d9b92e1e9f56e57b6",
@@ -3632,7 +3632,7 @@
           "compiled_tail_sha256": "c326d44af107fa99e135611a859318d93f8ab0ddc08382290eae7a7817a7a5d4",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "4b52982605353c62f77699058bbc8801059d1422b14e6d380a36355f6f68b994",
@@ -3660,7 +3660,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:a843363037358752e666e38a9c18bd5018daeae37da1f6517064ae17f0ac8586",
             "base:50de608b1552e9e8515c213703e02a94fba187cc2efd70db709c305a33a69148",
@@ -4380,7 +4380,7 @@
           "compiled_tail_sha256": "3bad5dd78aa588289e41691994b379c704fda0003a5ec185589f8077e2b1ec1d",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "2289c3167d6627bd1c68bafb392ef4ec8388fcf1683756aeb84fd35575a18aed",
@@ -4408,7 +4408,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:claude",
             "plan:5da10248992d3019e405e6a667b7ea2e157ac0d6378883209b4ee4539c454c49",
             "base:5f4cd2cc257dea3a93a7f3f75c6e518a8ae8bfbb8a3a166c53fca094afc1e4fa",
@@ -4460,7 +4460,7 @@
           "compiled_tail_sha256": "3bad5dd78aa588289e41691994b379c704fda0003a5ec185589f8077e2b1ec1d",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "2289c3167d6627bd1c68bafb392ef4ec8388fcf1683756aeb84fd35575a18aed",
@@ -4488,7 +4488,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:codex",
             "plan:19f7b55467bda8d162f73cd95ff8de0b544139a86fcfe4a778855b71f0dbf9e3",
             "base:5e91e29331d5ff04b2960f6a6ae770729bfdb465542bf2d77285564ad6bb01a5",
@@ -4540,7 +4540,7 @@
           "compiled_tail_sha256": "3bad5dd78aa588289e41691994b379c704fda0003a5ec185589f8077e2b1ec1d",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "2289c3167d6627bd1c68bafb392ef4ec8388fcf1683756aeb84fd35575a18aed",
@@ -4568,7 +4568,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:fedd74a96427fb1c85e5ac85c19505f4075cc4a9a07f45365be1bb99f24739b9",
             "base:053a936f570e4a321c561242d55c081311fa860a1e69427e0cdf030a4164d95b",
@@ -4620,7 +4620,7 @@
           "compiled_tail_sha256": "3bad5dd78aa588289e41691994b379c704fda0003a5ec185589f8077e2b1ec1d",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "2289c3167d6627bd1c68bafb392ef4ec8388fcf1683756aeb84fd35575a18aed",
@@ -4648,7 +4648,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:omp",
             "plan:82dda471e105338361df3f71bf3a290c3097c7c4be5107c5cec1039269207245",
             "base:f1669c2dbe9118118472609ae7c8db1bcb945f47d649cea73bf4a013f26296e4",
@@ -4700,7 +4700,7 @@
           "compiled_tail_sha256": "3bad5dd78aa588289e41691994b379c704fda0003a5ec185589f8077e2b1ec1d",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "2289c3167d6627bd1c68bafb392ef4ec8388fcf1683756aeb84fd35575a18aed",
@@ -4728,7 +4728,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:60e1f7a8f7b126b6122783f03ad32bd352658ee5deb4e5858493b347f85b46d1",
             "base:053a936f570e4a321c561242d55c081311fa860a1e69427e0cdf030a4164d95b",
@@ -5399,7 +5399,7 @@
           "compiled_tail_sha256": "5de041779a9cd23b55a510ef690faa81666fcba267bd21516fc5db2e7e5d7a3d",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "f827e3097cc6239b77ef9763169c81b51caabcf608c38dc65e7a35dfa2504b00",
@@ -5427,7 +5427,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:claude",
             "plan:38dd4b124148b59c9787517956572530ed03d65aea6c322c21e8ec52c7e37ac9",
             "base:788ac1a01548b9a18841a9fc4bc1638c685e59082c218a52ce95ee572bbd916f",
@@ -5480,7 +5480,7 @@
           "compiled_tail_sha256": "5de041779a9cd23b55a510ef690faa81666fcba267bd21516fc5db2e7e5d7a3d",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "f827e3097cc6239b77ef9763169c81b51caabcf608c38dc65e7a35dfa2504b00",
@@ -5508,7 +5508,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:codex",
             "plan:5fc166b42e6f54251ac2fa30ab639e6fefaf8cb2634c2906b99145e36ff65fd1",
             "base:9858163b2c6eca1632efb0fa2c57abe0833abff8f372536075c73d8d79333c35",
@@ -5561,7 +5561,7 @@
           "compiled_tail_sha256": "5de041779a9cd23b55a510ef690faa81666fcba267bd21516fc5db2e7e5d7a3d",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "f827e3097cc6239b77ef9763169c81b51caabcf608c38dc65e7a35dfa2504b00",
@@ -5589,7 +5589,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:57f4ba1d9bd9551085f6dfed0c71933155f6d7af5f5915e6bf217129b956ff47",
             "base:6c0c492259555cd3b18f8d540adcd558fe9532ea88f2091fd4e6ad987da86656",
@@ -5642,7 +5642,7 @@
           "compiled_tail_sha256": "5de041779a9cd23b55a510ef690faa81666fcba267bd21516fc5db2e7e5d7a3d",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "f827e3097cc6239b77ef9763169c81b51caabcf608c38dc65e7a35dfa2504b00",
@@ -5670,7 +5670,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:omp",
             "plan:57b98940bb7b6a587fe566314b74855ec1a3e74ead490e741aa1fa0a090dd826",
             "base:d4b9bcdd050d9aac1888a8406a0251d4367165413cc437b0a3b270e60a7abcb7",
@@ -5723,7 +5723,7 @@
           "compiled_tail_sha256": "5de041779a9cd23b55a510ef690faa81666fcba267bd21516fc5db2e7e5d7a3d",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "f827e3097cc6239b77ef9763169c81b51caabcf608c38dc65e7a35dfa2504b00",
@@ -5751,7 +5751,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:d9698d33125c50e248eeabaad2bba243bc3db9821ccf1d56d5c1ce880e110750",
             "base:6c0c492259555cd3b18f8d540adcd558fe9532ea88f2091fd4e6ad987da86656",
@@ -6390,7 +6390,7 @@
           "compiled_tail_sha256": "063cd9828832277de0b60c5093f04aa3cec9fbde8f2891a0e8c76299fed65f68",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "3df09a9fbac1f8158f13fa4c1a99894a730ef0b8ac563b959f25ce9b79f639a8",
@@ -6418,7 +6418,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:claude",
             "plan:382403e8b8b46c9f41557ae8c28c81f12cbd54f7ddaf4f684d4ccf7ed623e179",
             "base:78cf9c72da1543da26932f9dfb928ee1f7fac9d6167ef7bc447e1ec0a451a4bf",
@@ -6471,7 +6471,7 @@
           "compiled_tail_sha256": "063cd9828832277de0b60c5093f04aa3cec9fbde8f2891a0e8c76299fed65f68",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "3df09a9fbac1f8158f13fa4c1a99894a730ef0b8ac563b959f25ce9b79f639a8",
@@ -6499,7 +6499,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:codex",
             "plan:a4dc936c1ae918f49f8dce92e586d133c9a7899d9a825a47688541e682329607",
             "base:383a6443394060666c43f369e6feccfd0d7184ca9d9e6ff04a840465ca6fee56",
@@ -6552,7 +6552,7 @@
           "compiled_tail_sha256": "063cd9828832277de0b60c5093f04aa3cec9fbde8f2891a0e8c76299fed65f68",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "3df09a9fbac1f8158f13fa4c1a99894a730ef0b8ac563b959f25ce9b79f639a8",
@@ -6580,7 +6580,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:9de906257234cfe2ce409091af486f9c0a430b672055e0c24416ff8bd60fdefb",
             "base:30b82e7d761141070d959957842f4ec99845e01fc2e669b29476ecddf62c8e68",
@@ -6633,7 +6633,7 @@
           "compiled_tail_sha256": "063cd9828832277de0b60c5093f04aa3cec9fbde8f2891a0e8c76299fed65f68",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "3df09a9fbac1f8158f13fa4c1a99894a730ef0b8ac563b959f25ce9b79f639a8",
@@ -6661,7 +6661,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:omp",
             "plan:1d4af4cb3090f5245e93283f0baf63f4667db78586bbb4a60ff1e9d8438a9bed",
             "base:6cbeeda9cb0bd8f8af1021dee2264b4d455211f1edb5d497221c4c4decf9deee",
@@ -6714,7 +6714,7 @@
           "compiled_tail_sha256": "063cd9828832277de0b60c5093f04aa3cec9fbde8f2891a0e8c76299fed65f68",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "3df09a9fbac1f8158f13fa4c1a99894a730ef0b8ac563b959f25ce9b79f639a8",
@@ -6742,7 +6742,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:2104c9324ea1dce5f7c4756636b9145014c6d381dfe9bc8d2e72e4e5b8a300af",
             "base:30b82e7d761141070d959957842f4ec99845e01fc2e669b29476ecddf62c8e68",
@@ -7333,7 +7333,7 @@
           "compiled_tail_sha256": "ead0612462e40303524305d0d22096d67fac524a707d4b928b9ab897d6a79fb2",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "91d33c5f537e9ae207682d656f5fdfc0ccd408e6ec6403232fbef67ebed72410",
@@ -7361,7 +7361,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:claude",
             "plan:fedf6c92f6e1bdb6dfe89dba7594de94aaf4c6017a7d5839c14128f14a5d2c01",
             "base:b51d3946d68b71a0a0fcc3fefde973cf04a1c4f858428eba89f1f95e97054f15",
@@ -7422,7 +7422,7 @@
           "compiled_tail_sha256": "ead0612462e40303524305d0d22096d67fac524a707d4b928b9ab897d6a79fb2",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "91d33c5f537e9ae207682d656f5fdfc0ccd408e6ec6403232fbef67ebed72410",
@@ -7450,7 +7450,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:codex",
             "plan:8f4c82f8ee9905af1008269668d82e2a211ed73b1a4ee581edefcb584fd0d59e",
             "base:24e78e28a0fd446022081fe82ab6660642ef0c70e909c3ef5041ba3b1737b83e",
@@ -7511,7 +7511,7 @@
           "compiled_tail_sha256": "ead0612462e40303524305d0d22096d67fac524a707d4b928b9ab897d6a79fb2",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "91d33c5f537e9ae207682d656f5fdfc0ccd408e6ec6403232fbef67ebed72410",
@@ -7539,7 +7539,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:c269a0a278635525752dd595541b22c8d0a4236a0ff480b43a0fa64d98541979",
             "base:ab8f5c85212eb330ff1a3a7601ece8cd8c15f1a629441ff3bf4b945e410792b5",
@@ -7600,7 +7600,7 @@
           "compiled_tail_sha256": "ead0612462e40303524305d0d22096d67fac524a707d4b928b9ab897d6a79fb2",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "91d33c5f537e9ae207682d656f5fdfc0ccd408e6ec6403232fbef67ebed72410",
@@ -7628,7 +7628,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:omp",
             "plan:1570c760576b8fa694f529dce755719f0a98147a5d24c2be1268395cc230240a",
             "base:307ddb1822d10621706d0f07f2a439d9be7be6902bd89ba1e1e7fc43eec5340c",
@@ -7689,7 +7689,7 @@
           "compiled_tail_sha256": "ead0612462e40303524305d0d22096d67fac524a707d4b928b9ab897d6a79fb2",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "91d33c5f537e9ae207682d656f5fdfc0ccd408e6ec6403232fbef67ebed72410",
@@ -7717,7 +7717,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:b02399bad65f506bf54c45d2dc7e2cb7407c617e1896a260c324ec63bd6a01d6",
             "base:ab8f5c85212eb330ff1a3a7601ece8cd8c15f1a629441ff3bf4b945e410792b5",
@@ -8446,7 +8446,7 @@
           "compiled_tail_sha256": "cd4124b03361f4f713c40161575002b51d67885a11061b50764277a88cafa65a",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "925cb724c8942b4337934442beaf95703608122e8d82821972902cec17a7e4ed",
@@ -8474,7 +8474,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:claude",
             "plan:43359611ceff4e807803164ea6d232a16b32134aa16fe33d4418a903726133ff",
             "base:3404a7fe5858c37df454711997f31fb2e6267aee2717301b7e96c74322cef3da",
@@ -8537,7 +8537,7 @@
           "compiled_tail_sha256": "cd4124b03361f4f713c40161575002b51d67885a11061b50764277a88cafa65a",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "925cb724c8942b4337934442beaf95703608122e8d82821972902cec17a7e4ed",
@@ -8565,7 +8565,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:codex",
             "plan:992bdc5b97000daf552e17736fa4757c44410079f7afc70791c3f69af75fdba5",
             "base:006e474440576384b3ee140ece4c667d9afc83a7506ca804d26ef57575310c62",
@@ -8628,7 +8628,7 @@
           "compiled_tail_sha256": "cd4124b03361f4f713c40161575002b51d67885a11061b50764277a88cafa65a",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "925cb724c8942b4337934442beaf95703608122e8d82821972902cec17a7e4ed",
@@ -8656,7 +8656,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:12c415f17a19bf35f286fe013a691620decc940da5fed7163cb824d10787e8e0",
             "base:9f598457359180e4d16d0be1c367ee99344f06b3a73cc377950e457740c2af79",
@@ -8719,7 +8719,7 @@
           "compiled_tail_sha256": "cd4124b03361f4f713c40161575002b51d67885a11061b50764277a88cafa65a",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "925cb724c8942b4337934442beaf95703608122e8d82821972902cec17a7e4ed",
@@ -8747,7 +8747,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:omp",
             "plan:b48b154d90d52178245088833ff61a2ca7fab3b9bebaa5f13a845f0f4c9a2df4",
             "base:edc07b4e8dd5886ce3b3e7fe30b8e7117f00cb93fb4dc6d4616070f89b567ae1",
@@ -8810,7 +8810,7 @@
           "compiled_tail_sha256": "cd4124b03361f4f713c40161575002b51d67885a11061b50764277a88cafa65a",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "925cb724c8942b4337934442beaf95703608122e8d82821972902cec17a7e4ed",
@@ -8838,7 +8838,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:1fbaa1ea048ecd8ea5bf51e9ff3077aad0af985263868dedc688d0aeb6455175",
             "base:9f598457359180e4d16d0be1c367ee99344f06b3a73cc377950e457740c2af79",
@@ -9623,7 +9623,7 @@
           "compiled_tail_sha256": "6ff008a7065fc91244264830da4fabb4452283531b9dad4b47be78341f90c95a",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "4dce53aec24345b9d91547c2f8b77cf1d1b6da7bf2b9d5c05ca73e8db6a411e5",
@@ -9651,7 +9651,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:claude",
             "plan:f2a9ec638131276232c7e047594f90ffa8e388ec7c6d60d01fa88ec2bd6384db",
             "base:136dcf7e9a9205800b875089c17407a34af5986b2b3b04c6c9178ac168e331d5",
@@ -9725,7 +9725,7 @@
           "compiled_tail_sha256": "6ff008a7065fc91244264830da4fabb4452283531b9dad4b47be78341f90c95a",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "4dce53aec24345b9d91547c2f8b77cf1d1b6da7bf2b9d5c05ca73e8db6a411e5",
@@ -9753,7 +9753,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:codex",
             "plan:27c63396e3c032f4481716d85a8d6ca10d162aa40f14721a4dd5b8c3bd7be6f0",
             "base:9bb8735351485609bde9c5be814917eb62da460ef5cb6d39dc7413eb43ef47f4",
@@ -9827,7 +9827,7 @@
           "compiled_tail_sha256": "6ff008a7065fc91244264830da4fabb4452283531b9dad4b47be78341f90c95a",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "4dce53aec24345b9d91547c2f8b77cf1d1b6da7bf2b9d5c05ca73e8db6a411e5",
@@ -9855,7 +9855,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:d4fde6a8365e5b8d8279692d00747610ddce51473450b5f749d541b8328f31a8",
             "base:111975d639da9a507313f100e21bb09cc484fb591603ea73057423f65426bd2f",
@@ -9929,7 +9929,7 @@
           "compiled_tail_sha256": "6ff008a7065fc91244264830da4fabb4452283531b9dad4b47be78341f90c95a",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "4dce53aec24345b9d91547c2f8b77cf1d1b6da7bf2b9d5c05ca73e8db6a411e5",
@@ -9957,7 +9957,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:omp",
             "plan:209afc9a669a10857b5c1efc20741c6ca0323557437782dba41e40a4e8b716e0",
             "base:b6c27c2c712bed82ba28c4ba6ae42e974198c14f86bf9b47abdf1de95b9f02ee",
@@ -10031,7 +10031,7 @@
           "compiled_tail_sha256": "6ff008a7065fc91244264830da4fabb4452283531b9dad4b47be78341f90c95a",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "4dce53aec24345b9d91547c2f8b77cf1d1b6da7bf2b9d5c05ca73e8db6a411e5",
@@ -10059,7 +10059,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:935f768f871772b6d5d3177e96755fd535d03fae45a9d0c4b06ec690834297dc",
             "base:111975d639da9a507313f100e21bb09cc484fb591603ea73057423f65426bd2f",
@@ -10835,7 +10835,7 @@
           "compiled_tail_sha256": "cb43c611b59a561de5b862a3608e64df3f614831293921dd5841799e0646026c",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "6f452bc78bfdd106dc9f1d73df91dfe6308689fb69d6989bd077fb5258e8bcde",
@@ -10863,7 +10863,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:claude",
             "plan:0937040766ada791cf5ad257ac04dbcc08f7f496e24496ce7cbccb4263a9f876",
             "base:cd728c19d8f1a6f966f64873ec382b0690c29200ab8cad160f2110673298dfc1",
@@ -10917,7 +10917,7 @@
           "compiled_tail_sha256": "cb43c611b59a561de5b862a3608e64df3f614831293921dd5841799e0646026c",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "6f452bc78bfdd106dc9f1d73df91dfe6308689fb69d6989bd077fb5258e8bcde",
@@ -10945,7 +10945,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:codex",
             "plan:9bdcf87746283da1ee07470c8ad4239d1e9a90dc1b52a1db7b7ece39d2d8d348",
             "base:42fa7c73e0c4cdc3034d2267eb3d9b5fcb1a09decf470a9f239de889b5d2928b",
@@ -10999,7 +10999,7 @@
           "compiled_tail_sha256": "cb43c611b59a561de5b862a3608e64df3f614831293921dd5841799e0646026c",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "6f452bc78bfdd106dc9f1d73df91dfe6308689fb69d6989bd077fb5258e8bcde",
@@ -11027,7 +11027,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:8aeaac140b4338c3f38b5918b7dd58526dddf5028ad5e2cacadff9f8bb4cfce4",
             "base:0001df0fb2244cdff4a80dc0bec0d26e847653914f9d38abc91af3a78ddc50ca",
@@ -11081,7 +11081,7 @@
           "compiled_tail_sha256": "cb43c611b59a561de5b862a3608e64df3f614831293921dd5841799e0646026c",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "6f452bc78bfdd106dc9f1d73df91dfe6308689fb69d6989bd077fb5258e8bcde",
@@ -11109,7 +11109,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:omp",
             "plan:3bd0af9f8564c39b8087ea948088264f8063a8ab3bce7ea9e04bbf12bd839eca",
             "base:f89ecfb29269bacc88482880cdfc53b254b44e5a2759580efc3e95c0b2225615",
@@ -11163,7 +11163,7 @@
           "compiled_tail_sha256": "cb43c611b59a561de5b862a3608e64df3f614831293921dd5841799e0646026c",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "6f452bc78bfdd106dc9f1d73df91dfe6308689fb69d6989bd077fb5258e8bcde",
@@ -11191,7 +11191,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:d993503ecc9f39f273ca2803ccde9e09391c4a2e31f93b82081f79047042e328",
             "base:0001df0fb2244cdff4a80dc0bec0d26e847653914f9d38abc91af3a78ddc50ca",
@@ -11831,7 +11831,7 @@
           "compiled_tail_sha256": "729431c6e2f1992d7b68aa46795111a3ec021e873d413f07c371e208919e1825",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "925cb724c8942b4337934442beaf95703608122e8d82821972902cec17a7e4ed",
@@ -11859,7 +11859,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:claude",
             "plan:31db24ae505c51cceddbd3bf469626b8ecd29cc0151c8cd570210fd2444eb97a",
             "base:27abd7c980c30cad31471ab442b94b93cbb809def2a690b7a52310cbd362b1ec",
@@ -11917,7 +11917,7 @@
           "compiled_tail_sha256": "729431c6e2f1992d7b68aa46795111a3ec021e873d413f07c371e208919e1825",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "925cb724c8942b4337934442beaf95703608122e8d82821972902cec17a7e4ed",
@@ -11945,7 +11945,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:codex",
             "plan:862506c91630e8561c25df76a4c45ce5a53040a636609f12d0692eba222cf06f",
             "base:fd51891374fe361f92a7dbe98974241bb43e4bba4cb4acdd8350c7422192da9d",
@@ -12003,7 +12003,7 @@
           "compiled_tail_sha256": "729431c6e2f1992d7b68aa46795111a3ec021e873d413f07c371e208919e1825",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "925cb724c8942b4337934442beaf95703608122e8d82821972902cec17a7e4ed",
@@ -12031,7 +12031,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:84789b569676c5bebabca7d33addc8ec5e30b6342d2df80a33f961e544ed9182",
             "base:7101e37813cc64dd112d606d33c668db57fb32bb27c483e86d91a835181a0ef8",
@@ -12089,7 +12089,7 @@
           "compiled_tail_sha256": "729431c6e2f1992d7b68aa46795111a3ec021e873d413f07c371e208919e1825",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "925cb724c8942b4337934442beaf95703608122e8d82821972902cec17a7e4ed",
@@ -12117,7 +12117,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:omp",
             "plan:9ecc08140238844160c63e4ab9016d86300eb9dd8355de37a18261a3525d11eb",
             "base:8a71fb9f9ef4c252f0bd2658f337fbac533ae04e92c720bb4f6e25ebdcbde89c",
@@ -12175,7 +12175,7 @@
           "compiled_tail_sha256": "729431c6e2f1992d7b68aa46795111a3ec021e873d413f07c371e208919e1825",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "925cb724c8942b4337934442beaf95703608122e8d82821972902cec17a7e4ed",
@@ -12203,7 +12203,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:bd72eae4a3b9f03001fee93139cf0ddbbdf4179aec91755ddab5d36e50b092a5",
             "base:7101e37813cc64dd112d606d33c668db57fb32bb27c483e86d91a835181a0ef8",
@@ -12935,7 +12935,7 @@
           "compiled_tail_sha256": "6ff008a7065fc91244264830da4fabb4452283531b9dad4b47be78341f90c95a",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "920a2a12556df4f2cd0f88c37507586d721603ca8132fdef75ef2d822b8033c9",
@@ -12963,7 +12963,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:claude",
             "plan:fc8ceddca8d3623b351077b75dc9ca5e8cdf831d10962e4aa06fa6809d5ed151",
             "base:d14db6c4e17e8b0d6ef735f3372f63fa1c729d507254a2ca1fe62b0b9f14bda6",
@@ -13037,7 +13037,7 @@
           "compiled_tail_sha256": "6ff008a7065fc91244264830da4fabb4452283531b9dad4b47be78341f90c95a",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "920a2a12556df4f2cd0f88c37507586d721603ca8132fdef75ef2d822b8033c9",
@@ -13065,7 +13065,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:codex",
             "plan:eedbea65eadcf826208dbb5e297de2f1872481eee45f453072aa0e9638847fe7",
             "base:73fa7e00083f7bf3e544c05172c2761ae75e2fd12bc4ae4e2f60a168f95c5e91",
@@ -13139,7 +13139,7 @@
           "compiled_tail_sha256": "6ff008a7065fc91244264830da4fabb4452283531b9dad4b47be78341f90c95a",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "920a2a12556df4f2cd0f88c37507586d721603ca8132fdef75ef2d822b8033c9",
@@ -13167,7 +13167,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:058947fcecc792ff9f6e61b7636aee3136446ccf66489f42e2051a121d6020ad",
             "base:c4fe11150be0ff73215eb8ded7fb179325d8d3ee12f4ce903cb1a4f7102c591a",
@@ -13241,7 +13241,7 @@
           "compiled_tail_sha256": "6ff008a7065fc91244264830da4fabb4452283531b9dad4b47be78341f90c95a",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "920a2a12556df4f2cd0f88c37507586d721603ca8132fdef75ef2d822b8033c9",
@@ -13269,7 +13269,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:omp",
             "plan:3849e4b3e8421c97498d00619cf2964981d6641db97d4cc561d350e094aeb3b3",
             "base:d8a67d7699d94714c55707673f1b265aa50c6572b8cf4d6eed129ed858ffb836",
@@ -13343,7 +13343,7 @@
           "compiled_tail_sha256": "6ff008a7065fc91244264830da4fabb4452283531b9dad4b47be78341f90c95a",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "920a2a12556df4f2cd0f88c37507586d721603ca8132fdef75ef2d822b8033c9",
@@ -13371,7 +13371,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:59210442c212d7c11a1d1367fc6d6caf8c87ae27e4c8c37a266bf75f1a636b83",
             "base:c4fe11150be0ff73215eb8ded7fb179325d8d3ee12f4ce903cb1a4f7102c591a",
@@ -14150,7 +14150,7 @@
           "compiled_tail_sha256": "10447014b399afb5b948643d61bbcc62f4a5ac95ebc8080f16ed8849553c17be",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "fbeb474a1ecf50c3e466df5975a399dd4e81e26ca222d5bbf4f74fda6f7c9215",
@@ -14178,7 +14178,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:claude",
             "plan:d4d785ef134efe66acd300ca0639eacb77e2d20901939275a6f6a0ceb0ab6c70",
             "base:7b87fca531fd21a689bf0b9292ecc5c2d62ddcfbf7ce043f25da38236bcddeb0",
@@ -14240,7 +14240,7 @@
           "compiled_tail_sha256": "10447014b399afb5b948643d61bbcc62f4a5ac95ebc8080f16ed8849553c17be",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "fbeb474a1ecf50c3e466df5975a399dd4e81e26ca222d5bbf4f74fda6f7c9215",
@@ -14268,7 +14268,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:codex",
             "plan:213e088218b822f8866feb00a27ffb25cd4d24232fd9d94a5ef3b97dfe66a371",
             "base:5ea8b47ffe7becffbb159412341f247cee4403ba48ba8c1991941bd52be7332c",
@@ -14330,7 +14330,7 @@
           "compiled_tail_sha256": "10447014b399afb5b948643d61bbcc62f4a5ac95ebc8080f16ed8849553c17be",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "fbeb474a1ecf50c3e466df5975a399dd4e81e26ca222d5bbf4f74fda6f7c9215",
@@ -14358,7 +14358,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:81036c491534802bc42b7b61685dab1b7045a9ddbbbf73b449d32965fadb5260",
             "base:f4a1bb8380030920d49f729da9af540f2f721ef875062f2c3bf3681d3e61c802",
@@ -14420,7 +14420,7 @@
           "compiled_tail_sha256": "10447014b399afb5b948643d61bbcc62f4a5ac95ebc8080f16ed8849553c17be",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "fbeb474a1ecf50c3e466df5975a399dd4e81e26ca222d5bbf4f74fda6f7c9215",
@@ -14448,7 +14448,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:omp",
             "plan:a46ae1e366647901ec626fdade84e1780d426aa6624b0639a6e02a5b6bd16117",
             "base:be8c9a898686fa6de5991752225bbf1a19a3b2419d27f1dce37dbe0ca6266235",
@@ -14510,7 +14510,7 @@
           "compiled_tail_sha256": "10447014b399afb5b948643d61bbcc62f4a5ac95ebc8080f16ed8849553c17be",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "fbeb474a1ecf50c3e466df5975a399dd4e81e26ca222d5bbf4f74fda6f7c9215",
@@ -14538,7 +14538,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:906ef1f7de9bef0aa169e4ef274286ae6ddcdfc189d2a3c0f1eadea9f91d4b72",
             "base:f4a1bb8380030920d49f729da9af540f2f721ef875062f2c3bf3681d3e61c802",
@@ -15302,7 +15302,7 @@
           "compiled_tail_sha256": "7496fb6cc970a40b0272132eaab7e7ecee9ce57d8d7d4a81ecda4121c3d78209",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "52ae48a359e73591008c522ae81778ff8be6f4bde8c7153f20fcea4883f1deaf",
@@ -15330,7 +15330,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:claude",
             "plan:6092c54ee5e6d4706ce39391d1c2b3aa2992abf021ae7e0af7a7926d0e15526b",
             "base:3cbd3e1552c144cfdcfeadaf1f191350760550270a66eaf21e3e6ad79308767c",
@@ -15394,7 +15394,7 @@
           "compiled_tail_sha256": "7496fb6cc970a40b0272132eaab7e7ecee9ce57d8d7d4a81ecda4121c3d78209",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "52ae48a359e73591008c522ae81778ff8be6f4bde8c7153f20fcea4883f1deaf",
@@ -15422,7 +15422,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:codex",
             "plan:3dac4fc3de52510014bc3ccea6d0e4a9dec26e752cefb172efa5dd0ac3139d41",
             "base:34240c0a3138468ca7647d1885afa5d783c9e9c78641c5b58fb3b2f08076a48e",
@@ -15486,7 +15486,7 @@
           "compiled_tail_sha256": "7496fb6cc970a40b0272132eaab7e7ecee9ce57d8d7d4a81ecda4121c3d78209",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "52ae48a359e73591008c522ae81778ff8be6f4bde8c7153f20fcea4883f1deaf",
@@ -15514,7 +15514,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:1e5718ffba904390e0ac5663d7ac3ce3585b4d37cae3efeb2b259793be945d76",
             "base:48d29c78e425a307cc91eb4f4e6ca00092890f51f2799a27b0fcde4b96e43912",
@@ -15578,7 +15578,7 @@
           "compiled_tail_sha256": "7496fb6cc970a40b0272132eaab7e7ecee9ce57d8d7d4a81ecda4121c3d78209",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "52ae48a359e73591008c522ae81778ff8be6f4bde8c7153f20fcea4883f1deaf",
@@ -15606,7 +15606,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:omp",
             "plan:2ab7aac137a375120c87e33d535e5f618e199437658e21ad808b8a7dbf8be924",
             "base:85049aee032f44f92b4f5e5904cf9a4fb5a0612b3b8d2a77a33a540176856f01",
@@ -15670,7 +15670,7 @@
           "compiled_tail_sha256": "7496fb6cc970a40b0272132eaab7e7ecee9ce57d8d7d4a81ecda4121c3d78209",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "52ae48a359e73591008c522ae81778ff8be6f4bde8c7153f20fcea4883f1deaf",
@@ -15698,7 +15698,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:c8df0aca803ba097cf7eb572d6f5084a83ff5b957765130176a02062395cbcf9",
             "base:48d29c78e425a307cc91eb4f4e6ca00092890f51f2799a27b0fcde4b96e43912",
@@ -16492,7 +16492,7 @@
           "compiled_tail_sha256": "aa75f12968727327e599df1dbcc1441fb6d750ac93bcccf38261ddeb3b4ba3c5",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "a62078ec0936e90591a514f5d03e54c3487f3f0e09e0c5484c73c1ea561ae080",
@@ -16520,7 +16520,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:claude",
             "plan:1ebef312bca8caaf67eb86cd58cfe5191af6bd17f9ef26200fed12e99bc3ebe1",
             "base:799af56ba0d8d539f1d7c81c538e66fd0e6aa61264c1b4c68d8e604dfc6d2bf8",
@@ -16582,7 +16582,7 @@
           "compiled_tail_sha256": "aa75f12968727327e599df1dbcc1441fb6d750ac93bcccf38261ddeb3b4ba3c5",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "a62078ec0936e90591a514f5d03e54c3487f3f0e09e0c5484c73c1ea561ae080",
@@ -16610,7 +16610,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:codex",
             "plan:3b3fc5f90eb1b2da96319b73d9c95de6c97b4edd54056ccc384a6110472fb256",
             "base:0155226742c6277992139a38b8b65416c8b44cc4677d97d92de3d614b4e3329f",
@@ -16672,7 +16672,7 @@
           "compiled_tail_sha256": "aa75f12968727327e599df1dbcc1441fb6d750ac93bcccf38261ddeb3b4ba3c5",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "a62078ec0936e90591a514f5d03e54c3487f3f0e09e0c5484c73c1ea561ae080",
@@ -16700,7 +16700,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:4217542f57757129c05207bd30a232d7595f0a2921b571b0468a6c558dcab579",
             "base:ebe25878104e1a4097204bae35d99ba34b72e2823d844cb5e3c0ece499ced248",
@@ -16762,7 +16762,7 @@
           "compiled_tail_sha256": "aa75f12968727327e599df1dbcc1441fb6d750ac93bcccf38261ddeb3b4ba3c5",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "a62078ec0936e90591a514f5d03e54c3487f3f0e09e0c5484c73c1ea561ae080",
@@ -16790,7 +16790,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:omp",
             "plan:9c3edee52ff9b095e749522e607abb2fbacc0da104806878ee2e3569a472acfb",
             "base:92497973265f79db6d99a13941579c3f075f5924e9f154dce282fee909e73f38",
@@ -16852,7 +16852,7 @@
           "compiled_tail_sha256": "aa75f12968727327e599df1dbcc1441fb6d750ac93bcccf38261ddeb3b4ba3c5",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "a62078ec0936e90591a514f5d03e54c3487f3f0e09e0c5484c73c1ea561ae080",
@@ -16880,7 +16880,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:0aaf7664083fec53e1a1f1808d42a68e0a5a9eeb0d7a0d90e8614e60a1ce2e2e",
             "base:ebe25878104e1a4097204bae35d99ba34b72e2823d844cb5e3c0ece499ced248",
@@ -17646,7 +17646,7 @@
           "compiled_tail_sha256": "93479c0984d4f30bb88ebd8a776742fadf26053d274ddbe2456d3022caa821fe",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "f65c269913ba4134daf10c94b17abf5066b334912eb0726cf87e2fdec1c98550",
@@ -17674,7 +17674,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:claude",
             "plan:3267db95cb45db2d6d17f4d11a5257fcfed74bccccf4bc664b3b8e3d5a2ec687",
             "base:24f97d559b98a405ac8db26e321ddba15bb6661ebd884e23413a056e68b3f7e8",
@@ -17732,7 +17732,7 @@
           "compiled_tail_sha256": "93479c0984d4f30bb88ebd8a776742fadf26053d274ddbe2456d3022caa821fe",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "f65c269913ba4134daf10c94b17abf5066b334912eb0726cf87e2fdec1c98550",
@@ -17760,7 +17760,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:codex",
             "plan:3a0871aa660ca1f42f9a41d09a2bf7398033bfae89f6dbf9942591636d706388",
             "base:344422ae3a1540651a732aa4fcf39182a11956b6cf334101cd913942afb47d12",
@@ -17818,7 +17818,7 @@
           "compiled_tail_sha256": "93479c0984d4f30bb88ebd8a776742fadf26053d274ddbe2456d3022caa821fe",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "f65c269913ba4134daf10c94b17abf5066b334912eb0726cf87e2fdec1c98550",
@@ -17846,7 +17846,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:d7932ad662bee5c90246d427416e0bedb670a6e2144ee9feb8fd545cee78a2eb",
             "base:90d8bc1b68e84acabcfb30f4c6a0e6475ef2c48f038ce53855438eccd02cae37",
@@ -17904,7 +17904,7 @@
           "compiled_tail_sha256": "93479c0984d4f30bb88ebd8a776742fadf26053d274ddbe2456d3022caa821fe",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "f65c269913ba4134daf10c94b17abf5066b334912eb0726cf87e2fdec1c98550",
@@ -17932,7 +17932,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:omp",
             "plan:09fa6d28b89ca4ea6fe4dc3bfb57d78a53ec9ba2a08559db70343dee580e24be",
             "base:2f5a38828abe4db51753bb56e0696294212848695f5bfe739d2db95570a02752",
@@ -17990,7 +17990,7 @@
           "compiled_tail_sha256": "93479c0984d4f30bb88ebd8a776742fadf26053d274ddbe2456d3022caa821fe",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "f65c269913ba4134daf10c94b17abf5066b334912eb0726cf87e2fdec1c98550",
@@ -18018,7 +18018,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:16f6464a16e036f86fae4c89b033a377a09c0664270c114f7f8ea20d80f46e1c",
             "base:90d8bc1b68e84acabcfb30f4c6a0e6475ef2c48f038ce53855438eccd02cae37",
@@ -18705,7 +18705,7 @@
           "compiled_tail_sha256": "0daa44694a8a49d6b7c307601644bf849afb59455d88d3390c91204c1ddccea2",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "b4d7e10bc8736808a84a954e60b46b96491600ee167088a074fb62e0feaf1b42",
@@ -18733,7 +18733,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:claude",
             "plan:6bcb05d9fdc42348585907ce8b18a29762b0e63b10c3906dd4c56c8c2e5405f8",
             "base:33b29c18897774cfa5d9b691b77671d435d5541c091be09027ab08bafef9ffd8",
@@ -18796,7 +18796,7 @@
           "compiled_tail_sha256": "0daa44694a8a49d6b7c307601644bf849afb59455d88d3390c91204c1ddccea2",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "b4d7e10bc8736808a84a954e60b46b96491600ee167088a074fb62e0feaf1b42",
@@ -18824,7 +18824,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:codex",
             "plan:fd184875e39a0ff8beb02eca75fe8a4c1b73892ee74255e70fd0bf42be3b297e",
             "base:19e2efdef2b635773a9480d54d88e99171bc9490305e94b073163fc4433195b8",
@@ -18887,7 +18887,7 @@
           "compiled_tail_sha256": "0daa44694a8a49d6b7c307601644bf849afb59455d88d3390c91204c1ddccea2",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "b4d7e10bc8736808a84a954e60b46b96491600ee167088a074fb62e0feaf1b42",
@@ -18915,7 +18915,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:ef8c2ee9a09a41eff466c1057f4aa64a0f30ca358c3a188aa0e9b0a8c1bb0fac",
             "base:b017f39a5b20831a5fee8908d29d102a0c49241291d6a32f41995a5d8a96c3e0",
@@ -18978,7 +18978,7 @@
           "compiled_tail_sha256": "0daa44694a8a49d6b7c307601644bf849afb59455d88d3390c91204c1ddccea2",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "b4d7e10bc8736808a84a954e60b46b96491600ee167088a074fb62e0feaf1b42",
@@ -19006,7 +19006,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:omp",
             "plan:2edfea4863d9568a4085a5f1522befca0b7f50db2f05cd87f6fec8ddf821eea8",
             "base:832a4832dc8c1b2858b5105b9e63df12ce458d440ce87e5bce425c42c5414360",
@@ -19069,7 +19069,7 @@
           "compiled_tail_sha256": "0daa44694a8a49d6b7c307601644bf849afb59455d88d3390c91204c1ddccea2",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "b4d7e10bc8736808a84a954e60b46b96491600ee167088a074fb62e0feaf1b42",
@@ -19097,7 +19097,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:410a2fa079f22c023bc570693c34eee910898b7cc16d70f79e7652cb5cd3ddee",
             "base:b017f39a5b20831a5fee8908d29d102a0c49241291d6a32f41995a5d8a96c3e0",
@@ -19876,7 +19876,7 @@
           "compiled_tail_sha256": "83e493f32d08df4550d8a1555e0d448239590de2fb9d7aa7ca89fca2454b86b5",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "d3091a8520575b3075533a16d5976d0004550a3891bea4b5ae9f9b26b3d6eb76",
@@ -19904,7 +19904,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:claude",
             "plan:4a692fd2188435ac628374a2e0df609b74e354e5242d4c1f1f0fc8846e88b09f",
             "base:66b1082b03fcffc847cab860e1258381e3bf31fdefd38444a3d452d0bdc467c9",
@@ -19966,7 +19966,7 @@
           "compiled_tail_sha256": "83e493f32d08df4550d8a1555e0d448239590de2fb9d7aa7ca89fca2454b86b5",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "d3091a8520575b3075533a16d5976d0004550a3891bea4b5ae9f9b26b3d6eb76",
@@ -19994,7 +19994,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:codex",
             "plan:2a3326f97ffb1ea65c6cd0b31c31228c0d91becfc7fe0564d2c7505686379d54",
             "base:50bed4b2826a0fa222a4c3250c0cd10add7bf639605b59885301b9498583e81c",
@@ -20056,7 +20056,7 @@
           "compiled_tail_sha256": "83e493f32d08df4550d8a1555e0d448239590de2fb9d7aa7ca89fca2454b86b5",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "d3091a8520575b3075533a16d5976d0004550a3891bea4b5ae9f9b26b3d6eb76",
@@ -20084,7 +20084,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:c5b3aac2e262cceb996571c42d9091bef976f8dcb8e8609d06f998d3e868b008",
             "base:034c91eb39f5b6e273d3c336b799d1936e710edeb89fd3dd19076af045acd942",
@@ -20146,7 +20146,7 @@
           "compiled_tail_sha256": "83e493f32d08df4550d8a1555e0d448239590de2fb9d7aa7ca89fca2454b86b5",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "d3091a8520575b3075533a16d5976d0004550a3891bea4b5ae9f9b26b3d6eb76",
@@ -20174,7 +20174,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:omp",
             "plan:7ad32f8ffd6afb62b537746cb5cee6d4ac448478e7f5db980a1dd54aca3dedc9",
             "base:6e0226b4bee0a1235238573d98f263f57a46001ea033b87efb528db5de336050",
@@ -20236,7 +20236,7 @@
           "compiled_tail_sha256": "83e493f32d08df4550d8a1555e0d448239590de2fb9d7aa7ca89fca2454b86b5",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
-            "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "version": "2"
           },
           "effective_external_catalog_sha256": "d3091a8520575b3075533a16d5976d0004550a3891bea4b5ae9f9b26b3d6eb76",
@@ -20264,7 +20264,7 @@
           "identity_kind": "ROLE",
           "invalidation_keys": [
             "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-            "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+            "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
             "harness:pi",
             "plan:b55ad34a79ac6692d7e815331a260c600f9b39be7dd27c09f3afcd6523bc1213",
             "base:034c91eb39f5b6e273d3c336b799d1936e710edeb89fd3dd19076af045acd942",
@@ -20987,11 +20987,11 @@
           "bbk-context-routing",
           "bbk"
         ],
-        "compiled_prompt_sha256": "2d5b3c6601776135dc8daad54fc917d83272edd11a1e2b724f9bb819fd3e1d92",
-        "compiled_tail_sha256": "5629642409af9980438fa3e136141a9d6500d044d8703353238c78a1adab26fb",
+        "compiled_prompt_sha256": "65e4356c1c2eb1408123c1e1c076bfd1a0779e314cc654211e18ec27ec0b4111",
+        "compiled_tail_sha256": "07b00f4941c9b453117b012f38c50895c61a9a6b9c07f53612626f2d08386a50",
         "compiler": {
           "id": "bbk.compiled-procedure-compiler",
-          "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+          "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
           "version": "2"
         },
         "effective_external_catalog_sha256": "adb50c860aca07380d2ab82cf83915fa2b0c887bf1fb64b88aa9c5c118697f7e",
@@ -21019,16 +21019,16 @@
         "identity_kind": "CONTROLLER",
         "invalidation_keys": [
           "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-          "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+          "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
           "harness:claude",
-          "plan:8febd4fea96be6c261b3638fa2a486c5ae4893cf575bfc1a7c39e197e8ca4558",
-          "base:7d807208e676eeb605ab81728648a8dc28c1c0102302d458d2825b2ce4502c53",
+          "plan:387e53de68075ca2c371176501ffee3ee37a7c1a627ddc7fa5c2e6e2abacbd5d",
+          "base:3178b32350b79072dee985a6613cca6b3969e1e1e350a61792e6bdb20b04dfe6",
           "tools:bbf031f2eaa84ca5fe29601b8d19e7b582900ccdeae76f4d9fec580b190b9573",
           "adapter:d6dcb13c63e5b05998badc2a67b5ac1c8b99b67bc3b1aee9adaf1667e1967d27"
         ],
         "invocation_id": null,
         "logical_child_id": "projection:claude:bbk_controller",
-        "plan_sha256": "8febd4fea96be6c261b3638fa2a486c5ae4893cf575bfc1a7c39e197e8ca4558",
+        "plan_sha256": "387e53de68075ca2c371176501ffee3ee37a7c1a627ddc7fa5c2e6e2abacbd5d",
         "procedures": [
           {
             "catalog_visibility": "SUPPRESSED",
@@ -21037,7 +21037,7 @@
               "bbk-prompt-human-request",
               "bbk-prompt-profile-qualification"
             ],
-            "effective_sha256": "ecf8b5bad5c8b17de4f1fe9a8ecb43f125f8cf6d2a7a2c128a86bb3eb7f6bda9",
+            "effective_sha256": "a5ca84a24eef95026422baf8a0aea75c8a2726e2fd8281c1838dde9893ea9f5c",
             "id": "bbk-context-routing",
             "ordering": 0,
             "selection_reason": "ROLE_REQUIRED",
@@ -21062,7 +21062,7 @@
               "bbk-prompt-effect-ownership",
               "bbk-prompt-coordination-economy"
             ],
-            "effective_sha256": "b268297d67e1d1c862a4b834950719fe74d67ceef4c2d20c60241961f218f987",
+            "effective_sha256": "9c34a8330120c508859a55ebf1303fe4a9c93d9e3aaf5db0ad2348db5a88eb80",
             "id": "bbk",
             "ordering": 1,
             "selection_reason": "PRIMARY",
@@ -21073,9 +21073,9 @@
           }
         ],
         "prompt_metrics": {
-          "characters": 12450,
-          "estimated_tokens": 3113,
-          "utf8_bytes": 12456
+          "characters": 51304,
+          "estimated_tokens": 12826,
+          "utf8_bytes": 51514
         },
         "registry_revision": "ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
         "role": "bbk_controller",
@@ -21104,7 +21104,7 @@
         ]
       },
       "event": {
-        "effective_prompt_sha256": "2d5b3c6601776135dc8daad54fc917d83272edd11a1e2b724f9bb819fd3e1d92",
+        "effective_prompt_sha256": "65e4356c1c2eb1408123c1e1c076bfd1a0779e314cc654211e18ec27ec0b4111",
         "event": "PROMPT_COMPILED",
         "external_catalog_sha256": "adb50c860aca07380d2ab82cf83915fa2b0c887bf1fb64b88aa9c5c118697f7e",
         "harness": "CLAUDE",
@@ -21124,25 +21124,25 @@
       "file": "bbk_controller.md",
       "source_map": [
         {
-          "end": 1863,
+          "end": 40582,
           "id": "base-prompt",
-          "sha256": "7d807208e676eeb605ab81728648a8dc28c1c0102302d458d2825b2ce4502c53",
+          "sha256": "3178b32350b79072dee985a6613cca6b3969e1e1e350a61792e6bdb20b04dfe6",
           "source": "canonical-role-or-controller",
           "start": 0
         },
         {
-          "end": 3049,
+          "end": 41795,
           "id": "procedure:bbk-context-routing",
-          "sha256": "ecf8b5bad5c8b17de4f1fe9a8ecb43f125f8cf6d2a7a2c128a86bb3eb7f6bda9",
+          "sha256": "a5ca84a24eef95026422baf8a0aea75c8a2726e2fd8281c1838dde9893ea9f5c",
           "source": "shared/skills/bbk-context-routing/SKILL.md",
-          "start": 2756
+          "start": 41475
         },
         {
-          "end": 12421,
+          "end": 51275,
           "id": "procedure:bbk",
-          "sha256": "b268297d67e1d1c862a4b834950719fe74d67ceef4c2d20c60241961f218f987",
+          "sha256": "9c34a8330120c508859a55ebf1303fe4a9c93d9e3aaf5db0ad2348db5a88eb80",
           "source": "shared/skills/bbk/SKILL.md",
-          "start": 3090
+          "start": 41836
         }
       ]
     },
@@ -21152,11 +21152,11 @@
           "bbk-context-routing",
           "bbk"
         ],
-        "compiled_prompt_sha256": "f9f9119e51178b9a85e90e9f335e47572bf5220ccce543b1c4ac737089cd3079",
-        "compiled_tail_sha256": "5629642409af9980438fa3e136141a9d6500d044d8703353238c78a1adab26fb",
+        "compiled_prompt_sha256": "87d7b158f2a80883fcb42b702bebbd09453250bb7d051a37630f70468463ac65",
+        "compiled_tail_sha256": "07b00f4941c9b453117b012f38c50895c61a9a6b9c07f53612626f2d08386a50",
         "compiler": {
           "id": "bbk.compiled-procedure-compiler",
-          "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+          "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
           "version": "2"
         },
         "effective_external_catalog_sha256": "adb50c860aca07380d2ab82cf83915fa2b0c887bf1fb64b88aa9c5c118697f7e",
@@ -21184,16 +21184,16 @@
         "identity_kind": "CONTROLLER",
         "invalidation_keys": [
           "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-          "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+          "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
           "harness:codex",
-          "plan:9bdeb8abf692ad954388541494deb1d6a7cf59ce443b59655a53052256854d4b",
-          "base:3899b78b25e337d084ae6e141d7b4ca78b653cfebc208c5fd9c0ff683a06865f",
+          "plan:76141805f5261640c6bc4f1785b80ad6a6ac1b9d6dd40e48d26bb9c0f9872169",
+          "base:6b017dd3d53cd9cacc47d7f81db609d4828f5af2e6d29122557cc60052e6fd4d",
           "tools:bbf031f2eaa84ca5fe29601b8d19e7b582900ccdeae76f4d9fec580b190b9573",
           "adapter:7d2c19a9fb53c3905aca25b9042af5175226e2469a4fbd72128f9f92b4ef646a"
         ],
         "invocation_id": null,
         "logical_child_id": "projection:codex:bbk_controller",
-        "plan_sha256": "9bdeb8abf692ad954388541494deb1d6a7cf59ce443b59655a53052256854d4b",
+        "plan_sha256": "76141805f5261640c6bc4f1785b80ad6a6ac1b9d6dd40e48d26bb9c0f9872169",
         "procedures": [
           {
             "catalog_visibility": "SUPPRESSED",
@@ -21202,7 +21202,7 @@
               "bbk-prompt-human-request",
               "bbk-prompt-profile-qualification"
             ],
-            "effective_sha256": "ecf8b5bad5c8b17de4f1fe9a8ecb43f125f8cf6d2a7a2c128a86bb3eb7f6bda9",
+            "effective_sha256": "a5ca84a24eef95026422baf8a0aea75c8a2726e2fd8281c1838dde9893ea9f5c",
             "id": "bbk-context-routing",
             "ordering": 0,
             "selection_reason": "ROLE_REQUIRED",
@@ -21227,7 +21227,7 @@
               "bbk-prompt-effect-ownership",
               "bbk-prompt-coordination-economy"
             ],
-            "effective_sha256": "b268297d67e1d1c862a4b834950719fe74d67ceef4c2d20c60241961f218f987",
+            "effective_sha256": "9c34a8330120c508859a55ebf1303fe4a9c93d9e3aaf5db0ad2348db5a88eb80",
             "id": "bbk",
             "ordering": 1,
             "selection_reason": "PRIMARY",
@@ -21238,9 +21238,9 @@
           }
         ],
         "prompt_metrics": {
-          "characters": 12449,
-          "estimated_tokens": 3113,
-          "utf8_bytes": 12455
+          "characters": 51303,
+          "estimated_tokens": 12826,
+          "utf8_bytes": 51513
         },
         "registry_revision": "ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
         "role": "bbk_controller",
@@ -21269,7 +21269,7 @@
         ]
       },
       "event": {
-        "effective_prompt_sha256": "f9f9119e51178b9a85e90e9f335e47572bf5220ccce543b1c4ac737089cd3079",
+        "effective_prompt_sha256": "87d7b158f2a80883fcb42b702bebbd09453250bb7d051a37630f70468463ac65",
         "event": "PROMPT_COMPILED",
         "external_catalog_sha256": "adb50c860aca07380d2ab82cf83915fa2b0c887bf1fb64b88aa9c5c118697f7e",
         "harness": "CODEX",
@@ -21289,25 +21289,25 @@
       "file": "bbk_controller.md",
       "source_map": [
         {
-          "end": 1862,
+          "end": 40581,
           "id": "base-prompt",
-          "sha256": "3899b78b25e337d084ae6e141d7b4ca78b653cfebc208c5fd9c0ff683a06865f",
+          "sha256": "6b017dd3d53cd9cacc47d7f81db609d4828f5af2e6d29122557cc60052e6fd4d",
           "source": "canonical-role-or-controller",
           "start": 0
         },
         {
-          "end": 3048,
+          "end": 41794,
           "id": "procedure:bbk-context-routing",
-          "sha256": "ecf8b5bad5c8b17de4f1fe9a8ecb43f125f8cf6d2a7a2c128a86bb3eb7f6bda9",
+          "sha256": "a5ca84a24eef95026422baf8a0aea75c8a2726e2fd8281c1838dde9893ea9f5c",
           "source": "shared/skills/bbk-context-routing/SKILL.md",
-          "start": 2755
+          "start": 41474
         },
         {
-          "end": 12420,
+          "end": 51274,
           "id": "procedure:bbk",
-          "sha256": "b268297d67e1d1c862a4b834950719fe74d67ceef4c2d20c60241961f218f987",
+          "sha256": "9c34a8330120c508859a55ebf1303fe4a9c93d9e3aaf5db0ad2348db5a88eb80",
           "source": "shared/skills/bbk/SKILL.md",
-          "start": 3089
+          "start": 41835
         }
       ]
     },
@@ -21317,11 +21317,11 @@
           "bbk-context-routing",
           "bbk"
         ],
-        "compiled_prompt_sha256": "7b02ef0f1052d7093aa57193c0efe88ba1529389ec9e675cdc50e72c1038e3d1",
-        "compiled_tail_sha256": "5629642409af9980438fa3e136141a9d6500d044d8703353238c78a1adab26fb",
+        "compiled_prompt_sha256": "25ec89078baf7a714447037fa5009a0103862ffc3ff267f059f5f62a2e6282ae",
+        "compiled_tail_sha256": "07b00f4941c9b453117b012f38c50895c61a9a6b9c07f53612626f2d08386a50",
         "compiler": {
           "id": "bbk.compiled-procedure-compiler",
-          "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+          "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
           "version": "2"
         },
         "effective_external_catalog_sha256": "adb50c860aca07380d2ab82cf83915fa2b0c887bf1fb64b88aa9c5c118697f7e",
@@ -21349,16 +21349,16 @@
         "identity_kind": "CONTROLLER",
         "invalidation_keys": [
           "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-          "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+          "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
           "harness:pi",
-          "plan:3d8ce3484f4e75e9e98e0e312d65a2ca5f3de11eec6691878ee4c869780279d7",
-          "base:acbb7dde40f710411c0187da8e52e1e9c32fa8827bcfe5a474acd3f435a9f9be",
+          "plan:7afbaae397fa5303e384fc9ca3d23bab05e73137e33ddf78558273df6cfb98da",
+          "base:02c572cefcce66e26d83fc62e4c7b8f45e4ffa58c7670eb08bfd2715a6b82dac",
           "tools:bbf031f2eaa84ca5fe29601b8d19e7b582900ccdeae76f4d9fec580b190b9573",
           "adapter:ca28355760ff23f49347ecb49827dff994647294cea440ec9a6e51cb8f53bde1"
         ],
         "invocation_id": null,
         "logical_child_id": "projection:generic:bbk_controller",
-        "plan_sha256": "3d8ce3484f4e75e9e98e0e312d65a2ca5f3de11eec6691878ee4c869780279d7",
+        "plan_sha256": "7afbaae397fa5303e384fc9ca3d23bab05e73137e33ddf78558273df6cfb98da",
         "procedures": [
           {
             "catalog_visibility": "SUPPRESSED",
@@ -21367,7 +21367,7 @@
               "bbk-prompt-human-request",
               "bbk-prompt-profile-qualification"
             ],
-            "effective_sha256": "ecf8b5bad5c8b17de4f1fe9a8ecb43f125f8cf6d2a7a2c128a86bb3eb7f6bda9",
+            "effective_sha256": "a5ca84a24eef95026422baf8a0aea75c8a2726e2fd8281c1838dde9893ea9f5c",
             "id": "bbk-context-routing",
             "ordering": 0,
             "selection_reason": "ROLE_REQUIRED",
@@ -21392,7 +21392,7 @@
               "bbk-prompt-effect-ownership",
               "bbk-prompt-coordination-economy"
             ],
-            "effective_sha256": "b268297d67e1d1c862a4b834950719fe74d67ceef4c2d20c60241961f218f987",
+            "effective_sha256": "9c34a8330120c508859a55ebf1303fe4a9c93d9e3aaf5db0ad2348db5a88eb80",
             "id": "bbk",
             "ordering": 1,
             "selection_reason": "PRIMARY",
@@ -21403,9 +21403,9 @@
           }
         ],
         "prompt_metrics": {
-          "characters": 12451,
-          "estimated_tokens": 3113,
-          "utf8_bytes": 12457
+          "characters": 51305,
+          "estimated_tokens": 12827,
+          "utf8_bytes": 51515
         },
         "registry_revision": "ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
         "role": "bbk_controller",
@@ -21434,7 +21434,7 @@
         ]
       },
       "event": {
-        "effective_prompt_sha256": "7b02ef0f1052d7093aa57193c0efe88ba1529389ec9e675cdc50e72c1038e3d1",
+        "effective_prompt_sha256": "25ec89078baf7a714447037fa5009a0103862ffc3ff267f059f5f62a2e6282ae",
         "event": "PROMPT_COMPILED",
         "external_catalog_sha256": "adb50c860aca07380d2ab82cf83915fa2b0c887bf1fb64b88aa9c5c118697f7e",
         "harness": "PI",
@@ -21454,25 +21454,25 @@
       "file": "bbk_controller.md",
       "source_map": [
         {
-          "end": 1864,
+          "end": 40583,
           "id": "base-prompt",
-          "sha256": "acbb7dde40f710411c0187da8e52e1e9c32fa8827bcfe5a474acd3f435a9f9be",
+          "sha256": "02c572cefcce66e26d83fc62e4c7b8f45e4ffa58c7670eb08bfd2715a6b82dac",
           "source": "canonical-role-or-controller",
           "start": 0
         },
         {
-          "end": 3050,
+          "end": 41796,
           "id": "procedure:bbk-context-routing",
-          "sha256": "ecf8b5bad5c8b17de4f1fe9a8ecb43f125f8cf6d2a7a2c128a86bb3eb7f6bda9",
+          "sha256": "a5ca84a24eef95026422baf8a0aea75c8a2726e2fd8281c1838dde9893ea9f5c",
           "source": "shared/skills/bbk-context-routing/SKILL.md",
-          "start": 2757
+          "start": 41476
         },
         {
-          "end": 12422,
+          "end": 51276,
           "id": "procedure:bbk",
-          "sha256": "b268297d67e1d1c862a4b834950719fe74d67ceef4c2d20c60241961f218f987",
+          "sha256": "9c34a8330120c508859a55ebf1303fe4a9c93d9e3aaf5db0ad2348db5a88eb80",
           "source": "shared/skills/bbk/SKILL.md",
-          "start": 3091
+          "start": 41837
         }
       ]
     },
@@ -21482,11 +21482,11 @@
           "bbk-context-routing",
           "bbk"
         ],
-        "compiled_prompt_sha256": "1ba792f0d808c443efdaf32abcd54e109770f8f0046e4adc6ab938c5aea6d5bb",
-        "compiled_tail_sha256": "5629642409af9980438fa3e136141a9d6500d044d8703353238c78a1adab26fb",
+        "compiled_prompt_sha256": "4cf5d829bec5f5fb6c2a51349d901b5d9d4a2ccfa23517cd5f447117ac4bdd54",
+        "compiled_tail_sha256": "07b00f4941c9b453117b012f38c50895c61a9a6b9c07f53612626f2d08386a50",
         "compiler": {
           "id": "bbk.compiled-procedure-compiler",
-          "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+          "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
           "version": "2"
         },
         "effective_external_catalog_sha256": "adb50c860aca07380d2ab82cf83915fa2b0c887bf1fb64b88aa9c5c118697f7e",
@@ -21514,16 +21514,16 @@
         "identity_kind": "CONTROLLER",
         "invalidation_keys": [
           "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-          "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+          "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
           "harness:omp",
-          "plan:65c7eab2cbbd739d36d694230633ca15ff5af22c5b7417d9184824d8f878901d",
-          "base:9d70bfc6e07bdbff7b010eaf572ed20066fe0637c242cece9d5ea36e2d8ef80b",
+          "plan:7239a39b63c161797907ba0a0582f757c1f9a98639cddbf91d9056f6f0c81032",
+          "base:bbb2daeed3bd15d4709491b05ee91721a5a845ca3dbba09f17293581373d0e49",
           "tools:bbf031f2eaa84ca5fe29601b8d19e7b582900ccdeae76f4d9fec580b190b9573",
           "adapter:e57042d9b068edcd73e50c3972138b4807dd0089fae5b36f5e43c4f8d69353cb"
         ],
         "invocation_id": null,
         "logical_child_id": "projection:omp:bbk_controller",
-        "plan_sha256": "65c7eab2cbbd739d36d694230633ca15ff5af22c5b7417d9184824d8f878901d",
+        "plan_sha256": "7239a39b63c161797907ba0a0582f757c1f9a98639cddbf91d9056f6f0c81032",
         "procedures": [
           {
             "catalog_visibility": "SUPPRESSED",
@@ -21532,7 +21532,7 @@
               "bbk-prompt-human-request",
               "bbk-prompt-profile-qualification"
             ],
-            "effective_sha256": "ecf8b5bad5c8b17de4f1fe9a8ecb43f125f8cf6d2a7a2c128a86bb3eb7f6bda9",
+            "effective_sha256": "a5ca84a24eef95026422baf8a0aea75c8a2726e2fd8281c1838dde9893ea9f5c",
             "id": "bbk-context-routing",
             "ordering": 0,
             "selection_reason": "ROLE_REQUIRED",
@@ -21557,7 +21557,7 @@
               "bbk-prompt-effect-ownership",
               "bbk-prompt-coordination-economy"
             ],
-            "effective_sha256": "b268297d67e1d1c862a4b834950719fe74d67ceef4c2d20c60241961f218f987",
+            "effective_sha256": "9c34a8330120c508859a55ebf1303fe4a9c93d9e3aaf5db0ad2348db5a88eb80",
             "id": "bbk",
             "ordering": 1,
             "selection_reason": "PRIMARY",
@@ -21568,9 +21568,9 @@
           }
         ],
         "prompt_metrics": {
-          "characters": 12874,
-          "estimated_tokens": 3219,
-          "utf8_bytes": 12880
+          "characters": 51728,
+          "estimated_tokens": 12932,
+          "utf8_bytes": 51938
         },
         "registry_revision": "ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
         "role": "bbk_controller",
@@ -21599,7 +21599,7 @@
         ]
       },
       "event": {
-        "effective_prompt_sha256": "1ba792f0d808c443efdaf32abcd54e109770f8f0046e4adc6ab938c5aea6d5bb",
+        "effective_prompt_sha256": "4cf5d829bec5f5fb6c2a51349d901b5d9d4a2ccfa23517cd5f447117ac4bdd54",
         "event": "PROMPT_COMPILED",
         "external_catalog_sha256": "adb50c860aca07380d2ab82cf83915fa2b0c887bf1fb64b88aa9c5c118697f7e",
         "harness": "OMP",
@@ -21619,25 +21619,25 @@
       "file": "bbk_controller.md",
       "source_map": [
         {
-          "end": 2287,
+          "end": 41006,
           "id": "base-prompt",
-          "sha256": "9d70bfc6e07bdbff7b010eaf572ed20066fe0637c242cece9d5ea36e2d8ef80b",
+          "sha256": "bbb2daeed3bd15d4709491b05ee91721a5a845ca3dbba09f17293581373d0e49",
           "source": "canonical-role-or-controller",
           "start": 0
         },
         {
-          "end": 3473,
+          "end": 42219,
           "id": "procedure:bbk-context-routing",
-          "sha256": "ecf8b5bad5c8b17de4f1fe9a8ecb43f125f8cf6d2a7a2c128a86bb3eb7f6bda9",
+          "sha256": "a5ca84a24eef95026422baf8a0aea75c8a2726e2fd8281c1838dde9893ea9f5c",
           "source": "shared/skills/bbk-context-routing/SKILL.md",
-          "start": 3180
+          "start": 41899
         },
         {
-          "end": 12845,
+          "end": 51699,
           "id": "procedure:bbk",
-          "sha256": "b268297d67e1d1c862a4b834950719fe74d67ceef4c2d20c60241961f218f987",
+          "sha256": "9c34a8330120c508859a55ebf1303fe4a9c93d9e3aaf5db0ad2348db5a88eb80",
           "source": "shared/skills/bbk/SKILL.md",
-          "start": 3514
+          "start": 42260
         }
       ]
     },
@@ -21647,11 +21647,11 @@
           "bbk-context-routing",
           "bbk"
         ],
-        "compiled_prompt_sha256": "8db0e1525cd97aa19dffa73852c99f86fa29e11c01c7a249aea99405c7f34327",
-        "compiled_tail_sha256": "5629642409af9980438fa3e136141a9d6500d044d8703353238c78a1adab26fb",
+        "compiled_prompt_sha256": "bacea046314551649b4cb0b988ad186cd531e7534f3e34ead339e37fd064d58f",
+        "compiled_tail_sha256": "07b00f4941c9b453117b012f38c50895c61a9a6b9c07f53612626f2d08386a50",
         "compiler": {
           "id": "bbk.compiled-procedure-compiler",
-          "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+          "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
           "version": "2"
         },
         "effective_external_catalog_sha256": "adb50c860aca07380d2ab82cf83915fa2b0c887bf1fb64b88aa9c5c118697f7e",
@@ -21679,16 +21679,16 @@
         "identity_kind": "CONTROLLER",
         "invalidation_keys": [
           "registry:ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
-          "compiler:96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa",
+          "compiler:6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a",
           "harness:pi",
-          "plan:2f14f2ff52e04a33d1fa71dee24520166cfd5d4f31b8e29374bf38e294647757",
-          "base:1ef20fd4a1291ec500ff8a3fcf32333ca5494b55087d3b470dc3341c4f6e9974",
+          "plan:1dc1de235209290701f329fee0baaf9d7bb394502547ceee875c9160545d9f3a",
+          "base:619d52b865db6538a76500739911cdcbe41252ddea6b46589fb16eace39330d5",
           "tools:bbf031f2eaa84ca5fe29601b8d19e7b582900ccdeae76f4d9fec580b190b9573",
           "adapter:585b5e6511a23e097b6966eead20307c6559844390c49f13a84c5e5168b2b525"
         ],
         "invocation_id": null,
         "logical_child_id": "projection:pi:bbk_controller",
-        "plan_sha256": "2f14f2ff52e04a33d1fa71dee24520166cfd5d4f31b8e29374bf38e294647757",
+        "plan_sha256": "1dc1de235209290701f329fee0baaf9d7bb394502547ceee875c9160545d9f3a",
         "procedures": [
           {
             "catalog_visibility": "SUPPRESSED",
@@ -21697,7 +21697,7 @@
               "bbk-prompt-human-request",
               "bbk-prompt-profile-qualification"
             ],
-            "effective_sha256": "ecf8b5bad5c8b17de4f1fe9a8ecb43f125f8cf6d2a7a2c128a86bb3eb7f6bda9",
+            "effective_sha256": "a5ca84a24eef95026422baf8a0aea75c8a2726e2fd8281c1838dde9893ea9f5c",
             "id": "bbk-context-routing",
             "ordering": 0,
             "selection_reason": "ROLE_REQUIRED",
@@ -21722,7 +21722,7 @@
               "bbk-prompt-effect-ownership",
               "bbk-prompt-coordination-economy"
             ],
-            "effective_sha256": "b268297d67e1d1c862a4b834950719fe74d67ceef4c2d20c60241961f218f987",
+            "effective_sha256": "9c34a8330120c508859a55ebf1303fe4a9c93d9e3aaf5db0ad2348db5a88eb80",
             "id": "bbk",
             "ordering": 1,
             "selection_reason": "PRIMARY",
@@ -21733,9 +21733,9 @@
           }
         ],
         "prompt_metrics": {
-          "characters": 12446,
-          "estimated_tokens": 3112,
-          "utf8_bytes": 12452
+          "characters": 51300,
+          "estimated_tokens": 12825,
+          "utf8_bytes": 51510
         },
         "registry_revision": "ff2b8ca37abc2f7947a6b8f54d82c4963fff1ac6c2329d965c81a5c62ac1e035",
         "role": "bbk_controller",
@@ -21764,7 +21764,7 @@
         ]
       },
       "event": {
-        "effective_prompt_sha256": "8db0e1525cd97aa19dffa73852c99f86fa29e11c01c7a249aea99405c7f34327",
+        "effective_prompt_sha256": "bacea046314551649b4cb0b988ad186cd531e7534f3e34ead339e37fd064d58f",
         "event": "PROMPT_COMPILED",
         "external_catalog_sha256": "adb50c860aca07380d2ab82cf83915fa2b0c887bf1fb64b88aa9c5c118697f7e",
         "harness": "PI",
@@ -21784,25 +21784,25 @@
       "file": "bbk_controller.md",
       "source_map": [
         {
-          "end": 1859,
+          "end": 40578,
           "id": "base-prompt",
-          "sha256": "1ef20fd4a1291ec500ff8a3fcf32333ca5494b55087d3b470dc3341c4f6e9974",
+          "sha256": "619d52b865db6538a76500739911cdcbe41252ddea6b46589fb16eace39330d5",
           "source": "canonical-role-or-controller",
           "start": 0
         },
         {
-          "end": 3045,
+          "end": 41791,
           "id": "procedure:bbk-context-routing",
-          "sha256": "ecf8b5bad5c8b17de4f1fe9a8ecb43f125f8cf6d2a7a2c128a86bb3eb7f6bda9",
+          "sha256": "a5ca84a24eef95026422baf8a0aea75c8a2726e2fd8281c1838dde9893ea9f5c",
           "source": "shared/skills/bbk-context-routing/SKILL.md",
-          "start": 2752
+          "start": 41471
         },
         {
-          "end": 12417,
+          "end": 51271,
           "id": "procedure:bbk",
-          "sha256": "b268297d67e1d1c862a4b834950719fe74d67ceef4c2d20c60241961f218f987",
+          "sha256": "9c34a8330120c508859a55ebf1303fe4a9c93d9e3aaf5db0ad2348db5a88eb80",
           "source": "shared/skills/bbk/SKILL.md",
-          "start": 3086
+          "start": 41832
         }
       ]
     }
@@ -21828,7 +21828,7 @@
     "projections/claude/agents/bbk-worker-designer.md": "9e8285d68c408a32346432002cd8f03ea30a748e2d9c8be275175fe855187282",
     "projections/claude/agents/bbk-worker-orchestrator.md": "cbf30cf6ec4a3d862643dd54c44c38e5a97a09e6d49e3b99ff7abff0bdc6b86c",
     "projections/claude/agents/bbk-worker.md": "0e7441bdc8759e213f73f9782785e2410b50242a42d66d0fbe5716a5e1cce7bc",
-    "projections/claude/controllers/bbk_controller.md": "2d5b3c6601776135dc8daad54fc917d83272edd11a1e2b724f9bb819fd3e1d92",
+    "projections/claude/controllers/bbk_controller.md": "65e4356c1c2eb1408123c1e1c076bfd1a0779e314cc654211e18ec27ec0b4111",
     "projections/codex/agents/bbk_architect.toml": "363b20d5de9cb04ffa6acaf680923a3cb0595a099bd0e911a5fd5d8f7db0ff34",
     "projections/codex/agents/bbk_phase_wayfinder.toml": "b455407d7a3f455ca649e943b9ae7fffbde795a98e7647b6e2a32b266225dd1e",
     "projections/codex/agents/bbk_planning_wayfinder.toml": "7cfc2d6cbda33657cbda860716dc5691b385d82295c12300fd714bf12260ed51",
@@ -21848,7 +21848,7 @@
     "projections/codex/agents/bbk_worker.toml": "732b6f6cab66e7bc43da0e053e0438572d54dc48403b6889c247ac61bb81a9f9",
     "projections/codex/agents/bbk_worker_designer.toml": "359c550f791c21aaab1c813a17ea33712d3a658aa5b1da0b8887e1bec0765edf",
     "projections/codex/agents/bbk_worker_orchestrator.toml": "9d52423a4763c7adf4b4917ef8db8c89ace480a07c0c5b41d694dc76400576f9",
-    "projections/codex/controllers/bbk_controller.md": "f9f9119e51178b9a85e90e9f335e47572bf5220ccce543b1c4ac737089cd3079",
+    "projections/codex/controllers/bbk_controller.md": "87d7b158f2a80883fcb42b702bebbd09453250bb7d051a37630f70468463ac65",
     "projections/generic/agents/bbk_architect.md": "ca2d8b842c1e7cedbfd30fc4027ddc07cfe30e6db21879dba5cf200fc4673bb5",
     "projections/generic/agents/bbk_phase_wayfinder.md": "5ff79ca607d7be581bc8a50da193ac37336c9b05b462effb145fc73f36581107",
     "projections/generic/agents/bbk_planning_wayfinder.md": "c4897f0224ef96e857c68cf007afd300565682793503b77680cdac4a2c3f9002",
@@ -21868,7 +21868,7 @@
     "projections/generic/agents/bbk_worker.md": "7f03aef0e1f8f8c60baa934cdb195d6dcd4968d4b537550fddacab8df8422c4f",
     "projections/generic/agents/bbk_worker_designer.md": "9e2c0c49c162d95cbc7c38b7a1d5d3a78887778fbc63163fcbb4b78b4787e123",
     "projections/generic/agents/bbk_worker_orchestrator.md": "7dcf0d6f47f0abf189400fb99bebdd46395973290f6bf85749174dd455777b0f",
-    "projections/generic/controllers/bbk_controller.md": "7b02ef0f1052d7093aa57193c0efe88ba1529389ec9e675cdc50e72c1038e3d1",
+    "projections/generic/controllers/bbk_controller.md": "25ec89078baf7a714447037fa5009a0103862ffc3ff267f059f5f62a2e6282ae",
     "projections/omp/agents/bbk_architect.md": "19168f15a32c1995fb48dcc1ecee15595f49ecf5d5b96dc75905e77b755c14e8",
     "projections/omp/agents/bbk_phase_wayfinder.md": "ae1abcc8d75e16a0dc768650627068cedf4885fbf9a62d0b9e22c9535ab34066",
     "projections/omp/agents/bbk_planning_wayfinder.md": "39d75c0f555e3370de2a9e593d44acdd1b95d37dd3e83f50f4750521699a3363",
@@ -21888,7 +21888,7 @@
     "projections/omp/agents/bbk_worker.md": "464db3bc9ce7b9e503c2dd1bc1c5f4e027c8ccb55cbdfaec881b6797ff60fc4d",
     "projections/omp/agents/bbk_worker_designer.md": "5b8c795702d12b380f5499f06fad0a40177a8098808499086009fcde2e548875",
     "projections/omp/agents/bbk_worker_orchestrator.md": "f7c7e8d2e5ba8bcd9f9d6b027f0738cbeec74e55add6bb820a51f0b55392947a",
-    "projections/omp/controllers/bbk_controller.md": "bd2c4f06361acdd7384b205287f9ae7246adca459951d5aa94ff19e95c769555",
+    "projections/omp/controllers/bbk_controller.md": "36260fd52ca98d28ab146250f6847e243184e2fbb36e10445a207ca1a7f42bd6",
     "projections/pi/agents/bbk_architect.md": "ca2d8b842c1e7cedbfd30fc4027ddc07cfe30e6db21879dba5cf200fc4673bb5",
     "projections/pi/agents/bbk_phase_wayfinder.md": "5ff79ca607d7be581bc8a50da193ac37336c9b05b462effb145fc73f36581107",
     "projections/pi/agents/bbk_planning_wayfinder.md": "c4897f0224ef96e857c68cf007afd300565682793503b77680cdac4a2c3f9002",
@@ -21908,7 +21908,7 @@
     "projections/pi/agents/bbk_worker.md": "7f03aef0e1f8f8c60baa934cdb195d6dcd4968d4b537550fddacab8df8422c4f",
     "projections/pi/agents/bbk_worker_designer.md": "9e2c0c49c162d95cbc7c38b7a1d5d3a78887778fbc63163fcbb4b78b4787e123",
     "projections/pi/agents/bbk_worker_orchestrator.md": "7dcf0d6f47f0abf189400fb99bebdd46395973290f6bf85749174dd455777b0f",
-    "projections/pi/controllers/bbk_controller.md": "8db0e1525cd97aa19dffa73852c99f86fa29e11c01c7a249aea99405c7f34327"
+    "projections/pi/controllers/bbk_controller.md": "bacea046314551649b4cb0b988ad186cd531e7534f3e34ead339e37fd064d58f"
   },
   "globally_suppressed_procedures": [
     "bbk",

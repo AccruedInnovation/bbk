@@ -1,7 +1,7 @@
 {
   "authority_disclaimer": "BBK is a temporary method harness and is not an official Blueprint release or authority-bearing package.",
   "created_at": "2026-08-07T00:00:00Z",
-  "file_count": 918,
+  "file_count": 920,
   "files": [
     {
       "bytes": 139,
@@ -10,10 +10,22 @@
       "sha256": "68621095cc05ceaaf0c7568ca0d7ad42b24dff6299d87426254ea5eac9ca25fe"
     },
     {
-      "bytes": 2009,
+      "bytes": 1004,
       "executable": false,
-      "path": ".github/workflows/windows-verification.yml",
-      "sha256": "fc2ccc68abb28cebddef45a7efe847139f4bb74ead463aea9d216a01602c698f"
+      "path": ".github/ISSUE_TEMPLATE/bug_report.yml",
+      "sha256": "8e45d2df63c1c85300d2e14c255ae484a51b6fd8b466df28a69feaf10532e233"
+    },
+    {
+      "bytes": 659,
+      "executable": false,
+      "path": ".github/ISSUE_TEMPLATE/feature_request.yml",
+      "sha256": "fd30f9d2905f5036b46cfdbce54a65cb007922a47a8028c76c889867f9caf1df"
+    },
+    {
+      "bytes": 736,
+      "executable": false,
+      "path": ".github/pull_request_template.md",
+      "sha256": "663da8cc54984605efe78a7b145ae20f1719c80855fcb4381258bbaf72a07c59"
     },
     {
       "bytes": 134,
@@ -37,7 +49,7 @@
       "bytes": 62989,
       "executable": false,
       "path": "PROMPT-COMPILATION-REPORT.json",
-      "sha256": "bb91e668426b97554187cd75aaf6945c2538f0f588708dd5535ca991759eb7d0"
+      "sha256": "b33a84ad8daa964ba60cbd4ad0b318b28b048056ef2d76b3f87aa6b2f76ef944"
     },
     {
       "bytes": 6351,
@@ -46,10 +58,10 @@
       "sha256": "1c56565405b7bbabab26c051f796f4ecaafc5ab319a92060377fa1fff0b07402"
     },
     {
-      "bytes": 20757,
+      "bytes": 21457,
       "executable": false,
       "path": "README.md",
-      "sha256": "d07d6069d6337c5cbb71ca84cc3c02867db73a7d437e63aed816da050d0ceb96"
+      "sha256": "addf071dd2666eb2b8aeaeaeef46dcd6381478c416a46af44c911bc94e098852"
     },
     {
       "bytes": 6811,
@@ -172,10 +184,10 @@
       "sha256": "4cac15d65e2d095d67450e4ba7e650907c603d2c7a9fedf25ef1f488527389e0"
     },
     {
-      "bytes": 19733,
+      "bytes": 21169,
       "executable": false,
       "path": "docs/INSTALL.md",
-      "sha256": "85ce063629c94410a5196e28f16d55fc03455eca1596e447d237a0551662a39a"
+      "sha256": "35e1ada42459ceb25abaa17ae3e68fb303f51267ffd4c1622777d20cedda003c"
     },
     {
       "bytes": 18316,
@@ -214,16 +226,16 @@
       "sha256": "e5b1fd86112f47536db11c5906912dfc27e9eb3c86179e1b01bcde19cc3d95a0"
     },
     {
-      "bytes": 5937,
+      "bytes": 6809,
       "executable": false,
       "path": "docs/UPGRADING.md",
-      "sha256": "06b8cbaa374661dce88ea6bac308235ce83ced902a78a6db65966bb41fb0e78f"
+      "sha256": "b84e67f90d839ec2b27a09c69c4bcfabe99962bd0a947f3c28110d7baeb220d2"
     },
     {
-      "bytes": 48552,
+      "bytes": 50099,
       "executable": false,
       "path": "docs/USAGE.md",
-      "sha256": "d81855250b050e9ac91d58c221875128bf985a5afc3449a7cdbaec648ca579c1"
+      "sha256": "e64937402f8c931b19170e41708ee5502bd584ba9d3cb79a98d2b5b910803c7d"
     },
     {
       "bytes": 5352,
@@ -1078,10 +1090,10 @@
       "sha256": "0e7441bdc8759e213f73f9782785e2410b50242a42d66d0fbe5716a5e1cce7bc"
     },
     {
-      "bytes": 12456,
+      "bytes": 51514,
       "executable": false,
       "path": "projections/claude/controllers/bbk_controller.md",
-      "sha256": "2d5b3c6601776135dc8daad54fc917d83272edd11a1e2b724f9bb819fd3e1d92"
+      "sha256": "65e4356c1c2eb1408123c1e1c076bfd1a0779e314cc654211e18ec27ec0b4111"
     },
     {
       "bytes": 96468,
@@ -1198,10 +1210,10 @@
       "sha256": "9d52423a4763c7adf4b4917ef8db8c89ace480a07c0c5b41d694dc76400576f9"
     },
     {
-      "bytes": 12455,
+      "bytes": 51513,
       "executable": false,
       "path": "projections/codex/controllers/bbk_controller.md",
-      "sha256": "f9f9119e51178b9a85e90e9f335e47572bf5220ccce543b1c4ac737089cd3079"
+      "sha256": "87d7b158f2a80883fcb42b702bebbd09453250bb7d051a37630f70468463ac65"
     },
     {
       "bytes": 97192,
@@ -1318,16 +1330,16 @@
       "sha256": "7dcf0d6f47f0abf189400fb99bebdd46395973290f6bf85749174dd455777b0f"
     },
     {
-      "bytes": 12457,
+      "bytes": 51515,
       "executable": false,
       "path": "projections/generic/controllers/bbk_controller.md",
-      "sha256": "7b02ef0f1052d7093aa57193c0efe88ba1529389ec9e675cdc50e72c1038e3d1"
+      "sha256": "25ec89078baf7a714447037fa5009a0103862ffc3ff267f059f5f62a2e6282ae"
     },
     {
-      "bytes": 1184438,
+      "bytes": 1184463,
       "executable": false,
       "path": "projections/manifest.json",
-      "sha256": "f385624ab35798fc760f9aef26de69192a652a0219b0d68b331b0fd9c6d4e199"
+      "sha256": "203e3796c09b0a5f3df3a4429b1d703c9808088e046e534202d63d82142fd2ed"
     },
     {
       "bytes": 98702,
@@ -1444,10 +1456,10 @@
       "sha256": "f7c7e8d2e5ba8bcd9f9d6b027f0738cbeec74e55add6bb820a51f0b55392947a"
     },
     {
-      "bytes": 13053,
+      "bytes": 52111,
       "executable": false,
       "path": "projections/omp/controllers/bbk_controller.md",
-      "sha256": "bd2c4f06361acdd7384b205287f9ae7246adca459951d5aa94ff19e95c769555"
+      "sha256": "36260fd52ca98d28ab146250f6847e243184e2fbb36e10445a207ca1a7f42bd6"
     },
     {
       "bytes": 97192,
@@ -1564,10 +1576,10 @@
       "sha256": "7dcf0d6f47f0abf189400fb99bebdd46395973290f6bf85749174dd455777b0f"
     },
     {
-      "bytes": 12452,
+      "bytes": 51510,
       "executable": false,
       "path": "projections/pi/controllers/bbk_controller.md",
-      "sha256": "8db0e1525cd97aa19dffa73852c99f86fa29e11c01c7a249aea99405c7f34327"
+      "sha256": "bacea046314551649b4cb0b988ad186cd531e7534f3e34ead339e37fd064d58f"
     },
     {
       "bytes": 957,
@@ -4414,10 +4426,10 @@
       "sha256": "31b67d77b9072df2d2f0ace2469700db1cea5c3224439eecc6f4978715bfc78f"
     },
     {
-      "bytes": 5174,
+      "bytes": 7404,
       "executable": false,
       "path": "tests/test_compiled_procedures_alpha17.py",
-      "sha256": "7dff34458979aafa905787c4db61d579ac2782511b843839aba78269a5543d69"
+      "sha256": "24a1b5ba054d1a37f200a574b4691ccb142ceb619a76188351a2d0cea10985a3"
     },
     {
       "bytes": 10748,
@@ -4498,10 +4510,10 @@
       "sha256": "7eaf43f6833a004f36e660708bb95e4f10b7de5ba1daa0693c62698021646cf5"
     },
     {
-      "bytes": 12884,
+      "bytes": 20706,
       "executable": false,
       "path": "tests/test_installation_codex_workspace.py",
-      "sha256": "aabc01f2efccab593d3ba2e38d5298b63cc84851c9326cd73f30eb83ab54f305"
+      "sha256": "fc936fff2b7caca686050ddb3137ff191c8a25d93f6d80f0369584a8c947ca4d"
     },
     {
       "bytes": 14033,
@@ -4786,10 +4798,10 @@
       "sha256": "7839c1c6da6aafef06520330be061a6241ca4b3510565ff3abd4cfe164b481ab"
     },
     {
-      "bytes": 47420,
+      "bytes": 50683,
       "executable": false,
       "path": "tools/compiled_procedures.py",
-      "sha256": "96ebe9c94ee398cb2294e908fdd90a01101202ef5c92dbeb648f32e81fd081aa"
+      "sha256": "6d70bcaadb22a461e4b8b545be000597813f74f15fea3ce4bba30553ffb83e4a"
     },
     {
       "bytes": 20549,
@@ -4846,10 +4858,10 @@
       "sha256": "405746fb6ef148103ca78eba4c55cba14735b53f9b1737bef645f32f84c69e52"
     },
     {
-      "bytes": 40583,
+      "bytes": 41938,
       "executable": false,
       "path": "tools/generate_agents.py",
-      "sha256": "babef9f8829a8c38489b245b81ad0c3549379802331fe3f7d06b74d38d8f43ca"
+      "sha256": "6bff01c96fe7f7a8f16c9b72501bc55cdfae757a2128b5fe91e4a74d1ab60ebd"
     },
     {
       "bytes": 9070,
@@ -4888,10 +4900,10 @@
       "sha256": "71c42f0232674d4c7deacb24afe59442cc1387ac3a4a5667702705e8aa0b944d"
     },
     {
-      "bytes": 113094,
+      "bytes": 121966,
       "executable": false,
       "path": "tools/install.py",
-      "sha256": "e0f6bd3f59d8064eff3f6906cf76b1a831d1c0a0dbdc2f90cfae39755beba80e"
+      "sha256": "b5ac31728d56eea87c6bbc532748e98ba0b6cfcd337059ab1d1a1e9fc519a87e"
     },
     {
       "bytes": 18061,
@@ -5446,10 +5458,10 @@
       "sha256": "875de7ea9989a9e7922af00a1c2edebfa7062038fcc4135d211e54e57654b551"
     },
     {
-      "bytes": 27888,
+      "bytes": 34171,
       "executable": false,
       "path": "tools/update_codex.py",
-      "sha256": "2b06eacb2fe75ff228b3706b3bdbbb8b0cabf32c3e492457cf25b69201c5eba9"
+      "sha256": "7c6d77f2d253d532adefd97db282875f819b7d3d2b94731fd77787edd27dc68b"
     },
     {
       "bytes": 44509,
@@ -5520,7 +5532,7 @@
   "projection_count": 100,
   "projection_source_sha256": "a1f5c20bd0a01f4feebdc1d46b4087fd3f5cb6b4492faf80a47a0ab26717d2fe",
   "role_count": 19,
-  "root_sha256": "966af72ce93072930cca9edc00f7160f3afb2895bc98a0bec94f5e4519728888",
+  "root_sha256": "a9839fbb75c50623f6b4b82bef56dc7d4cbdb8eaeae283a4fec9d8d0a0260ea7",
   "schema": "bbk.package-manifest.v1",
   "targets": [
     "claude",

@@ -94,6 +94,8 @@ Test and install Codex at user scope:
 python tools/setup.py --test-and-install --scope user --codex
 ```
 
+Then start a fresh Codex session and invoke `$bbk` when BBK control is wanted. The user-scoped install makes the skill and named agents available; it does not add a global instruction that activates BBK in every project.
+
 Select another host or combine host flags:
 
 ```bash
@@ -137,7 +139,7 @@ Use project scope for definitions owned by one repository:
 python tools/setup.py --install --scope project --root /path/to/repository --codex
 ```
 
-Project scope requires an explicit project root. OMP project installations allow each repository to keep its own runtime routing state. Generic project agents are written under `<project>/.agents/bbk/agents`; Pi agents under `<project>/.pi/agents`; Codex agents under `<project>/.codex/agents`; OMP agents and extensions under `<project>/.omp`; and Claude Code agents and skills under `<project>/.claude`.
+Project scope requires an explicit project root. A Codex project install also creates or updates a delimited, installer-managed BBK activation block in `<project>/AGENTS.md`. Existing user content outside that block is preserved; BBK does not replace the file wholesale. OMP project installations allow each repository to keep its own runtime routing state. Generic project agents are written under `<project>/.agents/bbk/agents`; Pi agents under `<project>/.pi/agents`; Codex agents under `<project>/.codex/agents`; OMP agents and extensions under `<project>/.omp`; and Claude Code agents and skills under `<project>/.claude`.
 
 ## Verify without installing
 
@@ -265,7 +267,9 @@ python tools/setup.py --install --scope user --omp --codex --claude \
 
 ## Installed skills and agent definitions
 
-For Codex, OMP, Pi, and generic targets, shared skills are installed under the selected `.agents/skills` root. Claude Code receives the same canonical skills under `.claude/skills`.
+For Codex, OMP, Pi, and generic targets, installable skills are written under the selected `.agents/skills` root. Claude Code receives them under `.claude/skills`. Codex receives the `$bbk` controller skill and Claude Code receives `/bbk`; invoke the appropriate skill in a fresh host session. OMP's identically spelled `/bbk` command activates extension-owned persistent mode rather than a discovered skill.
+
+Controller compilation does not create a twentieth child agent. OMP consumes its compiled controller projection through extension-owned prompt replacement. Codex and Claude Code receive the controller through their installed `$bbk` and `/bbk` skill surfaces respectively, while their 19 generated `bbk_*` definitions remain non-user-facing child roles.
 
 The `bbk-artifact` skill includes the semantic procedure, host metadata, a generic draft template, a reference, and Windows/POSIX wrappers. The wrapper resolves the nearest valid project install first and then the user install, and calls the exact recorded Python interpreter and installed `tools/bbk.py`.
 
@@ -322,7 +326,7 @@ python tools/setup.py --test-and-update-codex --scope user
 python tools/setup.py --update-codex --scope user
 ```
 
-This updates Codex agent definitions and their shared skill surface. It preserves OMP, Pi, Claude Code, generic agents, installed profile packages, and the shared installed package state except for manifest records needed by the Codex update. Start a fresh Codex session if the host cached agent definitions.
+This updates Codex agent definitions and the installed `$bbk` and external optional skill surface. At project scope it also reconciles the managed BBK activation block in `AGENTS.md` without changing content outside that block. It preserves OMP, Pi, Claude Code, generic agents, installed profile packages, and the shared installed package state except for manifest records needed by the Codex update. Start a fresh Codex session after the update.
 
 Update only OMP while Codex remains available:
 
@@ -386,7 +390,10 @@ Claude Code agents: ~/.claude/agents               or <project>/.claude/agents
 Generic agents:     ~/.agents/bbk/agents           or <project>/.agents/bbk/agents
 Shared skills:      ~/.agents/skills               or <project>/.agents/skills
 Claude skills:      ~/.claude/skills               or <project>/.claude/skills
+Codex activation:   (none at user scope)            or <project>/AGENTS.md managed block
 ```
+
+After any install or update, start a fresh session in the affected host so it reloads skills and agent definitions. For OMP, reload the extension before starting that fresh session.
 
 The exact `bbk-installed-profiles` registry is written to each selected skill root. `effective-language-profiles.json` provides the machine-readable installation record. Use `bbk --json profile list` to inspect the active profile registry.
 

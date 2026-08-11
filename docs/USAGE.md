@@ -2,7 +2,7 @@
 
 This is the operating guide for BBK `0.1.0-alpha.17.0.2.1`. Installation and update details are in [`INSTALL.md`](INSTALL.md); role contracts are in [`AGENTS.md`](AGENTS.md); and qualification limits are in [`BOUNDARIES.md`](BOUNDARIES.md).
 
-BBK uses the harness-root session as the sole user-facing controller and exposes four controller-selectable canonical roots. All 19 roles are non-user-facing children compiled from split v4 role sources, 43 prompt modules, exact role-specific procedures, and generated v2 return contracts. Codex, OMP, Pi, Claude Code, and generic projections are generated from the same host-neutral compilation plan; OMP additionally replaces Main and child system prompts so conflicting generic or client-specific instructions cannot govern BBK work.
+BBK uses the harness-root session as the sole user-facing controller and exposes four controller-selectable canonical roots. All 19 roles are non-user-facing children compiled from split v4 role sources, 43 prompt modules, exact role-specific procedures, and generated v2 return contracts. Controller and child-role projections share the host-neutral compilation inputs, but they are delivered differently: OMP's extension uses the compiled controller to replace Main's prompt, while Codex exposes `$bbk` and Claude Code exposes `/bbk` as their installed controller skill. A controller projection is not installed as a child agent.
 
 ## Quick start
 
@@ -19,6 +19,8 @@ python tools/setup.py --install-dependencies --codex
 python tools/setup.py --test-and-install --scope user --codex
 ```
 
+Start a fresh Codex session after installation. The user-scoped install makes `$bbk` available but does not activate BBK for every Codex project or turn; invoke `$bbk` when you want the controller. A project-scoped Codex install also maintains a bounded BBK activation block in the project's `AGENTS.md`, preserving all content outside that managed block.
+
 Codex-only installation and verification do not require Node. The root `mise.toml` declares only jj and Beads; the Node pin is isolated in the non-default `tools/omp-runtime.mise.toml`. For OMP, select OMP on both commands so the bootstrap also installs that pinned Node runtime through mise:
 
 ```bash
@@ -28,7 +30,7 @@ python tools/setup.py --test-and-install --scope user --omp
 
 Use `--pi`, `--claude`, or `--generic` instead of `--codex`, or combine host flags. With no host flag, the installer selects all five projection targets, including OMP and its Node dependency. All bundled language profiles install by default. The dependency script installs BBK's declared system, managed, and Python package dependencies; it does not install the selected agent host or a language-profile toolchain.
 
-For OMP, reload the extension after an update and enter BBK mode:
+After installing or updating OMP, reload the extension, start a fresh OMP session, and enter BBK mode:
 
 ```text
 /reload-plugins
@@ -135,11 +137,17 @@ The JSON record distinguishes `task_status`, `peer_status`, `peer_status_current
 
 In persistent BBK mode, task results and IRC messages are event-delivered. Main should continue independent work or use an empty `job`/`irc wait` when blocked. The extension denies specific-job polling and rate-limits successful nonblocking list/inbox/roster probes to one per 300 seconds while children remain active. This prevents short polling loops without treating silence as failure or removing explicit cancellation.
 
-### Codex, Pi, Claude Code, and generic hosts
+### Codex and Claude Code
 
-Invoke the installed baseline `bbk` controller procedure in the visible parent session. That session is the only user-facing endpoint. Invoke a named canonical role where the host supports children so its model, effort, inlined mandatory procedures, tools, spawn policy, and return contract apply. Children return human-decision packets through the parent channel; they never open a separate user interaction. Only when named-agent invocation is genuinely unavailable may the visible session adopt a logical role, and it must preserve the same authority and communication boundaries.
+Invoke the installed `$bbk` skill in Codex or the installed `/bbk` skill in Claude Code from the visible parent session. OMP also spells its persistent extension-mode command `/bbk`, but that command is a different host surface from Claude Code's skill. The parent session is the only user-facing endpoint. Invoke a named canonical role where the host supports children so its model, effort, inlined mandatory procedures, tools, spawn policy, and return contract apply. Children return human-decision packets through the parent channel; they never open a separate user interaction. Only when named-agent invocation is genuinely unavailable may the visible session adopt a logical role, and it must preserve the same authority and communication boundaries.
+
+At Codex project scope, the installer creates or updates only its delimited managed activation block in `<project>/AGENTS.md`; existing user-authored content outside that block is retained. That block directs Codex to use the installed `$bbk` skill for project work. At user scope, the installer makes the skill discoverable but deliberately does not write a global activation instruction, so ordinary Codex sessions remain ordinary until `$bbk` is invoked. Start a fresh Codex or Claude Code session after every BBK install or update so the host discovers the new skill and agent definitions.
 
 For Codex, choose the parent turn's sandbox and approval policy before delegation. BBK custom agents do not force `read-only`; they inherit that parent setting. Claude Code roles likewise receive Edit/Write so non-mutating roles can persist coordination artifacts. Inherited write access does not authorize subject or product changes: those remain limited to the canonical mutating roles and their exact grants.
+
+### Pi and generic hosts
+
+Use the installed host-compatible definitions and keep the visible parent as the sole user-facing endpoint. These hosts do not gain OMP's `/bbk` command or extension-owned prompt replacement.
 
 ### Codex `multi_agent_v2` configuration
 
@@ -694,7 +702,7 @@ To update only BBK's Codex custom-agent definitions while preserving OMP and its
 python tools/setup.py --test-and-update-codex --scope user
 ```
 
-Use `--update-codex` instead when the release has already been verified. The updater changes BBK's 19 Codex custom-agent files, installs or refreshes the seven-file canonical `bbk-artifact` skill under `.agents/skills`, and reconciles unified-manifest ownership. It preserves the installed package, launcher, effective model-routing file, OMP agent/extension state, Pi agents, Claude Code, generic agents, and language profiles. Start a fresh Codex turn or session if the host has cached agent definitions or skills.
+Use `--update-codex` instead when the release has already been verified. The updater changes BBK's 19 Codex custom-agent files, installs or refreshes the controller `$bbk` skill and external optional skills under `.agents/skills`, maintains the project `AGENTS.md` activation block when project scope is selected, and reconciles unified-manifest ownership. It preserves user content outside the managed block, the installed package, launcher, effective model-routing file, OMP agent/extension state, Pi agents, Claude Code, generic agents, and language profiles. Start a fresh Codex session after the update.
 
 To update only OMP while Codex remains running:
 

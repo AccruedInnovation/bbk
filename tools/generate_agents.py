@@ -596,6 +596,41 @@ def render_controller(spec: Mapping[str, Any], *, host: str, compiled: Compilati
     return compiled.prompt
 
 
+CONTROLLER_SKILL_ACTIVATION = {
+    "codex": "Use this skill when the user invokes `$bbk` or explicitly asks Codex to use BBK.",
+    "claude": "Use this skill when the user invokes `/bbk` or explicitly asks Claude Code to use BBK.",
+    "pi": "Use this skill when the user selects the `bbk` skill or explicitly asks Pi to use BBK.",
+    "generic": "Use this skill when the user selects the `bbk` skill or explicitly asks the host to use BBK.",
+    "omp": "This skill is a discovery surface only; activate BBK through OMP's `/bbk` mode command.",
+}
+
+
+def rendered_controller_skill(
+    spec: Mapping[str, Any],
+    *,
+    host: str,
+    compiled: CompilationResult | None = None,
+) -> str:
+    """Render an installable, host-facing ``bbk`` SKILL.md."""
+    if host not in CONTROLLER_SKILL_ACTIVATION:
+        raise ValueError(f"unsupported controller skill host: {host}")
+    activation = CONTROLLER_SKILL_ACTIVATION[host]
+    result = compiled or compiled_controller(spec, host=host)
+    if "Apply the already embedded" in result.prompt:
+        raise ValueError("compiled controller contains unresolved prompt-module placeholders")
+    return "\n".join([
+        "---",
+        "name: bbk",
+        f"description: {yaml_scalar(activation)}",
+        "---",
+        "",
+        activation,
+        "",
+        result.prompt.rstrip(),
+        "",
+    ])
+
+
 def rendered_projections(
     model_routing_path: Path = MODEL_ROUTING_PATH,
     *,

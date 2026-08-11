@@ -2153,8 +2153,8 @@
         "bbk-context-routing",
         "bbk"
       ],
-      "prompt_characters": 12449,
-      "prompt_sha256": "f9f9119e51178b9a85e90e9f335e47572bf5220ccce543b1c4ac737089cd3079",
+      "prompt_characters": 51303,
+      "prompt_sha256": "87d7b158f2a80883fcb42b702bebbd09453250bb7d051a37630f70468463ac65",
       "target": "codex"
     },
     {
@@ -2171,8 +2171,8 @@
         "bbk-context-routing",
         "bbk"
       ],
-      "prompt_characters": 12874,
-      "prompt_sha256": "1ba792f0d808c443efdaf32abcd54e109770f8f0046e4adc6ab938c5aea6d5bb",
+      "prompt_characters": 51728,
+      "prompt_sha256": "4cf5d829bec5f5fb6c2a51349d901b5d9d4a2ccfa23517cd5f447117ac4bdd54",
       "target": "omp"
     },
     {
@@ -2189,8 +2189,8 @@
         "bbk-context-routing",
         "bbk"
       ],
-      "prompt_characters": 12450,
-      "prompt_sha256": "2d5b3c6601776135dc8daad54fc917d83272edd11a1e2b724f9bb819fd3e1d92",
+      "prompt_characters": 51304,
+      "prompt_sha256": "65e4356c1c2eb1408123c1e1c076bfd1a0779e314cc654211e18ec27ec0b4111",
       "target": "claude"
     },
     {
@@ -2207,8 +2207,8 @@
         "bbk-context-routing",
         "bbk"
       ],
-      "prompt_characters": 12446,
-      "prompt_sha256": "8db0e1525cd97aa19dffa73852c99f86fa29e11c01c7a249aea99405c7f34327",
+      "prompt_characters": 51300,
+      "prompt_sha256": "bacea046314551649b4cb0b988ad186cd531e7534f3e34ead339e37fd064d58f",
       "target": "pi"
     },
     {
@@ -2225,8 +2225,8 @@
         "bbk-context-routing",
         "bbk"
       ],
-      "prompt_characters": 12451,
-      "prompt_sha256": "7b02ef0f1052d7093aa57193c0efe88ba1529389ec9e675cdc50e72c1038e3d1",
+      "prompt_characters": 51305,
+      "prompt_sha256": "25ec89078baf7a714447037fa5009a0103862ffc3ff267f059f5f62a2e6282ae",
       "target": "generic"
     }
   ],

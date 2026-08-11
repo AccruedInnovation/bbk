@@ -27,7 +27,7 @@ python tools/setup.py --install-dependencies --codex
 python tools/setup.py --install --scope user --codex
 ```
 
-The dependency command asks for consent before it changes system or user tools. Then use Codex normally. BBK installs generated custom agents, skills, delegation rules, and model/reasoning routing for the Codex host.
+The dependency command asks for consent before it changes system or user tools. Start a fresh Codex session after installation, then invoke the installed `$bbk` skill when you want BBK control. `/bbk` is an OMP-only command. A user-scoped Codex install makes `$bbk` available without globally activating BBK.
 
 BBK also supports OMP / Oh My Pi, Pi, Claude Code, and portable generic agent definitions. See [Installation](#installation) for other setups.
 
@@ -91,10 +91,10 @@ For the full method and internal contracts, see [`docs/README.md`](docs/README.m
 
 | Host               | BBK integration                                                                                                               |
 | ------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
-| **Codex**          | Generated custom agents, model and reasoning-effort routing, skills, delegation triggers, and inherited host sandbox settings |
+| **Codex**          | Installed `$bbk` controller skill, generated custom agents, project `AGENTS.md` activation, model routing, and inherited sandbox settings |
 | **OMP / Oh My Pi** | Extension, persistent BBK mode, model-routing menu, commands, tools, skills, and native task-agent spawning metadata          |
 | **Pi**             | Generated Markdown agents, shared skills, and an external agent manifest for Pi-compatible hosts                              |
-| **Claude Code**    | Generated sub-agents, model and effort routing, skills, child-agent allowlists, and bounded coordination-file writes          |
+| **Claude Code**    | Installed `/bbk` controller skill, generated sub-agents, model routing, child-agent allowlists, and bounded coordination writes |
 | **Generic**        | Portable Markdown agent definitions and shared skills for other harnesses                                                     |
 
 BBK sits above the host. It does not tie project meaning to one model provider, issue tracker, or hosted project service. Current repository and worktree flows require Git. BBK resolves its pinned jj and Beads tools through mise.
@@ -138,6 +138,8 @@ Normal install, test, and update commands run the same dependency preflight befo
 python tools/setup.py --install --scope user --codex
 ```
 
+Start a fresh Codex session and invoke `$bbk`. For automatic project-local activation instead, install at project scope; BBK maintains only its delimited block in `<project>/AGENTS.md` and preserves the rest of the file.
+
 ### OMP / Oh My Pi
 
 ```bash
@@ -155,6 +157,8 @@ python tools/setup.py --install --scope user --pi
 ```bash
 python tools/setup.py --install --scope user --claude
 ```
+
+Start a fresh Claude Code session and invoke `/bbk`.
 
 ### Generic agents
 
@@ -220,6 +224,8 @@ See [`docs/INSTALL.md`](docs/INSTALL.md) for supported package managers, depende
 ```
 
 Inside BBK mode, the parent session stays user-facing and routes planning, execution, review, and acceptance work to the right BBK agents.
+
+These extended slash commands belong only to the OMP extension. Codex uses the installed `$bbk` skill; Claude Code uses its installed `/bbk` skill. After installing or updating any host integration, start a fresh session so the host discovers the new definitions; reload the OMP extension first when OMP was changed.
 
 ### Project records
 
