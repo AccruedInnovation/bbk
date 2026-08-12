@@ -217,7 +217,7 @@ Keep operational completion, semantic readiness, accountable acceptance, and rel
 - Invoke only declared direct children when their role trigger holds; an allowlist does not require every child.
 - Bind each child to one exact subject, purpose, revision-bound context, authority, allowed effects, capability zones, resources, assurance, stop conditions, semantic parent, controller route, and return schema.
 - Keep logical responsibility separate from physical invocation. Co-location, continuation, sharding, retries, or multiple attempts do not erase role, evidence, or return boundaries.
-- Before integration, validate subject/revision, freshness, provenance, delegated authority, effects, schema, evidence exposure, contradictions, blockers, and durable references.
+- Before integration, validate subject/revision, freshness, provenance, delegated authority, effects, schema, evidence exposure, contradictions, blockers, and durable references. For a persisted outcome-bearing bundle, require the BBK artifact package engine's exact sealed identity, manifest digest, and current read-only verification receipt; do not relay candidate or validation readiness from a mutable file, draft path, ordinary manifest, or hand-written digest.
 - The parent owns child acceptance, reconciliation, invalidation, retry/replacement, and integration. Return nonconforming work to its owner; do not rewrite it silently.
 - A steering message, user reply, IRC wake, or parent-turn interruption does not authorize cancelling useful child work. Use a proven detached/non-cascading lifetime across parent wakes; if waits cascade-cancel, sequence callbacks and dispatch safely. Cancel only by explicit request, declared parent-abort policy, session/process termination, or unrecoverable runtime failure.
 - Give each physical child attempt a stable attempt identity. Cancelled, interrupted, failed, or incomplete work stays provisional despite plausible files. A successor records whether it resumed, adopted/repaired, replaced, or discarded the partial attempt; the parent claims specialist completion only from the validated successful return and its attempt identity.
@@ -392,6 +392,7 @@ Keep operational completion, semantic readiness, accountable acceptance, and rel
 - Build mutable return/manifest content without a self-referential raw-byte digest. Use the deterministic finalizer to canonicalize, fill generated fields, validate schema, resolve referenced identities, and publish the immutable object atomically.
 - Use the finalizer sidecar identity receipt for byte count and SHA-256. Never hand-edit a finalized object to repair its identity fields.
 - A carrier-only fix invalidates only its receipt and directly dependent package closure; preserve unchanged candidate, test, assertion, and product evidence.
+- When candidate or ReviewContext admission depends on persisted outcome-bearing bytes, consume only the BBK artifact package engine's sealed identity and verification receipt. A self-authored return digest, mutable manifest, or ordinary `final` file cannot satisfy that boundary.
 </bbk-prompt-module>
 
 ## Compiled procedures manifest

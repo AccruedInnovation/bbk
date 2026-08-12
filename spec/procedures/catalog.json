@@ -123,7 +123,7 @@
         "bbk-prompt-coordination-economy"
       ],
       "source": "shared/skills/bbk/SKILL.md",
-      "source_sha256": "7178effa780f99c4f8239e53e1a815d6d59ca7a73419c34832ba066f071557c9",
+      "source_sha256": "d77d9253d195586b0b5c540f23535916dccc11d6745a03fb0c64e1a832e0ec62",
       "version": "0.1.0-alpha.17.0.2.1"
     },
     {
@@ -250,7 +250,7 @@
         "bbk-prompt-mechanical-admission"
       ],
       "source": "shared/skills/bbk-execution-slicing/SKILL.md",
-      "source_sha256": "024b80ff8b51d95d7aa24eb20760e017cc0c32bf9a785ac517c03f91ab988b16",
+      "source_sha256": "bed3b2dcaf7d0cf356ef7b307cf3cf158f82bcc9a464a12f93faa08da675a36c",
       "version": "0.1.0-alpha.17.0.2.1"
     },
     {
@@ -536,7 +536,7 @@
         "bbk-prompt-candidate-focused-review"
       ],
       "source": "shared/skills/bbk-review-plan/SKILL.md",
-      "source_sha256": "4a2b573f5bebaa16c33bf720da3f4b6dd9e67ec2b41bde1b28c3d77a4da8fccf",
+      "source_sha256": "6e9b2fb6b879f1615e3b6a9cb2672b2e3b6a27594544f665d97071846dc01545",
       "version": "0.1.0-alpha.17.0.2.1"
     },
     {
@@ -849,7 +849,7 @@
       "version": "0.1.0-alpha.17.0.2.1"
     }
   ],
-  "registry_revision": "d0411fafadbff3a8afcad6a05c835857da431ddd8dcf6c8a1d7a7b3aef14a413",
+  "registry_revision": "80e1378a4de1e22bf082ec71ed968bb144e14ca1947cd8fc169b030c06725e6d",
   "role_source_sha256": "17d0c9bbf6c3033ffa58283abc0499975d14f5c8becd369eca9c421458ff482b",
   "roles": {
     "bbk_architect": {

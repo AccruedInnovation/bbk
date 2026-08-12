@@ -315,6 +315,7 @@ Keep operational completion, semantic readiness, accountable acceptance, and rel
 - Build mutable return/manifest content without a self-referential raw-byte digest. Use the deterministic finalizer to canonicalize, fill generated fields, validate schema, resolve referenced identities, and publish the immutable object atomically.
 - Use the finalizer sidecar identity receipt for byte count and SHA-256. Never hand-edit a finalized object to repair its identity fields.
 - A carrier-only fix invalidates only its receipt and directly dependent package closure; preserve unchanged candidate, test, assertion, and product evidence.
+- When candidate or ReviewContext admission depends on persisted outcome-bearing bytes, consume only the BBK artifact package engine's sealed identity and verification receipt. A self-authored return digest, mutable manifest, or ordinary `final` file cannot satisfy that boundary.
 </bbk-prompt-module>
 
 ## Compiled procedures manifest

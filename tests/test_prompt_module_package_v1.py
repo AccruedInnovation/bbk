@@ -623,6 +623,33 @@ class PromptModulePackageV1Tests(unittest.TestCase):
         )
         self.assertIn("successor identity", successor)
         self.assertIn("invalidates evidence", successor)
+        candidate_text = "\n".join(clause["text"] for clause in candidate["clauses"])
+        for fragment in (
+            "No sealed artifact, no validation admission",
+            "sealed `candidate-package-v1`",
+            "tool-generated `contentSha256`",
+            "ordinary mutable path",
+            "read-only `bbk artifact verify`",
+            "`bbk artifact successor`",
+            "Never correct, amend, replace, or append to an admitted sealed package",
+        ):
+            self.assertIn(fragment, candidate_text)
+        rendered_roles = {
+            role["name"]: instruction_text(self.spec, role, host="generic")
+            for role in self.roles
+            if role["name"] in {
+                "bbk_worker", "bbk_worker_orchestrator",
+                "bbk_territory_orchestrator", "bbk_validator_orchestrator",
+                "bbk_validator",
+            }
+        }
+        sealed_gate = next(
+            clause["text"] for clause in candidate["clauses"]
+            if clause["id"] == "CANDIDATE.SEALED_ADMISSION_GATE"
+        )
+        for role_name, rendered in rendered_roles.items():
+            with self.subTest(sealed_admission_role=role_name):
+                self.assertEqual(rendered.count(sealed_gate), 1)
         reviewer = next(role for role in self.roles if role["name"] == "bbk_reviewer")
         reviewer_invalidation = next(
             responsibility for responsibility in reviewer["responsibilities"]
@@ -924,7 +951,8 @@ class PromptModulePackageV1Tests(unittest.TestCase):
             "same semantic run and physical attempt",
             "rerun only the affected gate",
             "Do not create successor planning",
-            "successor candidate and the smallest affected recheck",
+            "`bbk artifact successor` against the verified predecessor",
+            "smallest affected recheck",
             "Route contradictions of meaning",
         ):
             self.assertIn(fragment, mechanical)
@@ -949,7 +977,7 @@ class PromptModulePackageV1Tests(unittest.TestCase):
         )
         for fragment in (
             "named qualitative or cross-cutting product risk",
-            "exact frozen integrated candidate",
+            "exact read-only verified sealed integrated `candidate-package-v1`",
             "Do not rerun tests",
             "rather than rewriting the plan",
             "revalidate failed assertions",

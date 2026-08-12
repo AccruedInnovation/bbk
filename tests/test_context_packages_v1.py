@@ -205,6 +205,16 @@ class ContextPackageV1Tests(unittest.TestCase):
                 context_packages.compile_review_package(candidate, review_request(), output_root=base / "review")
             self.assertFalse((base / "review").exists())
 
+    def test_unsealed_candidate_draft_is_not_admitted(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            sealed = make_candidate(base)
+            draft = base / "candidate-draft"
+            self.assertTrue(sealed.exists())
+            with self.assertRaises(context_packages.ContextPackageError):
+                context_packages.compile_review_package(draft, review_request(), output_root=base / "review")
+            self.assertFalse((base / "review").exists())
+
     def test_review_request_template_validates(self) -> None:
         value = json.loads((ROOT / "templates" / "review-package-request.json").read_text(encoding="utf-8"))
         self.assertEqual(artifact_packages.validate_schema_instance(value, "bbk.review-package-request.v1"), [])

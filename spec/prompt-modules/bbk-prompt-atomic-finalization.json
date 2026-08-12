@@ -15,6 +15,10 @@
     {
       "id": "ATOMIC_FINALIZATION.SCOPED_INVALIDATION",
       "text": "A carrier-only fix invalidates only its receipt and directly dependent package closure; preserve unchanged candidate, test, assertion, and product evidence."
+    },
+    {
+      "id": "ATOMIC_FINALIZATION.PACKAGE_IDENTITY",
+      "text": "When candidate or ReviewContext admission depends on persisted outcome-bearing bytes, consume only the BBK artifact package engine's sealed identity and verification receipt. A self-authored return digest, mutable manifest, or ordinary `final` file cannot satisfy that boundary."
     }
   ]
 }

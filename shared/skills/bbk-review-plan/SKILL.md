@@ -36,7 +36,7 @@ Use `bbk-installed-profiles` to discover managed profile lenses, context selecto
 Review a named qualitative risk over an exact candidate without duplicating deterministic mechanics.
 
 - `CANDIDATE_REVIEW.NAMED_RISK` — Dispatch Reviewer only for a named qualitative or cross-cutting product risk deterministic checks cannot establish; otherwise return `NO_MATERIAL_ASSURANCE_WORK`.
-- `CANDIDATE_REVIEW.EXACT_SUBJECT` — Review the exact frozen integrated candidate or one exact material interface boundary; use current identity, package, environment, test, schema, and evidence receipts.
+- `CANDIDATE_REVIEW.EXACT_SUBJECT` — Review the exact read-only verified sealed integrated `candidate-package-v1` or one exact material interface boundary; for candidate-bound review use its tool-generated `contentSha256` as the sole admitted identity and require current package, manifest, seal or publication, verification, environment, test, schema, and evidence receipts.
 - `CANDIDATE_REVIEW.NO_DUPLICATE_MECHANICS` — Do not rerun tests, schema/package checks, hashing, profile discovery, or environment qualification merely to appear independent. Interpret current evidence independently; run another method only when the assurance contract names its controlled risk.
 - `CANDIDATE_REVIEW.DELTA_OUTPUT` — Return findings, evidence gaps, concrete deltas, affected scope, reopening triggers, and the smallest valid next action rather than rewriting the plan or restating unaffected context.
 - `CANDIDATE_REVIEW.SCOPED_RECHECK` — After repair, revalidate failed assertions, direct impact closure, and explicitly invalidated regression gates only. Broaden review only after changed semantics, interfaces, authority, protected floors, ownership, or evidence meaning.

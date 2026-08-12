@@ -314,7 +314,7 @@ Keep operational completion, semantic readiness, accountable acceptance, and rel
 - Encoding, BOM, newline, terminal-newline, canonicalization, serialization, schema shape, controlled vocabulary, generated metadata, path normalization, digest, byte count, manifest, package, carrier, locator, ledger/checkpoint formatting, and deterministic profile/tool projection defects are mechanical unless they change semantics, authority, interfaces, protected floors, ownership, external effects, or completion meaning.
 - Canonicalize before raw-byte identity. Declare encoding, BOM, line endings, terminal newline, deterministic serialization policy, and whether canonical content, raw bytes, or both govern; record both digests when both matter.
 - For reversible pre-freeze mechanical failure, preserve failed material/receipt, regenerate only the affected artifact/receipt, rerun only the affected gate, and continue the same semantic run and physical attempt. Do not create successor planning, architecture, review, WorkUnit, authority package, campaign, or attempt.
-- After freeze, product-byte repair creates a successor candidate and the smallest affected recheck. Create successor planning only if a governing semantic assumption, interface, authority, protected floor, ownership, or completion meaning changed.
+- After sealing, product-byte repair uses `bbk artifact successor` against the verified predecessor, creates a new revision and `contentSha256`, finalizes or explicitly seals and read-only verifies the successor, and runs the smallest affected recheck. Never edit or amend the admitted predecessor. Create successor planning only if a governing semantic assumption, interface, authority, protected floor, ownership, or completion meaning changed.
 - Route contradictions of meaning, interface changes, insufficient semantic evidence, governing-policy questions, safety/security exposure, and authority ambiguity to the exact semantic owner. Name any required additional grant; do not disguise it as technical repair.
 </bbk-prompt-module>
 
@@ -349,6 +349,7 @@ Keep operational completion, semantic readiness, accountable acceptance, and rel
 - Build mutable return/manifest content without a self-referential raw-byte digest. Use the deterministic finalizer to canonicalize, fill generated fields, validate schema, resolve referenced identities, and publish the immutable object atomically.
 - Use the finalizer sidecar identity receipt for byte count and SHA-256. Never hand-edit a finalized object to repair its identity fields.
 - A carrier-only fix invalidates only its receipt and directly dependent package closure; preserve unchanged candidate, test, assertion, and product evidence.
+- When candidate or ReviewContext admission depends on persisted outcome-bearing bytes, consume only the BBK artifact package engine's sealed identity and verification receipt. A self-authored return digest, mutable manifest, or ordinary `final` file cannot satisfy that boundary.
 </bbk-prompt-module>
 
 <bbk-prompt-module id="bbk-prompt-delivery-authority">

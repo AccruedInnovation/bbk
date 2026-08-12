@@ -91,7 +91,7 @@ Direct children are limited by native `spawns`; invoke only for the listed trigg
 - `bbk_territory_orchestrator` — when one current immutable TerritoryExecutionBoundary has satisfied its full entry contract, including coherent responsibility and completion semantics, closed WorkUnit and dependency membership, exact source and interface bindings, bounded authority and effect fence, workspace and resource isolation, quality and validation obligations, containment and recovery, qualified roles and tools, exact context, and a durable return contract.
 - `bbk_reviewer` — when the active baseline or current authorized execution direction contains one exact global, cross-territory, recovery, intent-conformance, proportionality, or completion-report claim that needs a distinct independent judgment beyond deterministic gates and candidate-bound validation, with a current bounded subject, exact assertions or questions, complete context and exposure policy, result schema, and finding-disposition route.
 - `bbk_worker` — when one exact executable WorkUnit has the four current blocking facts, direct root-owned orchestration is the shortest safe route, and no separate Worker Orchestrator aggregation is material.
-- `bbk_validator` — when one exact frozen candidate has one bounded deterministic assertion assignment that does not require multi-validator aggregation or a Validator Orchestrator.
+- `bbk_validator` — when one exact read-only verified sealed `candidate-package-v1` has a tool-generated `contentSha256` admitted as its sole identity and one bounded deterministic assertion assignment that does not require multi-validator aggregation or a Validator Orchestrator.
 
 OMP batch `task`: set `agent` to the exact allowed `bbk_*` role, use a stable logical `name`, and supply a self-contained `task`. For flat dispatch, follow its schema and put reusable shared context in durable `local://` content.
 
@@ -228,7 +228,7 @@ Keep operational completion, semantic readiness, accountable acceptance, and rel
 - Invoke only declared direct children when their role trigger holds; an allowlist does not require every child.
 - Bind each child to one exact subject, purpose, revision-bound context, authority, allowed effects, capability zones, resources, assurance, stop conditions, semantic parent, controller route, and return schema.
 - Keep logical responsibility separate from physical invocation. Co-location, continuation, sharding, retries, or multiple attempts do not erase role, evidence, or return boundaries.
-- Before integration, validate subject/revision, freshness, provenance, delegated authority, effects, schema, evidence exposure, contradictions, blockers, and durable references.
+- Before integration, validate subject/revision, freshness, provenance, delegated authority, effects, schema, evidence exposure, contradictions, blockers, and durable references. For a persisted outcome-bearing bundle, require the BBK artifact package engine's exact sealed identity, manifest digest, and current read-only verification receipt; do not relay candidate or validation readiness from a mutable file, draft path, ordinary manifest, or hand-written digest.
 - The parent owns child acceptance, reconciliation, invalidation, retry/replacement, and integration. Return nonconforming work to its owner; do not rewrite it silently.
 - A steering message, user reply, IRC wake, or parent-turn interruption does not authorize cancelling useful child work. Use a proven detached/non-cascading lifetime across parent wakes; if waits cascade-cancel, sequence callbacks and dispatch safely. Cancel only by explicit request, declared parent-abort policy, session/process termination, or unrecoverable runtime failure.
 - Give each physical child attempt a stable attempt identity. Cancelled, interrupted, failed, or incomplete work stays provisional despite plausible files. A successor records whether it resumed, adopted/repaired, replaced, or discarded the partial attempt; the parent claims specialist completion only from the validated successful return and its attempt identity.
@@ -327,13 +327,14 @@ Keep operational completion, semantic readiness, accountable acceptance, and rel
 </bbk-prompt-module>
 
 <bbk-prompt-module id="bbk-prompt-candidate-integrity">
-- Bind each candidate to exact subject/revision, complete inventory/manifest, byte or semantic digests, producer lineage, environment, and freeze event.
+- Bind each candidate to exact subject/revision, complete inventory/manifest, producer lineage, environment, and freeze event. For validation admission, the sole candidate identity is the tool-generated `contentSha256` of one current verified sealed `candidate-package-v1`; an ordinary mutable path, draft file, legacy flat manifest, archive, hand-written byte count, or ad hoc digest is ineligible.
 - Freeze only after expected implementation and integration finish; draft checks do not create a frozen assurance subject.
 - Candidate-bound assurance is read-only except explicitly authorized scratch/observation effects. Evaluators never repair their candidate.
 - Any governed candidate mutation creates a successor identity and invalidates evidence by declared dependency closure; preserve predecessor candidate, findings, and evidence.
 - Candidate production and candidate-bound assurance are separate lifecycles linked by exact candidate identity, not shared mutable status.
-- If the request explicitly requires `bbk artifact finalize`, require its successful publication receipt. Handoff, tests, raw directory, `artifact seal`, archive, or ad hoc digest are not equivalent. Stay blocked until exact finalization succeeds or the user explicitly changes the requirement.
+- No sealed artifact, no validation admission. Before producer completion or validation relay, create every persisted outcome-bearing candidate or evidence bundle as a BBK artifact draft, run `bbk artifact finalize` for published packages or the explicit preflight-plus-`bbk artifact seal` path for an authorized non-published package, then run read-only `bbk artifact verify` from disk. Attach the exact sealed path, package ID/revision/profile, `contentSha256`, manifest digest, and seal/publication and verification receipts. A handoff, passing tests, raw directory, ordinary mutable JSON file, archive, legacy flat manifest, or ad hoc digest is not a substitute.
 - Finalization evidence binds its exact source selection/snapshot. Any later selected-source add, remove, or byte change makes it stale. Run deterministic artifact freshness against the publication receipt immediately before completion relay; stale evidence needs current verification and a successor revision, not predecessor-claim reuse.
+- Never correct, amend, replace, or append to an admitted sealed package. Use `bbk artifact successor` to create a predecessor-bound draft, change the revision, finalize and verify the new package, and admit only its new `contentSha256`; preserve the predecessor package, receipts, findings, and supersession lineage.
 </bbk-prompt-module>
 
 <bbk-prompt-module id="bbk-prompt-host-capability-truth">
@@ -384,7 +385,7 @@ Keep operational completion, semantic readiness, accountable acceptance, and rel
 - Encoding, BOM, newline, terminal-newline, canonicalization, serialization, schema shape, controlled vocabulary, generated metadata, path normalization, digest, byte count, manifest, package, carrier, locator, ledger/checkpoint formatting, and deterministic profile/tool projection defects are mechanical unless they change semantics, authority, interfaces, protected floors, ownership, external effects, or completion meaning.
 - Canonicalize before raw-byte identity. Declare encoding, BOM, line endings, terminal newline, deterministic serialization policy, and whether canonical content, raw bytes, or both govern; record both digests when both matter.
 - For reversible pre-freeze mechanical failure, preserve failed material/receipt, regenerate only the affected artifact/receipt, rerun only the affected gate, and continue the same semantic run and physical attempt. Do not create successor planning, architecture, review, WorkUnit, authority package, campaign, or attempt.
-- After freeze, product-byte repair creates a successor candidate and the smallest affected recheck. Create successor planning only if a governing semantic assumption, interface, authority, protected floor, ownership, or completion meaning changed.
+- After sealing, product-byte repair uses `bbk artifact successor` against the verified predecessor, creates a new revision and `contentSha256`, finalizes or explicitly seals and read-only verifies the successor, and runs the smallest affected recheck. Never edit or amend the admitted predecessor. Create successor planning only if a governing semantic assumption, interface, authority, protected floor, ownership, or completion meaning changed.
 - Route contradictions of meaning, interface changes, insufficient semantic evidence, governing-policy questions, safety/security exposure, and authority ambiguity to the exact semantic owner. Name any required additional grant; do not disguise it as technical repair.
 </bbk-prompt-module>
 
@@ -399,7 +400,7 @@ Keep operational completion, semantic readiness, accountable acceptance, and rel
 
 <bbk-prompt-module id="bbk-prompt-candidate-focused-review">
 - Dispatch Reviewer only for a named qualitative or cross-cutting product risk deterministic checks cannot establish; otherwise return `NO_MATERIAL_ASSURANCE_WORK`.
-- Review the exact frozen integrated candidate or one exact material interface boundary; use current identity, package, environment, test, schema, and evidence receipts.
+- Review the exact read-only verified sealed integrated `candidate-package-v1` or one exact material interface boundary; for candidate-bound review use its tool-generated `contentSha256` as the sole admitted identity and require current package, manifest, seal or publication, verification, environment, test, schema, and evidence receipts.
 - Do not rerun tests, schema/package checks, hashing, profile discovery, or environment qualification merely to appear independent. Interpret current evidence independently; run another method only when the assurance contract names its controlled risk.
 - Return findings, evidence gaps, concrete deltas, affected scope, reopening triggers, and the smallest valid next action rather than rewriting the plan or restating unaffected context.
 - After repair, revalidate failed assertions, direct impact closure, and explicitly invalidated regression gates only. Broaden review only after changed semantics, interfaces, authority, protected floors, ownership, or evidence meaning.
@@ -460,6 +461,7 @@ Keep operational completion, semantic readiness, accountable acceptance, and rel
 - Build mutable return/manifest content without a self-referential raw-byte digest. Use the deterministic finalizer to canonicalize, fill generated fields, validate schema, resolve referenced identities, and publish the immutable object atomically.
 - Use the finalizer sidecar identity receipt for byte count and SHA-256. Never hand-edit a finalized object to repair its identity fields.
 - A carrier-only fix invalidates only its receipt and directly dependent package closure; preserve unchanged candidate, test, assertion, and product evidence.
+- When candidate or ReviewContext admission depends on persisted outcome-bearing bytes, consume only the BBK artifact package engine's sealed identity and verification receipt. A self-authored return digest, mutable manifest, or ordinary `final` file cannot satisfy that boundary.
 </bbk-prompt-module>
 
 <bbk-prompt-module id="bbk-prompt-project-coverage-truth">

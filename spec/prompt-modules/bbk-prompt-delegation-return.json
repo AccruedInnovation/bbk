@@ -18,7 +18,7 @@
     },
     {
       "id": "DELEGATION.VALIDATE_RETURN",
-      "text": "Before integration, validate subject/revision, freshness, provenance, delegated authority, effects, schema, evidence exposure, contradictions, blockers, and durable references."
+      "text": "Before integration, validate subject/revision, freshness, provenance, delegated authority, effects, schema, evidence exposure, contradictions, blockers, and durable references. For a persisted outcome-bearing bundle, require the BBK artifact package engine's exact sealed identity, manifest digest, and current read-only verification receipt; do not relay candidate or validation readiness from a mutable file, draft path, ordinary manifest, or hand-written digest."
     },
     {
       "id": "DELEGATION.PARENT_INTEGRATION",

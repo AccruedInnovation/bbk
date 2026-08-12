@@ -188,7 +188,7 @@ Keep operational completion, semantic readiness, accountable acceptance, and rel
 - Invoke only declared direct children when their role trigger holds; an allowlist does not require every child.
 - Bind each child to one exact subject, purpose, revision-bound context, authority, allowed effects, capability zones, resources, assurance, stop conditions, semantic parent, controller route, and return schema.
 - Keep logical responsibility separate from physical invocation. Co-location, continuation, sharding, retries, or multiple attempts do not erase role, evidence, or return boundaries.
-- Before integration, validate subject/revision, freshness, provenance, delegated authority, effects, schema, evidence exposure, contradictions, blockers, and durable references.
+- Before integration, validate subject/revision, freshness, provenance, delegated authority, effects, schema, evidence exposure, contradictions, blockers, and durable references. For a persisted outcome-bearing bundle, require the BBK artifact package engine's exact sealed identity, manifest digest, and current read-only verification receipt; do not relay candidate or validation readiness from a mutable file, draft path, ordinary manifest, or hand-written digest.
 - The parent owns child acceptance, reconciliation, invalidation, retry/replacement, and integration. Return nonconforming work to its owner; do not rewrite it silently.
 - A steering message, user reply, IRC wake, or parent-turn interruption does not authorize cancelling useful child work. Use a proven detached/non-cascading lifetime across parent wakes; if waits cascade-cancel, sequence callbacks and dispatch safely. Cancel only by explicit request, declared parent-abort policy, session/process termination, or unrecoverable runtime failure.
 - Give each physical child attempt a stable attempt identity. Cancelled, interrupted, failed, or incomplete work stays provisional despite plausible files. A successor records whether it resumed, adopted/repaired, replaced, or discarded the partial attempt; the parent claims specialist completion only from the validated successful return and its attempt identity.
@@ -306,7 +306,7 @@ Keep operational completion, semantic readiness, accountable acceptance, and rel
 - Encoding, BOM, newline, terminal-newline, canonicalization, serialization, schema shape, controlled vocabulary, generated metadata, path normalization, digest, byte count, manifest, package, carrier, locator, ledger/checkpoint formatting, and deterministic profile/tool projection defects are mechanical unless they change semantics, authority, interfaces, protected floors, ownership, external effects, or completion meaning.
 - Canonicalize before raw-byte identity. Declare encoding, BOM, line endings, terminal newline, deterministic serialization policy, and whether canonical content, raw bytes, or both govern; record both digests when both matter.
 - For reversible pre-freeze mechanical failure, preserve failed material/receipt, regenerate only the affected artifact/receipt, rerun only the affected gate, and continue the same semantic run and physical attempt. Do not create successor planning, architecture, review, WorkUnit, authority package, campaign, or attempt.
-- After freeze, product-byte repair creates a successor candidate and the smallest affected recheck. Create successor planning only if a governing semantic assumption, interface, authority, protected floor, ownership, or completion meaning changed.
+- After sealing, product-byte repair uses `bbk artifact successor` against the verified predecessor, creates a new revision and `contentSha256`, finalizes or explicitly seals and read-only verifies the successor, and runs the smallest affected recheck. Never edit or amend the admitted predecessor. Create successor planning only if a governing semantic assumption, interface, authority, protected floor, ownership, or completion meaning changed.
 - Route contradictions of meaning, interface changes, insufficient semantic evidence, governing-policy questions, safety/security exposure, and authority ambiguity to the exact semantic owner. Name any required additional grant; do not disguise it as technical repair.
 </bbk-prompt-module>
 
@@ -321,7 +321,7 @@ Keep operational completion, semantic readiness, accountable acceptance, and rel
 
 <bbk-prompt-module id="bbk-prompt-candidate-focused-review">
 - Dispatch Reviewer only for a named qualitative or cross-cutting product risk deterministic checks cannot establish; otherwise return `NO_MATERIAL_ASSURANCE_WORK`.
-- Review the exact frozen integrated candidate or one exact material interface boundary; use current identity, package, environment, test, schema, and evidence receipts.
+- Review the exact read-only verified sealed integrated `candidate-package-v1` or one exact material interface boundary; for candidate-bound review use its tool-generated `contentSha256` as the sole admitted identity and require current package, manifest, seal or publication, verification, environment, test, schema, and evidence receipts.
 - Do not rerun tests, schema/package checks, hashing, profile discovery, or environment qualification merely to appear independent. Interpret current evidence independently; run another method only when the assurance contract names its controlled risk.
 - Return findings, evidence gaps, concrete deltas, affected scope, reopening triggers, and the smallest valid next action rather than rewriting the plan or restating unaffected context.
 - After repair, revalidate failed assertions, direct impact closure, and explicitly invalidated regression gates only. Broaden review only after changed semantics, interfaces, authority, protected floors, ownership, or evidence meaning.
@@ -380,6 +380,7 @@ Keep operational completion, semantic readiness, accountable acceptance, and rel
 - Build mutable return/manifest content without a self-referential raw-byte digest. Use the deterministic finalizer to canonicalize, fill generated fields, validate schema, resolve referenced identities, and publish the immutable object atomically.
 - Use the finalizer sidecar identity receipt for byte count and SHA-256. Never hand-edit a finalized object to repair its identity fields.
 - A carrier-only fix invalidates only its receipt and directly dependent package closure; preserve unchanged candidate, test, assertion, and product evidence.
+- When candidate or ReviewContext admission depends on persisted outcome-bearing bytes, consume only the BBK artifact package engine's sealed identity and verification receipt. A self-authored return digest, mutable manifest, or ordinary `final` file cannot satisfy that boundary.
 </bbk-prompt-module>
 
 ## Compiled procedures manifest

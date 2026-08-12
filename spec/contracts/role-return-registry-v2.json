@@ -689,8 +689,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_reviewer-role.json",
-        "bytes": 38526,
-        "sha256": "a2ed3992794fb87ba16b82af956f9088faae94fdbf2c6ee6b647dbdfafc71255"
+        "bytes": 38900,
+        "sha256": "73a18450a3729e04d0e8af26076bd5698abee7e2a081f8afeed9025111885660"
       }
     },
     {
@@ -742,8 +742,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_root_orchestrator-role.json",
-        "bytes": 44783,
-        "sha256": "da15d4d3612d0193dcb8e387ef3df164d1daf4a5cf96dbea4023f2917d4ef5e9"
+        "bytes": 44882,
+        "sha256": "a1742a0ba0ba0e3a5176e9cd6f6cc07a0b0c4427575253ddc7980f2e6f031146"
       }
     },
     {
@@ -793,8 +793,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_territory_orchestrator-role.json",
-        "bytes": 45311,
-        "sha256": "b73daf38c15f67bd7377f9c933e0c1bb0fa4d740715df9b12569f349d4c05c55"
+        "bytes": 45932,
+        "sha256": "016aaa7bd3530690576c29e6cc7180113f9c0a93a67e5ba611524f39b0cac971"
       }
     },
     {
@@ -808,8 +808,8 @@
       "semantic_state_name": "worker_cohort_state",
       "return_schema": {
         "path": "spec/schemas/role-returns/bbk-worker-orchestrator-return-v2.schema.json",
-        "bytes": 14049,
-        "sha256": "05e126e1cedca9099b755c869d61284f0990cb195877d5432b9f4da361c0ccfa"
+        "bytes": 14465,
+        "sha256": "97270d6970575692df60f92673530eaf5020dd92ed76fb7602672eaaab023dad"
       },
       "compact_result_schema": {
         "path": "spec/schemas/role-results/bbk-worker-orchestrator-compact-result-v2.schema.json",
@@ -844,8 +844,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_worker_orchestrator-role.json",
-        "bytes": 44247,
-        "sha256": "18c7f114eb7b5c25a8ded934c8fbd60c64a07118f176bf2212b5a8166dd0e431"
+        "bytes": 45423,
+        "sha256": "68627281c614e589348f09d429d73f6d35aa677d5c0aba3c03bf23a219b95f6f"
       }
     },
     {
@@ -896,8 +896,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_validator_orchestrator-role.json",
-        "bytes": 47259,
-        "sha256": "4a4428fc55d005541388ac80d8c62eb28acb44ec333a087682504792087d90ec"
+        "bytes": 47642,
+        "sha256": "8579240d2b2fa05922313166579a4b899558cb6f01ecb5d7e5058c5e4a8467d3"
       }
     },
     {
@@ -911,8 +911,8 @@
       "semantic_state_name": "work_unit_execution_state",
       "return_schema": {
         "path": "spec/schemas/role-returns/bbk-worker-return-v2.schema.json",
-        "bytes": 10038,
-        "sha256": "7a6f1a9901ad4cea04dcb70adf219181ac839f8528445186d3cc4eadbf710063"
+        "bytes": 10416,
+        "sha256": "d01d572f6c577f9b382172cd7ee514fc28731c2d1a50537badacc98d7e72091b"
       },
       "compact_result_schema": {
         "path": "spec/schemas/role-results/bbk-worker-compact-result-v2.schema.json",
@@ -947,8 +947,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_worker-role.json",
-        "bytes": 34948,
-        "sha256": "9e241d1a9fe906b7bb70723b0fed6c49018061e5a89b4ba4e775ee93b43fb900"
+        "bytes": 36004,
+        "sha256": "5fa3291223d4905bd1d5f2577ff1f168f05884861065cc39317025ea79b7bfa0"
       }
     },
     {
@@ -998,8 +998,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_validator-role.json",
-        "bytes": 37195,
-        "sha256": "b024cbb84d6ac071434518d588a606bebb287b73b85c68c68f77b929d3aa8027"
+        "bytes": 37572,
+        "sha256": "6f2b4bd63d3dd686ccb6337d488cb8d17d84eee9e2a0c063c1ed88ca2b0ea529"
       }
     }
   ]

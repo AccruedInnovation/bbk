@@ -6,7 +6,7 @@
   "clauses": [
     {
       "id": "CANDIDATE.IDENTITY",
-      "text": "Bind each candidate to exact subject/revision, complete inventory/manifest, byte or semantic digests, producer lineage, environment, and freeze event."
+      "text": "Bind each candidate to exact subject/revision, complete inventory/manifest, producer lineage, environment, and freeze event. For validation admission, the sole candidate identity is the tool-generated `contentSha256` of one current verified sealed `candidate-package-v1`; an ordinary mutable path, draft file, legacy flat manifest, archive, hand-written byte count, or ad hoc digest is ineligible."
     },
     {
       "id": "CANDIDATE.FREEZE_LATE",
@@ -25,12 +25,16 @@
       "text": "Candidate production and candidate-bound assurance are separate lifecycles linked by exact candidate identity, not shared mutable status."
     },
     {
-      "id": "CANDIDATE.REQUIRED_FINALIZATION_EXACT",
-      "text": "If the request explicitly requires `bbk artifact finalize`, require its successful publication receipt. Handoff, tests, raw directory, `artifact seal`, archive, or ad hoc digest are not equivalent. Stay blocked until exact finalization succeeds or the user explicitly changes the requirement."
+      "id": "CANDIDATE.SEALED_ADMISSION_GATE",
+      "text": "No sealed artifact, no validation admission. Before producer completion or validation relay, create every persisted outcome-bearing candidate or evidence bundle as a BBK artifact draft, run `bbk artifact finalize` for published packages or the explicit preflight-plus-`bbk artifact seal` path for an authorized non-published package, then run read-only `bbk artifact verify` from disk. Attach the exact sealed path, package ID/revision/profile, `contentSha256`, manifest digest, and seal/publication and verification receipts. A handoff, passing tests, raw directory, ordinary mutable JSON file, archive, legacy flat manifest, or ad hoc digest is not a substitute."
     },
     {
       "id": "CANDIDATE.FINALIZATION_FRESHNESS",
       "text": "Finalization evidence binds its exact source selection/snapshot. Any later selected-source add, remove, or byte change makes it stale. Run deterministic artifact freshness against the publication receipt immediately before completion relay; stale evidence needs current verification and a successor revision, not predecessor-claim reuse."
+    },
+    {
+      "id": "CANDIDATE.SEALED_SUCCESSOR_ONLY",
+      "text": "Never correct, amend, replace, or append to an admitted sealed package. Use `bbk artifact successor` to create a predecessor-bound draft, change the revision, finalize and verify the new package, and admit only its new `contentSha256`; preserve the predecessor package, receipts, findings, and supersession lineage."
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "generator": "tools/generate_role_capabilities.py",
-  "manifest_digest": "sha256:d81f67415eb0628a5e2c05bfc7463a5669e5987e1debc8342a6912b9d5c0f959",
+  "manifest_digest": "sha256:104871927cbc34fc60c3c74205a00bb03f4d70856b192fb986c72ee4cbdb0dee",
   "policy_version": "1.0.0-alpha.17",
   "profile": "governed-software",
   "role_count": 19,
@@ -48,16 +48,16 @@
       "source_role_digest": "sha256:e539ab5370b811bc18e9aad1368336cf33cbafed385479d0c6d893a880562fc0"
     },
     {
-      "manifest_digest": "sha256:a1482d48ad9afa9369e2fd189639ee66a7d98761a6dfcae56cbb1480deb7dfd9",
+      "manifest_digest": "sha256:2ce368194ef8842cccf59261f5b5b4acdea093aa0efcd3551b3d147a2b92a30f",
       "path": "spec/role-capabilities/bbk_reviewer.json",
       "role": "bbk_reviewer",
-      "source_role_digest": "sha256:a2ed3992794fb87ba16b82af956f9088faae94fdbf2c6ee6b647dbdfafc71255"
+      "source_role_digest": "sha256:73a18450a3729e04d0e8af26076bd5698abee7e2a081f8afeed9025111885660"
     },
     {
-      "manifest_digest": "sha256:080aabf9be567a0917ee3db08bb07e3c87daca61802010720e2e9362451a2e9d",
+      "manifest_digest": "sha256:4543262ea5cd4ca3f58d388b732257d3fea877a9acd44bf5f00e703b5e6928ec",
       "path": "spec/role-capabilities/bbk_root_orchestrator.json",
       "role": "bbk_root_orchestrator",
-      "source_role_digest": "sha256:da15d4d3612d0193dcb8e387ef3df164d1daf4a5cf96dbea4023f2917d4ef5e9"
+      "source_role_digest": "sha256:a1742a0ba0ba0e3a5176e9cd6f6cc07a0b0c4427575253ddc7980f2e6f031146"
     },
     {
       "manifest_digest": "sha256:0ade8c002c11dfd6b762482b62edfe9258e34a28dc52bf191c930b4f3b26e620",
@@ -72,10 +72,10 @@
       "source_role_digest": "sha256:3b97e30d5653a4b3488608c2e5d580a83922f7295d7fb09fe551e41fab8336a6"
     },
     {
-      "manifest_digest": "sha256:e1b92061bda4cbb6d9c44bcd40a5abf725070d05f806cf16b430f60fa2d13687",
+      "manifest_digest": "sha256:189aa1323a3650a866c18ab146ad7efeadd69aebf3bfef2c8bd9f241f9adb8a1",
       "path": "spec/role-capabilities/bbk_territory_orchestrator.json",
       "role": "bbk_territory_orchestrator",
-      "source_role_digest": "sha256:b73daf38c15f67bd7377f9c933e0c1bb0fa4d740715df9b12569f349d4c05c55"
+      "source_role_digest": "sha256:016aaa7bd3530690576c29e6cc7180113f9c0a93a67e5ba611524f39b0cac971"
     },
     {
       "manifest_digest": "sha256:c667dec92c19bd9d7d455e3e6bfb063591d9ac3546fb6d4756ca251b394d72df",
@@ -84,16 +84,16 @@
       "source_role_digest": "sha256:80992f641f8b431b886cba58f3f812019c1307af49dd05ff927af1b0461411f7"
     },
     {
-      "manifest_digest": "sha256:6b10f927f90d37769cb6730f0c64c397b4ee539b18d0762e673aadb3fd2e0520",
+      "manifest_digest": "sha256:1a1be6e174ca678f112283cebccfc6b678690c64713b7c9ce8e3b38c83624ccf",
       "path": "spec/role-capabilities/bbk_validator.json",
       "role": "bbk_validator",
-      "source_role_digest": "sha256:b024cbb84d6ac071434518d588a606bebb287b73b85c68c68f77b929d3aa8027"
+      "source_role_digest": "sha256:6f2b4bd63d3dd686ccb6337d488cb8d17d84eee9e2a0c063c1ed88ca2b0ea529"
     },
     {
-      "manifest_digest": "sha256:dbed375d408f7732a96da7a732dfbd126301937b575555999f44217bde8ce0ce",
+      "manifest_digest": "sha256:018d86f8556d62956bea2753b774b3d07044e9e17499e9b6a2622960e5e6bb85",
       "path": "spec/role-capabilities/bbk_validator_orchestrator.json",
       "role": "bbk_validator_orchestrator",
-      "source_role_digest": "sha256:4a4428fc55d005541388ac80d8c62eb28acb44ec333a087682504792087d90ec"
+      "source_role_digest": "sha256:8579240d2b2fa05922313166579a4b899558cb6f01ecb5d7e5058c5e4a8467d3"
     },
     {
       "manifest_digest": "sha256:6ebce0c81ecc31ec458b2177c730e3525aa3170be9e88a8397f9db222794506f",
@@ -102,10 +102,10 @@
       "source_role_digest": "sha256:215b969ca81349cb1adca9842e29d7baf24e4a45740262c9369d2b5d737408e4"
     },
     {
-      "manifest_digest": "sha256:0da4db2b25f36def978509bd2e56e7869c7782afc699310f091618494e8d8045",
+      "manifest_digest": "sha256:895c275e297ce57322aeff4abf505e86fe9b1e0e32694b5dba1bc5d7da2b8cd0",
       "path": "spec/role-capabilities/bbk_worker.json",
       "role": "bbk_worker",
-      "source_role_digest": "sha256:9e241d1a9fe906b7bb70723b0fed6c49018061e5a89b4ba4e775ee93b43fb900"
+      "source_role_digest": "sha256:5fa3291223d4905bd1d5f2577ff1f168f05884861065cc39317025ea79b7bfa0"
     },
     {
       "manifest_digest": "sha256:7b62d7d512c7f65a185cd969ab5a14761415372737545fe309a3adce8e5eb9b5",
@@ -114,10 +114,10 @@
       "source_role_digest": "sha256:7627cfb10c6b4f8c9c44d88b153783dfe9009556f9c93d1d96fe9d7b5f69e37f"
     },
     {
-      "manifest_digest": "sha256:63413e8d3fe4af1066a25a70ee8da7a8a16cc851f03ef51bf832dae75d86eb5e",
+      "manifest_digest": "sha256:9f2b1cd3552481f770201b9fefcc60cbdcae2832649b73eb05cce0280042d164",
       "path": "spec/role-capabilities/bbk_worker_orchestrator.json",
       "role": "bbk_worker_orchestrator",
-      "source_role_digest": "sha256:18c7f114eb7b5c25a8ded934c8fbd60c64a07118f176bf2212b5a8166dd0e431"
+      "source_role_digest": "sha256:68627281c614e589348f09d429d73f6d35aa677d5c0aba3c03bf23a219b95f6f"
     }
   ],
   "schema": "bbk.role-capability-manifest.v1",

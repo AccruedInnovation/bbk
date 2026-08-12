@@ -10,7 +10,7 @@
     },
     {
       "id": "CANDIDATE_REVIEW.EXACT_SUBJECT",
-      "text": "Review the exact frozen integrated candidate or one exact material interface boundary; use current identity, package, environment, test, schema, and evidence receipts."
+      "text": "Review the exact read-only verified sealed integrated `candidate-package-v1` or one exact material interface boundary; for candidate-bound review use its tool-generated `contentSha256` as the sole admitted identity and require current package, manifest, seal or publication, verification, environment, test, schema, and evidence receipts."
     },
     {
       "id": "CANDIDATE_REVIEW.NO_DUPLICATE_MECHANICS",
