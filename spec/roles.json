@@ -8,8 +8,8 @@
   "source_manifest": {
     "catalog": {
       "path": "spec/roles/catalog.json",
-      "bytes": 16551,
-      "sha256": "17d0c9bbf6c3033ffa58283abc0499975d14f5c8becd369eca9c421458ff482b"
+      "bytes": 17899,
+      "sha256": "da458dbc8973e2e3b8cc3fee9c4c8b5f84fac88e8fa075c58a056615636f2492"
     },
     "roles": [
       {
@@ -117,14 +117,14 @@
       {
         "name": "bbk_worker",
         "path": "spec/roles/bbk_worker-role.json",
-        "bytes": 36004,
-        "sha256": "5fa3291223d4905bd1d5f2577ff1f168f05884861065cc39317025ea79b7bfa0"
+        "bytes": 35951,
+        "sha256": "4534ee98478e66486e7e97fa126e4f673b19a77bff7d7009c504a43de46d6ad2"
       },
       {
         "name": "bbk_validator",
         "path": "spec/roles/bbk_validator-role.json",
-        "bytes": 37572,
-        "sha256": "6f2b4bd63d3dd686ccb6337d488cb8d17d84eee9e2a0c063c1ed88ca2b0ea529"
+        "bytes": 37298,
+        "sha256": "fd0f23f48e051e25f9b0d473e436d187ac1926305d2bd1307d07fb640f044bc7"
       }
     ],
     "prompt_modules": [
@@ -235,8 +235,8 @@
       },
       {
         "path": "spec/prompt-modules/bbk-prompt-candidate-integrity.json",
-        "bytes": 3143,
-        "sha256": "7e25ac378aaa6eee5d4c5d4dd3ff6769209455ea5237e26aaf1f305184a1c5bb"
+        "bytes": 3039,
+        "sha256": "e86ea5f6d95323444ef4698c8f0558f63b7cd8e12e3b4cda4c9ffba9453f1779"
       },
       {
         "path": "spec/prompt-modules/bbk-prompt-planning-source-integrity.json",
@@ -285,8 +285,8 @@
       },
       {
         "path": "spec/prompt-modules/bbk-prompt-assurance-modes.json",
-        "bytes": 2060,
-        "sha256": "7691bbd70fe189e3c03d25cc467c04210526868cd751459289551ca9fc265874"
+        "bytes": 2564,
+        "sha256": "60ed5dc1ad46ce1c4f7b31563d249e30d038179886c904dd1eaad69c32899745"
       },
       {
         "path": "spec/prompt-modules/bbk-prompt-candidate-focused-review.json",
@@ -295,8 +295,8 @@
       },
       {
         "path": "spec/prompt-modules/bbk-prompt-critical-path-execution.json",
-        "bytes": 7825,
-        "sha256": "b3e48db85346060a43c01a586d5e8e53b869764a9989a540e6353b1bfcc87c64"
+        "bytes": 8788,
+        "sha256": "2fec8dbaf8c7ca9dfc309db7915f6a7258f17fe424e674619c37b5e1654a0027"
       },
       {
         "path": "spec/prompt-modules/bbk-prompt-compiled-procedure-consumption.json",
@@ -395,6 +395,20 @@
     ]
   },
   "controller_entrypoints": [
+    {
+      "route": "ROUTINE_EXECUTION",
+      "role": "bbk_worker",
+      "invocation_mode": "CANDIDATE_PRODUCTION",
+      "selected_by": "harness_root_controller",
+      "selection_when": "A clear local reversible Level 0 change has an exact WorkUnit, authority/effect fence, mutation owner, inputs/toolchain, focused checks, and return route; dispatch the Worker directly and retain one independent Validator floor."
+    },
+    {
+      "route": "ROUTINE_VALIDATION",
+      "role": "bbk_validator",
+      "invocation_mode": "ASSERTION_ATTEMPT",
+      "selected_by": "harness_root_controller",
+      "selection_when": "The direct Level 0 Worker result has a current lightweight candidate identity and exactly one grouped Validator assignment is required."
+    },
     {
       "route": "PLANNING",
       "role": "bbk_root_wayfinder",
@@ -718,6 +732,14 @@
       "allowed_parent_modes": [
         {
           "mode": "CANDIDATE_PRODUCTION",
+          "parent_kind": "controller",
+          "parents": [
+            "harness_root_controller"
+          ],
+          "purpose": "Execute one exact Level 0 routine WorkUnit through the shortest direct controller-to-Worker path."
+        },
+        {
+          "mode": "CANDIDATE_PRODUCTION",
           "parent_kind": "canonical_role",
           "parents": [
             "bbk_root_orchestrator",
@@ -740,6 +762,14 @@
       "name": "bbk_validator",
       "file": "spec/roles/bbk_validator-role.json",
       "allowed_parent_modes": [
+        {
+          "mode": "ASSERTION_ATTEMPT",
+          "parent_kind": "controller",
+          "parents": [
+            "harness_root_controller"
+          ],
+          "purpose": "Run the one grouped independent Validator assignment for a lightweight Level 0 candidate."
+        },
         {
           "mode": "ASSERTION_ATTEMPT",
           "parent_kind": "canonical_role",
@@ -6194,7 +6224,7 @@
         "execution"
       ],
       "delegation": {},
-      "description": "Execute one exact, semantically complete WorkUnit—implementation, integration, migration, repair, test or fixture, documentation, packaging, cleanup, bounded diagnosis, or other authorized production or experiment-support work—inside one current Worker invocation contract and one bounded mutation/effect fence, then return a provenance-bound result to the invoking `bbk_worker_orchestrator` or `bbk_prototyper` without broadening the work, performing independent assurance, or claiming candidate readiness.",
+      "description": "Execute one exact, semantically complete WorkUnit—implementation, integration, migration, repair, test or fixture, documentation, packaging, cleanup, bounded diagnosis, or other authorized production or experiment-support work—inside one current Worker invocation contract and one bounded mutation/effect fence, then return a provenance-bound result to the invoking controller, `bbk_worker_orchestrator`, or `bbk_prototyper` without broadening the work, performing independent assurance, or claiming candidate readiness.",
       "escalations": [
         "Return any material change to the WorkUnit, accepted sources, outcome, requirement, architecture, canonical interface, structure, slice, assertion, protected floor, ownership, authority, external-effect envelope, recovery semantics, candidate meaning, or completion rule to the invoking semantic parent before affected mutation continues. The normal parent is `bbk_worker_orchestrator` for candidate-producing execution or `bbk_prototyper` for experimental apparatus work.",
         "Return genuinely new local work as an exact discovery packet with subject, necessity, proposed scope, affected objects, authority and effect needs, estimated cost, rollback, assertion coverage, and whether unaffected work can continue. Do not implement it until a current parent direction or permit is bound.",
@@ -6284,9 +6314,9 @@
         "Use the assigned logical execution window to continue through implementation and focused checks rather than stopping after reconnaissance or planning. Before host-window, context, budget, or infrastructure interruption, write a durable checkpoint containing completed work, exact artifacts and effects, remaining steps, current blockers, cleanup, commands and evidence, and continuation identity. Return a compact verified handoff instead of an unstructured partial summary.",
         "On resume, verify the checkpoint path, byte count and SHA-256, WorkUnit and invocation digests, base and current workspace state, authority, profile and tool locks, external-effect state, prior attempt disposition, and parent route. Reuse verified completed work; do not repeat expensive discovery or mutate from an ambiguous or stale checkpoint. Return for reconciliation when duplicate attempts, ownership, cleanup, or effect state cannot be established.",
         "Own cleanup for every temporary effect the WorkUnit or invocation assigns to this Worker unless the contract names another owner. Stop services and processes, release locks and ephemeral credentials, remove or retain temporary packages and files according to policy, reconcile databases, devices and remote state, preserve evidence, and report `CLEAN`, `ROLLED_BACK`, `QUARANTINED`, `RESIDUALS_RECORDED`, `CLEANUP_BLOCKED`, or `NOT_APPLICABLE` as appropriate. Do not destroy evidence or another owner's state merely to report a clean workspace.",
-        "Before claiming completion, finalize and verify every persisted outcome-bearing bundle with the BBK artifact package engine. Attach the exact sealed path, package identity and revision, profile, `contentSha256`, manifest digest, and seal or publication and verification receipts. Never hand off a mutable JSON file, draft directory, ordinary path, hand-written hash, or stale `final` file as durable evidence. A correction after sealing requires a predecessor-bound successor package, new revision and digest, and new verification; never edit the sealed predecessor.",
+        "Before claiming completion, finalize and verify every persisted outcome-bearing bundle when the WorkUnit is consequential, binary, durable-handoff, explicitly packaged, or crosses a candidate/release boundary. A Level 0 routine source WorkUnit may return a lightweight changed-file-set candidate identity without a sealed package. Never hand off an unverifiable mutable carrier where a sealed boundary is required; a correction after sealing requires a predecessor-bound successor package.",
         "Return one structured `bbk.worker-result.v1` packet bound to the exact WorkUnit, semantic and physical attempts, parent, subject, authority, workspace, model and profiles, tools, actions, changed artifacts, external effects, focused checks and evidence, discoveries and deviations, cleanup, continuation, blockers, claims established and explicitly not established, residual uncertainty, invalidation triggers, durable artifact and handoff references, and smallest valid next action.",
-        "Use `READY_FOR_PARENT_INTEGRATION` only when every assigned output is present, every persisted outcome-bearing bundle is sealed and read-only verified with current receipts attached, the current WorkUnit completion checks are satisfied or explicitly non-applicable, actual changes and effects remain inside the contract, cleanup and continuation are reconciled, the exact result verifies, and no governing decision or required capability remains unresolved. This state means only that the invoking Worker Orchestrator or Prototyper may inspect and integrate the contribution; it does not mean that a candidate exists, an experiment is valid, an assertion passed independently, a finding closed, the issue completed, or release is authorized.",
+        "Use `READY_FOR_PARENT_INTEGRATION` only when every assigned output is present, any required package is sealed and read-only verified (or a routine lightweight identity is current), the current WorkUnit completion checks are satisfied or explicitly non-applicable, actual changes and effects remain inside the contract, cleanup and continuation are reconciled, the exact result verifies, and no governing decision or required capability remains unresolved. This state means only that the invoking controller, Worker Orchestrator, or Prototyper may inspect and integrate the contribution; it does not mean that a candidate exists, an experiment is valid, an assertion passed independently, a finding closed, the issue completed, or release is authorized.",
         "Begin the first outcome-bearing implementation action immediately after the four dispatch facts pass. Recheck authority only when the next action changes effect class or target, or a declared invalidation key changed.",
         "Run focused checks during implementation and exact WorkUnit completion checks once before return; run a broad repository validator only when its declared product inputs changed and use a structured result unless a material durable carrier is required."
       ],
@@ -6554,9 +6584,9 @@
       ],
       "purpose": "Determine what the assigned evidence establishes for the named assertions at proportionate cost while preserving exact subject identity, precommitted criteria, actual independence and evidence exposure, read-only candidate integrity, complete evidence and finding lineage, and the distinction among candidate defects, invalid or unavailable validation, governing decisions and accountable acceptance.",
       "responsibilities": [
-        "Bind the exact Validator assignment before outcome-bearing inspection: ReviewRun and assignment identity; semantic parent and controller route; candidate identity, revision, digest, manifest and freeze or immutability receipt; worker-quality attestation or other declared prerequisite; AssuranceContract and assertion references; fixed criteria, applicability, method, evidence and blocking consequence; ReviewContextManifest and context-pack digest; attempt purpose; prior-findings visibility and evidence-exposure policy; actual independence requirements; profiles, tools, environments, consumers, devices, fixtures and credentials; read and scratch authority; budgets, stopping, checkpoint, invalidation, result and handoff contracts. Do not reconstruct missing identity, authority, criteria or context from ambient conversation.",
+        "Bind the exact Validator assignment before outcome-bearing inspection: ReviewRun and assignment identity; semantic parent and controller route; candidate identity (sealed candidate-package for consequential work or lightweight changed-file-set identity for Level 0 routine work); worker-quality attestation or other declared prerequisite; AssuranceContract and assertion references; fixed criteria, applicability, method, evidence and blocking consequence; context and context-pack digest when required; attempt purpose; prior-findings visibility and evidence-exposure policy; actual independence requirements; profiles, tools, environments, consumers, devices, fixtures and credentials; read and scratch authority; budgets, stopping, checkpoint, invalidation, result and handoff contracts. Do not reconstruct missing identity, authority, criteria or context from ambient conversation.",
         "Confirm that the assignment is suitable for a Validator: one exact candidate, one observable assertion or tightly related assertion set, fixed criteria and applicability, a declared method, a qualified environment, exact evidence requirements, bounded interpretive discretion and an immutable result schema. Return an exact recharter need when the work instead requires a new proof obligation, broad qualitative review, factual research, empirical experiment, production repair, central aggregation or accountable decision.",
-        "Independently verify the candidate and assignment identity before evaluating substance. Require the exact sealed `candidate-package-v1` admitted by ReviewContext; run read-only `bbk artifact verify`; match its tool-generated `contentSha256` and manifest digest to the assignment and ReviewContext; and confirm package ID and revision, profile, seal or publication and verification receipts, predecessor and successor lineage, governing source and AssuranceContract currentness, candidate-bound prerequisite attestation, context-pack identity and no later mutation or supersession. Treat a mutable or draft path, loose file, ordinary manifest, archive, handoff-only reference, ad hoc hash, changed digest, mismatch, stale subject, substituted candidate, incomplete manifest, untrusted carrier or broken verification as `STALE`, a context or identity/integrity blocker, or an infrastructure state as appropriate; do not evaluate a convenient replacement or create a candidate defect merely because the carrier is wrong.",
+        "Independently verify the candidate and assignment identity before evaluating substance. For consequential or explicitly packaged work, require the exact sealed `candidate-package-v1` admitted by ReviewContext; run read-only `bbk artifact verify` and match its tool-generated `contentSha256` and manifest digest. For Level 0 routine work, verify the lightweight changed-file-set identity and source revision instead. In both cases confirm governing source currentness, assignment binding, no later mutation or supersession, and actual independent Validator invocation. Treat a missing or mismatched required carrier as an identity/integrity blocker; do not evaluate a convenient replacement.",
         "Preserve a strict read-only candidate fence. When a validation method would create caches, build outputs, generated files, database state, services, device changes or other effects, use an explicitly authorized scratch copy, isolated environment, simulator, test instance or reversible effect envelope that remains provably bound to the immutable candidate. Record pre-state, exact copy or deployment identity, allowed effects, cleanup and any difference from the governed subject. Never allow the validation method to mutate and then pass the candidate it evaluates.",
         "Verify the exact context actually received: included and retrieval-only objects, exclusions, omissions, redactions, generated summaries and source closure, content roots, packs, shards, compiler identity, completeness, blockers and invalidation dependencies. Required missing or stale context blocks only the affected assertion scope; it is not a candidate defect, an implicit waiver or permission to infer missing content.",
         "Freeze and record criteria before outcome-bearing evaluation. Preserve one attempt purpose—`EXPLORATORY`, `ALTERNATIVE`, `REPLICATION`, `ROBUSTNESS`, `TARGETED_CLOSURE`, `ADJUDICATION` or `CONFIRMATORY`—and one prior-findings visibility state—`HIDDEN`, `TARGETED`, `FULL` or `NOT_APPLICABLE`. Record worker narrative, prior findings, expected answers, deterministic results and other outcome-bearing evidence already visible. Criteria selected or materially changed after exposure cannot be represented as independent confirmation against the same evidence.",

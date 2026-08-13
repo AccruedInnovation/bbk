@@ -240,9 +240,59 @@
     },
     "controller_entrypoints": {
       "type": "array",
-      "minItems": 4,
-      "maxItems": 4,
+      "minItems": 6,
+      "maxItems": 6,
       "prefixItems": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/controllerEntrypoint"
+            },
+            {
+              "properties": {
+                "route": {
+                  "const": "ROUTINE_EXECUTION"
+                },
+                "role": {
+                  "const": "bbk_worker"
+                },
+                "invocation_mode": {
+                  "const": "CANDIDATE_PRODUCTION"
+                }
+              },
+              "required": [
+                "route",
+                "role",
+                "invocation_mode"
+              ]
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/controllerEntrypoint"
+            },
+            {
+              "properties": {
+                "route": {
+                  "const": "ROUTINE_VALIDATION"
+                },
+                "role": {
+                  "const": "bbk_validator"
+                },
+                "invocation_mode": {
+                  "const": "ASSERTION_ATTEMPT"
+                }
+              },
+              "required": [
+                "route",
+                "role",
+                "invocation_mode"
+              ]
+            }
+          ]
+        },
         {
           "allOf": [
             {

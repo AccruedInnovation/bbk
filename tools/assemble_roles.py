@@ -32,6 +32,8 @@ from return_contracts import validate_metadata as validate_return_contract_metad
 
 DEFAULT_ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_CONTROLLER_ENTRYPOINTS = (
+    ("ROUTINE_EXECUTION", "bbk_worker", "CANDIDATE_PRODUCTION"),
+    ("ROUTINE_VALIDATION", "bbk_validator", "ASSERTION_ATTEMPT"),
     ("PLANNING", "bbk_root_wayfinder", "CONTROLLER_ROOT"),
     ("EXECUTION", "bbk_root_orchestrator", "CONTROLLER_ROOT"),
     ("REVIEW", "bbk_reviewer", "DIRECT_BOUNDED_REVIEW"),
@@ -503,8 +505,8 @@ def _validate_catalog_shape(instance: Any, label: str, errors: list[str]) -> Non
             errors, non_empty=True, pattern=ROLE_NAME_PATTERN,
         )
     entrypoints = instance.get("controller_entrypoints")
-    if not isinstance(entrypoints, list) or len(entrypoints) != 4:
-        errors.append(f"{label}/controller_entrypoints: must contain exactly four entries")
+    if not isinstance(entrypoints, list) or len(entrypoints) != 6:
+        errors.append(f"{label}/controller_entrypoints: must contain exactly six entries")
     else:
         entrypoint_fields = {
             "route", "role", "invocation_mode", "selected_by", "selection_when",
@@ -514,7 +516,7 @@ def _validate_catalog_shape(instance: Any, label: str, errors: list[str]) -> Non
             _check_fields(entry, entrypoint_fields, item_label, errors)
             if not isinstance(entry, dict):
                 continue
-            if entry.get("route") not in {"PLANNING", "EXECUTION", "REVIEW", "ASSURANCE"}:
+            if entry.get("route") not in {"ROUTINE_EXECUTION", "ROUTINE_VALIDATION", "PLANNING", "EXECUTION", "REVIEW", "ASSURANCE"}:
                 errors.append(f"{item_label}/route: invalid")
             if not _is_non_empty_string(entry.get("role")) or not ROLE_NAME_PATTERN.fullmatch(entry["role"]):
                 errors.append(f"{item_label}/role: invalid")
@@ -1146,16 +1148,13 @@ def assemble(
         errors.append("canonical roles must remain non-user-facing")
 
     # Mode-specific role contracts whose behavior changes by parent context.
-    worker_modes = {
-        mode: set(mode_entry.get("parents") or [])
-        for mode_entry in entry_by_name.get("bbk_worker", {}).get("allowed_parent_modes", [])
-        if isinstance(mode_entry, dict)
-        for mode in [mode_entry.get("mode")]
-        if isinstance(mode, str)
-    }
+    worker_modes: dict[str, set[str]] = {}
+    for mode_entry in entry_by_name.get("bbk_worker", {}).get("allowed_parent_modes", []):
+        if isinstance(mode_entry, dict) and isinstance(mode_entry.get("mode"), str):
+            worker_modes.setdefault(mode_entry["mode"], set()).update(mode_entry.get("parents") or [])
     expected_worker_modes = {
         "CANDIDATE_PRODUCTION": {
-            "bbk_root_orchestrator", "bbk_territory_orchestrator", "bbk_worker_orchestrator"
+            "harness_root_controller", "bbk_root_orchestrator", "bbk_territory_orchestrator", "bbk_worker_orchestrator"
         },
         "PROTOTYPE_SUPPORT": {"bbk_prototyper"},
     }
@@ -1176,6 +1175,12 @@ def assemble(
         errors.append(
             "bbk_validator_orchestrator must support exactly TERRITORY_BOUND and CONTROLLER_ROOT"
         )
+    validator_modes: dict[str, set[str]] = {}
+    for mode_entry in entry_by_name.get("bbk_validator", {}).get("allowed_parent_modes", []):
+        if isinstance(mode_entry, dict) and isinstance(mode_entry.get("mode"), str):
+            validator_modes.setdefault(mode_entry["mode"], set()).update(mode_entry.get("parents") or [])
+    if validator_modes.get("ASSERTION_ATTEMPT") != {"bbk_root_orchestrator", "bbk_territory_orchestrator", "bbk_validator_orchestrator", "harness_root_controller"}:
+        errors.append("bbk_validator ASSERTION_ATTEMPT must include the routine controller route and existing orchestrators")
 
     reviewer_pairs = set(mode_pairs(entry_by_name.get("bbk_reviewer", {})))
     expected_reviewer_pairs = {
@@ -1232,7 +1237,7 @@ def assemble(
         stack.extend(by_name[current].get("spawns") or [])
     unreachable = sorted(known_names - reachable)
     if unreachable:
-        errors.append(f"roles unreachable from the four controller entrypoints: {unreachable}")
+        errors.append(f"roles unreachable from the controller entrypoints: {unreachable}")
 
     if errors:
         raise RolePackageError(errors)

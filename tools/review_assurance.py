@@ -76,6 +76,111 @@ DISPOSITIONS = {"FIXED", "REBUTTED", "ACCEPTED_RISK", "FALSE_POSITIVE", "DUPLICA
 COMPLETENESS = {"COMPLETE", "COMPLETE_WITH_DECLARED_EXCLUSIONS", "PARTIAL_NONBLOCKING", "BLOCKED_REQUIRED_CONTEXT_MISSING", "STALE", "INVALID"}
 PRIOR_VISIBILITY = {"HIDDEN", "TARGETED", "FULL", "NOT_APPLICABLE"}
 
+# Minimum-ceremony execution policy.  These helpers are intentionally small and
+# deterministic so callers can select the shallowest valid path without creating
+# a second policy engine.
+ESCALATION_TRIGGER_NAMES = {
+    "unclear_outcome",
+    "shared_interface",
+    "multiple_owners",
+    "external_effect",
+    "recovery_contract",
+    "qualitative_risk",
+    "acceptance_or_release",
+    "validator_inconclusive",
+}
+
+
+def classify_execution_level(*, outcome_clear: bool = True, shared_interface: bool = False,
+                             multiple_owners: bool = False, external_effect: bool = False,
+                             recovery_contract: bool = False, qualitative_risk: bool = False,
+                             acceptance_or_release: bool = False,
+                             validator_inconclusive: bool = False) -> dict[str, Any]:
+    """Return the minimum execution level and exact escalation triggers.
+
+    Level 0 is the default for clear, local, reversible work.  Level 1 adds
+    bounded coordination for consequential boundaries; Level 2 is reserved for
+    acceptance, release, irreversible effects, or unresolved qualitative risk.
+    """
+    flags = {
+        "unclear_outcome": not outcome_clear,
+        "shared_interface": shared_interface,
+        "multiple_owners": multiple_owners,
+        "external_effect": external_effect,
+        "recovery_contract": recovery_contract,
+        "qualitative_risk": qualitative_risk,
+        "acceptance_or_release": acceptance_or_release,
+        "validator_inconclusive": validator_inconclusive,
+    }
+    triggers = [name for name in ESCALATION_TRIGGER_NAMES if flags[name]]
+    level = 0 if not triggers else 1
+    if acceptance_or_release or external_effect or qualitative_risk or validator_inconclusive:
+        level = 2
+    return {
+        "level": level,
+        "name": f"LEVEL_{level}",
+        "routine": level == 0,
+        "escalation_triggers": sorted(triggers),
+        "unknowns_are_non_escalating": True,
+    }
+
+
+def lightweight_candidate_identity(paths: Sequence[str | os.PathLike[str]], *, revision: str = "") -> dict[str, Any]:
+    """Build a deterministic pre-freeze identity for a routine file-set candidate."""
+    files = []
+    for raw in paths:
+        path = Path(raw).resolve()
+        if not path.is_file():
+            raise FileNotFoundError(path)
+        data = path.read_bytes()
+        files.append({"path": path.as_posix(), "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest()})
+    files.sort(key=lambda item: item["path"])
+    identity = {"kind": "lightweight-file-set-v1", "revision": revision, "files": files}
+    identity["digest"] = canonical_digest(identity)
+    return identity
+
+
+def lightweight_candidate_current(identity: dict[str, Any], paths: Sequence[str | os.PathLike[str]], *, revision: str = "") -> bool:
+    """Check a lightweight identity against current bytes and revision."""
+    try:
+        return identity == lightweight_candidate_identity(paths, revision=revision)
+    except (FileNotFoundError, OSError):
+        return False
+
+
+def artifact_requirements(*, level: int = 0, explicit_packaging: bool = False,
+                          durable_handoff: bool = False, binary_output: bool = False) -> dict[str, Any]:
+    """Select artifact work conditionally; Level 0 source changes need no package."""
+    required = level > 0 or explicit_packaging or durable_handoff or binary_output
+    return {
+        "required": required,
+        "operations": ["finalize", "verify", "freshness"] if required else [],
+        "reason": "explicit-or-consequential-boundary" if required else "routine-source-change",
+        "sealed_package": required,
+    }
+
+
+def compile_routine_validator_plan(*, candidate: dict[str, Any], assertions: Sequence[dict[str, Any]],
+                                   method: str, tool: str = "", environment: str = "") -> dict[str, Any]:
+    """Compile exactly one grouped, independent Validator assignment."""
+    if not isinstance(candidate, dict) or not candidate.get("digest"):
+        raise ValueError("candidate identity is required")
+    if not assertions:
+        raise ValueError("at least one assertion is required")
+    refs = [str(item.get("assertionId")) for item in assertions if item.get("assertionId")]
+    if len(refs) != len(assertions):
+        raise ValueError("each assertion requires assertionId")
+    return {
+        "schema": "bbk.routine-validator-plan.v1",
+        "mode": "LEVEL_0",
+        "candidate": candidate,
+        "assignments": [{"assignmentId": "RV-1", "assertionRefs": refs, "method": method,
+                         "tool": tool, "environment": environment, "independent": True}],
+        "validatorCount": 1,
+        "grouped": True,
+        "reviewerRequired": False,
+    }
+
 
 def _dict(value: Any, where: str, errors: list[str]) -> dict[str, Any]:
     if not isinstance(value, dict):
@@ -262,8 +367,34 @@ def compile_review_manifest(assurance: dict[str, Any], *, purpose: str, manifest
     subject = dict(subject_override or assurance["subject"])
     applicability = assurance.get("reviewApplicability") or ("inline" if assurance["riskTier"] == "routine" else "manifest")
     assignments: list[dict[str, Any]] = []
+    # Routine INLINE work uses one grouped assignment when assertions share the
+    # same method/evidence/independence shape.  Higher-risk manifests retain the
+    # historical one-assertion-per-assignment planning semantics.
+    grouped: dict[tuple[Any, ...], dict[str, Any]] = {}
     for assertion in assurance["assertions"]:
         lens = _lens_for_assertion(assertion, assurance.get("changeClasses", []))
+        evidence = tuple(assertion.get("requiredEvidence", []))
+        independence = assertion.get("independence", {})
+        key = (lens, assertion["methods"][0], evidence, canonical_digest(independence))
+        if assurance["riskTier"] == "routine" and applicability == "inline":
+            item = grouped.get(key)
+            if item is None:
+                item = {
+                    "assignmentId": f"LA-R-{len(grouped) + 1}",
+                    "lens": lens,
+                    "primaryAssertionRefs": [],
+                    "method": assertion["methods"][0],
+                    "evidenceRequirements": list(evidence),
+                    "reviewerCapabilityRequirements": [],
+                    "independence": independence,
+                    "contextSelector": {"include": ["subject", "governing-contracts", "assertion-evidence"], "exclude": ["unrelated-history"]},
+                    "blocking": False,
+                }
+                grouped[key] = item
+                assignments.append(item)
+            item["primaryAssertionRefs"].append(assertion["assertionId"])
+            item["blocking"] = item["blocking"] or bool(assertion.get("blocking"))
+            continue
         assignments.append({
             "assignmentId": f"LA-{assertion['assertionId']}",
             "lens": lens,
@@ -271,7 +402,7 @@ def compile_review_manifest(assurance: dict[str, Any], *, purpose: str, manifest
             "method": assertion["methods"][0],
             "evidenceRequirements": assertion.get("requiredEvidence", []),
             "reviewerCapabilityRequirements": [lens],
-            "independence": assertion.get("independence", {}),
+            "independence": independence,
             "contextSelector": {"include": ["subject", "governing-contracts", "assertion-evidence"], "exclude": ["unrelated-history"]},
             "blocking": bool(assertion.get("blocking")),
         })

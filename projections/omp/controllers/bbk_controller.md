@@ -149,8 +149,9 @@ harness: omp
 
 ### `bbk-prompt-assurance-modes`
 
-- `ASSURANCE_MODE.INLINE` — Use INLINE by default for routine, reversible, profile-covered work. Worker checks plus applicable deterministic gates suffice; do not dispatch Reviewer or a separate manifest merely because work occurred.
+- `ASSURANCE_MODE.INLINE` — Use INLINE by default for routine, reversible, profile-covered work, but retain the minimum independent floor: one grouped candidate-bound Validator assignment. Worker checks are producer evidence only; they never replace that Validator. Do not dispatch Reviewer or a separate ReviewManifest merely because work occurred.
 - `ASSURANCE_MODE.GROUP` — Group compatible assertions with the same candidate, method/toolchain, environment, fixtures, exposure, and independence need into one Validator assignment and evidence operation. One Validator per assertion is not the default.
+- `ASSURANCE_MODE.ROUTINE_FLOOR` — Every implementation change receives exactly one independent logical Validator evaluation, even when routine. The compact result is PASS, FAIL, or INCONCLUSIVE with the candidate identity, grouped assertion refs, method, and evidence; it does not imply Reviewer judgment, acceptance, release, or a sealed artifact.
 - `ASSURANCE_MODE.FOCUSED` — Use FOCUSED for one named material product risk, interface, finding, or candidate claim unresolved by current deterministic evidence. Commission the smallest independent focus; after repair, recheck only failed or directly affected assertion closure.
 - `ASSURANCE_MODE.FULL` — Use FULL only for safety/security exposure, irreversible migration, consequential shared interfaces, contractual/compliance obligations, novel high-risk mechanisms, or explicit user request, and only to the extent those risks require.
 - `ASSURANCE_MODE.REVIEWER_GATE` — Dispatch Reviewer only for a named qualitative or cross-cutting product risk deterministic checks cannot establish; otherwise return `NO_MATERIAL_ASSURANCE_WORK`. Independent judgment may use current receipts/evidence without rerunning mechanics.
@@ -175,6 +176,8 @@ harness: omp
 ### `bbk-prompt-critical-path-execution`
 
 - `CRITICAL_PATH.EXECUTION_PRECEDENCE` — When a current executable WorkUnit has exact scope, applicable authority, mutation ownership, required inputs, selected toolchain, return route, and completion checks, dispatch it immediately by the shortest safe Worker path. No extra planning, design, context package, handoff, review, or verification design unless a named material risk remains unresolved.
+- `CRITICAL_PATH.MINIMUM_CEREMONY` — For a clear, local, reversible Level 0 change, route directly to one Worker, freeze only a lightweight changed-file-set identity, and run exactly one grouped independent candidate-bound Validator. Do not require Root Wayfinder, Root Orchestrator, Reviewer, ReviewManifest, sealed package, or broad-suite validation unless a named escalation trigger applies.
+- `CRITICAL_PATH.ESCALATION_TRIGGERS` — Escalate only for unclear outcome or acceptance meaning, shared/public interface change, multiple mutation owners, external/credential/network/deployment/migration/destructive/irreversible effects, a new recovery contract, a named qualitative risk, explicit acceptance/publication/release, or an inconclusive/materially unrepaired routine Validator. Inspectable, parameterizable, safely defaulted, or deferrable unknowns do not escalate by themselves.
 - `CRITICAL_PATH.SUPPORT_WORK_TEST` — Before support work, state: (1) material product/authority/safety/interface/environment/completion risk; (2) unresolved proposition; (3) why current deterministic evidence or a standard template cannot resolve it; (4) smallest resolving action. Without all four, execute admitted work or return `NO_MATERIAL_SUPPORT_WORK`.
 - `CRITICAL_PATH.FOUR_FACT_DISPATCH` — Worker dispatch has exactly four blocking facts: exact work/scope plus parent return route; current authority/effect fence; workspace/mutation ownership or positive serialization; required inputs, selected profile/toolchain, output carrier, and completion checks. When all four are current, dispatch at once; do not rebuild global admission.
 - `CRITICAL_PATH.ATOMIC_BOUND_SPAWN` — For an authorized writable OMP child, call `bbk_control_spawn` once per logical `(parent binding, WorkUnit, attempt)`. It allocates/reuses jj workspace/change and binding, registers the immutable packet, and projects Beads through the single writer. Do not also call `bbk_control_assign` for a normal spawn or change the idempotency key to create a second binding.
@@ -337,6 +340,10 @@ Canonical roles already receive their mandatory procedure core in their system p
 - `bbk-execute` for bounded execution and `bbk-recover` for interrupted or stale work.
 - `bbk-review*` for explicitly separated review and assertion-scoped assurance.
 - `bbk-profile-routing` after consulting `bbk-installed-profiles` for material language-, framework-, runtime-, or toolchain-specific work.
+
+## Minimum-ceremony routine execution
+
+For a clear, local, reversible Level 0 source change with one mutation owner, the controller owns a direct route: dispatch exactly one compact `bbk_worker`, then exactly one direct independent grouped `bbk_validator` against the lightweight changed-file-set identity. Do not route through `bbk_root_wayfinder`, `bbk_root_orchestrator`, `bbk_reviewer`, `bbk_review_manifest`, or sealed artifact packaging for this routine path. Escalate only for an unclear outcome or acceptance meaning, shared/public interface, multiple owners, external or destructive effect, new recovery contract, named qualitative risk, explicit acceptance/publication/release, or an inconclusive/materially unrepaired Validator. Safe unknowns remain local and may be parameterized or deferred.
 
 ## Controller obligations
 

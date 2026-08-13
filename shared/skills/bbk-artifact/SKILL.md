@@ -57,18 +57,18 @@ Use a dedicated semantic constructor when one exists:
 - Use `bbk handoff create` and `bbk handoff verify` for `bbk.handoff.v2`; do not hand-author generated handoff identity.
 - Use `bbk context worker` or `bbk context review` for generated Worker and review context packages.
 - Use `bbk candidate freeze`, `check`, `status`, or `verify` for the existing project-managed or legacy candidate lifecycle. Do not confuse `bbk.candidate.v1` with the sealed `candidate-package-v1` profile required by generated review context.
-- Use one-shot `bbk artifact finalize --root <project> --package-id <id> --revision <rev>` for ordinary software implementations; the source set defaults to the project root, and repeat `--source <path>` only to narrow it. It constructs the generic package draft, publishes under `.bbk/artifacts/sealed/`, and binds the exact live source set without requiring hand-authored package internals.
+- Use one-shot `bbk artifact finalize --root <project> --package-id <id> --revision <rev>` only for package/publication/release work, an exact immutable carrier, or explicit packaging authority; the source set defaults to the project root, and repeat `--source <path>` only to narrow it. A routine Level 0 source change uses a lightweight changed-file-set identity and does not require finalize or freshness.
 - Use draft-mode `bbk artifact finalize <draft-root> --root <project>` when an exact profile-specific descriptor, semantic artifact roles, references, or predecessor structure is required. Use the remaining `bbk artifact` commands for explicit preflight/seal/verify/successor operations, exact inspection, and legacy manifest compatibility.
 
 A legacy `artifact manifest` is a flat exact-file manifest. It is not a substitute for a sealed package when immutable publication, profile semantics, artifact-reference closure, or successor history is required.
 
 ## Run the standard package lifecycle
 
-For an ordinary implementation already present in the project workspace:
+For package/publication/release work or an exact immutable carrier already present in the project workspace:
 
 1. Select the exact implementation source set. `--source .` is appropriate only when the default exclusions and any explicit `--include`/`--exclude` rules describe the intended candidate.
 2. Run one-shot `finalize` with an explicit package ID and revision. BBK constructs a temporary generic draft, copies only the selected regular files, seals to a new absent directory under `.bbk/artifacts/sealed/<packageId>-<revision>`, verifies the exact tree, writes an immutable publication receipt under `.bbk/artifacts/publications`, and updates a mutable current pointer under `.bbk/artifacts/current`.
-3. Run `freshness` against the returned publication receipt immediately before a completion relay. A later source mutation invalidates the bound completion evidence and requires a successor revision.
+3. Run `freshness` against the returned publication receipt immediately before a completion relay. A later source mutation invalidates the bound completion evidence and requires a successor revision. This lifecycle is not required for a routine Level 0 source change, whose lightweight identity is invalidated directly by changed bytes or revision.
 4. Return the tool-generated identity and the claims that remain unestablished.
 
 For a profile-specific semantic package:

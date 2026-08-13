@@ -26,7 +26,7 @@
     },
     {
       "id": "CANDIDATE.SEALED_ADMISSION_GATE",
-      "text": "No sealed artifact, no validation admission. Before producer completion or validation relay, create every persisted outcome-bearing candidate or evidence bundle as a BBK artifact draft, run `bbk artifact finalize` for published packages or the explicit preflight-plus-`bbk artifact seal` path for an authorized non-published package, then run read-only `bbk artifact verify` from disk. Attach the exact sealed path, package ID/revision/profile, `contentSha256`, manifest digest, and seal/publication and verification receipts. A handoff, passing tests, raw directory, ordinary mutable JSON file, archive, legacy flat manifest, or ad hoc digest is not a substitute."
+      "text": "For consequential, release, binary, durable-handoff, or explicitly packaged work, No sealed artifact, no validation admission: create the BBK artifact draft, finalize or explicitly seal, then run read-only `bbk artifact verify` with current receipts. For a Level 0 routine source change, a lightweight changed-file-set candidate identity is sufficient and sealing is not a default gate. A handoff, passing tests, raw directory, ordinary mutable JSON file, archive, legacy flat manifest, or ad hoc digest cannot substitute where the sealed boundary is required."
     },
     {
       "id": "CANDIDATE.FINALIZATION_FRESHNESS",

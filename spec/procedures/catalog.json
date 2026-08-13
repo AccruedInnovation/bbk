@@ -123,7 +123,7 @@
         "bbk-prompt-coordination-economy"
       ],
       "source": "shared/skills/bbk/SKILL.md",
-      "source_sha256": "d77d9253d195586b0b5c540f23535916dccc11d6745a03fb0c64e1a832e0ec62",
+      "source_sha256": "ccf7d7e3ecb1a8714803c1b7fc2377373eab9a07709578df86bc2e4dabe9b1d1",
       "version": "0.1.0-alpha.17.0.2.1"
     },
     {
@@ -156,7 +156,7 @@
       "procedure_dependencies": [],
       "prompt_module_dependencies": [],
       "source": "shared/skills/bbk-artifact/SKILL.md",
-      "source_sha256": "6c6cbe2f3f6a6cd38d19170c8d02e8e11796a21a82fff65d25c10bb9ee241774",
+      "source_sha256": "27204b7d710ef7a7c5da8a2312004ef57f80a2044dedbb324021253be0f05da2",
       "version": "0.1.0-alpha.17.0.2.1"
     },
     {
@@ -336,7 +336,7 @@
         "bbk-prompt-critical-path-execution"
       ],
       "source": "shared/skills/bbk-phase-plan/SKILL.md",
-      "source_sha256": "123c8cb2409d299e5e45b8585f7501d5fda1867df99991510b18d30241aaeb3c",
+      "source_sha256": "e4314b0561abf3dcca0e352fd97f7b0701e736d8b9f706848bd1caafb4fe0bb6",
       "version": "0.1.0-alpha.17.0.2.1"
     },
     {
@@ -348,7 +348,7 @@
         "bbk-prompt-critical-path-execution"
       ],
       "source": "shared/skills/bbk-plan/SKILL.md",
-      "source_sha256": "9a03ae3c56350ff68f590cbcc200fff68e092d8c42ab4aebd37abd12aefb6d42",
+      "source_sha256": "4f240f4d4dd8cd205e0e0644291a6c5e24bc20cfb64f5ef67b6422f15752dea1",
       "version": "0.1.0-alpha.17.0.2.1"
     },
     {
@@ -577,7 +577,7 @@
         "bbk-prompt-critical-path-execution"
       ],
       "source": "shared/skills/bbk-root-execution/SKILL.md",
-      "source_sha256": "ad9fbd0ccb1146a6a3fd33241df4c2b23fbc430d9e77589a3464b6c70744a05d",
+      "source_sha256": "4fdd60dbe677896d5b9f71ae22c691bd7c7024cf539c4af931bfab782589b2a5",
       "version": "0.1.0-alpha.17.0.2.1"
     },
     {
@@ -644,7 +644,7 @@
         "bbk-prompt-critical-path-execution"
       ],
       "source": "shared/skills/bbk-territory-execution/SKILL.md",
-      "source_sha256": "3b06360728fe51bc15d73519f21707c8b21d7fb10418abb2f181fdc08d1bb578",
+      "source_sha256": "b90bc0cc4664305a3b5746f49e096f05ff80b62cc3d9dcf57cd9948d0a5c2fc4",
       "version": "0.1.0-alpha.17.0.2.1"
     },
     {
@@ -734,7 +734,7 @@
         "bbk-prompt-critical-path-execution"
       ],
       "source": "shared/skills/bbk-wayfind/SKILL.md",
-      "source_sha256": "7fdf61cad0555c6dc98ef07bc0ac774fe87e6f8e3fe91d5cd0a866ec5fcd2870",
+      "source_sha256": "b925c39c00848a06e7e0fb762fbc1a1cda5f37a9057458a36d108c7593e5e3d6",
       "version": "0.1.0-alpha.17.0.2.1"
     },
     {
@@ -760,7 +760,7 @@
         "bbk-prompt-critical-path-execution"
       ],
       "source": "shared/skills/bbk-work-graph/SKILL.md",
-      "source_sha256": "88d3f4292385bdee3c75cc4e2d06ac136c32dea8dce83a8f2441bc5f724623d6",
+      "source_sha256": "bd37c9cf5485fe4cb042220f7d3da5099d2cc48ff7af25c40050117d860ba61c",
       "version": "0.1.0-alpha.17.0.2.1"
     },
     {
@@ -845,12 +845,12 @@
         "bbk-prompt-critical-path-execution"
       ],
       "source": "shared/skills/bbk-worker-execution/SKILL.md",
-      "source_sha256": "07efc9a576dc06c7ad301132d89640e4193781a81646d9b382ea9535d51e0242",
+      "source_sha256": "86fc9a9e028ffa74332f1cc4fe9c0bfd19577493b904b8d22c8c97885c6e0556",
       "version": "0.1.0-alpha.17.0.2.1"
     }
   ],
-  "registry_revision": "80e1378a4de1e22bf082ec71ed968bb144e14ca1947cd8fc169b030c06725e6d",
-  "role_source_sha256": "17d0c9bbf6c3033ffa58283abc0499975d14f5c8becd369eca9c421458ff482b",
+  "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+  "role_source_sha256": "da458dbc8973e2e3b8cc3fee9c4c8b5f84fac88e8fa075c58a056615636f2492",
   "roles": {
     "bbk_architect": {
       "available": [
@@ -1481,5 +1481,5 @@
   },
   "schema": "bbk.procedure-registry.v2",
   "source": "spec/method-content.json",
-  "source_sha256": "e5acd7cb55c128d082c021260799cc24b91835c317e8928fa4223b958b9ecd69"
+  "source_sha256": "6c3a428d49a294d1abe77d031c4d8f211fccd305e0f1fc361a97aae3db030be0"
 }

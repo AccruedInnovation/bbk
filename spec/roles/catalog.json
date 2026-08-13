@@ -54,6 +54,20 @@
   },
   "controller_entrypoints": [
     {
+      "route": "ROUTINE_EXECUTION",
+      "role": "bbk_worker",
+      "invocation_mode": "CANDIDATE_PRODUCTION",
+      "selected_by": "harness_root_controller",
+      "selection_when": "A clear local reversible Level 0 change has an exact WorkUnit, authority/effect fence, mutation owner, inputs/toolchain, focused checks, and return route; dispatch the Worker directly and retain one independent Validator floor."
+    },
+    {
+      "route": "ROUTINE_VALIDATION",
+      "role": "bbk_validator",
+      "invocation_mode": "ASSERTION_ATTEMPT",
+      "selected_by": "harness_root_controller",
+      "selection_when": "The direct Level 0 Worker result has a current lightweight candidate identity and exactly one grouped Validator assignment is required."
+    },
+    {
       "route": "PLANNING",
       "role": "bbk_root_wayfinder",
       "invocation_mode": "CONTROLLER_ROOT",
@@ -376,6 +390,14 @@
       "allowed_parent_modes": [
         {
           "mode": "CANDIDATE_PRODUCTION",
+          "parent_kind": "controller",
+          "parents": [
+            "harness_root_controller"
+          ],
+          "purpose": "Execute one exact Level 0 routine WorkUnit through the shortest direct controller-to-Worker path."
+        },
+        {
+          "mode": "CANDIDATE_PRODUCTION",
           "parent_kind": "canonical_role",
           "parents": [
             "bbk_root_orchestrator",
@@ -398,6 +420,14 @@
       "name": "bbk_validator",
       "file": "spec/roles/bbk_validator-role.json",
       "allowed_parent_modes": [
+        {
+          "mode": "ASSERTION_ATTEMPT",
+          "parent_kind": "controller",
+          "parents": [
+            "harness_root_controller"
+          ],
+          "purpose": "Run the one grouped independent Validator assignment for a lightweight Level 0 candidate."
+        },
         {
           "mode": "ASSERTION_ATTEMPT",
           "parent_kind": "canonical_role",

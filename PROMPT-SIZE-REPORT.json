@@ -14,256 +14,256 @@
   ],
   "aggregate": {
     "baseline_bytes": 6481175,
-    "current_bytes": 7924441,
-    "delta_bytes": 1443266,
-    "delta_percent": 22.269
+    "current_bytes": 8032861,
+    "delta_bytes": 1551686,
+    "delta_percent": 23.941
   },
   "roles": {
     "bbk_root_wayfinder": {
       "baseline_bytes": 231465,
-      "current_bytes": 383438,
-      "delta_bytes": 151973,
-      "delta_percent": 65.657,
+      "current_bytes": 392733,
+      "delta_bytes": 161268,
+      "delta_percent": 69.673,
       "host_bytes": {
-        "generic": 76289,
-        "omp": 78485,
-        "codex": 75583,
-        "claude": 76792,
-        "pi": 76289
+        "generic": 78148,
+        "omp": 80344,
+        "codex": 77442,
+        "claude": 78651,
+        "pi": 78148
       }
     },
     "bbk_territory_wayfinder": {
       "baseline_bytes": 233697,
-      "current_bytes": 379112,
-      "delta_bytes": 145415,
-      "delta_percent": 62.224,
+      "current_bytes": 388407,
+      "delta_bytes": 154710,
+      "delta_percent": 66.201,
       "host_bytes": {
-        "generic": 75438,
-        "omp": 77457,
-        "codex": 74811,
-        "claude": 75968,
-        "pi": 75438
+        "generic": 77297,
+        "omp": 79316,
+        "codex": 76670,
+        "claude": 77827,
+        "pi": 77297
       }
     },
     "bbk_questioning_wayfinder": {
       "baseline_bytes": 269993,
-      "current_bytes": 301584,
-      "delta_bytes": 31591,
-      "delta_percent": 11.701,
+      "current_bytes": 305654,
+      "delta_bytes": 35661,
+      "delta_percent": 13.208,
       "host_bytes": {
-        "generic": 59828,
-        "omp": 62250,
-        "codex": 59583,
-        "claude": 60095,
-        "pi": 59828
+        "generic": 60642,
+        "omp": 63064,
+        "codex": 60397,
+        "claude": 60909,
+        "pi": 60642
       }
     },
     "bbk_planning_wayfinder": {
       "baseline_bytes": 310468,
-      "current_bytes": 395694,
-      "delta_bytes": 85226,
-      "delta_percent": 27.451,
+      "current_bytes": 401929,
+      "delta_bytes": 91461,
+      "delta_percent": 29.459,
       "host_bytes": {
-        "generic": 78779,
-        "omp": 80798,
-        "codex": 78192,
-        "claude": 79146,
-        "pi": 78779
+        "generic": 80026,
+        "omp": 82045,
+        "codex": 79439,
+        "claude": 80393,
+        "pi": 80026
       }
     },
     "bbk_phase_wayfinder": {
       "baseline_bytes": 358466,
-      "current_bytes": 428492,
-      "delta_bytes": 70026,
-      "delta_percent": 19.535,
+      "current_bytes": 434727,
+      "delta_bytes": 76261,
+      "delta_percent": 21.274,
       "host_bytes": {
-        "generic": 85337,
-        "omp": 87356,
-        "codex": 84792,
-        "claude": 85670,
-        "pi": 85337
+        "generic": 86584,
+        "omp": 88603,
+        "codex": 86039,
+        "claude": 86917,
+        "pi": 86584
       }
     },
     "bbk_question_guide": {
       "baseline_bytes": 276501,
-      "current_bytes": 304864,
-      "delta_bytes": 28363,
-      "delta_percent": 10.258,
+      "current_bytes": 308934,
+      "delta_bytes": 32433,
+      "delta_percent": 11.73,
       "host_bytes": {
-        "generic": 60564,
-        "omp": 62739,
-        "codex": 60228,
-        "claude": 60769,
-        "pi": 60564
+        "generic": 61378,
+        "omp": 63553,
+        "codex": 61042,
+        "claude": 61583,
+        "pi": 61378
       }
     },
     "bbk_researcher": {
       "baseline_bytes": 233297,
-      "current_bytes": 278130,
-      "delta_bytes": 44833,
-      "delta_percent": 19.217,
+      "current_bytes": 282200,
+      "delta_bytes": 48903,
+      "delta_percent": 20.962,
       "host_bytes": {
-        "generic": 55267,
-        "omp": 57039,
-        "codex": 55058,
-        "claude": 55499,
-        "pi": 55267
+        "generic": 56081,
+        "omp": 57853,
+        "codex": 55872,
+        "claude": 56313,
+        "pi": 56081
       }
     },
     "bbk_prototyper": {
       "baseline_bytes": 390212,
-      "current_bytes": 433683,
-      "delta_bytes": 43471,
-      "delta_percent": 11.14,
+      "current_bytes": 439918,
+      "delta_bytes": 49706,
+      "delta_percent": 12.738,
       "host_bytes": {
-        "generic": 86309,
-        "omp": 88554,
-        "codex": 85911,
-        "claude": 86600,
-        "pi": 86309
+        "generic": 87556,
+        "omp": 89801,
+        "codex": 87158,
+        "claude": 87847,
+        "pi": 87556
       }
     },
     "bbk_synthesizer": {
       "baseline_bytes": 265253,
-      "current_bytes": 306706,
-      "delta_bytes": 41453,
-      "delta_percent": 15.628,
+      "current_bytes": 310776,
+      "delta_bytes": 45523,
+      "delta_percent": 17.162,
       "host_bytes": {
-        "generic": 60998,
-        "omp": 62770,
-        "codex": 60710,
-        "claude": 61230,
-        "pi": 60998
+        "generic": 61812,
+        "omp": 63584,
+        "codex": 61524,
+        "claude": 62044,
+        "pi": 61812
       }
     },
     "bbk_architect": {
       "baseline_bytes": 404215,
-      "current_bytes": 448592,
-      "delta_bytes": 44377,
-      "delta_percent": 10.979,
+      "current_bytes": 452662,
+      "delta_bytes": 48447,
+      "delta_percent": 11.985,
       "host_bytes": {
-        "generic": 89406,
-        "omp": 91178,
-        "codex": 88964,
-        "claude": 89638,
-        "pi": 89406
+        "generic": 90220,
+        "omp": 91992,
+        "codex": 89778,
+        "claude": 90452,
+        "pi": 90220
       }
     },
     "bbk_verification_designer": {
       "baseline_bytes": 371504,
-      "current_bytes": 440921,
-      "delta_bytes": 69417,
-      "delta_percent": 18.685,
+      "current_bytes": 446636,
+      "delta_bytes": 75132,
+      "delta_percent": 20.224,
       "host_bytes": {
-        "generic": 87921,
-        "omp": 89693,
-        "codex": 87233,
-        "claude": 88153,
-        "pi": 87921
+        "generic": 89064,
+        "omp": 90836,
+        "codex": 88376,
+        "claude": 89296,
+        "pi": 89064
       }
     },
     "bbk_worker_designer": {
       "baseline_bytes": 394341,
-      "current_bytes": 451323,
-      "delta_bytes": 56982,
-      "delta_percent": 14.45,
+      "current_bytes": 457558,
+      "delta_bytes": 63217,
+      "delta_percent": 16.031,
       "host_bytes": {
-        "generic": 89955,
-        "omp": 91953,
-        "codex": 89273,
-        "claude": 90187,
-        "pi": 89955
+        "generic": 91202,
+        "omp": 93200,
+        "codex": 90520,
+        "claude": 91434,
+        "pi": 91202
       }
     },
     "bbk_reviewer": {
       "baseline_bytes": 340508,
-      "current_bytes": 402138,
-      "delta_bytes": 61630,
-      "delta_percent": 18.099,
+      "current_bytes": 408373,
+      "delta_bytes": 67865,
+      "delta_percent": 19.931,
       "host_bytes": {
-        "generic": 80101,
-        "omp": 82099,
-        "codex": 79504,
-        "claude": 80333,
-        "pi": 80101
+        "generic": 81348,
+        "omp": 83346,
+        "codex": 80751,
+        "claude": 81580,
+        "pi": 81348
       }
     },
     "bbk_root_orchestrator": {
       "baseline_bytes": 418113,
-      "current_bytes": 526274,
-      "delta_bytes": 108161,
-      "delta_percent": 25.869,
+      "current_bytes": 531989,
+      "delta_bytes": 113876,
+      "delta_percent": 27.236,
       "host_bytes": {
-        "generic": 104907,
-        "omp": 107152,
-        "codex": 104048,
-        "claude": 105260,
-        "pi": 104907
+        "generic": 106050,
+        "omp": 108295,
+        "codex": 105191,
+        "claude": 106403,
+        "pi": 106050
       }
     },
     "bbk_territory_orchestrator": {
       "baseline_bytes": 445571,
-      "current_bytes": 547464,
-      "delta_bytes": 101893,
-      "delta_percent": 22.868,
+      "current_bytes": 553179,
+      "delta_bytes": 107608,
+      "delta_percent": 24.151,
       "host_bytes": {
-        "generic": 109115,
-        "omp": 111360,
-        "codex": 108368,
-        "claude": 109506,
-        "pi": 109115
+        "generic": 110258,
+        "omp": 112503,
+        "codex": 109511,
+        "claude": 110649,
+        "pi": 110258
       }
     },
     "bbk_worker_orchestrator": {
       "baseline_bytes": 405609,
-      "current_bytes": 513644,
-      "delta_bytes": 108035,
-      "delta_percent": 26.635,
+      "current_bytes": 519359,
+      "delta_bytes": 113750,
+      "delta_percent": 28.044,
       "host_bytes": {
-        "generic": 102385,
-        "omp": 104630,
-        "codex": 101602,
-        "claude": 102642,
-        "pi": 102385
+        "generic": 103528,
+        "omp": 105773,
+        "codex": 102745,
+        "claude": 103785,
+        "pi": 103528
       }
     },
     "bbk_validator_orchestrator": {
       "baseline_bytes": 437962,
-      "current_bytes": 512268,
-      "delta_bytes": 74306,
-      "delta_percent": 16.966,
+      "current_bytes": 517983,
+      "delta_bytes": 80021,
+      "delta_percent": 18.271,
       "host_bytes": {
-        "generic": 102081,
-        "omp": 104326,
-        "codex": 101412,
-        "claude": 102368,
-        "pi": 102081
+        "generic": 103224,
+        "omp": 105469,
+        "codex": 102555,
+        "claude": 103511,
+        "pi": 103224
       }
     },
     "bbk_worker": {
       "baseline_bytes": 341656,
-      "current_bytes": 449365,
-      "delta_bytes": 107709,
-      "delta_percent": 31.526,
+      "current_bytes": 454750,
+      "delta_bytes": 113094,
+      "delta_percent": 33.102,
       "host_bytes": {
-        "generic": 89580,
-        "omp": 91578,
-        "codex": 88815,
-        "claude": 89812,
-        "pi": 89580
+        "generic": 90657,
+        "omp": 92655,
+        "codex": 89892,
+        "claude": 90889,
+        "pi": 90657
       }
     },
     "bbk_validator": {
       "baseline_bytes": 352344,
-      "current_bytes": 420749,
-      "delta_bytes": 68405,
-      "delta_percent": 19.414,
+      "current_bytes": 425094,
+      "delta_bytes": 72750,
+      "delta_percent": 20.647,
       "host_bytes": {
-        "generic": 83839,
-        "omp": 85837,
-        "codex": 83163,
-        "claude": 84071,
-        "pi": 83839
+        "generic": 84708,
+        "omp": 86706,
+        "codex": 84032,
+        "claude": 84940,
+        "pi": 84708
       }
     }
   }

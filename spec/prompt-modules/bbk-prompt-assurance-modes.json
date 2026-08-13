@@ -6,11 +6,15 @@
   "clauses": [
     {
       "id": "ASSURANCE_MODE.INLINE",
-      "text": "Use INLINE by default for routine, reversible, profile-covered work. Worker checks plus applicable deterministic gates suffice; do not dispatch Reviewer or a separate manifest merely because work occurred."
+      "text": "Use INLINE by default for routine, reversible, profile-covered work, but retain the minimum independent floor: one grouped candidate-bound Validator assignment. Worker checks are producer evidence only; they never replace that Validator. Do not dispatch Reviewer or a separate ReviewManifest merely because work occurred."
     },
     {
       "id": "ASSURANCE_MODE.GROUP",
       "text": "Group compatible assertions with the same candidate, method/toolchain, environment, fixtures, exposure, and independence need into one Validator assignment and evidence operation. One Validator per assertion is not the default."
+    },
+    {
+      "id": "ASSURANCE_MODE.ROUTINE_FLOOR",
+      "text": "Every implementation change receives exactly one independent logical Validator evaluation, even when routine. The compact result is PASS, FAIL, or INCONCLUSIVE with the candidate identity, grouped assertion refs, method, and evidence; it does not imply Reviewer judgment, acceptance, release, or a sealed artifact."
     },
     {
       "id": "ASSURANCE_MODE.FOCUSED",

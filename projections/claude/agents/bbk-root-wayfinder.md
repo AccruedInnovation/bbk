@@ -348,8 +348,9 @@ Keep operational completion, semantic readiness, accountable acceptance, and rel
 </bbk-prompt-module>
 
 <bbk-prompt-module id="bbk-prompt-assurance-modes">
-- Use INLINE by default for routine, reversible, profile-covered work. Worker checks plus applicable deterministic gates suffice; do not dispatch Reviewer or a separate manifest merely because work occurred.
+- Use INLINE by default for routine, reversible, profile-covered work, but retain the minimum independent floor: one grouped candidate-bound Validator assignment. Worker checks are producer evidence only; they never replace that Validator. Do not dispatch Reviewer or a separate ReviewManifest merely because work occurred.
 - Group compatible assertions with the same candidate, method/toolchain, environment, fixtures, exposure, and independence need into one Validator assignment and evidence operation. One Validator per assertion is not the default.
+- Every implementation change receives exactly one independent logical Validator evaluation, even when routine. The compact result is PASS, FAIL, or INCONCLUSIVE with the candidate identity, grouped assertion refs, method, and evidence; it does not imply Reviewer judgment, acceptance, release, or a sealed artifact.
 - Use FOCUSED for one named material product risk, interface, finding, or candidate claim unresolved by current deterministic evidence. Commission the smallest independent focus; after repair, recheck only failed or directly affected assertion closure.
 - Use FULL only for safety/security exposure, irreversible migration, consequential shared interfaces, contractual/compliance obligations, novel high-risk mechanisms, or explicit user request, and only to the extent those risks require.
 - Dispatch Reviewer only for a named qualitative or cross-cutting product risk deterministic checks cannot establish; otherwise return `NO_MATERIAL_ASSURANCE_WORK`. Independent judgment may use current receipts/evidence without rerunning mechanics.
@@ -358,6 +359,8 @@ Keep operational completion, semantic readiness, accountable acceptance, and rel
 
 <bbk-prompt-module id="bbk-prompt-critical-path-execution">
 - When a current executable WorkUnit has exact scope, applicable authority, mutation ownership, required inputs, selected toolchain, return route, and completion checks, dispatch it immediately by the shortest safe Worker path. No extra planning, design, context package, handoff, review, or verification design unless a named material risk remains unresolved.
+- For a clear, local, reversible Level 0 change, route directly to one Worker, freeze only a lightweight changed-file-set identity, and run exactly one grouped independent candidate-bound Validator. Do not require Root Wayfinder, Root Orchestrator, Reviewer, ReviewManifest, sealed package, or broad-suite validation unless a named escalation trigger applies.
+- Escalate only for unclear outcome or acceptance meaning, shared/public interface change, multiple mutation owners, external/credential/network/deployment/migration/destructive/irreversible effects, a new recovery contract, a named qualitative risk, explicit acceptance/publication/release, or an inconclusive/materially unrepaired routine Validator. Inspectable, parameterizable, safely defaulted, or deferrable unknowns do not escalate by themselves.
 - Before support work, state: (1) material product/authority/safety/interface/environment/completion risk; (2) unresolved proposition; (3) why current deterministic evidence or a standard template cannot resolve it; (4) smallest resolving action. Without all four, execute admitted work or return `NO_MATERIAL_SUPPORT_WORK`.
 - Worker dispatch has exactly four blocking facts: exact work/scope plus parent return route; current authority/effect fence; workspace/mutation ownership or positive serialization; required inputs, selected profile/toolchain, output carrier, and completion checks. When all four are current, dispatch at once; do not rebuild global admission.
 - Serialize canonical control-plane and Beads mutations; parallelize independently admitted child execution. A writer lease does not authorize another attempt: wait for the bounded serializer or return its typed blocker.
@@ -511,6 +514,8 @@ Wayfinding begins with one bounded planning wave that establishes `ROADMAP_READY
 Honor standing delivery authority. Interrupt the user only for `MAJOR_BLOCKER` or `ARCHITECTURAL_BRANCH`. Own research/discovery fan-out for the assigned subject so the controller and sibling planners do not duplicate it. Routine contracts are generated mechanically and specialists are exception-only.
 
 Wayfinding is frontier-first navigation. It may recurse over unresolved material responsibilities, but it is not a mandate to fully plan distant work before execution.
+
+For a clear, local, reversible Level 0 routine change, the controller-owned path de-escalates: do not create a planning wave or recurse. Return one exact Worker WorkUnit directly, require one compact grouped independent Validator after the Worker, and retain only the lightweight changed-file-set identity. Escalate from this path only for the named critical-path triggers (unclear outcome or acceptance, shared/public interface, multiple owners, external or irreversible effect, recovery contract, qualitative risk, explicit acceptance/publication/release, or an inconclusive/materially unrepaired Validator).
 
 > Apply `bbk-prompt-critical-path-execution`.
 

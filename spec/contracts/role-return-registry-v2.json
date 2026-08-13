@@ -911,8 +911,8 @@
       "semantic_state_name": "work_unit_execution_state",
       "return_schema": {
         "path": "spec/schemas/role-returns/bbk-worker-return-v2.schema.json",
-        "bytes": 10416,
-        "sha256": "d01d572f6c577f9b382172cd7ee514fc28731c2d1a50537badacc98d7e72091b"
+        "bytes": 11197,
+        "sha256": "c1a4d3a1898e1555c68f384a57fefcb74ab38ef0ff3c953dc7263c0a27359326"
       },
       "compact_result_schema": {
         "path": "spec/schemas/role-results/bbk-worker-compact-result-v2.schema.json",
@@ -947,8 +947,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_worker-role.json",
-        "bytes": 36004,
-        "sha256": "5fa3291223d4905bd1d5f2577ff1f168f05884861065cc39317025ea79b7bfa0"
+        "bytes": 35951,
+        "sha256": "4534ee98478e66486e7e97fa126e4f673b19a77bff7d7009c504a43de46d6ad2"
       }
     },
     {
@@ -962,8 +962,8 @@
       "semantic_state_name": "validator_attempt_state",
       "return_schema": {
         "path": "spec/schemas/role-returns/bbk-validator-return-v2.schema.json",
-        "bytes": 9385,
-        "sha256": "c617356e21cebe21e117c5ed98254c3b1e65597a04aef54cf05351a2edd5cbd3"
+        "bytes": 10163,
+        "sha256": "9544254947c22bddf529b8b7578c56f6d3b0229f032cbbceda76ac54e49d9056"
       },
       "compact_result_schema": {
         "path": "spec/schemas/role-results/bbk-validator-compact-result-v2.schema.json",
@@ -998,8 +998,8 @@
       ],
       "source": {
         "path": "spec/roles/bbk_validator-role.json",
-        "bytes": 37572,
-        "sha256": "6f2b4bd63d3dd686ccb6337d488cb8d17d84eee9e2a0c063c1ed88ca2b0ea529"
+        "bytes": 37298,
+        "sha256": "fd0f23f48e051e25f9b0d473e436d187ac1926305d2bd1307d07fb640f044bc7"
       }
     }
   ]

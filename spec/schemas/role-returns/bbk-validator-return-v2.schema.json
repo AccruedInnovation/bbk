@@ -104,6 +104,30 @@
                     "type": "object",
                     "properties": {
                       "kind": {
+                        "const": "controller"
+                      },
+                      "id": {
+                        "enum": [
+                          "harness_root_controller"
+                        ]
+                      },
+                      "invocation_mode": {
+                        "const": "ASSERTION_ATTEMPT"
+                      },
+                      "role": {
+                        "type": "null"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "id",
+                      "invocation_mode"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
                         "const": "canonical_role"
                       },
                       "id": {

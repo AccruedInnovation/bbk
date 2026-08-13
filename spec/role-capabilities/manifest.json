@@ -1,6 +1,6 @@
 {
   "generator": "tools/generate_role_capabilities.py",
-  "manifest_digest": "sha256:104871927cbc34fc60c3c74205a00bb03f4d70856b192fb986c72ee4cbdb0dee",
+  "manifest_digest": "sha256:831178dd2748bb1210f81ffe301f4582dea8e4769c560188ece8b14a395c7ae5",
   "policy_version": "1.0.0-alpha.17",
   "profile": "governed-software",
   "role_count": 19,
@@ -84,10 +84,10 @@
       "source_role_digest": "sha256:80992f641f8b431b886cba58f3f812019c1307af49dd05ff927af1b0461411f7"
     },
     {
-      "manifest_digest": "sha256:1a1be6e174ca678f112283cebccfc6b678690c64713b7c9ce8e3b38c83624ccf",
+      "manifest_digest": "sha256:6998a1d5465cc0340661198ffd83f32df4ccbdf986b2a519cb69bc798a238d30",
       "path": "spec/role-capabilities/bbk_validator.json",
       "role": "bbk_validator",
-      "source_role_digest": "sha256:6f2b4bd63d3dd686ccb6337d488cb8d17d84eee9e2a0c063c1ed88ca2b0ea529"
+      "source_role_digest": "sha256:fd0f23f48e051e25f9b0d473e436d187ac1926305d2bd1307d07fb640f044bc7"
     },
     {
       "manifest_digest": "sha256:018d86f8556d62956bea2753b774b3d07044e9e17499e9b6a2622960e5e6bb85",
@@ -102,10 +102,10 @@
       "source_role_digest": "sha256:215b969ca81349cb1adca9842e29d7baf24e4a45740262c9369d2b5d737408e4"
     },
     {
-      "manifest_digest": "sha256:895c275e297ce57322aeff4abf505e86fe9b1e0e32694b5dba1bc5d7da2b8cd0",
+      "manifest_digest": "sha256:d2114efb354b46a339082308d3ae5d7f26b893aeaa2e769259b93b7cb21d883d",
       "path": "spec/role-capabilities/bbk_worker.json",
       "role": "bbk_worker",
-      "source_role_digest": "sha256:5fa3291223d4905bd1d5f2577ff1f168f05884861065cc39317025ea79b7bfa0"
+      "source_role_digest": "sha256:4534ee98478e66486e7e97fa126e4f673b19a77bff7d7009c504a43de46d6ad2"
     },
     {
       "manifest_digest": "sha256:7b62d7d512c7f65a185cd969ab5a14761415372737545fe309a3adce8e5eb9b5",
@@ -121,6 +121,6 @@
     }
   ],
   "schema": "bbk.role-capability-manifest.v1",
-  "source_catalog_digest": "sha256:17d0c9bbf6c3033ffa58283abc0499975d14f5c8becd369eca9c421458ff482b",
+  "source_catalog_digest": "sha256:da458dbc8973e2e3b8cc3fee9c4c8b5f84fac88e8fa075c58a056615636f2492",
   "source_policy_digest": "sha256:0ab97bacd60ddc7b27524eb5b30bcc33b45fc9c432e1c0d83d7d490ee24ddcc7"
 }
