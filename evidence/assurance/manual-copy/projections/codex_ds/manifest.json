@@ -1,0 +1,430 @@
+{
+  "activation": "ACTIVATION_NEUTRAL",
+  "canonical_sources": {
+    "model_routing": "spec/model-routing.json",
+    "roles": "spec/roles.json",
+    "source_sha256": "953719fb10f49afcf7212d1d7facdeaf5a10e0d2d6f22bf391a63f8c59a83407"
+  },
+  "invariants": {
+    "credential_value_persisted": false,
+    "keyless_generation_nonblocking": true,
+    "other_host_projections_unchanged": true,
+    "parent_and_defaults_unchanged": true,
+    "silent_fallback": false,
+    "user_config_mutated": false
+  },
+  "projection_count": 38,
+  "qualification": {
+    "credential_value_observed": false,
+    "path": "evidence/qualification/deepseek-codex-provider-seam-r4/qualification-receipt.json",
+    "sha256": "c3b0e71ed86f73a8db8a9a8e92a3b68962fcabcda2452d7c255400726a543a2e"
+  },
+  "registry": {
+    "path": "spec/codex-external-targets.json",
+    "sha256": "e3022d14fcd27335878b8c001837e159f325de8503d4eb033c308c60fa1412f2"
+  },
+  "revision": 1,
+  "role_count": 19,
+  "schema": "bbk.codex-external-projection-manifest.v1",
+  "subject": "codex-deepseek-external-targets",
+  "targets": {
+    "deepseek-v4-flash": {
+      "fallback": "NONE",
+      "files": [
+        {
+          "bytes": 89730,
+          "fallback": "NONE",
+          "model": "deepseek-v4-flash",
+          "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_architect.toml",
+          "provider": "deepseek",
+          "role": "bbk_architect",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "e39117bd6d2299583ab289df0f78a5329e4745e972be55789fa058f65288f911"
+        },
+        {
+          "bytes": 85688,
+          "fallback": "NONE",
+          "model": "deepseek-v4-flash",
+          "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_phase_wayfinder.toml",
+          "provider": "deepseek",
+          "role": "bbk_phase_wayfinder",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "cd86f32b19df31e5b1a6a5160472439077fc7841dd25ce1d8817afa8658bfdca"
+        },
+        {
+          "bytes": 79056,
+          "fallback": "NONE",
+          "model": "deepseek-v4-flash",
+          "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_planning_wayfinder.toml",
+          "provider": "deepseek",
+          "role": "bbk_planning_wayfinder",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "5c5153ce6227e08176fefb5772ee3644d2ef6c8f01b5fd3867c655ffcead7751"
+        },
+        {
+          "bytes": 86742,
+          "fallback": "NONE",
+          "model": "deepseek-v4-flash",
+          "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_prototyper.toml",
+          "provider": "deepseek",
+          "role": "bbk_prototyper",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "cd4bb5b262f885a84ee184e998057d60e7bb18495f1454f6a9de5cd36b6ca318"
+        },
+        {
+          "bytes": 60854,
+          "fallback": "NONE",
+          "model": "deepseek-v4-flash",
+          "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_question_guide.toml",
+          "provider": "deepseek",
+          "role": "bbk_question_guide",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "528209bd4a04b8f9b3c9912b162a1ab6a9c14340f84a73003043518cd43a833e"
+        },
+        {
+          "bytes": 60346,
+          "fallback": "NONE",
+          "model": "deepseek-v4-flash",
+          "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_questioning_wayfinder.toml",
+          "provider": "deepseek",
+          "role": "bbk_questioning_wayfinder",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "ce77b42daa8a2b6f78f8b497973b140886da4c219106f6b7dbe4a46fbafc6c32"
+        },
+        {
+          "bytes": 55781,
+          "fallback": "NONE",
+          "model": "deepseek-v4-flash",
+          "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_researcher.toml",
+          "provider": "deepseek",
+          "role": "bbk_researcher",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "d2d06ff8e0e5a320c5df0af0ff86aef96c8fb4a2485eb0f1a041217323021de1"
+        },
+        {
+          "bytes": 80374,
+          "fallback": "NONE",
+          "model": "deepseek-v4-flash",
+          "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_reviewer.toml",
+          "provider": "deepseek",
+          "role": "bbk_reviewer",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "33c23f3aece8aadee6960633a597d7e14c45fdbeaa42bb6a5fc6f8243d023a15"
+        },
+        {
+          "bytes": 104999,
+          "fallback": "NONE",
+          "model": "deepseek-v4-flash",
+          "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_root_orchestrator.toml",
+          "provider": "deepseek",
+          "role": "bbk_root_orchestrator",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "2e646c9934e4ee62441722943257d7d56c9723d983a02a4263189a50051fe7ec"
+        },
+        {
+          "bytes": 76311,
+          "fallback": "NONE",
+          "model": "deepseek-v4-flash",
+          "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_root_wayfinder.toml",
+          "provider": "deepseek",
+          "role": "bbk_root_wayfinder",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "3151d8c40536bf9e957bbf09d3ecadee8e59c207124164dca4dea44df413b999"
+        },
+        {
+          "bytes": 61397,
+          "fallback": "NONE",
+          "model": "deepseek-v4-flash",
+          "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_synthesizer.toml",
+          "provider": "deepseek",
+          "role": "bbk_synthesizer",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "a7dd5a53d71860c05f643cc9b826248ee6706458b30cf1e5c43b759fb5ef78bc"
+        },
+        {
+          "bytes": 109190,
+          "fallback": "NONE",
+          "model": "deepseek-v4-flash",
+          "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_territory_orchestrator.toml",
+          "provider": "deepseek",
+          "role": "bbk_territory_orchestrator",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "409a96fcd5609e8b4bc8e3b4c28d5293fc3d95559a8f87420693485989a1f64d"
+        },
+        {
+          "bytes": 75582,
+          "fallback": "NONE",
+          "model": "deepseek-v4-flash",
+          "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_territory_wayfinder.toml",
+          "provider": "deepseek",
+          "role": "bbk_territory_wayfinder",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "a38f2e54af8d59d2ee02935dc67c93f559fba2d501b9939609385924e91fefc6"
+        },
+        {
+          "bytes": 83995,
+          "fallback": "NONE",
+          "model": "deepseek-v4-flash",
+          "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_validator.toml",
+          "provider": "deepseek",
+          "role": "bbk_validator",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "8c90fde724b28ee91a886b4e7d2c728c87aa0000a13149433d18071217c1e23d"
+        },
+        {
+          "bytes": 102515,
+          "fallback": "NONE",
+          "model": "deepseek-v4-flash",
+          "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_validator_orchestrator.toml",
+          "provider": "deepseek",
+          "role": "bbk_validator_orchestrator",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "e13610279cfedd62388d76425cae387cf68d8221fd923b7d0409f11499f47ccc"
+        },
+        {
+          "bytes": 88070,
+          "fallback": "NONE",
+          "model": "deepseek-v4-flash",
+          "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_verification_designer.toml",
+          "provider": "deepseek",
+          "role": "bbk_verification_designer",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "e20c86e06f7ee4da8295072490a297266b2638c3dbf7c5c34c404447e9331b2f"
+        },
+        {
+          "bytes": 89745,
+          "fallback": "NONE",
+          "model": "deepseek-v4-flash",
+          "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_worker.toml",
+          "provider": "deepseek",
+          "role": "bbk_worker",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "af0f9109767b513f29c65631a1c1a0170b612268d3067bf12009c36fc02bd4cb"
+        },
+        {
+          "bytes": 90102,
+          "fallback": "NONE",
+          "model": "deepseek-v4-flash",
+          "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_worker_designer.toml",
+          "provider": "deepseek",
+          "role": "bbk_worker_designer",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "24e9bb8b58d1c641df35dc771f205934567cb81a5a8e8e0246cbf2d7d44a66a3"
+        },
+        {
+          "bytes": 102464,
+          "fallback": "NONE",
+          "model": "deepseek-v4-flash",
+          "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_worker_orchestrator.toml",
+          "provider": "deepseek",
+          "role": "bbk_worker_orchestrator",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "8eee95aca6beb015acd4450cfa1efcbf579b6b1d5d540b87043cee6cf33d6ea0"
+        }
+      ],
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "role_count": 19,
+      "selection": "EXPLICIT_ONLY"
+    },
+    "deepseek-v4-pro": {
+      "fallback": "NONE",
+      "files": [
+        {
+          "bytes": 89728,
+          "fallback": "NONE",
+          "model": "deepseek-v4-pro",
+          "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_architect.toml",
+          "provider": "deepseek",
+          "role": "bbk_architect",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "f43fa28282f00d3a96cd5641605ada54edefce722f9197fa1642d0eb3924c02f"
+        },
+        {
+          "bytes": 85686,
+          "fallback": "NONE",
+          "model": "deepseek-v4-pro",
+          "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_phase_wayfinder.toml",
+          "provider": "deepseek",
+          "role": "bbk_phase_wayfinder",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "60a51fe213763e41f82210767cddf97afaa8add3b0ac5d59f0809045867aab18"
+        },
+        {
+          "bytes": 79054,
+          "fallback": "NONE",
+          "model": "deepseek-v4-pro",
+          "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_planning_wayfinder.toml",
+          "provider": "deepseek",
+          "role": "bbk_planning_wayfinder",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "52e42075460d75535ba3be8908e6f0963512705bf0edd8aede6f472e112de072"
+        },
+        {
+          "bytes": 86740,
+          "fallback": "NONE",
+          "model": "deepseek-v4-pro",
+          "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_prototyper.toml",
+          "provider": "deepseek",
+          "role": "bbk_prototyper",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "f6e91939ad9b64f23189183c1387136c4ca3047864fd0e0ab457bdc8b80d674e"
+        },
+        {
+          "bytes": 60852,
+          "fallback": "NONE",
+          "model": "deepseek-v4-pro",
+          "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_question_guide.toml",
+          "provider": "deepseek",
+          "role": "bbk_question_guide",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "4e7009865d080eb5b47eb7f92c22790b14e9a9f2b8846f88138cfc19917c8f79"
+        },
+        {
+          "bytes": 60344,
+          "fallback": "NONE",
+          "model": "deepseek-v4-pro",
+          "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_questioning_wayfinder.toml",
+          "provider": "deepseek",
+          "role": "bbk_questioning_wayfinder",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "f1bceee3845f7017ef7a0e6f4f1cdb21f2acf270480ec1e3f8acecbfcbf7c4dd"
+        },
+        {
+          "bytes": 55779,
+          "fallback": "NONE",
+          "model": "deepseek-v4-pro",
+          "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_researcher.toml",
+          "provider": "deepseek",
+          "role": "bbk_researcher",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "512b33d4a023c5f2f15683163d8777933c3fda8448a13796230e3db83f4afd4c"
+        },
+        {
+          "bytes": 80372,
+          "fallback": "NONE",
+          "model": "deepseek-v4-pro",
+          "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_reviewer.toml",
+          "provider": "deepseek",
+          "role": "bbk_reviewer",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "7f811b1bef6afcbf7a62fbb3fd524f77b79a0f989d30ad2a8dc02fef236107ab"
+        },
+        {
+          "bytes": 104997,
+          "fallback": "NONE",
+          "model": "deepseek-v4-pro",
+          "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_root_orchestrator.toml",
+          "provider": "deepseek",
+          "role": "bbk_root_orchestrator",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "19f4b683f8c546284a9ca99b32152d6f13cbe00210d3e67f5f6ff8e77d59180b"
+        },
+        {
+          "bytes": 76309,
+          "fallback": "NONE",
+          "model": "deepseek-v4-pro",
+          "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_root_wayfinder.toml",
+          "provider": "deepseek",
+          "role": "bbk_root_wayfinder",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "b77b108351c835a979807eeff1ea87a5b30a1bfa9abd48aa69212ae244a7f966"
+        },
+        {
+          "bytes": 61395,
+          "fallback": "NONE",
+          "model": "deepseek-v4-pro",
+          "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_synthesizer.toml",
+          "provider": "deepseek",
+          "role": "bbk_synthesizer",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "00eced9a25e6b5da07fb153776acf6323dfdd5c4e6a7836bb5cacd3e618ce736"
+        },
+        {
+          "bytes": 109188,
+          "fallback": "NONE",
+          "model": "deepseek-v4-pro",
+          "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_territory_orchestrator.toml",
+          "provider": "deepseek",
+          "role": "bbk_territory_orchestrator",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "6537dc7b256f39c4eb2f0bd2cdda945297e6c31bc4b620711877d7b11ca9e85a"
+        },
+        {
+          "bytes": 75580,
+          "fallback": "NONE",
+          "model": "deepseek-v4-pro",
+          "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_territory_wayfinder.toml",
+          "provider": "deepseek",
+          "role": "bbk_territory_wayfinder",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "1c18e5112a5c1640f4374109c34d33fae13d1e354e2bf558571de971bd7d594c"
+        },
+        {
+          "bytes": 83993,
+          "fallback": "NONE",
+          "model": "deepseek-v4-pro",
+          "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_validator.toml",
+          "provider": "deepseek",
+          "role": "bbk_validator",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "b79c719c5179ece7c92694595db0420805c0854906bff650e07da8310b96674e"
+        },
+        {
+          "bytes": 102513,
+          "fallback": "NONE",
+          "model": "deepseek-v4-pro",
+          "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_validator_orchestrator.toml",
+          "provider": "deepseek",
+          "role": "bbk_validator_orchestrator",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "aa51232add5702386b5d5ec593d4957d66cd2075220f7def8edb7790238297b0"
+        },
+        {
+          "bytes": 88068,
+          "fallback": "NONE",
+          "model": "deepseek-v4-pro",
+          "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_verification_designer.toml",
+          "provider": "deepseek",
+          "role": "bbk_verification_designer",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "ab1d10b00ff4e2d1695ffca427c67fa3268264e6799eacd37e5effe50c9f8d82"
+        },
+        {
+          "bytes": 89743,
+          "fallback": "NONE",
+          "model": "deepseek-v4-pro",
+          "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_worker.toml",
+          "provider": "deepseek",
+          "role": "bbk_worker",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "d321a5aafc7eab9d7576263bfc40b129634c5cfb1f838c633bc26a6dcfd43e93"
+        },
+        {
+          "bytes": 90100,
+          "fallback": "NONE",
+          "model": "deepseek-v4-pro",
+          "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_worker_designer.toml",
+          "provider": "deepseek",
+          "role": "bbk_worker_designer",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "b02e6ef63f12d919e43baeebcc95ca47f11406e738455545acfe58fff5142606"
+        },
+        {
+          "bytes": 102462,
+          "fallback": "NONE",
+          "model": "deepseek-v4-pro",
+          "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_worker_orchestrator.toml",
+          "provider": "deepseek",
+          "role": "bbk_worker_orchestrator",
+          "selection": "EXPLICIT_ONLY",
+          "sha256": "80e3a3a409b54a641dbccbf457a997d84b95095ee76bff7ab387f93de3a128ab"
+        }
+      ],
+      "model": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "role_count": 19,
+      "selection": "EXPLICIT_ONLY"
+    }
+  }
+}

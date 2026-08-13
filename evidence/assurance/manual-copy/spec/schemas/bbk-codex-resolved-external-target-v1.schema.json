@@ -1,0 +1,311 @@
+{
+  "$defs": {
+    "credential": {
+      "additionalProperties": false,
+      "properties": {
+        "env_key": {
+          "const": "DEEPSEEK_API_KEY"
+        },
+        "kind": {
+          "const": "environment"
+        },
+        "value_persisted": {
+          "const": false
+        }
+      },
+      "required": [
+        "kind",
+        "env_key",
+        "value_persisted"
+      ],
+      "type": "object"
+    },
+    "provider": {
+      "additionalProperties": false,
+      "properties": {
+        "base_url": {
+          "format": "uri",
+          "type": "string"
+        },
+        "id": {
+          "const": "deepseek"
+        },
+        "name": {
+          "type": "string"
+        },
+        "observed_or_qualified_request_path": {
+          "type": "string"
+        },
+        "responses_path_joining_disposition": {
+          "type": "string"
+        },
+        "wire_api": {
+          "const": "responses"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "base_url",
+        "wire_api",
+        "responses_path_joining_disposition",
+        "observed_or_qualified_request_path"
+      ],
+      "type": "object"
+    },
+    "ref": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "sha256"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://bbk.local/schemas/bbk-codex-resolved-external-target-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "RESOLVED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "rejection": {
+            "required": [
+              "reason_code",
+              "reason"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "registry_ref",
+          "provider",
+          "model",
+          "credential_source",
+          "capabilities",
+          "isolated_codex_projection",
+          "qualification_ref"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "REJECTED"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "rejection"
+        ]
+      }
+    }
+  ],
+  "properties": {
+    "capabilities": {
+      "additionalProperties": false,
+      "properties": {
+        "requested": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "supported": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "unsupported": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "supported",
+        "unsupported",
+        "requested"
+      ],
+      "type": "object"
+    },
+    "credential_source": {
+      "$ref": "#/$defs/credential"
+    },
+    "invariants": {
+      "additionalProperties": false,
+      "properties": {
+        "parent_and_defaults_unchanged": {
+          "const": true
+        },
+        "silent_fallback": {
+          "const": false
+        },
+        "user_config_mutated": {
+          "const": false
+        }
+      },
+      "required": [
+        "parent_and_defaults_unchanged",
+        "silent_fallback",
+        "user_config_mutated"
+      ],
+      "type": "object"
+    },
+    "isolated_codex_projection": {
+      "additionalProperties": false,
+      "properties": {
+        "base_url": {
+          "format": "uri",
+          "type": "string"
+        },
+        "credential_ref": {
+          "$ref": "#/$defs/credential"
+        },
+        "model": {
+          "type": "string"
+        },
+        "model_provider": {
+          "const": "deepseek"
+        },
+        "provider_name": {
+          "type": "string"
+        },
+        "wire_api": {
+          "const": "responses"
+        }
+      },
+      "required": [
+        "model_provider",
+        "model",
+        "provider_name",
+        "base_url",
+        "wire_api",
+        "credential_ref"
+      ],
+      "type": "object"
+    },
+    "model": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "provider": {
+      "$ref": "#/$defs/provider"
+    },
+    "qualification_ref": {
+      "additionalProperties": false,
+      "properties": {
+        "disposition": {
+          "enum": [
+            "QUALIFIED_MOCK_LIVE",
+            "QUALIFIED_MOCK_LIVE_DEFERRED"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "sha256",
+        "disposition"
+      ],
+      "type": "object"
+    },
+    "registry_ref": {
+      "$ref": "#/$defs/ref"
+    },
+    "rejection": {
+      "additionalProperties": false,
+      "properties": {
+        "details": {},
+        "reason": {
+          "type": "string"
+        },
+        "reason_code": {
+          "pattern": "^[A-Z0-9_]+$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reason_code",
+        "reason"
+      ],
+      "type": "object"
+    },
+    "schema": {
+      "const": "bbk.codex-resolved-external-target.v1"
+    },
+    "selection": {
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "const": "EXPLICIT"
+        },
+        "target_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "mode",
+        "target_id"
+      ],
+      "type": "object"
+    },
+    "status": {
+      "enum": [
+        "RESOLVED",
+        "REJECTED"
+      ]
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "selection",
+    "rejection",
+    "invariants"
+  ],
+  "title": "BBK Codex resolved external target v1",
+  "type": "object"
+}

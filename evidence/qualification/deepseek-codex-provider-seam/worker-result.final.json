@@ -1,0 +1,404 @@
+{
+  "attempt_ref": {
+    "host_session_id": "WU-DS-01C-R2-c64ea81eb1a54c83b440a1395a99afa6",
+    "physical_attempt_id": "WU-DS-01C-R2-c64ea81eb1a54c83b440a1395a99afa6",
+    "semantic_run_id": "TERRITORY-RUN-PKG-BBK-CODEX-DEEPSEEK-001-PH-DS-01R-A1"
+  },
+  "authority_and_effects_used": {
+    "allowed_effect_classes": [
+      "READ_ONLY_LOCAL_HOST_INSPECTION",
+      "FILESYSTEM_WRITE_IN_EXACT_WORKSPACE_PATHS",
+      "LOOPBACK_ONLY_SIMULATION",
+      "ATTEMPT_OWNED_LOCAL_PROCESS",
+      "EXACT_ATTEMPT_OWNED_PROCESS_CLEANUP_AFTER_IDENTITY_REVALIDATION"
+    ],
+    "authority_refs": [
+      {
+        "id": "AUTH-PKG-BBK-CODEX-DEEPSEEK-001-PRODUCE-ONLY-R1",
+        "revision": 1
+      },
+      {
+        "digest": "5bebbe7c3161167b7340c8054e7113803fbbc3d4f05c0f70352f7afa135754a0",
+        "id": "TEB-PKG-BBK-CODEX-DEEPSEEK-001-PH-DS-01R-R2",
+        "revision": 2
+      }
+    ],
+    "denied_or_uncovered_effects": [
+      {
+        "destinations": [
+          "https://chatgpt.com/backend-api/plugins/featured",
+          "GitHub HTTP during curated plugin sync"
+        ],
+        "effect": "OUTBOUND_NETWORK",
+        "evidence": ".bbk/tmp/PKG-BBK-CODEX-DEEPSEEK-001/PH-DS-01R/WU-DS-01C-R2-c64ea81eb1a54c83b440a1395a99afa6/trial-01-ollama-replay6/codex.err",
+        "observed": true
+      }
+    ],
+    "effects_used": [
+      {
+        "effect": "READ_ONLY_LOCAL_HOST_INSPECTION",
+        "result": "PID87364/listener56339 absent; PID91104 present untouched"
+      },
+      {
+        "effect": "FILESYSTEM_WRITE_IN_EXACT_WORKSPACE_PATHS",
+        "result": "fixture/evidence records written"
+      },
+      {
+        "effect": "LOOPBACK_ONLY_SIMULATION",
+        "result": "mock 127.0.0.1:11434 received GET probes and POST /v1/responses"
+      },
+      {
+        "effect": "ATTEMPT_OWNED_PROCESS_CLEANUP",
+        "result": "Codex PID40084 fenced; mock PID40620 exited; port11434 released"
+      }
+    ],
+    "violations_or_ambiguities": [
+      {
+        "containment": "Affected attempt stopped; no further trials",
+        "rule": "SAFEGUARD-LOOPBACK-ONLY",
+        "type": "TERMINAL_AUTHORITY_BREACH"
+      }
+    ]
+  },
+  "contract": "bbk.worker-return.v2",
+  "detail_level": "FULL",
+  "durable_handoff_refs": [
+    {
+      "bytes": 3214,
+      "id": "pkg-bbk-codex-deepseek-001-wu-ds-01c-authority-blocked-2",
+      "path": ".bbk/artifacts/publications/pkg-bbk-codex-deepseek-001-wu-ds-01c-authority-blocked-2.json",
+      "producer_attempt_ref": {
+        "physical_attempt_id": "WU-DS-01C-R2-c64ea81eb1a54c83b440a1395a99afa6",
+        "semantic_run_id": "TERRITORY-RUN-PKG-BBK-CODEX-DEEPSEEK-001-PH-DS-01R-A1"
+      },
+      "schema": "bbk.artifact-package-publication.v1",
+      "sha256": "daa5d6638ab5066f57be58b37fee7d6c66fe820f9a0ab02658ccfdfe29298c3c",
+      "subject_ref": {
+        "id": "WU-DS-01C-LOCAL-PROVIDER-MOCK-SEAM",
+        "revision": 2
+      }
+    }
+  ],
+  "executor": {
+    "host_session_id": "WU-DS-01C-R2-c64ea81eb1a54c83b440a1395a99afa6",
+    "invocation_id": "INV-WU-DS-01C-R2",
+    "model": "bbk_worker",
+    "provider": "openai",
+    "role": "bbk_worker"
+  },
+  "invocation_mode": "CANDIDATE_PRODUCTION",
+  "operational_disposition": "BLOCKED_AUTHORITY",
+  "parent_ref": {
+    "id": "bbk_worker_orchestrator",
+    "invocation_mode": "CANDIDATE_PRODUCTION",
+    "kind": "canonical_role",
+    "return_route": "/root/deepseek_execution_campaign/deepseek_ph_ds_01r/worker_orch_ds01c",
+    "role": "bbk_worker_orchestrator"
+  },
+  "result": {
+    "actions_and_commands": {
+      "actions": [
+        "Fresh PID/port/process identity observation",
+        "Codex help/features/mcp/app-server schema capture",
+        "Serialized ollama loopback trial with mock on 127.0.0.1:11434",
+        "Fenced exact Codex process after outbound effect",
+        "Wrote reconciliation and method ledger",
+        "Finalized and verified BBK artifact package"
+      ]
+    },
+    "authority_and_capability_use": {
+      "allowed_effect_classes": [
+        "READ_ONLY_LOCAL_HOST_INSPECTION",
+        "FILESYSTEM_WRITE_IN_EXACT_WORKSPACE_PATHS",
+        "LOOPBACK_ONLY_SIMULATION",
+        "ATTEMPT_OWNED_LOCAL_PROCESS",
+        "EXACT_ATTEMPT_OWNED_PROCESS_CLEANUP_AFTER_IDENTITY_REVALIDATION"
+      ],
+      "authority_refs": [
+        {
+          "id": "AUTH-PKG-BBK-CODEX-DEEPSEEK-001-PRODUCE-ONLY-R1"
+        }
+      ],
+      "denied_or_uncovered_effects": [
+        {
+          "destinations": [
+            "chatgpt.com",
+            "GitHub"
+          ],
+          "effect": "outbound network",
+          "result": "observed unauthorized"
+        }
+      ],
+      "effects_used": [
+        {
+          "effect": "loopback mock",
+          "result": "POST /v1/responses observed"
+        }
+      ],
+      "violations_or_ambiguities": [
+        {
+          "type": "TERMINAL_AUTHORITY_BREACH"
+        }
+      ]
+    },
+    "blockers": [
+      {
+        "affected_scope": "all remaining WU-DS-01C method trials",
+        "classification": "TERMINAL_AUTHORITY_BREACH",
+        "containment": "fenced Codex; no further trials",
+        "evidence": "codex.err and mock.out",
+        "remaining": "authority/containment redesign",
+        "type": "BLOCKED_AUTHORITY"
+      }
+    ],
+    "changed_artifacts": {
+      "artifacts": [
+        {
+          "bytes": 3638,
+          "path": "tests/fixtures/deepseek-codex-provider-seam/mock_responses_provider.py",
+          "purpose": "loopback qualification mock",
+          "retention": "retain",
+          "sha256": "dcd4cc288139e55038312dd6677c359eb19fa86e6cead2d020826358755b0e98"
+        },
+        {
+          "bytes": 1502,
+          "path": "evidence/qualification/deepseek-codex-provider-seam/residual-cleanup-reconciliation.json",
+          "purpose": "pre-gate and cleanup receipt",
+          "retention": "retain",
+          "sha256": "a18ed83264ae119a94459dd9785135601a7e37a9e4c7aeef0af27cebe8219d72"
+        },
+        {
+          "bytes": 2424,
+          "path": "evidence/qualification/deepseek-codex-provider-seam/method-candidate-ledger.json",
+          "purpose": "trial ledger",
+          "retention": "retain",
+          "sha256": "5d53dab01cb8e6ac3c97f30fcca7067d4df74c4cb7dd40affcc0b8a0341b1130"
+        }
+      ]
+    },
+    "checks_and_evidence": {
+      "checks": [
+        {
+          "evidence": "residual-cleanup-reconciliation.json",
+          "id": "PRE-GATE-DS-01C-RESIDUAL-RECONCILIATION",
+          "state": "PASS"
+        },
+        {
+          "evidence": "trial-01-ollama-replay6/trial-result.json; mock POST /v1/responses observed",
+          "id": "AS-DS-SEAM-INVOKE-01",
+          "state": "INCONCLUSIVE"
+        },
+        {
+          "evidence": "codex.err outbound plugin sync",
+          "id": "AS-DS-SEAM-ISOLATION-01",
+          "state": "FAIL"
+        },
+        {
+          "evidence": "port11434 released; no current-attempt process remained",
+          "id": "GATE-DS-01C-PROCESS-PORT-SETTLEMENT",
+          "state": "PASS"
+        }
+      ],
+      "limitations": [
+        "Worker checks are not independent validation",
+        "Outbound violation invalidates no-outbound qualification"
+      ]
+    },
+    "claims_established_and_not_established": {
+      "established": [
+        "Pre-gate residual state passed",
+        "Codex 0.144.1 emitted a correlated POST /v1/responses to loopback mock before breach",
+        "Current-attempt resources settled"
+      ],
+      "not_established": [
+        "IF-CODEX-LOCAL-PROVIDER-MOCK-INVOKE qualification",
+        "no-outbound isolation",
+        "DS-A04 through DS-A09",
+        "live provider or credential qualification",
+        "product implementation",
+        "candidate acceptance",
+        "deployment",
+        "publication",
+        "release",
+        "independent validation"
+      ]
+    },
+    "cleanup_and_residuals": {
+      "plugin_cache": "retained as evidence; parent owns disposition",
+      "ports": "settled",
+      "processes": "settled",
+      "protected_pid_91104": "untouched",
+      "residual_owner": "bbk_worker_orchestrator",
+      "state": "QUARANTINED",
+      "temporary_root": ".bbk/tmp/PKG-BBK-CODEX-DEEPSEEK-001/PH-DS-01R/WU-DS-01C-R2-c64ea81eb1a54c83b440a1395a99afa6"
+    },
+    "continuation_and_recovery": {
+      "completed": [
+        "pre-gate",
+        "help/schema capture",
+        "trial-01 replay6",
+        "cleanup",
+        "artifact finalization"
+      ],
+      "duplicate_attempt_risk": "do not restart same attempt",
+      "remaining": [
+        "parent authority review"
+      ],
+      "resume_prerequisite": "reissued authority with network containment",
+      "state": "BLOCKED"
+    },
+    "discoveries_and_deviations": {
+      "discoveries": [
+        {
+          "fact": "Codex startup plugin sync contacts external destinations and writes isolated plugin cache despite --oss/ignore-user-config",
+          "impact": "loopback-only safeguard violated",
+          "type": "MATERIAL_DIVERGENCE"
+        }
+      ],
+      "parent_notified": true
+    },
+    "durable_artifact_and_handoff": {
+      "contentSha256": "a13bcf3ad5922cc881cad7b8c0cc7ed2e8bee07a21f9b5a733f0f945ac7ab518",
+      "freshness": "PASS",
+      "manifestSha256": "60a104756c0344535b96846291df0e9efe82120652f6c3e9241b5abcf3c7608c",
+      "package_id": "pkg-bbk-codex-deepseek-001-wu-ds-01c-authority-blocked",
+      "publication_receipt": ".bbk/artifacts/publications/pkg-bbk-codex-deepseek-001-wu-ds-01c-authority-blocked-2.json",
+      "revision": "2",
+      "sealed_path": ".bbk/artifacts/sealed/pkg-bbk-codex-deepseek-001-wu-ds-01c-authority-blocked-2",
+      "verification": "PASS read-only"
+    },
+    "external_effects": {
+      "outbound": [
+        {
+          "destination": "https://chatgpt.com/backend-api/plugins/featured",
+          "observed": true
+        },
+        {
+          "destination": "GitHub HTTP curated plugin sync",
+          "observed": true
+        }
+      ],
+      "ports": [
+        {
+          "address": "127.0.0.1:11434",
+          "result": "released"
+        },
+        {
+          "address": "127.0.0.1:56339",
+          "result": "absent pre-gate"
+        }
+      ],
+      "processes": [
+        {
+          "operation": "Codex trial",
+          "owner": "current attempt",
+          "pid": 40084,
+          "result": "fenced"
+        },
+        {
+          "operation": "loopback mock",
+          "owner": "current attempt",
+          "pid": 40620,
+          "result": "exited cleanly"
+        },
+        {
+          "operation": "none",
+          "owner": "protected",
+          "pid": 91104,
+          "result": "untouched"
+        }
+      ]
+    },
+    "governing_sources_and_fixed_decisions": {
+      "baseline": {
+        "digest": "9bea5cf7293078c490a7e0576461f7d39f8bf15fa3e17f6cc3ed6ce7e026ef17",
+        "id": "OB-PKG-BBK-CODEX-DEEPSEEK-001-R2",
+        "revision": 2
+      },
+      "fixed_decisions": [
+        "No outbound network",
+        "No PID91104 effect",
+        "At most three serialized trials",
+        "Qualification-only; no DS-A04..A09 claims"
+      ],
+      "work_graph": {
+        "digest": "92bb26e47860829900d4e365a7c18605dc63c5a8f7df7e9031c2a70c5f96308c",
+        "id": "WG-PKG-BBK-CODEX-DEEPSEEK-001-R2",
+        "revision": 2
+      }
+    },
+    "invalidation_and_supersession": {
+      "invalidated": [
+        "Trial-01 no-outbound qualification evidence",
+        "any seam pass inference"
+      ],
+      "preserved": [
+        "all failed trial logs",
+        "outbound evidence",
+        "pre-gate receipt"
+      ],
+      "successor_trigger": "new authority and enforced outbound containment"
+    },
+    "model_profile_tool_and_context": {
+      "codex": "0.144.1",
+      "codex_sha256": "cbacbb9726262ef558b4af0438a1b2a5bba9076132401d947b5b4d2bf92ab0e4",
+      "context": "WU-DS-01C-R2 invocation packet",
+      "profile": "bbk-profile-python 0.1.0-alpha.3",
+      "python": "C:\\Python313\\python.exe 3.13.12",
+      "tools": [
+        "PowerShell",
+        "bbk artifact"
+      ]
+    },
+    "parent_specific_contribution": {
+      "contribution": "qualification-only seam attempt and exact authority-breach disposition",
+      "integration_prerequisite": "parent must preserve blocked state and quarantine residual plugin cache",
+      "mode": "CANDIDATE_PRODUCTION"
+    },
+    "work_unit_ref": {
+      "currentness": "CURRENT_UNTIL_AUTHORITY_BREACH",
+      "digest": "92bb26e47860829900d4e365a7c18605dc63c5a8f7df7e9031c2a70c5f96308c",
+      "id": "WU-DS-01C-LOCAL-PROVIDER-MOCK-SEAM",
+      "invalidation_state": "BLOCKED_BY_OUTBOUND_EFFECT",
+      "revision": 2,
+      "subject": "IF-CODEX-LOCAL-PROVIDER-MOCK-INVOKE"
+    },
+    "workspace_and_prestate": {
+      "historical_paths_read_only": [
+        "tests/fixtures/deepseek-codex-probe/",
+        "evidence/qualification/deepseek-codex-probe/"
+      ],
+      "owned_paths": [
+        "tests/fixtures/deepseek-codex-provider-seam/",
+        "evidence/qualification/deepseek-codex-provider-seam/"
+      ],
+      "ownership": "exclusive Worker attempt",
+      "pre_gate": "PASS",
+      "repo": "D:\\Projects\\BBK\\repos\\bbk"
+    }
+  },
+  "return_kind": "WORK_UNIT_RESULT",
+  "role": "bbk_worker",
+  "schema": "bbk.role-return.v2",
+  "semantic_state": {
+    "name": "work_unit_execution_state",
+    "value": "NEEDS_PARENT_AUTHORITY"
+  },
+  "smallest_valid_next_action": {
+    "action": "Preserve BLOCKED_AUTHORITY disposition and quarantined evidence; redesign enforced outbound containment before any successor trial",
+    "affected_refs": [
+      {
+        "id": "WU-DS-01C-LOCAL-PROVIDER-MOCK-SEAM",
+        "revision": 2
+      }
+    ],
+    "owner": "bbk_worker_orchestrator",
+    "reason": "Current authority prohibits outbound network and was breached by Codex startup plugin sync",
+    "unaffected_work_may_continue": true
+  },
+  "subject_ref": {
+    "id": "PKG-BBK-CODEX-DEEPSEEK-001",
+    "revision": "cf754f479d8e0e1c3ea4adebe529da6cf5ace155"
+  },
+  "summary": "Pre-gate passed and Codex 0.144.1 reached the loopback mock, but startup performed unauthorized outbound plugin sync and wrote plugin cache state. Exact Codex process was fenced; no further trials ran."
+}

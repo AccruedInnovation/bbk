@@ -1,0 +1,28 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-codex-resolved-external-target-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BBK Codex resolved external target v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "status", "selection", "rejection", "invariants"],
+  "properties": {
+    "schema": {"const": "bbk.codex-resolved-external-target.v1"},
+    "status": {"enum": ["RESOLVED", "REJECTED"]},
+    "registry_ref": {"$ref": "#/$defs/ref"},
+    "selection": {"type": "object", "additionalProperties": false, "required": ["mode", "target_id"], "properties": {"mode": {"const": "EXPLICIT"}, "target_id": {"type": ["string", "null"]}}},
+    "provider": {"$ref": "#/$defs/provider"},
+    "model": {"type": "object", "additionalProperties": false, "required": ["id"], "properties": {"id": {"type": "string"}}},
+    "credential_source": {"$ref": "#/$defs/credential"},
+    "capabilities": {"type": "object", "additionalProperties": false, "required": ["supported", "unsupported", "requested"], "properties": {"supported": {"type": "array", "items": {"type": "string"}}, "unsupported": {"type": "array", "items": {"type": "string"}}, "requested": {"type": "array", "items": {"type": "string"}}}},
+    "isolated_codex_projection": {"type": "object", "additionalProperties": false, "required": ["model_provider", "model", "provider_name", "base_url", "wire_api", "credential_ref"], "properties": {"model_provider": {"const": "deepseek"}, "model": {"type": "string"}, "provider_name": {"type": "string"}, "base_url": {"type": "string", "format": "uri"}, "wire_api": {"const": "responses"}, "credential_ref": {"$ref": "#/$defs/credential"}}},
+    "qualification_ref": {"type": "object", "additionalProperties": false, "required": ["id", "sha256", "disposition"], "properties": {"id": {"type": "string"}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "disposition": {"enum": ["QUALIFIED_MOCK_LIVE", "QUALIFIED_MOCK_LIVE_DEFERRED"]}}},
+    "rejection": {"type": "object", "additionalProperties": false, "required": ["reason_code", "reason"], "properties": {"reason_code": {"type": "string", "pattern": "^[A-Z0-9_]+$"}, "reason": {"type": "string"}, "details": {}}},
+    "invariants": {"type": "object", "additionalProperties": false, "required": ["parent_and_defaults_unchanged", "silent_fallback", "user_config_mutated"], "properties": {"parent_and_defaults_unchanged": {"const": true}, "silent_fallback": {"const": false}, "user_config_mutated": {"const": false}}}
+  },
+  "allOf": [{"if": {"properties": {"status": {"const": "RESOLVED"}}}, "then": {"required": ["registry_ref", "provider", "model", "credential_source", "capabilities", "isolated_codex_projection", "qualification_ref"], "properties": {"rejection": {"type": "object", "required": ["reason_code", "reason"]}}}}, {"if": {"properties": {"status": {"const": "REJECTED"}}}, "then": {"required": ["rejection"]}}],
+  "$defs": {
+    "ref": {"type": "object", "additionalProperties": false, "required": ["id", "revision", "sha256"], "properties": {"id": {"type": "string"}, "revision": {"type": "integer", "minimum": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}},
+    "credential": {"type": "object", "additionalProperties": false, "required": ["kind", "env_key", "value_persisted"], "properties": {"kind": {"const": "environment"}, "env_key": {"const": "DEEPSEEK_API_KEY"}, "value_persisted": {"const": false}}},
+    "provider": {"type": "object", "additionalProperties": false, "required": ["id", "name", "base_url", "wire_api", "responses_path_joining_disposition", "observed_or_qualified_request_path"], "properties": {"id": {"const": "deepseek"}, "name": {"type": "string"}, "base_url": {"type": "string", "format": "uri"}, "wire_api": {"const": "responses"}, "responses_path_joining_disposition": {"type": "string"}, "observed_or_qualified_request_path": {"type": "string"}}}
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "schema": "bbk.deepseek-codex-provider-seam-reconciliation.v1",
+  "work_unit_ref": {
+    "id": "WU-DS-01C-LOCAL-PROVIDER-MOCK-SEAM",
+    "revision": 2,
+    "contract": "RIC-WU-DS-01C-R2",
+    "boundary": "TEB-PKG-BBK-CODEX-DEEPSEEK-001-PH-DS-01R-R2"
+  },
+  "attempt": "WU-DS-01C-R2-c64ea81eb1a54c83b440a1395a99afa6",
+  "observed_at": "2026-08-13T04:44:00Z",
+  "pre_gate": {
+    "id": "PRE-GATE-DS-01C-RESIDUAL-RECONCILIATION",
+    "state": "PASS",
+    "pid_87364": "ABSENT",
+    "listener_127.0.0.1:56339": "ABSENT",
+    "pid_91104": "PRESENT_READ_ONLY_UNTOUCHED",
+    "protected_process_executable": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.803.10989.0_x64__2p2nqsd0c76g0\\app\\resources\\codex.exe"
+  },
+  "current_attempt_settlement": {
+    "codex_pid_40084": "FENCED_AFTER_OUTBOUND_EFFECT_AND_RETRY",
+    "mock_pid_40620": "EXITED_CLEANLY",
+    "listener_127.0.0.1:11434": "RELEASED",
+    "unknown_processes": "NO_CURRENT_ATTEMPT_PROCESS_REMAINED",
+    "protected_pid_91104": "NO_EFFECT"
+  },
+  "residual_state": {
+    "state": "QUARANTINED",
+    "path": ".bbk/tmp/PKG-BBK-CODEX-DEEPSEEK-001/PH-DS-01R/WU-DS-01C-R2-c64ea81eb1a54c83b440a1395a99afa6/trial-01-ollama-replay6/codex-home/.tmp/plugins",
+    "reason": "Retained as evidence of unexpected plugin sync writes; do not delete until parent disposition.",
+    "owner": "bbk_worker_orchestrator"
+  },
+  "cleanup_limit": "No user config, credentials, protected process, or historical predecessor roots were mutated by this Worker."
+}

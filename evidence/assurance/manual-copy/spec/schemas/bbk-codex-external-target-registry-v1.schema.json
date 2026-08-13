@@ -1,0 +1,262 @@
+{
+  "$defs": {
+    "capability": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "type": "string"
+        },
+        "notes": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "provider": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "state": {
+          "const": "CONFIGURED_UNQUALIFIED"
+        },
+        "supported": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "provider",
+        "state",
+        "supported",
+        "notes"
+      ],
+      "type": "object"
+    },
+    "protectedRouting": {
+      "additionalProperties": false,
+      "properties": {
+        "default_unchanged": {
+          "const": true
+        },
+        "paths": {
+          "const": [
+            "spec/model-routing.json",
+            "spec/omp-model-routing-profiles.json"
+          ],
+          "type": "array"
+        },
+        "policy": {
+          "const": "READ_ONLY_PROTECTED"
+        },
+        "role_count": {
+          "const": 19
+        }
+      },
+      "required": [
+        "paths",
+        "role_count",
+        "policy",
+        "default_unchanged"
+      ],
+      "type": "object"
+    },
+    "provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "delta": {
+          "const": "third_party/codex-deepseek-subagent/BBK-DELTA.md"
+        },
+        "file_map": {
+          "const": "third_party/codex-deepseek-subagent/UPSTREAM-FILE-MAP.csv"
+        },
+        "license": {
+          "const": "MIT"
+        },
+        "notice": {
+          "const": "third_party/codex-deepseek-subagent/NOTICE.md"
+        },
+        "source_root": {
+          "const": "third_party/codex-deepseek-subagent"
+        },
+        "tracked_file_count": {
+          "const": 33
+        },
+        "upstream_commit": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        },
+        "upstream_repository": {
+          "format": "uri",
+          "type": "string"
+        }
+      },
+      "required": [
+        "upstream_repository",
+        "upstream_commit",
+        "license",
+        "tracked_file_count",
+        "source_root",
+        "notice",
+        "file_map",
+        "delta"
+      ],
+      "type": "object"
+    },
+    "provider": {
+      "additionalProperties": false,
+      "properties": {
+        "credential_source": {
+          "additionalProperties": false,
+          "properties": {
+            "env_key": {
+              "const": "DEEPSEEK_API_KEY"
+            },
+            "kind": {
+              "const": "environment"
+            },
+            "value_persisted": {
+              "const": false
+            }
+          },
+          "required": [
+            "kind",
+            "env_key",
+            "value_persisted"
+          ],
+          "type": "object"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "qualification_state": {
+          "const": "CONFIGURED_UNQUALIFIED"
+        },
+        "transport": {
+          "additionalProperties": false,
+          "properties": {
+            "base_url": {
+              "format": "uri",
+              "type": "string"
+            },
+            "wire_api": {
+              "const": "responses"
+            }
+          },
+          "required": [
+            "base_url",
+            "wire_api"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "transport",
+        "credential_source",
+        "qualification_state"
+      ],
+      "type": "object"
+    },
+    "target": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "const": false
+        },
+        "id": {
+          "pattern": "^deepseek-v4-(pro|flash)$",
+          "type": "string"
+        },
+        "model": {
+          "enum": [
+            "deepseek-v4-pro",
+            "deepseek-v4-flash"
+          ],
+          "type": "string"
+        },
+        "provider": {
+          "const": "deepseek"
+        },
+        "qualification_state": {
+          "const": "CONFIGURED_UNQUALIFIED"
+        },
+        "selection": {
+          "const": "EXPLICIT_ONLY"
+        }
+      },
+      "required": [
+        "id",
+        "provider",
+        "model",
+        "selection",
+        "qualification_state",
+        "enabled"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://bbk.local/schemas/bbk-codex-external-target-registry-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "activation": {
+      "const": "ACTIVATION_NEUTRAL"
+    },
+    "capabilities": {
+      "items": {
+        "$ref": "#/$defs/capability"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "id": {
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "type": "string"
+    },
+    "protected_routing": {
+      "$ref": "#/$defs/protectedRouting"
+    },
+    "provenance": {
+      "$ref": "#/$defs/provenance"
+    },
+    "providers": {
+      "items": {
+        "$ref": "#/$defs/provider"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "revision": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "bbk.codex-external-target-registry.v1"
+    },
+    "targets": {
+      "items": {
+        "$ref": "#/$defs/target"
+      },
+      "minItems": 2,
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "revision",
+    "activation",
+    "providers",
+    "capabilities",
+    "targets",
+    "provenance",
+    "protected_routing"
+  ],
+  "title": "BBK Codex external target registry v1",
+  "type": "object"
+}

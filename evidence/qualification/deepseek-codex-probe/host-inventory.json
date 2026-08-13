@@ -1,0 +1,90 @@
+{
+  "schema": "bbk.deepseek-codex-host-inventory.v1",
+  "work_unit_ref": {
+    "id": "WU-DS-01A-INSTALLED-CODEX-INVENTORY",
+    "revision": 1,
+    "boundary_id": "TEB-PKG-BBK-CODEX-DEEPSEEK-001-PH-DS-01-R1",
+    "baseline_revision": "cf754f479d8e0e1c3ea4adebe529da6cf5ace155"
+  },
+  "observed_at": "2026-08-13T03:58:05.9921909Z",
+  "provenance_policy": "Direct observations are distinguished from bounded inference; no credential values or provider responses were accessed.",
+  "node": {
+    "node_id": "TOMBSTONE",
+    "hostname": "TOMBSTONE",
+    "os": {
+      "caption": "Microsoft Windows 11 Enterprise",
+      "version": "10.0.26100",
+      "build": "26100",
+      "architecture": "64-bit"
+    },
+    "shell": "PowerShell",
+    "repository": {
+      "path": "D:\\Projects\\BBK\\repos\\bbk",
+      "head": "cf754f479d8e0e1c3ea4adebe529da6cf5ace155",
+      "owned_path_prestate": "absent; no prior deepseek-codex-probe directory"
+    }
+  },
+  "python": {
+    "path": "C:\\Python313\\python.exe",
+    "realpath": "C:\\Python313\\python.exe",
+    "version": "3.13.12",
+    "implementation": "CPython",
+    "build": "MSC v.1944 64 bit (AMD64)",
+    "bytes": 105816,
+    "sha256": "a2a4eff8d0b0c845284c607d50a3b5b966ac5a3121736a2e38e165bd6644d9fe",
+    "identity_check": "PASS"
+  },
+  "bbk_profile_registry": {
+    "bbk_version": "0.1.0-alpha.17.0.2.1",
+    "discovery_command": "C:\\Users\\Tombstone\\AppData\\Local\\BBK\\bin\\bbk.cmd --json profile list",
+    "profiles": [
+      { "id": "codesys", "version": "0.1.0-alpha.5", "manifest_sha256": "bbcab67fbb50483f3a281fe725820bd1c29f334da9c4e75930b84b821b557e91", "status": "valid" },
+      { "id": "go", "version": "0.1.0-alpha.3", "manifest_sha256": "b00c37c52b66624757dc8b2816074cc5458fefefc971cbd1ba8c327a856c95de", "status": "valid" },
+      { "id": "python", "version": "0.1.0-alpha.3", "manifest_sha256": "65a701a48213b2efdbb29f433ec1b1354a3a08c96e652c9ec9e90105ca3e2428", "status": "valid", "capabilities": { "implementation_structure": "supported", "review_assurance": "supported", "state_decision_effect": "supported" } },
+      { "id": "rust", "version": "0.1.0-alpha.3", "manifest_sha256": "0610e769bd3925c171120df510e869212acd6448c571cb13fb406a08d755018e", "status": "valid" },
+      { "id": "typescript-javascript", "version": "0.1.0-alpha.3", "manifest_sha256": "d11d765c2bfaff242e1ee6cb1bc1dacec36dad7000717f40f6c210f9c2f8c392", "status": "valid" }
+    ],
+    "deepseek_or_codex_specific_profile": "NOT_PRESENT_IN_INSTALLED_REGISTRY"
+  },
+  "codex_subjects": [
+    {
+      "subject_role": "accessible_cli_subject",
+      "path": "C:\\Users\\Tombstone\\AppData\\Local\\Programs\\Pen\\resources\\app.asar.unpacked\\node_modules\\@openai\\codex-win32-x64\\vendor\\x86_64-pc-windows-msvc\\bin\\codex.exe",
+      "package": "@openai/codex-win32-x64",
+      "package_version": "0.144.1",
+      "target": "x86_64-pc-windows-msvc",
+      "bytes": 341200688,
+      "sha256": "cbacbb9726262ef558b4af0438a1b2a5bba9076132401d947b5b4d2bf92ab0e4",
+      "signature": "Valid; signer CN=OpenAI OpCo, LLC",
+      "version_observation": { "command": "<absolute path> --version", "stdout": "codex-cli 0.144.1", "status": "PASS" }
+    },
+    {
+      "subject_role": "installed_appx_subject",
+      "package": "OpenAI.Codex",
+      "package_version": "26.803.10989.0",
+      "install_location": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.803.10989.0_x64__2p2nqsd0c76g0",
+      "resource_cli_path": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.803.10989.0_x64__2p2nqsd0c76g0\\app\\resources\\codex.exe",
+      "resource_cli_bytes": 293412656,
+      "resource_cli_sha256": "592958896cbffa154709618476fc9c9bf7fe73957e9a4fc12094c5051b6c69b3",
+      "resource_cli_signature": "Valid; signer CN=OpenAI OpCo, LLC",
+      "execution_observation": "PATH codex.exe and direct AppX resource execution returned Windows access denied/ResourceUnavailable; do not use this subject for WU-DS-01B without explicit access resolution."
+    }
+  ],
+  "installed_codex_help_schema_observations": {
+    "source": "accessible_cli_subject codex-cli 0.144.1",
+    "help_commands": ["codex --help", "codex features --help", "codex mcp --help", "codex app-server --help", "codex app-server generate-json-schema --help", "codex exec --help"],
+    "config_surfaces": ["-c/--config dotted key=value override from ~/.codex/config.toml", "--strict-config rejects unknown fields", "-p/--profile selects $CODEX_HOME/<name>.config.toml overlay", "--model selects model", "--local-provider accepts lmstudio or ollama with --oss", "app-server generate-json-schema emits protocol schema to explicit --out"],
+    "provider_schema_surface": {
+      "observed_binary_config_keys": ["model_provider", "model_providers", "provider", "model", "base_url"],
+      "custom_provider_guard": "Embedded diagnostics reject empty provider names and overriding reserved built-in provider IDs.",
+      "deepseek_literal_in_binary": false,
+      "interpretation": "Custom provider configuration is an installed Codex surface; DeepSeek endpoint, credentials, model alias, and live compatibility remain unestablished."
+    },
+    "feature_command": {
+      "command": "codex features list",
+      "observed_enabled": ["apps", "auth_elicitation", "browser_use", "browser_use_external", "browser_use_full_cdp_access", "code_mode_host", "computer_use", "fast_mode", "goals", "guardian_approval", "hooks", "image_generation", "in_app_browser", "mentions_v2", "multi_agent", "multi_agent_v2", "personality", "plugin_sharing", "plugins", "remote_plugin", "secret_auth_storage", "shell_snapshot", "shell_tool", "tool_call_mcp_elicitation", "tool_suggest", "workspace_dependencies"],
+      "network_observed": false
+    }
+  },
+  "claim_limits": ["No DeepSeek provider request, credential value, or external network effect was performed.", "No live provider compatibility, native callback behavior, or credential qualification is established.", "No product implementation, candidate, assertion pass, acceptance, deployment, publication, or release is established."]
+}

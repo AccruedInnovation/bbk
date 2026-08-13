@@ -1,0 +1,48 @@
+{
+  "schema": "bbk.deepseek-codex-pre-execution-confirmation.v1",
+  "work_unit_ref": {
+    "id": "WU-DS-01A-INSTALLED-CODEX-INVENTORY",
+    "revision": 1,
+    "worker_contract_ref": "RIC-WU-DS-01A-R1",
+    "boundary_id": "TEB-PKG-BBK-CODEX-DEEPSEEK-001-PH-DS-01-R1",
+    "work_graph_digest": "e22f6443b13f16b7c4fd15347dc570cbbc83f36e024ad50ab8b3bd4314a963ae"
+  },
+  "confirmed_at": "2026-08-13T03:58:05.9921909Z",
+  "execution_mode": "CANDIDATE_PRODUCTION",
+  "network_policy": { "required": "ZERO", "observed_outbound_requests": false, "loopback": "not used by this WorkUnit" },
+  "dispatch_facts": {
+    "scope_and_return_route": { "status": "PASS", "scope": "Read-only local Windows Codex/Python/profile inventory plus two exact evidence files", "return_route": "bbk_worker_orchestrator for PH-DS-01" },
+    "authority_and_effect_fence": {
+      "status": "PASS",
+      "authority_ref": "AUTH-PKG-BBK-CODEX-DEEPSEEK-001-PRODUCE-ONLY-R1",
+      "allowed_effects_used": ["READ_ONLY_LOCAL_HOST_INSPECTION", "FILESYSTEM_WRITE_IN_WORKSPACE"],
+      "prohibited_effects_not_used": ["OUTBOUND_NETWORK", "REAL_CREDENTIAL_ACCESS_OR_USE", "REAL_PROVIDER_CALL", "USER_OR_HOST_CONFIG_MUTATION", "GLOBAL_CACHE_OR_TOOLCHAIN_MAINTENANCE", "EXTERNAL_EXECUTION", "OMP_MUTATION"]
+    },
+    "workspace_and_mutation_ownership": {
+      "status": "PASS",
+      "workspace": "D:\\Projects\\BBK\\repos\\bbk",
+      "owned_paths": ["evidence/qualification/deepseek-codex-probe/host-inventory.json", "evidence/qualification/deepseek-codex-probe/pre-execution-confirmation.json"],
+      "prestate": "Both files and parent directory absent before this attempt; no owned-path collision observed."
+    },
+    "inputs_toolchain_carrier_checks": {
+      "status": "PASS_WITH_LIMITATION",
+      "python": "C:\\Python313\\python.exe identity PASS; SHA-256 a2a4eff8d0b0c845284c607d50a3b5b966ac5a3121736a2e38e165bd6644d9fe",
+      "profile_registry": "BBK Python 0.1.0-alpha.3 valid; no DeepSeek/Codex-specific installed profile",
+      "codex_cli": "Bundled @openai/codex-win32-x64 0.144.1 absolute path executes and returns help/version",
+      "appx_alias": "Installed OpenAI.Codex AppX resource is present but PATH/direct execution is access-denied; explicit absolute bundled CLI path is the admitted subject for next frontier.",
+      "output_carrier": "Two JSON evidence files in owned evidence surface",
+      "completion_checks": ["node and installed-subject binding", "claim provenance classification", "credential redaction", "owned-path diff"]
+    }
+  },
+  "pre_execution_command_register": [
+    { "command": "hostname; Get-CimInstance Win32_OperatingSystem", "purpose": "Bind exact Windows node and OS", "status": "PASS", "network": "none", "credential_access": "none" },
+    { "command": "C:\\Python313\\python.exe --version and identity/hash probe", "purpose": "Confirm exact interpreter identity", "status": "PASS", "network": "none", "credential_access": "none" },
+    { "command": "C:\\Users\\Tombstone\\AppData\\Local\\BBK\\bin\\bbk.cmd --json profile list", "purpose": "Late-bind installed BBK profile registry", "status": "PASS", "network": "none", "credential_access": "none" },
+    { "command": "<absolute bundled codex.exe> --version; --help; features list; app-server generate-json-schema --help", "purpose": "Late-bind installed Codex help/config/schema surfaces", "status": "PASS", "network": "none observed", "credential_access": "none" },
+    { "command": "codex --version / codex --help via PATH AppX alias", "purpose": "Check canonical PATH accessibility", "status": "BLOCKED_TECHNICAL", "observation": "PowerShell ResourceUnavailable/access denied from WindowsApps path; preserved as limitation, no retry or mutation.", "network": "none", "credential_access": "none" }
+  ],
+  "redaction": { "credential_values_read": false, "credential_values_emitted": false, "user_config_contents_read": false, "only_user_config_metadata_observed": true },
+  "cleanup": { "state": "CLEAN", "temporary_files": [], "processes_started": [], "external_state": "none", "retained_evidence": ["host-inventory.json", "pre-execution-confirmation.json"] },
+  "disposition": "READY_FOR_WU_DS_01B_ADMISSION_WITH_EXPLICIT_BUNDLED_CODEX_PATH",
+  "residual_uncertainty": ["AppX PATH alias remains inaccessible under current Windows ACLs.", "DeepSeek endpoint/model alias, credentials, native callback behavior, and live provider compatibility remain unresolved by this read-only WorkUnit."]
+}

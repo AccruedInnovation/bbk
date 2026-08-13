@@ -1,0 +1,14 @@
+{
+  "schema": "bbk.deepseek-codex-provider-seam-reconciliation.v1",
+  "work_unit_ref": {"id": "WU-DS-01C-LOCAL-PROVIDER-MOCK-SEAM", "revision": 3},
+  "boundary": "TEB-PKG-BBK-CODEX-DEEPSEEK-001-PH-DS-01R-R4",
+  "attempt": "WU-DS-01C-R4-a1",
+  "state": "CLEAN",
+  "owned_roots": ["evidence/qualification/deepseek-codex-provider-seam-r4", ".bbk/tmp/PKG-BBK-CODEX-DEEPSEEK-001/PH-DS-01R-R4/WU-DS-01C-R4-a1", "tests/fixtures/deepseek-codex-provider-seam-r4"],
+  "processes": {"attempt_owned": "terminated", "protected_processes": "untouched"},
+  "listener": {"port": 11434, "released": true},
+  "credential": {"env_key": "DEEPSEEK_API_KEY", "value_persisted": false, "secret_scan": "PASS"},
+  "config": {"attempt_private_codex_home": true, "user_default_config_mutated": false},
+  "residuals": {"sanitized_trial_logs": "retained", "owner": "bbk_worker_orchestrator"},
+  "protected_prestate": {"candidate": "UNCHANGED", "prior_quarantine": "UNCHANGED", "ds_a01": "UNCHANGED"}
+}

@@ -1,0 +1,28 @@
+ {
+   "schema": "bbk.ds06.inclusion-comparison.v1",
+   "candidatePackage": "pkg-bbk-codex-deepseek-001-integrated-r6@2",
+   "productFileCount": 92,
+   "sealedArtifactCount": 93,
+   "sourceContributions": {
+     "ph_ds_02": 39,
+     "ph_ds_03": 3,
+     "ph_ds_04": 42,
+     "ph_ds_05": 7
+   },
+   "overlays": 2,
+   "collisions": [],
+   "undeclaredPaths": [],
+   "missingPaths": [],
+   "rawRegistry": {
+     "path": "spec/codex-external-targets.json",
+     "canonicalEquality": "PASS",
+     "rawIdentityPreserved": true
+   },
+   "successorDocumentation": {
+     "path": "docs/MODEL-ROUTING.md",
+     "selectedPhase": "PH-DS-04",
+     "selection": "PASS"
+   },
+   "inventoryCheck": "PASS",
+   "notes": "candidate.json is the sole descriptor; inventory.json intentionally excluded."
+ }

@@ -1,0 +1,57 @@
+ {
+   "schema": "bbk.ds06.assertion-contributions.v1",
+   "candidatePackage": "pkg-bbk-codex-deepseek-001-integrated-r6@2",
+   "assertions": [
+     {
+       "id": "DS06-A01-INTEGRATED-COMPONENT-INCLUSION",
+       "disposition": "PASS",
+       "evidence": [
+         "inclusion-comparison.json",
+         "candidate-input-map.json"
+       ],
+       "independence": "worker deterministic; not independent validation"
+     },
+     {
+       "id": "DS06-A02-EXPLICIT-SELECTION-DEFAULT-PRESERVATION",
+       "disposition": "PASS",
+       "evidence": [
+         "inclusion-comparison.json",
+         "protected-carrier-scan.json"
+       ],
+       "independence": "worker deterministic; not independent validation"
+     },
+     {
+       "id": "DS06-A06-LIFECYCLE-RECEIPT-REUSE-ON-EXACT-BYTES",
+       "disposition": "PASS",
+       "evidence": [
+         "keyless-actor-flow.json",
+         "candidate-input-map.json"
+       ],
+       "independence": "worker deterministic; not independent validation"
+     },
+     {
+       "id": "DS06-A07-ACTOR-VISIBLE-KEYLESS-STATUS-AND-FAILURE-TRUTH",
+       "disposition": "PASS",
+       "evidence": [
+         "keyless-actor-flow.json"
+       ],
+       "independence": "worker deterministic; not independent validation"
+     }
+   ],
+   "globalContributions": {
+     "DS_R2_A01": "PASS deterministic contribution",
+     "DS_R2_A02": "PASS keyless deterministic contribution; live unestablished",
+     "DS_R2_A05": "PASS carrier scan; live secret handling unestablished",
+     "DS_R2_A06": "PASS lifecycle receipt reuse",
+     "DS_R2_A07": "PASS keyless status/failure truth; live actor behavior unestablished"
+   },
+   "liveLane": "DEFERRED_CONDITION_ABSENT_NONBLOCKING",
+   "claimsNotEstablished": [
+     "independent validation",
+     "semantic acceptance",
+     "live credential-backed provider success",
+     "deployment",
+     "publication",
+     "release"
+   ]
+ }

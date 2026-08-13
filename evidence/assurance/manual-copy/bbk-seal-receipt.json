@@ -1,0 +1,13 @@
+{
+  "authorityBoundary": "This receipt proves exact stored bytes and declared local reference closure only; it does not establish semantic acceptance, authorization, independent review, deployment readiness, or release authority.",
+  "contentSha256": "926f81ae0ec4952f2901b4a8dcde1bcf6539d58d892b517cf45d7f6e7059b39f",
+  "manifestSha256": "591ffe59ce18fcc04e917f6bcd4422d3c9bb64a63db53a93db6117644390a3db",
+  "packageId": "pkg-bbk-codex-deepseek-001-integrated-r7",
+  "revision": "4",
+  "schema": "bbk.artifact-package-seal-receipt.v1",
+  "sealedAtUtc": "2026-08-13T21:20:42Z",
+  "tool": {
+    "name": "bbk",
+    "version": "0.1.0-alpha.17.0.2.1"
+  }
+}

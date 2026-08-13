@@ -1,0 +1,14 @@
+{
+  "schema": "bbk.deepseek-codex-provider-seam-method-ledger.v1",
+  "work_unit_ref": {"id": "WU-DS-01C-LOCAL-PROVIDER-MOCK-SEAM", "revision": 2},
+  "attempt": "WU-DS-01C-R2-c64ea81eb1a54c83b440a1395a99afa6",
+  "codex": {"path": "C:\\Users\\Tombstone\\AppData\\Local\\Programs\\Pen\\resources\\app.asar.unpacked\\node_modules\\@openai\\codex-win32-x64\\vendor\\x86_64-pc-windows-msvc\\bin\\codex.exe", "version": "0.144.1", "sha256": "cbacbb9726262ef558b4af0438a1b2a5bba9076132401d947b5b4d2bf92ab0e4"},
+  "help_schema_resource_surfaces": {"state": "CAPTURED", "commands": ["codex --help", "codex features --help", "codex features list", "codex mcp --help", "codex mcp list", "codex app-server --help", "codex app-server generate-json-schema --help", "codex exec --help", "codex app-server generate-json-schema --out <attempt-temp>"]},
+  "trials": [
+    {"id": "TRIAL-01", "method": "--oss --local-provider ollama", "port": 11434, "replays": ["R0_BAD_EXEC_FLAG", "R1_PROMPT_ARG_SPLIT", "R2_OLLAMA_PROBE_501", "R3_OLLAMA_PROBE_404", "R4_OLLAMA_PROBE_404", "R5_OLLAMA_BODY_DECODE", "R6_POST_REACHED"], "state": "BLOCKED_AUTHORITY_TERMINAL", "qualifying": false, "mock_receipt": {"requests": ["GET /v1/models", "GET /api/version", "GET /v1/models", "GET /api/tags", "POST /v1/responses"], "request_body_sha256": "7ffb237b503ae9607b61f96e9e693bdf523652e9c50d23ed40475de6fc8c523d", "request_body_bytes": 64058, "authorization_present": false, "probe_marker": "WU-DS-01C-R2-c64ea81eb1a54c83b440a1395a99afa6"}},
+    {"id": "TRIAL-02", "method": "NOT_STARTED", "state": "NOT_RUN_DUE_TO_AUTHORITY_REVOCATION"},
+    {"id": "TRIAL-03", "method": "NOT_STARTED", "state": "NOT_RUN_DUE_TO_AUTHORITY_REVOCATION"}
+  ],
+  "outbound_effect": {"observed": true, "destinations": ["https://chatgpt.com/backend-api/plugins/featured", "GitHub HTTP during curated plugin sync"], "evidence": ".bbk/tmp/PKG-BBK-CODEX-DEEPSEEK-001/PH-DS-01R/WU-DS-01C-R2-c64ea81eb1a54c83b440a1395a99afa6/trial-01-ollama-replay6/codex.err", "disposition": "TERMINAL_AUTHORITY_BREACH"},
+  "claims": {"established": ["Codex 0.144.1 emitted a loopback mock request before authority breach; request correlation and response path were observed"], "not_established": ["IF-CODEX-LOCAL-PROVIDER-MOCK-INVOKE qualification", "DS-A04 through DS-A09", "no-outbound isolation", "provider compatibility", "credentials", "product implementation", "candidate acceptance", "release"]}
+}

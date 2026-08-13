@@ -1,0 +1,50 @@
+ {
+   "schema": "bbk.ds06.keyless-actor-flow.v1",
+   "candidatePackage": "pkg-bbk-codex-deepseek-001-integrated-r6@2",
+   "credentialPresence": false,
+   "credentialValueAccessed": false,
+   "networkAttempted": false,
+   "providerErrorMode": "synthetic deterministic; no provider call",
+   "actors": [
+     {
+       "target": "deepseek-v4-pro",
+       "role": "bbk_worker",
+       "home": ".bbk/tmp/PKG-BBK-CODEX-DEEPSEEK-001/PH-DS-06/WU-DS-R6-06-A1/pro-home-r2",
+       "installStatus": "PASS",
+       "status": "CURRENT",
+       "credentialState": "ABSENT",
+       "providerState": "CREDENTIAL_ABSENT",
+       "providerErrorState": "ERROR",
+       "projectionSha256": "d321a5aafc7eab9d7576263bfc40b129634c5cfb1f838c633bc26a6dcfd43e93"
+     },
+     {
+       "target": "deepseek-v4-flash",
+       "role": "bbk_worker",
+       "home": ".bbk/tmp/PKG-BBK-CODEX-DEEPSEEK-001/PH-DS-06/WU-DS-R6-06-A1/flash-home-r2",
+       "installStatus": "PASS",
+       "status": "CURRENT",
+       "credentialState": "ABSENT",
+       "providerState": "CREDENTIAL_ABSENT",
+       "providerErrorState": "ERROR",
+       "projectionSha256": "af0f9109767b513f29c65631a1c1a0170b612268d3067bf12009c36fc02bd4cb"
+     }
+   ],
+  "cleanup": {
+    "state": "RESIDUALS_RECORDED",
+    "residuals": [
+      "pro-home",
+      "flash-home",
+      "pro-home-r2",
+      "flash-home-r2"
+    ],
+    "owner": "WU-DS-R6-06-INTEGRATED-KEYLESS-CANDIDATE-FREEZE@1",
+    "reason": "Attempt-private disposable homes retained for evidence lineage; no process or network listener remains."
+  },
+  "assertions": [
+     "Distinct Pro/Flash homes PASS",
+     "CREDENTIAL_ABSENT visible",
+     "Synthetic provider error visible",
+     "No fallback attempted",
+     "Credential reference persisted without value"
+   ]
+ }

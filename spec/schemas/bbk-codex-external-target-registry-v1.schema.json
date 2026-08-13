@@ -1,0 +1,79 @@
+{
+  "$id": "https://bbk.local/schemas/bbk-codex-external-target-registry-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BBK Codex external target registry v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "revision", "activation", "providers", "capabilities", "targets", "provenance", "protected_routing"],
+  "properties": {
+    "schema_version": {"const": "bbk.codex-external-target-registry.v1"},
+    "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+    "revision": {"type": "integer", "minimum": 1},
+    "activation": {"const": "ACTIVATION_NEUTRAL"},
+    "providers": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/provider"}},
+    "capabilities": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/capability"}},
+    "targets": {"type": "array", "minItems": 2, "items": {"$ref": "#/$defs/target"}},
+    "provenance": {"$ref": "#/$defs/provenance"},
+    "protected_routing": {"$ref": "#/$defs/protectedRouting"}
+  },
+  "$defs": {
+    "provider": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "name", "transport", "credential_source", "qualification_state"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+        "name": {"type": "string", "minLength": 1},
+        "transport": {"type": "object", "additionalProperties": false, "required": ["base_url", "wire_api"], "properties": {"base_url": {"type": "string", "format": "uri"}, "wire_api": {"const": "responses"}}},
+        "credential_source": {"type": "object", "additionalProperties": false, "required": ["kind", "env_key", "value_persisted"], "properties": {"kind": {"const": "environment"}, "env_key": {"const": "DEEPSEEK_API_KEY"}, "value_persisted": {"const": false}}},
+        "qualification_state": {"const": "CONFIGURED_UNQUALIFIED"}
+      }
+    },
+    "capability": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "provider", "state", "supported", "notes"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+        "provider": {"type": "string", "minLength": 1},
+        "state": {"const": "CONFIGURED_UNQUALIFIED"},
+        "supported": {"type": "boolean"},
+        "notes": {"type": "string", "minLength": 1}
+      }
+    },
+    "target": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "provider", "model", "selection", "qualification_state", "enabled"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^deepseek-v4-(pro|flash)$"},
+        "provider": {"const": "deepseek"},
+        "model": {"type": "string", "enum": ["deepseek-v4-pro", "deepseek-v4-flash"]},
+        "selection": {"const": "EXPLICIT_ONLY"},
+        "qualification_state": {"const": "CONFIGURED_UNQUALIFIED"},
+        "enabled": {"const": false}
+      }
+    },
+    "provenance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["upstream_repository", "upstream_commit", "license", "tracked_file_count", "source_root", "notice", "file_map", "delta"],
+      "properties": {
+        "upstream_repository": {"type": "string", "format": "uri"},
+        "upstream_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "license": {"const": "MIT"},
+        "tracked_file_count": {"const": 33},
+        "source_root": {"const": "third_party/codex-deepseek-subagent"},
+        "notice": {"const": "third_party/codex-deepseek-subagent/NOTICE.md"},
+        "file_map": {"const": "third_party/codex-deepseek-subagent/UPSTREAM-FILE-MAP.csv"},
+        "delta": {"const": "third_party/codex-deepseek-subagent/BBK-DELTA.md"}
+      }
+    },
+    "protectedRouting": {
+      "type": "object", "additionalProperties": false,
+      "required": ["paths", "role_count", "policy", "default_unchanged"],
+      "properties": {
+        "paths": {"type": "array", "const": ["spec/model-routing.json", "spec/omp-model-routing-profiles.json"]},
+        "role_count": {"const": 19},
+        "policy": {"const": "READ_ONLY_PROTECTED"},
+        "default_unchanged": {"const": true}
+      }
+    }
+  }
+}

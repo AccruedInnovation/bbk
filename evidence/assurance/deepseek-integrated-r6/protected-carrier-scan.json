@@ -1,0 +1,18 @@
+ {
+   "schema": "bbk.ds06.protected-carrier-scan.v1",
+   "candidatePackage": "pkg-bbk-codex-deepseek-001-integrated-r6@2",
+   "scanRoot": ".bbk/artifacts/sealed/pkg-bbk-codex-deepseek-001-integrated-r6-2",
+   "scanMode": "read-only",
+   "credentialReferencePatternsPresent": true,
+   "credentialValuePatternHits": 0,
+   "tokenLikePatternHits": 0,
+   "protectedDefaultMutationDetected": false,
+   "openaiDefaultBytesUnchanged": "PASS",
+   "credentialCarrierValuesAbsent": "PASS",
+   "networkOrCredentialEffects": "NONE",
+   "result": "PASS",
+   "limitations": [
+     "Reference strings such as DEEPSEEK_API_KEY are expected and are not credential values.",
+     "Live credential-backed behavior was not exercised."
+   ]
+ }

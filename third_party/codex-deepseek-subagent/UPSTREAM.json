@@ -1,0 +1,16 @@
+{
+  "schema": "bbk.third-party-upstream.v1",
+  "name": "codex-deepseek-subagent",
+  "repository": "https://github.com/Utopia-V/codex-deepseek-subagent",
+  "upstream_commit": "c949e8d9b8922a48990b1e08259ad4baefc75f55",
+  "license": "MIT",
+  "tracked_file_count": 33,
+  "source_state": "clean_read_only_pinned_commit",
+  "copy_policy": "byte_for_byte",
+  "activation": "none",
+  "network_or_provider_effects": "prohibited",
+  "file_map": "UPSTREAM-FILE-MAP.csv",
+  "delta": "BBK-DELTA.md",
+  "license_file": "LICENSE",
+  "notice": "NOTICE.md"
+}

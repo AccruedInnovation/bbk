@@ -1,0 +1,22 @@
+{
+  "schema": "bbk.deepseek-codex-native-config-probe.v1",
+  "work_unit_ref": {"id": "WU-DS-01B-KEYLESS-NATIVE-CONFIG-PROBE", "revision": 1, "contract": "RIC-WU-DS-01B-R1", "boundary": "TEB-PKG-BBK-CODEX-DEEPSEEK-001-PH-DS-01-R1"},
+  "subject": {"node_id": "TOMBSTONE", "codex_path": "C:\\Users\\Tombstone\\AppData\\Local\\Programs\\Pen\\resources\\app.asar.unpacked\\node_modules\\@openai\\codex-win32-x64\\vendor\\x86_64-pc-windows-msvc\\bin\\codex.exe", "version": "0.144.1", "sha256": "cbacbb9726262ef558b4af0438a1b2a5bba9076132401d947b5b4d2bf92ab0e4"},
+  "method": {"mode": "KEYLESS_LOOPBACK_ONLY", "mock": "tests/fixtures/deepseek-codex-probe/mock_responses.py", "network": "loopback only; no outbound observed", "credentials": "none read or emitted", "user_config": "not read or mutated"},
+  "observations": [
+    {"id":"CFG-01","claim":"dotted -c overrides and model provider keys are accepted surfaces","disposition":"OBSERVED_HELP_SCHEMA"},
+    {"id":"CFG-02","claim":"isolated CODEX_HOME config can be selected without user-home mutation","disposition":"OBSERVED_SETUP_ONLY"},
+    {"id":"CFG-03","claim":"Responses endpoint path joining and provider request compatibility","disposition":"INCONCLUSIVE","detail":"mock received no request; noninteractive invocation timed out before provider dispatch"},
+    {"id":"AUTH-01","claim":"credential/shell isolation and keyless operation","disposition":"NOT_ESTABLISHED"},
+    {"id":"CAP-01","claim":"unsupported capability rejection and fail-closed fallback","disposition":"OBSERVED_HELP_ONLY"},
+    {"id":"TOOL-01","claim":"tools/returns/serialization and lifecycle correlation","disposition":"NOT_ESTABLISHED"},
+    {"id":"NATIVE-01","claim":"native child task/return transport","disposition":"INCONCLUSIVE","detail":"No safe correlation seam evidenced by bounded keyless mock; no Hook trigger."}
+  ],
+  "attempts": [{"id":"A1","result":"CONFIG_HELP_AND_LOOPBACK_MOCK_PREPARED","codex_invocation":"exec --ephemeral --skip-git-repo-check --json -m deepseek-v4-flash","mock_requests":0},{"id":"A2","result":"BLOCKED_TECHNICAL","reason":"Codex noninteractive prompt dispatch did not reach loopback mock within bounded timeout; process fenced."},{"id":"A3-REPAIR1","predecessor":"A2","result":"CONFIG_PARSE_PASS_HELP","correction":"Use --strict-config with top-level --help to exercise isolated CODEX_HOME without provider dispatch or reserved features syntax.","exit":0,"mock_requests":0,"native_dispatch":"NOT_ATTEMPTED_AFTER_SAFE_PARSE_GATE"},{"id":"A4-REPAIR2","predecessor":"A3-REPAIR1","result":"STDIN_INVOCATION_REACHED_TURN","correction":"Use documented `codex exec ... -` stdin form; no positional prompt argument.","observed":"thread.started and turn.started; model metadata fallback warning; mock requests 0; bounded job ended without provider dispatch","exit":"INCONCLUSIVE","process":"no bundled Codex process remained after reconciliation"}],
+  "assertion_dispositions": {"TRG-DS-HOOK-01":"ABSENT_NOT_TRIGGERED", "DS-A04":"NOT_ESTABLISHED", "DS-A05":"NOT_ESTABLISHED", "DS-A06":"NOT_ESTABLISHED", "DS-A07":"NOT_ESTABLISHED", "DS-A08":"NOT_ESTABLISHED", "DS-A09":"INCONCLUSIVE"},
+  "cleanup": {"state":"RESIDUALS_RECORDED", "processes":"bundled Codex attempt fenced; pre-existing AppX Codex untouched", "ports":"mock ephemeral listener exited", "temporary_root":".bbk/tmp/PKG-BBK-CODEX-DEEPSEEK-001/PH-DS-01 retained for parent inspection; contains only probe logs/config", "credentials":"none"},
+  "claims_not_established": ["any DS assertion pass", "native transport qualification", "live provider compatibility", "credential qualification", "candidate readiness, acceptance, release"],
+  "blockers": [{"type":"BLOCKED_TECHNICAL", "scope":"native Responses dispatch", "evidence":"mock request count zero; bounded Codex invocation timed out and was fenced", "next":"Parent may rerun with an invocation contract that supplies a supported local provider/mock execution mode or classify native path unresolved."}],
+  "semantic_state": "PARTIAL_WITH_EXPLICIT_GAPS",
+  "repair_cycle": {"number":2,"of":2,"scope":"documented stdin invocation correction","contract_unchanged":true,"predecessor_preserved":true,"frontier_exit":"BLOCKED_TECHNICAL_NATIVE_DISPATCH_UNRESOLVED"}
+}

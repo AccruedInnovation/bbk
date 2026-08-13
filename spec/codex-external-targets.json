@@ -1,0 +1,43 @@
+{
+  "schema_version": "bbk.codex-external-target-registry.v1",
+  "id": "codex-deepseek-external-targets",
+  "revision": 1,
+  "activation": "ACTIVATION_NEUTRAL",
+  "providers": [
+    {
+      "id": "deepseek",
+      "name": "DeepSeek",
+      "transport": {"base_url": "https://api.deepseek.com", "wire_api": "responses"},
+      "credential_source": {"kind": "environment", "env_key": "DEEPSEEK_API_KEY", "value_persisted": false},
+      "qualification_state": "CONFIGURED_UNQUALIFIED"
+    }
+  ],
+  "capabilities": [
+    {"id": "responses-api", "provider": "deepseek", "state": "CONFIGURED_UNQUALIFIED", "supported": true, "notes": "Native Responses transport is recorded for explicit qualification; no provider call occurs under PRODUCE_ONLY."},
+    {"id": "function-tools", "provider": "deepseek", "state": "CONFIGURED_UNQUALIFIED", "supported": true, "notes": "Capability is documented by the accepted provider facts and remains unqualified for Codex integration."},
+    {"id": "apply-patch-custom-tool", "provider": "deepseek", "state": "CONFIGURED_UNQUALIFIED", "supported": true, "notes": "Capability is an explicit qualification target, not an activation or pass claim."},
+    {"id": "image-inputs", "provider": "deepseek", "state": "CONFIGURED_UNQUALIFIED", "supported": false, "notes": "Unsupported by the accepted provider facts; resolver work must fail closed before dispatch."},
+    {"id": "file-inputs", "provider": "deepseek", "state": "CONFIGURED_UNQUALIFIED", "supported": false, "notes": "Unsupported by the accepted provider facts; no fallback is implied."},
+    {"id": "built-in-responses-tools", "provider": "deepseek", "state": "CONFIGURED_UNQUALIFIED", "supported": false, "notes": "file_search, code_interpreter, computer_use, mcp and similar built-ins are not enabled."}
+  ],
+  "targets": [
+    {"id": "deepseek-v4-pro", "provider": "deepseek", "model": "deepseek-v4-pro", "selection": "EXPLICIT_ONLY", "qualification_state": "CONFIGURED_UNQUALIFIED", "enabled": false},
+    {"id": "deepseek-v4-flash", "provider": "deepseek", "model": "deepseek-v4-flash", "selection": "EXPLICIT_ONLY", "qualification_state": "CONFIGURED_UNQUALIFIED", "enabled": false}
+  ],
+  "provenance": {
+    "upstream_repository": "https://github.com/Utopia-V/codex-deepseek-subagent",
+    "upstream_commit": "c949e8d9b8922a48990b1e08259ad4baefc75f55",
+    "license": "MIT",
+    "tracked_file_count": 33,
+    "source_root": "third_party/codex-deepseek-subagent",
+    "notice": "third_party/codex-deepseek-subagent/NOTICE.md",
+    "file_map": "third_party/codex-deepseek-subagent/UPSTREAM-FILE-MAP.csv",
+    "delta": "third_party/codex-deepseek-subagent/BBK-DELTA.md"
+  },
+  "protected_routing": {
+    "paths": ["spec/model-routing.json", "spec/omp-model-routing-profiles.json"],
+    "role_count": 19,
+    "policy": "READ_ONLY_PROTECTED",
+    "default_unchanged": true
+  }
+}

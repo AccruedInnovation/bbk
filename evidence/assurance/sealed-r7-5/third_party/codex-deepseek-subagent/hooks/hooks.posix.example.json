@@ -1,0 +1,19 @@
+{
+  "description": "One-shot plaintext task handoff for the DeepSeek-backed v4_flash_worker.",
+  "hooks": {
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "additionalContextLimit": 0,
+            "command": "python3 \"/absolute/path/to/plaintext_handoff.py\" --mode hook",
+            "statusMessage": "Delivering the staged Flash assignment",
+            "timeout": 10,
+            "type": "command"
+          }
+        ],
+        "matcher": "^v4_flash_worker$"
+      }
+    ]
+  }
+}

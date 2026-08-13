@@ -1,0 +1,36 @@
+{
+  "artifactCount": 96,
+  "authorityBoundary": "This receipt proves exact stored bytes and declared local reference closure only; it does not establish semantic acceptance, authorization, independent review, deployment readiness, or release authority.",
+  "claimsNotEstablished": [
+    "semantic acceptance",
+    "authorization",
+    "independent review",
+    "deployment readiness",
+    "live acceptance"
+  ],
+  "completionClaims": [
+    "BYTE_INTEGRITY_VERIFIED"
+  ],
+  "contentSha256": "309da4d5f4d662aff476598095b5b089d3b6ad5986a83ada41dc123aa65e217a",
+  "manifestSha256": "c2d3e2d2b192ea117add3d784fd61eb0d842220373de1e352102bfc1b82666f7",
+  "packageId": "pkg-bbk-codex-deepseek-001-integrated-r7",
+  "policy": {
+    "mutableCoordinationOverrideUsed": false,
+    "mutableCoordinationPaths": [],
+    "publicationMetadataOutsideSealedTree": true
+  },
+  "profile": {
+    "id": "generic",
+    "version": "1"
+  },
+  "publishedAtUtc": "2026-08-13T21:38:06Z",
+  "revision": "5",
+  "schema": "bbk.artifact-package-publication.v1",
+  "sealedRoot": "evidence\\assurance\\sealed-r7-5",
+  "sealedTreeSha256": "17bf5fe1a6ec648b8364f3b3e327e1b9e7449704ffacd77cb448fdeb9d948759",
+  "status": "PUBLISHED",
+  "tool": {
+    "name": "bbk",
+    "version": "0.1.0-alpha.17.0.2.1"
+  }
+}

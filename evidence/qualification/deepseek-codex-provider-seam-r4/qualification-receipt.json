@@ -1,0 +1,21 @@
+{
+  "schema": "bbk.deepseek-codex-provider-seam-qualification.v1",
+  "work_unit_ref": {"id": "WU-DS-01C-LOCAL-PROVIDER-MOCK-SEAM", "revision": 3, "contract": "RIC-WU-DS-01C-R3", "boundary": "TEB-PKG-BBK-CODEX-DEEPSEEK-001-PH-DS-01R-R4"},
+  "attempt": {"semantic_run_id": "TERRITORY-RUN-PKG-BBK-CODEX-DEEPSEEK-001-PH-DS-01R-R4-A1", "physical_attempt_id": "WU-DS-01C-R4-a1"},
+  "subject": {"candidate_content_sha256": "c10931a296124bee553aa2a5c2454cc8ceba002286fbb24ca572844cb428c27d", "ds_a01": "PASS_REUSED_CURRENT", "user_config": "READ_ONLY_UNCHANGED", "prior_quarantine": "READ_ONLY_UNCHANGED"},
+  "provider": {"codex_version": "0.144.1", "codex_path_class": "installed_codex_win32_x64", "provider_mode": "OSS_OLLAMA_EXPLICIT", "model": "deepseek-v4-flash", "request_path": "/v1/responses", "base_url": "http://127.0.0.1:11434", "path_joining": "OBSERVED"},
+  "disposition": "QUALIFIED_MOCK_LIVE_DEFERRED",
+  "trials": [
+    {"id": "TRIAL-01", "state": "FAILED_SETUP", "evidence_path": ".bbk/tmp/PKG-BBK-CODEX-DEEPSEEK-001/PH-DS-01R-R4/WU-DS-01C-R4-a1/codex.err"},
+    {"id": "TRIAL-02", "state": "REPAIR_FAILED_RESPONSE_CAPTURE", "evidence_path": ".bbk/tmp/PKG-BBK-CODEX-DEEPSEEK-001/PH-DS-01R-R4/WU-DS-01C-R4-a1/trial-02-repair"},
+    {"id": "TRIAL-03", "state": "MOCK_CORRELATED", "mock_output": ".bbk/tmp/PKG-BBK-CODEX-DEEPSEEK-001/PH-DS-01R-R4/WU-DS-01C-R4-a1/trial-03-final/mock.out", "codex_output": ".bbk/tmp/PKG-BBK-CODEX-DEEPSEEK-001/PH-DS-01R-R4/WU-DS-01C-R4-a1/trial-03-final/codex.out"}
+  ],
+  "mock_exchange": {"request_count": 6, "preflight_paths": ["/v1/models", "/api/version", "/v1/models", "/api/tags", "/api/pull"], "correlated_request": {"method": "POST", "path": "/v1/responses", "probe_marker": "WU-DS-01C-R4-a1", "authorization_present": false, "body_bytes": 64044, "body_sha256": "2be596c8bbbbac57b3d6a8ce7ae1bdbb0bb98fdbd09789b41b8fe6190b07affd"}, "response_observed": true},
+  "default_discrimination": {"method": "explicit_provider_flags_required", "default_route_unchanged": true, "routing_check": "PASS", "routing_receipt": "fa1d9e38e50346f18561c76a0f1e64bec10f0f76e7e78b0f1f7f58f7d4fb6b2b", "silent_fallback": false},
+  "resolver_input_sufficiency": {"provider_id": "deepseek", "model_id": "deepseek-v4-flash", "base_url": "https://api.deepseek.com", "wire_api": "responses", "responses_path_joining": "qualified_by_mock_path", "credential_ref": {"kind": "environment", "env_key": "DEEPSEEK_API_KEY", "value_persisted": false}, "qualification_ref": "this_receipt", "sufficient": true},
+  "credential": {"env_key": "DEEPSEEK_API_KEY", "presence": "ABSENT", "class": "ABSENT", "value_observed": false, "live_request": "NOT_RUN"},
+  "checks": {"secret_scan": "PASS_NO_SECRET_VALUE_OR_ASSIGNMENT_FOUND", "owned_diff": "PASS_ONLY_R4_FIXTURE_AND_EVIDENCE_ROOTS", "cleanup": "PASS_ATTEMPT_PROCESSES_AND_PORT_SETTLED", "receipt_shape": "PASS"},
+  "claims_established": ["Explicit OSS provider reached loopback /v1/responses with correlated marker", "Responses path joining and resolver fields are sufficient", "Canonical default routing check passed unchanged", "No credential value was observed or persisted", "Attempt-owned process and listener cleanup settled"],
+  "claims_not_established": ["Live DeepSeek qualification (credential absent)", "DS-A04 through DS-A09", "PH-DS-03 execution", "candidate acceptance", "deployment", "publication", "release", "independent validation"],
+  "cleanup": {"state": "CLEAN", "temporary_root": ".bbk/tmp/PKG-BBK-CODEX-DEEPSEEK-001/PH-DS-01R-R4/WU-DS-01C-R4-a1", "processes": "terminated", "listener_port": 11434, "credential_bearing_files": "none", "residuals": "sanitized trial logs retained"}
+}

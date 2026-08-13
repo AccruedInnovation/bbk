@@ -1,0 +1,52 @@
+ {
+   "schema": "bbk.ds06.candidate-input-map.v1",
+   "workUnit": "WU-DS-R6-06-INTEGRATED-KEYLESS-CANDIDATE-FREEZE@1",
+   "candidate": {
+     "packageId": "pkg-bbk-codex-deepseek-001-integrated-r6",
+     "revision": "2",
+     "contentSha256": "71b6fb8bb815c80b88c7a2bb9b411cd46167d82df5a60e1902cc072617ce7fba",
+     "manifestSha256": "2d4893442c2790fcc3ef11ba5106a3b885cf56f4a18067944fcc3358f14067a7",
+     "sealedRoot": ".bbk/artifacts/sealed/pkg-bbk-codex-deepseek-001-integrated-r6-2",
+     "artifactCount": 93,
+     "productFileCount": 92
+   },
+   "inputs": [
+     {
+       "phase": "PH-DS-02",
+       "packageId": "pkg-bbk-codex-deepseek-ds02",
+       "revision": "1",
+       "contentSha256": "c10931a296124bee553aa2a5c2454cc8ceba002286fbb24ca572844cb428c27d",
+       "manifestSha256": "de968774a699a3da8a4d67b50476669a5c1d246e323b53ffcf93ccaf870a0690",
+       "sealedRoot": ".bbk/artifacts/sealed/pkg-bbk-codex-deepseek-ds02-1"
+     },
+     {
+       "phase": "PH-DS-03",
+       "packageId": "pkg-bbk-codex-deepseek-001-ph-ds-03-r4",
+       "revision": "1",
+       "contentSha256": "801c6a4f40ea16e7fa8aa6553c47666e4435da4a038075090c78445e1de7064c",
+       "manifestSha256": "44f32381874fef921680efee0f174f835fa2896daabbe1758bec83e8afdfb3d9",
+       "sealedRoot": ".bbk/artifacts/sealed/pkg-bbk-codex-deepseek-001-ph-ds-03-r4-1"
+     },
+     {
+       "phase": "PH-DS-04",
+       "packageId": "pkg-bbk-codex-deepseek-001-ph-ds-04-r5",
+       "revision": "1",
+       "contentSha256": "81fdb76804d4f57ee663e92c4eb6a5ea53703cc39d34f7eb4bdd0b017b03afca",
+       "manifestSha256": "a9c0b980d6b56190b7c036bac31f2cf724aba8d92338b982d98bad742bdd1022",
+       "sealedRoot": ".bbk/artifacts/sealed/pkg-bbk-codex-deepseek-001-ph-ds-04-r5-1"
+     },
+     {
+       "phase": "PH-DS-05",
+       "packageId": "pkg-bbk-codex-deepseek-001-ph-ds-05-r5-4",
+       "revision": "4",
+       "contentSha256": "b1095dfdbea4e6d07bf97db603e2612a1189916967fba59eb7fbc3dbae2f084c",
+       "manifestSha256": "60331b017826ae15bc4771feb2d0772b51ca423dcbf34649d1d4aa504960e782",
+       "sealedRoot": ".bbk/artifacts/sealed/pkg-bbk-codex-deepseek-001-ph-ds-05-r5-4"
+     }
+   ],
+   "overlays": [
+     "spec/codex-external-targets.json retained from PH-DS-02 raw registry",
+     "docs/MODEL-ROUTING.md selected from PH-DS-04 successor"
+   ],
+   "currentness": "Input package verify receipts PASS; candidate rev2 verify/freshness PASS."
+ }

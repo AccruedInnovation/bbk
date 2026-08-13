@@ -1,0 +1,21 @@
+{
+  "byte_count": 14085,
+  "canonicalization_profile": "bbk-json-utf8-lf-v1",
+  "finalizer": {
+    "id": "bbk.atomic-json-finalizer",
+    "sha256": "f4dd8f7177baa4fb6e0ea5c2751e9ed248208e0cb52c48180be59328b2b12ada",
+    "version": "1"
+  },
+  "generated_at": "2026-08-13T04:51:48Z",
+  "invalidation_keys": [
+    "subject:3710735f4bc5394a581d03ba8986d1a522e522817677f137b4313b70e72ed37c",
+    "finalizer:f4dd8f7177baa4fb6e0ea5c2751e9ed248208e0cb52c48180be59328b2b12ada"
+  ],
+  "referenced_artifact_identities": [],
+  "schema": "bbk.identity-receipt.v1",
+  "schema_id": "https://bbk.local/schemas/bbk-worker-return-v2.schema.json",
+  "schema_validation": "PASS",
+  "sha256": "3710735f4bc5394a581d03ba8986d1a522e522817677f137b4313b70e72ed37c",
+  "subject_kind": "ROLE_RETURN",
+  "subject_ref": "D:/Projects/BBK/repos/bbk/evidence/qualification/deepseek-codex-provider-seam/worker-result.final.json"
+}

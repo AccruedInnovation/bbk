@@ -1,0 +1,13 @@
+{
+  "schema": "bbk.deepseek-codex-provider-seam-method-ledger.v1",
+  "work_unit_ref": {"id": "WU-DS-01C-LOCAL-PROVIDER-MOCK-SEAM", "revision": 3},
+  "attempt": "WU-DS-01C-R4-a1",
+  "trials": [
+    {"id": "TRIAL-01", "state": "FAILED_SETUP", "qualifying": false},
+    {"id": "TRIAL-02", "state": "REPAIR_FAILED_RESPONSE_CAPTURE", "qualifying": false},
+    {"id": "TRIAL-03", "state": "MOCK_CORRELATED", "qualifying": true, "request": {"path": "/v1/responses", "probe_marker": "WU-DS-01C-R4-a1", "body_bytes": 64044, "body_sha256": "2be596c8bbbbac57b3d6a8ce7ae1bdbb0bb98fdbd09789b41b8fe6190b07affd"}}
+  ],
+  "credential": {"env_key": "DEEPSEEK_API_KEY", "presence": "ABSENT", "class": "ABSENT", "value_persisted": false},
+  "disposition": "QUALIFIED_MOCK_LIVE_DEFERRED",
+  "preserved": ["R2 authority-blocked evidence", "sealed candidate c10931a296124bee553aa2a5c2454cc8ceba002286fbb24ca572844cb428c27d", "DS-A01 PASS receipt"]
+}
