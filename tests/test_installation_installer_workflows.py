@@ -3,10 +3,13 @@ from __future__ import annotations
 
 # Historical source: test_alpha11_1_bundled_release.py
 # ---------------------------------------------------------------------------
+
+
 import io
 import importlib
 import json
 import os
+import subprocess
 import tempfile
 import unittest
 from contextlib import redirect_stderr
@@ -28,6 +31,42 @@ m5_EXPECTED_PROFILE_VERSIONS = dict(sorted((m5_RELEASE.get('profileVersions') or
 m5_EXPECTED_PROFILES = sorted(m5_EXPECTED_PROFILE_VERSIONS)
 
 class Alpha111BundledReleaseTests(unittest.TestCase):
+
+    @staticmethod
+    def _predecessor_is_valid(profile, expected_package, expected_version):
+        predecessor = profile.get('predecessor')
+        if not isinstance(predecessor, dict):
+            return False
+        if predecessor.get('package') != expected_package:
+            return False
+        version = predecessor.get('version')
+        if not isinstance(version, str) or not version:
+            return False
+        if version != expected_version:
+            return True
+        candidate = predecessor.get('candidate')
+        if not isinstance(candidate, str) or candidate.count('@') != 1:
+            return False
+        candidate_id, revision = candidate.split('@')
+        if not candidate_id or not revision or not revision.startswith('r') or not revision[1:].isdigit():
+            return False
+        successor_candidate = profile.get('successor_candidate')
+        successor_revision = profile.get('successor_revision')
+        if not isinstance(successor_candidate, str) or not isinstance(successor_revision, str):
+            return False
+        if candidate in {successor_candidate, f'{successor_candidate}@{successor_revision}'}:
+            return False
+        source_package = predecessor.get('source_package')
+        source_prefix = f'packages/{expected_package}-{expected_version}-r'
+        if not isinstance(source_package, str) or not source_package.startswith(source_prefix):
+            return False
+        if source_package[len(source_prefix):] != revision[1:]:
+            return False
+        for field in ('package_root_sha256', 'package_manifest_sha256'):
+            value = predecessor.get(field)
+            if not isinstance(value, str) or len(value) != 64 or any(char not in '0123456789abcdefABCDEF' for char in value):
+                return False
+        return True
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -81,10 +120,28 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
                 self.assertIn('0.1.0-alpha.8', install_doc)
                 self.assertIn('contract dialect', metadata_doc.lower())
                 self.assertEqual(omp_package['version'], expected_version)
-                predecessor = item.profile.get('predecessor', {})
-                self.assertEqual(predecessor.get('package'), item.package_name)
-                self.assertIsInstance(predecessor.get('version'), str)
-                self.assertNotEqual(predecessor.get('version'), expected_version)
+                self.assertTrue(self._predecessor_is_valid(item.profile, item.package_name, expected_version))
+
+    def test_same_version_predecessor_lineage_fails_closed(self):
+        item = self.by_id['codesys']
+        profile = item.profile
+        predecessor = profile['predecessor']
+        self.assertEqual(predecessor['version'], profile['version'])
+        self.assertTrue(self._predecessor_is_valid(profile, item.package_name, item.version))
+        missing = dict(profile)
+        missing.pop('predecessor')
+        self.assertFalse(self._predecessor_is_valid(missing, item.package_name, item.version))
+        for field in ('package', 'version', 'candidate', 'source_package', 'package_root_sha256', 'package_manifest_sha256'):
+            malformed = dict(profile)
+            malformed_predecessor = dict(predecessor)
+            malformed_predecessor[field] = None
+            malformed['predecessor'] = malformed_predecessor
+            self.assertFalse(self._predecessor_is_valid(malformed, item.package_name, item.version), field)
+        self_reference = dict(profile)
+        self_reference_predecessor = dict(predecessor)
+        self_reference_predecessor['candidate'] = f"{profile['successor_candidate']}@{profile['successor_revision']}"
+        self_reference['predecessor'] = self_reference_predecessor
+        self.assertFalse(self._predecessor_is_valid(self_reference, item.package_name, item.version))
 
     def test_current_docs_describe_the_declared_profile_set(self):
         combined = "\n".join(
@@ -111,6 +168,60 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
                 self.assertIn('function explicitCommand(value)', extension)
                 self.assertIn('.endsWith(".py")', extension)
                 self.assertIn('return pythonCommand(path.resolve(value))', extension)
+
+    def test_all_omp_python_children_share_the_direct_runtime_contract(self):
+        extension = (m5_ROOT / 'omp' / 'extension' / 'index.js').read_text(encoding='utf-8')
+        self.assertIn('C:\\\\Python313\\\\python.exe', extension)
+        self.assertIn('normalizedFsPath(selected) !== normalizedFsPath("C:\\\\Python313\\\\python.exe")', extension)
+        self.assertIn('BBK direct Python invariant requires C:\\\\Python313\\\\python.exe; got ${selected}', extension)
+        self.assertIn('function qualifiedPythonPath()', extension)
+        self.assertIn('requires an explicit qualified PYTHONPATH', extension)
+        self.assertIn('return ["-B", "-X", "utf8", script]', extension)
+        self.assertIn('PYTHONDONTWRITEBYTECODE: "1"', extension)
+        self.assertIn('PYTHONNOUSERSITE: "1"', extension)
+        self.assertIn('PYTHONPATH: qualifiedPath', extension)
+        self.assertEqual(3, extension.count('spawn(pythonCommand(),'))
+        self.assertIn('...scriptPrefix(targetRoutingCliPath)', extension)
+        self.assertIn('...scriptPrefix(script)', extension)
+        self.assertIn('...commandPrefix()', extension)
+        self.assertIn('function runQualifiedTask(request, projectRoot, signal)', extension)
+        self.assertIn('qualifiedTaskPath,', extension)
+        self.assertNotIn('["-3", "-X", "utf8"', extension)
+
+    def test_global_python_launch_inventory_has_no_unclassified_release_constructor(self):
+        governed = {
+            'tools/install.py': ('sys.executable,', 'py -3 -X utf8', '"${BBK_PYTHON:-python3}" -X utf8'),
+            'tools/omp_model_routing.py': ('sys.executable,', '"-S",\n            "-X"'),
+            'tools/update_omp.py': ('sys.executable, "-X", "utf8"',),
+            'tools/run_tests.py': ('sys.executable, "-B"',),
+            'tools/verify_all.py': ('sys.executable, "tools/run_tests.py"',),
+            'tools/validate_alpha8_fixtures.py': ('[sys.executable,',),
+            'tools/build_release.py': ('sys.executable, "tools/run_tests.py"',),
+            'tools/install_dependencies.py': ('[sys.executable, "-m"',),
+            'tools/bbk.py': ('[str(tool_python), str(Path(__file__).resolve())',),
+            'tests/_fake_executable.py': ('"{sys.executable}" -S -X utf8',),
+        }
+        for relative, forbidden in governed.items():
+            source = (m5_ROOT / relative).read_text(encoding='utf-8')
+            for fragment in forbidden:
+                self.assertNotIn(fragment, source, f'unclassified launch producer: {relative}: {fragment}')
+        helper = (m5_ROOT / 'tools' / 'runtime_requirements.py').read_text(encoding='utf-8')
+        for fragment in ('DIRECT_PYTHON_WINDOWS', 'python_command', 'python_environment', 'normalize_python_command'):
+            self.assertIn(fragment, helper)
+
+    def test_generated_and_fake_launchers_are_fail_closed(self):
+        name, content = install.launcher(m5_ROOT)
+        self.assertEqual(name, 'bbk.cmd' if os.name == 'nt' else 'bbk')
+        text = content.decode('utf-8')
+        self.assertIn('-B -X utf8', text)
+        self.assertIn('PYTHONDONTWRITEBYTECODE', text)
+        self.assertIn('PYTHONNOUSERSITE', text)
+        self.assertIn('BBK_QUALIFIED_PYTHONPATH', text)
+        self.assertNotIn('py -3 -X utf8', text)
+        fake = (m5_ROOT / 'tests' / '_fake_executable.py').read_text(encoding='utf-8')
+        self.assertIn('direct_python_executable()', fake)
+        self.assertIn('-B -S -X utf8', fake)
+
 
     def test_python_profile_accepts_compatible_successor_core(self):
         item = self.by_id['python']
@@ -218,3 +329,95 @@ class Alpha111BundledReleaseTests(unittest.TestCase):
             self.assertIn(expected, combined)
 
 # ---------------------------------------------------------------------------
+
+
+class GlobalPythonLaunchInvariantTests(unittest.TestCase):
+
+    def test_canonical_constructor_preserves_argv_and_external_roots(self):
+        from runtime_requirements import python_command, python_environment
+
+        qualified = os.pathsep.join((str(m5_ROOT), str(m5_TOOLS), r'C:\Users\Tombstone\.cache\bbk\tooling\jsonschema-4.25.1\Lib\site-packages'))
+        source_env = {
+            'PYTHONPATH': qualified,
+            'TEMP': r'D:\AHR13\WU-S8-01\temp',
+            'TMP': r'D:\AHR13\WU-S8-01\tmp',
+            'TMPDIR': r'D:\AHR13\WU-S8-01\tmp',
+            'BBK_TEST_CACHE_DIR': r'D:\AHR13\WU-S8-01\cache',
+            'BBK_NATIVE_EVIDENCE_ROOT': r'D:\AHR13\WU-S8-01\evidence',
+        }
+        command = python_command(m5_ROOT / 'tools' / 'install.py', '--json')
+        self.assertEqual(command[0].casefold(), r'C:\Python313\python.exe'.casefold())
+        self.assertEqual(command[1:4], ['-B', '-X', 'utf8'])
+        self.assertEqual(command[4], str(m5_ROOT / 'tools' / 'install.py'))
+        environment = python_environment(source_env)
+        self.assertEqual(environment['PYTHONDONTWRITEBYTECODE'], '1')
+        self.assertEqual(environment['PYTHONNOUSERSITE'], '1')
+        self.assertEqual(environment['PYTHONPATH'], qualified)
+        for key in ('TEMP', 'TMP', 'TMPDIR', 'BBK_TEST_CACHE_DIR', 'BBK_NATIVE_EVIDENCE_ROOT'):
+            self.assertEqual(environment[key], source_env[key])
+
+    def test_canonical_constructor_fails_closed_without_runtime_inputs(self):
+        from runtime_requirements import PythonLaunchInvariantError, direct_python_executable, python_environment
+
+        with self.assertRaises(PythonLaunchInvariantError):
+            python_environment({'TEMP': r'D:\AHR13\WU-S8-01\temp'})
+        with mock.patch.dict(os.environ, {'BBK_DIRECT_PYTHON_EXECUTABLE': r'C:\Wrong\python.exe'}, clear=False):
+            with self.assertRaises(PythonLaunchInvariantError):
+                direct_python_executable()
+
+    def test_qualified_closure_fails_closed_on_missing_or_misprojected_roots(self):
+        from runtime_requirements import PythonLaunchInvariantError, python_environment
+
+        managed = r'C:\Users\Tombstone\.cache\bbk\tooling\jsonschema-4.25.1\Lib\site-packages'
+        with self.assertRaises(PythonLaunchInvariantError):
+            python_environment({'PYTHONPATH': os.pathsep.join((str(m5_ROOT), str(m5_TOOLS), r'D:\missing\site-packages'))})
+        with self.assertRaises(PythonLaunchInvariantError):
+            python_environment({'PYTHONPATH': os.pathsep.join((str(m5_TOOLS), str(m5_ROOT), managed))})
+        with self.assertRaises(PythonLaunchInvariantError):
+            python_environment({'PYTHONPATH': os.pathsep.join((str(m5_ROOT), str(m5_TOOLS), str(m5_ROOT), managed))})
+
+    def test_fast_standard_release_descendants_retain_real_import_closure(self):
+        import run_tests
+        import verify_all
+
+        managed = Path(r'C:\Users\Tombstone\.cache\bbk\tooling\jsonschema-4.25.1\Lib\site-packages')
+        qualified = os.pathsep.join((str(m5_ROOT), str(m5_TOOLS), str(managed)))
+        source_env = {
+            'PYTHONPATH': qualified,
+            'BBK_QUALIFIED_PYTHONPATH': qualified,
+            'TEMP': r'D:\AHR13\WU-S9-01\temp',
+            'TMP': r'D:\AHR13\WU-S9-01\tmp',
+            'TMPDIR': r'D:\AHR13\WU-S9-01\tmp',
+            'PYTHONPYCACHEPREFIX': r'D:\AHR13\WU-S9-01\pycache',
+            'BBK_TEST_CACHE_DIR': r'D:\AHR13\WU-S9-01\cache',
+            'BBK_NATIVE_EVIDENCE_ROOT': r'D:\AHR13\WU-S9-01\evidence',
+            'BBK_DIRECT_PYTHON_EXECUTABLE': r'C:\Python313\python.exe',
+            'USERPROFILE': str(Path.home()),
+            'PATH': os.environ.get('PATH', ''),
+        }
+        probe = (
+            'import importlib.metadata, json, os, sys, jsonschema, referencing; '
+            'print(json.dumps({"exe":sys.executable,"argv":sys.argv[1:],'
+            '"pythonpath":os.environ["PYTHONPATH"],"dontwrite":os.environ["PYTHONDONTWRITEBYTECODE"],'
+            '"nousersite":os.environ["PYTHONNOUSERSITE"],"jsonschema":jsonschema.__version__,'
+            '"referencing":importlib.metadata.version("referencing"),"temp":os.environ["TEMP"],'
+            '"tmp":os.environ["TMP"],"tmpdir":os.environ["TMPDIR"]}))'
+        )
+        with mock.patch.dict(os.environ, source_env, clear=True):
+            for profile in ('fast', 'standard', 'release'):
+                for constructor in (run_tests._subprocess_environment, verify_all._subprocess_environment):
+                    environment = constructor()
+                    command = [r'C:\Python313\python.exe', '-B', '-X', 'utf8', '-c', probe]
+                    self.assertEqual(command[0].casefold(), r'c:\python313\python.exe')
+                    self.assertEqual(command[1], '-B')
+                    completed = subprocess.run(command, cwd=Path(r'D:\AHR13\WU-S9-01\cwd'), env=environment, capture_output=True, text=True, check=True)
+                    observed = json.loads(completed.stdout)
+                    self.assertEqual(observed['exe'].casefold(), r'c:\python313\python.exe')
+                    self.assertEqual(observed['jsonschema'], '4.25.1')
+                    self.assertTrue(observed['referencing'])
+                    self.assertEqual(observed['dontwrite'], '1')
+                    self.assertEqual(observed['nousersite'], '1')
+                    self.assertEqual(observed['pythonpath'].split(os.pathsep), [str(m5_ROOT), str(m5_TOOLS), str(managed)])
+                    self.assertEqual(observed['temp'], source_env['TEMP'])
+                    self.assertEqual(observed['tmp'], source_env['TMP'])
+                    self.assertEqual(observed['tmpdir'], source_env['TMPDIR'])

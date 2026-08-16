@@ -133,6 +133,63 @@ class RoleReturnRuntimeTests(unittest.TestCase):
         )
         self.assertEqual(len(candidates), len({os.path.normcase(os.path.abspath(str(item))) for item in candidates}))
 
+    def test_managed_validator_is_imported_in_place_without_python_reexec(self) -> None:
+        managed = self.project / ".bbk" / "tooling" / "jsonschema-4.25.1"
+        executable = managed / "Scripts" / "python.exe"
+        site_packages = managed / "Lib" / "site-packages"
+        executable.parent.mkdir(parents=True)
+        site_packages.joinpath("jsonschema").mkdir(parents=True)
+        site_packages.joinpath("referencing").mkdir(parents=True)
+        executable.write_bytes(b"managed interpreter marker")
+        site_packages.joinpath("jsonschema", "__init__.py").write_text("__version__ = 'test'\n", encoding="utf-8")
+        site_packages.joinpath("referencing", "__init__.py").write_text(
+            "class Resource:\n    @classmethod\n    def from_contents(cls, value): return value\n\nclass Registry:\n    def with_resource(self, *args): return self\n",
+            encoding="utf-8",
+        )
+        previous_path = list(sys.path)
+        previous_modules = {name: sys.modules.pop(name, None) for name in ("jsonschema", "referencing")}
+        before = sorted(path.relative_to(self.project).as_posix() for path in self.project.rglob("*") if path.is_file())
+        try:
+            sys.path[:] = [item for item in previous_path if "site-packages" not in item.lower()]
+            with mock.patch.dict(os.environ, {"BBK_JSONSCHEMA_PYTHON": str(executable), "PYTHONPATH": "ambient-forbidden"}, clear=False):
+                with mock.patch.object(os, "execve", side_effect=AssertionError("managed Python must never be re-execed")):
+                    result = runtime._maybe_reexec_managed_validator(self.project)
+                configured_pythonpath = os.environ["PYTHONPATH"]
+            self.assertEqual("CONFIGURED", result["status"])
+            self.assertEqual([str(site_packages)], result["site_packages"])
+            self.assertEqual(result["pythonpath"], configured_pythonpath)
+            self.assertIn(str(site_packages), result["pythonpath"])
+            self.assertNotIn("ambient-forbidden", result["pythonpath"])
+            self.assertNotIn(str(executable), result["pythonpath"])
+            self.assertEqual(before, sorted(path.relative_to(self.project).as_posix() for path in self.project.rglob("*") if path.is_file()))
+            self.assertEqual([], list(self.project.rglob("*.pyc")))
+        finally:
+            sys.path[:] = previous_path
+            for name, module in previous_modules.items():
+                sys.modules.pop(name, None)
+                if module is not None:
+                    sys.modules[name] = module
+
+    def test_direct_python_environment_fails_closed_on_wrong_executable(self) -> None:
+        with mock.patch.dict(os.environ, {"BBK_DIRECT_PYTHON_EXECUTABLE": str(self.project / "wrong-python.exe")}, clear=False):
+            with self.assertRaises(runtime.RoleReturnRuntimeError) as raised:
+                runtime._enforce_direct_python_environment()
+        self.assertEqual("ROLE_RETURN_PYTHON_EXECUTABLE_INVALID", raised.exception.code)
+
+    def test_direct_python_environment_records_exact_flags(self) -> None:
+        with mock.patch.dict(
+            os.environ,
+            {
+                "BBK_DIRECT_PYTHON_EXECUTABLE": sys.executable,
+                "PYTHONDONTWRITEBYTECODE": "1",
+                "PYTHONNOUSERSITE": "1",
+            },
+            clear=False,
+        ):
+            runtime._enforce_direct_python_environment()
+        self.assertTrue(sys.flags.dont_write_bytecode)
+        self.assertIn("-B", getattr(sys, "orig_argv", []))
+
     def test_all_role_compact_examples_are_schema_valid(self) -> None:
         _catalog, roles, _entries = runtime.load_package(ROOT)
         jsonschema, registry, _resources, _origins = runtime._validation_registry(ROOT)

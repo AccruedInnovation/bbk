@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib
 import json
 import os
 import re
@@ -81,34 +82,111 @@ def _validator_python_candidates(project_root: str | Path) -> list[Path]:
     return candidates
 
 
-def _maybe_reexec_managed_validator(project_root: str | Path) -> None:
-    """Re-exec under BBK's managed jsonschema environment when needed.
+def _validator_site_packages(candidate: Path) -> list[Path]:
+    """Resolve package roots for a managed interpreter without executing it."""
+    executable = candidate.resolve()
+    prefix = executable.parent.parent if executable.parent.name.lower() in {"scripts", "bin"} else executable.parent
+    version = f"python{sys.version_info.major}.{sys.version_info.minor}"
+    roots = (
+        prefix / "Lib" / "site-packages",
+        prefix / "lib" / version / "site-packages",
+        prefix / "site-packages",
+    )
+    result: list[Path] = []
+    seen: set[str] = set()
+    for root in roots:
+        key = os.path.normcase(os.path.abspath(str(root)))
+        if key in seen or not root.is_dir():
+            continue
+        if not (root / "jsonschema").is_dir() or not (root / "referencing").is_dir():
+            continue
+        seen.add(key)
+        result.append(root)
+    return result
 
-    The hidden-yield hook must never silently skip Draft 2020-12 validation.
-    Re-exec preserves the original argv and emits the same structured result to
-    the JavaScript bridge.  A guard prevents recursive delegation.
+
+def _qualified_pythonpath(project_root: str | Path, site_packages: Path) -> list[Path]:
+    """Return only repository and managed-validator import roots."""
+    project = Path(project_root).expanduser().resolve()
+    roots = [project, project / "tools", Path(__file__).resolve().parents[1], Path(__file__).resolve().parent, site_packages]
+    result: list[Path] = []
+    seen: set[str] = set()
+    for root in roots:
+        try:
+            resolved = root.resolve(strict=True)
+        except OSError:
+            continue
+        key = os.path.normcase(os.path.abspath(str(resolved)))
+        if key not in seen and resolved.is_dir():
+            seen.add(key)
+            result.append(resolved)
+    return result
+
+
+def _enforce_direct_python_environment() -> None:
+    """Fail closed unless the process itself is the qualified direct Python."""
+    configured = os.environ.get("BBK_DIRECT_PYTHON_EXECUTABLE")
+    expected = Path(configured or (r"C:\Python313\python.exe" if os.name == "nt" else sys.executable)).resolve()
+    actual = Path(sys.executable).resolve()
+    if actual != expected:
+        raise RoleReturnRuntimeError(
+            "ROLE_RETURN_PYTHON_EXECUTABLE_INVALID",
+            f"direct interpreter must be {expected}, got {actual}",
+            diagnostics=[{"expected": str(expected), "actual": str(actual)}],
+        )
+    original_argv = list(getattr(sys, "orig_argv", sys.argv))
+    has_b_flag = any(item == "-B" or item.startswith("-B") for item in original_argv)
+    if os.environ.get("PYTHONDONTWRITEBYTECODE") != "1" or not sys.flags.dont_write_bytecode or not has_b_flag:
+        raise RoleReturnRuntimeError(
+            "ROLE_RETURN_PYTHON_BYTECODE_POLICY_INVALID",
+            "direct interpreter must run with -B and PYTHONDONTWRITEBYTECODE=1",
+            diagnostics=[{"argv": original_argv, "dont_write_bytecode": sys.flags.dont_write_bytecode, "has_b_flag": has_b_flag}],
+        )
+    if os.environ.get("PYTHONNOUSERSITE") != "1":
+        raise RoleReturnRuntimeError(
+            "ROLE_RETURN_PYTHON_USER_SITE_POLICY_INVALID",
+            "PYTHONNOUSERSITE=1 is required for the qualified runtime",
+        )
+
+
+def _maybe_reexec_managed_validator(project_root: str | Path) -> dict[str, Any]:
+    """Make managed validator packages importable in-place; never re-exec Python.
+
+    The hidden-yield hook must never skip Draft 2020-12 validation, but nested
+    execution must retain the direct interpreter, ``-B`` argv, and all caller
+    environment roots.  We therefore add the qualified managed site-packages
+    directory to this process rather than dispatching another interpreter.
     """
-    if _validator_runtime_available() or os.environ.get("BBK_ROLE_RETURN_RUNTIME_REEXEC") == "1":
-        return
-    current = Path(sys.executable).resolve()
-    for candidate in _validator_python_candidates(project_root):
+    if _validator_runtime_available():
+        return {"status": "AVAILABLE", "site_packages": [], "pythonpath": os.environ.get("PYTHONPATH", "")}
+    candidates = _validator_python_candidates(project_root)
+    attempted: list[str] = []
+    for candidate in candidates:
         try:
             resolved = candidate.resolve(strict=True)
         except OSError:
             continue
-        if resolved == current or not resolved.is_file():
-            continue
-        environment = dict(os.environ)
-        environment.update({
-            "BBK_ROLE_RETURN_RUNTIME_REEXEC": "1",
-            "PYTHONUTF8": "1",
-            "PYTHONIOENCODING": "utf-8",
-        })
-        argv = [str(resolved), "-X", "utf8", str(Path(__file__).resolve()), *sys.argv[1:]]
-        try:
-            os.execve(str(resolved), argv, environment)
-        except OSError:
-            continue
+        attempted.append(str(resolved))
+        for site_packages in _validator_site_packages(resolved):
+            roots = _qualified_pythonpath(project_root, site_packages)
+            os.environ["PYTHONPATH"] = os.pathsep.join(str(root) for root in roots)
+            for root in reversed(roots):
+                if str(root) not in sys.path:
+                    sys.path.insert(0, str(root))
+            importlib.invalidate_caches()
+            if _validator_runtime_available():
+                return {
+                    "status": "CONFIGURED",
+                    "managed_interpreter": str(resolved),
+                    "site_packages": [str(site_packages)],
+                    "pythonpath": os.environ["PYTHONPATH"],
+                }
+    raise RoleReturnRuntimeError(
+        "ROLE_RETURN_VALIDATOR_UNAVAILABLE",
+        "Draft 2020-12 validator is unavailable in the direct interpreter and no qualified managed site-packages root could be configured",
+        diagnostics=[{"candidates": attempted, "project_root": str(Path(project_root).resolve())}],
+        smallest_next_action="Provide the qualified managed jsonschema package root through the current invocation and retry without changing the direct interpreter.",
+    )
 
 
 class RoleReturnRuntimeError(RuntimeError):
@@ -199,11 +277,18 @@ def _validation_registry(package_root: Path):
         import jsonschema
         from referencing import Registry, Resource
     except ImportError as exc:  # pragma: no cover - exercised in installed-host tests
-        raise RoleReturnRuntimeError(
-            "ROLE_RETURN_VALIDATOR_UNAVAILABLE",
-            f"Draft 2020-12 validator is unavailable: {exc}",
-            smallest_next_action="Use the BBK-managed jsonschema environment and retry; do not bypass yield validation.",
-        ) from exc
+        try:
+            _maybe_reexec_managed_validator(package_root)
+            import jsonschema
+            from referencing import Registry, Resource
+        except RoleReturnRuntimeError:
+            raise
+        except ImportError as configured_exc:
+            raise RoleReturnRuntimeError(
+                "ROLE_RETURN_VALIDATOR_UNAVAILABLE",
+                f"Draft 2020-12 validator is unavailable: {configured_exc}",
+                smallest_next_action="Use the BBK-managed jsonschema environment and retry; do not bypass yield validation.",
+            ) from exc
     resources: dict[str, Any] = {}
     origins: dict[str, str] = {}
     for schema_path in sorted((package_root / "spec" / "schemas").rglob("*.json"), key=lambda p: p.as_posix()):
@@ -908,8 +993,9 @@ def _parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
-    _maybe_reexec_managed_validator(args.root)
     try:
+        _enforce_direct_python_environment()
+        _maybe_reexec_managed_validator(args.root)
         result = execute(
             _project_root(args.root),
             _package_root(args.package_root),

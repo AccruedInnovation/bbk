@@ -245,8 +245,8 @@
       },
       {
         "path": "spec/prompt-modules/bbk-prompt-host-capability-truth.json",
-        "bytes": 1187,
-        "sha256": "38a66a3ff7321071cdf8f7a1e9557168b391ef0bf087e969807f4c6951f4261c"
+        "bytes": 1740,
+        "sha256": "2e8499f50b2401846c0b2f7b947691e4f111b41fc3e7b9210028339b328dfacc"
       },
       {
         "path": "spec/prompt-modules/bbk-prompt-execution-autonomy.json",

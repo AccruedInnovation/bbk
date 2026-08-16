@@ -404,6 +404,10 @@ class Alpha101EntrySetupTests(unittest.TestCase):
             )
             report_path = root.parent / f'{root.name}-timing.json'
             cache_path = root.parent / f'{root.name}-durations.json'
+            attempt = root.parent / f'{root.name}-attempt'
+            for name in ('evidence', 'temp', 'cache', 'pycache'):
+                (attempt / name).mkdir(parents=True)
+            qualified = os.pathsep.join((str(m4_ROOT), str(m4_ROOT / 'tools'), r'C:\Users\Tombstone\.cache\bbk\tooling\jsonschema-4.25.1\Lib\site-packages'))
             try:
                 with mock.patch.object(run_tests, 'ROOT', root), mock.patch.object(
                     run_tests, 'TESTS', tests
@@ -416,6 +420,17 @@ class Alpha101EntrySetupTests(unittest.TestCase):
                     {
                         'BBK_TEST_PROFILE': 'prior-profile',
                         'BBK_EXTERNAL_SCHEMA': 'prior-schema',
+                        'BBK_LAUNCH_RECORD_ROOT': str(attempt / 'evidence'),
+                        'BBK_NATIVE_EVIDENCE_ROOT': str(attempt / 'evidence'),
+                        'BBK_TEST_CACHE_DIR': str(attempt / 'cache'),
+                        'TEMP': str(attempt / 'temp'),
+                        'TMP': str(attempt / 'temp'),
+                        'TMPDIR': str(attempt / 'temp'),
+                        'PYTHONPYCACHEPREFIX': str(attempt / 'pycache'),
+                        'PYTHONPATH': qualified,
+                        'BBK_QUALIFIED_PYTHONPATH': qualified,
+                        'PYTHONDONTWRITEBYTECODE': '1',
+                        'PYTHONNOUSERSITE': '1',
                     },
                     clear=False,
                 ):

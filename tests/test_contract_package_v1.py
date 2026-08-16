@@ -524,6 +524,7 @@ class ContractPackageV1Tests(unittest.TestCase):
             [sys.executable, "-S", "tools/validate_contract_package.py", "--check", "--require-jsonschema"],
             cwd=ROOT, check=False, text=True, encoding="utf-8", errors="replace",
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=60,
+            env={**os.environ, "PYTHONPATH": "", "BBK_QUALIFIED_PYTHONPATH": "", "PYTHONNOUSERSITE": "1"},
         )
         self.assertNotEqual(required.returncode, 0)
         self.assertIn("jsonschema and referencing are required", required.stdout + required.stderr)

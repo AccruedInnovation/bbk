@@ -97,6 +97,10 @@ class MinimumCeremonyTests(unittest.TestCase):
         wayfind = method["skills"]["bbk-wayfind"]
         artifact = method["skills"]["bbk-artifact"]
         self.assertIn("exactly one compact `bbk_worker`", controller)
+        self.assertIn("## Select one proportional route", controller)
+        self.assertIn("Use Level 0 first", controller)
+        self.assertNotIn("For every non-trivial governed request", controller)
+        self.assertNotIn("Absence of a `.bbk` directory", controller)
         self.assertIn("controller-owned path de-escalates", wayfind)
         self.assertIn("does not require finalize or freshness", artifact)
         for path in (

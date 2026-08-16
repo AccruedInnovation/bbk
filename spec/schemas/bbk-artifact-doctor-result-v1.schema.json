@@ -1,0 +1,227 @@
+{
+  "$defs": {
+    "capability": {
+      "additionalProperties": false,
+      "properties": {
+        "observation": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "probe": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "status": {
+          "enum": [
+            "PASS",
+            "CONFLICT",
+            "SHARING_RETRYABLE",
+            "UNSUPPORTED",
+            "AMBIGUOUS",
+            "FAILED"
+          ]
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "type": "object"
+    },
+    "cleanup": {
+      "additionalProperties": false,
+      "properties": {
+        "paths": {
+          "items": {
+            "$ref": "#/$defs/path"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "state": {
+          "enum": [
+            "CLEAN",
+            "ROLLED_BACK",
+            "QUARANTINED",
+            "RESIDUALS_RECORDED",
+            "CLEANUP_BLOCKED",
+            "NOT_APPLICABLE"
+          ]
+        }
+      },
+      "required": [
+        "state",
+        "paths"
+      ],
+      "type": "object"
+    },
+    "environment": {
+      "additionalProperties": false,
+      "properties": {
+        "host": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "os": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "python": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "toolVersion": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "volume": {
+          "$ref": "#/$defs/nonEmpty"
+        }
+      },
+      "required": [
+        "host",
+        "os",
+        "volume",
+        "python",
+        "toolVersion"
+      ],
+      "type": "object"
+    },
+    "finding": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "message": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "pointer": {
+          "$ref": "#/$defs/nonEmpty"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "type": "object"
+    },
+    "nonEmpty": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "path": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "$id": "https://bbk.local/schemas/bbk-artifact-doctor-result-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "capabilities": {
+      "additionalProperties": false,
+      "properties": {
+        "atomicReplace": {
+          "$ref": "#/$defs/capability"
+        },
+        "cleanup": {
+          "$ref": "#/$defs/capability"
+        },
+        "directoryFlush": {
+          "$ref": "#/$defs/capability"
+        },
+        "directoryNoReplace": {
+          "$ref": "#/$defs/capability"
+        },
+        "durableFileWrite": {
+          "$ref": "#/$defs/capability"
+        },
+        "fileNoReplace": {
+          "$ref": "#/$defs/capability"
+        },
+        "osLocks": {
+          "$ref": "#/$defs/capability"
+        },
+        "readback": {
+          "$ref": "#/$defs/capability"
+        },
+        "runtime": {
+          "$ref": "#/$defs/capability"
+        },
+        "sameVolume": {
+          "$ref": "#/$defs/capability"
+        },
+        "workspace": {
+          "$ref": "#/$defs/capability"
+        }
+      },
+      "required": [
+        "runtime",
+        "workspace",
+        "sameVolume",
+        "durableFileWrite",
+        "directoryFlush",
+        "atomicReplace",
+        "fileNoReplace",
+        "directoryNoReplace",
+        "osLocks",
+        "readback",
+        "cleanup"
+      ],
+      "type": "object"
+    },
+    "checkedAtUtc": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "claimsNotEstablished": {
+      "items": {
+        "$ref": "#/$defs/nonEmpty"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "cleanup": {
+      "$ref": "#/$defs/cleanup"
+    },
+    "environment": {
+      "$ref": "#/$defs/environment"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/finding"
+      },
+      "type": "array"
+    },
+    "root": {
+      "$ref": "#/$defs/path"
+    },
+    "schema": {
+      "const": "bbk.artifact-doctor-result.v1"
+    },
+    "smallestNextAction": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "status": {
+      "enum": [
+        "PASS",
+        "REJECTED"
+      ]
+    },
+    "targetParent": {
+      "$ref": "#/$defs/path"
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "root",
+    "targetParent",
+    "capabilities",
+    "findings",
+    "cleanup",
+    "claimsNotEstablished",
+    "smallestNextAction"
+  ],
+  "title": "BBK artifact doctor result v1",
+  "type": "object"
+}
+
+

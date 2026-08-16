@@ -1,0 +1,827 @@
+{
+  "$defs": {
+    "cleanup": {
+      "additionalProperties": false,
+      "properties": {
+        "paths": {
+          "items": {
+            "$ref": "#/$defs/path"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "state": {
+          "enum": [
+            "CLEAN",
+            "ROLLED_BACK",
+            "QUARANTINED",
+            "RESIDUALS_RECORDED",
+            "CLEANUP_BLOCKED",
+            "NOT_APPLICABLE"
+          ]
+        }
+      },
+      "required": [
+        "state",
+        "paths"
+      ],
+      "type": "object"
+    },
+    "effect": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "effect": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "status": {
+          "enum": [
+            "ABSENT",
+            "PRESENT",
+            "CONFLICT",
+            "AMBIGUOUS"
+          ]
+        }
+      },
+      "required": [
+        "effect",
+        "path",
+        "status"
+      ],
+      "type": "object"
+    },
+    "event": {
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "properties": {
+            "fromPhase": {
+              "const": "CREATED"
+            },
+            "toPhase": {
+              "const": "DOCTOR_PASSED"
+            }
+          }
+        },
+        {
+          "properties": {
+            "fromPhase": {
+              "const": "DOCTOR_PASSED"
+            },
+            "toPhase": {
+              "const": "LOCKS_HELD"
+            }
+          }
+        },
+        {
+          "properties": {
+            "fromPhase": {
+              "const": "LOCKS_HELD"
+            },
+            "toPhase": {
+              "const": "DRAFT_SNAPSHOTTED"
+            }
+          }
+        },
+        {
+          "properties": {
+            "fromPhase": {
+              "const": "DRAFT_SNAPSHOTTED"
+            },
+            "toPhase": {
+              "const": "STAGE_MATERIALIZED"
+            }
+          }
+        },
+        {
+          "properties": {
+            "fromPhase": {
+              "const": "STAGE_MATERIALIZED"
+            },
+            "toPhase": {
+              "const": "STAGE_VERIFIED"
+            }
+          }
+        },
+        {
+          "properties": {
+            "fromPhase": {
+              "const": "STAGE_VERIFIED"
+            },
+            "toPhase": {
+              "const": "PUBLISH_INTENT_RECORDED"
+            }
+          }
+        },
+        {
+          "properties": {
+            "fromPhase": {
+              "const": "PUBLISH_INTENT_RECORDED"
+            },
+            "toPhase": {
+              "const": "TARGET_PUBLISHED"
+            }
+          }
+        },
+        {
+          "properties": {
+            "fromPhase": {
+              "const": "TARGET_PUBLISHED"
+            },
+            "toPhase": {
+              "const": "TARGET_VERIFIED_INITIAL"
+            }
+          }
+        },
+        {
+          "properties": {
+            "fromPhase": {
+              "const": "TARGET_VERIFIED_INITIAL"
+            },
+            "toPhase": {
+              "const": "RECEIPT_PUBLISHED"
+            }
+          }
+        },
+        {
+          "properties": {
+            "fromPhase": {
+              "const": "RECEIPT_PUBLISHED"
+            },
+            "toPhase": {
+              "const": "RECEIPT_VERIFIED"
+            }
+          }
+        },
+        {
+          "properties": {
+            "fromPhase": {
+              "const": "RECEIPT_VERIFIED"
+            },
+            "toPhase": {
+              "const": "TARGET_VERIFIED_DECISIVE"
+            }
+          }
+        },
+        {
+          "properties": {
+            "fromPhase": {
+              "const": "TARGET_VERIFIED_DECISIVE"
+            },
+            "toPhase": {
+              "const": "CURRENT_PROJECTED"
+            }
+          }
+        },
+        {
+          "properties": {
+            "fromPhase": {
+              "const": "CURRENT_PROJECTED"
+            },
+            "toPhase": {
+              "const": "CURRENT_VERIFIED"
+            }
+          }
+        },
+        {
+          "properties": {
+            "fromPhase": {
+              "const": "CURRENT_VERIFIED"
+            },
+            "toPhase": {
+              "const": "COMPLETED"
+            }
+          }
+        },
+        {
+          "properties": {
+            "fromPhase": {
+              "const": "TARGET_VERIFIED_INITIAL"
+            },
+            "toPhase": {
+              "const": "NON_PUBLISHED"
+            }
+          }
+        },
+        {
+          "properties": {
+            "fromPhase": {
+              "const": "TARGET_VERIFIED_DECISIVE"
+            },
+            "toPhase": {
+              "const": "COMPLETED"
+            }
+          }
+        }
+      ],
+      "properties": {
+        "atUtc": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "effect": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "fromPhase": {
+          "$ref": "#/$defs/phase"
+        },
+        "observation": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "sequence": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "toPhase": {
+          "$ref": "#/$defs/phase"
+        }
+      },
+      "required": [
+        "sequence",
+        "atUtc",
+        "fromPhase",
+        "toPhase",
+        "effect",
+        "observation"
+      ],
+      "type": "object"
+    },
+    "failure": {
+      "additionalProperties": false,
+      "properties": {
+        "affectedPaths": {
+          "items": {
+            "$ref": "#/$defs/path"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "code": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "determinacy": {
+          "enum": [
+            "DETERMINISTIC",
+            "AMBIGUOUS"
+          ]
+        },
+        "effect": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "observation": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "retryReceipt": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "smallestNextAction": {
+          "$ref": "#/$defs/nonEmpty"
+        }
+      },
+      "required": [
+        "code",
+        "determinacy",
+        "effect",
+        "observation",
+        "affectedPaths",
+        "retryReceipt",
+        "smallestNextAction"
+      ],
+      "type": "object"
+    },
+    "identity": {
+      "additionalProperties": false,
+      "properties": {
+        "contentSha256": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/sha256"
+            }
+          ]
+        },
+        "manifestSha256": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/sha256"
+            }
+          ]
+        },
+        "packageId": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/safeId"
+            }
+          ]
+        },
+        "revision": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/nonEmpty"
+            }
+          ]
+        },
+        "treeSha256": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/sha256"
+            }
+          ]
+        }
+      },
+      "required": [
+        "manifestSha256",
+        "contentSha256",
+        "treeSha256",
+        "packageId",
+        "revision"
+      ],
+      "type": "object"
+    },
+    "lock": {
+      "additionalProperties": false,
+      "properties": {
+        "acquired": {
+          "type": "boolean"
+        },
+        "key": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "kind": {
+          "enum": [
+            "PUBLICATION_NAMESPACE",
+            "PACKAGE_ID"
+          ]
+        },
+        "released": {
+          "type": "boolean"
+        },
+        "token": {
+          "$ref": "#/$defs/nonEmpty"
+        }
+      },
+      "required": [
+        "key",
+        "kind",
+        "token",
+        "acquired",
+        "released"
+      ],
+      "type": "object"
+    },
+    "namespaces": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact": {
+          "$ref": "#/$defs/path"
+        },
+        "pointer": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/path"
+            }
+          ]
+        },
+        "publication": {
+          "$ref": "#/$defs/path"
+        },
+        "receipt": {
+          "$ref": "#/$defs/path"
+        },
+        "stage": {
+          "$ref": "#/$defs/path"
+        },
+        "target": {
+          "$ref": "#/$defs/path"
+        },
+        "workspace": {
+          "$ref": "#/$defs/path"
+        }
+      },
+      "required": [
+        "workspace",
+        "artifact",
+        "publication",
+        "stage",
+        "target",
+        "receipt",
+        "pointer"
+      ],
+      "type": "object"
+    },
+    "nonEmpty": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "path": {
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+$",
+      "type": "string"
+    },
+    "phase": {
+      "enum": [
+        "CREATED",
+        "DOCTOR_PASSED",
+        "LOCKS_HELD",
+        "DRAFT_SNAPSHOTTED",
+        "STAGE_MATERIALIZED",
+        "STAGE_VERIFIED",
+        "PUBLISH_INTENT_RECORDED",
+        "TARGET_PUBLISHED",
+        "TARGET_VERIFIED_INITIAL",
+        "RECEIPT_PUBLISHED",
+        "RECEIPT_VERIFIED",
+        "TARGET_VERIFIED_DECISIVE",
+        "CURRENT_PROJECTED",
+        "CURRENT_VERIFIED",
+        "COMPLETED",
+        "NON_PUBLISHED"
+      ],
+      "type": "string"
+    },
+    "profile": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/safeId"
+        },
+        "version": {
+          "$ref": "#/$defs/nonEmpty"
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ],
+      "type": "object"
+    },
+    "retry": {
+      "additionalProperties": false,
+      "properties": {
+        "attempt": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "delayMs": {
+          "enum": [
+            0,
+            25,
+            50,
+            100,
+            200,
+            400
+          ]
+        },
+        "effect": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "observation": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "win32Error": {
+          "enum": [
+            32,
+            33
+          ]
+        }
+      },
+      "required": [
+        "effect",
+        "attempt",
+        "win32Error",
+        "delayMs",
+        "observation"
+      ],
+      "type": "object"
+    },
+    "safeId": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+      "type": "string"
+    },
+    "sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "snapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "fileCount": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "files": {
+          "items": {
+            "$ref": "#/$defs/snapshotFile"
+          },
+          "type": "array"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "required": [
+        "sha256",
+        "bytes",
+        "fileCount",
+        "files"
+      ],
+      "type": "object"
+    },
+    "snapshotFile": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://bbk.local/schemas/bbk-artifact-operation-journal-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "disposition": {
+            "enum": [
+              "RECOVERY_REQUIRED",
+              "CANCELLED_PRESERVED",
+              "PUBLISH_BLOCKED"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "failure",
+          "resumeFromPhase"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "disposition": {
+            "enum": [
+              "COMPLETED",
+              "NON_PUBLISHED"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "failure": {
+            "type": "null"
+          },
+          "resumeFromPhase": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "SEAL"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "phase": {
+            "enum": [
+              "CREATED",
+              "DOCTOR_PASSED",
+              "LOCKS_HELD",
+              "DRAFT_SNAPSHOTTED",
+              "STAGE_MATERIALIZED",
+              "STAGE_VERIFIED",
+              "PUBLISH_INTENT_RECORDED",
+              "TARGET_PUBLISHED",
+              "TARGET_VERIFIED_INITIAL",
+              "NON_PUBLISHED"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "claimsNotEstablished": {
+      "items": {
+        "$ref": "#/$defs/nonEmpty"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "cleanup": {
+      "$ref": "#/$defs/cleanup"
+    },
+    "command": {
+      "enum": [
+        "doctor",
+        "seal",
+        "finalize",
+        "reconcile"
+      ]
+    },
+    "disposition": {
+      "enum": [
+        "ACTIVE",
+        "COMPLETED",
+        "NON_PUBLISHED",
+        "REJECTED",
+        "RECOVERY_REQUIRED",
+        "CONFLICT_REJECTED",
+        "CANCELLED_PRESERVED",
+        "PUBLISH_BLOCKED"
+      ]
+    },
+    "effectsObserved": {
+      "items": {
+        "$ref": "#/$defs/effect"
+      },
+      "type": "array"
+    },
+    "events": {
+      "items": {
+        "$ref": "#/$defs/event"
+      },
+      "type": "array"
+    },
+    "expectedDraftSnapshot": {
+      "$ref": "#/$defs/snapshot"
+    },
+    "expectedIdentity": {
+      "$ref": "#/$defs/identity"
+    },
+    "failure": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/failure"
+        }
+      ]
+    },
+    "locks": {
+      "items": {
+        "$ref": "#/$defs/lock"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "mode": {
+      "enum": [
+        "SEAL",
+        "FINALIZE",
+        "RECONCILE"
+      ]
+    },
+    "namespaces": {
+      "$ref": "#/$defs/namespaces"
+    },
+    "operationId": {
+      "format": "uuid",
+      "type": "string"
+    },
+    "operationToken": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "packageId": {
+      "$ref": "#/$defs/safeId"
+    },
+    "phase": {
+      "enum": [
+        "CREATED",
+        "DOCTOR_PASSED",
+        "LOCKS_HELD",
+        "DRAFT_SNAPSHOTTED",
+        "STAGE_MATERIALIZED",
+        "STAGE_VERIFIED",
+        "PUBLISH_INTENT_RECORDED",
+        "TARGET_PUBLISHED",
+        "TARGET_VERIFIED_INITIAL",
+        "RECEIPT_PUBLISHED",
+        "RECEIPT_VERIFIED",
+        "TARGET_VERIFIED_DECISIVE",
+        "CURRENT_PROJECTED",
+        "CURRENT_VERIFIED",
+        "COMPLETED",
+        "NON_PUBLISHED"
+      ]
+    },
+    "physicalAttempt": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "profile": {
+      "$ref": "#/$defs/profile"
+    },
+    "requestedTarget": {
+      "$ref": "#/$defs/path"
+    },
+    "resumeFromPhase": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/phase"
+        }
+      ]
+    },
+    "retryObservations": {
+      "items": {
+        "$ref": "#/$defs/retry"
+      },
+      "type": "array"
+    },
+    "revision": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "schema": {
+      "const": "bbk.artifact-operation-journal.v1"
+    },
+    "semanticRun": {
+      "$ref": "#/$defs/nonEmpty"
+    }
+  },
+  "required": [
+    "schema",
+    "operationId",
+    "operationToken",
+    "command",
+    "mode",
+    "packageId",
+    "profile",
+    "revision",
+    "namespaces",
+    "requestedTarget",
+    "expectedDraftSnapshot",
+    "expectedIdentity",
+    "locks",
+    "phase",
+    "events",
+    "retryObservations",
+    "effectsObserved",
+    "cleanup",
+    "disposition",
+    "failure",
+    "resumeFromPhase",
+    "claimsNotEstablished"
+  ],
+  "title": "BBK artifact operation journal v1",
+  "type": "object"
+}
+
+

@@ -37,7 +37,7 @@
           "harness": "CLAUDE",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:claude",
             "plan:fd5d055495b131b8e41319d514eee5c001ca9ab7f86cf6fc200b47448abe689e",
@@ -82,7 +82,7 @@
             "estimated_tokens": 22593,
             "utf8_bytes": 90452
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_architect",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -121,7 +121,7 @@
           "harness": "CODEX",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:codex",
             "plan:a4b955c99ef2cf95720abb215b176bd8fda39240ee4aebef6f2a41e2a46ffc4a",
@@ -166,7 +166,7 @@
             "estimated_tokens": 22425,
             "utf8_bytes": 89778
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_architect",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -205,7 +205,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:56694fc7224acb948e1751b80073d055b7139cb2ad8e75668ee38fdfb5ef99d6",
@@ -250,7 +250,7 @@
             "estimated_tokens": 22535,
             "utf8_bytes": 90220
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_architect",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -289,7 +289,7 @@
           "harness": "OMP",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:omp",
             "plan:f9be72245cfabf9968ca69c1613a66358db202e57bdd534bff34c7aa6b5ea69a",
@@ -334,7 +334,7 @@
             "estimated_tokens": 22978,
             "utf8_bytes": 91992
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_architect",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -373,7 +373,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:cae208d8df52e663badc6455127f8cb33fbf8ef7f04d7eee1cdff4f2a29c0db2",
@@ -418,7 +418,7 @@
             "estimated_tokens": 22535,
             "utf8_bytes": 90220
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_architect",
           "schema": "bbk.compiled-procedure-manifest.v1"
         }
@@ -1100,7 +1100,7 @@
           "harness": "CLAUDE",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:claude",
             "plan:644d8dadff46657c162de07d8f218b525ba25c46b18c47b21810319abbec0a1d",
@@ -1148,7 +1148,7 @@
             "estimated_tokens": 21711,
             "utf8_bytes": 86917
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_phase_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -1187,7 +1187,7 @@
           "harness": "CODEX",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:codex",
             "plan:df01b3ca457e12e10c1a2103952afc416807b4e5e45eaae12f4e3047602628e7",
@@ -1235,7 +1235,7 @@
             "estimated_tokens": 21492,
             "utf8_bytes": 86039
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_phase_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -1274,7 +1274,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:3b73c859a6cb04f5d6968e51c4afb77fb5f89580fbc3a70bce455756b4bf3d58",
@@ -1322,7 +1322,7 @@
             "estimated_tokens": 21628,
             "utf8_bytes": 86584
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_phase_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -1361,7 +1361,7 @@
           "harness": "OMP",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:omp",
             "plan:ac880930b4ac03c5853f9854dad984f1937b2c40cb61dfe657667c0dd230501f",
@@ -1409,7 +1409,7 @@
             "estimated_tokens": 22133,
             "utf8_bytes": 88603
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_phase_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -1448,7 +1448,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:aeb0411df3cfcba24405684f06457ec8a902ca6cde64224440c018b2d4a8b961",
@@ -1496,7 +1496,7 @@
             "estimated_tokens": 21628,
             "utf8_bytes": 86584
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_phase_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         }
@@ -2229,7 +2229,7 @@
           "harness": "CLAUDE",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:claude",
             "plan:da72eb831552d15e68aa1414936f881ead0b05fd3f7225ed422b4d66d56e2de7",
@@ -2277,7 +2277,7 @@
             "estimated_tokens": 20086,
             "utf8_bytes": 80393
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_planning_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -2316,7 +2316,7 @@
           "harness": "CODEX",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:codex",
             "plan:b3a9b8bc323525e50181171e8a19fde0c2833d3447a868451dbb7f5c77dee842",
@@ -2364,7 +2364,7 @@
             "estimated_tokens": 19847,
             "utf8_bytes": 79439
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_planning_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -2403,7 +2403,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:0db75ce1ec8ccdb6c95a610e1fda1e20d8a3dcc83202ddd1220f3ab3d216e073",
@@ -2451,7 +2451,7 @@
             "estimated_tokens": 19994,
             "utf8_bytes": 80026
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_planning_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -2490,7 +2490,7 @@
           "harness": "OMP",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:omp",
             "plan:bb2d578044d93488cb7136dc84a71724db21d27c1bbd19f5f834861d89c1fc1e",
@@ -2538,7 +2538,7 @@
             "estimated_tokens": 20499,
             "utf8_bytes": 82045
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_planning_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -2577,7 +2577,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:ed89ea9c23ba7e89046e2b187a23cb6baefb97ce51bfa75a0a1955fb29ce8bad",
@@ -2625,7 +2625,7 @@
             "estimated_tokens": 19994,
             "utf8_bytes": 80026
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_planning_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         }
@@ -3329,7 +3329,7 @@
           "harness": "CLAUDE",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:claude",
             "plan:45a08a55b658da8995e494a12de11a35f4adc91f0d07aeb30beb0f0ac352da6f",
@@ -3377,7 +3377,7 @@
             "estimated_tokens": 21951,
             "utf8_bytes": 87847
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_prototyper",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -3416,7 +3416,7 @@
           "harness": "CODEX",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:codex",
             "plan:27663964103516034d76bcbbab536e35eb7dc43297fb91fb57b0c892f46ba7a3",
@@ -3464,7 +3464,7 @@
             "estimated_tokens": 21779,
             "utf8_bytes": 87158
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_prototyper",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -3503,7 +3503,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:13499b1967ef04ddd301e874a068887cc1614c4d3fe1dd8261bcea42cc3db971",
@@ -3551,7 +3551,7 @@
             "estimated_tokens": 21878,
             "utf8_bytes": 87556
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_prototyper",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -3559,7 +3559,7 @@
           "catalog_suppression_set": [
             "bbk-prototype"
           ],
-          "compiled_prompt_sha256": "0c9e149d54586c413103a4f2f4219ec235fb1c7a204b6626867bfbfad787753f",
+          "compiled_prompt_sha256": "0661b085bf244ccd63efec7be07631bdf435f4ed2f3750222b52e04901cbe52e",
           "compiled_tail_sha256": "9c94100f66567f74df9ea86c8b4c844fb42eac7e58b69de6de5e5290442a5624",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
@@ -3590,11 +3590,11 @@
           "harness": "OMP",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:omp",
-            "plan:8446439176ee738b4ee9d53b187921313065182030bf6225a628f348efaa5adf",
-            "base:742754ade7aae60b5c8112871a2e393ae9a681ccd7d921198706dd9a51ec8259",
+            "plan:50ca07f6b8e49eff7b13039868c216f4b30b1a749af4f60799e8d5e558278ce0",
+            "base:d8787c215a7145997260b2eb1d07eadd8fd4836fa63cb0b6596731f30244de82",
             "return:31e8f036ad7637c14e128d069d23980e0fa053122e1cbc529e379702c13929de",
             "model:c81dada1b20ff970c34ccdb7724b1778928cc6d2980aae101b1948302f60a349",
             "tools:3bec528eee2d172e648edfb457dc88e4cff15a19393df1b6236780e8d3b6a422",
@@ -3602,7 +3602,7 @@
           ],
           "invocation_id": null,
           "logical_child_id": "projection:omp:bbk_prototyper",
-          "plan_sha256": "8446439176ee738b4ee9d53b187921313065182030bf6225a628f348efaa5adf",
+          "plan_sha256": "50ca07f6b8e49eff7b13039868c216f4b30b1a749af4f60799e8d5e558278ce0",
           "procedures": [
             {
               "catalog_visibility": "SUPPRESSED",
@@ -3634,11 +3634,11 @@
             }
           ],
           "prompt_metrics": {
-            "characters": 89757,
-            "estimated_tokens": 22440,
-            "utf8_bytes": 89801
+            "characters": 90203,
+            "estimated_tokens": 22551,
+            "utf8_bytes": 90247
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_prototyper",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -3677,7 +3677,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:13a3225845f5d0241c6f191fc041861437a4fd62524bebc65751d0cf835d07ff",
@@ -3725,7 +3725,7 @@
             "estimated_tokens": 21878,
             "utf8_bytes": 87556
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_prototyper",
           "schema": "bbk.compiled-procedure-manifest.v1"
         }
@@ -3899,7 +3899,7 @@
             "bbk-prompt-effects-cleanup": "af6b51d2ae4b3e1d32120e2acf674d0806e1ef93a7e2d99fac1a9012316bc66e",
             "bbk-prompt-evidence-lineage": "4bfebba5e9ea2590893e2682b439386b665ce0623ece0df41ded8b790800f8b1",
             "bbk-prompt-handoff-protocol": "c79810ed701e3be0bb7d659d379b5990b5cc9e08754a3fe0aa7fa4ae2ee55643",
-            "bbk-prompt-host-capability-truth": "4eaa78860b6ac4f5a5d335833612d00f698fee779fcd656fd4fa404b941891d8",
+            "bbk-prompt-host-capability-truth": "91636adb73871fbc96be5bfbaaa3493b9638d02a7c63c7e98f6ac1c3180efd83",
             "bbk-prompt-invocation-binding": "3d2d6b4072daa638caebd8c17de3418d3c492d72f382d4cf039a2413eff59e93",
             "bbk-prompt-liveness-recovery": "137ade65f5260f18dcf9fcb8337adc66443bb5301085f4a6f6a1a5a8351c9ceb",
             "bbk-prompt-product-first-proportionality": "2ccd2e6d647fde6a0a07bf9bdc7ac91300ab564a186b82e6a2bcf9bbd0863e14",
@@ -4023,7 +4023,7 @@
           "source_reads_by_compiler": 1
         },
         "omp": {
-          "effective_prompt_sha256": "0c9e149d54586c413103a4f2f4219ec235fb1c7a204b6626867bfbfad787753f",
+          "effective_prompt_sha256": "0661b085bf244ccd63efec7be07631bdf435f4ed2f3750222b52e04901cbe52e",
           "event": "PROMPT_COMPILED",
           "external_catalog_sha256": "4b52982605353c62f77699058bbc8801059d1422b14e6d380a36355f6f68b994",
           "harness": "OMP",
@@ -4133,18 +4133,18 @@
         ],
         "omp": [
           {
-            "end": 68216,
+            "end": 68662,
             "id": "base-prompt",
-            "sha256": "742754ade7aae60b5c8112871a2e393ae9a681ccd7d921198706dd9a51ec8259",
+            "sha256": "d8787c215a7145997260b2eb1d07eadd8fd4836fa63cb0b6596731f30244de82",
             "source": "canonical-role-or-controller",
             "start": 0
           },
           {
-            "end": 89728,
+            "end": 90174,
             "id": "procedure:bbk-prototype",
             "sha256": "53318c5e724b464b44c4b10f4a71a0a4c34d030d68aad7e1b57e7d806fd600ed",
             "source": "shared/skills/bbk-prototype/SKILL.md",
-            "start": 68639
+            "start": 69085
           }
         ],
         "pi": [
@@ -4425,7 +4425,7 @@
           "harness": "CLAUDE",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:claude",
             "plan:57327442ebd0998c54578e675a4fb0c5c5d00803327444f384dec129c3de48ca",
@@ -4466,7 +4466,7 @@
             "estimated_tokens": 15386,
             "utf8_bytes": 61583
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_question_guide",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -4505,7 +4505,7 @@
           "harness": "CODEX",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:codex",
             "plan:f158f9527209d57c52f0ee156fa0f2effd202436a5a3ff45c2e6d639929d7ce7",
@@ -4546,7 +4546,7 @@
             "estimated_tokens": 15250,
             "utf8_bytes": 61042
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_question_guide",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -4585,7 +4585,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:0e1b93ac9c42658459d413a4cef5d31a75cf4c41e04c2aced4874520400e5962",
@@ -4626,7 +4626,7 @@
             "estimated_tokens": 15334,
             "utf8_bytes": 61378
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_question_guide",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -4665,7 +4665,7 @@
           "harness": "OMP",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:omp",
             "plan:020e0cf3fa2deb048ca57dc1ca6b3ff0c4fb4eedc61e50396d28c4a084557740",
@@ -4706,7 +4706,7 @@
             "estimated_tokens": 15878,
             "utf8_bytes": 63553
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_question_guide",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -4745,7 +4745,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:50b6102fb8f81c526d7bfddaded0c1c252e9533dba057c49bfdeab54408f19bc",
@@ -4786,7 +4786,7 @@
             "estimated_tokens": 15334,
             "utf8_bytes": 61378
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_question_guide",
           "schema": "bbk.compiled-procedure-manifest.v1"
         }
@@ -5444,7 +5444,7 @@
           "harness": "CLAUDE",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:claude",
             "plan:46404fbd11f812283bf5f18e96618a4c8e994a4275eb594014351f3072d15b36",
@@ -5486,7 +5486,7 @@
             "estimated_tokens": 15220,
             "utf8_bytes": 60909
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_questioning_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -5525,7 +5525,7 @@
           "harness": "CODEX",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:codex",
             "plan:d409a16251ae0a169566635d7bd0f56ff27b9d00a8b701795ac7d855f77db7f2",
@@ -5567,7 +5567,7 @@
             "estimated_tokens": 15092,
             "utf8_bytes": 60397
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_questioning_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -5606,7 +5606,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:c11c9a869becf2e52def645b0f0b239cc92ddce559afc44dd9d4886734fa389a",
@@ -5648,7 +5648,7 @@
             "estimated_tokens": 15153,
             "utf8_bytes": 60642
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_questioning_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -5687,7 +5687,7 @@
           "harness": "OMP",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:omp",
             "plan:ef30a4342e1b02e5a868bfa95891fbab3fd7a206db68230d15bb47cff515a560",
@@ -5729,7 +5729,7 @@
             "estimated_tokens": 15758,
             "utf8_bytes": 63064
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_questioning_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -5768,7 +5768,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:61b15a8daa613ecf1a4d98cbd4e182c4dc48487ed2bc4982afc8a97d340f1509",
@@ -5810,7 +5810,7 @@
             "estimated_tokens": 15153,
             "utf8_bytes": 60642
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_questioning_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         }
@@ -6435,7 +6435,7 @@
           "harness": "CLAUDE",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:claude",
             "plan:4244e66902a21adcc98d4d3c0e2c05fbb8775769c7b6fc50ca791e0bf27c6c00",
@@ -6477,7 +6477,7 @@
             "estimated_tokens": 14064,
             "utf8_bytes": 56313
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_researcher",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -6516,7 +6516,7 @@
           "harness": "CODEX",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:codex",
             "plan:6e2e7ed7c43e4e90a3beb3a86ec15172c918cb37f22645a6f292a73be1265afc",
@@ -6558,7 +6558,7 @@
             "estimated_tokens": 13953,
             "utf8_bytes": 55872
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_researcher",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -6597,7 +6597,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:f047579286192c0346681c975d043e97fe43410aff0fb30a29ba02df539a3b6e",
@@ -6639,7 +6639,7 @@
             "estimated_tokens": 14006,
             "utf8_bytes": 56081
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_researcher",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -6678,7 +6678,7 @@
           "harness": "OMP",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:omp",
             "plan:9b9d20d814541dc8536f5f833e945f7564cebd76ec357c468fd395e8584be9bc",
@@ -6720,7 +6720,7 @@
             "estimated_tokens": 14449,
             "utf8_bytes": 57853
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_researcher",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -6759,7 +6759,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:0f21a4f0282dd984e869b4eb92290b5a54e72176a82f2a10063c03e7789d9691",
@@ -6801,7 +6801,7 @@
             "estimated_tokens": 14006,
             "utf8_bytes": 56081
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_researcher",
           "schema": "bbk.compiled-procedure-manifest.v1"
         }
@@ -7378,7 +7378,7 @@
           "harness": "CLAUDE",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:claude",
             "plan:71b15098cfa55e11c91f733c9a975677ce1ea19cd7247a034332a12850e7f3d6",
@@ -7428,7 +7428,7 @@
             "estimated_tokens": 20383,
             "utf8_bytes": 81580
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_reviewer",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -7467,7 +7467,7 @@
           "harness": "CODEX",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:codex",
             "plan:689d814d19447f34910edc3b3981cf2003a9ca0456b06866fcdc037d4116975b",
@@ -7517,7 +7517,7 @@
             "estimated_tokens": 20176,
             "utf8_bytes": 80751
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_reviewer",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -7556,7 +7556,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:b8c1862d0bb5ad5b0a299be7418dd3dc3592642e547c57019adcc0710df77c0a",
@@ -7606,7 +7606,7 @@
             "estimated_tokens": 20325,
             "utf8_bytes": 81348
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_reviewer",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -7645,7 +7645,7 @@
           "harness": "OMP",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:omp",
             "plan:28e7491a76d93f2a406949063afd62e264d85c584386b94c39b3d5dc2d340631",
@@ -7695,7 +7695,7 @@
             "estimated_tokens": 20824,
             "utf8_bytes": 83346
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_reviewer",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -7734,7 +7734,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:dc14143a368f62b5aa62e0a9a08a7292703c24e2b638a9c0cfa96a6dafb6caf6",
@@ -7784,7 +7784,7 @@
             "estimated_tokens": 20325,
             "utf8_bytes": 81348
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_reviewer",
           "schema": "bbk.compiled-procedure-manifest.v1"
         }
@@ -8491,7 +8491,7 @@
           "harness": "CLAUDE",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:claude",
             "plan:f1a46d67cb32904effaa290609d3bc77196d452dc9221d1d59c433030cc26ba8",
@@ -8544,7 +8544,7 @@
             "estimated_tokens": 26582,
             "utf8_bytes": 106403
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_root_orchestrator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -8583,7 +8583,7 @@
           "harness": "CODEX",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:codex",
             "plan:69a91eaac1645fdd5532ab19434d967c207653dbf46faf25946c2eaef5295075",
@@ -8636,7 +8636,7 @@
             "estimated_tokens": 26279,
             "utf8_bytes": 105191
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_root_orchestrator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -8675,7 +8675,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:141da50561d34ed45cf004f8199671fe71f15fd862aec5399c411abfa0a1d6ad",
@@ -8728,7 +8728,7 @@
             "estimated_tokens": 26494,
             "utf8_bytes": 106050
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_root_orchestrator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -8736,7 +8736,7 @@
           "catalog_suppression_set": [
             "bbk-root-execution"
           ],
-          "compiled_prompt_sha256": "18c1e81b612dbc6e1c14d023ad5a3015d40ec0aa7736c1752170f9cd6e712154",
+          "compiled_prompt_sha256": "e549d86aca252a2809421ef964af51d0de3f2419551a919863d4d562913c2b5b",
           "compiled_tail_sha256": "7020fd4bb35fabfe76460c0b0492c107fbbcf242aa1bddb6bc6890368ea371e2",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
@@ -8767,11 +8767,11 @@
           "harness": "OMP",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:omp",
-            "plan:3e65c2e5a4fe66ee6b04158f5e3e884483e452348d360c1a0d059980f4533b22",
-            "base:c6e7bad13640413877859567afb54d548d2b0ba5f8f424c2559a7c68375cbdbf",
+            "plan:2bbe57ee40d6e25573e5470cc5f2b94cf44fcfff3c5b93593b631928766deb8f",
+            "base:c4565de3cbedafb4e5b28b675289770bd052bc44ba4221f7fe731e859035b8b6",
             "return:482e9c0c15572f7d74df4481fccbecc5a1053f4e346f18f8a6a2a45793d7e948",
             "model:34420b75cc2106eb7e57d4a073cf33e3ba2cd7e4610c1de45a0cb40e24f9807a",
             "tools:c1ccf572d656cd752f3bf2f026b5abd9d46625a964e5a82e4514d1782d6d627d",
@@ -8779,7 +8779,7 @@
           ],
           "invocation_id": null,
           "logical_child_id": "projection:omp:bbk_root_orchestrator",
-          "plan_sha256": "3e65c2e5a4fe66ee6b04158f5e3e884483e452348d360c1a0d059980f4533b22",
+          "plan_sha256": "2bbe57ee40d6e25573e5470cc5f2b94cf44fcfff3c5b93593b631928766deb8f",
           "procedures": [
             {
               "catalog_visibility": "SUPPRESSED",
@@ -8816,11 +8816,11 @@
             }
           ],
           "prompt_metrics": {
-            "characters": 108219,
-            "estimated_tokens": 27055,
-            "utf8_bytes": 108295
+            "characters": 108665,
+            "estimated_tokens": 27167,
+            "utf8_bytes": 108741
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_root_orchestrator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -8859,7 +8859,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:d3ab0d111d0a0a3749b7dad76ce776e09786368d9edaee4a809657daaa7e205b",
@@ -8912,7 +8912,7 @@
             "estimated_tokens": 26494,
             "utf8_bytes": 106050
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_root_orchestrator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         }
@@ -9096,7 +9096,7 @@
             "bbk-prompt-evidence-lineage": "4bfebba5e9ea2590893e2682b439386b665ce0623ece0df41ded8b790800f8b1",
             "bbk-prompt-execution-autonomy": "06d18cdd0eb3e36db2013a1ce2a26b559c8cd40d6c783cce00e4dacf660ae44d",
             "bbk-prompt-handoff-protocol": "c79810ed701e3be0bb7d659d379b5990b5cc9e08754a3fe0aa7fa4ae2ee55643",
-            "bbk-prompt-host-capability-truth": "4eaa78860b6ac4f5a5d335833612d00f698fee779fcd656fd4fa404b941891d8",
+            "bbk-prompt-host-capability-truth": "91636adb73871fbc96be5bfbaaa3493b9638d02a7c63c7e98f6ac1c3180efd83",
             "bbk-prompt-invocation-binding": "3d2d6b4072daa638caebd8c17de3418d3c492d72f382d4cf039a2413eff59e93",
             "bbk-prompt-liveness-recovery": "137ade65f5260f18dcf9fcb8337adc66443bb5301085f4a6f6a1a5a8351c9ceb",
             "bbk-prompt-mechanical-admission": "5a33eaae39e3c135c080d2c57b57c3ebe9f22944afbe1dfb86919984ec0fed66",
@@ -9232,7 +9232,7 @@
           "source_reads_by_compiler": 1
         },
         "omp": {
-          "effective_prompt_sha256": "18c1e81b612dbc6e1c14d023ad5a3015d40ec0aa7736c1752170f9cd6e712154",
+          "effective_prompt_sha256": "e549d86aca252a2809421ef964af51d0de3f2419551a919863d4d562913c2b5b",
           "event": "PROMPT_COMPILED",
           "external_catalog_sha256": "925cb724c8942b4337934442beaf95703608122e8d82821972902cec17a7e4ed",
           "harness": "OMP",
@@ -9353,18 +9353,18 @@
         ],
         "omp": [
           {
-            "end": 85586,
+            "end": 86032,
             "id": "base-prompt",
-            "sha256": "c6e7bad13640413877859567afb54d548d2b0ba5f8f424c2559a7c68375cbdbf",
+            "sha256": "c4565de3cbedafb4e5b28b675289770bd052bc44ba4221f7fe731e859035b8b6",
             "source": "canonical-role-or-controller",
             "start": 0
           },
           {
-            "end": 108190,
+            "end": 108636,
             "id": "procedure:bbk-root-execution",
             "sha256": "cc33e2854f3f0d2df7f3068e8c7063087db2b543b4c26090b7da7f1b42778381",
             "source": "shared/skills/bbk-root-execution/SKILL.md",
-            "start": 86019
+            "start": 86465
           }
         ],
         "pi": [
@@ -9677,7 +9677,7 @@
           "harness": "CLAUDE",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:claude",
             "plan:5a1d2b3ed14b39444b1cbae3ad54326fea1e69422ae06a801c7005e80ac9c229",
@@ -9742,7 +9742,7 @@
             "estimated_tokens": 19650,
             "utf8_bytes": 78651
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_root_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -9782,7 +9782,7 @@
           "harness": "CODEX",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:codex",
             "plan:502be3ee34cc827fb8ee3d1abb1b2b139ca3cca348dd79a24eab5f03b2677737",
@@ -9847,7 +9847,7 @@
             "estimated_tokens": 19348,
             "utf8_bytes": 77442
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_root_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -9887,7 +9887,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:ba9756343660d6aed6e68942556beab46e18acf73383f1a38a6852ae808fdab2",
@@ -9952,7 +9952,7 @@
             "estimated_tokens": 19524,
             "utf8_bytes": 78148
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_root_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -9992,7 +9992,7 @@
           "harness": "OMP",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:omp",
             "plan:bcbc1416e82767b170f07b7aae84d0ec798151ae4b8a44aaaba0c09cfd7e37d3",
@@ -10057,7 +10057,7 @@
             "estimated_tokens": 20073,
             "utf8_bytes": 80344
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_root_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -10097,7 +10097,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:34e8e954e28855ad809bb11101cf9aa32874b77517b60340d58067bf1513a328",
@@ -10162,7 +10162,7 @@
             "estimated_tokens": 19524,
             "utf8_bytes": 78148
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_root_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         }
@@ -10909,7 +10909,7 @@
           "harness": "CLAUDE",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:claude",
             "plan:48ff6c2d34da2d472fea8270eea559b2c955a4e723cb4a0cc4e9db1a8141b991",
@@ -10952,7 +10952,7 @@
             "estimated_tokens": 15503,
             "utf8_bytes": 62044
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_synthesizer",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -10991,7 +10991,7 @@
           "harness": "CODEX",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:codex",
             "plan:9381d258506b1cc7598a1c82a7c0da0f3b21b9148785a2d2ed09437d782a4629",
@@ -11034,7 +11034,7 @@
             "estimated_tokens": 15373,
             "utf8_bytes": 61524
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_synthesizer",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -11073,7 +11073,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:f919c18ce294f523976d0c3555f4cc1d3bc994938d2343552356a404f98bf374",
@@ -11116,7 +11116,7 @@
             "estimated_tokens": 15445,
             "utf8_bytes": 61812
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_synthesizer",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -11155,7 +11155,7 @@
           "harness": "OMP",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:omp",
             "plan:73b667293c34c416018652000bf474f4ee3c33bb4ef7f932414066994c0ee229",
@@ -11198,7 +11198,7 @@
             "estimated_tokens": 15888,
             "utf8_bytes": 63584
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_synthesizer",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -11237,7 +11237,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:e75c156f4136c8b0d24d10142652c6929300c1c4bd65fff8e532abc8cb2d9af0",
@@ -11280,7 +11280,7 @@
             "estimated_tokens": 15445,
             "utf8_bytes": 61812
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_synthesizer",
           "schema": "bbk.compiled-procedure-manifest.v1"
         }
@@ -11905,7 +11905,7 @@
           "harness": "CLAUDE",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:claude",
             "plan:996b577640102755c3d157b10979b97ae7bd89d795061ccdf2f54a57bcd6ecb4",
@@ -11953,7 +11953,7 @@
             "estimated_tokens": 27641,
             "utf8_bytes": 110649
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_territory_orchestrator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -11992,7 +11992,7 @@
           "harness": "CODEX",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:codex",
             "plan:22cd38ac455d3346bbad989c1a528771914a8d6e6bb2ff02e801d168bbc75195",
@@ -12040,7 +12040,7 @@
             "estimated_tokens": 27356,
             "utf8_bytes": 109511
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_territory_orchestrator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -12079,7 +12079,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:c390a10ac4ea90a500fd48b46a960216cf24e73aee09bf0de4bbe1bdf4551eac",
@@ -12127,7 +12127,7 @@
             "estimated_tokens": 27543,
             "utf8_bytes": 110258
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_territory_orchestrator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -12135,7 +12135,7 @@
           "catalog_suppression_set": [
             "bbk-territory-execution"
           ],
-          "compiled_prompt_sha256": "1061ac19a5ca4994957fd29e92efda64e5ff885a65b706dfd8ce063722af21a0",
+          "compiled_prompt_sha256": "847bd4509eca04dd1c83a65ee1fe3816797cb6b43ea49f42c13729143fb5d0ac",
           "compiled_tail_sha256": "646e106d7d36db58e59488c5fe04588be87e4131b83051f62f82f291da9c47b9",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
@@ -12166,11 +12166,11 @@
           "harness": "OMP",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:omp",
-            "plan:00668f72e34054b7d1c4dc2f20db811b91e51d778f4246b85ff8519f5aa9d9eb",
-            "base:5011be04c7077da84dda9762d8b51a8c2f1825e2e70f60fd7ce819f0f4a8843a",
+            "plan:6c55e4a934379aa9808d62b3ff7c4d6f84f90b7cb170fef1fe366dcbbdb9903d",
+            "base:4a100914379ed96499a424bf1484516e1b0536b4624e76d97bbec123ceb95ccc",
             "return:aa4ef7c9b7e768031a9cbc96535b51b535dd13d4513c85ff195a9254c35b8520",
             "model:8f62b7b3068c99ce0f097696409ffd2add9dae62fe90103603023265d4eb1bc1",
             "tools:23b17f0cbce5c31fe5bb7a030ef16ca2887425aab40d01a8ad86ed6bcf883bfc",
@@ -12178,7 +12178,7 @@
           ],
           "invocation_id": null,
           "logical_child_id": "projection:omp:bbk_territory_orchestrator",
-          "plan_sha256": "00668f72e34054b7d1c4dc2f20db811b91e51d778f4246b85ff8519f5aa9d9eb",
+          "plan_sha256": "6c55e4a934379aa9808d62b3ff7c4d6f84f90b7cb170fef1fe366dcbbdb9903d",
           "procedures": [
             {
               "catalog_visibility": "SUPPRESSED",
@@ -12210,11 +12210,11 @@
             }
           ],
           "prompt_metrics": {
-            "characters": 112415,
-            "estimated_tokens": 28104,
-            "utf8_bytes": 112503
+            "characters": 112861,
+            "estimated_tokens": 28216,
+            "utf8_bytes": 112949
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_territory_orchestrator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -12253,7 +12253,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:74bf51e517b46769a6017b81b2380c8766f24c6921d9e6ae29403913ef6cfc32",
@@ -12301,7 +12301,7 @@
             "estimated_tokens": 27543,
             "utf8_bytes": 110258
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_territory_orchestrator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         }
@@ -12482,7 +12482,7 @@
             "bbk-prompt-delegation-return": "82c7e5d9de252e2603714b207a23a6445dec2d81c20e908a4af528ebf09031e9",
             "bbk-prompt-durable-handoff": "065bfcb48753c7d4c16ace590a9dd0b9b0bd9e53267dfc5c3cd1d1a1c09151ad",
             "bbk-prompt-handoff-protocol": "c79810ed701e3be0bb7d659d379b5990b5cc9e08754a3fe0aa7fa4ae2ee55643",
-            "bbk-prompt-host-capability-truth": "4eaa78860b6ac4f5a5d335833612d00f698fee779fcd656fd4fa404b941891d8",
+            "bbk-prompt-host-capability-truth": "91636adb73871fbc96be5bfbaaa3493b9638d02a7c63c7e98f6ac1c3180efd83",
             "bbk-prompt-invocation-binding": "3d2d6b4072daa638caebd8c17de3418d3c492d72f382d4cf039a2413eff59e93",
             "bbk-prompt-liveness-recovery": "137ade65f5260f18dcf9fcb8337adc66443bb5301085f4a6f6a1a5a8351c9ceb",
             "bbk-prompt-mechanical-admission": "5a33eaae39e3c135c080d2c57b57c3ebe9f22944afbe1dfb86919984ec0fed66",
@@ -12607,7 +12607,7 @@
           "source_reads_by_compiler": 1
         },
         "omp": {
-          "effective_prompt_sha256": "1061ac19a5ca4994957fd29e92efda64e5ff885a65b706dfd8ce063722af21a0",
+          "effective_prompt_sha256": "847bd4509eca04dd1c83a65ee1fe3816797cb6b43ea49f42c13729143fb5d0ac",
           "event": "PROMPT_COMPILED",
           "external_catalog_sha256": "925cb724c8942b4337934442beaf95703608122e8d82821972902cec17a7e4ed",
           "harness": "OMP",
@@ -12725,18 +12725,18 @@
         ],
         "omp": [
           {
-            "end": 85319,
+            "end": 85765,
             "id": "base-prompt",
-            "sha256": "5011be04c7077da84dda9762d8b51a8c2f1825e2e70f60fd7ce819f0f4a8843a",
+            "sha256": "4a100914379ed96499a424bf1484516e1b0536b4624e76d97bbec123ceb95ccc",
             "source": "canonical-role-or-controller",
             "start": 0
           },
           {
-            "end": 112386,
+            "end": 112832,
             "id": "procedure:bbk-territory-execution",
             "sha256": "d9ca7ba65e26c3b9878457e1f2baebe07dfef9bc86c27f166fe0544d8fc67758",
             "source": "shared/skills/bbk-territory-execution/SKILL.md",
-            "start": 85762
+            "start": 86208
           }
         ],
         "pi": [
@@ -13018,7 +13018,7 @@
           "harness": "CLAUDE",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:claude",
             "plan:9c5caa4775342e0c929a5736355cc6d6a88ab7c4337d4e56eea49d7ad7de9ea9",
@@ -13083,7 +13083,7 @@
             "estimated_tokens": 19444,
             "utf8_bytes": 77827
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_territory_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -13123,7 +13123,7 @@
           "harness": "CODEX",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:codex",
             "plan:d2b371ced539aa9880760f7b9f65e086a6ebd65d837ce123cf7c2baba0a21b11",
@@ -13188,7 +13188,7 @@
             "estimated_tokens": 19154,
             "utf8_bytes": 76670
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_territory_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -13228,7 +13228,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:29866417b783cef5e82a7877eadd5a7b977c9222e1fbf067b2a3d648a7a1cf00",
@@ -13293,7 +13293,7 @@
             "estimated_tokens": 19311,
             "utf8_bytes": 77297
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_territory_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -13333,7 +13333,7 @@
           "harness": "OMP",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:omp",
             "plan:38a2901eb0cd3950e26c2c0a0fea84ccbe1cbac19855ce7c650f02f1c7a70cb3",
@@ -13398,7 +13398,7 @@
             "estimated_tokens": 19816,
             "utf8_bytes": 79316
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_territory_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -13438,7 +13438,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:9687525eff4bd1fcb9e1397ae3b79e49740df8f8c3f56dee4fd8b024ec75b1a9",
@@ -13503,7 +13503,7 @@
             "estimated_tokens": 19311,
             "utf8_bytes": 77297
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_territory_wayfinder",
           "schema": "bbk.compiled-procedure-manifest.v1"
         }
@@ -14253,7 +14253,7 @@
           "harness": "CLAUDE",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:claude",
             "plan:f03309a7ef34d22d2ab047905f6e9126809a1dcc28d817253a71365367781dcd",
@@ -14304,7 +14304,7 @@
             "estimated_tokens": 21218,
             "utf8_bytes": 84940
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_validator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -14343,7 +14343,7 @@
           "harness": "CODEX",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:codex",
             "plan:3512d97743157dabfb0e6fcfe0d848d3f1fd57c35220311934d6717b72aa68e2",
@@ -14394,7 +14394,7 @@
             "estimated_tokens": 20991,
             "utf8_bytes": 84032
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_validator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -14433,7 +14433,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:e5e4e0e64e16b1d5fb590a69c35c939428f5f4eb7b67b2bfcf79f080657f88a7",
@@ -14484,7 +14484,7 @@
             "estimated_tokens": 21160,
             "utf8_bytes": 84708
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_validator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -14492,7 +14492,7 @@
           "catalog_suppression_set": [
             "bbk-assertion-validation"
           ],
-          "compiled_prompt_sha256": "713628ffbe89c104fa462ae697b590f401b69d2bc8cba629efc3ebabb65755fa",
+          "compiled_prompt_sha256": "2ff426dd84be8bf5dbb9846c1c25129430cd1912e2eef9f0c5aa5d5c62881766",
           "compiled_tail_sha256": "bd1e7a3cd908670e043dd568e59e969c5f3124e20a806b7d42438dd937268076",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
@@ -14523,11 +14523,11 @@
           "harness": "OMP",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:omp",
-            "plan:8b537121ac5832bc56fe9597a73b378bde6aa1393ec0ffda6f48f793042f48c5",
-            "base:d91a8560887bcc293ef4c8169858ea05cee78744b9cc2162ff78c1b28fcac1bd",
+            "plan:c9330bccfedce4c0c9c2db94f9f190230892fdcf925050a8abf4d197fb37f043",
+            "base:a487491ff36ac8a8f1c29f88d09c04ae0d277956ee4168a4161af3626c49754b",
             "return:422cbc06c3148b1b2c4ce41ab17f0e3d686f71b35b167115e63e474f62d2582f",
             "model:77b15cd7d321f9ccd6d470dfa4cafcd4ea27170d7f4ef8df7875fb01655c0ce4",
             "tools:f9e2d3d29e079c8c6ad280cf016516951051303307e2e37390ee4acad8f0e364",
@@ -14535,7 +14535,7 @@
           ],
           "invocation_id": null,
           "logical_child_id": "projection:omp:bbk_validator",
-          "plan_sha256": "8b537121ac5832bc56fe9597a73b378bde6aa1393ec0ffda6f48f793042f48c5",
+          "plan_sha256": "c9330bccfedce4c0c9c2db94f9f190230892fdcf925050a8abf4d197fb37f043",
           "procedures": [
             {
               "catalog_visibility": "SUPPRESSED",
@@ -14570,11 +14570,11 @@
             }
           ],
           "prompt_metrics": {
-            "characters": 86636,
-            "estimated_tokens": 21659,
-            "utf8_bytes": 86706
+            "characters": 87082,
+            "estimated_tokens": 21771,
+            "utf8_bytes": 87152
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_validator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -14613,7 +14613,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:afbc7f0a1225a84e7e8ebcae437352ecd7da6b96ec47702e4ed1409ca4cbf69f",
@@ -14664,7 +14664,7 @@
             "estimated_tokens": 21160,
             "utf8_bytes": 84708
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_validator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         }
@@ -14851,7 +14851,7 @@
             "bbk-prompt-evidence-receipts": "f674dca8c21057a322d3586db6634252d4cfa3768fb890a5cf429f191f5cd781",
             "bbk-prompt-finding-lifecycle": "b895e7b5cb566ed1ddcd674761e8e9668fac09f2768a5d3e888bee093ceb8000",
             "bbk-prompt-handoff-protocol": "c79810ed701e3be0bb7d659d379b5990b5cc9e08754a3fe0aa7fa4ae2ee55643",
-            "bbk-prompt-host-capability-truth": "4eaa78860b6ac4f5a5d335833612d00f698fee779fcd656fd4fa404b941891d8",
+            "bbk-prompt-host-capability-truth": "91636adb73871fbc96be5bfbaaa3493b9638d02a7c63c7e98f6ac1c3180efd83",
             "bbk-prompt-invocation-binding": "3d2d6b4072daa638caebd8c17de3418d3c492d72f382d4cf039a2413eff59e93",
             "bbk-prompt-liveness-recovery": "137ade65f5260f18dcf9fcb8337adc66443bb5301085f4a6f6a1a5a8351c9ceb",
             "bbk-prompt-mechanical-admission": "5a33eaae39e3c135c080d2c57b57c3ebe9f22944afbe1dfb86919984ec0fed66",
@@ -14980,7 +14980,7 @@
           "source_reads_by_compiler": 1
         },
         "omp": {
-          "effective_prompt_sha256": "713628ffbe89c104fa462ae697b590f401b69d2bc8cba629efc3ebabb65755fa",
+          "effective_prompt_sha256": "2ff426dd84be8bf5dbb9846c1c25129430cd1912e2eef9f0c5aa5d5c62881766",
           "event": "PROMPT_COMPILED",
           "external_catalog_sha256": "fbeb474a1ecf50c3e466df5975a399dd4e81e26ca222d5bbf4f74fda6f7c9215",
           "harness": "OMP",
@@ -15093,18 +15093,18 @@
         ],
         "omp": [
           {
-            "end": 73615,
+            "end": 74061,
             "id": "base-prompt",
-            "sha256": "d91a8560887bcc293ef4c8169858ea05cee78744b9cc2162ff78c1b28fcac1bd",
+            "sha256": "a487491ff36ac8a8f1c29f88d09c04ae0d277956ee4168a4161af3626c49754b",
             "source": "canonical-role-or-controller",
             "start": 0
           },
           {
-            "end": 86607,
+            "end": 87053,
             "id": "procedure:bbk-assertion-validation",
             "sha256": "089ef9a2410c6aa69b544c09fab6be96c36a7d287f12da0e96df1627f674bfb3",
             "source": "shared/skills/bbk-assertion-validation/SKILL.md",
-            "start": 74060
+            "start": 74506
           }
         ],
         "pi": [
@@ -15405,7 +15405,7 @@
           "harness": "CLAUDE",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:claude",
             "plan:e7e4be6d8043c32cacd40efe508e629bfb4be901696d896c46d924b925774788",
@@ -15458,7 +15458,7 @@
             "estimated_tokens": 25858,
             "utf8_bytes": 103511
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_validator_orchestrator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -15497,7 +15497,7 @@
           "harness": "CODEX",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:codex",
             "plan:94177d106fb8ca35471ed5dd7bf31c895129dcafa6c0aa0521a9b6bb4bfbf932",
@@ -15550,7 +15550,7 @@
             "estimated_tokens": 25619,
             "utf8_bytes": 102555
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_validator_orchestrator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -15589,7 +15589,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:8f1b5c4f86b85efb3a21a3b803fe6ae676d1cb7009d892d8cc82b302538a1e0d",
@@ -15642,7 +15642,7 @@
             "estimated_tokens": 25786,
             "utf8_bytes": 103224
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_validator_orchestrator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -15650,7 +15650,7 @@
           "catalog_suppression_set": [
             "bbk-validation-orchestration"
           ],
-          "compiled_prompt_sha256": "5545502bb0c030094a11c7f2f3996801167d9112422f929b35cac452b4a49a9f",
+          "compiled_prompt_sha256": "10ea7bfcab2d5fdac67fee483f9fedd5f5fcf1de9e9ba1ca3f56cd395c90d306",
           "compiled_tail_sha256": "a62c97ad1e407ccf0c6b0e9dc41cc7d576082bd6eb5d103b061be769add9cf66",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
@@ -15681,11 +15681,11 @@
           "harness": "OMP",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:omp",
-            "plan:bae420d6011f0c07c0a816822858a95b12cfc68483dccc7b360fe5ac7150c9bf",
-            "base:bf0bd7b6ca396f59b8719b4a3c8bbbab9fe75493b036358c0956348ae901a407",
+            "plan:fb1898da6e9b741aba26e7007c47ed8db029be1ad7f6506fa2ca7f22e34d725f",
+            "base:3d63bb604bb89acd1985b318dbd4cec1537026008062252e581cf9477b31037c",
             "return:596e3575b85e2315e28c5f76b51bb2c112f92c46a2a3e61c323de387ff4be3ef",
             "model:e84ef9a72f5b10392e30e7d87046e93b4b875b573dc5dc2f1e995077b517a4d6",
             "tools:ff17f65218712a7b3c11d9747cd6154d6450f481a3ffb45f0a4bd9f937619cf8",
@@ -15693,7 +15693,7 @@
           ],
           "invocation_id": null,
           "logical_child_id": "projection:omp:bbk_validator_orchestrator",
-          "plan_sha256": "bae420d6011f0c07c0a816822858a95b12cfc68483dccc7b360fe5ac7150c9bf",
+          "plan_sha256": "fb1898da6e9b741aba26e7007c47ed8db029be1ad7f6506fa2ca7f22e34d725f",
           "procedures": [
             {
               "catalog_visibility": "SUPPRESSED",
@@ -15730,11 +15730,11 @@
             }
           ],
           "prompt_metrics": {
-            "characters": 105389,
-            "estimated_tokens": 26348,
-            "utf8_bytes": 105469
+            "characters": 105835,
+            "estimated_tokens": 26459,
+            "utf8_bytes": 105915
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_validator_orchestrator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -15773,7 +15773,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:7547a61fb979125e38383963460a49fb73c5fb5826ca3002ab40c6ff5cfaa6ec",
@@ -15826,7 +15826,7 @@
             "estimated_tokens": 25786,
             "utf8_bytes": 103224
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_validator_orchestrator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         }
@@ -16034,7 +16034,7 @@
             "bbk-prompt-evidence-receipts": "f674dca8c21057a322d3586db6634252d4cfa3768fb890a5cf429f191f5cd781",
             "bbk-prompt-finding-lifecycle": "b895e7b5cb566ed1ddcd674761e8e9668fac09f2768a5d3e888bee093ceb8000",
             "bbk-prompt-handoff-protocol": "c79810ed701e3be0bb7d659d379b5990b5cc9e08754a3fe0aa7fa4ae2ee55643",
-            "bbk-prompt-host-capability-truth": "4eaa78860b6ac4f5a5d335833612d00f698fee779fcd656fd4fa404b941891d8",
+            "bbk-prompt-host-capability-truth": "91636adb73871fbc96be5bfbaaa3493b9638d02a7c63c7e98f6ac1c3180efd83",
             "bbk-prompt-invocation-binding": "3d2d6b4072daa638caebd8c17de3418d3c492d72f382d4cf039a2413eff59e93",
             "bbk-prompt-liveness-recovery": "137ade65f5260f18dcf9fcb8337adc66443bb5301085f4a6f6a1a5a8351c9ceb",
             "bbk-prompt-mechanical-admission": "5a33eaae39e3c135c080d2c57b57c3ebe9f22944afbe1dfb86919984ec0fed66",
@@ -16168,7 +16168,7 @@
           "source_reads_by_compiler": 1
         },
         "omp": {
-          "effective_prompt_sha256": "5545502bb0c030094a11c7f2f3996801167d9112422f929b35cac452b4a49a9f",
+          "effective_prompt_sha256": "10ea7bfcab2d5fdac67fee483f9fedd5f5fcf1de9e9ba1ca3f56cd395c90d306",
           "event": "PROMPT_COMPILED",
           "external_catalog_sha256": "52ae48a359e73591008c522ae81778ff8be6f4bde8c7153f20fcea4883f1deaf",
           "harness": "OMP",
@@ -16284,18 +16284,18 @@
         ],
         "omp": [
           {
-            "end": 84491,
+            "end": 84937,
             "id": "base-prompt",
-            "sha256": "bf0bd7b6ca396f59b8719b4a3c8bbbab9fe75493b036358c0956348ae901a407",
+            "sha256": "3d63bb604bb89acd1985b318dbd4cec1537026008062252e581cf9477b31037c",
             "source": "canonical-role-or-controller",
             "start": 0
           },
           {
-            "end": 105360,
+            "end": 105806,
             "id": "procedure:bbk-validation-orchestration",
             "sha256": "a612a7c7925f6c7a5e1f667467e94e6cb6a41b10a7072c38fd25723ce917ae0d",
             "source": "shared/skills/bbk-validation-orchestration/SKILL.md",
-            "start": 84944
+            "start": 85390
           }
         ],
         "pi": [
@@ -16595,7 +16595,7 @@
           "harness": "CLAUDE",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:claude",
             "plan:42185a4903b25cae3b6edb1e576972f5eedf1d67ac20929f0b5f9e51d910ad92",
@@ -16646,7 +16646,7 @@
             "estimated_tokens": 22308,
             "utf8_bytes": 89296
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_verification_designer",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -16685,7 +16685,7 @@
           "harness": "CODEX",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:codex",
             "plan:9ef39b2a9224b9917b6e87c1e5b9a8391dea26d08d185670705b4293d4776d33",
@@ -16736,7 +16736,7 @@
             "estimated_tokens": 22078,
             "utf8_bytes": 88376
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_verification_designer",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -16775,7 +16775,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:0f4067d2d85eded5406c0a731cd27904ba402757e45ed10ddcfa3cc94057ea7e",
@@ -16826,7 +16826,7 @@
             "estimated_tokens": 22250,
             "utf8_bytes": 89064
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_verification_designer",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -16834,7 +16834,7 @@
           "catalog_suppression_set": [
             "bbk-verification-design"
           ],
-          "compiled_prompt_sha256": "69314a82fcddd80e64722efcafb6fd457fce7e86168223fe0caccf482fbac304",
+          "compiled_prompt_sha256": "42d0caa1b5fa56d3d6be3a66d9666674477c1cf3c978fbce8c5f94d34b3d7bdf",
           "compiled_tail_sha256": "603bf6552790395dafd0a471b8c67d263268008610b3b57c3069d49093882258",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
@@ -16865,11 +16865,11 @@
           "harness": "OMP",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:omp",
-            "plan:d8940629d5688b727fa95bee677747e6fb7e0cb46e03553ab61c364fd652ea87",
-            "base:427499c92cfbae04d5a95930096f05442135b3ec1287ecca57ed3376501ec855",
+            "plan:8106fe65bfc8e0d6481e975926a1cad71953e7e85954daf6be9da510c989ab77",
+            "base:350aa36249be04408e9268960a004f4daedfd588a373f1b9619edff82026336b",
             "return:37c7982711ab7618faecddcb2c9bab76fa118a55921e19271ecc55c52d2639cd",
             "model:eb0c75af76eca1860c5196b06133ef6f9ddab245bde41746467471d710eb1288",
             "tools:f9e2d3d29e079c8c6ad280cf016516951051303307e2e37390ee4acad8f0e364",
@@ -16877,7 +16877,7 @@
           ],
           "invocation_id": null,
           "logical_child_id": "projection:omp:bbk_verification_designer",
-          "plan_sha256": "d8940629d5688b727fa95bee677747e6fb7e0cb46e03553ab61c364fd652ea87",
+          "plan_sha256": "8106fe65bfc8e0d6481e975926a1cad71953e7e85954daf6be9da510c989ab77",
           "procedures": [
             {
               "catalog_visibility": "SUPPRESSED",
@@ -16912,11 +16912,11 @@
             }
           ],
           "prompt_metrics": {
-            "characters": 90772,
-            "estimated_tokens": 22693,
-            "utf8_bytes": 90836
+            "characters": 91218,
+            "estimated_tokens": 22805,
+            "utf8_bytes": 91282
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_verification_designer",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -16955,7 +16955,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:a8d70baaf3de187c16a1f2bd41e614a783b1885d0a4642bc4d36eae2761b3245",
@@ -17006,7 +17006,7 @@
             "estimated_tokens": 22250,
             "utf8_bytes": 89064
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_verification_designer",
           "schema": "bbk.compiled-procedure-manifest.v1"
         }
@@ -17186,7 +17186,7 @@
             "bbk-prompt-evidence-receipts": "f674dca8c21057a322d3586db6634252d4cfa3768fb890a5cf429f191f5cd781",
             "bbk-prompt-finding-lifecycle": "b895e7b5cb566ed1ddcd674761e8e9668fac09f2768a5d3e888bee093ceb8000",
             "bbk-prompt-handoff-protocol": "c79810ed701e3be0bb7d659d379b5990b5cc9e08754a3fe0aa7fa4ae2ee55643",
-            "bbk-prompt-host-capability-truth": "4eaa78860b6ac4f5a5d335833612d00f698fee779fcd656fd4fa404b941891d8",
+            "bbk-prompt-host-capability-truth": "91636adb73871fbc96be5bfbaaa3493b9638d02a7c63c7e98f6ac1c3180efd83",
             "bbk-prompt-invocation-binding": "3d2d6b4072daa638caebd8c17de3418d3c492d72f382d4cf039a2413eff59e93",
             "bbk-prompt-mechanical-admission": "5a33eaae39e3c135c080d2c57b57c3ebe9f22944afbe1dfb86919984ec0fed66",
             "bbk-prompt-planning-source-integrity": "25df5a9665c200d84dd69dd6a8418ec9a3451a65f187ca0ec1d3bd2a660a2f88",
@@ -17317,7 +17317,7 @@
           "source_reads_by_compiler": 1
         },
         "omp": {
-          "effective_prompt_sha256": "69314a82fcddd80e64722efcafb6fd457fce7e86168223fe0caccf482fbac304",
+          "effective_prompt_sha256": "42d0caa1b5fa56d3d6be3a66d9666674477c1cf3c978fbce8c5f94d34b3d7bdf",
           "event": "PROMPT_COMPILED",
           "external_catalog_sha256": "a62078ec0936e90591a514f5d03e54c3487f3f0e09e0c5484c73c1ea561ae080",
           "harness": "OMP",
@@ -17430,18 +17430,18 @@
         ],
         "omp": [
           {
-            "end": 70131,
+            "end": 70577,
             "id": "base-prompt",
-            "sha256": "427499c92cfbae04d5a95930096f05442135b3ec1287ecca57ed3376501ec855",
+            "sha256": "350aa36249be04408e9268960a004f4daedfd588a373f1b9619edff82026336b",
             "source": "canonical-role-or-controller",
             "start": 0
           },
           {
-            "end": 90743,
+            "end": 91189,
             "id": "procedure:bbk-verification-design",
             "sha256": "7cea586530e683f73addff403b84989a18ac5660e65b5c6fb69186c9350efb18",
             "source": "shared/skills/bbk-verification-design/SKILL.md",
-            "start": 70574
+            "start": 71020
           }
         ],
         "pi": [
@@ -17749,7 +17749,7 @@
           "harness": "CLAUDE",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:claude",
             "plan:c7d71441b046a29c0e323132f96c2689e57fa5820339f451132c245b6dc5deef",
@@ -17796,7 +17796,7 @@
             "estimated_tokens": 22705,
             "utf8_bytes": 90889
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_worker",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -17835,7 +17835,7 @@
           "harness": "CODEX",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:codex",
             "plan:d5e4200b3bee0f25ef0f464f4693973d52af0c4de2e327d4cd4ba8f1afd379f8",
@@ -17882,7 +17882,7 @@
             "estimated_tokens": 22456,
             "utf8_bytes": 89892
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_worker",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -17921,7 +17921,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:46c5bcfaf7dddfc5ba1c784826caf7285b9a58f3a4fdc30ccd6ff53e487e0608",
@@ -17968,7 +17968,7 @@
             "estimated_tokens": 22647,
             "utf8_bytes": 90657
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_worker",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -17976,7 +17976,7 @@
           "catalog_suppression_set": [
             "bbk-work-unit-execution"
           ],
-          "compiled_prompt_sha256": "bb1ac869dff934878687dc915b5e17e6d684a465673054e08dd09f4cef528ce3",
+          "compiled_prompt_sha256": "0d6c88867bbe8fe481d895dff2420483c9718dffd921cf05c01d86299c2aa019",
           "compiled_tail_sha256": "abc02ab10843af8c215218bbbe55202475d4f483a4ed539716e9d85f2721d448",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
@@ -18007,11 +18007,11 @@
           "harness": "OMP",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:omp",
-            "plan:3e17662b9453a976162acdb6849d33f75770b79b8304a09158c4d66ca76c9028",
-            "base:5e75498666c6778c8ef233bfd005092131c2c24b13ef3a85a2a2e7a0ecc36ea3",
+            "plan:870552e1cf1eaa27299727963868e93b5a40151d2b35da900cd701a5bedbe7fb",
+            "base:c1305669721db4711f9f88f209cf5b4640179ffdfa93d5cda18e516376b10e9f",
             "return:3dcda73b8aea9d35488c65df9a5c46c04f64bcc6e06e8823f632a00ccb164c68",
             "model:c6d714504202fdbe08eabf3cf42eed3803aa51a267fcb6fd466dde7e88b7e938",
             "tools:e48f944167520b4f90401d9a6a0c899f4e7d08b1af86c30f3e80da9fe3c99108",
@@ -18019,7 +18019,7 @@
           ],
           "invocation_id": null,
           "logical_child_id": "projection:omp:bbk_worker",
-          "plan_sha256": "3e17662b9453a976162acdb6849d33f75770b79b8304a09158c4d66ca76c9028",
+          "plan_sha256": "870552e1cf1eaa27299727963868e93b5a40151d2b35da900cd701a5bedbe7fb",
           "procedures": [
             {
               "catalog_visibility": "SUPPRESSED",
@@ -18050,11 +18050,11 @@
             }
           ],
           "prompt_metrics": {
-            "characters": 92585,
-            "estimated_tokens": 23147,
-            "utf8_bytes": 92655
+            "characters": 93031,
+            "estimated_tokens": 23258,
+            "utf8_bytes": 93101
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_worker",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -18093,7 +18093,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:41431397e6798004883525f5f4cc2c769f7b2f125b1eb507cc66529ea595bbf6",
@@ -18140,7 +18140,7 @@
             "estimated_tokens": 22647,
             "utf8_bytes": 90657
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_worker",
           "schema": "bbk.compiled-procedure-manifest.v1"
         }
@@ -18311,7 +18311,7 @@
             "bbk-prompt-effects-cleanup": "af6b51d2ae4b3e1d32120e2acf674d0806e1ef93a7e2d99fac1a9012316bc66e",
             "bbk-prompt-evidence-lineage": "4bfebba5e9ea2590893e2682b439386b665ce0623ece0df41ded8b790800f8b1",
             "bbk-prompt-handoff-protocol": "c79810ed701e3be0bb7d659d379b5990b5cc9e08754a3fe0aa7fa4ae2ee55643",
-            "bbk-prompt-host-capability-truth": "4eaa78860b6ac4f5a5d335833612d00f698fee779fcd656fd4fa404b941891d8",
+            "bbk-prompt-host-capability-truth": "91636adb73871fbc96be5bfbaaa3493b9638d02a7c63c7e98f6ac1c3180efd83",
             "bbk-prompt-invocation-binding": "3d2d6b4072daa638caebd8c17de3418d3c492d72f382d4cf039a2413eff59e93",
             "bbk-prompt-liveness-recovery": "137ade65f5260f18dcf9fcb8337adc66443bb5301085f4a6f6a1a5a8351c9ceb",
             "bbk-prompt-mechanical-admission": "5a33eaae39e3c135c080d2c57b57c3ebe9f22944afbe1dfb86919984ec0fed66",
@@ -18433,7 +18433,7 @@
           "source_reads_by_compiler": 1
         },
         "omp": {
-          "effective_prompt_sha256": "bb1ac869dff934878687dc915b5e17e6d684a465673054e08dd09f4cef528ce3",
+          "effective_prompt_sha256": "0d6c88867bbe8fe481d895dff2420483c9718dffd921cf05c01d86299c2aa019",
           "event": "PROMPT_COMPILED",
           "external_catalog_sha256": "f65c269913ba4134daf10c94b17abf5066b334912eb0726cf87e2fdec1c98550",
           "harness": "OMP",
@@ -18549,18 +18549,18 @@
         ],
         "omp": [
           {
-            "end": 76209,
+            "end": 76655,
             "id": "base-prompt",
-            "sha256": "5e75498666c6778c8ef233bfd005092131c2c24b13ef3a85a2a2e7a0ecc36ea3",
+            "sha256": "c1305669721db4711f9f88f209cf5b4640179ffdfa93d5cda18e516376b10e9f",
             "source": "canonical-role-or-controller",
             "start": 0
           },
           {
-            "end": 92556,
+            "end": 93002,
             "id": "procedure:bbk-work-unit-execution",
             "sha256": "06ba29682e0a8000c9b7181fcb9b776a4c0a3b54d6020021e28360eae5575a40",
             "source": "shared/skills/bbk-work-unit-execution/SKILL.md",
-            "start": 76652
+            "start": 77098
           }
         ],
         "pi": [
@@ -18808,7 +18808,7 @@
           "harness": "CLAUDE",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:claude",
             "plan:73a6fcf39e9b3a7c85ab1450a317c59dbaff02de276b437c7cef803696b5a584",
@@ -18860,7 +18860,7 @@
             "estimated_tokens": 22842,
             "utf8_bytes": 91434
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_worker_designer",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -18899,7 +18899,7 @@
           "harness": "CODEX",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:codex",
             "plan:7c3d05355b0c75e0ab8327bf302911b9d80baa5c91d533ae34917918252d4c3b",
@@ -18951,7 +18951,7 @@
             "estimated_tokens": 22613,
             "utf8_bytes": 90520
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_worker_designer",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -18990,7 +18990,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:d3f70567dd1d9bfb4c8bd7fa4254bbea79bc660731a4a3be5364aa4197fabca3",
@@ -19042,7 +19042,7 @@
             "estimated_tokens": 22784,
             "utf8_bytes": 91202
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_worker_designer",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -19050,7 +19050,7 @@
           "catalog_suppression_set": [
             "bbk-worker-design"
           ],
-          "compiled_prompt_sha256": "958b648674d9e7e3d77c7c91116e33b387d9b56351196260506bcb3bda647e60",
+          "compiled_prompt_sha256": "b8f07003d3213211de69334d0f1fde7307e5a3a805e3b0b8d4ee18f2fa094bfd",
           "compiled_tail_sha256": "03941118d2f08f115616ad5a4b51892e167e9d8cf161b54c098e8bdd64c3da9e",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
@@ -19081,11 +19081,11 @@
           "harness": "OMP",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:omp",
-            "plan:53c39e0a7e89a48a326cc6db2d920b1f75ca9011114e37ae6e92a0e0801129e0",
-            "base:a148859274832e6aa159875c30a0814eb6fe6c8064f234e46d844ccef1242539",
+            "plan:7bd26b8d2ef7c506642b952deec015bc0a2999e1bfe9f9bada3429f143a4dbc7",
+            "base:01af118abcede17139f957649e67206e76517318b7fcada39895efbaa1d926b1",
             "return:24cd01481cb1a49cf7b55d791b93981e5c2ba763892a48d96acc004afbe5d537",
             "model:53601e3f5962905fa574b25195fb8347f275296373ba231a56f9a7ad3f9fffd0",
             "tools:f9e2d3d29e079c8c6ad280cf016516951051303307e2e37390ee4acad8f0e364",
@@ -19093,7 +19093,7 @@
           ],
           "invocation_id": null,
           "logical_child_id": "projection:omp:bbk_worker_designer",
-          "plan_sha256": "53c39e0a7e89a48a326cc6db2d920b1f75ca9011114e37ae6e92a0e0801129e0",
+          "plan_sha256": "7bd26b8d2ef7c506642b952deec015bc0a2999e1bfe9f9bada3429f143a4dbc7",
           "procedures": [
             {
               "catalog_visibility": "SUPPRESSED",
@@ -19129,11 +19129,11 @@
             }
           ],
           "prompt_metrics": {
-            "characters": 93132,
-            "estimated_tokens": 23283,
-            "utf8_bytes": 93200
+            "characters": 93578,
+            "estimated_tokens": 23395,
+            "utf8_bytes": 93646
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_worker_designer",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -19172,7 +19172,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:ffa6e9180d1bca9ad66bc500c069d6be48fa97467fd5e37fbf3a854167ed6604",
@@ -19224,7 +19224,7 @@
             "estimated_tokens": 22784,
             "utf8_bytes": 91202
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_worker_designer",
           "schema": "bbk.compiled-procedure-manifest.v1"
         }
@@ -19393,7 +19393,7 @@
             "bbk-prompt-effects-cleanup": "af6b51d2ae4b3e1d32120e2acf674d0806e1ef93a7e2d99fac1a9012316bc66e",
             "bbk-prompt-execution-autonomy": "06d18cdd0eb3e36db2013a1ce2a26b559c8cd40d6c783cce00e4dacf660ae44d",
             "bbk-prompt-handoff-protocol": "c79810ed701e3be0bb7d659d379b5990b5cc9e08754a3fe0aa7fa4ae2ee55643",
-            "bbk-prompt-host-capability-truth": "4eaa78860b6ac4f5a5d335833612d00f698fee779fcd656fd4fa404b941891d8",
+            "bbk-prompt-host-capability-truth": "91636adb73871fbc96be5bfbaaa3493b9638d02a7c63c7e98f6ac1c3180efd83",
             "bbk-prompt-invocation-binding": "3d2d6b4072daa638caebd8c17de3418d3c492d72f382d4cf039a2413eff59e93",
             "bbk-prompt-liveness-recovery": "137ade65f5260f18dcf9fcb8337adc66443bb5301085f4a6f6a1a5a8351c9ceb",
             "bbk-prompt-mechanical-admission": "5a33eaae39e3c135c080d2c57b57c3ebe9f22944afbe1dfb86919984ec0fed66",
@@ -19528,7 +19528,7 @@
           "source_reads_by_compiler": 1
         },
         "omp": {
-          "effective_prompt_sha256": "958b648674d9e7e3d77c7c91116e33b387d9b56351196260506bcb3bda647e60",
+          "effective_prompt_sha256": "b8f07003d3213211de69334d0f1fde7307e5a3a805e3b0b8d4ee18f2fa094bfd",
           "event": "PROMPT_COMPILED",
           "external_catalog_sha256": "b4d7e10bc8736808a84a954e60b46b96491600ee167088a074fb62e0feaf1b42",
           "harness": "OMP",
@@ -19641,18 +19641,18 @@
         ],
         "omp": [
           {
-            "end": 74322,
+            "end": 74768,
             "id": "base-prompt",
-            "sha256": "a148859274832e6aa159875c30a0814eb6fe6c8064f234e46d844ccef1242539",
+            "sha256": "01af118abcede17139f957649e67206e76517318b7fcada39895efbaa1d926b1",
             "source": "canonical-role-or-controller",
             "start": 0
           },
           {
-            "end": 93103,
+            "end": 93549,
             "id": "procedure:bbk-worker-design",
             "sha256": "9f66e5405caa0181b1eebb4939ed5bfd862ef5a913965683e3cff751a7d02f66",
             "source": "shared/skills/bbk-worker-design/SKILL.md",
-            "start": 74753
+            "start": 75199
           }
         ],
         "pi": [
@@ -19979,7 +19979,7 @@
           "harness": "CLAUDE",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:claude",
             "plan:3caeecf7f0910e674cf8bd296ba48bb87347bd15af95151cbf65c972d2823db1",
@@ -20031,7 +20031,7 @@
             "estimated_tokens": 25932,
             "utf8_bytes": 103785
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_worker_orchestrator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -20070,7 +20070,7 @@
           "harness": "CODEX",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:codex",
             "plan:fddc9c3e23cd6e0415330c76acf0fcf8ace2eedf31d2cd92a0581c7bde4182a1",
@@ -20122,7 +20122,7 @@
             "estimated_tokens": 25672,
             "utf8_bytes": 102745
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_worker_orchestrator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -20161,7 +20161,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:8f5442c20a36d31eeedcdd98735753625d0dcfd32832b64778c9e814cf2dc482",
@@ -20213,7 +20213,7 @@
             "estimated_tokens": 25868,
             "utf8_bytes": 103528
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_worker_orchestrator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -20221,7 +20221,7 @@
           "catalog_suppression_set": [
             "bbk-worker-execution"
           ],
-          "compiled_prompt_sha256": "9f1d1b1bb37f24b61615bbdd8905dd47bc193ea35d980b6d5ca5c00536927331",
+          "compiled_prompt_sha256": "6bbd23e66110894d884e9b8518941f86c708d9660cd5377068359468d62d35d2",
           "compiled_tail_sha256": "b13aa3a16ea9152dffd7563bbd1df39d1b9a5c8394f69ea4408223d509b40dfd",
           "compiler": {
             "id": "bbk.compiled-procedure-compiler",
@@ -20252,11 +20252,11 @@
           "harness": "OMP",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:omp",
-            "plan:b175a9dbdb6317e85ee94a3f2331f899ff59d65fcde85ab998fe2d577da1c536",
-            "base:e7a5ef5790cd1e44d89b126e2271bc6c635c1cfb02ca72ad866ac59dc0b066c7",
+            "plan:36797370f21d02e09f79ea6e5e5b0bed305b8291841a55be0d02c61a3c8832db",
+            "base:99153649a3a544e0774dc1f33443416f7a3da08f60fc7f909391016485d0a7f3",
             "return:da91a6416ad5c34adf6ac1c42f4e99a39fd27b1fa4a7991f45d053f6ba7eff71",
             "model:678dfc79b043c5478f1b946e29e2dade9ce0d59f6e93a47725b418c2e1858f9f",
             "tools:d57030b5f29f45c264fe0883fd732ae8de30a92569856dcaf676bb11fe60c876",
@@ -20264,7 +20264,7 @@
           ],
           "invocation_id": null,
           "logical_child_id": "projection:omp:bbk_worker_orchestrator",
-          "plan_sha256": "b175a9dbdb6317e85ee94a3f2331f899ff59d65fcde85ab998fe2d577da1c536",
+          "plan_sha256": "36797370f21d02e09f79ea6e5e5b0bed305b8291841a55be0d02c61a3c8832db",
           "procedures": [
             {
               "catalog_visibility": "SUPPRESSED",
@@ -20300,11 +20300,11 @@
             }
           ],
           "prompt_metrics": {
-            "characters": 105715,
-            "estimated_tokens": 26429,
-            "utf8_bytes": 105773
+            "characters": 106161,
+            "estimated_tokens": 26541,
+            "utf8_bytes": 106219
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_worker_orchestrator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         },
@@ -20343,7 +20343,7 @@
           "harness": "PI",
           "identity_kind": "ROLE",
           "invalidation_keys": [
-            "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+            "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
             "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
             "harness:pi",
             "plan:06641ba8074594759b30168499961bf39108821ac568cacad62521c9e2192def",
@@ -20395,7 +20395,7 @@
             "estimated_tokens": 25868,
             "utf8_bytes": 103528
           },
-          "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "role": "bbk_worker_orchestrator",
           "schema": "bbk.compiled-procedure-manifest.v1"
         }
@@ -20573,7 +20573,7 @@
             "bbk-prompt-evidence-lineage": "4bfebba5e9ea2590893e2682b439386b665ce0623ece0df41ded8b790800f8b1",
             "bbk-prompt-execution-autonomy": "06d18cdd0eb3e36db2013a1ce2a26b559c8cd40d6c783cce00e4dacf660ae44d",
             "bbk-prompt-handoff-protocol": "c79810ed701e3be0bb7d659d379b5990b5cc9e08754a3fe0aa7fa4ae2ee55643",
-            "bbk-prompt-host-capability-truth": "4eaa78860b6ac4f5a5d335833612d00f698fee779fcd656fd4fa404b941891d8",
+            "bbk-prompt-host-capability-truth": "91636adb73871fbc96be5bfbaaa3493b9638d02a7c63c7e98f6ac1c3180efd83",
             "bbk-prompt-invocation-binding": "3d2d6b4072daa638caebd8c17de3418d3c492d72f382d4cf039a2413eff59e93",
             "bbk-prompt-liveness-recovery": "137ade65f5260f18dcf9fcb8337adc66443bb5301085f4a6f6a1a5a8351c9ceb",
             "bbk-prompt-mechanical-admission": "5a33eaae39e3c135c080d2c57b57c3ebe9f22944afbe1dfb86919984ec0fed66",
@@ -20706,7 +20706,7 @@
           "source_reads_by_compiler": 1
         },
         "omp": {
-          "effective_prompt_sha256": "9f1d1b1bb37f24b61615bbdd8905dd47bc193ea35d980b6d5ca5c00536927331",
+          "effective_prompt_sha256": "6bbd23e66110894d884e9b8518941f86c708d9660cd5377068359468d62d35d2",
           "event": "PROMPT_COMPILED",
           "external_catalog_sha256": "d3091a8520575b3075533a16d5976d0004550a3891bea4b5ae9f9b26b3d6eb76",
           "harness": "OMP",
@@ -20825,18 +20825,18 @@
         ],
         "omp": [
           {
-            "end": 86097,
+            "end": 86543,
             "id": "base-prompt",
-            "sha256": "e7a5ef5790cd1e44d89b126e2271bc6c635c1cfb02ca72ad866ac59dc0b066c7",
+            "sha256": "99153649a3a544e0774dc1f33443416f7a3da08f60fc7f909391016485d0a7f3",
             "source": "canonical-role-or-controller",
             "start": 0
           },
           {
-            "end": 105686,
+            "end": 106132,
             "id": "procedure:bbk-worker-execution",
             "sha256": "1f203dc7cec7f92e72cbaab8ef94b203b236f6205e27636fc6373348f245ff88",
             "source": "shared/skills/bbk-worker-execution/SKILL.md",
-            "start": 86534
+            "start": 86980
           }
         ],
         "pi": [
@@ -21072,8 +21072,8 @@
           "bbk-context-routing",
           "bbk"
         ],
-        "compiled_prompt_sha256": "119795ca90943616ec77222ff1388084415e68f8bc8fa249f3c8b9d2521df351",
-        "compiled_tail_sha256": "1b8f3c72981e2b79d49515e1ddb35d53b790545add489dcadd41768eafccffdf",
+        "compiled_prompt_sha256": "8e3c68de37f4504ab9e7289491a99d6873212b4318c847ea82e5c9e867e2037d",
+        "compiled_tail_sha256": "b25108de9c69c30fcb3fb8a0e1cbb2d7ae06be3755423f2b5b19b14a8b5f1ec4",
         "compiler": {
           "id": "bbk.compiled-procedure-compiler",
           "sha256": "2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
@@ -21103,17 +21103,17 @@
         "harness": "CLAUDE",
         "identity_kind": "CONTROLLER",
         "invalidation_keys": [
-          "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
           "harness:claude",
-          "plan:a40395d83756806a0624373bc20bacb09a8e88f57f82b4c144dc3df928d33476",
-          "base:949219a6996eb28b2ccfb7c60446759b68eb1a551b0c6e08eb16330eb51fc26e",
+          "plan:5d73397ddecd31a14a58937f9dfc7eaef96fbce9aef2a8f7d57bd09a5f909054",
+          "base:67fbcdc9de2de735d9e46886530879982b80b39bc2369e6ec266efcdd2d1997b",
           "tools:bbf031f2eaa84ca5fe29601b8d19e7b582900ccdeae76f4d9fec580b190b9573",
           "adapter:d6dcb13c63e5b05998badc2a67b5ac1c8b99b67bc3b1aee9adaf1667e1967d27"
         ],
         "invocation_id": null,
         "logical_child_id": "projection:claude:bbk_controller",
-        "plan_sha256": "a40395d83756806a0624373bc20bacb09a8e88f57f82b4c144dc3df928d33476",
+        "plan_sha256": "5d73397ddecd31a14a58937f9dfc7eaef96fbce9aef2a8f7d57bd09a5f909054",
         "procedures": [
           {
             "catalog_visibility": "SUPPRESSED",
@@ -21135,6 +21135,7 @@
             "catalog_visibility": "SUPPRESSED",
             "dependencies": [
               "bbk-prompt-authority-completion-vocabulary",
+              "bbk-prompt-host-capability-truth",
               "bbk-prompt-execution-autonomy",
               "bbk-prompt-user-attention",
               "bbk-prompt-baseline-transition",
@@ -21147,22 +21148,22 @@
               "bbk-prompt-effect-ownership",
               "bbk-prompt-coordination-economy"
             ],
-            "effective_sha256": "5fb7f278b86fb595b5827efe294c2a41a29f0bbdde8a52680aff380d236576f0",
+            "effective_sha256": "c6f21d946366f2857694a7eb1573fd7d5f3323fb61590296332792cfa1d92f6d",
             "id": "bbk",
             "ordering": 1,
             "selection_reason": "PRIMARY",
             "source_ref": "shared/skills/bbk/SKILL.md",
-            "source_sha256": "ccf7d7e3ecb1a8714803c1b7fc2377373eab9a07709578df86bc2e4dabe9b1d1",
+            "source_sha256": "9c61115a771b64c57bcb77090e810800276a132d58aae0a2b21571a66fe14c60",
             "state": "COMPILED_COMPLETE",
             "version": "0.1.0-alpha.17.0.2.1"
           }
         ],
         "prompt_metrics": {
-          "characters": 45676,
-          "estimated_tokens": 11419,
-          "utf8_bytes": 45884
+          "characters": 47245,
+          "estimated_tokens": 11812,
+          "utf8_bytes": 47461
         },
-        "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+        "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
         "role": "bbk_controller",
         "schema": "bbk.compiled-procedure-manifest.v1"
       },
@@ -21189,7 +21190,7 @@
         ]
       },
       "event": {
-        "effective_prompt_sha256": "119795ca90943616ec77222ff1388084415e68f8bc8fa249f3c8b9d2521df351",
+        "effective_prompt_sha256": "8e3c68de37f4504ab9e7289491a99d6873212b4318c847ea82e5c9e867e2037d",
         "event": "PROMPT_COMPILED",
         "external_catalog_sha256": "adb50c860aca07380d2ab82cf83915fa2b0c887bf1fb64b88aa9c5c118697f7e",
         "harness": "CLAUDE",
@@ -21209,25 +21210,25 @@
       "file": "bbk_controller.md",
       "source_map": [
         {
-          "end": 35174,
+          "end": 36121,
           "id": "base-prompt",
-          "sha256": "949219a6996eb28b2ccfb7c60446759b68eb1a551b0c6e08eb16330eb51fc26e",
+          "sha256": "67fbcdc9de2de735d9e46886530879982b80b39bc2369e6ec266efcdd2d1997b",
           "source": "canonical-role-or-controller",
           "start": 0
         },
         {
-          "end": 35865,
+          "end": 36812,
           "id": "procedure:bbk-context-routing",
           "sha256": "8884f19c6cc8cc78f7f567d9e7c82960f3787cf32284c3620ce81166b862f84f",
           "source": "shared/skills/bbk-context-routing/SKILL.md",
-          "start": 35671
+          "start": 36618
         },
         {
-          "end": 45647,
+          "end": 47216,
           "id": "procedure:bbk",
-          "sha256": "5fb7f278b86fb595b5827efe294c2a41a29f0bbdde8a52680aff380d236576f0",
+          "sha256": "c6f21d946366f2857694a7eb1573fd7d5f3323fb61590296332792cfa1d92f6d",
           "source": "shared/skills/bbk/SKILL.md",
-          "start": 35906
+          "start": 36853
         }
       ]
     },
@@ -21237,8 +21238,8 @@
           "bbk-context-routing",
           "bbk"
         ],
-        "compiled_prompt_sha256": "1c94c98fff95163ae5fa92eec3d8ab9bc6f34b90abad18e03d7a9c31489cc8d5",
-        "compiled_tail_sha256": "1b8f3c72981e2b79d49515e1ddb35d53b790545add489dcadd41768eafccffdf",
+        "compiled_prompt_sha256": "cc0d6335d2982e5dd8c9f57f6a290f81a8e978ee2296dff1753ac555b20061a7",
+        "compiled_tail_sha256": "b25108de9c69c30fcb3fb8a0e1cbb2d7ae06be3755423f2b5b19b14a8b5f1ec4",
         "compiler": {
           "id": "bbk.compiled-procedure-compiler",
           "sha256": "2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
@@ -21268,17 +21269,17 @@
         "harness": "CODEX",
         "identity_kind": "CONTROLLER",
         "invalidation_keys": [
-          "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
           "harness:codex",
-          "plan:49140b77ba80eb65218fc0088067533961978c8f9f8ab23344e7b9368f2cec24",
-          "base:d980d5b14433f44cb39a091439b6eb85e39a045d124edd596d2b22cfd7ebcb90",
+          "plan:3b8247e4e1781ae7577f9cbe253a8b424435e84428c6ef8b151333ce07ba2cd3",
+          "base:945a3031d54218693991f613844245713d7f54898321c18ccdfef8e12b7a3393",
           "tools:bbf031f2eaa84ca5fe29601b8d19e7b582900ccdeae76f4d9fec580b190b9573",
           "adapter:7d2c19a9fb53c3905aca25b9042af5175226e2469a4fbd72128f9f92b4ef646a"
         ],
         "invocation_id": null,
         "logical_child_id": "projection:codex:bbk_controller",
-        "plan_sha256": "49140b77ba80eb65218fc0088067533961978c8f9f8ab23344e7b9368f2cec24",
+        "plan_sha256": "3b8247e4e1781ae7577f9cbe253a8b424435e84428c6ef8b151333ce07ba2cd3",
         "procedures": [
           {
             "catalog_visibility": "SUPPRESSED",
@@ -21300,6 +21301,7 @@
             "catalog_visibility": "SUPPRESSED",
             "dependencies": [
               "bbk-prompt-authority-completion-vocabulary",
+              "bbk-prompt-host-capability-truth",
               "bbk-prompt-execution-autonomy",
               "bbk-prompt-user-attention",
               "bbk-prompt-baseline-transition",
@@ -21312,22 +21314,22 @@
               "bbk-prompt-effect-ownership",
               "bbk-prompt-coordination-economy"
             ],
-            "effective_sha256": "5fb7f278b86fb595b5827efe294c2a41a29f0bbdde8a52680aff380d236576f0",
+            "effective_sha256": "c6f21d946366f2857694a7eb1573fd7d5f3323fb61590296332792cfa1d92f6d",
             "id": "bbk",
             "ordering": 1,
             "selection_reason": "PRIMARY",
             "source_ref": "shared/skills/bbk/SKILL.md",
-            "source_sha256": "ccf7d7e3ecb1a8714803c1b7fc2377373eab9a07709578df86bc2e4dabe9b1d1",
+            "source_sha256": "9c61115a771b64c57bcb77090e810800276a132d58aae0a2b21571a66fe14c60",
             "state": "COMPILED_COMPLETE",
             "version": "0.1.0-alpha.17.0.2.1"
           }
         ],
         "prompt_metrics": {
-          "characters": 45675,
-          "estimated_tokens": 11419,
-          "utf8_bytes": 45883
+          "characters": 47244,
+          "estimated_tokens": 11811,
+          "utf8_bytes": 47460
         },
-        "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+        "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
         "role": "bbk_controller",
         "schema": "bbk.compiled-procedure-manifest.v1"
       },
@@ -21354,7 +21356,7 @@
         ]
       },
       "event": {
-        "effective_prompt_sha256": "1c94c98fff95163ae5fa92eec3d8ab9bc6f34b90abad18e03d7a9c31489cc8d5",
+        "effective_prompt_sha256": "cc0d6335d2982e5dd8c9f57f6a290f81a8e978ee2296dff1753ac555b20061a7",
         "event": "PROMPT_COMPILED",
         "external_catalog_sha256": "adb50c860aca07380d2ab82cf83915fa2b0c887bf1fb64b88aa9c5c118697f7e",
         "harness": "CODEX",
@@ -21374,25 +21376,25 @@
       "file": "bbk_controller.md",
       "source_map": [
         {
-          "end": 35173,
+          "end": 36120,
           "id": "base-prompt",
-          "sha256": "d980d5b14433f44cb39a091439b6eb85e39a045d124edd596d2b22cfd7ebcb90",
+          "sha256": "945a3031d54218693991f613844245713d7f54898321c18ccdfef8e12b7a3393",
           "source": "canonical-role-or-controller",
           "start": 0
         },
         {
-          "end": 35864,
+          "end": 36811,
           "id": "procedure:bbk-context-routing",
           "sha256": "8884f19c6cc8cc78f7f567d9e7c82960f3787cf32284c3620ce81166b862f84f",
           "source": "shared/skills/bbk-context-routing/SKILL.md",
-          "start": 35670
+          "start": 36617
         },
         {
-          "end": 45646,
+          "end": 47215,
           "id": "procedure:bbk",
-          "sha256": "5fb7f278b86fb595b5827efe294c2a41a29f0bbdde8a52680aff380d236576f0",
+          "sha256": "c6f21d946366f2857694a7eb1573fd7d5f3323fb61590296332792cfa1d92f6d",
           "source": "shared/skills/bbk/SKILL.md",
-          "start": 35905
+          "start": 36852
         }
       ]
     },
@@ -21402,8 +21404,8 @@
           "bbk-context-routing",
           "bbk"
         ],
-        "compiled_prompt_sha256": "bebb02404ad2a9fb427c2e7d111346dd5f90112c2a2249838d2339d94ca2dae9",
-        "compiled_tail_sha256": "1b8f3c72981e2b79d49515e1ddb35d53b790545add489dcadd41768eafccffdf",
+        "compiled_prompt_sha256": "ded0b9e5ecf5f22155a770d67922232b7ba86be450c185a10ed55d46e3cab942",
+        "compiled_tail_sha256": "b25108de9c69c30fcb3fb8a0e1cbb2d7ae06be3755423f2b5b19b14a8b5f1ec4",
         "compiler": {
           "id": "bbk.compiled-procedure-compiler",
           "sha256": "2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
@@ -21433,17 +21435,17 @@
         "harness": "PI",
         "identity_kind": "CONTROLLER",
         "invalidation_keys": [
-          "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
           "harness:pi",
-          "plan:ade6d4cb5ea8bc41e26a7d48e40441246ac33f1e58728687fb8a46d77020e58f",
-          "base:fbf098d3ac190801aef74de8353d99641c124f002cd615e92353999b35c24fa5",
+          "plan:b8309335344ebe93ed83e41bfe76d5e7cf70c0cce55d49e76fba98959953cc75",
+          "base:1725955536e15386cadc9b18c76e40298116ef70f633c21b2aac20eb0129786c",
           "tools:bbf031f2eaa84ca5fe29601b8d19e7b582900ccdeae76f4d9fec580b190b9573",
           "adapter:ca28355760ff23f49347ecb49827dff994647294cea440ec9a6e51cb8f53bde1"
         ],
         "invocation_id": null,
         "logical_child_id": "projection:generic:bbk_controller",
-        "plan_sha256": "ade6d4cb5ea8bc41e26a7d48e40441246ac33f1e58728687fb8a46d77020e58f",
+        "plan_sha256": "b8309335344ebe93ed83e41bfe76d5e7cf70c0cce55d49e76fba98959953cc75",
         "procedures": [
           {
             "catalog_visibility": "SUPPRESSED",
@@ -21465,6 +21467,7 @@
             "catalog_visibility": "SUPPRESSED",
             "dependencies": [
               "bbk-prompt-authority-completion-vocabulary",
+              "bbk-prompt-host-capability-truth",
               "bbk-prompt-execution-autonomy",
               "bbk-prompt-user-attention",
               "bbk-prompt-baseline-transition",
@@ -21477,22 +21480,22 @@
               "bbk-prompt-effect-ownership",
               "bbk-prompt-coordination-economy"
             ],
-            "effective_sha256": "5fb7f278b86fb595b5827efe294c2a41a29f0bbdde8a52680aff380d236576f0",
+            "effective_sha256": "c6f21d946366f2857694a7eb1573fd7d5f3323fb61590296332792cfa1d92f6d",
             "id": "bbk",
             "ordering": 1,
             "selection_reason": "PRIMARY",
             "source_ref": "shared/skills/bbk/SKILL.md",
-            "source_sha256": "ccf7d7e3ecb1a8714803c1b7fc2377373eab9a07709578df86bc2e4dabe9b1d1",
+            "source_sha256": "9c61115a771b64c57bcb77090e810800276a132d58aae0a2b21571a66fe14c60",
             "state": "COMPILED_COMPLETE",
             "version": "0.1.0-alpha.17.0.2.1"
           }
         ],
         "prompt_metrics": {
-          "characters": 45677,
-          "estimated_tokens": 11420,
-          "utf8_bytes": 45885
+          "characters": 47246,
+          "estimated_tokens": 11812,
+          "utf8_bytes": 47462
         },
-        "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+        "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
         "role": "bbk_controller",
         "schema": "bbk.compiled-procedure-manifest.v1"
       },
@@ -21519,7 +21522,7 @@
         ]
       },
       "event": {
-        "effective_prompt_sha256": "bebb02404ad2a9fb427c2e7d111346dd5f90112c2a2249838d2339d94ca2dae9",
+        "effective_prompt_sha256": "ded0b9e5ecf5f22155a770d67922232b7ba86be450c185a10ed55d46e3cab942",
         "event": "PROMPT_COMPILED",
         "external_catalog_sha256": "adb50c860aca07380d2ab82cf83915fa2b0c887bf1fb64b88aa9c5c118697f7e",
         "harness": "PI",
@@ -21539,25 +21542,25 @@
       "file": "bbk_controller.md",
       "source_map": [
         {
-          "end": 35175,
+          "end": 36122,
           "id": "base-prompt",
-          "sha256": "fbf098d3ac190801aef74de8353d99641c124f002cd615e92353999b35c24fa5",
+          "sha256": "1725955536e15386cadc9b18c76e40298116ef70f633c21b2aac20eb0129786c",
           "source": "canonical-role-or-controller",
           "start": 0
         },
         {
-          "end": 35866,
+          "end": 36813,
           "id": "procedure:bbk-context-routing",
           "sha256": "8884f19c6cc8cc78f7f567d9e7c82960f3787cf32284c3620ce81166b862f84f",
           "source": "shared/skills/bbk-context-routing/SKILL.md",
-          "start": 35672
+          "start": 36619
         },
         {
-          "end": 45648,
+          "end": 47217,
           "id": "procedure:bbk",
-          "sha256": "5fb7f278b86fb595b5827efe294c2a41a29f0bbdde8a52680aff380d236576f0",
+          "sha256": "c6f21d946366f2857694a7eb1573fd7d5f3323fb61590296332792cfa1d92f6d",
           "source": "shared/skills/bbk/SKILL.md",
-          "start": 35907
+          "start": 36854
         }
       ]
     },
@@ -21567,8 +21570,8 @@
           "bbk-context-routing",
           "bbk"
         ],
-        "compiled_prompt_sha256": "188eac110121c9895e4a32faf43bc155fd14ae92d292f96556e6cb9a59131222",
-        "compiled_tail_sha256": "1b8f3c72981e2b79d49515e1ddb35d53b790545add489dcadd41768eafccffdf",
+        "compiled_prompt_sha256": "a7ca5fd117b78a24a03ff185ba55d60674e5936f39533fcd2d80d7da7e24ba27",
+        "compiled_tail_sha256": "b25108de9c69c30fcb3fb8a0e1cbb2d7ae06be3755423f2b5b19b14a8b5f1ec4",
         "compiler": {
           "id": "bbk.compiled-procedure-compiler",
           "sha256": "2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
@@ -21598,17 +21601,17 @@
         "harness": "OMP",
         "identity_kind": "CONTROLLER",
         "invalidation_keys": [
-          "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
           "harness:omp",
-          "plan:96982a8ebd4d6325b254c6408bedd5d88136d7c05af70a11e6c9841dadc0e157",
-          "base:a63346d9c4b43d5deef36a0fcb20fafd839e12a12ff9fa30855a9eaf9657f4cb",
+          "plan:33ebe3da2f5565924f2e78b339c2e1e04a8c4577428c3690b0b83802dd25b275",
+          "base:7a280311a1a920817881c3287f834ab6e7533db5c95b75f25e0c216b2b3d7ac9",
           "tools:bbf031f2eaa84ca5fe29601b8d19e7b582900ccdeae76f4d9fec580b190b9573",
           "adapter:e57042d9b068edcd73e50c3972138b4807dd0089fae5b36f5e43c4f8d69353cb"
         ],
         "invocation_id": null,
         "logical_child_id": "projection:omp:bbk_controller",
-        "plan_sha256": "96982a8ebd4d6325b254c6408bedd5d88136d7c05af70a11e6c9841dadc0e157",
+        "plan_sha256": "33ebe3da2f5565924f2e78b339c2e1e04a8c4577428c3690b0b83802dd25b275",
         "procedures": [
           {
             "catalog_visibility": "SUPPRESSED",
@@ -21630,6 +21633,7 @@
             "catalog_visibility": "SUPPRESSED",
             "dependencies": [
               "bbk-prompt-authority-completion-vocabulary",
+              "bbk-prompt-host-capability-truth",
               "bbk-prompt-execution-autonomy",
               "bbk-prompt-user-attention",
               "bbk-prompt-baseline-transition",
@@ -21642,22 +21646,22 @@
               "bbk-prompt-effect-ownership",
               "bbk-prompt-coordination-economy"
             ],
-            "effective_sha256": "5fb7f278b86fb595b5827efe294c2a41a29f0bbdde8a52680aff380d236576f0",
+            "effective_sha256": "c6f21d946366f2857694a7eb1573fd7d5f3323fb61590296332792cfa1d92f6d",
             "id": "bbk",
             "ordering": 1,
             "selection_reason": "PRIMARY",
             "source_ref": "shared/skills/bbk/SKILL.md",
-            "source_sha256": "ccf7d7e3ecb1a8714803c1b7fc2377373eab9a07709578df86bc2e4dabe9b1d1",
+            "source_sha256": "9c61115a771b64c57bcb77090e810800276a132d58aae0a2b21571a66fe14c60",
             "state": "COMPILED_COMPLETE",
             "version": "0.1.0-alpha.17.0.2.1"
           }
         ],
         "prompt_metrics": {
-          "characters": 47464,
-          "estimated_tokens": 11866,
-          "utf8_bytes": 47680
+          "characters": 49508,
+          "estimated_tokens": 12377,
+          "utf8_bytes": 49734
         },
-        "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+        "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
         "role": "bbk_controller",
         "schema": "bbk.compiled-procedure-manifest.v1"
       },
@@ -21684,7 +21688,7 @@
         ]
       },
       "event": {
-        "effective_prompt_sha256": "188eac110121c9895e4a32faf43bc155fd14ae92d292f96556e6cb9a59131222",
+        "effective_prompt_sha256": "a7ca5fd117b78a24a03ff185ba55d60674e5936f39533fcd2d80d7da7e24ba27",
         "event": "PROMPT_COMPILED",
         "external_catalog_sha256": "adb50c860aca07380d2ab82cf83915fa2b0c887bf1fb64b88aa9c5c118697f7e",
         "harness": "OMP",
@@ -21704,25 +21708,25 @@
       "file": "bbk_controller.md",
       "source_map": [
         {
-          "end": 36962,
+          "end": 38384,
           "id": "base-prompt",
-          "sha256": "a63346d9c4b43d5deef36a0fcb20fafd839e12a12ff9fa30855a9eaf9657f4cb",
+          "sha256": "7a280311a1a920817881c3287f834ab6e7533db5c95b75f25e0c216b2b3d7ac9",
           "source": "canonical-role-or-controller",
           "start": 0
         },
         {
-          "end": 37653,
+          "end": 39075,
           "id": "procedure:bbk-context-routing",
           "sha256": "8884f19c6cc8cc78f7f567d9e7c82960f3787cf32284c3620ce81166b862f84f",
           "source": "shared/skills/bbk-context-routing/SKILL.md",
-          "start": 37459
+          "start": 38881
         },
         {
-          "end": 47435,
+          "end": 49479,
           "id": "procedure:bbk",
-          "sha256": "5fb7f278b86fb595b5827efe294c2a41a29f0bbdde8a52680aff380d236576f0",
+          "sha256": "c6f21d946366f2857694a7eb1573fd7d5f3323fb61590296332792cfa1d92f6d",
           "source": "shared/skills/bbk/SKILL.md",
-          "start": 37694
+          "start": 39116
         }
       ]
     },
@@ -21732,8 +21736,8 @@
           "bbk-context-routing",
           "bbk"
         ],
-        "compiled_prompt_sha256": "90b0c21eb70ca398f6fba2a2f41430cf7bb65116508282b1397404a1c773f8f7",
-        "compiled_tail_sha256": "1b8f3c72981e2b79d49515e1ddb35d53b790545add489dcadd41768eafccffdf",
+        "compiled_prompt_sha256": "b813334d53e1ba11e7446163a1fe23f38fef92f56b423b6fe01d73334f2068c4",
+        "compiled_tail_sha256": "b25108de9c69c30fcb3fb8a0e1cbb2d7ae06be3755423f2b5b19b14a8b5f1ec4",
         "compiler": {
           "id": "bbk.compiled-procedure-compiler",
           "sha256": "2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
@@ -21763,17 +21767,17 @@
         "harness": "PI",
         "identity_kind": "CONTROLLER",
         "invalidation_keys": [
-          "registry:b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+          "registry:e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
           "compiler:2571b5aaee76cd03af86f902b9e60a6bccb43a91539a7a97e7411d36ad4649d4",
           "harness:pi",
-          "plan:f5acf36b61a68e135161cc50e8860006ae19258c9a546852c50f5dfca17f8323",
-          "base:ec6c438623e4982815d3bc34e4023cd439bad716059c5255d0c46573375d475b",
+          "plan:04a5d6fbd84209000e38387a09ed0c9ed4bab2c8607729546e1f39e841435718",
+          "base:435c4492f9d6044bff8b1899930cad4130f384fd0869a177d6bc0404d3324a0e",
           "tools:bbf031f2eaa84ca5fe29601b8d19e7b582900ccdeae76f4d9fec580b190b9573",
           "adapter:585b5e6511a23e097b6966eead20307c6559844390c49f13a84c5e5168b2b525"
         ],
         "invocation_id": null,
         "logical_child_id": "projection:pi:bbk_controller",
-        "plan_sha256": "f5acf36b61a68e135161cc50e8860006ae19258c9a546852c50f5dfca17f8323",
+        "plan_sha256": "04a5d6fbd84209000e38387a09ed0c9ed4bab2c8607729546e1f39e841435718",
         "procedures": [
           {
             "catalog_visibility": "SUPPRESSED",
@@ -21795,6 +21799,7 @@
             "catalog_visibility": "SUPPRESSED",
             "dependencies": [
               "bbk-prompt-authority-completion-vocabulary",
+              "bbk-prompt-host-capability-truth",
               "bbk-prompt-execution-autonomy",
               "bbk-prompt-user-attention",
               "bbk-prompt-baseline-transition",
@@ -21807,22 +21812,22 @@
               "bbk-prompt-effect-ownership",
               "bbk-prompt-coordination-economy"
             ],
-            "effective_sha256": "5fb7f278b86fb595b5827efe294c2a41a29f0bbdde8a52680aff380d236576f0",
+            "effective_sha256": "c6f21d946366f2857694a7eb1573fd7d5f3323fb61590296332792cfa1d92f6d",
             "id": "bbk",
             "ordering": 1,
             "selection_reason": "PRIMARY",
             "source_ref": "shared/skills/bbk/SKILL.md",
-            "source_sha256": "ccf7d7e3ecb1a8714803c1b7fc2377373eab9a07709578df86bc2e4dabe9b1d1",
+            "source_sha256": "9c61115a771b64c57bcb77090e810800276a132d58aae0a2b21571a66fe14c60",
             "state": "COMPILED_COMPLETE",
             "version": "0.1.0-alpha.17.0.2.1"
           }
         ],
         "prompt_metrics": {
-          "characters": 45672,
-          "estimated_tokens": 11418,
-          "utf8_bytes": 45880
+          "characters": 47241,
+          "estimated_tokens": 11811,
+          "utf8_bytes": 47457
         },
-        "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+        "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
         "role": "bbk_controller",
         "schema": "bbk.compiled-procedure-manifest.v1"
       },
@@ -21849,7 +21854,7 @@
         ]
       },
       "event": {
-        "effective_prompt_sha256": "90b0c21eb70ca398f6fba2a2f41430cf7bb65116508282b1397404a1c773f8f7",
+        "effective_prompt_sha256": "b813334d53e1ba11e7446163a1fe23f38fef92f56b423b6fe01d73334f2068c4",
         "event": "PROMPT_COMPILED",
         "external_catalog_sha256": "adb50c860aca07380d2ab82cf83915fa2b0c887bf1fb64b88aa9c5c118697f7e",
         "harness": "PI",
@@ -21869,25 +21874,25 @@
       "file": "bbk_controller.md",
       "source_map": [
         {
-          "end": 35170,
+          "end": 36117,
           "id": "base-prompt",
-          "sha256": "ec6c438623e4982815d3bc34e4023cd439bad716059c5255d0c46573375d475b",
+          "sha256": "435c4492f9d6044bff8b1899930cad4130f384fd0869a177d6bc0404d3324a0e",
           "source": "canonical-role-or-controller",
           "start": 0
         },
         {
-          "end": 35861,
+          "end": 36808,
           "id": "procedure:bbk-context-routing",
           "sha256": "8884f19c6cc8cc78f7f567d9e7c82960f3787cf32284c3620ce81166b862f84f",
           "source": "shared/skills/bbk-context-routing/SKILL.md",
-          "start": 35667
+          "start": 36614
         },
         {
-          "end": 45643,
+          "end": 47212,
           "id": "procedure:bbk",
-          "sha256": "5fb7f278b86fb595b5827efe294c2a41a29f0bbdde8a52680aff380d236576f0",
+          "sha256": "c6f21d946366f2857694a7eb1573fd7d5f3323fb61590296332792cfa1d92f6d",
           "source": "shared/skills/bbk/SKILL.md",
-          "start": 35902
+          "start": 36849
         }
       ]
     }
@@ -21913,7 +21918,7 @@
     "projections/claude/agents/bbk-worker-designer.md": "35d6dc1a6a4a9cedaf8f8ccef4ba74079cbdb8dc0c989ab3de2948afc2428ff9",
     "projections/claude/agents/bbk-worker-orchestrator.md": "1f0a3741ad81fb4579d05905faf3f3a4e82a3f292430108cf7ee7d589b5317a3",
     "projections/claude/agents/bbk-worker.md": "1d9d2a6b5f5c5383b4d104f597f18b80e10eda3645f36a3c2dd5ea69d4e96942",
-    "projections/claude/controllers/bbk_controller.md": "119795ca90943616ec77222ff1388084415e68f8bc8fa249f3c8b9d2521df351",
+    "projections/claude/controllers/bbk_controller.md": "8e3c68de37f4504ab9e7289491a99d6873212b4318c847ea82e5c9e867e2037d",
     "projections/codex/agents/bbk_architect.toml": "9b235427f7ef26cb5f30dd443a4df62c93445f4726be7321eedc0454fb8525c6",
     "projections/codex/agents/bbk_phase_wayfinder.toml": "5e707b7c0e6d93f32c229e18161a4ac03c662559d07978f4c893998f06632a43",
     "projections/codex/agents/bbk_planning_wayfinder.toml": "861ccdd6314cbb80ee3688c3eb634fc0c23b4e81c3b785735fcc3123c6b77a27",
@@ -21933,7 +21938,7 @@
     "projections/codex/agents/bbk_worker.toml": "e9c5044280fae415bbf409a4762bb12247c1ee3e3534e726eb6db11bf2cd3f71",
     "projections/codex/agents/bbk_worker_designer.toml": "c26ee1d67c0735c04d494652ca5f8b594c56e91206ff261eb69e3f0dc538ec22",
     "projections/codex/agents/bbk_worker_orchestrator.toml": "eff1c00a8b3f9244bfc0cabbfdc9598b7d72641dcd38edbe44eb1e9277d93d02",
-    "projections/codex/controllers/bbk_controller.md": "1c94c98fff95163ae5fa92eec3d8ab9bc6f34b90abad18e03d7a9c31489cc8d5",
+    "projections/codex/controllers/bbk_controller.md": "cc0d6335d2982e5dd8c9f57f6a290f81a8e978ee2296dff1753ac555b20061a7",
     "projections/generic/agents/bbk_architect.md": "1f2c80c9c79d0b4eb2ee92656883286fde8fd2b3906a0651e8abaef484853f65",
     "projections/generic/agents/bbk_phase_wayfinder.md": "a3dd51a3d9019b577264e3bcf078e34d24844dcb56d39633a1cf8603394f3380",
     "projections/generic/agents/bbk_planning_wayfinder.md": "367f27be5120342a37dbfb46545aaff62befbdb04169a6dbf573adb26c67a257",
@@ -21953,27 +21958,27 @@
     "projections/generic/agents/bbk_worker.md": "d7bf0b6e2c42ae33fbc7066ec57558966b7b9adfbe2f4081e048438aa23406e5",
     "projections/generic/agents/bbk_worker_designer.md": "246b0c1d16d4db02d7b585d5a01b5bb44050370b437b0c96f2aa77515aaf6e37",
     "projections/generic/agents/bbk_worker_orchestrator.md": "06129e954ffb6b0b4f43c6f5d54a75d545a76d35dfbd2bba7c1f5f4f534ee044",
-    "projections/generic/controllers/bbk_controller.md": "bebb02404ad2a9fb427c2e7d111346dd5f90112c2a2249838d2339d94ca2dae9",
+    "projections/generic/controllers/bbk_controller.md": "ded0b9e5ecf5f22155a770d67922232b7ba86be450c185a10ed55d46e3cab942",
     "projections/omp/agents/bbk_architect.md": "14c0a169a9d6a74b097af11d12f339d1b972d7d91ed567d0995c1847190c0156",
     "projections/omp/agents/bbk_phase_wayfinder.md": "4f72d9a2e2d4eab2a7ae5e60da642062e3419d076e4488b3a9038750c4ecc82f",
     "projections/omp/agents/bbk_planning_wayfinder.md": "ee9374cd9a3f2232bde419fc803f797653cb48796882b1de891ac3c3b074c593",
-    "projections/omp/agents/bbk_prototyper.md": "0b2548a6968829dd3c4e87893a95b22fedc5a4fb7677658f7fadb47c9d5f77e3",
+    "projections/omp/agents/bbk_prototyper.md": "903c02516e1ca47c6b3956d6a5dc784df8bb8f0a528aeba35aa4e7b68690e81b",
     "projections/omp/agents/bbk_question_guide.md": "10290028a7c9c1bcbb9b7a4cb497ffe86a6b13ed63f68d79e3b3f4e6626a4687",
     "projections/omp/agents/bbk_questioning_wayfinder.md": "b45c75b7ffd2933b3e818df1763a47ef4596433e81b9e3e2acf85b2817adf203",
     "projections/omp/agents/bbk_researcher.md": "a738aac8fc1c33b7a9ca298de92584a44adde0419f6c9c77da19a90e224600a3",
     "projections/omp/agents/bbk_reviewer.md": "b3d0691229eb6f854f7da2ec072a9892dcb44a58938979206ae0b75b155970d1",
-    "projections/omp/agents/bbk_root_orchestrator.md": "ec76051b782dcd02ec38c3e368c16bf33571a1564be20c43ff9ae12a667e6023",
+    "projections/omp/agents/bbk_root_orchestrator.md": "cb596e743f6a0e8c754d7b41c924b9598db99bdfa682ebc6188f84dd6001be1c",
     "projections/omp/agents/bbk_root_wayfinder.md": "5d376e028282681e08644ae0d853bb9d5e458199ffe373252349e675b7e33883",
     "projections/omp/agents/bbk_synthesizer.md": "a2cb988c2ae7e15fc6dc0f62856c43a362bed960d0d7261d3cd350f6953a3fae",
-    "projections/omp/agents/bbk_territory_orchestrator.md": "8d54ea7e9392d764fd2d2fcb77e785695b132c85c8614373a4f6bf7eeee2306d",
+    "projections/omp/agents/bbk_territory_orchestrator.md": "aeeee621efbb637df88122a4dbb42e107b7c6c7d4a00d7b5317ca88617149333",
     "projections/omp/agents/bbk_territory_wayfinder.md": "8ba5dcfefef32a51f10e6fc2f9f034b8d2c27381c0ef89d17acb40f216852eb1",
-    "projections/omp/agents/bbk_validator.md": "f37d4ef809c3d7309a6090fe19e9d7f17924cea509d0394a4328d88489ab8ed1",
-    "projections/omp/agents/bbk_validator_orchestrator.md": "839f6541f6c0c1a70c7c7ed84d3ad312a6119fc28fdb664270187c8b9534b27f",
-    "projections/omp/agents/bbk_verification_designer.md": "80a63971115af242a717e4406ef3fa6c31be0fc5ba27f530b6c90697c1dcd17f",
-    "projections/omp/agents/bbk_worker.md": "5b89129a3cb39ccea5a7e48af9d76e75f3b2e826035f2730867d97f09841bad5",
-    "projections/omp/agents/bbk_worker_designer.md": "c57456fd017cd94227d8e3d15ef3891218d8606768ba490f23c825fae20f1ec2",
-    "projections/omp/agents/bbk_worker_orchestrator.md": "ff74921f21cff1cc29c56c9f5f445e9aa9945154763c91abc7f6da847fde5290",
-    "projections/omp/controllers/bbk_controller.md": "50e4141562395c39e0e5522ca57994d5a04b15e1cb60038735157151604f55e6",
+    "projections/omp/agents/bbk_validator.md": "a43f19d50c913824c72128daa62b791ae938a448d8cfcca850b86b480bf56eb4",
+    "projections/omp/agents/bbk_validator_orchestrator.md": "234cd1c4e1ebb784f860df9daf2492eb3ea814e5da292f757c4402c5865420de",
+    "projections/omp/agents/bbk_verification_designer.md": "8e544c0b3502fae89a812debddb798b9023fa0c580110c051a8901ef5e68e76f",
+    "projections/omp/agents/bbk_worker.md": "1630672aad03f36cea12cc85d43e6263b5b13b4dff72255f497d8e405f204fe1",
+    "projections/omp/agents/bbk_worker_designer.md": "82e43936df115b6f331d6cfa667423b4aded644e245b7319cac61026c7f474c6",
+    "projections/omp/agents/bbk_worker_orchestrator.md": "21b21de5f735ff8f680d9228112019677d6308ea0096b102a3e1e83ab9fc336d",
+    "projections/omp/controllers/bbk_controller.md": "08b83a36a53d886050a5a7413fd4172daf0707286fa1628775528b3c598023b6",
     "projections/pi/agents/bbk_architect.md": "1f2c80c9c79d0b4eb2ee92656883286fde8fd2b3906a0651e8abaef484853f65",
     "projections/pi/agents/bbk_phase_wayfinder.md": "a3dd51a3d9019b577264e3bcf078e34d24844dcb56d39633a1cf8603394f3380",
     "projections/pi/agents/bbk_planning_wayfinder.md": "367f27be5120342a37dbfb46545aaff62befbdb04169a6dbf573adb26c67a257",
@@ -21993,7 +21998,7 @@
     "projections/pi/agents/bbk_worker.md": "d7bf0b6e2c42ae33fbc7066ec57558966b7b9adfbe2f4081e048438aa23406e5",
     "projections/pi/agents/bbk_worker_designer.md": "246b0c1d16d4db02d7b585d5a01b5bb44050370b437b0c96f2aa77515aaf6e37",
     "projections/pi/agents/bbk_worker_orchestrator.md": "06129e954ffb6b0b4f43c6f5d54a75d545a76d35dfbd2bba7c1f5f4f534ee044",
-    "projections/pi/controllers/bbk_controller.md": "90b0c21eb70ca398f6fba2a2f41430cf7bb65116508282b1397404a1c773f8f7"
+    "projections/pi/controllers/bbk_controller.md": "b813334d53e1ba11e7446163a1fe23f38fef92f56b423b6fe01d73334f2068c4"
   },
   "globally_suppressed_procedures": [
     "bbk",
@@ -22040,7 +22045,7 @@
     "bbk-worker-execution"
   ],
   "method_content_source": "spec/method-content.json",
-  "method_content_source_sha256": "6c3a428d49a294d1abe77d031c4d8f211fccd305e0f1fc361a97aae3db030be0",
+  "method_content_source_sha256": "3c80a030d970a4e94205daa526744d1ff60dcc798c967f90ba0bcb4a47c9a191",
   "model_route_count": 19,
   "model_routing_mode": "per-role",
   "model_routing_schema": "bbk.model-routing.v2",
@@ -22096,12 +22101,12 @@
     ],
     "HOST_TOOL_ONLY": []
   },
-  "procedure_registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
-  "procedure_registry_sha256": "93d612301264758c60e267174863703d20eeee70bde100ab738c9dc6b55ce004",
+  "procedure_registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
+  "procedure_registry_sha256": "79e8512c6a62293a92363faafc37fdb320557de1fc9c45ceb69983bda25e4630",
   "procedure_registry_source": "spec/procedures/catalog.json",
   "projection_count": 100,
   "prompt_module_package": "spec/prompt-modules/catalog.json",
-  "prompt_module_source_sha256": "8fec99971ceb0d4e074abe37cb757fac891b2bdf94e5dcccd0e9aeecab83cde2",
+  "prompt_module_source_sha256": "f5038d4d3860b7fb9666725658972dceefd4424dbc9b8d937abad74ca20998e4",
   "prompt_module_sources": [
     {
       "bytes": 6620,
@@ -22219,9 +22224,9 @@
       "sha256": "1f08eaa98aa3513143663b9145381fdc70074a9bad8bc4824092c56de694323c"
     },
     {
-      "bytes": 1187,
+      "bytes": 1740,
       "path": "spec/prompt-modules/bbk-prompt-host-capability-truth.json",
-      "sha256": "38a66a3ff7321071cdf8f7a1e9557168b391ef0bf087e969807f4c6951f4261c"
+      "sha256": "2e8499f50b2401846c0b2f7b947691e4f111b41fc3e7b9210028339b328dfacc"
     },
     {
       "bytes": 2835,
@@ -22327,10 +22332,10 @@
   "role_count": 19,
   "role_return_registry": "spec/contracts/role-return-registry.json",
   "role_return_registry_v2": "spec/contracts/role-return-registry-v2.json",
-  "role_source_sha256": "d7bda2398682c824b7b155bdb097512b7041a4d0f0eb2ae6e2cac2c9dfc5f149",
+  "role_source_sha256": "caea853c6a788f013ddb5592c3b68d283e6afbc52bf86b9075d2580f243c6d7c",
   "schema": "bbk.projection-manifest.v10",
   "source": "spec/roles.json",
-  "source_sha256": "45a6536b15b7776381fd971be98b49294fb51b55e854fc46ea230919bc58d054",
+  "source_sha256": "f189a418c878327fccb0df9f0a4402850ffcdae6087a17dca68f06b2657f7948",
   "target_count": 5,
   "targets": [
     "claude",

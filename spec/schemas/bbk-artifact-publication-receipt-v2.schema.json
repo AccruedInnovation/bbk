@@ -1,0 +1,205 @@
+{
+  "$defs": {
+    "nonEmpty": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "policy": {
+      "additionalProperties": false,
+      "properties": {
+        "mutableCoordinationOverrideUsed": {
+          "type": "boolean"
+        },
+        "mutableCoordinationPaths": {
+          "items": {
+            "$ref": "#/$defs/nonEmpty"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "publicationMetadataOutsideSealedTree": {
+          "const": true
+        }
+      },
+      "required": [
+        "publicationMetadataOutsideSealedTree",
+        "mutableCoordinationOverrideUsed",
+        "mutableCoordinationPaths"
+      ],
+      "type": "object"
+    },
+    "profile": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/safeId"
+        },
+        "version": {
+          "$ref": "#/$defs/nonEmpty"
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ],
+      "type": "object"
+    },
+    "safeId": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+      "type": "string"
+    },
+    "sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "sourceBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "const": "software-source-set"
+        },
+        "projectRoot": {
+          "$ref": "#/$defs/nonEmpty"
+        },
+        "schema": {
+          "const": "bbk.artifact-source-binding.v1"
+        },
+        "selection": {
+          "type": "object"
+        },
+        "snapshot": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "schema",
+        "mode",
+        "projectRoot",
+        "selection",
+        "snapshot"
+      ],
+      "type": "object"
+    },
+    "tool": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "const": "bbk"
+        },
+        "version": {
+          "$ref": "#/$defs/nonEmpty"
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://bbk.local/schemas/bbk-artifact-publication-receipt-v2.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifactCount": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "authorityBoundary": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "claimsNotEstablished": {
+      "items": {
+        "$ref": "#/$defs/nonEmpty"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "completionClaims": {
+      "contains": {
+        "const": "BYTE_INTEGRITY_VERIFIED"
+      },
+      "items": {
+        "const": "BYTE_INTEGRITY_VERIFIED"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "contentSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "manifestSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "operationId": {
+      "format": "uuid",
+      "type": "string"
+    },
+    "packageId": {
+      "$ref": "#/$defs/safeId"
+    },
+    "policy": {
+      "$ref": "#/$defs/policy"
+    },
+    "profile": {
+      "$ref": "#/$defs/profile"
+    },
+    "publishedAtUtc": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "revision": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "schema": {
+      "const": "bbk.artifact-publication-receipt.v2"
+    },
+    "sealedRoot": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "sealedTreeSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "sourceBinding": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/sourceBinding"
+        }
+      ]
+    },
+    "status": {
+      "const": "PUBLISHED"
+    },
+    "tool": {
+      "$ref": "#/$defs/tool"
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "packageId",
+    "revision",
+    "profile",
+    "artifactCount",
+    "contentSha256",
+    "manifestSha256",
+    "sealedRoot",
+    "sealedTreeSha256",
+    "publishedAtUtc",
+    "tool",
+    "operationId",
+    "policy",
+    "authorityBoundary",
+    "completionClaims",
+    "claimsNotEstablished"
+  ],
+  "title": "BBK immutable artifact publication receipt v2",
+  "type": "object"
+}
+
+

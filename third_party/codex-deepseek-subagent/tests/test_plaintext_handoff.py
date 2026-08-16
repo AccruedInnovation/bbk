@@ -153,7 +153,7 @@ class PlaintextHandoffCliTests(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout, "")
-        self.assertEqual(json.loads(self.pending_path.read_text()), original)
+        self.assertEqual(json.loads(self.pending_path.read_text(encoding="utf-8")), original)
 
     def test_hook_ignores_non_target_events_without_consuming_pending(self):
         original = envelope("leave this assignment untouched")
@@ -170,7 +170,7 @@ class PlaintextHandoffCliTests(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout, "")
-        self.assertEqual(json.loads(self.pending_path.read_text()), original)
+        self.assertEqual(json.loads(self.pending_path.read_text(encoding="utf-8")), original)
 
     def test_stage_refuses_to_replace_an_active_pending_assignment(self):
         original = envelope("first assignment")
@@ -179,7 +179,7 @@ class PlaintextHandoffCliTests(unittest.TestCase):
         result = self.invoke("stage", "second assignment")
 
         self.assertEqual(result.returncode, 3)
-        self.assertEqual(json.loads(self.pending_path.read_text()), original)
+        self.assertEqual(json.loads(self.pending_path.read_text(encoding="utf-8")), original)
 
     def test_stage_refuses_while_an_unexpired_claim_exists(self):
         self.state_directory.mkdir(parents=True)
@@ -191,7 +191,7 @@ class PlaintextHandoffCliTests(unittest.TestCase):
 
         self.assertNotEqual(result.returncode, 0)
         self.assertNotIn("Traceback", result.stderr)
-        self.assertEqual(json.loads(claimed.read_text()), active)
+        self.assertEqual(json.loads(claimed.read_text(encoding="utf-8")), active)
         self.assertFalse(self.pending_path.exists())
 
     def test_stage_quarantines_expired_claim_with_blank_assignment(self):
@@ -209,7 +209,7 @@ class PlaintextHandoffCliTests(unittest.TestCase):
         self.assertFalse(claimed.exists())
         quarantined = list(self.state_directory.glob(f"{AGENT_TYPE}.failed.*.json"))
         self.assertEqual(len(quarantined), 1)
-        self.assertEqual(json.loads(quarantined[0].read_text()), invalid)
+        self.assertEqual(json.loads(quarantined[0].read_text(encoding="utf-8")), invalid)
         self.assertFalse(self.pending_path.exists())
 
     # Robustness contract: unknown state is preserved; known-expired state is cleaned.
@@ -220,7 +220,7 @@ class PlaintextHandoffCliTests(unittest.TestCase):
         result = self.invoke("stage", "fresh assignment")
 
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(json.loads(self.pending_path.read_text())["assignment"], "fresh assignment")
+        self.assertEqual(json.loads(self.pending_path.read_text(encoding="utf-8"))["assignment"], "fresh assignment")
 
     def test_stage_never_replaces_structurally_invalid_expired_envelopes(self):
         invalid_cases = {
@@ -247,7 +247,7 @@ class PlaintextHandoffCliTests(unittest.TestCase):
 
                 self.assertNotEqual(result.returncode, 0)
                 self.assertNotIn("Traceback", result.stderr)
-                self.assertEqual(json.loads(pending.read_text()), invalid)
+                self.assertEqual(json.loads(pending.read_text(encoding="utf-8")), invalid)
 
     def test_stage_rejects_timezone_naive_timestamps_without_losing_state(self):
         invalid_cases = {
@@ -266,7 +266,7 @@ class PlaintextHandoffCliTests(unittest.TestCase):
 
                 self.assertNotEqual(result.returncode, 0)
                 self.assertNotIn("Traceback", result.stderr)
-                self.assertEqual(json.loads(pending.read_text()), invalid)
+                self.assertEqual(json.loads(pending.read_text(encoding="utf-8")), invalid)
 
     def test_stage_rejects_corrupt_pending_json_without_traceback_or_data_loss(self):
         corrupt = b'{"schema":1,"assignment":"unfinished'
@@ -287,7 +287,7 @@ class PlaintextHandoffCliTests(unittest.TestCase):
 
         self.assertNotEqual(result.returncode, 0)
         self.assertNotIn("Traceback", result.stderr)
-        self.assertEqual(json.loads(self.pending_path.read_text()), original)
+        self.assertEqual(json.loads(self.pending_path.read_text(encoding="utf-8")), original)
 
     def test_hook_rejects_malformed_json_input_without_traceback(self):
         result = self.invoke("hook", "not-json")
@@ -311,7 +311,7 @@ class PlaintextHandoffCliTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         remaining = self.handoff_state_files()
         self.assertEqual(len(remaining), 1)
-        self.assertEqual(json.loads(remaining[0].read_text()), invalid)
+        self.assertEqual(json.loads(remaining[0].read_text(encoding="utf-8")), invalid)
 
     def test_hook_preserves_corrupt_pending_bytes_on_validation_failure(self):
         corrupt = b'{"schema":1,"assignment":"must survive'
@@ -336,7 +336,7 @@ class PlaintextHandoffCliTests(unittest.TestCase):
         self.assertNotIn("Traceback", result.stderr)
         remaining = self.handoff_state_files()
         self.assertEqual(len(remaining), 1)
-        self.assertEqual(json.loads(remaining[0].read_text()), invalid)
+        self.assertEqual(json.loads(remaining[0].read_text(encoding="utf-8")), invalid)
 
     def test_hook_reports_missing_assignment_as_transport_failure(self):
         result = self.invoke("hook", self.target_hook_input())
@@ -510,8 +510,8 @@ class PlaintextHandoffCliTests(unittest.TestCase):
 
         self.assertNotEqual(result.returncode, 0)
         self.assertNotIn("Traceback", result.stderr)
-        self.assertEqual(json.loads(self.pending_path.read_text()), pending)
-        self.assertEqual(json.loads(claimed.read_text()), existing_claim)
+        self.assertEqual(json.loads(self.pending_path.read_text(encoding="utf-8")), pending)
+        self.assertEqual(json.loads(claimed.read_text(encoding="utf-8")), existing_claim)
 
     def test_hook_rejects_timezone_naive_timestamps_without_losing_state(self):
         invalid_cases = {
@@ -536,7 +536,7 @@ class PlaintextHandoffCliTests(unittest.TestCase):
                 self.assertNotIn("Traceback", result.stderr)
                 remaining = sorted(state_directory.glob(f"{AGENT_TYPE}.*.json"))
                 self.assertEqual(len(remaining), 1)
-                self.assertEqual(json.loads(remaining[0].read_text()), invalid)
+                self.assertEqual(json.loads(remaining[0].read_text(encoding="utf-8")), invalid)
 
     def test_hook_removes_a_known_expired_pending_assignment(self):
         self.write_pending(envelope("expired assignment", expires_in=-10))

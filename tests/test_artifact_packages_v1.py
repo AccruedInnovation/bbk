@@ -856,5 +856,33 @@ class ArtifactCompatibilityAndCliTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
 
 
+class ArtifactV1IntegrationTests(unittest.TestCase):
+    def test_native_v1_package_reader_preserves_identity_and_read_only_floor(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            draft = make_draft(root / "draft")
+            sealed = root / "sealed"
+            artifact_packages.seal_draft(draft, sealed, sealed_at_utc="2026-08-14T20:00:00Z")
+            manifest = artifact_packages.load_path(sealed / artifact_packages.MANIFEST_FILE)
+            package = artifact_packages.load_path(sealed / artifact_packages.PACKAGE_FILE)
+            self.assertEqual(manifest["schema"], "bbk.artifact-package-manifest.v1")
+            self.assertEqual(package["schema"], "bbk.artifact-package.v1")
+            before = {
+                path.relative_to(sealed).as_posix(): path.read_bytes()
+                for path in sealed.rglob("*")
+                if path.is_file()
+            }
+            result = artifact_packages.verify_package(sealed)
+            self.assertEqual(result["status"], "PASS", result)
+            self.assertTrue(result["readOnly"])
+            self.assertEqual(result["contentSha256"], manifest["contentSha256"])
+            after = {
+                path.relative_to(sealed).as_posix(): path.read_bytes()
+                for path in sealed.rglob("*")
+                if path.is_file()
+            }
+            self.assertEqual(before, after)
+
+
 if __name__ == "__main__":
     unittest.main()

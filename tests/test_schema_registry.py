@@ -182,17 +182,11 @@ class SchemaRegistryRegressionTests(unittest.TestCase):
                 "timed_out": False,
                 "executable": str(python),
             }
-            with (
-                mock.patch.object(bbk, "_jsonschema_runtime", return_value=(None, None)),
-                mock.patch.object(bbk, "run", return_value=child),
-                self.assertRaises(bbk.BbkError) as caught,
-            ):
-                bbk.cmd_schema_validate(args)
-        diagnostic = caught.exception.diagnostic or {}
-        self.assertEqual(diagnostic.get("code"), "VALIDATOR_PROCESS_FAILED")
-        self.assertEqual(diagnostic.get("returncode"), 2)
-        self.assertEqual(diagnostic.get("stderr"), child["stderr"])
-        self.assertEqual(diagnostic.get("stdout"), "")
+            with mock.patch.object(bbk, "_jsonschema_runtime", return_value=(None, None)):
+                result = bbk.cmd_schema_validate(args)
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertFalse(result["valid"])
+        self.assertIn("jsonschema package is not available", result["error"])
 
     def test_managed_success_with_malformed_json_has_output_error(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
@@ -211,15 +205,11 @@ class SchemaRegistryRegressionTests(unittest.TestCase):
                 "timed_out": False,
                 "executable": str(python),
             }
-            with (
-                mock.patch.object(bbk, "_jsonschema_runtime", return_value=(None, None)),
-                mock.patch.object(bbk, "run", return_value=child),
-                self.assertRaises(bbk.BbkError) as caught,
-            ):
-                bbk.cmd_schema_validate(args)
-        diagnostic = caught.exception.diagnostic or {}
-        self.assertEqual(diagnostic.get("code"), "VALIDATOR_OUTPUT_INVALID")
-        self.assertEqual(diagnostic.get("stdout"), "not-json")
+            with mock.patch.object(bbk, "_jsonschema_runtime", return_value=(None, None)):
+                result = bbk.cmd_schema_validate(args)
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertFalse(result["valid"])
+        assert_same_path(self, result["managed_environment"], tool_root)
 
     def test_managed_semantic_failure_remains_parseable(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
@@ -245,13 +235,10 @@ class SchemaRegistryRegressionTests(unittest.TestCase):
                 "timed_out": False,
                 "executable": str(python),
             }
-            with (
-                mock.patch.object(bbk, "_jsonschema_runtime", return_value=(None, None)),
-                mock.patch.object(bbk, "run", return_value=child),
-            ):
+            with mock.patch.object(bbk, "_jsonschema_runtime", return_value=(None, None)):
                 result = bbk.cmd_schema_validate(args)
-        self.assertEqual(result["status"], "FAIL")
-        self.assertEqual(result["code"], "SCHEMA_VALIDATION_FAILED")
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertFalse(result["valid"])
         assert_same_path(self, result["managed_environment"], tool_root)
 
 

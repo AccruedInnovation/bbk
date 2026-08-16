@@ -28,6 +28,7 @@ class VcsFixtureTests(unittest.TestCase):
         )
         self.assertEqual(b"alpha\n", (first.root / "src/value.txt").read_bytes())
         self.assertEqual(b"\x00\xff\n", (first.root / "binary.dat").read_bytes())
+        self.assertEqual(b"alpha\n", first.show_head("src/value.txt"))
         self.assertEqual("false", first.run("config", "--get", "core.autocrlf").stdout.strip())
         self.assertEqual("lf", first.run("config", "--get", "core.eol").stdout.strip())
         self.assertNotEqual(first.branch, second.branch)

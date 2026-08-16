@@ -41,6 +41,7 @@ import validate_alpha7_fixtures as validate_alpha7_tool
 import validate_alpha8_fixtures as validate_alpha8_tool
 import validate_contract_package as validate_contract_package_tool
 import verify_package as verify_package_tool
+from runtime_requirements import normalize_python_command, python_environment
 
 _IN_PROCESS_CLIS = {
     (TOOLS / "assemble_roles.py").resolve(): assemble_roles_tool.main,
@@ -204,8 +205,12 @@ def _run_nested_python_script(
     started = time.monotonic()
     previous_argv = sys.argv[:]
     returncode = 0
+    effective_env = dict(env) if env is not None else os.environ.copy()
+    effective_env["PYTHONDONTWRITEBYTECODE"] = "1"
+    effective_env["PYTHONNOUSERSITE"] = "1"
+    effective_env.setdefault("PYTHONPATH", str(ROOT))
     try:
-        with process_context(cwd=cwd, env=env), contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+        with process_context(cwd=cwd, env=effective_env), contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
             sys.argv = [str(script), *script_argv]
             try:
                 runpy.run_path(str(script), run_name="__main__")
@@ -231,7 +236,7 @@ def _run_nested_python_script(
         "stderr": stderr.getvalue(),
         "duration_seconds": round(time.monotonic() - started, 6),
         "timed_out": False,
-        "executable": shutil.which(str(argv[0]), path=(env or os.environ).get("PATH")),
+        "executable": shutil.which(str(argv[0]), path=effective_env.get("PATH")),
     }
 
 
@@ -272,12 +277,20 @@ def run_cli(
     is delegated to a real child process.
     """
     args = [str(value) for value in command]
+    child_env = dict(env) if env is not None else os.environ.copy()
+    child_env["PYTHONDONTWRITEBYTECODE"] = "1"
+    child_env["PYTHONNOUSERSITE"] = "1"
+    child_env.setdefault("PYTHONPATH", str(ROOT))
     parsed = None if force_subprocess else _python_script(args)
     if parsed is None:
+        normalized = normalize_python_command(args)
+        if normalized != args:
+            args = normalized
+            child_env = python_environment(child_env)
         return subprocess.run(
             args,
             cwd=str(cwd or ROOT),
-            env=dict(env) if env is not None else None,
+            env=child_env,
             check=check,
             stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
@@ -293,7 +306,7 @@ def run_cli(
     stderr = io.StringIO()
     try:
         with (
-            process_context(cwd=cwd or ROOT, env=env),
+            process_context(cwd=cwd or ROOT, env=child_env),
             accelerate_nested_profile_python(),
             # ``subprocess.run(..., stdin=DEVNULL)`` gives every child CLI an
             # immediate EOF.  Mirror that contract for in-process entrypoints

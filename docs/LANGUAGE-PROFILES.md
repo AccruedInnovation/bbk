@@ -2,6 +2,13 @@
 
 BBK installs independently manifested Go, Python, Rust, and TypeScript/JavaScript profile packages at `0.1.0-alpha.3` by default. Strict manifests bind their metadata, compatibility, OMP launch behavior, structure-validator detection, and consolidated test surfaces. The typed capability protocol is `bbk.profile-capability.v1`.
 
+CODESYS Structured Text is an accepted target-only qualification profile for repository and
+controller integration checks. It is not part of the bundled public profile
+set in this release; its external package, version metadata, and qualification
+evidence remain separately owned and must not be inferred from the Go, Python,
+Rust, or TypeScript/JavaScript packages listed below.
+The separately qualified CODESYS package is version `0.1.0-alpha.5`.
+
 ## Bundled inventory
 
 The verified inner archives live at `bundled-language-profiles/packages/`:

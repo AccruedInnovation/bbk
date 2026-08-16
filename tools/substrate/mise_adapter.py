@@ -63,6 +63,11 @@ ESSENTIAL_ENVIRONMENT = (
     'MISE_NO_ENV',
     'MISE_NO_DOTENV',
     'PYTHONDONTWRITEBYTECODE',
+    # Qualified Python-backed launchers must receive the caller's explicit
+    # import closure.  Omitting these roots makes Windows .cmd fixtures fail
+    # before their payload starts, producing a misleading substrate error.
+    'PYTHONPATH',
+    'BBK_QUALIFIED_PYTHONPATH',
 )
 SENSITIVE_NAME = re.compile(r"(?:TOKEN|SECRET|PASSWORD|PASSWD|API[_-]?KEY|CREDENTIAL|AUTH)", re.IGNORECASE)
 

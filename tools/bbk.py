@@ -33,7 +33,7 @@ TOOLS_DIR = Path(__file__).resolve().parent
 if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
-from runtime_requirements import enforce_supported_python
+from runtime_requirements import enforce_supported_python, normalize_python_command, python_command, python_environment
 
 enforce_supported_python(program="BBK")
 
@@ -180,10 +180,12 @@ try:
         ArtifactPackageError,
         build_legacy_manifest as artifact_build_legacy_manifest,
         create_successor as artifact_create_successor,
+        doctor as artifact_doctor,
         file_reference as artifact_file_reference,
         finalize_draft as artifact_finalize_draft,
         finalize_source_set as artifact_finalize_source_set,
         preflight_draft as artifact_preflight_draft,
+        reconcile_operation as artifact_reconcile_operation,
         verify_publication_freshness as artifact_verify_publication_freshness,
         seal_draft as artifact_seal_draft,
         verify_file_reference as artifact_verify_file_reference,
@@ -205,10 +207,12 @@ except ModuleNotFoundError:
         ArtifactPackageError,
         build_legacy_manifest as artifact_build_legacy_manifest,
         create_successor as artifact_create_successor,
+        doctor as artifact_doctor,
         file_reference as artifact_file_reference,
         finalize_draft as artifact_finalize_draft,
         finalize_source_set as artifact_finalize_source_set,
         preflight_draft as artifact_preflight_draft,
+        reconcile_operation as artifact_reconcile_operation,
         verify_publication_freshness as artifact_verify_publication_freshness,
         seal_draft as artifact_seal_draft,
         verify_file_reference as artifact_verify_file_reference,
@@ -647,8 +651,12 @@ def run(argv: Sequence[str], cwd: Path, *, timeout: float | None = None, env: di
         raise BbkError("Command argv must not be empty")
     started = time.monotonic()
     execution_environment = os.environ if env is None else env
+    execution_command = normalize_python_command(command)
+    child_environment = execution_environment
+    if execution_command != command:
+        child_environment = python_environment(execution_environment)
     executable = shutil.which(command[0], path=execution_environment.get("PATH"))
-    execution_command = list(command)
+    execution_command = list(execution_command)
     if command[0].casefold() == "git":
         configured = execution_environment.get("BBK_GIT") or execution_environment.get("BBK_TEST_GIT")
         resolved = (
@@ -665,7 +673,7 @@ def run(argv: Sequence[str], cwd: Path, *, timeout: float | None = None, env: di
             )
     try:
         result = subprocess.run(
-            execution_command, cwd=str(cwd), env=env, timeout=timeout, check=False,
+            execution_command, cwd=str(cwd), env=child_environment, timeout=timeout, check=False,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
         )
         try:
@@ -1974,7 +1982,60 @@ def cmd_artifact_preflight(args: argparse.Namespace) -> dict[str, Any]:
     )
 
 
+def _artifact_reject_stale_lock_takeover(args: argparse.Namespace) -> dict[str, Any] | None:
+    if not bool(getattr(args, "recover_stale_lock", False)):
+        return None
+    return {
+        "schema": "bbk.artifact-package-cli-result.v1",
+        "status": "REJECTED",
+        "code": "PACKAGE_LOCK_RECOVERY_REQUIRES_RECONCILE",
+        "message": "Stale-lock age never authorizes takeover; reconcile the exact operation journal.",
+        "smallest_next_action": "Run bbk artifact reconcile with the exact journal path or operation ID.",
+        "claims_not_established": ["transaction completion", "publication", "semantic acceptance"],
+    }
+
+
+def cmd_artifact_doctor(args: argparse.Namespace) -> dict[str, Any]:
+    root = Path(args.root).expanduser().resolve()
+    if not root.is_dir():
+        raise invalid_argument_error(
+            "Artifact doctor root is not an existing directory.",
+            field="root",
+            received=args.root,
+            example_command="bbk artifact doctor --root .",
+            documentation_command="bbk artifact doctor --help",
+            smallest_next_action="Provide an existing local project or transaction root.",
+        )
+    target_parent = None
+    if args.publication_root:
+        target_parent = Path(args.publication_root).expanduser()
+        if not target_parent.is_absolute():
+            target_parent = root / target_parent
+    return artifact_doctor(root, target_parent)
+
+
+def cmd_artifact_reconcile(args: argparse.Namespace) -> dict[str, Any]:
+    root = resolve_root(args.root, required=False) or Path.cwd().resolve()
+    raw = Path(args.journal_or_operation).expanduser()
+    journal = raw if raw.is_absolute() else root / raw
+    if not journal.is_file() and SAFE_ID.fullmatch(args.journal_or_operation):
+        journal = root / ".bbk" / "artifacts" / "operations" / f"{args.journal_or_operation}.json"
+    if not journal.is_file():
+        raise invalid_argument_error(
+            "The exact operation journal or operation ID does not resolve to a file.",
+            field="journal_or_operation",
+            received=args.journal_or_operation,
+            example_command="bbk artifact reconcile <journal-or-operation-id> --root .",
+            documentation_command="bbk artifact reconcile --help",
+            smallest_next_action="Provide the exact existing journal path or operation ID under .bbk/artifacts/operations.",
+        )
+    return artifact_reconcile_operation(journal, resume=bool(args.resume))
+
+
 def cmd_artifact_seal(args: argparse.Namespace) -> dict[str, Any]:
+    rejected = _artifact_reject_stale_lock_takeover(args)
+    if rejected is not None:
+        return rejected
     registry = Path(args.registry).expanduser().resolve() if args.registry else None
     try:
         return artifact_seal_draft(
@@ -1988,6 +2049,9 @@ def cmd_artifact_seal(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def cmd_artifact_finalize(args: argparse.Namespace) -> dict[str, Any]:
+    rejected = _artifact_reject_stale_lock_takeover(args)
+    if rejected is not None:
+        return rejected
     registry = Path(args.registry).expanduser().resolve() if args.registry else None
     root = resolve_root(args.root, required=False) or Path.cwd().resolve()
     try:
@@ -2052,6 +2116,9 @@ def cmd_artifact_freshness(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def cmd_artifact_successor(args: argparse.Namespace) -> dict[str, Any]:
+    rejected = _artifact_reject_stale_lock_takeover(args)
+    if rejected is not None:
+        return rejected
     registry = Path(args.registry).expanduser().resolve() if args.registry else None
     try:
         return artifact_create_successor(
@@ -3352,7 +3419,7 @@ def run_to_bound_files(
     env: dict[str, str] | None,
 ) -> dict[str, Any]:
     """Run without an in-memory output ceiling and atomically bind both streams."""
-    command = [str(item) for item in argv]
+    command = normalize_python_command(argv)
     if not command:
         raise BbkError("Command argv must not be empty")
     stdout_path.parent.mkdir(parents=True, exist_ok=True)
@@ -3361,7 +3428,10 @@ def run_to_bound_files(
     stdout_temp = stdout_path.with_name(f".{stdout_path.name}.{token}.tmp")
     stderr_temp = stderr_path.with_name(f".{stderr_path.name}.{token}.tmp")
     started = time.monotonic()
-    executable = shutil.which(command[0], path=(env or os.environ).get("PATH"))
+    child_environment = env or os.environ
+    if command != [str(item) for item in argv]:
+        child_environment = python_environment(child_environment)
+    executable = shutil.which(command[0], path=child_environment.get("PATH"))
     returncode = 127
     timed_out = False
     try:
@@ -3370,7 +3440,7 @@ def run_to_bound_files(
                 result = subprocess.run(
                     command,
                     cwd=str(cwd),
-                    env=env,
+                    env=child_environment,
                     timeout=timeout,
                     check=False,
                     stdout=stdout_handle,
@@ -4345,9 +4415,19 @@ def _venv_python(root: Path) -> Path:
     return root / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
 
 
-def _jsonschema_runtime() -> tuple[Any | None, str | None]:
+def _jsonschema_runtime(tool_root: Path | None = None) -> tuple[Any | None, str | None]:
+    if tool_root is not None:
+        candidates = [
+            tool_root / "Lib" / "site-packages",
+            tool_root / "lib" / f"python{sys.version_info.major}.{sys.version_info.minor}" / "site-packages",
+        ]
+        for site_packages in candidates:
+            if site_packages.is_dir() and str(site_packages) not in sys.path:
+                sys.path.insert(0, str(site_packages))
     try:
+        import importlib
         import jsonschema  # type: ignore
+        importlib.invalidate_caches()
         try:
             version = importlib_metadata.version("jsonschema")
         except importlib_metadata.PackageNotFoundError:
@@ -4820,102 +4900,36 @@ def cmd_schema_explain(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def _ensure_jsonschema_environment(tool_root: Path, wheelhouse: str | None) -> dict[str, Any]:
-    python = _venv_python(tool_root)
+    site_packages = tool_root / (Path("Lib") / "site-packages" if os.name == "nt" else Path(f"lib/python{sys.version_info.major}.{sys.version_info.minor}/site-packages"))
+    site_packages.mkdir(parents=True, exist_ok=True)
     operations: list[dict[str, Any]] = []
-    if not python.is_file():
-        tool_root.parent.mkdir(parents=True, exist_ok=True)
-        result = run([sys.executable, "-m", "venv", str(tool_root)], Path.cwd(), timeout=300)
-        operations.append({"operation": "create-venv", **result})
-        if result["returncode"] != 0:
-            raise BbkError(f"Could not create schema-validator environment: {result['stderr'] or result['stdout']}")
-    argv = [str(python), "-m", "pip", "install", "--disable-pip-version-check", "jsonschema==4.25.1"]
+    argv = python_command(
+        None,
+        "install",
+        "--target",
+        str(site_packages),
+        "--disable-pip-version-check",
+        "jsonschema==4.25.1",
+        module="pip",
+    )
     if wheelhouse:
-        argv[4:4] = ["--no-index", "--find-links", str(Path(wheelhouse).expanduser().resolve())]
+        argv.extend(["--no-index", "--find-links", str(Path(wheelhouse).expanduser().resolve())])
     result = run(argv, Path.cwd(), timeout=600)
     operations.append({"operation": "install-jsonschema", **result})
     if result["returncode"] != 0:
         raise BbkError(f"Could not install jsonschema 4.25.1: {result['stderr'] or result['stdout']}")
-    return {"python": str(python), "operations": operations}
+    return {"python": str(direct_python_executable()), "site_packages": str(site_packages), "operations": operations}
 
 
 def cmd_schema_validate(args: argparse.Namespace) -> dict[str, Any]:
     root = resolve_root(args.root, required=False)
-    package, version = _jsonschema_runtime()
     tool_root = _schema_tool_root(root, args.tool_dir)
+    package, version = _jsonschema_runtime(tool_root)
     if package is None:
         tool_python = _venv_python(tool_root)
         if not tool_python.is_file() and args.ensure:
             ensured = _ensure_jsonschema_environment(tool_root, args.wheelhouse)
-            tool_python = Path(ensured["python"])
-        if tool_python.is_file() and Path(sys.executable).resolve() != tool_python.resolve():
-            argv = [str(tool_python), str(Path(__file__).resolve()), "--json", "schema", "validate", "--schema", args.schema]
-            for instance in args.instance:
-                argv += ["--instance", instance]
-            if args.root:
-                argv += ["--root", args.root]
-            result = run(argv, Path.cwd(), timeout=args.timeout)
-            if result["returncode"] not in {0, 1}:
-                message = f"Managed schema validator process failed with exit code {result['returncode']}"
-                raise BbkError(
-                    message,
-                    diagnostic={
-                        "schema": "bbk.managed-validator-error.v1",
-                        "status": "ERROR",
-                        "code": "VALIDATOR_PROCESS_FAILED",
-                        "message": message,
-                        "command_identity": "bbk schema validate",
-                        "argv": result.get("argv", argv),
-                        "returncode": result["returncode"],
-                        "stdout": result.get("stdout", ""),
-                        "stderr": result.get("stderr", ""),
-                        "timed_out": bool(result.get("timed_out", False)),
-                        "tool_version": "jsonschema==4.25.1",
-                        "managed_environment": str(tool_root),
-                        "smallest_next_action": "Inspect the preserved managed-validator stderr, repair the process-level failure, and rerun the same command.",
-                    },
-                )
-            try:
-                value = json.loads(result["stdout"])
-            except json.JSONDecodeError as exc:
-                message = "Managed schema validator exited normally but returned malformed JSON"
-                raise BbkError(
-                    message,
-                    diagnostic={
-                        "schema": "bbk.managed-validator-error.v1",
-                        "status": "ERROR",
-                        "code": "VALIDATOR_OUTPUT_INVALID",
-                        "message": message,
-                        "command_identity": "bbk schema validate",
-                        "argv": result.get("argv", argv),
-                        "returncode": result["returncode"],
-                        "stdout": result.get("stdout", ""),
-                        "stderr": result.get("stderr", ""),
-                        "tool_version": "jsonschema==4.25.1",
-                        "managed_environment": str(tool_root),
-                        "smallest_next_action": "Preserve the child output, repair its JSON transport, and rerun without interpreting the malformed payload as a validation result.",
-                    },
-                ) from exc
-            if not isinstance(value, dict):
-                message = "Managed schema validator returned a JSON value that is not an object"
-                raise BbkError(
-                    message,
-                    diagnostic={
-                        "schema": "bbk.managed-validator-error.v1",
-                        "status": "ERROR",
-                        "code": "VALIDATOR_OUTPUT_INVALID",
-                        "message": message,
-                        "command_identity": "bbk schema validate",
-                        "argv": result.get("argv", argv),
-                        "returncode": result["returncode"],
-                        "stdout": result.get("stdout", ""),
-                        "stderr": result.get("stderr", ""),
-                        "tool_version": "jsonschema==4.25.1",
-                        "managed_environment": str(tool_root),
-                        "smallest_next_action": "Return one structured JSON object from the managed validator and rerun.",
-                    },
-                )
-            value["managed_environment"] = str(tool_root)
-            return value
+            package, version = _jsonschema_runtime(tool_root)
         return {
             "schema": "bbk.schema-validation.v1",
             "status": "BLOCKED",
@@ -6257,6 +6271,8 @@ def parser() -> argparse.ArgumentParser:
     artifact = sub.add_parser("artifact").add_subparsers(parser_class=BbkArgumentParser, dest="artifact_command", required=True)
     x = artifact.add_parser("inspect"); x.add_argument("path"); x.add_argument("--exclude", action="append"); x.add_argument("--include-examples", action="store_true"); x.add_argument("--verbose", action="store_true"); x.add_argument("--output"); x.set_defaults(func=cmd_artifact_inspect)
     x = artifact.add_parser("manifest"); x.add_argument("--root"); x.add_argument("--path", action="append"); x.add_argument("--source", action="append"); x.add_argument("--include", action="append"); x.add_argument("--exclude", action="append"); x.add_argument("--include-examples", action="store_true"); x.add_argument("--subject"); x.add_argument("--root-label"); x.add_argument("--output"); x.set_defaults(func=cmd_artifact_manifest)
+    x = artifact.add_parser("doctor"); x.add_argument("--root", required=True); x.add_argument("--publication-root"); x.set_defaults(func=cmd_artifact_doctor)
+    x = artifact.add_parser("reconcile"); x.add_argument("journal_or_operation"); x.add_argument("--root"); x.add_argument("--resume", action="store_true"); x.set_defaults(func=cmd_artifact_reconcile)
     x = artifact.add_parser("preflight"); x.add_argument("draft_root"); x.add_argument("--registry"); x.add_argument("--max-depth", type=int, default=128); x.set_defaults(func=cmd_artifact_preflight)
     x = artifact.add_parser("seal"); x.add_argument("draft_root"); x.add_argument("--output", required=True); x.add_argument("--registry"); x.add_argument("--recover-stale-lock", action="store_true"); x.set_defaults(func=cmd_artifact_seal)
     x = artifact.add_parser("finalize"); x.add_argument("draft_root", nargs="?"); x.add_argument("--root"); x.add_argument("--output"); x.add_argument("--publication-root"); x.add_argument("--registry"); x.add_argument("--package-id"); x.add_argument("--revision"); x.add_argument("--source", action="append"); x.add_argument("--include", action="append"); x.add_argument("--exclude", action="append"); x.add_argument("--subject-kind"); x.add_argument("--subject-id"); x.add_argument("--subject-revision"); x.add_argument("--purpose"); x.add_argument("--allow-mutable-coordination", action="store_true"); x.add_argument("--no-current-pointer", action="store_true"); x.add_argument("--recover-stale-lock", action="store_true"); x.set_defaults(func=cmd_artifact_finalize)

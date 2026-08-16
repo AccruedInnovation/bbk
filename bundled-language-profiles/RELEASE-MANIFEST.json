@@ -1,5 +1,5 @@
 {
-  "fileCount": 10,
+  "fileCount": 12,
   "files": [
     {
       "bytes": 1044,
@@ -7,9 +7,19 @@
       "sha256": "808d40e45f4df0615e30dd0340166899de43970cd19cac2046620822d3ddfb10"
     },
     {
-      "bytes": 461,
+      "bytes": 575,
       "path": "SHA256SUMS.txt",
-      "sha256": "4f629187455d3bad0093159da9f2460f4a0545c1dbd11ed55ae99ee293847f8b"
+      "sha256": "2173907dab7c39836b671dd7a68e6dd668567976ac5d8332f017c9c2531b4b40"
+    },
+    {
+      "bytes": 588803,
+      "path": "packages/bbk-profile-codesys-0.1.0-alpha.5.zip",
+      "sha256": "9cfa5f2f356dfee75e7e387f8e44b5d895b7b8df6c718bc7ffbe4e48a0ba2e42"
+    },
+    {
+      "bytes": 105,
+      "path": "packages/bbk-profile-codesys-0.1.0-alpha.5.zip.sha256",
+      "sha256": "d01b53622f443d91320788a9afd08f4447426ab11d38bf42a8d8c53225cf09da"
     },
     {
       "bytes": 249138,
@@ -54,6 +64,7 @@
   ],
   "generatedAt": "2026-08-07T00:00:00-06:00",
   "profileVersions": {
+    "codesys": "0.1.0-alpha.5",
     "go": "0.1.0-alpha.3",
     "python": "0.1.0-alpha.3",
     "rust": "0.1.0-alpha.3",

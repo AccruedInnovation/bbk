@@ -1,0 +1,67 @@
+name: Windows verification
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "tools/install.py"
+      - "tools/install_dependencies.py"
+      - "tools/update_codex.py"
+      - "tools/update_omp.py"
+      - "tools/install*.py"
+      - "tools/update*.py"
+      - "tools/setup.py"
+      - "tools/run_tests.py"
+      - "tools/windows_compat.py"
+      - "tools/path_compat.py"
+      - "tests/test_installation_runner_processes.py"
+      - "tests/test_installation_profile_packages.py"
+      - "tests/test_installation_*.py"
+      - "tests/test_dependencies.py"
+      - "tests/test_core_contracts.py"
+      - "tests/test_*subprocess*.py"
+      - "tests/test_*console*.py"
+      - "tests/test_*temp*.py"
+      - "tests/test_*path*.py"
+      - "tests/test_*manifest*.py"
+      - "PACKAGE-MANIFEST.json"
+      - "bundled-language-profiles/**"
+      - ".github/workflows/windows-verification.yml"
+
+jobs:
+  verify:
+    name: Verify (Python ${{ matrix.python-version }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.13"]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Set up mise tools
+        uses: jdx/mise-action@v4
+
+      - name: Install declared Codex and OMP dependencies
+        run: python tools/setup.py --install-dependencies --codex --omp --yes
+
+      - name: Check declared Codex and OMP dependencies
+        run: python tools/setup.py --check-dependencies --codex --omp
+
+      - name: Run native Windows compatibility probes
+        run: python tools/windows_compat.py
+
+      - name: Run CP1252 Unicode probe
+        env:
+          PYTHONUTF8: "0"
+          PYTHONIOENCODING: "cp1252:strict"
+        run: python -m unittest tests.test_core_contracts.Alpha6CongruenceTests.test_unicode_initialization_examples_and_uninitialized_status_are_truthful
+
+      - name: Run release verification
+        run: python tools/run_tests.py --all --profile release --require-node

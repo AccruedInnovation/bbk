@@ -727,13 +727,14 @@ class PromptModulePackageV1Tests(unittest.TestCase):
                             1 if clause["id"] in applicable else 0,
                         )
 
-    def test_exactly_five_clauses_are_canonical_omp_only(self) -> None:
+    def test_exactly_six_clauses_are_canonical_omp_only(self) -> None:
         expected = {
             "CONTEXT.HOST_EDGE",
             "CRITICAL_PATH.ATOMIC_BOUND_SPAWN",
             "CRITICAL_PATH.TOKEN_DISPATCH",
             "HUMAN.REQUEST_TRANSPORT",
             "LIVENESS.EVENT_DELIVERY",
+            "HOST.OMP_EXTENSION_GUARD",
         }
         scoped = {
             clause["id"]: tuple(clause.get("hosts", ()))
@@ -988,6 +989,7 @@ class PromptModulePackageV1Tests(unittest.TestCase):
             set(module_directives(self.method["skills"]["bbk"])),
             {
                 "bbk-prompt-user-attention", "bbk-prompt-execution-autonomy",
+                "bbk-prompt-host-capability-truth",
                 "bbk-prompt-authority-completion-vocabulary",
                 "bbk-prompt-baseline-transition",
                 "bbk-prompt-critical-path-execution",

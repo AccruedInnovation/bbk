@@ -42,6 +42,15 @@ class GitSeed:
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
         )
 
+    def show_head(self, relative_path: str) -> bytes:
+        """Read one baseline path from this fixture's explicit HEAD context."""
+        path = Path(relative_path)
+        if path.is_absolute() or ".." in path.parts:
+            raise ValueError(f"fixture path must be relative: {relative_path!r}")
+        return subprocess.check_output(
+            [str(GIT), "show", f"HEAD:{path.as_posix()}"], cwd=self.root
+        )
+
 
 def prepare_git_seed(
     root: Path,

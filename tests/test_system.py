@@ -905,6 +905,8 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
         self.assertIn("Do not begin or continue a Grill for routine acceptance", guide)
         roots = [entry["role"] for entry in role_catalog["controller_entrypoints"]]
         self.assertEqual(roots, [
+            "bbk_worker",
+            "bbk_validator",
             "bbk_root_wayfinder",
             "bbk_root_orchestrator",
             "bbk_reviewer",

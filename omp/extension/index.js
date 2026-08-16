@@ -259,24 +259,37 @@ const protectedFragments = [
 ];
 
 function pythonCommand() {
-  return process.env.BBK_PYTHON || (process.platform === "win32" ? "py" : "python3");
+  const selected = process.env.BBK_PYTHON || (process.platform === "win32" ? "C:\\Python313\\python.exe" : "python3");
+  if (process.platform === "win32" && normalizedFsPath(selected) !== normalizedFsPath("C:\\Python313\\python.exe")) {
+    throw new Error(`BBK direct Python invariant requires C:\\Python313\\python.exe; got ${selected}`);
+  }
+  return selected;
+}
+function qualifiedPythonPath() {
+  const value = process.env.BBK_QUALIFIED_PYTHONPATH || process.env.PYTHONPATH || "";
+  if (!value.trim()) throw new Error("BBK direct Python invariant requires an explicit qualified PYTHONPATH");
+  return value;
+}
+function pythonInvocationPrefix(script) {
+  qualifiedPythonPath();
+  return ["-B", "-X", "utf8", script];
 }
 function commandPrefix() {
-  return process.platform === "win32" && !process.env.BBK_PYTHON
-    ? ["-3", "-X", "utf8", cliPath]
-    : ["-X", "utf8", cliPath];
+  return pythonInvocationPrefix(cliPath);
 }
 function scriptPrefix(script) {
-  return process.platform === "win32" && !process.env.BBK_PYTHON
-    ? ["-3", "-X", "utf8", script]
-    : ["-X", "utf8", script];
+  return pythonInvocationPrefix(script);
 }
 function pythonUtf8Environment(extra = {}) {
+  const qualifiedPath = qualifiedPythonPath();
   return {
     ...process.env,
     PYTHONUTF8: "1",
     PYTHONIOENCODING: "utf-8",
     ...extra,
+    PYTHONDONTWRITEBYTECODE: "1",
+    PYTHONNOUSERSITE: "1",
+    PYTHONPATH: qualifiedPath,
   };
 }
 function decodeStrictUtf8(chunks, streamName) {

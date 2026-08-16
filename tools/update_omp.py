@@ -27,7 +27,7 @@ TOOLS_DIR = Path(__file__).resolve().parent
 if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
-from runtime_requirements import enforce_supported_python
+from runtime_requirements import enforce_supported_python, direct_python_executable, python_command, python_environment
 
 enforce_supported_python(program='BBK OMP updater')
 
@@ -268,7 +268,7 @@ def make_desired_files(
         )
     bbk_cli_binding = {
         "launcher": install_tool.json_path(bbk_launcher_path) if bbk_launcher_path else None,
-        "python": install_tool.json_path(Path(sys.executable).resolve()),
+        "python": install_tool.json_path(Path(direct_python_executable())),
         "script": install_tool.json_path(package_root / "tools" / "bbk.py"),
     }
 
@@ -493,8 +493,7 @@ def restore_planned_files(plan: Sequence[PlannedFile]) -> None:
 
 
 def _strict_subprocess_json(command: Sequence[str], *, cwd: Path) -> dict[str, Any]:
-    env = os.environ.copy()
-    env.update({"PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8", "PYTHONDONTWRITEBYTECODE": "1"})
+    env = python_environment(os.environ, extra={"PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"})
     try:
         completed = subprocess.run(
             list(command), cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -532,11 +531,10 @@ def smoke_installed_runtime(*, extension: Path, package_root: Path) -> dict[str,
         "host_preflight, omp_model_routing, strict_json, governed_filesystem; "
         "print('PASS')"
     )
-    env = os.environ.copy()
-    env.update({"PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8", "PYTHONDONTWRITEBYTECODE": "1"})
+    env = python_environment(os.environ, extra={"PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"})
     try:
         imported = subprocess.run(
-            [sys.executable, "-X", "utf8", "-c", import_probe],
+            [direct_python_executable(), "-B", "-X", "utf8", "-c", import_probe],
             cwd=extension, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             check=False, timeout=45,
         )
@@ -548,13 +546,13 @@ def smoke_installed_runtime(*, extension: Path, package_root: Path) -> dict[str,
             + imported.stderr.decode("utf-8", errors="backslashreplace").strip()
         )
     routing = _strict_subprocess_json(
-        [sys.executable, "-X", "utf8", str(extension / "omp_model_routing.py"), "--json", "status"],
+        python_command(extension / "omp_model_routing.py", "--json", "status"),
         cwd=extension,
     )
     if routing.get("status") != "PASS":
         raise OmpUpdateError(f"Installed OMP model-routing status did not pass: {routing}")
     schemas = _strict_subprocess_json(
-        [sys.executable, "-X", "utf8", str(extension / "bbk.py"), "--json", "schema", "list"],
+        python_command(extension / "bbk.py", "--json", "schema", "list"),
         cwd=package_root,
     )
     if not isinstance(schemas.get("count"), int) or int(schemas["count"]) <= 0:

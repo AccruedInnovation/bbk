@@ -39,6 +39,7 @@ import tempfile
 import threading
 import time
 import unittest
+import uuid
 from pathlib import Path
 from typing import Any, Mapping, NamedTuple, Sequence, TextIO
 
@@ -46,7 +47,8 @@ TOOLS_DIR = Path(__file__).resolve().parent
 if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
-from runtime_requirements import enforce_supported_python
+from runtime_requirements import PythonLaunchInvariantError, enforce_supported_python, python_command, python_environment
+import launch_recorder
 
 enforce_supported_python(program='BBK test runner')
 
@@ -63,6 +65,10 @@ DEFAULT_TEST_PROFILE = "standard"
 DURATION_SEED_PATH = TESTS / "test-durations.json"
 LAST_RUN_REPORT: dict[str, Any] | None = None
 FAST_TEST_FILES = frozenset({
+    # ART-HARD-A13 is the bounded native artifact-control subject.  Keep its
+    # applicability-aware skips in the fast inventory so the gate cannot omit
+    # the subject merely because this host is not Windows.
+    "test_artifact_windows_native.py",
     "test_assurance_state.py",
     "test_dependencies.py",
     "test_contract_package_v1.py",
@@ -233,7 +239,24 @@ def _subprocess_environment(*, report_path: Path | None = None) -> dict[str, str
     environment["PYTHONIOENCODING"] = (
         f"{SUBPROCESS_OUTPUT_ENCODING}:{SUBPROCESS_OUTPUT_ERRORS}"
     )
-    environment["BBK_TEST_ALLOW_MISSING_DEPENDENCIES"] = "1"
+    environment["PYTHONDONTWRITEBYTECODE"] = "1"
+    environment["PYTHONNOUSERSITE"] = "1"
+    if raw_cache := environment.get("BBK_TEST_CACHE_DIR"):
+        runtime = Path(raw_cache).expanduser() / "runtime"
+        runtime.mkdir(parents=True, exist_ok=True)
+        # Preserve caller-owned external roots when supplied.  Only construct
+        # attempt-local fallbacks for callers that omitted them.
+        if not environment.get("TEMP"):
+            environment["TEMP"] = str(runtime / "temp")
+        if not environment.get("TMP"):
+            environment["TMP"] = str(runtime / "temp")
+        if not environment.get("TMPDIR"):
+            environment["TMPDIR"] = str(runtime / "temp")
+        if not environment.get("PYTHONPYCACHEPREFIX"):
+            environment["PYTHONPYCACHEPREFIX"] = str(runtime / "cache")
+        Path(environment["TEMP"]).mkdir(parents=True, exist_ok=True)
+        Path(environment["PYTHONPYCACHEPREFIX"]).mkdir(parents=True, exist_ok=True)
+    environment = python_environment(environment, extra={"BBK_TEST_ALLOW_MISSING_DEPENDENCIES": "1"})
     if report_path is not None:
         # Every child receives a fresh parent-owned carrier.  Overriding an
         # inherited value prevents nested BBK runners from writing into an
@@ -282,7 +305,7 @@ def unittest_command(
     buffer: bool = False,
 ) -> list[str]:
     """Return the standard-library unittest discovery command."""
-    command = [sys.executable, str(TOOLS_DIR / "test_module_runner.py"), "--discover", pattern]
+    command = python_command(TOOLS_DIR / "test_module_runner.py", "--discover", pattern)
     if verbose:
         command.append("-v")
     elif quiet:
@@ -303,7 +326,7 @@ def unittest_modules_command(
     buffer: bool = False,
 ) -> list[str]:
     """Return one unittest command for an exact set of package test modules."""
-    command = [sys.executable, str(TOOLS_DIR / "test_module_runner.py")]
+    command = python_command(TOOLS_DIR / "test_module_runner.py")
     if verbose:
         command.append("-v")
     elif quiet:
@@ -546,6 +569,18 @@ def _store_run_report(report: dict[str, Any], path: Path | None) -> None:
         write_json_atomic(path, report)
     except OSError as exc:
         report["report_write_error"] = f"{type(exc).__name__}: {exc}"
+
+
+def _attach_launch_ledger(report: dict[str, Any], *, child_scope: bool = False) -> bool:
+    """Finalize the explicit launch ledger and fail closed on its integrity."""
+    try:
+        ledger = launch_recorder.finalize(exclude_enclosing_ancestor=child_scope)
+    except launch_recorder.LaunchRecordError as exc:
+        launch_recorder.persist_error_diagnostic(exc, report=report)
+        return False
+    if ledger is not None:
+        report["launch_ledger"] = ledger
+    return True
 
 
 def update_duration_cache(
@@ -849,8 +884,20 @@ def _execute_unittest_command(
     report_path: Path | None = None
     structured = _empty_structured_test_report()
     process: subprocess.Popen[bytes] | None = None
+    launch: launch_recorder.LaunchHandle | None = None
+    launch_completed = False
+    launch_failure: launch_recorder.LaunchRecordError | None = None
+    timed_out = False
+    returncode = 2
     try:
-        fd, raw_capture = tempfile.mkstemp(prefix="bbk-test-suite-", suffix=".log")
+        capture_dir = None
+        if raw_cache := os.environ.get("BBK_TEST_CACHE_DIR"):
+            capture_dir = Path(raw_cache).expanduser() / "runtime" / "captures"
+            capture_dir.mkdir(parents=True, exist_ok=True)
+        mkstemp_kwargs = {"prefix": "bbk-test-suite-", "suffix": ".log"}
+        if capture_dir is not None:
+            mkstemp_kwargs["dir"] = str(capture_dir)
+        fd, raw_capture = tempfile.mkstemp(**mkstemp_kwargs)
         os.close(fd)
         capture_path = Path(raw_capture)
         # Derive a sibling carrier from the already private capture name so
@@ -862,15 +909,24 @@ def _execute_unittest_command(
         )
         os.close(report_fd)
         with capture_path.open("wb") as writer:
+            child_environment = _subprocess_environment(report_path=report_path)
+            launch = launch_recorder.prepare(
+                command,
+                cwd=ROOT,
+                environment=child_environment,
+                kind="unittest-suite",
+                require_evidence_root=True,
+            )
             process = subprocess.Popen(
                 list(command),
                 cwd=ROOT,
                 stdin=subprocess.DEVNULL,
                 stdout=writer,
                 stderr=subprocess.STDOUT,
-                env=_subprocess_environment(report_path=report_path),
+                env=child_environment,
                 **creation,
             )
+            launch.started(process.pid)
 
         decoder = codecs.getincrementaldecoder(SUBPROCESS_OUTPUT_ENCODING)(
             errors=SUBPROCESS_OUTPUT_ERRORS
@@ -878,7 +934,6 @@ def _execute_unittest_command(
         chunks: list[str] = []
         started = time.monotonic()
         last_visible_activity = started
-        timed_out = False
         with capture_path.open("rb") as reader:
             while process.poll() is None:
                 now = time.monotonic()
@@ -912,6 +967,9 @@ def _execute_unittest_command(
             except subprocess.TimeoutExpired:
                 timed_out = True
                 returncode = 2
+            if launch is not None:
+                launch.completed(returncode=returncode, state="timed-out" if timed_out else "completed")
+                launch_completed = True
             if stream is None:
                 reader.seek(0)
                 output = reader.read().decode(
@@ -942,7 +1000,14 @@ def _execute_unittest_command(
             return SuiteResult(
                 label, 2, output, parse_test_count(output), (issue,), parse_skip_count(output)
             )
+    except (launch_recorder.LaunchRecordError, PythonLaunchInvariantError) as exc:
+        if isinstance(exc, launch_recorder.LaunchRecordError):
+            launch_failure = exc
+        issue = TestIssue("PROCESS ERROR", label, f"{type(exc).__name__}: {exc}")
+        return SuiteResult(label, 2, "", None, (issue,), 0)
     except OSError as exc:
+        if launch is not None:
+            launch.spawn_failed(exc)
         issue = TestIssue("PROCESS ERROR", label, f"{type(exc).__name__}: {exc}")
         return SuiteResult(label, 2, "", None, (issue,), 0)
     finally:
@@ -951,6 +1016,31 @@ def _execute_unittest_command(
                 _terminate_process_tree(process)
             except OSError:
                 pass
+        if process is not None:
+            try:
+                process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                timed_out = True
+        if launch is not None and process is not None and not launch_completed:
+            observed = process.poll()
+            if observed is None:
+                observed = 2
+            try:
+                launch.completed(
+                    returncode=observed,
+                    state="timed-out" if timed_out else "completed",
+                    error=(
+                        f"{type(launch_failure).__name__}: {launch_failure}"
+                        if launch_failure is not None
+                        else ("suite process cleanup completed before launch finalization" if timed_out else None)
+                    ),
+                )
+                launch_completed = True
+            except launch_recorder.LaunchRecordError as exc:
+                # Keep the underlying process/test result, while the later
+                # aggregate receives the exact record identity and ownership
+                # details from this durable integrity failure.
+                launch_failure = exc
         if capture_path is not None:
             _remove_capture_file(capture_path)
         if report_path is not None:
@@ -1358,6 +1448,8 @@ def run_test_pool(
             for index in range(1, len(groups) + 1)
         ],
     }
+    if not _attach_launch_ledger(LAST_RUN_REPORT, child_scope=True):
+        exit_code = 1
     return exit_code
 
 
@@ -1432,6 +1524,8 @@ def run_test_batch(
             "status": "PASS" if result.passed else "FAIL",
         }],
     }
+    if not _attach_launch_ledger(LAST_RUN_REPORT, child_scope=True):
+        exit_code = 1
     return exit_code
 
 
@@ -1530,6 +1624,8 @@ def run_test_files(
             for index, path in enumerate(files, start=1)
         ],
     }
+    if not _attach_launch_ledger(LAST_RUN_REPORT, child_scope=True):
+        exit_code = 1
     return exit_code
 
 
@@ -1663,6 +1759,8 @@ def _run_test_files_parallel(
             for index in range(1, len(files) + 1)
         ],
     }
+    if not _attach_launch_ledger(LAST_RUN_REPORT, child_scope=True):
+        exit_code = 1
     return exit_code
 
 

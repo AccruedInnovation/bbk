@@ -57,6 +57,9 @@ class DependencyContractTests(unittest.TestCase):
     def test_install_with_empty_path_blocks_before_writing_or_third_party_imports(self) -> None:
         environment = os.environ.copy()
         environment["PATH"] = ""
+        environment["PYTHONPATH"] = str(ROOT)
+        environment["PYTHONDONTWRITEBYTECODE"] = "1"
+        environment["PYTHONNOUSERSITE"] = "1"
         environment.pop("BBK_TEST_ALLOW_MISSING_DEPENDENCIES", None)
         with tempfile.TemporaryDirectory() as raw_project:
             project = Path(raw_project)
@@ -122,6 +125,9 @@ class DependencyContractTests(unittest.TestCase):
     def test_dependency_check_runs_before_python_packages_are_installed(self) -> None:
         environment = os.environ.copy()
         environment["PATH"] = ""
+        environment["PYTHONPATH"] = str(ROOT)
+        environment["PYTHONDONTWRITEBYTECODE"] = "1"
+        environment["PYTHONNOUSERSITE"] = "1"
         result = subprocess.run(
             [
                 sys.executable,

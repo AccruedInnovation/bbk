@@ -40,7 +40,12 @@ class CodexExternalTargetsTests(unittest.TestCase):
             rows = list(csv.DictReader(stream))
         self.assertEqual(len(rows), 33)
         self.assertEqual(self.registry["provenance"]["tracked_file_count"], len(rows))
-        self.assertEqual({r["classification"] for r in rows}, {"COPIED"})
+        self.assertEqual({r["classification"] for r in rows}, {"COPIED", "TRANSFORMED"})
+        transformed = [r for r in rows if r["classification"] == "TRANSFORMED"]
+        self.assertEqual(len(transformed), 1)
+        self.assertEqual(transformed[0]["bbk_path"], "third_party/codex-deepseek-subagent/tests/test_plaintext_handoff.py")
+        self.assertIn("codex-ds-plaintext-handoff-explicit-utf8-v1", transformed[0]["reason"])
+        self.assertIn("14 occurrences", transformed[0]["reason"])
         for row in rows:
             path = ROOT / row["bbk_path"]
             self.assertTrue(path.is_file(), row["bbk_path"])
@@ -52,8 +57,25 @@ class CodexExternalTargetsTests(unittest.TestCase):
         commit = self.registry["provenance"]["upstream_commit"]
         for row in csv.DictReader((UPSTREAM_ROOT / "UPSTREAM-FILE-MAP.csv").read_text(encoding="utf-8").splitlines()):
             source = subprocess.check_output(["git", "-C", r"D:\Projects\BBK-codex-deepseek-subagent", "show", f"{commit}:{row['upstream_path']}"])
+            if row["classification"] == "TRANSFORMED":
+                operation = b".read_text()"
+                replacement = b'.read_text(encoding="utf-8")'
+                self.assertEqual(source.count(operation), 14, row["upstream_path"])
+                source = source.replace(operation, replacement)
             local = (ROOT / row["bbk_path"]).read_bytes()
             self.assertEqual(local, source, row["upstream_path"])
+
+    def test_transformation_record_preserves_both_file_identities(self):
+        metadata = json.loads((UPSTREAM_ROOT / "UPSTREAM.json").read_text(encoding="utf-8"))
+        self.assertEqual(metadata["copy_policy"], "byte_for_byte_except_declared_transformations")
+        self.assertEqual(metadata["transformed_file_count"], 1)
+        self.assertEqual(len(metadata["transformations"]), 1)
+        transformation = metadata["transformations"][0]
+        self.assertEqual(transformation["transformation_id"], "codex-ds-plaintext-handoff-explicit-utf8-v1")
+        self.assertEqual(transformation["operation"], '.read_text() -> .read_text(encoding="utf-8")')
+        self.assertEqual(transformation["occurrence_count"], 14)
+        self.assertEqual(transformation["upstream_sha256"], "3f5c47b78b6038b964e06e30fc18490ba52b591fb207dc458ff233f231047cd8")
+        self.assertEqual(transformation["local_sha256"], "77ec4c343866918f91815ef7ca031901601d041a1cb44bdb1e4c9418c239da85")
 
     def test_protected_routing_matches_repository_baseline(self):
         protected = ["spec/model-routing.json", "spec/omp-model-routing-profiles.json"]

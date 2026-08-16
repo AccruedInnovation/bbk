@@ -37,6 +37,7 @@ import run_tests
 import windows_compat
 import install as install_tool
 import verify_all
+import verify_package
 from tests import _test_profiles as test_profiles
 from tests._path_support import assert_different_path, assert_same_path, assert_same_path_sequence
 m8_build_release = m1_load_module('bbk_build_release_alpha13', 'tools/build_release.py')
@@ -48,14 +49,18 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
 
     def test_release_package_uses_an_explicit_cross_extractor_mode_policy(self):
         self.assertEqual(m8_build_release.PACKAGE_EXECUTABLES, frozenset())
-        self.assertTrue(all((not m8_build_release.is_executable(path) for path in m8_build_release.package_files())))
+        files = list(m8_build_release.package_files())
+        self.assertTrue(all((not m8_build_release.is_executable(path) for path in files)))
+        self.assertFalse(any('.bbk' in path.relative_to(m8_ROOT).parts for path in files))
+
+    def test_package_verifier_uses_the_same_governance_exclusions(self):
+        self.assertEqual(m8_build_release.EXCLUDED_PARTS, verify_package.EXCLUDED_PARTS)
 
     def test_release_builder_uses_the_exhaustive_test_profile(self):
         with mock.patch.object(m8_build_release, "run") as runner:
             m8_build_release.qualification_checks()
-        runner.assert_called_once_with([
-            sys.executable,
-            "tools/run_tests.py",
+        runner.assert_called_once_with(m8_build_release.python_command(
+            m8_ROOT / "tools" / "run_tests.py",
             "--all",
             "--profile",
             "release",
@@ -64,7 +69,7 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
             "pooled",
             "--jobs",
             "0",
-        ])
+        ))
 
     def _expanded_profiles(self, destination: Path, *, count: int | None=None) -> list[Path]:
         packages = destination / 'packages'
@@ -666,11 +671,15 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
             errors='strict',
             write_through=True,
         )
-        spec = verify_all.CheckSpec(
-            'Unicode output probe',
-            (sys.executable, '-c', 'print("Résumé → 🚀")'),
-        )
-        result = verify_all.execute_step(spec, stream=stream)
+        with tempfile.TemporaryDirectory() as raw_root:
+            probe = Path(raw_root) / "unicode_probe.py"
+            probe.write_text('print("Résumé → 🚀")\n', encoding="utf-8")
+            spec = verify_all.CheckSpec(
+                'Unicode output probe',
+                tuple(run_tests.python_command(probe)),
+                cwd=probe.parent,
+            )
+            result = verify_all.execute_step(spec, stream=stream)
         stream.flush()
         output = raw_output.getvalue().decode('cp1252')
         stream.detach()

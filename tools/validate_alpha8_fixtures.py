@@ -8,9 +8,10 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
 from contracts import validate_profile, validate_profile_capability_request, validate_profile_capability_result
 from validate_alpha7_fixtures import validate as validate_alpha7
+from runtime_requirements import python_command, python_environment
 
 def run_json(args:list[str])->dict[str,Any]:
- p=subprocess.run([sys.executable,str(ROOT/'tools/bbk.py'),'--json',*args],cwd=ROOT,text=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+ p=subprocess.run(python_command(ROOT/'tools/bbk.py','--json',*args),cwd=ROOT,env=python_environment(),text=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
  if p.returncode!=0: return {'status':'ERROR','stderr':p.stderr,'stdout':p.stdout,'argv':args}
  return json.loads(p.stdout)
 def check(name,status,detail=None): return {'name':name,'status':status,'detail':detail}

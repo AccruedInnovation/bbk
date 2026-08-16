@@ -59,6 +59,7 @@ MANIFEST = ROOT / "projections" / "manifest.json"
 CODEX_DS_ROOT = ROOT / "projections" / "codex_ds"
 CODEX_DS_MANIFEST = CODEX_DS_ROOT / "manifest.json"
 CODEX_DS_REGISTRY = ROOT / "spec" / "codex-external-targets.json"
+CODEX_DS_UPSTREAM = ROOT / "third_party" / "codex-deepseek-subagent" / "UPSTREAM.json"
 CODEX_DS_QUALIFICATION = ROOT / "evidence" / "qualification" / "deepseek-codex-provider-seam-r4" / "qualification-receipt.json"
 
 
@@ -953,6 +954,8 @@ def _render_codex_deepseek(
 def external_codex_expected_files() -> tuple[dict[Path, bytes], dict[str, Any]]:
     """Return the exact additive 19-role Pro/Flash Codex projection bundle."""
     registry, registry_sha256, qualification, qualification_sha256 = _external_target_inputs()
+    upstream_metadata = json.loads(CODEX_DS_UPSTREAM.read_text(encoding="utf-8"))
+    upstream_sha256 = sha256(CODEX_DS_UPSTREAM.read_bytes())
     spec = json.loads(SPEC_PATH.read_text(encoding="utf-8"))
     routing = load_model_routing(MODEL_ROUTING_PATH, root=ROOT, role_spec=spec)
     method_content = canonical_method_content()
@@ -1000,6 +1003,14 @@ def external_codex_expected_files() -> tuple[dict[Path, bytes], dict[str, Any]]:
         "activation": "ACTIVATION_NEUTRAL",
         "registry": {"path": portable_relative_path(CODEX_DS_REGISTRY, ROOT), "sha256": registry_sha256},
         "qualification": {"path": portable_relative_path(CODEX_DS_QUALIFICATION, ROOT), "sha256": qualification_sha256, "credential_value_observed": False},
+        "upstream_provenance": {
+            "path": portable_relative_path(CODEX_DS_UPSTREAM, ROOT),
+            "sha256": upstream_sha256,
+            "upstream_commit": upstream_metadata["upstream_commit"],
+            "tracked_file_count": upstream_metadata["tracked_file_count"],
+            "transformed_file_count": upstream_metadata["transformed_file_count"],
+            "transformations": upstream_metadata.get("transformations", []),
+        },
         "canonical_sources": {
             "roles": portable_relative_path(SPEC_PATH, ROOT),
             "model_routing": portable_relative_path(MODEL_ROUTING_PATH, ROOT),
@@ -1119,35 +1130,43 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true", help="fail when generated files are missing or drifted")
     parser.add_argument("--codex-ds", action="store_true", help="generate/check additive DeepSeek Codex Pro/Flash projections")
+    parser.add_argument("--external-only", action="store_true", help="generate/check only the additive DeepSeek Codex projection bundle")
     args = parser.parse_args()
     try:
-        outputs, manifest = expected_files()
+        outputs, manifest = ({}, {}) if args.external_only else expected_files()
         external_outputs, external_manifest = external_codex_expected_files()
     except (OSError, json.JSONDecodeError, ValueError) as exc:
         print(f"BBK agent projection input error: {exc}", file=sys.stderr)
         return 1
     if args.check:
-        errors = check(outputs) + check_external_codex(external_outputs)
+        errors = ([] if args.external_only else check(outputs)) + check_external_codex(external_outputs)
         if errors:
             print("BBK agent projection drift detected:", file=sys.stderr)
             for error in errors:
                 print(f"- {error}", file=sys.stderr)
             return 1
-        print(
-            f"OK: {manifest['role_count']} roles, {manifest['model_route_count']} direct model routes, "
-            f"{manifest['target_count']} targets, and {manifest['projection_count']} projections "
-            f"match {manifest['source_sha256']}; DeepSeek external bundle has "
-            f"{external_manifest['projection_count']} projections"
-        )
+        if args.external_only:
+            print(f"OK: DeepSeek external bundle has {external_manifest['projection_count']} projections")
+        else:
+            print(
+                f"OK: {manifest['role_count']} roles, {manifest['model_route_count']} direct model routes, "
+                f"{manifest['target_count']} targets, and {manifest['projection_count']} projections "
+                f"match {manifest['source_sha256']}; DeepSeek external bundle has "
+                f"{external_manifest['projection_count']} projections"
+            )
         return 0
-    write(outputs)
+    if not args.external_only:
+        write(outputs)
     write(external_outputs)
-    print(
-        f"Generated {manifest['role_count']} roles into {manifest['projection_count']} projections "
-        f"across {manifest['target_count']} targets using {manifest['model_route_count']} direct model routes; "
-        f"generated {external_manifest['projection_count']} explicit DeepSeek projections"
-    )
-    print(f"Projection input SHA-256: {manifest['source_sha256']}")
+    if args.external_only:
+        print(f"Generated {external_manifest['projection_count']} explicit DeepSeek projections")
+    else:
+        print(
+            f"Generated {manifest['role_count']} roles into {manifest['projection_count']} projections "
+            f"across {manifest['target_count']} targets using {manifest['model_route_count']} direct model routes; "
+            f"generated {external_manifest['projection_count']} explicit DeepSeek projections"
+        )
+        print(f"Projection input SHA-256: {manifest['source_sha256']}")
     return 0
 
 

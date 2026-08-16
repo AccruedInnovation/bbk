@@ -16,6 +16,7 @@ from typing import Any, Mapping, Sequence
 
 from strict_json import StrictJsonError, load_path as strict_load_path, loads_bytes as strict_loads_bytes, loads_text as strict_loads_text
 from path_compat import canonical_path_text, path_key
+from runtime_requirements import python_command, python_environment
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 DEFAULT_BINDING = SCRIPT_DIR / "bbk-package-root.json"
@@ -720,12 +721,8 @@ def _run_installer(
     with tempfile.TemporaryDirectory(prefix="bbk-project-routing-") as temp:
         policy_path = Path(temp) / "effective-user-routes.json"
         policy_path.write_bytes(pretty_json_bytes(policy))
-        command = [
-            sys.executable,
-            "-S",
-            "-X",
-            "utf8",
-            str(installer),
+        command = python_command(
+            installer,
             "--json",
             "install",
             "--scope",
@@ -736,13 +733,14 @@ def _run_installer(
             "--no-language-profiles",
             "--model-routing",
             str(policy_path),
-        ]
+            module=None,
+            isolated=True,
+        )
         if replace:
             command.extend(["--uninstall-existing", "--force"])
         if dry_run:
             command.append("--dry-run")
-        env = os.environ.copy()
-        env.update({"PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"})
+        env = python_environment(os.environ, extra={"PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"})
         completed = subprocess.run(
             command,
             cwd=project,
@@ -851,23 +849,20 @@ def inspect_project_localization(context: Mapping[str, Any], project_value: str 
     installer_status: dict[str, Any] | None = None
     try:
         installer = _authenticated_installer(context)
-        command = [
-            sys.executable,
-            "-S",
-            "-X",
-            "utf8",
-            str(installer),
+        command = python_command(
+            installer,
             "--json",
             "status",
             "--scope",
             "project",
             "--root",
             str(project),
-        ]
+            isolated=True,
+        )
         completed = subprocess.run(
             command,
             cwd=project,
-            env={**os.environ, "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"},
+            env=python_environment(os.environ, extra={"PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"}),
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             check=False,

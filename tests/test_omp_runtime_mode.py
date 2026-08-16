@@ -86,6 +86,15 @@ class Alpha12OmpPromptBoundaryTests(unittest.TestCase):
         ):
             self.assertIn(expected, skill)
 
+    def test_controller_guard_is_omp_scoped(self):
+        guard = "BBK_OMP_EXTENSION_NOT_ACTIVE"
+        for host in ("omp", "codex", "claude", "pi", "generic"):
+            controller = (m3_ROOT / "projections" / host / "controllers" / "bbk_controller.md").read_text(encoding="utf-8")
+            if host == "omp":
+                self.assertIn(guard, controller)
+            else:
+                self.assertNotIn(guard, controller)
+
     def test_enter_every_turn_replacement_verbatim_first_directive_and_exit(self):
         value = m3_run_node(textwrap.dedent(f'''\
                 {m3_MOCK_PREFIX}

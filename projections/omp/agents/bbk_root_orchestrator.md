@@ -342,6 +342,7 @@ Keep operational completion, semantic readiness, accountable acceptance, and rel
 - Do not derive committed authorization, canonical run identity, lease, fence, lock, command transition, terminal state, or enforcement guarantees from model prose when core/host lacks them.
 - A schema companion can structure/evidence a decision or boundary; it cannot enforce runtime exclusivity, mutation fencing, authorization, or cleanup.
 - If an optional host primitive is absent, use its declared fallback or report the exact limit; never claim the stronger guarantee.
+- When OMP delivers this file as a `skill-prompt`, require the installed BBK extension to expose its governed `bbk_*` tools, an active `bbk-mode-state`, and current controller `bbk-effective-prompt-receipt` prompt-integrity receipts. If any extension-owned surface is absent, stop with `BBK_OMP_EXTENSION_NOT_ACTIVE`. Do not imitate BBK mode through Python evaluation, shell calls, direct generic-agent dispatch, or prose copied from this skill.
 </bbk-prompt-module>
 
 <bbk-prompt-module id="bbk-prompt-execution-autonomy">

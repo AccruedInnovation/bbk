@@ -1,4 +1,53 @@
 {
+  "compatibility": {
+    "dualRead": true,
+    "families": {
+      "currentPointer": {
+        "readers": [
+          "spec/schemas/bbk-artifact-package-current-pointer-v1.schema.json",
+          "spec/schemas/bbk-artifact-current-pointer-v2.schema.json"
+        ],
+        "writer": "spec/schemas/bbk-artifact-package-current-pointer-v1.schema.json"
+      },
+      "draft": {
+        "readers": [
+          "spec/schemas/bbk-artifact-package-draft-v1.schema.json",
+          "spec/schemas/bbk-artifact-package-draft-v2.schema.json"
+        ],
+        "writer": "spec/schemas/bbk-artifact-package-draft-v1.schema.json"
+      },
+      "manifest": {
+        "readers": [
+          "spec/schemas/bbk-artifact-package-manifest-v1.schema.json",
+          "spec/schemas/bbk-artifact-package-manifest-v2.schema.json"
+        ],
+        "writer": "spec/schemas/bbk-artifact-package-manifest-v1.schema.json"
+      },
+      "package": {
+        "readers": [
+          "spec/schemas/bbk-artifact-package-v1.schema.json",
+          "spec/schemas/bbk-artifact-package-v2.schema.json"
+        ],
+        "writer": "spec/schemas/bbk-artifact-package-v1.schema.json"
+      },
+      "publicationReceipt": {
+        "readers": [
+          "spec/schemas/bbk-artifact-package-publication-v1.schema.json",
+          "spec/schemas/bbk-artifact-publication-receipt-v2.schema.json"
+        ],
+        "writer": "spec/schemas/bbk-artifact-package-publication-v1.schema.json"
+      },
+      "sealReceipt": {
+        "readers": [
+          "spec/schemas/bbk-artifact-package-seal-receipt-v1.schema.json",
+          "spec/schemas/bbk-artifact-package-seal-receipt-v2.schema.json"
+        ],
+        "writer": "spec/schemas/bbk-artifact-package-seal-receipt-v1.schema.json"
+      }
+    },
+    "mode": "READERS_FIRST",
+    "v2WritesEnabled": false
+  },
   "generatedFieldOwnership": {
     "descriptorFields": [
       "bytes",
@@ -34,14 +83,21 @@
       ],
       "description": "Generic local artifact package with declared local references.",
       "descriptorSchema": "bbk-artifact-package-draft-v1.schema.json",
+      "dualRead": true,
       "id": "generic",
       "permittedSchemas": [
         "*"
       ],
+      "readerSchemas": [
+        "bbk-artifact-package-draft-v1.schema.json",
+        "bbk-artifact-package-draft-v2.schema.json"
+      ],
       "requiredSchemas": [],
       "semanticValidators": [],
       "successorClearPointers": [],
-      "version": "1"
+      "v2WriteEnabled": false,
+      "version": "1",
+      "writerSchema": "bbk-artifact-package-draft-v1.schema.json"
     },
     {
       "artifactReferenceCycles": "FORBIDDEN",
@@ -53,11 +109,16 @@
       ],
       "description": "Sealed v2 handoff package.",
       "descriptorSchema": "bbk-artifact-package-draft-v1.schema.json",
+      "dualRead": true,
       "id": "handoff-v2",
       "permittedSchemas": [
         "bbk.handoff.v2",
         "bbk.evidence-receipt.v2",
         "*"
+      ],
+      "readerSchemas": [
+        "bbk-artifact-package-draft-v1.schema.json",
+        "bbk-artifact-package-draft-v2.schema.json"
       ],
       "requiredSchemas": [
         "bbk.handoff.v2"
@@ -69,7 +130,9 @@
         "/attempt",
         "/continuation/checkpoint"
       ],
-      "version": "1"
+      "v2WriteEnabled": false,
+      "version": "1",
+      "writerSchema": "bbk-artifact-package-draft-v1.schema.json"
     },
     {
       "artifactReferenceCycles": "FORBIDDEN",
@@ -81,11 +144,16 @@
       ],
       "description": "Role return v2 package with compact or full detail.",
       "descriptorSchema": "bbk-artifact-package-draft-v1.schema.json",
+      "dualRead": true,
       "id": "role-return-v2",
       "permittedSchemas": [
         "bbk.role-return.v2",
         "bbk.evidence-receipt.v2",
         "*"
+      ],
+      "readerSchemas": [
+        "bbk-artifact-package-draft-v1.schema.json",
+        "bbk-artifact-package-draft-v2.schema.json"
       ],
       "requiredSchemas": [
         "bbk.role-return.v2"
@@ -98,7 +166,9 @@
         "/generated_at",
         "/effects/attempt_owned"
       ],
-      "version": "1"
+      "v2WriteEnabled": false,
+      "version": "1",
+      "writerSchema": "bbk-artifact-package-draft-v1.schema.json"
     },
     {
       "artifactReferenceCycles": "FORBIDDEN",
@@ -110,6 +180,7 @@
       ],
       "description": "Mechanically generated standard Worker invocation/context package.",
       "descriptorSchema": "bbk-artifact-package-draft-v1.schema.json",
+      "dualRead": true,
       "id": "worker-context-v1",
       "permittedSchemas": [
         "bbk.worker-context-package.v1",
@@ -117,6 +188,10 @@
         "bbk.profile-lock.v1",
         "bbk.prototype-charter.v2",
         "*"
+      ],
+      "readerSchemas": [
+        "bbk-artifact-package-draft-v1.schema.json",
+        "bbk-artifact-package-draft-v2.schema.json"
       ],
       "requiredSchemas": [
         "bbk.worker-context-package.v1"
@@ -126,7 +201,9 @@
         "/admission",
         "/hostPreflight/cache"
       ],
-      "version": "1"
+      "v2WriteEnabled": false,
+      "version": "1",
+      "writerSchema": "bbk-artifact-package-draft-v1.schema.json"
     },
     {
       "artifactReferenceCycles": "FORBIDDEN",
@@ -139,12 +216,17 @@
       ],
       "description": "Generated review or focused recheck context package.",
       "descriptorSchema": "bbk-artifact-package-draft-v1.schema.json",
+      "dualRead": true,
       "id": "review-package-v2",
       "permittedSchemas": [
         "bbk.review-package.v2",
         "bbk.review-finding.v1",
         "bbk.evidence-receipt.v2",
         "*"
+      ],
+      "readerSchemas": [
+        "bbk-artifact-package-draft-v1.schema.json",
+        "bbk-artifact-package-draft-v2.schema.json"
       ],
       "requiredSchemas": [
         "bbk.review-package.v2"
@@ -156,7 +238,9 @@
         "/attempt",
         "/findings"
       ],
-      "version": "1"
+      "v2WriteEnabled": false,
+      "version": "1",
+      "writerSchema": "bbk-artifact-package-draft-v1.schema.json"
     },
     {
       "artifactReferenceCycles": "FORBIDDEN",
@@ -169,10 +253,15 @@
       ],
       "description": "Integrated candidate package for bounded review and release evidence.",
       "descriptorSchema": "bbk-artifact-package-draft-v1.schema.json",
+      "dualRead": true,
       "id": "candidate-package-v1",
       "permittedSchemas": [
         "bbk.candidate-package.v1",
         "*"
+      ],
+      "readerSchemas": [
+        "bbk-artifact-package-draft-v1.schema.json",
+        "bbk-artifact-package-draft-v2.schema.json"
       ],
       "requiredSchemas": [
         "bbk.candidate-package.v1"
@@ -181,7 +270,9 @@
         "candidate-subject-binding"
       ],
       "successorClearPointers": [],
-      "version": "1"
+      "v2WriteEnabled": false,
+      "version": "1",
+      "writerSchema": "bbk-artifact-package-draft-v1.schema.json"
     }
   ],
   "registryVersion": "1",

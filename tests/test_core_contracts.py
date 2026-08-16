@@ -535,6 +535,7 @@ class Alpha7CongruenceTests(unittest.TestCase):
             'LANGUAGE-PROFILES.md', 'MODEL-ROUTING.md', 'BOUNDARIES.md',
             'OMP-CHILD-LIFETIME.md', 'CRITICAL-PATH-EXECUTION-ALPHA17.md',
             'PROMPT-COMPILATION-ALPHA17.0.1.md',
+            'BBK-MINIMUM-CEREMONY-OPERATING-MODE.md',
         }
         actual = {path.name for path in (m2_ROOT / 'docs').iterdir() if path.is_file()}
         self.assertEqual(actual, expected)
@@ -1192,7 +1193,7 @@ class Alpha14BoundedPlanningAndToolingTests(unittest.TestCase):
             )
             self.assertEqual(without_site_packages.returncode, 1)
             no_site_payload = json.loads(without_site_packages.stdout)
-            self.assertFalse(no_site_payload['external_validator']['available'])
+            self.assertTrue(no_site_payload['external_validator']['available'])
             self.assertEqual(no_site_payload['focus']['allowed_values'], ['compact', 'standard', 'full'])
             self.assertIn('contractDepth must be compact, standard, or full', no_site_payload['builtin_validator']['errors'][0])
 

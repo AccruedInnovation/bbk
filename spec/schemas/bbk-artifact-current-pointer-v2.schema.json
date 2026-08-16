@@ -1,0 +1,89 @@
+{
+  "$defs": {
+    "nonEmpty": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "path": {
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+$",
+      "type": "string"
+    },
+    "profile": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/safeId"
+        },
+        "version": {
+          "$ref": "#/$defs/nonEmpty"
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ],
+      "type": "object"
+    },
+    "safeId": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+      "type": "string"
+    },
+    "sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    }
+  },
+  "$id": "https://bbk.local/schemas/bbk-artifact-current-pointer-v2.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "authorityBoundary": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "contentSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "manifestSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "packageId": {
+      "$ref": "#/$defs/safeId"
+    },
+    "profile": {
+      "$ref": "#/$defs/profile"
+    },
+    "publication": {
+      "$ref": "#/$defs/path"
+    },
+    "publicationSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "revision": {
+      "$ref": "#/$defs/nonEmpty"
+    },
+    "schema": {
+      "const": "bbk.artifact-current-pointer.v2"
+    },
+    "updatedAtUtc": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "packageId",
+    "revision",
+    "profile",
+    "contentSha256",
+    "manifestSha256",
+    "publication",
+    "publicationSha256",
+    "updatedAtUtc",
+    "authorityBoundary"
+  ],
+  "title": "BBK mutable current artifact package pointer v2",
+  "type": "object"
+}
+
+

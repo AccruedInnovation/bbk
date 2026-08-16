@@ -106,6 +106,10 @@ bounded independent review
   → bbk_reviewer
 assertion-scoped candidate acceptance
   → bbk_validator_orchestrator
+clear local reversible Level 0 implementation
+  → bbk_worker
+grouped candidate-bound Level 0 assertion
+  → bbk_validator
 ```
 
 With OMP's advertised batch form, dispatch even one root as `{ context, tasks: [{ name, agent, task, ... }] }`. Set `agent` to the exact canonical `bbk_*` role, use `name` only as a stable IRC/job identifier, and put the complete self-contained assignment in `task`. When OMP advertises only the flat form, follow it exactly and put reusable shared background in a durable `local://` context file.

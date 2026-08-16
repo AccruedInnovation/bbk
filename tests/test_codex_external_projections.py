@@ -68,6 +68,17 @@ class CodexExternalProjectionTests(unittest.TestCase):
         self.assertFalse(manifest["invariants"]["silent_fallback"])
         self.assertFalse(manifest["invariants"]["credential_value_persisted"])
 
+    def test_manifest_preserves_external_upstream_transformation_provenance(self) -> None:
+        manifest = json.loads((PROJECTIONS / "manifest.json").read_text(encoding="utf-8"))
+        provenance = manifest["upstream_provenance"]
+        self.assertEqual(provenance["upstream_commit"], "c949e8d9b8922a48990b1e08259ad4baefc75f55")
+        self.assertEqual(provenance["tracked_file_count"], 33)
+        self.assertEqual(provenance["transformed_file_count"], 1)
+        self.assertEqual(len(provenance["transformations"]), 1)
+        transformation = provenance["transformations"][0]
+        self.assertEqual(transformation["transformation_id"], "codex-ds-plaintext-handoff-explicit-utf8-v1")
+        self.assertEqual(transformation["occurrence_count"], 14)
+
 
 if __name__ == "__main__":  # pragma: no cover
     unittest.main()

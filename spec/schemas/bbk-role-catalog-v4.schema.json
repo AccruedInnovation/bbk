@@ -106,6 +106,8 @@
       "properties": {
         "route": {
           "enum": [
+            "ROUTINE_EXECUTION",
+            "ROUTINE_VALIDATION",
             "PLANNING",
             "EXECUTION",
             "REVIEW",

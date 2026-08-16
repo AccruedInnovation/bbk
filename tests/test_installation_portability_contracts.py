@@ -17,6 +17,7 @@ from unittest import mock
 from tests._path_support import source_ast
 
 ROOT = Path(__file__).resolve().parents[1]
+QUALIFIED_SITE = Path(r"C:\Users\Tombstone\.cache\bbk\tooling\jsonschema-4.25.1\Lib\site-packages")
 
 
 def load_module(name: str, relative_path: str):
@@ -68,6 +69,9 @@ class Alpha91PortabilityTests(unittest.TestCase):
             root = Path(temp)
             tests = root / "tests"
             tests.mkdir()
+            attempt = root / "attempt"
+            for name in ("evidence", "temp", "cache", "pycache"):
+                (attempt / name).mkdir(parents=True)
             test_file = tests / "test_nested_marker.py"
             test_file.write_text(
                 "import unittest\n"
@@ -77,7 +81,21 @@ class Alpha91PortabilityTests(unittest.TestCase):
                 "        self.assertTrue(True)\n",
                 encoding="utf-8",
             )
-            with mock.patch.object(run_tests, "ROOT", root), mock.patch.object(run_tests, "TESTS", tests):
+            qualified = os.pathsep.join((str(ROOT), str(ROOT / "tools"), str(QUALIFIED_SITE)))
+            env = {
+                "BBK_LAUNCH_RECORD_ROOT": str(attempt / "evidence"),
+                "BBK_NATIVE_EVIDENCE_ROOT": str(attempt / "evidence"),
+                "BBK_TEST_CACHE_DIR": str(attempt / "cache"),
+                "TEMP": str(attempt / "temp"),
+                "TMP": str(attempt / "temp"),
+                "TMPDIR": str(attempt / "temp"),
+                "PYTHONPYCACHEPREFIX": str(attempt / "pycache"),
+                "PYTHONPATH": qualified,
+                "BBK_QUALIFIED_PYTHONPATH": qualified,
+                "PYTHONDONTWRITEBYTECODE": "1",
+                "PYTHONNOUSERSITE": "1",
+            }
+            with mock.patch.object(run_tests, "ROOT", root), mock.patch.object(run_tests, "TESTS", tests), mock.patch.dict(os.environ, env, clear=False):
                 self.assertEqual(run_tests.run_test_files([test_file], stream=io.StringIO()), 0)
             report = run_tests.LAST_RUN_REPORT
             self.assertIsNotNone(report)

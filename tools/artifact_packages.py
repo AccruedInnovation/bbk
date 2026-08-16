@@ -40,6 +40,14 @@ except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     from strict_json import DEFAULT_MAX_DEPTH, StrictJsonError, load_path, loads_bytes
 
+try:
+    import artifact_platform as _artifact_fs
+except ModuleNotFoundError:
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import artifact_platform as _artifact_fs
+
 BBK_JSON_1 = "BBK-JSON-1"
 DRAFT_FILE = "bbk-package-draft.json"
 PACKAGE_FILE = "bbk-package.json"
@@ -80,9 +88,48 @@ AUTHORITY_BOUNDARY = (
     "it does not establish semantic acceptance, authorization, independent review, "
     "deployment readiness, or release authority."
 )
+JOURNAL_ROOT = Path(".bbk") / "artifacts" / "operations"
+SHARING_RETRY_CODES = (32, 33)
+SHARING_RETRY_DELAYS_MS = (0, 25, 50, 100, 200, 400)
+JOURNAL_PHASES = (
+    "CREATED", "DOCTOR_PASSED", "LOCKS_HELD", "DRAFT_SNAPSHOTTED",
+    "STAGE_MATERIALIZED", "STAGE_VERIFIED", "PUBLISH_INTENT_RECORDED",
+    "TARGET_PUBLISHED", "TARGET_VERIFIED_INITIAL", "RECEIPT_PUBLISHED",
+    "RECEIPT_VERIFIED", "TARGET_VERIFIED_DECISIVE", "CURRENT_PROJECTED",
+    "CURRENT_VERIFIED", "COMPLETED", "NON_PUBLISHED",
+)
+JOURNAL_DISPOSITIONS = (
+    "ACTIVE", "COMPLETED", "NON_PUBLISHED", "REJECTED",
+    "RECOVERY_REQUIRED", "CONFLICT_REJECTED", "CANCELLED_PRESERVED",
+    "PUBLISH_BLOCKED",
+)
 _SAFE_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
 _ROLE = re.compile(r"^[A-Za-z][A-Za-z0-9._-]{0,127}$")
+
+# Readers are intentionally broader than the current v1 writers.  Keep the
+# family vocabulary in one place so an unknown schema cannot silently fall
+# through to the historical v1 verifier.
+_SCHEMA_FAMILIES: dict[str, tuple[str, ...]] = {
+    "draft": ("bbk.artifact-package-draft.v1", "bbk.artifact-package-draft.v2"),
+    "package": ("bbk.artifact-package.v1", "bbk.artifact-package.v2"),
+    "manifest": ("bbk.artifact-package-manifest.v1", "bbk.artifact-package-manifest.v2"),
+    "sealReceipt": ("bbk.artifact-package-seal-receipt.v1", "bbk.artifact-package-seal-receipt.v2"),
+    "publicationReceipt": ("bbk.artifact-package-publication.v1", "bbk.artifact-publication-receipt.v2"),
+    "currentPointer": ("bbk.artifact-package-current-pointer.v1", "bbk.artifact-current-pointer.v2"),
+}
+
+
+def _family_schema(value: Any, family: str) -> str | None:
+    """Return the exact admitted schema for one compatibility family."""
+    if not isinstance(value, Mapping):
+        return None
+    schema = value.get("schema")
+    return schema if isinstance(schema, str) and schema in _SCHEMA_FAMILIES.get(family, ()) else None
+
+
+def _is_v2_schema(value: Any, family: str) -> bool:
+    return _family_schema(value, family) == _SCHEMA_FAMILIES.get(family, (None, None))[1]
 
 
 def _package_root() -> Path:
@@ -216,6 +263,232 @@ def _fsync_dir(path: Path) -> None:
         pass
     finally:
         os.close(fd)
+
+
+def _capability(status: str, observation: str, probe: str | None = None) -> dict[str, str]:
+    result = {"status": status, "observation": observation}
+    if probe:
+        result["probe"] = probe
+    return result
+
+
+def doctor(root: Path | str, target_parent: Path | str | None = None) -> dict[str, Any]:
+    """Qualify the exact local filesystem before candidate materialization."""
+    base = Path(root).expanduser().resolve(strict=False)
+    parent = Path(target_parent or base).expanduser().resolve(strict=False)
+    findings: list[dict[str, Any]] = []
+    capabilities: dict[str, dict[str, str]] = {}
+    fs_result = _artifact_fs.doctor(base, parent)
+    if fs_result.ok:
+        common = _capability("PASS", "filesystem probe completed", "artifact_platform.doctor")
+        for key in (
+            "runtime", "workspace", "sameVolume", "durableFileWrite", "directoryFlush",
+            "atomicReplace", "fileNoReplace", "directoryNoReplace", "osLocks", "readback", "cleanup",
+        ):
+            capabilities[key] = dict(common)
+    else:
+        error = fs_result.error
+        message = str(error or "filesystem doctor rejected the workspace")
+        for key in (
+            "runtime", "workspace", "sameVolume", "durableFileWrite", "directoryFlush",
+            "atomicReplace", "fileNoReplace", "directoryNoReplace", "osLocks", "readback", "cleanup",
+        ):
+            capabilities[key] = _capability("FAILED", message, "artifact_platform.doctor")
+        findings.append({"code": getattr(error, "code", "ARTIFACT_DOCTOR_FAILED"), "message": message})
+    status = "PASS" if fs_result.ok else "REJECTED"
+    result: dict[str, Any] = {
+        "schema": "bbk.artifact-doctor-result.v1",
+        "status": status,
+        "root": str(base),
+        "targetParent": str(parent),
+        "checkedAtUtc": utc_now(),
+        "environment": {
+            "host": socket.gethostname(),
+            "os": os.name,
+            "volume": str(base.anchor or base.drive or "local"),
+            "python": f"{os.sys.version_info.major}.{os.sys.version_info.minor}.{os.sys.version_info.micro}",
+            "toolVersion": _version(),
+        },
+        "capabilities": capabilities,
+        "findings": findings,
+        "cleanup": {"state": "CLEAN", "paths": []},
+        "claimsNotEstablished": ["native Windows durability", "semantic acceptance", "release readiness"],
+        "smallestNextAction": "Proceed with the exact transaction under the qualified workspace." if status == "PASS" else "Repair the exact filesystem capability finding and rerun doctor.",
+    }
+    schema_findings = validate_schema_instance(result, result["schema"])
+    if schema_findings:
+        result["status"] = "REJECTED"
+        result["findings"].extend({"code": item.get("code", "DOCTOR_SCHEMA_INVALID"), "message": item.get("message", "doctor result schema invalid")} for item in schema_findings)
+        result["smallestNextAction"] = "Repair the doctor result contract before materializing a candidate."
+    return result
+
+
+def _journal_rel(path: Path, root: Path) -> str:
+    try:
+        return path.resolve(strict=False).relative_to(root.resolve(strict=False)).as_posix()
+    except ValueError:
+        return path.resolve(strict=False).as_posix().replace("\\", "/")
+
+
+def _journal_snapshot(root: Path) -> dict[str, Any]:
+    files: list[dict[str, Any]] = []
+    total = 0
+    if root.exists() and root.is_dir():
+        for candidate in sorted(root.rglob("*"), key=lambda item: item.relative_to(root).as_posix()):
+            if candidate.is_symlink() or not candidate.is_file():
+                continue
+            size = candidate.stat().st_size
+            files.append({"path": candidate.relative_to(root).as_posix(), "bytes": size, "sha256": sha256_file(candidate)})
+            total += size
+    identity = {"files": files}
+    return {"sha256": sha256_bytes(identity_json_bytes(identity)), "bytes": total, "fileCount": len(files), "files": files}
+
+
+def _journal_path(project: Path, operation_id: str) -> Path:
+    return project / JOURNAL_ROOT / f"{operation_id}.json"
+
+
+def _new_operation_journal(
+    *, command: str, mode: str, project: Path, package_id: str, profile: Mapping[str, Any], revision: str,
+    requested_target: Path, draft: Path, target: Path, receipt: Path, pointer: Path | None,
+    semantic_run: str | None = None, physical_attempt: str | None = None,
+) -> tuple[dict[str, Any], Path]:
+    operation_id = str(uuid.uuid4())
+    token = uuid.uuid4().hex + uuid.uuid4().hex
+    journal = {
+        "schema": "bbk.artifact-operation-journal.v1", "operationId": operation_id, "operationToken": token,
+        "command": command, "mode": mode, "packageId": package_id, "profile": dict(profile), "revision": str(revision),
+        "namespaces": {"workspace": _journal_rel(project, project), "artifact": _journal_rel(project / DEFAULT_ARTIFACT_ROOT, project), "publication": _journal_rel(receipt.parent, project), "stage": _journal_rel(target.parent, project), "target": _journal_rel(target, project), "receipt": _journal_rel(receipt, project), "pointer": _journal_rel(pointer, project) if pointer else None},
+        "requestedTarget": _journal_rel(requested_target, project), "expectedDraftSnapshot": _journal_snapshot(draft),
+        "expectedIdentity": {"manifestSha256": None, "contentSha256": None, "treeSha256": None, "packageId": package_id, "revision": str(revision)},
+        "locks": [], "phase": "CREATED", "events": [], "retryObservations": [], "effectsObserved": [],
+        "cleanup": {"state": "CLEAN", "paths": []}, "disposition": "ACTIVE", "failure": None, "resumeFromPhase": None,
+        "claimsNotEstablished": ["semantic acceptance", "authorization", "independent review", "release readiness"],
+    }
+    path = _journal_path(project, operation_id)
+    _persist_operation_journal(path, journal)
+    return journal, path
+
+
+def _persist_operation_journal(path: Path, journal: Mapping[str, Any]) -> None:
+    candidate = dict(journal)
+    findings = validate_schema_instance(candidate, "bbk.artifact-operation-journal.v1")
+    if findings:
+        raise ArtifactPackageError({
+            "schema": "bbk.artifact-operation-journal-result.v1", "status": "REJECTED", "code": "PACKAGE_JOURNAL_SCHEMA_INVALID",
+            "message": "Operation journal failed strict schema validation.", "path": str(path), "findings": findings,
+            "smallest_next_action": "Repair the exact journal transition and preserve the failed operation state.",
+            "claims_not_established": ["transaction completion", "publication", "semantic acceptance"],
+        })
+    atomic_write(path, canonical_json_bytes(candidate))
+
+
+def _journal_transition(journal: MutableMapping[str, Any], path: Path, to_phase: str, effect: str, observation: str) -> None:
+    from_phase = str(journal["phase"])
+    legal = {"CREATED": "DOCTOR_PASSED", "DOCTOR_PASSED": "LOCKS_HELD", "LOCKS_HELD": "DRAFT_SNAPSHOTTED", "DRAFT_SNAPSHOTTED": "STAGE_MATERIALIZED", "STAGE_MATERIALIZED": "STAGE_VERIFIED", "STAGE_VERIFIED": "PUBLISH_INTENT_RECORDED", "PUBLISH_INTENT_RECORDED": "TARGET_PUBLISHED", "TARGET_PUBLISHED": "TARGET_VERIFIED_INITIAL", "TARGET_VERIFIED_INITIAL": "RECEIPT_PUBLISHED", "RECEIPT_PUBLISHED": "RECEIPT_VERIFIED", "RECEIPT_VERIFIED": "TARGET_VERIFIED_DECISIVE", "TARGET_VERIFIED_DECISIVE": "CURRENT_PROJECTED", "CURRENT_PROJECTED": "CURRENT_VERIFIED", "CURRENT_VERIFIED": "COMPLETED"}
+    if to_phase != legal.get(from_phase) and not (from_phase == "TARGET_VERIFIED_INITIAL" and to_phase == "NON_PUBLISHED") and not (from_phase == "TARGET_VERIFIED_DECISIVE" and to_phase == "COMPLETED"):
+        raise ValueError(f"illegal journal phase transition {from_phase}->{to_phase}")
+    journal["events"].append({"sequence": len(journal["events"]), "atUtc": utc_now(), "fromPhase": from_phase, "toPhase": to_phase, "effect": effect, "observation": observation})
+    journal["phase"] = to_phase
+    _persist_operation_journal(path, journal)
+
+
+def retry_sharing(operation: Any, *, effect: str, journal: MutableMapping[str, Any] | None = None) -> Any:
+    """Run one effect with exactly the portable Win32 sharing retry policy."""
+    for attempt, delay_ms in enumerate(SHARING_RETRY_DELAYS_MS):
+        if delay_ms:
+            import time
+            time.sleep(delay_ms / 1000)
+        try:
+            return operation()
+        except BaseException as exc:
+            classification = _artifact_fs.classify_error(exc, operation=effect)
+            if not classification.retryable:
+                raise
+            if journal is not None:
+                journal["retryObservations"].append({"effect": effect, "attempt": attempt, "win32Error": int(classification.win32_code), "delayMs": delay_ms, "observation": str(exc)})
+                if journal.get("_journalPath"):
+                    _persist_operation_journal(Path(str(journal["_journalPath"])), journal)
+    raise ArtifactPackageError(_operation_error(
+        "bbk.artifact-package-transaction-result.v1", "PACKAGE_PUBLISH_BLOCKED", f"Sharing retry policy exhausted for {effect}.",
+        classification="MECHANICAL", remediation="Reconcile the exact token-bound operation after verifying its extant bytes.",
+        details={"attempts": len(SHARING_RETRY_DELAYS_MS), "delaysMs": list(SHARING_RETRY_DELAYS_MS)},
+    ))
+
+
+def _create_file_noreplace(path: Path, data: bytes, *, journal: MutableMapping[str, Any] | None = None) -> None:
+    def create() -> Any:
+        result = _artifact_fs.create_file_noreplace(path, data)
+        if result.status == "SHARING_RETRYABLE":
+            error = OSError(result.get("message", "sharing violation"))
+            error.winerror = int(getattr(result.error, "win32_code", 32) or 32)  # type: ignore[attr-defined]
+            raise error
+        return result
+
+    result = retry_sharing(create, effect=f"receipt:{path}", journal=journal)
+    if not result.ok:
+        error = result.error
+        if error is not None and error.code == "ALREADY_EXISTS":
+            raise FileExistsError(errno.EEXIST, "immutable receipt already exists", str(path))
+        raise OSError(getattr(error, "errno_value", errno.EIO), str(error or "receipt creation failed"), str(path))
+
+
+def validate_operation_journal(path: Path | str) -> dict[str, Any]:
+    target = Path(path).expanduser().resolve(strict=True)
+    try:
+        value = load_path(target)
+    except (StrictJsonError, OSError) as exc:
+        return {"schema": "bbk.artifact-operation-journal-result.v1", "status": "REJECTED", "code": "PACKAGE_JOURNAL_INVALID", "message": str(exc), "path": str(target), "smallest_next_action": "Preserve the journal bytes and return for reconciliation."}
+    findings = validate_schema_instance(value, "bbk.artifact-operation-journal.v1") if isinstance(value, Mapping) else [{"code": "SCHEMA_TYPE", "message": "journal must be an object"}]
+    return {"schema": "bbk.artifact-operation-journal-result.v1", "status": "PASS" if not findings else "REJECTED", "journalPath": str(target), "operationId": value.get("operationId") if isinstance(value, Mapping) else None, "phase": value.get("phase") if isinstance(value, Mapping) else None, "disposition": value.get("disposition") if isinstance(value, Mapping) else None, "findings": findings, "smallest_next_action": "Use the exact journal for token-bound reconcile." if not findings else "Preserve the invalid journal and do not infer transaction state."}
+
+
+def reconcile_operation(journal: Path | str, *, resume: bool = False) -> dict[str, Any]:
+    """Observe or explicitly resume one journal without rematerializing bytes."""
+    checked = validate_operation_journal(journal)
+    if checked["status"] != "PASS":
+        return checked
+    path = Path(checked["journalPath"])
+    value = load_path(path)
+    assert isinstance(value, dict)
+    disposition = value["disposition"]
+    if disposition in {"COMPLETED", "NON_PUBLISHED", "REJECTED", "CONFLICT_REJECTED"}:
+        return {
+            "schema": "bbk.artifact-package-reconcile-result.v1", "status": "PASS", "operationId": value["operationId"],
+            "journalPath": str(path), "phase": value["phase"], "disposition": disposition, "readOnly": True,
+            "materialized": False, "regenerated": False, "effectsObserved": value.get("effectsObserved", []),
+            "smallest_next_action": "Consume the immutable terminal journal; no recovery mutation is permitted.",
+            "claims_not_established": value.get("claimsNotEstablished", []),
+        }
+    if not resume:
+        return {
+            "schema": "bbk.artifact-package-reconcile-result.v1", "status": "PASS", "operationId": value["operationId"],
+            "journalPath": str(path), "phase": value["phase"], "disposition": disposition, "readOnly": True,
+            "materialized": False, "regenerated": False, "effectsObserved": value.get("effectsObserved", []),
+            "smallest_next_action": "Use --resume only after exact stage/target/receipt evidence establishes one missing effect.",
+            "claims_not_established": value.get("claimsNotEstablished", []),
+        }
+    # A resume request is deliberately conservative: the caller must supply
+    # the exact journal and token, and this core never reads the mutable draft
+    # or regenerates candidate bytes during recovery.
+    value["disposition"] = "PUBLISH_BLOCKED"
+    value["failure"] = {
+        "code": "PACKAGE_RECONCILE_EFFECT_UNCERTAIN", "determinacy": "AMBIGUOUS", "effect": "resume",
+        "observation": "No safe missing-effect proof was available from the journal alone.",
+        "affectedPaths": [], "retryReceipt": None,
+        "smallestNextAction": "Inspect exact stage/target/receipt bytes and retry reconcile only with a bound recovery observation.",
+    }
+    value["resumeFromPhase"] = value["phase"]
+    _persist_operation_journal(path, value)
+    return {
+        "schema": "bbk.artifact-package-reconcile-result.v1", "status": "PUBLISH_BLOCKED", "operationId": value["operationId"],
+        "journalPath": str(path), "phase": value["phase"], "disposition": value["disposition"], "readOnly": False,
+        "materialized": False, "regenerated": False, "smallest_next_action": value["failure"]["smallestNextAction"],
+        "claims_not_established": value.get("claimsNotEstablished", []),
+    }
+
+
+reconcile = reconcile_operation
 
 
 def _pointer(parts: Sequence[str | int]) -> str:
@@ -890,16 +1163,18 @@ def preflight_draft(
 
     validator = _SchemaValidator()
     if descriptor is not None:
-        for item in validator.validate(descriptor, "bbk.artifact-package-draft.v1"):
-            item["path"] = str(descriptor_path)
-            findings.append(item)
-        if descriptor.get("schema") != "bbk.artifact-package-draft.v1":
+        descriptor_schema = _family_schema(descriptor, "draft")
+        if descriptor_schema is None:
             findings.append(finding(
                 "PACKAGE_DESCRIPTOR_SCHEMA_INVALID",
-                "descriptor.schema must equal bbk.artifact-package-draft.v1.",
+                "descriptor.schema must be one of the governed artifact-package draft schemas.",
                 pointer="/schema",
                 path=str(descriptor_path),
             ))
+        else:
+            for item in validator.validate(descriptor, descriptor_schema):
+                item["path"] = str(descriptor_path)
+                findings.append(item)
         package_id = descriptor.get("packageId")
         revision = descriptor.get("revision")
         if not isinstance(package_id, str) or not _SAFE_ID.fullmatch(package_id):
@@ -917,6 +1192,21 @@ def preflight_draft(
                     classification="SEMANTIC_OWNER_REQUIRED",
                     remediation="Select one exact profile ID/version from the canonical registry.",
                 ))
+            elif descriptor_schema is not None:
+                readers = profile.get("readerSchemas") if isinstance(profile.get("readerSchemas"), list) else []
+                schema_name = {
+                    "bbk.artifact-package-draft.v1": "bbk-artifact-package-draft-v1.schema.json",
+                    "bbk.artifact-package-draft.v2": "bbk-artifact-package-draft-v2.schema.json",
+                }.get(descriptor_schema)
+                if descriptor_schema.endswith(".v2") and schema_name not in readers:
+                    findings.append(finding(
+                        "PACKAGE_DESCRIPTOR_SCHEMA_NOT_READABLE",
+                        f"Profile {profile.get('id')} {profile.get('version')} does not admit draft schema {descriptor_schema}.",
+                        pointer="/schema",
+                        path=str(descriptor_path),
+                        classification="SEMANTIC_OWNER_REQUIRED",
+                        remediation="Select a profile whose readers include the exact draft schema.",
+                    ))
 
         raw_artifacts = descriptor.get("artifacts")
         if isinstance(raw_artifacts, list):
@@ -1145,23 +1435,19 @@ def _exclusive_lock(lock_path: Path, *, operation: str, target: Path, recover_st
         with contextlib.suppress(OSError):
             age = max(0.0, dt.datetime.now().timestamp() - lock_path.stat().st_mtime)
         stale = age is not None and age > stale_seconds
-        if recover_stale and stale:
-            shutil.rmtree(lock_path)
-            lock_path.mkdir(mode=0o700)
-        else:
-            code = "PACKAGE_LOCK_STALE_OR_AMBIGUOUS" if stale else "PACKAGE_LOCK_HELD"
-            raise ArtifactPackageError(_operation_error(
-                "bbk.artifact-package-lock-result.v1",
-                code,
-                f"Exclusive package lock is already present: {lock_path}",
-                path=str(lock_path),
-                remediation=(
-                    "Inspect the recorded owner and explicitly rerun with stale-lock recovery only after confirming no active owner."
-                    if stale
-                    else "Allow the current owner to finish, or inspect and resolve the exact lock owner before retrying."
-                ),
-                details={"metadata": metadata, "ageSeconds": age, "staleThresholdSeconds": stale_seconds},
-            )) from exc
+        code = "PACKAGE_LOCK_STALE_OR_AMBIGUOUS" if stale else "PACKAGE_LOCK_HELD"
+        raise ArtifactPackageError(_operation_error(
+            "bbk.artifact-package-lock-result.v1",
+            code,
+            f"Exclusive package lock is already present: {lock_path}",
+            path=str(lock_path),
+            remediation=(
+                "Age never authorizes takeover; verify the owner and reconcile the exact operation before retrying."
+                if stale
+                else "Allow the current owner to finish, or inspect and resolve the exact lock owner before retrying."
+            ),
+            details={"metadata": metadata, "ageSeconds": age, "staleThresholdSeconds": stale_seconds, "takeover": "FORBIDDEN"},
+        )) from exc
     atomic_write(lock_path / "lock.json", canonical_json_bytes(_lock_metadata(operation, target)))
     try:
         yield lock_path
@@ -1201,7 +1487,22 @@ def _atomic_publish_noreplace(stage: Path, target: Path) -> None:
     # check; platforms with renameat2 use the kernel no-replace primitive.
     if target.exists() or target.is_symlink():
         raise FileExistsError(errno.EEXIST, "target already exists", str(target))
-    os.rename(stage, target)
+
+    def publish() -> None:
+        if target.exists() or target.is_symlink():
+            raise FileExistsError(errno.EEXIST, "target already exists", str(target))
+        try:
+            os.rename(stage, target)
+        except PermissionError as exc:
+            # Native Windows can transiently report ERROR_ACCESS_DENIED while
+            # the directory handle is being closed.  It is not an age-based
+            # lock takeover and is safe to retry while the target remains
+            # absent; genuine sharing violations use retry_sharing below.
+            if os.name == "nt" and getattr(exc, "winerror", None) == 5:
+                setattr(exc, "winerror", 32)
+            raise
+
+    retry_sharing(publish, effect=f"directory-publish:{target}")
     _fsync_dir(target.parent)
 
 
@@ -1210,6 +1511,8 @@ def _content_identity(
     artifacts: Sequence[Mapping[str, Any]],
     reference_graph: Sequence[Mapping[str, str]],
 ) -> tuple[dict[str, Any], str]:
+    if descriptor.get("schema") in _SCHEMA_FAMILIES["package"][1:] + _SCHEMA_FAMILIES["manifest"][1:]:
+        return _content_identity_v2(descriptor, artifacts, reference_graph)
     value: dict[str, Any] = {
         "schema": "bbk.artifact-package-content.v1",
         "canonicalization": BBK_JSON_1,
@@ -1218,6 +1521,35 @@ def _content_identity(
         "profile": descriptor.get("profile"),
         "subject": descriptor.get("subject"),
         "predecessor": descriptor.get("predecessor"),
+        "artifacts": list(artifacts),
+        "referenceGraph": list(reference_graph),
+    }
+    return value, sha256_bytes(identity_json_bytes(value))
+
+
+def _content_identity_v2(
+    descriptor: Mapping[str, Any],
+    artifacts: Sequence[Mapping[str, Any]],
+    reference_graph: Sequence[Mapping[str, str]],
+) -> tuple[dict[str, Any], str]:
+    """Build the pure v2 semantic identity without physical lineage locators."""
+    predecessor = descriptor.get("predecessor")
+    if isinstance(predecessor, Mapping):
+        predecessor = {
+            key: predecessor[key]
+            for key in ("packageId", "revision", "contentSha256", "manifestSha256")
+            if key in predecessor
+        }
+    value: dict[str, Any] = {
+        "schema": "bbk.artifact-package-content.v2",
+        "canonicalization": BBK_JSON_1,
+        "packageId": descriptor.get("packageId"),
+        "revision": descriptor.get("revision"),
+        "profile": descriptor.get("profile"),
+        "subject": descriptor.get("subject"),
+        "metadata": descriptor.get("metadata", {}),
+        "predecessor": predecessor,
+        "successorReason": descriptor.get("successorReason"),
         "artifacts": list(artifacts),
         "referenceGraph": list(reference_graph),
     }
@@ -1285,6 +1617,8 @@ def seal_draft(
     lock = output_parent / f".{output.name}.bbk-seal.lock"
     stage = output_parent / f".{output.name}.bbk-stage-{uuid.uuid4().hex}"
     schema = "bbk.artifact-package-seal-result.v1"
+    journal: dict[str, Any] | None = None
+    journal_path: Path | None = None
     if output.exists() or output.is_symlink():
         raise ArtifactPackageError(_operation_error(
             schema,
@@ -1318,8 +1652,27 @@ def seal_draft(
                 })
             descriptor = load_path(draft / DRAFT_FILE)
             assert isinstance(descriptor, dict)
+            qualification = doctor(draft, output_parent)
+            if qualification["status"] != "PASS":
+                raise ArtifactPackageError({
+                    "schema": schema, "status": "REJECTED", "code": "PACKAGE_DOCTOR_REJECTED",
+                    "message": "Seal stopped before materialization because the filesystem doctor rejected the workspace.",
+                    "doctor": qualification, "smallest_next_action": qualification["smallestNextAction"],
+                    "claims_not_established": ["candidate materialization", "publication", "semantic acceptance"],
+                })
+            journal, journal_path = _new_operation_journal(
+                command="seal", mode="SEAL", project=output_parent, package_id=str(descriptor["packageId"]),
+                profile=descriptor.get("profile") if isinstance(descriptor.get("profile"), Mapping) else {"id": "generic", "version": "1"},
+                revision=str(descriptor["revision"]), requested_target=output, draft=draft, target=output,
+                receipt=output / RECEIPT_FILE, pointer=None,
+            )
+            _journal_transition(journal, journal_path, "DOCTOR_PASSED", "doctor", "filesystem capability doctor PASS")
+            journal["locks"] = [{"key": str(lock), "kind": "PUBLICATION_NAMESPACE", "token": journal["operationToken"], "acquired": True, "released": False}]
+            _journal_transition(journal, journal_path, "LOCKS_HELD", "lock", "seal lock held")
             stage.mkdir(mode=0o700)
             entries = _artifact_entries_from_draft(draft, descriptor, stage)
+            journal["expectedDraftSnapshot"] = _journal_snapshot(draft)
+            _journal_transition(journal, journal_path, "DRAFT_SNAPSHOTTED", "draft snapshot", "closed draft snapshot acknowledged")
             graph = _reference_graph(entries)
             identity_value, content_sha = _content_identity(descriptor, entries, graph)
             package = {
@@ -1368,6 +1721,7 @@ def seal_draft(
             atomic_write(stage / MANIFEST_FILE, manifest_bytes)
             atomic_write(stage / RECEIPT_FILE, canonical_json_bytes(receipt))
             _fsync_dir(stage)
+            _journal_transition(journal, journal_path, "STAGE_MATERIALIZED", "stage materialization", "stage bytes flushed")
             if _test_fail_phase == "after-stage":
                 raise RuntimeError("injected failure after stage construction")
             staged_verification = verify_package(stage, registry_path=registry_path)
@@ -1383,10 +1737,14 @@ def seal_draft(
                     "smallest_next_action": staged_verification.get("smallest_next_action"),
                     "claims_not_established": staged_verification.get("claims_not_established", []),
                 })
+            journal["expectedIdentity"] = {"manifestSha256": sha256_bytes(manifest_bytes), "contentSha256": content_sha, "treeSha256": _sealed_tree_snapshot(stage)["sha256"], "packageId": str(descriptor["packageId"]), "revision": str(descriptor["revision"])}
+            _journal_transition(journal, journal_path, "STAGE_VERIFIED", "stage verification", "staged package exact and semantic verification PASS")
             if _test_fail_phase == "before-publish":
                 raise RuntimeError("injected failure before publish")
+            _journal_transition(journal, journal_path, "PUBLISH_INTENT_RECORDED", "publish intent", "explicit seal does not publish external metadata")
             _atomic_publish_noreplace(stage, output)
             stage = Path()  # mark moved
+            _journal_transition(journal, journal_path, "TARGET_PUBLISHED", "target publish", "sealed target published without replacement")
             final_verification = verify_package(output, registry_path=registry_path)
             if final_verification["status"] != "PASS":
                 # This should be unreachable after same-volume rename.  Do not
@@ -1402,6 +1760,13 @@ def seal_draft(
                     "smallest_next_action": "Quarantine the exact target and inspect the recorded verification findings.",
                     "claims_not_established": final_verification.get("claims_not_established", []),
                 })
+            _journal_transition(journal, journal_path, "TARGET_VERIFIED_INITIAL", "target verification", "sealed target exact and semantic verification PASS")
+            target_snapshot = _sealed_tree_snapshot(output)
+            journal["effectsObserved"] = [{"effect": "target", "path": _journal_rel(output, output_parent), "status": "PRESENT", "bytes": sum(int(item["bytes"]) for item in target_snapshot["files"]), "sha256": target_snapshot["sha256"]}]
+            for lock_record in journal["locks"]:
+                lock_record["released"] = True
+            journal["disposition"] = "NON_PUBLISHED"
+            _journal_transition(journal, journal_path, "NON_PUBLISHED", "seal terminal", "explicit seal ends NON_PUBLISHED")
             return {
                 "schema": schema,
                 "status": "PASS",
@@ -1414,6 +1779,9 @@ def seal_draft(
                 "manifestSha256": receipt["manifestSha256"],
                 "artifactCount": len(entries),
                 "verification": final_verification,
+                "publicationState": "NON_PUBLISHED",
+                "operationId": journal["operationId"] if journal else None,
+                "journalPath": str(journal_path) if journal_path else None,
                 "authorityBoundary": AUTHORITY_BOUNDARY,
                 "smallest_next_action": "Provide the exact sealed package reference to its intended bounded consumer.",
                 "claims_not_established": [
@@ -1423,7 +1791,18 @@ def seal_draft(
                     "release readiness",
                 ],
             }
-    except ArtifactPackageError:
+    except ArtifactPackageError as exc:
+        if journal is not None and journal_path is not None and journal.get("disposition") == "ACTIVE":
+            post_intent = JOURNAL_PHASES.index(str(journal.get("phase"))) >= JOURNAL_PHASES.index("PUBLISH_INTENT_RECORDED")
+            journal["disposition"] = "RECOVERY_REQUIRED" if post_intent else "REJECTED"
+            journal["resumeFromPhase"] = journal.get("phase") if post_intent else None
+            journal["failure"] = {
+                "code": str(exc.result.get("code", "PACKAGE_SEAL_FAILED")), "determinacy": "DETERMINISTIC",
+                "effect": "seal", "observation": str(exc), "affectedPaths": [_journal_rel(output, output_parent)],
+                "retryReceipt": None, "smallestNextAction": "Inspect the exact journal and preserve the failed attempt before retrying.",
+            } if post_intent else None
+            with contextlib.suppress(Exception):
+                _persist_operation_journal(journal_path, journal)
         raise
     except FileExistsError as exc:
         raise ArtifactPackageError(_operation_error(
@@ -1434,6 +1813,17 @@ def seal_draft(
             remediation="Preserve the existing target and choose a new output or create a successor.",
         )) from exc
     except Exception as exc:
+        if journal is not None and journal_path is not None and journal.get("disposition") == "ACTIVE":
+            post_intent = JOURNAL_PHASES.index(str(journal.get("phase"))) >= JOURNAL_PHASES.index("PUBLISH_INTENT_RECORDED")
+            journal["disposition"] = "RECOVERY_REQUIRED" if post_intent else "REJECTED"
+            journal["resumeFromPhase"] = journal.get("phase") if post_intent else None
+            journal["failure"] = {
+                "code": "PACKAGE_SEAL_FAILED", "determinacy": "AMBIGUOUS" if post_intent else "DETERMINISTIC",
+                "effect": "seal", "observation": str(exc), "affectedPaths": [_journal_rel(output, output_parent)],
+                "retryReceipt": None, "smallestNextAction": "Inspect the exact journal and preserve the failed attempt before retrying.",
+            } if post_intent else None
+            with contextlib.suppress(Exception):
+                _persist_operation_journal(journal_path, journal)
         raise ArtifactPackageError(_operation_error(
             schema,
             "PACKAGE_SEAL_FAILED",
@@ -2050,10 +2440,12 @@ def verify_publication_freshness(
             }
         if not isinstance(value, dict):
             return _operation_error(schema, "PACKAGE_FRESHNESS_SUBJECT_INVALID", "Freshness subject JSON must be an object.", path=str(target))
-        if value.get("schema") == "bbk.artifact-package-current-pointer.v1":
+        pointer_schema = _family_schema(value, "currentPointer")
+        publication_schema = _family_schema(value, "publicationReceipt")
+        if pointer_schema is not None:
             pointer = value
             pointer_path = target
-            pointer_schema_findings = validate_schema_instance(pointer, pointer["schema"])
+            pointer_schema_findings = validate_schema_instance(pointer, pointer_schema)
             if pointer_schema_findings:
                 return _operation_error(
                     schema,
@@ -2074,14 +2466,15 @@ def verify_publication_freshness(
                 publication = load_path(publication_path)
             except (OSError, ValueError, StrictJsonError) as exc:
                 return _operation_error(schema, "PACKAGE_FRESHNESS_PUBLICATION_INVALID", f"Current pointer publication cannot be read: {exc}", path=str(candidate))
-        elif value.get("schema") == "bbk.artifact-package-publication.v1":
+        elif publication_schema is not None:
             publication = value
             publication_path = target
         else:
             return _operation_error(schema, "PACKAGE_FRESHNESS_SUBJECT_INVALID", "JSON subject is neither a BBK publication receipt nor current pointer.", path=str(target))
         if not isinstance(publication, dict):
             return _operation_error(schema, "PACKAGE_FRESHNESS_PUBLICATION_INVALID", "Publication receipt is not an object.", path=str(publication_path))
-        publication_schema_findings = validate_schema_instance(publication, "bbk.artifact-package-publication.v1")
+        publication_schema = _family_schema(publication, "publicationReceipt")
+        publication_schema_findings = validate_schema_instance(publication, publication_schema or "bbk.artifact-package-publication.v1")
         if publication_schema_findings:
             return _operation_error(
                 schema,
@@ -2099,7 +2492,10 @@ def verify_publication_freshness(
                     "expected": pointer.get("publicationSha256"),
                     "observed": observed_publication_sha256,
                 })
-            for key in ("packageId", "revision", "contentSha256"):
+            pointer_identity_fields = ["packageId", "revision", "contentSha256"]
+            if _is_v2_schema(pointer, "currentPointer"):
+                pointer_identity_fields.append("manifestSha256")
+            for key in pointer_identity_fields:
                 if pointer.get(key) != publication.get(key):
                     metadata_findings.append({
                         "code": "PACKAGE_POINTER_PUBLICATION_IDENTITY_MISMATCH",
@@ -2366,6 +2762,8 @@ def finalize_draft(
     would invalidate the package that contains them.
     """
     schema = "bbk.artifact-package-finalize-result.v1"
+    transaction_journal: dict[str, Any] | None = None
+    transaction_journal_path: Path | None = None
     explicit_project: Path | None = None
     if project_root is not None:
         try:
@@ -2515,6 +2913,20 @@ def finalize_draft(
     publications.mkdir(parents=True, exist_ok=True)
     if write_current_pointer:
         current_root.mkdir(parents=True, exist_ok=True)
+    qualification = doctor(project, sealed_parent)
+    if qualification["status"] != "PASS":
+        raise ArtifactPackageError({
+            "schema": schema, "status": "REJECTED", "code": "PACKAGE_DOCTOR_REJECTED",
+            "message": "Finalize stopped before candidate materialization because the filesystem doctor rejected the workspace.",
+            "doctor": qualification, "smallest_next_action": qualification["smallestNextAction"],
+            "claims_not_established": ["candidate materialization", "publication", "semantic acceptance"],
+        })
+    transaction_journal, transaction_journal_path = _new_operation_journal(
+        command="finalize", mode="FINALIZE", project=project, package_id=str(descriptor["packageId"]),
+        profile=descriptor.get("profile") if isinstance(descriptor.get("profile"), Mapping) else {"id": "generic", "version": "1"},
+        revision=str(descriptor["revision"]), requested_target=output, draft=draft, target=output,
+        receipt=publication_path, pointer=current_path if write_current_pointer else None,
+    )
     if publication_path.exists() or publication_path.is_symlink():
         raise ArtifactPackageError(_operation_error(
             schema,
@@ -2530,6 +2942,12 @@ def finalize_draft(
     finalize_lock = artifact_root / f".{package_token}.bbk-finalize.lock"
     artifact_root.mkdir(parents=True, exist_ok=True)
     with _exclusive_lock(finalize_lock, operation="finalize", target=output, recover_stale=recover_stale_lock):
+        _journal_transition(transaction_journal, transaction_journal_path, "DOCTOR_PASSED", "doctor", "filesystem capability doctor PASS")
+        transaction_journal["locks"] = [
+            {"key": str(artifact_root), "kind": "PUBLICATION_NAMESPACE", "token": transaction_journal["operationToken"], "acquired": True, "released": False},
+            {"key": str(finalize_lock), "kind": "PACKAGE_ID", "token": transaction_journal["operationToken"], "acquired": True, "released": False},
+        ]
+        _journal_transition(transaction_journal, transaction_journal_path, "LOCKS_HELD", "lock", "publication namespace and package locks held")
         # Repeat external-target checks under the package-level lock.  This
         # closes the ordinary BBK writer race between preflight and publish.
         if publication_path.exists() or publication_path.is_symlink():
@@ -2541,6 +2959,8 @@ def finalize_draft(
                 remediation="Choose a successor revision or inspect the existing publication before retrying.",
             ))
         current_snapshot = _file_restore_snapshot(current_path) if write_current_pointer else None
+        transaction_journal["expectedDraftSnapshot"] = _journal_snapshot(draft)
+        _journal_transition(transaction_journal, transaction_journal_path, "DRAFT_SNAPSHOTTED", "draft snapshot", "closed draft snapshot acknowledged")
         seal_result = seal_draft(
             draft,
             output,
@@ -2548,6 +2968,7 @@ def finalize_draft(
             recover_stale_lock=recover_stale_lock,
             sealed_at_utc=finalized_at_utc,
         )
+        _journal_transition(transaction_journal, transaction_journal_path, "STAGE_MATERIALIZED", "stage materialization", "sealed stage materialized")
         before_publication = _sealed_tree_snapshot(output)
         verification = verify_package(output, registry_path=registry_path)
         if verification.get("status") != "PASS":
@@ -2561,6 +2982,11 @@ def finalize_draft(
                 "smallest_next_action": verification.get("smallest_next_action"),
                 "claims_not_established": verification.get("claims_not_established", []),
             })
+        transaction_journal["expectedIdentity"] = {"manifestSha256": seal_result.get("manifestSha256"), "contentSha256": seal_result.get("contentSha256"), "treeSha256": before_publication["sha256"], "packageId": str(seal_result.get("packageId")), "revision": str(seal_result.get("revision"))}
+        _journal_transition(transaction_journal, transaction_journal_path, "STAGE_VERIFIED", "stage verification", "staged package exact and semantic verification PASS")
+        _journal_transition(transaction_journal, transaction_journal_path, "PUBLISH_INTENT_RECORDED", "publish intent", "durable finalize intent acknowledged")
+        _journal_transition(transaction_journal, transaction_journal_path, "TARGET_PUBLISHED", "target publish", "target published without replacement")
+        _journal_transition(transaction_journal, transaction_journal_path, "TARGET_VERIFIED_INITIAL", "target verification", "initial target exact and semantic verification PASS")
         published_at = finalized_at_utc or utc_now()
         try:
             sealed_reference = str(output.relative_to(project))
@@ -2618,10 +3044,34 @@ def finalize_draft(
         publication_sha256 = sha256_bytes(publication_bytes)
         metadata_published = False
         try:
-            atomic_write(publication_path, publication_bytes)
+            _create_file_noreplace(publication_path, publication_bytes, journal=transaction_journal)
             metadata_published = True
+            _journal_transition(transaction_journal, transaction_journal_path, "RECEIPT_PUBLISHED", "receipt publish", "immutable publication receipt created without replacement")
+            receipt_readback = publication_path.read_bytes()
+            receipt_findings = validate_schema_instance(load_path(publication_path), "bbk.artifact-package-publication.v1")
+            if receipt_readback != publication_bytes or sha256_bytes(receipt_readback) != publication_sha256 or receipt_findings:
+                raise ArtifactPackageError({
+                    "schema": schema, "status": "REJECTED", "code": "PACKAGE_FINALIZE_RECEIPT_VERIFY_FAILED",
+                    "message": "The immutable publication receipt failed readback/schema/hash verification.",
+                    "publicationReceipt": str(publication_path), "findings": receipt_findings,
+                    "smallest_next_action": "Preserve the receipt and target for token-bound reconcile.",
+                    "claims_not_established": ["publication completion", "semantic acceptance", "release readiness"],
+                })
+            _journal_transition(transaction_journal, transaction_journal_path, "RECEIPT_VERIFIED", "receipt readback", "receipt bytes/schema/hash verified")
             if _test_fail_phase == "after-publication":
                 raise OSError("injected artifact-finalize failure after publication")
+            decisive_snapshot = _sealed_tree_snapshot(output)
+            decisive_verification = verify_package(output, registry_path=registry_path)
+            if decisive_snapshot != before_publication or decisive_verification.get("status") != "PASS":
+                raise ArtifactPackageError({
+                    "schema": schema, "status": "REJECTED", "code": "PACKAGE_FINALIZE_DECISIVE_VERIFY_FAILED",
+                    "message": "The target changed or failed semantic verification before current-pointer projection.",
+                    "outputRoot": str(output), "before": before_publication, "after": decisive_snapshot,
+                    "verification": decisive_verification,
+                    "smallest_next_action": "Preserve the immutable target/receipt and reconcile the exact operation.",
+                    "claims_not_established": ["current pointer", "semantic acceptance", "release readiness"],
+                })
+            _journal_transition(transaction_journal, transaction_journal_path, "TARGET_VERIFIED_DECISIVE", "decisive target verification", "target reverified after immutable receipt readback")
             pointer: dict[str, Any] | None = None
             if write_current_pointer:
                 try:
@@ -2657,6 +3107,16 @@ def finalize_draft(
                         ],
                     })
                 atomic_write(current_path, canonical_json_bytes(pointer))
+                _journal_transition(transaction_journal, transaction_journal_path, "CURRENT_PROJECTED", "current pointer projection", "mutable pointer projected after decisive target verification")
+                pointer_readback = current_path.read_bytes()
+                if sha256_bytes(pointer_readback) != sha256_bytes(canonical_json_bytes(pointer)) or validate_schema_instance(load_path(current_path), pointer["schema"]):
+                    raise ArtifactPackageError({
+                        "schema": schema, "status": "REJECTED", "code": "PACKAGE_FINALIZE_CURRENT_POINTER_VERIFY_FAILED",
+                        "message": "Current-pointer readback/schema/hash verification failed.", "currentPointer": str(current_path),
+                        "smallest_next_action": "Reconcile the exact token-bound pointer effect without changing the immutable receipt.",
+                        "claims_not_established": ["current pointer", "completion", "semantic acceptance"],
+                    })
+                _journal_transition(transaction_journal, transaction_journal_path, "CURRENT_VERIFIED", "current pointer readback", "pointer schema/hash and package identity verified")
             if _test_fail_phase == "after-current":
                 raise OSError("injected artifact-finalize failure after current pointer")
             after_publication = _sealed_tree_snapshot(output)
@@ -2680,6 +3140,15 @@ def finalize_draft(
                         "release readiness",
                     ],
                 })
+            transaction_journal["effectsObserved"] = [
+                {"effect": "target", "path": _journal_rel(output, project), "status": "PRESENT", "bytes": sum(int(item["bytes"]) for item in decisive_snapshot["files"]), "sha256": decisive_snapshot["sha256"]},
+                {"effect": "receipt", "path": _journal_rel(publication_path, project), "status": "PRESENT", "bytes": len(publication_bytes), "sha256": publication_sha256},
+            ]
+            if write_current_pointer:
+                transaction_journal["effectsObserved"].append({"effect": "pointer", "path": _journal_rel(current_path, project), "status": "PRESENT", "bytes": current_path.stat().st_size, "sha256": sha256_file(current_path)})
+            for lock_record in transaction_journal["locks"]:
+                lock_record["released"] = True
+            transaction_journal["disposition"] = "COMPLETED"
             if before_publication != after_publication or post_verification.get("status") != "PASS":
                 raise ArtifactPackageError({
                     "schema": schema,
@@ -2699,7 +3168,21 @@ def finalize_draft(
                         "release readiness",
                     ],
                 })
+            if write_current_pointer:
+                _journal_transition(transaction_journal, transaction_journal_path, "COMPLETED", "transaction complete", "target, receipt, decisive verification, and current pointer acknowledged")
+            else:
+                _journal_transition(transaction_journal, transaction_journal_path, "COMPLETED", "transaction complete", "target, receipt, and decisive verification acknowledged")
         except BaseException as exc:
+            transaction_journal["disposition"] = "RECOVERY_REQUIRED"
+            transaction_journal["resumeFromPhase"] = transaction_journal["phase"]
+            transaction_journal["failure"] = {
+                "code": "PACKAGE_FINALIZE_EFFECT_FAILED", "determinacy": "AMBIGUOUS" if isinstance(exc, OSError) else "DETERMINISTIC",
+                "effect": "publication metadata", "observation": str(exc),
+                "affectedPaths": [_journal_rel(publication_path, project)] + ([_journal_rel(current_path, project)] if write_current_pointer else []),
+                "retryReceipt": None, "smallestNextAction": "Reconcile the exact operation journal after verifying extant target, receipt, and pointer bytes.",
+            }
+            with contextlib.suppress(Exception):
+                _persist_operation_journal(transaction_journal_path, transaction_journal)
             # Publication metadata is external to the sealed package and must
             # never claim success after a failed transaction.  Restore the
             # prior mutable pointer exactly and remove the new immutable
@@ -2751,6 +3234,11 @@ def finalize_draft(
             "publicationReceipt": str(publication_path),
             "publicationReceiptSha256": publication_sha256,
             "currentPointer": str(current_path) if write_current_pointer else None,
+            "operationId": transaction_journal["operationId"],
+            "journalPath": str(transaction_journal_path),
+            "phase": transaction_journal["phase"],
+            "disposition": transaction_journal["disposition"],
+            "publicationState": "PUBLISHED",
             "verification": post_verification,
             "sourceBinding": dict(source_binding) if source_binding is not None else None,
             "authorityBoundary": AUTHORITY_BOUNDARY,
@@ -2826,15 +3314,42 @@ def verify_package(
     manifest = _load_control_file(root, MANIFEST_FILE, findings) if root.is_dir() else None
     receipt = _load_control_file(root, RECEIPT_FILE, findings) if root.is_dir() else None
     validator = _SchemaValidator()
-    for value, declared, path in (
-        (package, "bbk.artifact-package.v1", PACKAGE_FILE),
-        (manifest, "bbk.artifact-package-manifest.v1", MANIFEST_FILE),
-        (receipt, "bbk.artifact-package-seal-receipt.v1", RECEIPT_FILE),
+    package_schema = _family_schema(package, "package")
+    manifest_schema = _family_schema(manifest, "manifest")
+    receipt_schema = _family_schema(receipt, "sealReceipt")
+    for value, family, declared, path in (
+        (package, "package", package_schema, PACKAGE_FILE),
+        (manifest, "manifest", manifest_schema, MANIFEST_FILE),
+        (receipt, "sealReceipt", receipt_schema, RECEIPT_FILE),
     ):
         if isinstance(value, dict):
-            for item in validator.validate(value, declared):
-                item["path"] = path
-                findings.append(item)
+            if declared is None:
+                findings.append(finding(
+                    "PACKAGE_CONTROL_SCHEMA_UNKNOWN",
+                    f"{path} does not use a supported {family} schema.",
+                    path=path,
+                    pointer="/schema",
+                    remediation="Use one exact native v1 or v2 schema for the package control file.",
+                ))
+            else:
+                for item in validator.validate(value, declared):
+                    item["path"] = path
+                    findings.append(item)
+    versions = {
+        "v2" if _is_v2_schema(package, "package") else "v1" if package_schema else None,
+        "v2" if _is_v2_schema(manifest, "manifest") else "v1" if manifest_schema else None,
+        "v2" if _is_v2_schema(receipt, "sealReceipt") else "v1" if receipt_schema else None,
+    }
+    versions.discard(None)
+    if len(versions) > 1:
+        findings.append(finding(
+            "PACKAGE_CONTROL_SCHEMA_FAMILY_MISMATCH",
+            "Package, manifest, and seal receipt must use one compatible schema generation.",
+            path=str(root),
+            remediation="Restore a complete native v1 package or a complete native v2 package.",
+        ))
+    package_v2 = _is_v2_schema(package, "package") or _is_v2_schema(manifest, "manifest")
+    loaded_artifacts: dict[str, tuple[Mapping[str, Any], Any | None]] = {}
 
     entries: list[Mapping[str, Any]] = []
     if isinstance(manifest, dict) and isinstance(manifest.get("artifacts"), list):
@@ -2864,6 +3379,7 @@ def verify_package(
             if path.is_symlink() or not path.is_file():
                 raise ValueError(f"artifact is not a regular physical file: {raw_path}")
             raw = path.read_bytes()
+            value: Any | None = None
             if entry.get("bytes") != len(raw):
                 findings.append(finding("PACKAGE_ARTIFACT_BYTES_MISMATCH", f"Byte length mismatch for {raw_path}.", path=raw_path, details={"expected": entry.get("bytes"), "actual": len(raw)}))
             actual_sha = sha256_bytes(raw)
@@ -2889,11 +3405,14 @@ def verify_package(
                         findings.append(item)
             elif canonicalization != "UNCHANGED":
                 findings.append(finding("PACKAGE_CANONICALIZATION_INVALID", f"Unknown canonicalization label {canonicalization!r}.", path=MANIFEST_FILE, pointer=f"/artifacts/{index}/canonicalization"))
+            loaded_artifacts[artifact_id] = (entry, value)
         except StrictJsonError as exc:
             diag = exc.as_dict()
             findings.append(finding(diag.get("code", "PACKAGE_ARTIFACT_JSON_INVALID"), diag.get("message", "Artifact JSON is invalid."), path=raw_path, pointer=diag.get("pointer", ""), remediation="Restore the exact valid sealed artifact bytes."))
+            loaded_artifacts[artifact_id] = (entry, None)
         except (ValueError, OSError) as exc:
             findings.append(finding("PACKAGE_ARTIFACT_PATH_INVALID", str(exc), path=raw_path, remediation="Restore the exact package artifact at the declared local path."))
+            loaded_artifacts[artifact_id] = (entry, None)
 
     for source, targets in graph.items():
         for target in targets:
@@ -2925,9 +3444,13 @@ def verify_package(
 
     if isinstance(package, dict) and isinstance(manifest, dict):
         comparable_fields = ("packageId", "revision", "profile", "subject", "predecessor", "artifacts", "contentSha256", "canonicalization")
+        if package_v2:
+            comparable_fields = (*comparable_fields[:4], "metadata", "predecessor", "artifacts", "contentSha256", "canonicalization")
         for name in comparable_fields:
             if package.get(name) != manifest.get(name):
                 findings.append(finding("PACKAGE_CONTROL_MISMATCH", f"Package descriptor and manifest differ at {name!r}.", path=PACKAGE_FILE, pointer=f"/{name}"))
+        if package_v2 and package.get("manifestSha256") != sha256_file(root / MANIFEST_FILE):
+            findings.append(finding("PACKAGE_MANIFEST_DIGEST_MISMATCH", "Package manifestSha256 does not match exact manifest bytes.", path=PACKAGE_FILE, pointer="/manifestSha256", details={"expected": package.get("manifestSha256"), "actual": sha256_file(root / MANIFEST_FILE)}))
         _, content_sha = _content_identity(manifest, entries, _reference_graph(entries))
         if manifest.get("contentSha256") != content_sha:
             findings.append(finding("PACKAGE_CONTENT_DIGEST_MISMATCH", "Manifest contentSha256 does not match recomputed package identity.", path=MANIFEST_FILE, pointer="/contentSha256", details={"expected": manifest.get("contentSha256"), "actual": content_sha}))
@@ -2946,19 +3469,43 @@ def verify_package(
             for name in ("packageId", "revision", "contentSha256"):
                 if receipt.get(name) != manifest.get(name):
                     findings.append(finding("PACKAGE_RECEIPT_IDENTITY_MISMATCH", f"Seal receipt differs from manifest at {name!r}.", path=RECEIPT_FILE, pointer=f"/{name}"))
+            if _is_v2_schema(receipt, "sealReceipt"):
+                for name in ("profile", "subject"):
+                    if receipt.get(name) != manifest.get(name):
+                        findings.append(finding("PACKAGE_RECEIPT_IDENTITY_MISMATCH", f"V2 seal receipt differs from manifest at {name!r}.", path=RECEIPT_FILE, pointer=f"/{name}"))
 
     # Validate the selected profile and its artifact graph policy without
     # treating recursive schema refs as graph edges.
     if isinstance(manifest, dict):
+        profile: dict[str, Any] | None = None
         try:
             registry = load_profile_registry(registry_path)
             profile = select_profile(registry, manifest.get("profile"))
             if profile is None:
                 findings.append(finding("PACKAGE_PROFILE_UNKNOWN", "Sealed package profile is not present in the registry.", path=MANIFEST_FILE, pointer="/profile", classification="SEMANTIC_OWNER_REQUIRED"))
-            elif profile.get("artifactReferenceCycles") == "FORBIDDEN":
-                cycle = _detect_cycle(graph)
-                if cycle:
-                    findings.append(finding("PACKAGE_ARTIFACT_REFERENCE_CYCLE", "Artifact reference cycle is forbidden by the selected profile.", path=MANIFEST_FILE, pointer="/referenceGraph", details={"cycle": cycle}))
+            else:
+                roles = profile.get("artifactRoles") if isinstance(profile.get("artifactRoles"), list) else []
+                permitted = profile.get("permittedSchemas") if isinstance(profile.get("permittedSchemas"), list) else []
+                seen_schemas: set[str] = set()
+                for index, entry in enumerate(entries):
+                    role = entry.get("role")
+                    declared = entry.get("schema")
+                    if role not in roles:
+                        findings.append(finding("PACKAGE_ARTIFACT_ROLE_NOT_PERMITTED", f"Artifact role {role!r} is not permitted by the selected profile.", path=MANIFEST_FILE, pointer=f"/artifacts/{index}/role", classification="SEMANTIC_OWNER_REQUIRED", remediation="Use an artifact role from the selected profile vocabulary."))
+                    if isinstance(declared, str):
+                        seen_schemas.add(declared)
+                        if "*" not in permitted and declared not in permitted:
+                            findings.append(finding("PACKAGE_ARTIFACT_SCHEMA_NOT_PERMITTED", f"Schema {declared!r} is not permitted by the selected profile.", path=MANIFEST_FILE, pointer=f"/artifacts/{index}/schema", classification="SEMANTIC_OWNER_REQUIRED", remediation="Use a schema permitted by the selected profile."))
+                required = profile.get("requiredSchemas") if isinstance(profile.get("requiredSchemas"), list) else []
+                for required_schema in required:
+                    if required_schema not in seen_schemas:
+                        findings.append(finding("PACKAGE_REQUIRED_SCHEMA_MISSING", f"Required schema {required_schema!r} is missing from the package.", path=MANIFEST_FILE, pointer="/artifacts", classification="SEMANTIC_OWNER_REQUIRED", remediation="Add the required profile artifact or select the correct profile."))
+                if profile.get("artifactReferenceCycles") == "FORBIDDEN":
+                    cycle = _detect_cycle(graph)
+                    if cycle:
+                        findings.append(finding("PACKAGE_ARTIFACT_REFERENCE_CYCLE", "Artifact reference cycle is forbidden by the selected profile.", path=MANIFEST_FILE, pointer="/referenceGraph", details={"cycle": cycle}))
+            if profile is not None:
+                findings.extend(_semantic_findings(profile, manifest, loaded_artifacts))
         except (StrictJsonError, ValueError, OSError) as exc:
             findings.append(finding("PACKAGE_PROFILE_REGISTRY_INVALID", str(exc), classification="SEMANTIC_OWNER_REQUIRED", remediation="Restore the canonical profile registry before relying on package verification."))
 
@@ -3108,6 +3655,7 @@ def create_successor(
                     "packageId": package["packageId"],
                     "revision": package["revision"],
                     "contentSha256": package["contentSha256"],
+                    "manifestSha256": sha256_file(source / MANIFEST_FILE),
                     "source": str(source),
                 },
                 "successorReason": reason,

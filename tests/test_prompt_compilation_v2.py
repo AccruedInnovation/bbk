@@ -143,7 +143,7 @@ class PromptCompilationV2Tests(unittest.TestCase):
             for clause in module["clauses"]
             if clause.get("hosts") == ["omp"]
         ]
-        self.assertEqual(5, len(omp_only))
+        self.assertEqual(6, len(omp_only))
         for clause_text in omp_only:
             self.assertIn(clause_text, results["omp"].prompt)
             for harness in ("codex", "claude", "pi", "generic"):
@@ -167,11 +167,16 @@ class PromptCompilationV2Tests(unittest.TestCase):
             for clause in module["clauses"]
             if clause.get("hosts") == ["omp"]
         ]
-        self.assertEqual(4, len(scoped_texts))
+        self.assertEqual(5, len(scoped_texts))
         for clause_text in scoped_texts:
             self.assertIn(clause_text, results["omp"].prompt)
             for harness in ("codex", "claude", "pi", "generic"):
                 self.assertNotIn(clause_text, results[harness].prompt)
+
+        guard = "BBK_OMP_EXTENSION_NOT_ACTIVE"
+        self.assertIn(guard, results["omp"].prompt)
+        for harness in ("codex", "claude", "pi", "generic"):
+            self.assertNotIn(guard, results[harness].prompt)
 
     def test_followup_reuse_requires_exact_invalidation_vector(self) -> None:
         role = self.roles["bbk_worker"]

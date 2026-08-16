@@ -23,7 +23,7 @@ TOOLS_DIR = Path(__file__).resolve().parent
 if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
-from runtime_requirements import enforce_supported_python
+from runtime_requirements import enforce_supported_python, direct_python_executable, python_command, python_environment
 
 enforce_supported_python(program="BBK installer")
 
@@ -77,6 +77,7 @@ OMP_EXTENSION_RUNTIME_FILES: tuple[str, ...] = (
     "runtime_requirements.py",
     "strict_json.py",
     "artifact_packages.py",
+    "artifact_platform.py",
     "bbk_artifact.py",
     "context_packages.py",
     "host_preflight.py",
@@ -761,9 +762,9 @@ def launcher(package_root: Path) -> tuple[str, bytes]:
     if os.name == "nt":
         return (
             "bbk.cmd",
-            f'@echo off\r\nif defined BBK_PYTHON ("%BBK_PYTHON%" -X utf8 "{script}" %*) else (py -3 -X utf8 "{script}" %*)\r\n'.encode(),
+            f'@echo off\r\nif defined BBK_PYTHON if /I not "%BBK_PYTHON%"=="{direct_python_executable()}" exit /b 2\r\nif not defined BBK_QUALIFIED_PYTHONPATH if not defined PYTHONPATH exit /b 2\r\nset "PYTHONDONTWRITEBYTECODE=1"\r\nset "PYTHONNOUSERSITE=1"\r\nif defined BBK_PYTHON ("%BBK_PYTHON%" -B -X utf8 "{script}" %*) else ("{direct_python_executable()}" -B -X utf8 "{script}" %*)\r\n'.encode(),
         )
-    return "bbk", f'#!/bin/sh\nexec "${{BBK_PYTHON:-python3}}" -X utf8 {json.dumps(str(script))} "$@"\n'.encode()
+    return "bbk", f'#!/bin/sh\n: "${{BBK_QUALIFIED_PYTHONPATH:?qualified PYTHONPATH required}}"\nexport PYTHONDONTWRITEBYTECODE=1 PYTHONNOUSERSITE=1\nexec "${{BBK_PYTHON:-python3}}" -B -X utf8 {json.dumps(str(script))} "$@"\n'.encode()
 
 
 def profile_launcher(item: PreparedProfile, package_root: Path) -> tuple[str, bytes]:
@@ -777,9 +778,9 @@ def profile_launcher(item: PreparedProfile, package_root: Path) -> tuple[str, by
     if os.name == "nt":
         return (
             f"{command}.cmd",
-            f'@echo off\r\nif defined BBK_PYTHON ("%BBK_PYTHON%" -X utf8 "{script}" %*) else (py -3 -X utf8 "{script}" %*)\r\n'.encode(),
+            f'@echo off\r\nif defined BBK_PYTHON if /I not "%BBK_PYTHON%"=="{direct_python_executable()}" exit /b 2\r\nif not defined BBK_QUALIFIED_PYTHONPATH if not defined PYTHONPATH exit /b 2\r\nset "PYTHONDONTWRITEBYTECODE=1"\r\nset "PYTHONNOUSERSITE=1"\r\nif defined BBK_PYTHON ("%BBK_PYTHON%" -B -X utf8 "{script}" %*) else ("{direct_python_executable()}" -B -X utf8 "{script}" %*)\r\n'.encode(),
         )
-    return command, f'#!/bin/sh\nexec "${{BBK_PYTHON:-python3}}" -X utf8 {json.dumps(str(script))} "$@"\n'.encode()
+    return command, f'#!/bin/sh\n: "${{BBK_QUALIFIED_PYTHONPATH:?qualified PYTHONPATH required}}"\nexport PYTHONDONTWRITEBYTECODE=1 PYTHONNOUSERSITE=1\nexec "${{BBK_PYTHON:-python3}}" -B -X utf8 {json.dumps(str(script))} "$@"\n'.encode()
 
 
 def manifest_path(scope: str, project: Path | None, root: Path) -> Path:
@@ -1471,9 +1472,8 @@ def run_verification_gate(
     """Run verification in a child process while streaming human progress."""
     with tempfile.TemporaryDirectory(prefix="bbk-verification-report-") as raw_temp:
         report_path = Path(raw_temp) / "verification.json"
-        command = [
-            sys.executable,
-            str(ROOT / "tools" / "verify_all.py"),
+        command = python_command(
+            ROOT / "tools" / "verify_all.py",
             "--report-file",
             str(report_path),
             "--profile",
@@ -1482,7 +1482,7 @@ def run_verification_gate(
             str(jobs),
             "--test-mode",
             test_mode,
-        ]
+        )
         if timing_report:
             command.extend(["--timing-report", timing_report])
         elif no_timing_report:
@@ -1497,6 +1497,7 @@ def run_verification_gate(
                 include_node=require_node,
                 strict=os.environ.get("BBK_TEST_ALLOW_MISSING_DEPENDENCIES") != "1",
             )
+            environment = python_environment(environment)
         except dependency_tool.DependencyError as exc:
             raise InstallError(f"Verification dependencies are unavailable: {exc}") from exc
         try:
@@ -1778,7 +1779,7 @@ def _perform_install(
 
     bbk_cli_binding = {
         "launcher": json_path(bbk_launcher_path) if bbk_launcher_path else None,
-        "python": json_path(Path(sys.executable).resolve()),
+        "python": json_path(Path(direct_python_executable())),
         "script": json_path(package_root / "tools" / "bbk.py"),
     }
 

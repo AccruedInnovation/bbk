@@ -27,7 +27,7 @@ spec/roles.json                     generated compatibility projection; do not e
 
 The catalogue owns:
 
-- the four controller-selectable roots;
+    - the six controller-selectable roots (`bbk_root_wayfinder`, `bbk_root_orchestrator`, `bbk_reviewer`, `bbk_validator_orchestrator`, `bbk_worker`, and `bbk_validator`);
 - every allowed parent and invocation mode;
 - all direct-child edges and expected child-return modes;
 - the roles allowed to originate a structured human request;
@@ -54,8 +54,10 @@ The **harness-root controller** is the sole user-facing BBK identity. It classif
 | Execution | `bbk_root_orchestrator` | accepted baseline plus sufficient authority for execution, integration, or recovery |
 | Review | `bbk_reviewer` | exact bounded independent review charter |
 | Assurance | `bbk_validator_orchestrator` | exact candidate and assertion-scoped assurance campaign |
+| Direct implementation | `bbk_worker` | one exact bounded implementation or repair WorkUnit |
+| Direct assertion | `bbk_validator` | one grouped candidate-bound assertion evaluation |
 
-This is a deliberate multi-root graph. The union of the four roots reaches all 19 roles; not every role descends from `bbk_root_wayfinder`. `bbk_reviewer` may also run as a bounded child where its catalogue parent mode permits that use.
+This is a deliberate multi-root graph. The six accepted roots cover the routine direct Worker/Validator path as well as escalated planning, execution, review, and assurance; not every role descends from `bbk_root_wayfinder`.
 
 Every canonical `bbk_*` role remains non-user-facing, including roles whose names contain `root`, `guide`, `orchestrator`, `reviewer`, or `validator`. A child never asks the user directly, calls a human-interaction surface, seizes terminal focus, or infers consent from silence or transport state.
 

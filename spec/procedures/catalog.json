@@ -110,6 +110,7 @@
       "procedure_dependencies": [],
       "prompt_module_dependencies": [
         "bbk-prompt-authority-completion-vocabulary",
+        "bbk-prompt-host-capability-truth",
         "bbk-prompt-execution-autonomy",
         "bbk-prompt-user-attention",
         "bbk-prompt-baseline-transition",
@@ -123,7 +124,7 @@
         "bbk-prompt-coordination-economy"
       ],
       "source": "shared/skills/bbk/SKILL.md",
-      "source_sha256": "ccf7d7e3ecb1a8714803c1b7fc2377373eab9a07709578df86bc2e4dabe9b1d1",
+      "source_sha256": "9c61115a771b64c57bcb77090e810800276a132d58aae0a2b21571a66fe14c60",
       "version": "0.1.0-alpha.17.0.2.1"
     },
     {
@@ -849,7 +850,7 @@
       "version": "0.1.0-alpha.17.0.2.1"
     }
   ],
-  "registry_revision": "b864191b0340b0d7f90e15d71bb421c1b573bcf78988e40fc469c72f5cf4a169",
+  "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
   "role_source_sha256": "da458dbc8973e2e3b8cc3fee9c4c8b5f84fac88e8fa075c58a056615636f2492",
   "roles": {
     "bbk_architect": {
@@ -1481,5 +1482,5 @@
   },
   "schema": "bbk.procedure-registry.v2",
   "source": "spec/method-content.json",
-  "source_sha256": "6c3a428d49a294d1abe77d031c4d8f211fccd305e0f1fc361a97aae3db030be0"
+  "source_sha256": "3c80a030d970a4e94205daa526744d1ff60dcc798c967f90ba0bcb4a47c9a191"
 }

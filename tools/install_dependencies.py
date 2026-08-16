@@ -26,7 +26,7 @@ TOOLS_DIR = Path(__file__).resolve().parent
 if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
-from runtime_requirements import enforce_supported_python
+from runtime_requirements import enforce_supported_python, normalize_python_command, python_command, python_environment
 
 enforce_supported_python(program="BBK dependency installer")
 
@@ -161,7 +161,10 @@ def run_command(
             }
         )
     try:
-        completed = subprocess.run(list(command), **kwargs)
+        values = normalize_python_command(command)
+        if values != [str(item) for item in command]:
+            kwargs["env"] = python_environment(kwargs.get("env"))
+        completed = subprocess.run(values, **kwargs)
     except OSError as exc:
         raise BootstrapError(f"could not start {_display_command(command)}: {exc}") from exc
     output = str(getattr(completed, "stdout", "") or "")
@@ -253,9 +256,9 @@ def pip_available(*, environment: Mapping[str, str] | None = None) -> bool:
     source = dict(os.environ if environment is None else environment)
     try:
         completed = subprocess.run(
-            [sys.executable, "-m", "pip", "--version"],
+            python_command(None, "--version", module="pip"),
             cwd=ROOT,
-            env=source,
+            env=python_environment(source),
             stdin=subprocess.DEVNULL,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
@@ -340,10 +343,10 @@ def install_dependencies(args: argparse.Namespace) -> dict[str, Any]:
         displayed.append(f"download and run {MISE_INSTALL_URL} into ~/.local/bin/mise")
     displayed.extend(f"mise install {spec}" for spec in managed_specs)
     if need_pip_bootstrap:
-        displayed.append(_display_command([sys.executable, "-m", "ensurepip", "--upgrade"]))
+        displayed.append(_display_command(python_command(None, "--upgrade", module="ensurepip")))
     if python_requirements:
         displayed.append(
-            _display_command([sys.executable, "-m", "pip", "install", "--upgrade", *python_requirements])
+            _display_command(python_command(None, "install", "--upgrade", *python_requirements, module="pip"))
         )
 
     if not args.json:
@@ -394,7 +397,7 @@ def install_dependencies(args: argparse.Namespace) -> dict[str, Any]:
 
     if need_pip_bootstrap:
         run_command(
-            [sys.executable, "-m", "ensurepip", "--upgrade"],
+            python_command(None, "--upgrade", module="ensurepip"),
             environment=source,
             echo=echo,
         )
@@ -405,7 +408,7 @@ def install_dependencies(args: argparse.Namespace) -> dict[str, Any]:
             )
     if python_requirements:
         run_command(
-            [sys.executable, "-m", "pip", "install", "--upgrade", *python_requirements],
+            python_command(None, "install", "--upgrade", *python_requirements, module="pip"),
             environment=source,
             echo=echo,
         )

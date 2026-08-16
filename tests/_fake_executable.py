@@ -5,6 +5,11 @@ import stat
 import sys
 from pathlib import Path
 
+TOOLS_ROOT = Path(__file__).resolve().parents[1] / "tools"
+if str(TOOLS_ROOT) not in sys.path:
+    sys.path.insert(0, str(TOOLS_ROOT))
+from runtime_requirements import direct_python_executable
+
 
 def _windows_launcher(path: Path) -> Path:
     return path if path.suffix.lower() == ".cmd" else path.with_name(path.name + ".cmd")
@@ -37,7 +42,11 @@ def write_python_executable(
         script.write_text(source, encoding="utf-8", newline="\n")
         launcher.write_text(
             "@echo off\r\n"
-            f'"{sys.executable}" -S -X utf8 "%~dp0{script.name}" %*\r\n'
+            f'if defined BBK_PYTHON if /I not "%BBK_PYTHON%"=="{direct_python_executable()}" exit /b 2\r\n'
+            'if not defined BBK_QUALIFIED_PYTHONPATH if not defined PYTHONPATH exit /b 2\r\n'
+            'set "PYTHONDONTWRITEBYTECODE=1"\r\n'
+            'set "PYTHONNOUSERSITE=1"\r\n'
+            f'"{direct_python_executable()}" -B -S -X utf8 "%~dp0{script.name}" %*\r\n'
             "exit /b %ERRORLEVEL%\r\n",
             encoding="utf-8",
             newline="",
@@ -45,7 +54,7 @@ def write_python_executable(
         return launcher.resolve()
 
     path.write_text(
-        f"#!{sys.executable} -S\n" + source,
+        f"#!{sys.executable} -B -S -X utf8\n" + source,
         encoding="utf-8",
         newline="\n",
     )

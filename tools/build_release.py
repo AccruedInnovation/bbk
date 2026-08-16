@@ -19,7 +19,7 @@ TOOLS_DIR = Path(__file__).resolve().parent
 if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
-from runtime_requirements import enforce_supported_python
+from runtime_requirements import enforce_supported_python, normalize_python_command, python_command, python_environment
 
 enforce_supported_python(program='BBK release builder')
 
@@ -29,8 +29,24 @@ TOP = f"bbk-{VERSION}"
 FIXED_TIME = (2026, 8, 7, 0, 0, 0)
 PACKAGE_CREATED_AT = "2026-08-07T00:00:00Z"
 PROFILE_GENERATED_AT = "2026-08-07T00:00:00-06:00"
-EXCLUDED_PARTS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
+# Governance, execution, and interpreter state are never release subjects.
+# Keep this identical to the package verifier so a direct source-root build
+# and its strict readback select the same files.
+EXCLUDED_PARTS = {".git", ".bbk", "evidence", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
 EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
+INCLUDED_EVIDENCE_FILES = frozenset({
+    "evidence/alpha17-rc6-work-unit-dispositions.json",
+    "evidence/qualification/deepseek-codex-provider-seam-r4/qualification-receipt.json",
+    "evidence/qualification/omp-host-contract-rc9.json",
+    "evidence/qualification/session-inspector-oracle-alpha17.json",
+})
+# Candidate metadata is a carrier/control descriptor for the qualification
+# attempt, not a governed product subject in a strict source mirror.
+EXCLUDED_ROOT_FILES = frozenset({"candidate.json"})
+# The root manifest is a package control carrier.  It is included in the
+# materialized release/mirror closure, but intentionally excluded from its own
+# generated ``files`` list so the root digest remains non-self-referential.
+MANDATORY_CONTROL_FILES = ("PACKAGE-MANIFEST.json",)
 # Package executability is an explicit release contract, not an accident of the
 # build host checkout. Alpha.13 exposes every command through an interpreter, so
 # the source archive intentionally has no native executable entrypoints.
@@ -38,7 +54,8 @@ PACKAGE_EXECUTABLES: frozenset[str] = frozenset()
 
 
 def run(command: Sequence[str]) -> None:
-    subprocess.run([str(x) for x in command], cwd=ROOT, check=True)
+    values = normalize_python_command(command)
+    subprocess.run(values, cwd=ROOT, env=python_environment(), check=True)
 
 
 def sha256_file(path: Path) -> str:
@@ -58,9 +75,9 @@ def package_files() -> Iterable[Path]:
         if not path.is_file():
             continue
         rel = path.relative_to(ROOT)
-        if any(part in EXCLUDED_PARTS for part in rel.parts) or path.suffix in EXCLUDED_SUFFIXES:
+        if (any(part in EXCLUDED_PARTS for part in rel.parts) and rel.as_posix() not in INCLUDED_EVIDENCE_FILES) or path.suffix in EXCLUDED_SUFFIXES:
             continue
-        if rel.as_posix() == "PACKAGE-MANIFEST.json":
+        if rel.as_posix() == "PACKAGE-MANIFEST.json" or rel.as_posix() in EXCLUDED_ROOT_FILES:
             continue
         yield path
 
@@ -188,7 +205,7 @@ def zip_info(name: str, executable: bool) -> zipfile.ZipInfo:
 
 
 def build_zip(output: Path, manifest: dict[str, Any]) -> None:
-    all_files = [ROOT / item["path"] for item in manifest["files"]] + [ROOT / "PACKAGE-MANIFEST.json"]
+    all_files = package_control_closure(manifest)
     with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
         for path in sorted(all_files, key=lambda p: p.relative_to(ROOT).as_posix()):
             rel = path.relative_to(ROOT).as_posix()
@@ -196,18 +213,30 @@ def build_zip(output: Path, manifest: dict[str, Any]) -> None:
             archive.writestr(zip_info(f"{TOP}/{rel}", executable), path.read_bytes(), compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
 
 
+def package_control_closure(manifest: dict[str, Any], root: Path = ROOT) -> list[Path]:
+    """Return package files plus mandatory controls for a mirror/archive.
+
+    Controls are a separate closure: ``PACKAGE-MANIFEST.json`` must travel
+    with a materialized package but cannot list itself in the generated
+    manifest.  Keeping this selection in the canonical builder makes the
+    distinction explicit and testable.
+    """
+    return [root / item["path"] for item in manifest["files"]] + [root / name for name in MANDATORY_CONTROL_FILES]
+
+
 def qualification_checks() -> None:
     """Run the same ordered verification surface exposed to package users."""
-    run([
-        sys.executable, "tools/run_tests.py", "--all", "--profile", "release",
+    run(python_command(
+        ROOT / "tools" / "run_tests.py", "--all", "--profile", "release",
         "--require-node", "--mode", "pooled", "--jobs", "0",
-    ])
+    ))
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", default=str(ROOT.parent))
     parser.add_argument("--skip-tests", action="store_true")
+    parser.add_argument("--manifest-only", action="store_true")
     args = parser.parse_args(argv)
     output_dir = Path(args.output_dir).expanduser().resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -217,10 +246,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     # PACKAGE-MANIFEST.json is excluded from its own root digest, so write it
     # before qualification and use it as the pre-execution trust gate.
     manifest = write_manifest()
+    if args.manifest_only:
+        print(f"Package root SHA-256: {manifest['root_sha256']}")
+        print(f"Files: {manifest['file_count']}")
+        return 0
     if not args.skip_tests:
         qualification_checks()
     manifest = write_manifest()
-    run([sys.executable, "tools/verify_package.py", "--strict-mode"])
+    run(python_command(ROOT / "tools" / "verify_package.py", "--strict-mode"))
     archive = output_dir / f"{TOP}.zip"
     build_zip(archive, manifest)
     digest = sha256_file(archive)

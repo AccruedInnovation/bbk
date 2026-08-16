@@ -3,7 +3,7 @@
   "canonical_sources": {
     "model_routing": "spec/model-routing.json",
     "roles": "spec/roles.json",
-    "source_sha256": "0bd7327fd076dce47a3e94cf5f3ffd87c43cb2fab42b6d56967b9a2efdf0bd3b"
+    "source_sha256": "81a7bbb77507bbeae7e173a6e8fa2e2a4af9a659dad70aee0dbafc68e24ee634"
   },
   "invariants": {
     "credential_value_persisted": false,
@@ -426,5 +426,23 @@
       "role_count": 19,
       "selection": "EXPLICIT_ONLY"
     }
+  },
+  "upstream_provenance": {
+    "path": "third_party/codex-deepseek-subagent/UPSTREAM.json",
+    "sha256": "95d3cd97aa3ad585246cc756a4afad3ddb17eff40f800818e15a599fb2dc1ba3",
+    "tracked_file_count": 33,
+    "transformations": [
+      {
+        "bbk_path": "third_party/codex-deepseek-subagent/tests/test_plaintext_handoff.py",
+        "local_sha256": "77ec4c343866918f91815ef7ca031901601d041a1cb44bdb1e4c9418c239da85",
+        "occurrence_count": 14,
+        "operation": ".read_text() -> .read_text(encoding=\"utf-8\")",
+        "transformation_id": "codex-ds-plaintext-handoff-explicit-utf8-v1",
+        "upstream_path": "tests/test_plaintext_handoff.py",
+        "upstream_sha256": "3f5c47b78b6038b964e06e30fc18490ba52b591fb207dc458ff233f231047cd8"
+      }
+    ],
+    "transformed_file_count": 1,
+    "upstream_commit": "c949e8d9b8922a48990b1e08259ad4baefc75f55"
   }
 }

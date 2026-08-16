@@ -18,8 +18,15 @@ from runtime_requirements import enforce_supported_python
 
 enforce_supported_python(program='BBK package verifier')
 
-EXCLUDED_PARTS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
+EXCLUDED_PARTS = {".git", ".bbk", "evidence", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
 EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
+INCLUDED_EVIDENCE_FILES = frozenset({
+    "evidence/alpha17-rc6-work-unit-dispositions.json",
+    "evidence/qualification/deepseek-codex-provider-seam-r4/qualification-receipt.json",
+    "evidence/qualification/omp-host-contract-rc9.json",
+    "evidence/qualification/session-inspector-oracle-alpha17.json",
+})
+EXCLUDED_ROOT_FILES = frozenset({"candidate.json"})
 
 
 def sha256_file(path: Path) -> str:
@@ -40,9 +47,9 @@ def actual_files(root: Path) -> set[str]:
         if not path.is_file():
             continue
         rel = path.relative_to(root)
-        if any(part in EXCLUDED_PARTS for part in rel.parts) or path.suffix in EXCLUDED_SUFFIXES:
+        if (any(part in EXCLUDED_PARTS for part in rel.parts) and rel.as_posix() not in INCLUDED_EVIDENCE_FILES) or path.suffix in EXCLUDED_SUFFIXES:
             continue
-        if rel.as_posix() == "PACKAGE-MANIFEST.json":
+        if rel.as_posix() == "PACKAGE-MANIFEST.json" or rel.as_posix() in EXCLUDED_ROOT_FILES:
             continue
         values.add(rel.as_posix())
     return values
