@@ -14,74 +14,74 @@
   ],
   "aggregate": {
     "baseline_bytes": 6481175,
-    "current_bytes": 8036875,
-    "delta_bytes": 1555700,
-    "delta_percent": 24.003
+    "current_bytes": 8038980,
+    "delta_bytes": 1557805,
+    "delta_percent": 24.036
   },
   "roles": {
     "bbk_root_wayfinder": {
       "baseline_bytes": 231465,
-      "current_bytes": 392733,
-      "delta_bytes": 161268,
-      "delta_percent": 69.673,
+      "current_bytes": 392953,
+      "delta_bytes": 161488,
+      "delta_percent": 69.768,
       "host_bytes": {
-        "generic": 78148,
-        "omp": 80344,
-        "codex": 77442,
-        "claude": 78651,
-        "pi": 78148
+        "generic": 78192,
+        "omp": 80388,
+        "codex": 77486,
+        "claude": 78695,
+        "pi": 78192
       }
     },
     "bbk_territory_wayfinder": {
       "baseline_bytes": 233697,
-      "current_bytes": 388407,
-      "delta_bytes": 154710,
-      "delta_percent": 66.201,
+      "current_bytes": 388657,
+      "delta_bytes": 154960,
+      "delta_percent": 66.308,
       "host_bytes": {
-        "generic": 77297,
-        "omp": 79316,
-        "codex": 76670,
-        "claude": 77827,
-        "pi": 77297
+        "generic": 77347,
+        "omp": 79366,
+        "codex": 76720,
+        "claude": 77877,
+        "pi": 77347
       }
     },
     "bbk_questioning_wayfinder": {
       "baseline_bytes": 269993,
-      "current_bytes": 305654,
-      "delta_bytes": 35661,
-      "delta_percent": 13.208,
+      "current_bytes": 305904,
+      "delta_bytes": 35911,
+      "delta_percent": 13.301,
       "host_bytes": {
-        "generic": 60642,
-        "omp": 63064,
-        "codex": 60397,
-        "claude": 60909,
-        "pi": 60642
+        "generic": 60692,
+        "omp": 63114,
+        "codex": 60447,
+        "claude": 60959,
+        "pi": 60692
       }
     },
     "bbk_planning_wayfinder": {
       "baseline_bytes": 310468,
-      "current_bytes": 401929,
-      "delta_bytes": 91461,
-      "delta_percent": 29.459,
+      "current_bytes": 402179,
+      "delta_bytes": 91711,
+      "delta_percent": 29.54,
       "host_bytes": {
-        "generic": 80026,
-        "omp": 82045,
-        "codex": 79439,
-        "claude": 80393,
-        "pi": 80026
+        "generic": 80076,
+        "omp": 82095,
+        "codex": 79489,
+        "claude": 80443,
+        "pi": 80076
       }
     },
     "bbk_phase_wayfinder": {
       "baseline_bytes": 358466,
-      "current_bytes": 434727,
-      "delta_bytes": 76261,
-      "delta_percent": 21.274,
+      "current_bytes": 434952,
+      "delta_bytes": 76486,
+      "delta_percent": 21.337,
       "host_bytes": {
-        "generic": 86584,
-        "omp": 88603,
-        "codex": 86039,
-        "claude": 86917,
-        "pi": 86584
+        "generic": 86629,
+        "omp": 88648,
+        "codex": 86084,
+        "claude": 86962,
+        "pi": 86629
       }
     },
     "bbk_question_guide": {
@@ -190,41 +190,41 @@
     },
     "bbk_root_orchestrator": {
       "baseline_bytes": 418113,
-      "current_bytes": 532435,
-      "delta_bytes": 114322,
-      "delta_percent": 27.342,
+      "current_bytes": 532755,
+      "delta_bytes": 114642,
+      "delta_percent": 27.419,
       "host_bytes": {
-        "generic": 106050,
-        "omp": 108741,
-        "codex": 105191,
-        "claude": 106403,
-        "pi": 106050
+        "generic": 106114,
+        "omp": 108805,
+        "codex": 105255,
+        "claude": 106467,
+        "pi": 106114
       }
     },
     "bbk_territory_orchestrator": {
       "baseline_bytes": 445571,
-      "current_bytes": 553625,
-      "delta_bytes": 108054,
-      "delta_percent": 24.251,
+      "current_bytes": 553920,
+      "delta_bytes": 108349,
+      "delta_percent": 24.317,
       "host_bytes": {
-        "generic": 110258,
-        "omp": 112949,
-        "codex": 109511,
-        "claude": 110649,
-        "pi": 110258
+        "generic": 110317,
+        "omp": 113008,
+        "codex": 109570,
+        "claude": 110708,
+        "pi": 110317
       }
     },
     "bbk_worker_orchestrator": {
       "baseline_bytes": 405609,
-      "current_bytes": 519805,
-      "delta_bytes": 114196,
-      "delta_percent": 28.154,
+      "current_bytes": 520100,
+      "delta_bytes": 114491,
+      "delta_percent": 28.227,
       "host_bytes": {
-        "generic": 103528,
-        "omp": 106219,
-        "codex": 102745,
-        "claude": 103785,
-        "pi": 103528
+        "generic": 103587,
+        "omp": 106278,
+        "codex": 102804,
+        "claude": 103844,
+        "pi": 103587
       }
     },
     "bbk_validator_orchestrator": {

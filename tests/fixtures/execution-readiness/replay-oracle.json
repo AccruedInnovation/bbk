@@ -1,0 +1,33 @@
+{
+  "schema": "bbk.execution-readiness-replay-oracle.v1",
+  "campaign": "BBK-EXECUTION-READINESS-001",
+  "work_unit": "WU-ER-06-STREAMLINED",
+  "history_corpus": {
+    "path": "tests/fixtures/execution-readiness/history-corpus.json",
+    "sha256": "7f15bc949bdaddd0b26fca70f52695d5159420e1150fb6e464353aca21d3c0c7"
+  },
+  "history_cases": [
+    {"id": "HIST-INCOMPLETE-MIRROR", "expected": "ENVIRONMENT_ADMISSION_FAILURE", "inner": "NOT_RUN", "outer": "FAIL"},
+    {"id": "HIST-STATIC-OVERCLAIM", "expected": "STATIC_INVENTORY_PASS_PLUS_DYNAMIC_EXECUTION_NOT_ESTABLISHED", "inner": "PASS", "outer": "NOT_RUN"},
+    {"id": "HIST-INNER-PASS-OUTER-FAIL", "expected": "BLOCKED_TECHNICAL", "inner": "PASS", "outer": "FAIL"},
+    {"id": "HIST-S21-ZERO-DELTA", "expected": "ZERO_PAYLOAD_SUCCESSOR", "inner": "NOT_RUN", "outer": "NOT_RUN"},
+    {"id": "HIST-S22-S24-CANDIDATE-JSON-ONLY", "expected": "ADMINISTRATIVE_CARRIER_DELTA", "inner": "PASS", "outer": "PASS"},
+    {"id": "HIST-HANDOFF-ROOT-FAILURE", "expected": "CARRIER_TRANSPORT_FAILURE", "inner": "PASS", "outer": "FAIL"},
+    {"id": "HIST-A3-CUTOFF", "expected": "SOURCE_REPORT_ONLY", "inner": "NOT_RUN", "outer": "NOT_RUN"},
+    {"id": "HIST-UNCHANGED-GATE", "expected": "REUSED_RECEIPT", "inner": "PASS", "outer": "PASS", "execution_count": 0},
+    {"id": "HIST-RECURRENT-INFRASTRUCTURE", "expected": "SECOND_RECURRENCE_STOP", "inner": "NOT_RUN", "outer": "FAIL"}
+  ],
+  "synthetic_cases": [
+    {"id": "WRONG_SUBJECT", "expected": "WRONG_SUBJECT"},
+    {"id": "CONTRADICTORY_EVIDENCE", "expected": "CONTRADICTORY_EVIDENCE"},
+    {"id": "INTEGRITY_FAILURE", "expected": "INTEGRITY_FAILURE"},
+    {"id": "UNOWNED_WRITE", "expected": "UNOWNED_WRITE"},
+    {"id": "AMBIGUOUS_IRREVERSIBLE_EFFECT", "expected": "AMBIGUOUS_IRREVERSIBLE_EFFECT"},
+    {"id": "CROSS_BOUNDARY_EFFECT", "expected": "CROSS_BOUNDARY_EFFECT"},
+    {"id": "ZERO_PAYLOAD_SUCCESSOR", "expected": "ZERO_PAYLOAD_SUCCESSOR"},
+    {"id": "INNER_PASS_OUTER_FAIL", "expected": "BLOCKED_TECHNICAL"},
+    {"id": "STATIC_DYNAMIC", "expected": "DYNAMIC_EXECUTION_NOT_ESTABLISHED"},
+    {"id": "RECURRENCE_2", "expected": "SECOND_RECURRENCE_STOP"},
+    {"id": "PRESEAL_CUTOFF", "expected": "PRESEAL_CUTOFF"}
+  ]
+}

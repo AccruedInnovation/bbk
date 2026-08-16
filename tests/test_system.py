@@ -1479,7 +1479,7 @@ class Alpha118WayfindingExecutionTests(a118_unittest.TestCase):
     def test_method_and_schema_surfaces_include_new_contracts(self) -> None:
         methods = a118_json.loads((A118_ROOT / "spec" / "method-content.json").read_text(encoding="utf-8"))
         self.assertEqual(len(methods["skills"]), 40)
-        self.assertEqual(len(methods["references"]), 23)
+        self.assertEqual(len(methods["references"]), 24)
         prompt_catalog = a118_json.loads((A118_ROOT / "spec" / "prompt-modules" / "catalog.json").read_text(encoding="utf-8"))
         self.assertEqual(len(prompt_catalog["module_entries"]), 43)
         for name in ("bbk-wayfind", "bbk-grill", "bbk-handoff", "bbk-work-unit-execution", "bbk-assertion-validation"):

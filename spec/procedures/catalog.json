@@ -196,7 +196,7 @@
       "procedure_dependencies": [],
       "prompt_module_dependencies": [],
       "source": "shared/skills/bbk-beads/SKILL.md",
-      "source_sha256": "209117fe291bd4a336b544f983914ceaec0bacd00494432bdd9ae759bd98dc7a",
+      "source_sha256": "5f6942b94af3a1144af04962e393cf75d5fb21d3fa14f4d66ed9171d3ae0b5d1",
       "version": "0.1.0-alpha.17.0.2.1"
     },
     {
@@ -850,7 +850,7 @@
       "version": "0.1.0-alpha.17.0.2.1"
     }
   ],
-  "registry_revision": "e4ba05d87bdb50ff695f547662226cd92f4d4908826e63af9631134fe55ae803",
+  "registry_revision": "5ede46c2ab61851aae36efe8bec3241b5d5002bed139684d3faa44ede23e682f",
   "role_source_sha256": "da458dbc8973e2e3b8cc3fee9c4c8b5f84fac88e8fa075c58a056615636f2492",
   "roles": {
     "bbk_architect": {
@@ -1482,5 +1482,5 @@
   },
   "schema": "bbk.procedure-registry.v2",
   "source": "spec/method-content.json",
-  "source_sha256": "3c80a030d970a4e94205daa526744d1ff60dcc798c967f90ba0bcb4a47c9a191"
+  "source_sha256": "80fe671107a0ab6e231e291c6dff155c3269ec5decc5ccef6899522ebb1faa16"
 }

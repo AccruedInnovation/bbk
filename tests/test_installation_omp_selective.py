@@ -6,12 +6,15 @@ import os
 import sys
 import tempfile
 import unittest
+from types import SimpleNamespace
+from unittest import mock
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 TOOLS = ROOT / "tools"
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 import install as install_tool
+import update_omp
 from tests._cli_support import run_cli as test_run_cli
 from tests._path_support import assert_same_path
 from tests._path_support import source_ast
@@ -19,6 +22,25 @@ m4_ROOT = ROOT
 
 class Alpha161SelectiveOmpInstallerTests(unittest.TestCase):
     """Regression coverage for the alpha.16 selective OMP replacement defect."""
+
+    def test_empty_installed_profiles_skip_bundle_preparation_without_changing_selection(self):
+        with tempfile.TemporaryDirectory() as temp:
+            with mock.patch.object(
+                update_omp,
+                "prepare_profile_sources",
+                side_effect=AssertionError("bundled profiles must not be prepared when none are installed"),
+            ):
+                empty_selection = update_omp.prepared_bundled_profiles([], Path(temp))
+                self.assertEqual(empty_selection, ([], []))
+
+            prepared = [SimpleNamespace(profile_id="python"), SimpleNamespace(profile_id="rust")]
+            with mock.patch.object(update_omp, "prepare_profile_sources", return_value=prepared) as prepare:
+                selected, skipped = update_omp.prepared_bundled_profiles(["rust", "missing"], Path(temp))
+            prepare.assert_called_once_with(
+                [str(install_tool.BUNDLED_PROFILES_PATH)], temp_root=Path(temp), selected_ids=None
+            )
+            self.assertEqual([item.profile_id for item in selected], ["rust"])
+            self.assertEqual(skipped, ["missing"])
 
     def test_canonical_omp_runtime_inventory_covers_local_python_import_closure(self):
         tools = {

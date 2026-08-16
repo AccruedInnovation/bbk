@@ -33,8 +33,8 @@
       },
       "source": {
         "path": "spec/roles/bbk_root_wayfinder-role.json",
-        "bytes": 23933,
-        "sha256": "dd4a40e9c0cb8dd04242fc4f6baeb593af2ff636fd8770af50af5202fc6e30bb"
+        "bytes": 23977,
+        "sha256": "33b43ab61c5dd9270ef0e4f1542f2c57537986f169f0d220f387f625e3902c0d"
       }
     },
     {
@@ -53,8 +53,8 @@
       },
       "source": {
         "path": "spec/roles/bbk_territory_wayfinder-role.json",
-        "bytes": 26875,
-        "sha256": "80992f641f8b431b886cba58f3f812019c1307af49dd05ff927af1b0461411f7"
+        "bytes": 26925,
+        "sha256": "3f4a4c0c4ec42861878646a65a6a34352333be8afde1917d503fc0289feafaf2"
       }
     },
     {
@@ -73,8 +73,8 @@
       },
       "source": {
         "path": "spec/roles/bbk_questioning_wayfinder-role.json",
-        "bytes": 29064,
-        "sha256": "a9e8add74b73224df5033759472a25939ac4d18e30f9e7c11604f897932f7f20"
+        "bytes": 29114,
+        "sha256": "5344a5bebb641a1d96c069b752ba5a463cd7adec23cef2d0d4d42cad791bb1d7"
       }
     },
     {
@@ -93,8 +93,8 @@
       },
       "source": {
         "path": "spec/roles/bbk_planning_wayfinder-role.json",
-        "bytes": 32667,
-        "sha256": "40f3e5f9c206010503bbefca69db9e3f6ff8a2276e741a87fd0072611d38df44"
+        "bytes": 32717,
+        "sha256": "4faed7f60b3d7e74d15e1725716bd43fda64a2da92eb8c22d2dd7c14bc5af5ee"
       }
     },
     {
@@ -113,8 +113,8 @@
       },
       "source": {
         "path": "spec/roles/bbk_phase_wayfinder-role.json",
-        "bytes": 37170,
-        "sha256": "ad2110de92736dbb240c001c8ce62271e06346f2f7d27804e82f9a2e43ff1670"
+        "bytes": 37215,
+        "sha256": "c0ee90672d3de851f8157e01c4aa2618f4aeb2848d62feb67d3389a867c22678"
       }
     },
     {
@@ -293,8 +293,8 @@
       },
       "source": {
         "path": "spec/roles/bbk_root_orchestrator-role.json",
-        "bytes": 44882,
-        "sha256": "a1742a0ba0ba0e3a5176e9cd6f6cc07a0b0c4427575253ddc7980f2e6f031146"
+        "bytes": 44946,
+        "sha256": "886b7ac72a4155e6eb2285b4e203ca06d9ff0a88c11b45cfde83efd416cb1733"
       }
     },
     {
@@ -313,8 +313,8 @@
       },
       "source": {
         "path": "spec/roles/bbk_territory_orchestrator-role.json",
-        "bytes": 45932,
-        "sha256": "016aaa7bd3530690576c29e6cc7180113f9c0a93a67e5ba611524f39b0cac971"
+        "bytes": 45991,
+        "sha256": "cd888872dd717561fd37f8bbf499359c6a9d9ac9617943907bf6a4fa73f5057a"
       }
     },
     {
@@ -333,8 +333,8 @@
       },
       "source": {
         "path": "spec/roles/bbk_worker_orchestrator-role.json",
-        "bytes": 45423,
-        "sha256": "68627281c614e589348f09d429d73f6d35aa677d5c0aba3c03bf23a219b95f6f"
+        "bytes": 45482,
+        "sha256": "f195d00d389c506dee261f452918b41ca01159a2c99f8247cbb673ab7a8d7367"
       }
     },
     {

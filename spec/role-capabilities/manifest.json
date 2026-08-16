@@ -1,6 +1,6 @@
 {
   "generator": "tools/generate_role_capabilities.py",
-  "manifest_digest": "sha256:831178dd2748bb1210f81ffe301f4582dea8e4769c560188ece8b14a395c7ae5",
+  "manifest_digest": "sha256:08e1243e6dc24358de3227f2fbf718538f7c8c2c7fdb7c062f3e710981f28a08",
   "policy_version": "1.0.0-alpha.17",
   "profile": "governed-software",
   "role_count": 19,
@@ -12,16 +12,16 @@
       "source_role_digest": "sha256:233a07f783f18bb49c80570c2ca8b61161201665ef75cabb9f72bf21f5d1a77c"
     },
     {
-      "manifest_digest": "sha256:60b8a716254aea442d54b5f973269c067addce81b468b3eb06269ddc8860140c",
+      "manifest_digest": "sha256:151f4fd878e50788c4503089d1c7ce40b8c2ec2272aae2dbbdf1501c4715fd3d",
       "path": "spec/role-capabilities/bbk_phase_wayfinder.json",
       "role": "bbk_phase_wayfinder",
-      "source_role_digest": "sha256:ad2110de92736dbb240c001c8ce62271e06346f2f7d27804e82f9a2e43ff1670"
+      "source_role_digest": "sha256:c0ee90672d3de851f8157e01c4aa2618f4aeb2848d62feb67d3389a867c22678"
     },
     {
-      "manifest_digest": "sha256:230fca288d47e7357355fc42cda1440e4dc6e83950ae090dc22358fc8e83ec64",
+      "manifest_digest": "sha256:5703c71ee5221082461619ca0611bdcc5ac879f391dab0c714644c514bad12f7",
       "path": "spec/role-capabilities/bbk_planning_wayfinder.json",
       "role": "bbk_planning_wayfinder",
-      "source_role_digest": "sha256:40f3e5f9c206010503bbefca69db9e3f6ff8a2276e741a87fd0072611d38df44"
+      "source_role_digest": "sha256:4faed7f60b3d7e74d15e1725716bd43fda64a2da92eb8c22d2dd7c14bc5af5ee"
     },
     {
       "manifest_digest": "sha256:18e21194688fa9374ee3a1b81c525c55d74653c0e5c086fe3dbe851470b95149",
@@ -36,10 +36,10 @@
       "source_role_digest": "sha256:f6892bb1d679b25e4ebbf4c9d83ed1815c04eb16423d04a079936fd54aa09a9b"
     },
     {
-      "manifest_digest": "sha256:531276494e45d083e181a3fb541dec136f609fa3f3622f6f692009e2e5c8e0c8",
+      "manifest_digest": "sha256:8b198f3e1beac70caca5f4238a62503350cbde44a0eb321e1cc6149410668c42",
       "path": "spec/role-capabilities/bbk_questioning_wayfinder.json",
       "role": "bbk_questioning_wayfinder",
-      "source_role_digest": "sha256:a9e8add74b73224df5033759472a25939ac4d18e30f9e7c11604f897932f7f20"
+      "source_role_digest": "sha256:5344a5bebb641a1d96c069b752ba5a463cd7adec23cef2d0d4d42cad791bb1d7"
     },
     {
       "manifest_digest": "sha256:3cbe31875bbbe879fa0eb055668f49bbf32806ded2148f2578e1e3a4ff2c3b96",
@@ -54,16 +54,16 @@
       "source_role_digest": "sha256:73a18450a3729e04d0e8af26076bd5698abee7e2a081f8afeed9025111885660"
     },
     {
-      "manifest_digest": "sha256:4543262ea5cd4ca3f58d388b732257d3fea877a9acd44bf5f00e703b5e6928ec",
+      "manifest_digest": "sha256:d07df326a7dcd2b89b37736ae8a7b8201b3a12e2e899faf5557061daf446fc85",
       "path": "spec/role-capabilities/bbk_root_orchestrator.json",
       "role": "bbk_root_orchestrator",
-      "source_role_digest": "sha256:a1742a0ba0ba0e3a5176e9cd6f6cc07a0b0c4427575253ddc7980f2e6f031146"
+      "source_role_digest": "sha256:886b7ac72a4155e6eb2285b4e203ca06d9ff0a88c11b45cfde83efd416cb1733"
     },
     {
-      "manifest_digest": "sha256:0ade8c002c11dfd6b762482b62edfe9258e34a28dc52bf191c930b4f3b26e620",
+      "manifest_digest": "sha256:ab1e2d13af0b2fa75f19bb7a6d76af1fce90d9b57e86875e4ad51176a552733f",
       "path": "spec/role-capabilities/bbk_root_wayfinder.json",
       "role": "bbk_root_wayfinder",
-      "source_role_digest": "sha256:dd4a40e9c0cb8dd04242fc4f6baeb593af2ff636fd8770af50af5202fc6e30bb"
+      "source_role_digest": "sha256:33b43ab61c5dd9270ef0e4f1542f2c57537986f169f0d220f387f625e3902c0d"
     },
     {
       "manifest_digest": "sha256:5d778e636aadc5c62dd49ee66770d691295d05fde0300f5bc369d8e04f48a7d2",
@@ -72,16 +72,16 @@
       "source_role_digest": "sha256:3b97e30d5653a4b3488608c2e5d580a83922f7295d7fb09fe551e41fab8336a6"
     },
     {
-      "manifest_digest": "sha256:189aa1323a3650a866c18ab146ad7efeadd69aebf3bfef2c8bd9f241f9adb8a1",
+      "manifest_digest": "sha256:a3a1e448a44bf309dfb9dde1035e08f185b3f9efe4fa0fb287a54e0828953a54",
       "path": "spec/role-capabilities/bbk_territory_orchestrator.json",
       "role": "bbk_territory_orchestrator",
-      "source_role_digest": "sha256:016aaa7bd3530690576c29e6cc7180113f9c0a93a67e5ba611524f39b0cac971"
+      "source_role_digest": "sha256:cd888872dd717561fd37f8bbf499359c6a9d9ac9617943907bf6a4fa73f5057a"
     },
     {
-      "manifest_digest": "sha256:c667dec92c19bd9d7d455e3e6bfb063591d9ac3546fb6d4756ca251b394d72df",
+      "manifest_digest": "sha256:3fc4d29eb520c1d59aac23649ee7a5a389d82521d2a5d7c5aff860b935200bc3",
       "path": "spec/role-capabilities/bbk_territory_wayfinder.json",
       "role": "bbk_territory_wayfinder",
-      "source_role_digest": "sha256:80992f641f8b431b886cba58f3f812019c1307af49dd05ff927af1b0461411f7"
+      "source_role_digest": "sha256:3f4a4c0c4ec42861878646a65a6a34352333be8afde1917d503fc0289feafaf2"
     },
     {
       "manifest_digest": "sha256:6998a1d5465cc0340661198ffd83f32df4ccbdf986b2a519cb69bc798a238d30",
@@ -114,10 +114,10 @@
       "source_role_digest": "sha256:7627cfb10c6b4f8c9c44d88b153783dfe9009556f9c93d1d96fe9d7b5f69e37f"
     },
     {
-      "manifest_digest": "sha256:9f2b1cd3552481f770201b9fefcc60cbdcae2832649b73eb05cce0280042d164",
+      "manifest_digest": "sha256:efe882aee51e5f9961222b73e25588efe77424a885efe6f3783d3dc900b9dd99",
       "path": "spec/role-capabilities/bbk_worker_orchestrator.json",
       "role": "bbk_worker_orchestrator",
-      "source_role_digest": "sha256:68627281c614e589348f09d429d73f6d35aa677d5c0aba3c03bf23a219b95f6f"
+      "source_role_digest": "sha256:f195d00d389c506dee261f452918b41ca01159a2c99f8247cbb673ab7a8d7367"
     }
   ],
   "schema": "bbk.role-capability-manifest.v1",

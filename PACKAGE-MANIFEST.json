@@ -1,7 +1,7 @@
 {
   "authority_disclaimer": "BBK is a temporary method harness and is not an official Blueprint release or authority-bearing package.",
   "created_at": "2026-08-07T00:00:00Z",
-  "file_count": 1009,
+  "file_count": 1036,
   "files": [
     {
       "bytes": 139,
@@ -34,10 +34,10 @@
       "sha256": "b6acb578c54a33b2387a9c49dc661ec98faa662e5b53898c11c3dc882a9aa8ae"
     },
     {
-      "bytes": 210,
+      "bytes": 304,
       "executable": false,
       "path": ".gitignore",
-      "sha256": "ec6dbb8f1805e8b31da349fc57db709f61b5cd8a511bc562a6f65460fcdb548e"
+      "sha256": "105713e3eb4f9ca95461c7aff93493b29e57915830618a1560fde118fff21628"
     },
     {
       "bytes": 74818,
@@ -61,13 +61,13 @@
       "bytes": 62989,
       "executable": false,
       "path": "PROMPT-COMPILATION-REPORT.json",
-      "sha256": "3b8ce418911b0c2f3b8c283302f01c7d89153ac6b3d55d1e754bcae573a3ba08"
+      "sha256": "5feb1f275c4b11dcf1c414c161cb506c4c7a395d2dc6937ae6cf88a26af8a689"
     },
     {
-      "bytes": 6346,
+      "bytes": 6345,
       "executable": false,
       "path": "PROMPT-SIZE-REPORT.json",
-      "sha256": "16b59b9d4d2e3af83b191ba1a8d2c07794c0435d3bd14d1e488c35f2d430558b"
+      "sha256": "86924e5db45913c174c5486940b1f28e77b067f3eb97b30c3d8328c88aed721f"
     },
     {
       "bytes": 21767,
@@ -176,6 +176,18 @@
       "executable": false,
       "path": "docs/ASSURANCE.md",
       "sha256": "977a8bc00b8a05780e74a03fb7209c063336993ea4270c5a19e8b0adef773035"
+    },
+    {
+      "bytes": 7943,
+      "executable": false,
+      "path": "docs/BBK-EXECUTION-READINESS-001-EXECUTION-AMENDMENT-001.md",
+      "sha256": "adfc79b618b1ac372c3adb903c5ac6c19b8dcdedb99164ca82ce6a9fdc777e84"
+    },
+    {
+      "bytes": 29242,
+      "executable": false,
+      "path": "docs/BBK-EXECUTION-READINESS-001-PLAN.md",
+      "sha256": "33a05e3cf4fb123c0429101828e5999fdfe62ee6973710294991734626b23c38"
     },
     {
       "bytes": 6130,
@@ -874,16 +886,16 @@
       "sha256": "485f6173a978800af78a8c1fc08ccb94cd1d7018f42741194b7a60aaeb971e86"
     },
     {
-      "bytes": 87696,
+      "bytes": 87741,
       "executable": false,
       "path": "projections/claude/agents/bbk-phase-wayfinder.md",
-      "sha256": "172082f463dafa6caa2965fdea390c0e341fbd4cea41107620165ad67b415508"
+      "sha256": "f7d4dbbcf37eaf644105b29b144c11011cda92b97e64a14e86e053c780e794da"
     },
     {
-      "bytes": 81161,
+      "bytes": 81211,
       "executable": false,
       "path": "projections/claude/agents/bbk-planning-wayfinder.md",
-      "sha256": "cd907f61a48e185ff2acc64b7ca1e19a4aa943b619da4c76987949a27e515a83"
+      "sha256": "87d328e6e4d66de0ebb98fc2c0c39c8575be571cbf3b72e4ada46b4884f5d91a"
     },
     {
       "bytes": 88557,
@@ -898,10 +910,10 @@
       "sha256": "9e40e326642cca7a94741092a7a3f5f7d16727ab7110b27235faa08547bbc8ba"
     },
     {
-      "bytes": 61527,
+      "bytes": 61577,
       "executable": false,
       "path": "projections/claude/agents/bbk-questioning-wayfinder.md",
-      "sha256": "67c29d63168dd2b4aab330225a64e3f7c23536266723c967f19281e4bba87073"
+      "sha256": "0a59b0fe64f9a9b2025465e7ae6007804a29a1c81f64a5b1a216cb1aca1a9d1a"
     },
     {
       "bytes": 56882,
@@ -916,16 +928,16 @@
       "sha256": "c29fbd99b31afdacfcfdcdf9a8f33830bcb9a36807de6ee417cffe151634dd88"
     },
     {
-      "bytes": 107245,
+      "bytes": 107309,
       "executable": false,
       "path": "projections/claude/agents/bbk-root-orchestrator.md",
-      "sha256": "81add56c0cd339d94c90f3cfb448b044b66a53bec312f4a16cfc92a2bfe0e6b4"
+      "sha256": "e5992d9d1c940b0f285a9bea07cd1cc0d2487e085ef212572084d2ea259c42d7"
     },
     {
-      "bytes": 79381,
+      "bytes": 79425,
       "executable": false,
       "path": "projections/claude/agents/bbk-root-wayfinder.md",
-      "sha256": "98af877aa4d275bdce2c07a02d0a76f800ce5d54fbb7d433d4e84d0b52978618"
+      "sha256": "59044ecb9db340febed1289db1eb1ab87939324433888660cd6edde8e5e94a82"
     },
     {
       "bytes": 62540,
@@ -934,16 +946,16 @@
       "sha256": "699ac859438db160f4b16f8c8d702c32b5c63ba17642f77290afaa2044f77383"
     },
     {
-      "bytes": 111389,
+      "bytes": 111448,
       "executable": false,
       "path": "projections/claude/agents/bbk-territory-orchestrator.md",
-      "sha256": "d759530808c9ee6f5c844dd355f6ea5370f540530a258e492e49435eaf29347b"
+      "sha256": "a6a5febfa5434e7022a859f90531578a56db967e8d5978d4a7066e10500e5dd0"
     },
     {
-      "bytes": 78598,
+      "bytes": 78648,
       "executable": false,
       "path": "projections/claude/agents/bbk-territory-wayfinder.md",
-      "sha256": "e6c8142c33f1028c954efd674027a4b869ba41aded4fede262b662809297c130"
+      "sha256": "2b0e5f8c3531056edd7a26968b27917848f8bafc01db6e17ac1131e3e9c15a4e"
     },
     {
       "bytes": 104467,
@@ -970,10 +982,10 @@
       "sha256": "35d6dc1a6a4a9cedaf8f8ccef4ba74079cbdb8dc0c989ab3de2948afc2428ff9"
     },
     {
-      "bytes": 104483,
+      "bytes": 104542,
       "executable": false,
       "path": "projections/claude/agents/bbk-worker-orchestrator.md",
-      "sha256": "1f0a3741ad81fb4579d05905faf3f3a4e82a3f292430108cf7ee7d589b5317a3"
+      "sha256": "af4e6f29a0dc85b14030c9bf418f5f3d2a3a70fa1bf67ec450d13f2c324a1def"
     },
     {
       "bytes": 91663,
@@ -994,22 +1006,22 @@
       "sha256": "9b235427f7ef26cb5f30dd443a4df62c93445f4726be7321eedc0454fb8525c6"
     },
     {
-      "bytes": 86639,
+      "bytes": 86684,
       "executable": false,
       "path": "projections/codex/agents/bbk_phase_wayfinder.toml",
-      "sha256": "5e707b7c0e6d93f32c229e18161a4ac03c662559d07978f4c893998f06632a43"
+      "sha256": "342764e4fe54d0c1fec6ba8550103a649e072771a4bd892c26e1126f13012180"
     },
     {
-      "bytes": 80007,
+      "bytes": 80057,
       "executable": false,
       "path": "projections/codex/agents/bbk_planning_wayfinder.toml",
-      "sha256": "861ccdd6314cbb80ee3688c3eb634fc0c23b4e81c3b785735fcc3123c6b77a27"
+      "sha256": "7f06ca258d1902d76be2afa74a8ae133cd57979668f811dd6843e39ff4ef203b"
     },
     {
-      "bytes": 87694,
+      "bytes": 87695,
       "executable": false,
       "path": "projections/codex/agents/bbk_prototyper.toml",
-      "sha256": "90f9d0e8f4836b04a56150ad12d5b61ef71fe445bd23218707c7fc2f8188d08c"
+      "sha256": "4ba2a4e612927f5156bbae77adab7641a7d1202bc7eebe6651a1f8e90fe78480"
     },
     {
       "bytes": 61372,
@@ -1018,10 +1030,10 @@
       "sha256": "ca8ea11455fa3726db432fbb27cb23d26c02d61bab33c1a6937e45809fba7440"
     },
     {
-      "bytes": 60864,
+      "bytes": 60914,
       "executable": false,
       "path": "projections/codex/agents/bbk_questioning_wayfinder.toml",
-      "sha256": "b20b2348a1cbd235ec110b7677d09d37ecca0d81a38c34f779cef2e6196f9fed"
+      "sha256": "9cfd4008f5945fd387ac97c5120a0bb80d59875dc3b72c9a0a766883685b9895"
     },
     {
       "bytes": 56300,
@@ -1036,16 +1048,16 @@
       "sha256": "cdb7b259d56a6921935f8829f11b97ebbd97e2e4f236b7c969e870780bb0c73d"
     },
     {
-      "bytes": 105846,
+      "bytes": 105910,
       "executable": false,
       "path": "projections/codex/agents/bbk_root_orchestrator.toml",
-      "sha256": "74e9832d5b868c537b7bdbfc202c043c304bc4aee3b5c848bc32ddf6b9e349b3"
+      "sha256": "4734ea4aa74d6baabcbc01a23c4ffce5a4d26729378e0874bfc0ee20d129d0bb"
     },
     {
-      "bytes": 77874,
+      "bytes": 77918,
       "executable": false,
       "path": "projections/codex/agents/bbk_root_wayfinder.toml",
-      "sha256": "b992b85e3f7f992c44cf1508b0ceb3f17c2643e41afa7eaca3a33a8c4beef7a4"
+      "sha256": "a0909e1f7b1f77757793c57f4fa2bd32db25d12dca2cc9472c31a181eee69acd"
     },
     {
       "bytes": 61915,
@@ -1054,16 +1066,16 @@
       "sha256": "ddc8bb14cbef01c510002028ba8dca5fd6076a5b4d84bf4d945e44e0bb784951"
     },
     {
-      "bytes": 110038,
+      "bytes": 110098,
       "executable": false,
       "path": "projections/codex/agents/bbk_territory_orchestrator.toml",
-      "sha256": "dec53cda4e015209966bd875b7c2091a558d3a1253890e96a9a058a299fdd04e"
+      "sha256": "514d58939c53d1bb8a0a0fb57dea90df425156a2abef73e9f2ce637f77006e91"
     },
     {
-      "bytes": 77145,
+      "bytes": 77195,
       "executable": false,
       "path": "projections/codex/agents/bbk_territory_wayfinder.toml",
-      "sha256": "276e98b06ec67a3cfc31e44aa2e1c9a02a13c19710d9e56b94b71aba708bf66b"
+      "sha256": "30a45211b2893677fa4ebb4ce50a60e20933de6bf20ee70597b94aecc5d287d2"
     },
     {
       "bytes": 84569,
@@ -1096,10 +1108,10 @@
       "sha256": "c26ee1d67c0735c04d494652ca5f8b594c56e91206ff261eb69e3f0dc538ec22"
     },
     {
-      "bytes": 103312,
+      "bytes": 103372,
       "executable": false,
       "path": "projections/codex/agents/bbk_worker_orchestrator.toml",
-      "sha256": "eff1c00a8b3f9244bfc0cabbfdc9598b7d72641dcd38edbe44eb1e9277d93d02"
+      "sha256": "5a1af749a8ec43fd08a7332c4a5c4d729227494322d26870d95677ec31970ba0"
     },
     {
       "bytes": 47460,
@@ -1114,16 +1126,16 @@
       "sha256": "73f1cf1752558351df20cf719a7945459da740a63d37193fd8d71ca182922fcc"
     },
     {
-      "bytes": 86935,
+      "bytes": 86980,
       "executable": false,
       "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_phase_wayfinder.toml",
-      "sha256": "d177381f08d8adcb76b31aefe81d830727745fc537c4d707f3ac7e1162d258cf"
+      "sha256": "c173b6ce9e60e641b04af22c4c13d6046de55e2dd3891586420425944f533a69"
     },
     {
-      "bytes": 80303,
+      "bytes": 80353,
       "executable": false,
       "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_planning_wayfinder.toml",
-      "sha256": "433b89803815adcd3e3fb958f39d4fea34ffbe605729666a6a42b9d8a59c7486"
+      "sha256": "c1460af01b3e2b4c3e0d1f1b2d91c793eeb2258cb1b4a201d9baab92bf8be3f2"
     },
     {
       "bytes": 87989,
@@ -1138,10 +1150,10 @@
       "sha256": "9d4be6a48f7af4841f1fbf071f1e555b4560cd24e05d7d243db61c0197247cfd"
     },
     {
-      "bytes": 61160,
+      "bytes": 61210,
       "executable": false,
       "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_questioning_wayfinder.toml",
-      "sha256": "7ebfa3fc33aae181488fcd783df326007e19dd1c882a1f3463a16ee687cbfe4b"
+      "sha256": "2480e01b7e4f3341faf5c55b62301bd9ef557a130fb3dad5f3e47fa16f6bacae"
     },
     {
       "bytes": 56595,
@@ -1156,16 +1168,16 @@
       "sha256": "79cae6bf114dbded9213796a5be137308437a6ebd57155dc68b50a170de6e196"
     },
     {
-      "bytes": 106142,
+      "bytes": 106206,
       "executable": false,
       "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_root_orchestrator.toml",
-      "sha256": "1008a71600143c7977fa1c7b408c7e54b6952ecac4fdcc3a0e142cc6e1ca4775"
+      "sha256": "171da9c093c72788e0d1f2efadb447ecbe08da53e075ee99a92447712c826825"
     },
     {
-      "bytes": 78170,
+      "bytes": 78214,
       "executable": false,
       "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_root_wayfinder.toml",
-      "sha256": "606443df47f171d8f2b979217173809f89462817190af906c07be52a71df6859"
+      "sha256": "fc6dc98fc0d0174b4db9ecae076a8beab6dee147bc15a2f8d31d8414ec731c66"
     },
     {
       "bytes": 62211,
@@ -1174,16 +1186,16 @@
       "sha256": "9fea07df383d0e11b8b099489df0992bb5d48adfd1153245478e3a42fa47af86"
     },
     {
-      "bytes": 110333,
+      "bytes": 110392,
       "executable": false,
       "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_territory_orchestrator.toml",
-      "sha256": "c888be1e864ab82e5b2bb87ff28f202c9c7ecfb2e975b7b6b533d7d77da53af3"
+      "sha256": "7d4f433e46a818987b1fdc9c27da3081c62194f22907beb9adb1fbc613ba101f"
     },
     {
-      "bytes": 77441,
+      "bytes": 77491,
       "executable": false,
       "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_territory_wayfinder.toml",
-      "sha256": "58716fc911dbbe406291d3c18531bb45a1ead107ac979efa8f71e7bed58169a2"
+      "sha256": "39a69c7b789d661d50e8d214fa56f68ad85e58855ad194db184113b0abe91788"
     },
     {
       "bytes": 84864,
@@ -1216,10 +1228,10 @@
       "sha256": "3d7859e98e74791049fbeeb24131f987c310546c96fdb5853d56670a933740c0"
     },
     {
-      "bytes": 103607,
+      "bytes": 103666,
       "executable": false,
       "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_worker_orchestrator.toml",
-      "sha256": "9d002974bec2aef8f7462ee01e8d8da195311db3b888ced6013392d9636a7012"
+      "sha256": "5990e5cf59aa6ff4e5eabf2d95adb8f56bc7316025cd0ff15990d94885886fb3"
     },
     {
       "bytes": 90542,
@@ -1228,16 +1240,16 @@
       "sha256": "941913ea69a4420ef057c2881db6b8d9afd247cba016a1cdb648b6eb2e36422c"
     },
     {
-      "bytes": 86933,
+      "bytes": 86978,
       "executable": false,
       "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_phase_wayfinder.toml",
-      "sha256": "c6c5a220d61a09a317560efab7b6c5b242d0a493f161ab587de1f0e468f8dce7"
+      "sha256": "da33ad4364613a992835d8f9d7217712f8e761abed4be94a8eea26e2c58f420f"
     },
     {
-      "bytes": 80301,
+      "bytes": 80351,
       "executable": false,
       "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_planning_wayfinder.toml",
-      "sha256": "04fc4c6f9d2be03be8226f0c1881636d174a3ecd8960a0759421f34da972ca07"
+      "sha256": "660310d9435bdbdd62744c3e3868f16ecdc79dc3143d65960c1dd3d2c005f185"
     },
     {
       "bytes": 87987,
@@ -1252,10 +1264,10 @@
       "sha256": "da824d4d1132a0d61e004c2ae4847659cc3de8ba2aedf91aa3b3221bab174b04"
     },
     {
-      "bytes": 61158,
+      "bytes": 61208,
       "executable": false,
       "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_questioning_wayfinder.toml",
-      "sha256": "ddd8b7d60bb862385cac8fdeb4785d312a0774269a97597258b728b1014f8c43"
+      "sha256": "b81005dfa1d6238009b8a6f53305af8ca22d5c60d75c31fac5b5c6227a13296c"
     },
     {
       "bytes": 56593,
@@ -1270,16 +1282,16 @@
       "sha256": "25a366e04e5be5632af16b293bc1b574c0c9b76a1977c86b34cccb477af532f9"
     },
     {
-      "bytes": 106140,
+      "bytes": 106204,
       "executable": false,
       "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_root_orchestrator.toml",
-      "sha256": "22c1061eeffe9ec5bad690af975f3d04811807c08a0311547fdc0b385b3dc7ef"
+      "sha256": "8ee59cb33d31e33814cd3a260f52124b1b29f0b09739f1c5acbccf8c8a9f8607"
     },
     {
-      "bytes": 78168,
+      "bytes": 78212,
       "executable": false,
       "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_root_wayfinder.toml",
-      "sha256": "05d6f41436f6de785b2e820939cab7dd185490f62b333e5ea7acdff91fb78f5e"
+      "sha256": "5e9e5e725a3cc82185be90ea9c65bca3362a4a10909032053a5a1af13ce3ff12"
     },
     {
       "bytes": 62209,
@@ -1288,16 +1300,16 @@
       "sha256": "2583d1fe5e66c770f7e4fd4d05448ee875d53e2dacc4c09c3223f31d5d37a186"
     },
     {
-      "bytes": 110331,
+      "bytes": 110390,
       "executable": false,
       "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_territory_orchestrator.toml",
-      "sha256": "a8cd5e973ad39089a5a37b3d53f1a937844365e7f7cb988ea6c5a331fd28dd71"
+      "sha256": "fe82b0f4acd487ffcf1682d906247f51ac183984bb71f3fdc6ee7f8bae86edb7"
     },
     {
-      "bytes": 77439,
+      "bytes": 77489,
       "executable": false,
       "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_territory_wayfinder.toml",
-      "sha256": "ded380dc9276227f66d04e559aeb7aaa9cc589912f9f43aed673635e0f57f149"
+      "sha256": "8f051404e0912bc78ef91055276315f044513f6d8a3b1ffd0535a16792b537b4"
     },
     {
       "bytes": 84862,
@@ -1330,16 +1342,16 @@
       "sha256": "e36226c5084048778680c073d4afcb453798171a4af7e3373ddc8add91e65fd5"
     },
     {
-      "bytes": 103605,
+      "bytes": 103664,
       "executable": false,
       "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_worker_orchestrator.toml",
-      "sha256": "01366a5c3e31a190efe74f0950a8205f64756a8c5acaabe1a85d729199291933"
+      "sha256": "5452478d20b76d53c02b30de93c40d6ac5775c26588b9f0e390eae3dbed266ef"
     },
     {
       "bytes": 17898,
       "executable": false,
       "path": "projections/codex_ds/manifest.json",
-      "sha256": "0389ff7beb12ca365eb68226b9d622743df01614159ebb3a9641132a975e5c6d"
+      "sha256": "b347d98a74423e1361ec98add09988e697232c602f341aa62b18d8d909b7df70"
     },
     {
       "bytes": 90220,
@@ -1348,16 +1360,16 @@
       "sha256": "1f2c80c9c79d0b4eb2ee92656883286fde8fd2b3906a0651e8abaef484853f65"
     },
     {
-      "bytes": 86584,
+      "bytes": 86629,
       "executable": false,
       "path": "projections/generic/agents/bbk_phase_wayfinder.md",
-      "sha256": "a3dd51a3d9019b577264e3bcf078e34d24844dcb56d39633a1cf8603394f3380"
+      "sha256": "fac4fdcd47d66802f924e3c180cccfccb99a24cdc3606c2161df3d65ffb58553"
     },
     {
-      "bytes": 80026,
+      "bytes": 80076,
       "executable": false,
       "path": "projections/generic/agents/bbk_planning_wayfinder.md",
-      "sha256": "367f27be5120342a37dbfb46545aaff62befbdb04169a6dbf573adb26c67a257"
+      "sha256": "db50d2159845030a4dccfd2f807ffbf2d80ac0af9c1fc3135c39a42e276b9cd5"
     },
     {
       "bytes": 87556,
@@ -1372,10 +1384,10 @@
       "sha256": "3b8660d5aafbc965257f0162b2fccbf82df8fe379183fb1f4837dc44249f35f1"
     },
     {
-      "bytes": 60642,
+      "bytes": 60692,
       "executable": false,
       "path": "projections/generic/agents/bbk_questioning_wayfinder.md",
-      "sha256": "6e0fc77e090e9df525def3a2a1479ce375ea38cf86d14c0c0010b09d6dccf0d0"
+      "sha256": "dc11892fc80273e085edd1507b8dfc9c4d36b837903adab25b3f8c8cbf827659"
     },
     {
       "bytes": 56081,
@@ -1390,16 +1402,16 @@
       "sha256": "a576b381adc80dfd60cb615f3168ea0bea3ba7adb564f4964eff2c8849a8ad34"
     },
     {
-      "bytes": 106050,
+      "bytes": 106114,
       "executable": false,
       "path": "projections/generic/agents/bbk_root_orchestrator.md",
-      "sha256": "9b61c530c34ce4545fea158f1fc5464a543a1c91f2c002d90b154811f821697d"
+      "sha256": "8c718e76eb51d90dad4d16fcdaa6d3eda97d2c5384563951b9e7124b2431acc7"
     },
     {
-      "bytes": 78148,
+      "bytes": 78192,
       "executable": false,
       "path": "projections/generic/agents/bbk_root_wayfinder.md",
-      "sha256": "b9071d23f5eeaabf0b8a0a5d771a70d80db586960a16672f033c66bcacb1b3b2"
+      "sha256": "4c768dd291879612d4c91a0d3fac332b12939c52709bd8fd802415b91230e8d9"
     },
     {
       "bytes": 61812,
@@ -1408,16 +1420,16 @@
       "sha256": "c16a617db81a2b5a9e0871804270425e8d36d54da66c7d25a6279d49a3eb8f8a"
     },
     {
-      "bytes": 110258,
+      "bytes": 110317,
       "executable": false,
       "path": "projections/generic/agents/bbk_territory_orchestrator.md",
-      "sha256": "7467a575ba8e86a1308a17ea20fa18cbb8fe79865b0f05d324d0202a75154bb5"
+      "sha256": "d07cc20a38825d29a3771b5167e6be3dd08abf5b49424c662aa7736f8d244f3e"
     },
     {
-      "bytes": 77297,
+      "bytes": 77347,
       "executable": false,
       "path": "projections/generic/agents/bbk_territory_wayfinder.md",
-      "sha256": "8e7cdd0aa9b894db860d6319aee36b401c171a3def49f364c0ecba900fc468a3"
+      "sha256": "31ae85a50b1943c67045e4558662f9743bab3a3b54db5e6234026d30c4d39d89"
     },
     {
       "bytes": 84708,
@@ -1450,10 +1462,10 @@
       "sha256": "246b0c1d16d4db02d7b585d5a01b5bb44050370b437b0c96f2aa77515aaf6e37"
     },
     {
-      "bytes": 103528,
+      "bytes": 103587,
       "executable": false,
       "path": "projections/generic/agents/bbk_worker_orchestrator.md",
-      "sha256": "06129e954ffb6b0b4f43c6f5d54a75d545a76d35dfbd2bba7c1f5f4f534ee044"
+      "sha256": "bf64c5dda278058f05c9ffbc12ec56f7182abee4f9690028cf40d651ac9806e3"
     },
     {
       "bytes": 47462,
@@ -1462,10 +1474,10 @@
       "sha256": "ded0b9e5ecf5f22155a770d67922232b7ba86be450c185a10ed55d46e3cab942"
     },
     {
-      "bytes": 1189866,
+      "bytes": 1189869,
       "executable": false,
       "path": "projections/manifest.json",
-      "sha256": "fdfa7557af91616e3fe718802c71b7e85ee22c60b0ac81c6ed7211afbfff9134"
+      "sha256": "785965a64e142faa6c0b6807bcb8dcda59b88366b7f8f394517e9b11fc133416"
     },
     {
       "bytes": 92554,
@@ -1474,16 +1486,16 @@
       "sha256": "14c0a169a9d6a74b097af11d12f339d1b972d7d91ed567d0995c1847190c0156"
     },
     {
-      "bytes": 89370,
+      "bytes": 89415,
       "executable": false,
       "path": "projections/omp/agents/bbk_phase_wayfinder.md",
-      "sha256": "4f72d9a2e2d4eab2a7ae5e60da642062e3419d076e4488b3a9038750c4ecc82f"
+      "sha256": "f533dba36fe2df591558932e46a8844ac6c946b4163861542b6d7d3b0511416d"
     },
     {
-      "bytes": 82804,
+      "bytes": 82854,
       "executable": false,
       "path": "projections/omp/agents/bbk_planning_wayfinder.md",
-      "sha256": "ee9374cd9a3f2232bde419fc803f797653cb48796882b1de891ac3c3b074c593"
+      "sha256": "ab2a89dcc4cda4924c6d543b8486ef0cb8c96025fe98ead42d2011a7b3204d5c"
     },
     {
       "bytes": 90914,
@@ -1498,10 +1510,10 @@
       "sha256": "10290028a7c9c1bcbb9b7a4cb497ffe86a6b13ed63f68d79e3b3f4e6626a4687"
     },
     {
-      "bytes": 63678,
+      "bytes": 63728,
       "executable": false,
       "path": "projections/omp/agents/bbk_questioning_wayfinder.md",
-      "sha256": "b45c75b7ffd2933b3e818df1763a47ef4596433e81b9e3e2acf85b2817adf203"
+      "sha256": "86f3c1afe22d87c2f2f2c950cf714cf31426ac4a3c80db4a58c41316bb728b85"
     },
     {
       "bytes": 58373,
@@ -1516,16 +1528,16 @@
       "sha256": "b3d0691229eb6f854f7da2ec072a9892dcb44a58938979206ae0b75b155970d1"
     },
     {
-      "bytes": 109572,
+      "bytes": 109636,
       "executable": false,
       "path": "projections/omp/agents/bbk_root_orchestrator.md",
-      "sha256": "cb596e743f6a0e8c754d7b41c924b9598db99bdfa682ebc6188f84dd6001be1c"
+      "sha256": "21f44d0f71317af98fdb937ed4cbb4975fb7037f3dab5afc4cc86961f34348e8"
     },
     {
-      "bytes": 81061,
+      "bytes": 81105,
       "executable": false,
       "path": "projections/omp/agents/bbk_root_wayfinder.md",
-      "sha256": "5d376e028282681e08644ae0d853bb9d5e458199ffe373252349e675b7e33883"
+      "sha256": "2ec0d1c3823045fb90d89883fbec6b2b2ab7598b3d114aef6c0cc41612420eac"
     },
     {
       "bytes": 64069,
@@ -1534,16 +1546,16 @@
       "sha256": "a2cb988c2ae7e15fc6dc0f62856c43a362bed960d0d7261d3cd350f6953a3fae"
     },
     {
-      "bytes": 113679,
+      "bytes": 113738,
       "executable": false,
       "path": "projections/omp/agents/bbk_territory_orchestrator.md",
-      "sha256": "aeeee621efbb637df88122a4dbb42e107b7c6c7d4a00d7b5317ca88617149333"
+      "sha256": "36c4e306e6a44dfc866e3481634b2abf45c43545a47ea8fb5bfb5ceca1384e4e"
     },
     {
-      "bytes": 80081,
+      "bytes": 80131,
       "executable": false,
       "path": "projections/omp/agents/bbk_territory_wayfinder.md",
-      "sha256": "8ba5dcfefef32a51f10e6fc2f9f034b8d2c27381c0ef89d17acb40f216852eb1"
+      "sha256": "20ad993d03d2f69815d4eb3f358c9a70de9a31b7871d0a6de50ad063ec5c215d"
     },
     {
       "bytes": 87778,
@@ -1576,10 +1588,10 @@
       "sha256": "82e43936df115b6f331d6cfa667423b4aded644e245b7319cac61026c7f474c6"
     },
     {
-      "bytes": 106904,
+      "bytes": 106963,
       "executable": false,
       "path": "projections/omp/agents/bbk_worker_orchestrator.md",
-      "sha256": "21b21de5f735ff8f680d9228112019677d6308ea0096b102a3e1e83ab9fc336d"
+      "sha256": "f28f6a7d20f9f0e742f76f1c975e3ae78210886d9718c7be3784eb64085170d4"
     },
     {
       "bytes": 49907,
@@ -1594,16 +1606,16 @@
       "sha256": "1f2c80c9c79d0b4eb2ee92656883286fde8fd2b3906a0651e8abaef484853f65"
     },
     {
-      "bytes": 86584,
+      "bytes": 86629,
       "executable": false,
       "path": "projections/pi/agents/bbk_phase_wayfinder.md",
-      "sha256": "a3dd51a3d9019b577264e3bcf078e34d24844dcb56d39633a1cf8603394f3380"
+      "sha256": "fac4fdcd47d66802f924e3c180cccfccb99a24cdc3606c2161df3d65ffb58553"
     },
     {
-      "bytes": 80026,
+      "bytes": 80076,
       "executable": false,
       "path": "projections/pi/agents/bbk_planning_wayfinder.md",
-      "sha256": "367f27be5120342a37dbfb46545aaff62befbdb04169a6dbf573adb26c67a257"
+      "sha256": "db50d2159845030a4dccfd2f807ffbf2d80ac0af9c1fc3135c39a42e276b9cd5"
     },
     {
       "bytes": 87556,
@@ -1618,10 +1630,10 @@
       "sha256": "3b8660d5aafbc965257f0162b2fccbf82df8fe379183fb1f4837dc44249f35f1"
     },
     {
-      "bytes": 60642,
+      "bytes": 60692,
       "executable": false,
       "path": "projections/pi/agents/bbk_questioning_wayfinder.md",
-      "sha256": "6e0fc77e090e9df525def3a2a1479ce375ea38cf86d14c0c0010b09d6dccf0d0"
+      "sha256": "dc11892fc80273e085edd1507b8dfc9c4d36b837903adab25b3f8c8cbf827659"
     },
     {
       "bytes": 56081,
@@ -1636,16 +1648,16 @@
       "sha256": "a576b381adc80dfd60cb615f3168ea0bea3ba7adb564f4964eff2c8849a8ad34"
     },
     {
-      "bytes": 106050,
+      "bytes": 106114,
       "executable": false,
       "path": "projections/pi/agents/bbk_root_orchestrator.md",
-      "sha256": "9b61c530c34ce4545fea158f1fc5464a543a1c91f2c002d90b154811f821697d"
+      "sha256": "8c718e76eb51d90dad4d16fcdaa6d3eda97d2c5384563951b9e7124b2431acc7"
     },
     {
-      "bytes": 78148,
+      "bytes": 78192,
       "executable": false,
       "path": "projections/pi/agents/bbk_root_wayfinder.md",
-      "sha256": "b9071d23f5eeaabf0b8a0a5d771a70d80db586960a16672f033c66bcacb1b3b2"
+      "sha256": "4c768dd291879612d4c91a0d3fac332b12939c52709bd8fd802415b91230e8d9"
     },
     {
       "bytes": 61812,
@@ -1654,16 +1666,16 @@
       "sha256": "c16a617db81a2b5a9e0871804270425e8d36d54da66c7d25a6279d49a3eb8f8a"
     },
     {
-      "bytes": 110258,
+      "bytes": 110317,
       "executable": false,
       "path": "projections/pi/agents/bbk_territory_orchestrator.md",
-      "sha256": "7467a575ba8e86a1308a17ea20fa18cbb8fe79865b0f05d324d0202a75154bb5"
+      "sha256": "d07cc20a38825d29a3771b5167e6be3dd08abf5b49424c662aa7736f8d244f3e"
     },
     {
-      "bytes": 77297,
+      "bytes": 77347,
       "executable": false,
       "path": "projections/pi/agents/bbk_territory_wayfinder.md",
-      "sha256": "8e7cdd0aa9b894db860d6319aee36b401c171a3def49f364c0ecba900fc468a3"
+      "sha256": "31ae85a50b1943c67045e4558662f9743bab3a3b54db5e6234026d30c4d39d89"
     },
     {
       "bytes": 84708,
@@ -1696,10 +1708,10 @@
       "sha256": "246b0c1d16d4db02d7b585d5a01b5bb44050370b437b0c96f2aa77515aaf6e37"
     },
     {
-      "bytes": 103528,
+      "bytes": 103587,
       "executable": false,
       "path": "projections/pi/agents/bbk_worker_orchestrator.md",
-      "sha256": "06129e954ffb6b0b4f43c6f5d54a75d545a76d35dfbd2bba7c1f5f4f534ee044"
+      "sha256": "bf64c5dda278058f05c9ffbc12ec56f7182abee4f9690028cf40d651ac9806e3"
     },
     {
       "bytes": 47457,
@@ -1730,6 +1742,12 @@
       "executable": false,
       "path": "shared/references/context-routing.md",
       "sha256": "aeb7330a417a9dd1f4cba9663551d7868e798da305514901d41273bc1c931ea8"
+    },
+    {
+      "bytes": 1377,
+      "executable": false,
+      "path": "shared/references/deterministic-operations.md",
+      "sha256": "2f39346a9056a4fb31f5f22f903a37b2cafc464ab21166641afebe6075ee0654"
     },
     {
       "bytes": 361,
@@ -1900,10 +1918,10 @@
       "sha256": "cc1e0b58d0dd32edec4178eefe9d97962a51f2ead58c77cc6b656c855f0e9423"
     },
     {
-      "bytes": 4849,
+      "bytes": 5463,
       "executable": false,
       "path": "shared/skills/bbk-beads/SKILL.md",
-      "sha256": "209117fe291bd4a336b544f983914ceaec0bacd00494432bdd9ae759bd98dc7a"
+      "sha256": "5f6942b94af3a1144af04962e393cf75d5fb21d3fa14f4d66ed9171d3ae0b5d1"
     },
     {
       "bytes": 4292,
@@ -2155,13 +2173,19 @@
       "bytes": 47333,
       "executable": false,
       "path": "spec/contracts/role-return-registry-v2.json",
-      "sha256": "c9ff6466a580f222876c68d5e108d97b3359840418819c6dc314db9b22cb74db"
+      "sha256": "b7a6fb459ede4c973a30651a4418df76657198ed2b6cc8f37b4364dcb4bedc62"
     },
     {
       "bytes": 15880,
       "executable": false,
       "path": "spec/contracts/role-return-registry.json",
-      "sha256": "2b92acb332ebe8f14c49d9c0049cc511900a2bdbc440068c455249c83129d709"
+      "sha256": "fd6966ea878491f1277ef52af9d8525c7f2cc5cd859f1f4fd35cca30d5ddb314"
+    },
+    {
+      "bytes": 2131,
+      "executable": false,
+      "path": "spec/contracts/schema-registry.json",
+      "sha256": "36e13b74af0c70650ad0ec2db7e55f6a4c8b28001d79a882a36d119ee04d79da"
     },
     {
       "bytes": 368,
@@ -2176,22 +2200,28 @@
       "sha256": "5699a5b853f7632e8f8f2a5267e6d3b5a48445f04c917b4b3389d2d81bbb9f5b"
     },
     {
-      "bytes": 442935,
+      "bytes": 444971,
       "executable": false,
       "path": "spec/method-content.json",
-      "sha256": "3c80a030d970a4e94205daa526744d1ff60dcc798c967f90ba0bcb4a47c9a191"
+      "sha256": "80fe671107a0ab6e231e291c6dff155c3269ec5decc5ccef6899522ebb1faa16"
     },
     {
-      "bytes": 6281,
+      "bytes": 6284,
       "executable": false,
       "path": "spec/model-routing.json",
-      "sha256": "a98be13d0d5e51f944ff5c29f6b66614a1075fa497ee204341d597139777de98"
+      "sha256": "9d336dcd97d7e0b51807c9e73a4b075fc01b017c2e14217dbb6555ddd163ed3e"
     },
     {
       "bytes": 8113,
       "executable": false,
       "path": "spec/omp-model-routing-profiles.json",
       "sha256": "ffe877c850c9bd3e9107885b088a3343f1ada80503eb849757e941422343ebe2"
+    },
+    {
+      "bytes": 4378,
+      "executable": false,
+      "path": "spec/operations/deterministic-operation-registry.json",
+      "sha256": "774fd084b9d4bd9624f13899a434246e75fe0518ee95b2027c3a28522a4f3989"
     },
     {
       "bytes": 541,
@@ -2221,7 +2251,7 @@
       "bytes": 49881,
       "executable": false,
       "path": "spec/procedures/catalog.json",
-      "sha256": "5fd165484569428be9f941ac9f614703fbb56b88e9487c9fc3cabc447cf054f6"
+      "sha256": "70a5878a868bfab52cf3f7887922f77a81c3fa74ce7494990aa53dae2860da75"
     },
     {
       "bytes": 162,
@@ -2509,13 +2539,13 @@
       "bytes": 901,
       "executable": false,
       "path": "spec/role-capabilities/bbk_phase_wayfinder.json",
-      "sha256": "260f173a10c283f26af30982bf4aa62ed5fd1dac5e8c5cc16b6913bdcc2aa0e2"
+      "sha256": "6c15cf29754781dabd07b67b7cb55b2765ca452df03775e314a23ddcaf808583"
     },
     {
       "bytes": 904,
       "executable": false,
       "path": "spec/role-capabilities/bbk_planning_wayfinder.json",
-      "sha256": "b6e0e761173df88d5c09ba0957687a39c187154c60f87607ef6b708e238c8b15"
+      "sha256": "538227db06e64035a2b95f9de798d05822cc6de02fce3b5006b8facb2fab3ba1"
     },
     {
       "bytes": 1330,
@@ -2533,7 +2563,7 @@
       "bytes": 907,
       "executable": false,
       "path": "spec/role-capabilities/bbk_questioning_wayfinder.json",
-      "sha256": "90ef24cb24d24252562c96c6240814b875f52ba47ac4f8eb8fd8402bb447aaa4"
+      "sha256": "25f76ba267df6f62e7e97782000de44828007cf7162e41291403baa08b354e9f"
     },
     {
       "bytes": 896,
@@ -2551,13 +2581,13 @@
       "bytes": 1283,
       "executable": false,
       "path": "spec/role-capabilities/bbk_root_orchestrator.json",
-      "sha256": "73779fda352b6c8122420b403b7ca44582ef413c0302b2d360ccaac2d6b8efc5"
+      "sha256": "31b5ea93fd0ad4edc496e9bc97bef0864511035385108704310517e67f37299b"
     },
     {
       "bytes": 900,
       "executable": false,
       "path": "spec/role-capabilities/bbk_root_wayfinder.json",
-      "sha256": "84496181b2f572471531d65ef418498e69c6dd8de5fb6fb61339cfe955046f79"
+      "sha256": "39734408c54f2ffe4b777e10cc12954bf09eef5e5644fc958cbaf06cb06a3baa"
     },
     {
       "bytes": 897,
@@ -2569,13 +2599,13 @@
       "bytes": 1288,
       "executable": false,
       "path": "spec/role-capabilities/bbk_territory_orchestrator.json",
-      "sha256": "faef799be0a7db8f667328d8b13cce56e0ae7d45791af33765e6e79f26a62e80"
+      "sha256": "288768580b627e8bcc8d13b072486afe559f9ebcfd33d4539611ed7eceb74442"
     },
     {
       "bytes": 905,
       "executable": false,
       "path": "spec/role-capabilities/bbk_territory_wayfinder.json",
-      "sha256": "ac0b9c41330650270b59d95a5d239f0798313cd23ae0d735aa8d4c3b549baa60"
+      "sha256": "d8a73e9feb05885a1cfd71e0f493060723c4a3ad9096b3c5c79407793e5588e1"
     },
     {
       "bytes": 1032,
@@ -2611,19 +2641,19 @@
       "bytes": 1285,
       "executable": false,
       "path": "spec/role-capabilities/bbk_worker_orchestrator.json",
-      "sha256": "79ea389f4bf3abc126093ac0fe2b1529343eea36eea3035b3fc39347a0ed7b5b"
+      "sha256": "fe9d57d987c2484807ab23719e7956f7f50927f68eaa21be621ff8545246b990"
     },
     {
       "bytes": 6651,
       "executable": false,
       "path": "spec/role-capabilities/manifest.json",
-      "sha256": "2e44f83777a88e16c56eb9ef2fe9ad36c53a96742c50430375b140d55705188b"
+      "sha256": "99deaeae859c1b17bfe287682fec537045fd82e778e66ad129acf0b9515dbdff"
     },
     {
-      "bytes": 746036,
+      "bytes": 746457,
       "executable": false,
       "path": "spec/roles.json",
-      "sha256": "4108155615628bf5ec77616bce887cdd90cd5d7ab43cd918a825d77d8627a9a4"
+      "sha256": "7b8d3b6aea4517f943e336ae74f24248781eec00efdd3b01a147b9a21d1ceae5"
     },
     {
       "bytes": 3556,
@@ -2638,16 +2668,16 @@
       "sha256": "233a07f783f18bb49c80570c2ca8b61161201665ef75cabb9f72bf21f5d1a77c"
     },
     {
-      "bytes": 37170,
+      "bytes": 37215,
       "executable": false,
       "path": "spec/roles/bbk_phase_wayfinder-role.json",
-      "sha256": "ad2110de92736dbb240c001c8ce62271e06346f2f7d27804e82f9a2e43ff1670"
+      "sha256": "c0ee90672d3de851f8157e01c4aa2618f4aeb2848d62feb67d3389a867c22678"
     },
     {
-      "bytes": 32667,
+      "bytes": 32717,
       "executable": false,
       "path": "spec/roles/bbk_planning_wayfinder-role.json",
-      "sha256": "40f3e5f9c206010503bbefca69db9e3f6ff8a2276e741a87fd0072611d38df44"
+      "sha256": "4faed7f60b3d7e74d15e1725716bd43fda64a2da92eb8c22d2dd7c14bc5af5ee"
     },
     {
       "bytes": 38670,
@@ -2662,10 +2692,10 @@
       "sha256": "f6892bb1d679b25e4ebbf4c9d83ed1815c04eb16423d04a079936fd54aa09a9b"
     },
     {
-      "bytes": 29064,
+      "bytes": 29114,
       "executable": false,
       "path": "spec/roles/bbk_questioning_wayfinder-role.json",
-      "sha256": "a9e8add74b73224df5033759472a25939ac4d18e30f9e7c11604f897932f7f20"
+      "sha256": "5344a5bebb641a1d96c069b752ba5a463cd7adec23cef2d0d4d42cad791bb1d7"
     },
     {
       "bytes": 25676,
@@ -2680,16 +2710,16 @@
       "sha256": "73a18450a3729e04d0e8af26076bd5698abee7e2a081f8afeed9025111885660"
     },
     {
-      "bytes": 44882,
+      "bytes": 44946,
       "executable": false,
       "path": "spec/roles/bbk_root_orchestrator-role.json",
-      "sha256": "a1742a0ba0ba0e3a5176e9cd6f6cc07a0b0c4427575253ddc7980f2e6f031146"
+      "sha256": "886b7ac72a4155e6eb2285b4e203ca06d9ff0a88c11b45cfde83efd416cb1733"
     },
     {
-      "bytes": 23933,
+      "bytes": 23977,
       "executable": false,
       "path": "spec/roles/bbk_root_wayfinder-role.json",
-      "sha256": "dd4a40e9c0cb8dd04242fc4f6baeb593af2ff636fd8770af50af5202fc6e30bb"
+      "sha256": "33b43ab61c5dd9270ef0e4f1542f2c57537986f169f0d220f387f625e3902c0d"
     },
     {
       "bytes": 25419,
@@ -2698,16 +2728,16 @@
       "sha256": "3b97e30d5653a4b3488608c2e5d580a83922f7295d7fb09fe551e41fab8336a6"
     },
     {
-      "bytes": 45932,
+      "bytes": 45991,
       "executable": false,
       "path": "spec/roles/bbk_territory_orchestrator-role.json",
-      "sha256": "016aaa7bd3530690576c29e6cc7180113f9c0a93a67e5ba611524f39b0cac971"
+      "sha256": "cd888872dd717561fd37f8bbf499359c6a9d9ac9617943907bf6a4fa73f5057a"
     },
     {
-      "bytes": 26875,
+      "bytes": 26925,
       "executable": false,
       "path": "spec/roles/bbk_territory_wayfinder-role.json",
-      "sha256": "80992f641f8b431b886cba58f3f812019c1307af49dd05ff927af1b0461411f7"
+      "sha256": "3f4a4c0c4ec42861878646a65a6a34352333be8afde1917d503fc0289feafaf2"
     },
     {
       "bytes": 37298,
@@ -2740,10 +2770,10 @@
       "sha256": "7627cfb10c6b4f8c9c44d88b153783dfe9009556f9c93d1d96fe9d7b5f69e37f"
     },
     {
-      "bytes": 45423,
+      "bytes": 45482,
       "executable": false,
       "path": "spec/roles/bbk_worker_orchestrator-role.json",
-      "sha256": "68627281c614e589348f09d429d73f6d35aa677d5c0aba3c03bf23a219b95f6f"
+      "sha256": "f195d00d389c506dee261f452918b41ca01159a2c99f8247cbb673ab7a8d7367"
     },
     {
       "bytes": 17899,
@@ -2992,6 +3022,12 @@
       "sha256": "aa20a034c1e38b057a1d7379aa8c4d5b4ba160f65c811a4a1d01c5ac16b8fc77"
     },
     {
+      "bytes": 3795,
+      "executable": false,
+      "path": "spec/schemas/bbk-command-attempt-v2.schema.json",
+      "sha256": "3cb79b532f819ce1b902717fa27796445bfb83b93f9cae5b153e5adf683ea3fb"
+    },
+    {
       "bytes": 4729,
       "executable": false,
       "path": "spec/schemas/bbk-compiled-procedure-manifest-v1.schema.json",
@@ -3038,6 +3074,18 @@
       "executable": false,
       "path": "spec/schemas/bbk-coordination-command-v1.schema.json",
       "sha256": "7c30353cd677f3b68878fc9f5b33a98f1fa8bcd562e9b241eb239a0022be5af1"
+    },
+    {
+      "bytes": 2614,
+      "executable": false,
+      "path": "spec/schemas/bbk-deterministic-operation-registry-v1.schema.json",
+      "sha256": "aa715a071ab69cc461f2d5905d3f1cbcc2acb7d721a5f08aae8a011815f455bb"
+    },
+    {
+      "bytes": 2014,
+      "executable": false,
+      "path": "spec/schemas/bbk-diagnostic-v1.schema.json",
+      "sha256": "c14a6620c108b48b53d7c861c3452a83ba900cdc339e27cbae6d7910ff14fd6c"
     },
     {
       "bytes": 2053,
@@ -3154,6 +3202,12 @@
       "sha256": "735707107237692eae76d4165663b76b7c13b63c383db8179853d48b1de3728e"
     },
     {
+      "bytes": 4272,
+      "executable": false,
+      "path": "spec/schemas/bbk-identity-graph-v1.schema.json",
+      "sha256": "86c0a438a60333a3b5e163cae21324fd176a315dec19e1899889048714f6d7fe"
+    },
+    {
       "bytes": 1891,
       "executable": false,
       "path": "spec/schemas/bbk-identity-receipt-v1.schema.json",
@@ -3248,6 +3302,12 @@
       "executable": false,
       "path": "spec/schemas/bbk-omp-enforcement-boundary-status-v1.schema.json",
       "sha256": "a760345365a28721d1e275c07812e37e28f60ff98209e0ac3491b149e15aa905"
+    },
+    {
+      "bytes": 1016,
+      "executable": false,
+      "path": "spec/schemas/bbk-operation-qualification-v1.schema.json",
+      "sha256": "b025a9a75cca616eb63f63de2387adbe21e751c61dd3c919212f8aa92a355df3"
     },
     {
       "bytes": 1343,
@@ -3368,6 +3428,18 @@
       "executable": false,
       "path": "spec/schemas/bbk-read-only-task-registration-v1.schema.json",
       "sha256": "895a91f9a4391578156df878f74203ffbc35d0fccd4387430d7ab0dcf8f29145"
+    },
+    {
+      "bytes": 1265,
+      "executable": false,
+      "path": "spec/schemas/bbk-recurrence-disposition-v1.schema.json",
+      "sha256": "0bb50fb704279a179237218a82c89dc43522803b057acebbfc1a11cc55f8728d"
+    },
+    {
+      "bytes": 978,
+      "executable": false,
+      "path": "spec/schemas/bbk-replay-oracle-result-v1.schema.json",
+      "sha256": "3910cdec2a85447ede7de1645028acb9d657acfe3224958bd494137cba1924aa"
     },
     {
       "bytes": 2169,
@@ -3550,6 +3622,18 @@
       "sha256": "0bf82c2a62d5a92a4d04817b7fdc00968b929526cd211cd2ce72b40baee3f9c3"
     },
     {
+      "bytes": 1273,
+      "executable": false,
+      "path": "spec/schemas/bbk-run-aggregate-v2.schema.json",
+      "sha256": "1b365bfc755c4951a801bbc9681e4efdfefd0b95d506655a7fbb2b4509bd6f95"
+    },
+    {
+      "bytes": 920,
+      "executable": false,
+      "path": "spec/schemas/bbk-schema-registry-v1.schema.json",
+      "sha256": "c00264c44199b83c30a6dcdb41235c208c37ddf5cb261a22cda6721d6ff305fc"
+    },
+    {
       "bytes": 5401,
       "executable": false,
       "path": "spec/schemas/bbk-session-inspector-contradictions-v1.schema.json",
@@ -3572,6 +3656,12 @@
       "executable": false,
       "path": "spec/schemas/bbk-solution-outcome-fit-v1.schema.json",
       "sha256": "71aae7b60f8238cbd12fc5f6ef8262d24d6e2fa2800338ca3c97b8370bfc2235"
+    },
+    {
+      "bytes": 867,
+      "executable": false,
+      "path": "spec/schemas/bbk-source-sanity-v1.schema.json",
+      "sha256": "b823b13d633c151ec3387eb82db2ce40d139fe33277b102705741cade16d4bf9"
     },
     {
       "bytes": 2517,
@@ -3620,6 +3710,12 @@
       "executable": false,
       "path": "spec/schemas/bbk-spawn-session-activation-v1.schema.json",
       "sha256": "12832cc6c545cb5b4a2df25a408b1d982a57ec0bb476d32eb859d84f7832fd53"
+    },
+    {
+      "bytes": 2312,
+      "executable": false,
+      "path": "spec/schemas/bbk-stage-receipt-v1.schema.json",
+      "sha256": "1f1255d78de3cb2c8fbc7ee58034051a9266e3e8b89be76847a317979ac77060"
     },
     {
       "bytes": 20973,
@@ -3706,10 +3802,16 @@
       "sha256": "db2cb9b8442d18061e09c11f6b950ac334b05414ad5baf5ea5600732fa118fe4"
     },
     {
-      "bytes": 1990,
+      "bytes": 1034,
+      "executable": false,
+      "path": "spec/schemas/bbk-verification-precheck-result-v1.schema.json",
+      "sha256": "c6ee31b5d8ba49d6c6373991ffc8aafea2d9a7f3f724549407df513d7c86ffd3"
+    },
+    {
+      "bytes": 2155,
       "executable": false,
       "path": "spec/schemas/bbk-verification-receipt-v1.schema.json",
-      "sha256": "5d2b6922bb29adc93df5afea3b41513a9b11d5ac5edc7a937cf17bf50aa00ba8"
+      "sha256": "42cb2d4e60d35b1120a1fc9faa63ed9abe7ee97fb00c5e83f7f3c20a014d71fa"
     },
     {
       "bytes": 4343,
@@ -4504,10 +4606,10 @@
       "sha256": "de8c3c0ba37ac2ba6a5d6ac6f3e52780c1a760eef1a7a763456c6902eb23e62c"
     },
     {
-      "bytes": 6281,
+      "bytes": 6284,
       "executable": false,
       "path": "tests/fixtures/alpha17-default-model-routing.json",
-      "sha256": "a98be13d0d5e51f944ff5c29f6b66614a1075fa497ee204341d597139777de98"
+      "sha256": "9d336dcd97d7e0b51807c9e73a4b075fc01b017c2e14217dbb6555ddd163ed3e"
     },
     {
       "bytes": 1009,
@@ -4592,6 +4694,24 @@
       "executable": false,
       "path": "tests/fixtures/deepseek-codex-provider-seam/mock_responses_provider.py",
       "sha256": "dcd4cc288139e55038312dd6677c359eb19fa86e6cead2d020826358755b0e98"
+    },
+    {
+      "bytes": 1650,
+      "executable": false,
+      "path": "tests/fixtures/execution-readiness/history-corpus.json",
+      "sha256": "7f15bc949bdaddd0b26fca70f52695d5159420e1150fb6e464353aca21d3c0c7"
+    },
+    {
+      "bytes": 2225,
+      "executable": false,
+      "path": "tests/fixtures/execution-readiness/replay-oracle.json",
+      "sha256": "42b4adf8a509ee547f93a3e633d899a449b3f67df10c629edcd613cb50f962ca"
+    },
+    {
+      "bytes": 936,
+      "executable": false,
+      "path": "tests/fixtures/execution-readiness/synthetic-matrix.json",
+      "sha256": "ee2e95d3b5208ddc8b0d3f8879336b97ffaa77033e02839725413460cdf6109f"
     },
     {
       "bytes": 7506,
@@ -4696,10 +4816,10 @@
       "sha256": "3b8629bd25175b74180b4f896c5e24c2711847f5758972628aabb9d461dd89d8"
     },
     {
-      "bytes": 5545,
+      "bytes": 5939,
       "executable": false,
       "path": "tests/test_codex_external_targets.py",
-      "sha256": "fdab1e91cb3bd296f15dfebd30945085c2794d7992f036a07905a34514cf1a22"
+      "sha256": "98ddd17f8c2b964ac8725c68890b33a9225f14689232cd1aebfad92698ebb111"
     },
     {
       "bytes": 3543,
@@ -4732,10 +4852,10 @@
       "sha256": "549fd83dfee47978786ab710c56e537131ec48241afaea46caa63aef2e881321"
     },
     {
-      "bytes": 81553,
+      "bytes": 81674,
       "executable": false,
       "path": "tests/test_core_contracts.py",
-      "sha256": "b2093450aebd74c3598ba5a13a0dff8cf5ddc81a8a90d4e4b29745aa51b742f4"
+      "sha256": "75ec2a6ee063a5450e048eda3926fa4228f33e5fae51cbdb73cc69bc89a09661"
     },
     {
       "bytes": 27622,
@@ -4792,10 +4912,10 @@
       "sha256": "7eaf43f6833a004f36e660708bb95e4f10b7de5ba1daa0693c62698021646cf5"
     },
     {
-      "bytes": 20706,
+      "bytes": 26547,
       "executable": false,
       "path": "tests/test_installation_codex_workspace.py",
-      "sha256": "fc936fff2b7caca686050ddb3137ff191c8a25d93f6d80f0369584a8c947ca4d"
+      "sha256": "b0de7d3a3b4cd7b703181033499fee7f93ac2fd559174c848c12797c18ce5946"
     },
     {
       "bytes": 26138,
@@ -4804,10 +4924,10 @@
       "sha256": "da30f99bfb0bde8d8e3300baf6db0e3105580861d66725f87461429f8cd9cefa"
     },
     {
-      "bytes": 8096,
+      "bytes": 9303,
       "executable": false,
       "path": "tests/test_installation_omp_selective.py",
-      "sha256": "e3af1a3c9facd9b591295e1e93ba94b908869d993a0000ef023eb6913cccc8a5"
+      "sha256": "18363f2f811a7e471ea713b3b8457e594c8576b066ee3d8ed0b073bdaf7366b8"
     },
     {
       "bytes": 13403,
@@ -4816,10 +4936,10 @@
       "sha256": "ec4a5eca9dd467416fd2470186d9da5b7df3f8e7e62dab64dad2d723943f484b"
     },
     {
-      "bytes": 37667,
+      "bytes": 37731,
       "executable": false,
       "path": "tests/test_installation_profile_packages.py",
-      "sha256": "9d6e31f42ae415a770ea3ffdd12cdc090fa2d71c551f3dfb3d06c8760280ce9c"
+      "sha256": "547d73a4c3808ca4d82787e3303558f50281e095d538a144440265c2b309b1c4"
     },
     {
       "bytes": 3004,
@@ -4844,6 +4964,18 @@
       "executable": false,
       "path": "tests/test_launch_recorder.py",
       "sha256": "288219bc576d538974bb360ce7c2cda03335a7ef2c4c5a1654f0e15fe4b7c4b4"
+    },
+    {
+      "bytes": 7226,
+      "executable": false,
+      "path": "tests/test_m3_deterministic_operations.py",
+      "sha256": "974b939120ec09bb6cdf3640d2985c1e3b42ac2c3819e68825693a7f2df2bce5"
+    },
+    {
+      "bytes": 7884,
+      "executable": false,
+      "path": "tests/test_m4_identity_graph.py",
+      "sha256": "3164eb6c864d03b6951b4d04afef35bbc151937e4354af92aa9d24364aec39e1"
     },
     {
       "bytes": 34267,
@@ -4924,10 +5056,10 @@
       "sha256": "11e1c31aada03a9a41586f3e8e894157b904d716433da0b2fca6edb98c975382"
     },
     {
-      "bytes": 66659,
+      "bytes": 66676,
       "executable": false,
       "path": "tests/test_prompt_module_package_v1.py",
-      "sha256": "a84820491f816a3f9e0e206dd9701012d7cb94657a60519e07814ae0dda89377"
+      "sha256": "11a4bf44c15e3db7a8aae4721e7a4fc0b4da6d172e27d12062e14604c31c7fca"
     },
     {
       "bytes": 1952,
@@ -4948,10 +5080,16 @@
       "sha256": "85795c182a49749711c433d1039a9587dff893732d09db9d7ba7a481e248d99c"
     },
     {
-      "bytes": 9502,
+      "bytes": 10854,
       "executable": false,
       "path": "tests/test_release_qualification.py",
-      "sha256": "b41064c941ab7bd484e54c330094797c1269fb6b09d2e07e90ec87e89c1d9113"
+      "sha256": "f4d245af64f6a7ef47af0824b834761aa976e23eec8806bd2fa1ed518429cda6"
+    },
+    {
+      "bytes": 2510,
+      "executable": false,
+      "path": "tests/test_replay_oracle.py",
+      "sha256": "d3c343ad57f4beb3156037c3fe950fe3261ca8b4dfb3e10096343023c403f0a6"
     },
     {
       "bytes": 5003,
@@ -5017,7 +5155,7 @@
       "bytes": 106387,
       "executable": false,
       "path": "tests/test_system.py",
-      "sha256": "2a1d97745813157ea266a89d892246562711a816d2d501e67ce0f3d8a9830909"
+      "sha256": "884d1583e456bc88e0475e5a9e8d82e495ba892c379c1b1241fb9f7dd035ffbd"
     },
     {
       "bytes": 3422,
@@ -5026,10 +5164,10 @@
       "sha256": "86dae0a85cb38de8f67a1561f8f3d923c5be801bc9ccc719e72cf9e9efcab565"
     },
     {
-      "bytes": 10816,
+      "bytes": 13460,
       "executable": false,
       "path": "tests/test_verification_economy.py",
-      "sha256": "ab8ad9431fdfc2cbd569ffaeb69a5632481b1241a32037494c9250e7f8ca9fa5"
+      "sha256": "1555764160d42035c5964832f1214e864200df74d529d15f5d6180b3a1729486"
     },
     {
       "bytes": 2618,
@@ -5296,10 +5434,10 @@
       "sha256": "f4dd8f7177baa4fb6e0ea5c2751e9ed248208e0cb52c48180be59328b2b12ada"
     },
     {
-      "bytes": 348403,
+      "bytes": 353833,
       "executable": false,
       "path": "tools/bbk.py",
-      "sha256": "930c57dfec6e29a06125f10dd73dedc283c06ba1c43e4f9a8a1ae4d72283fa05"
+      "sha256": "c1cd0777435860aa05e09f453939f68b23f374da2789e26fc43d79d60a94f37e"
     },
     {
       "bytes": 418,
@@ -5314,10 +5452,10 @@
       "sha256": "c52d674480be562c0eabed7ae2ccf4be100cb700864ee83510c4fd6edc9d378b"
     },
     {
-      "bytes": 12224,
+      "bytes": 12241,
       "executable": false,
       "path": "tools/build_release.py",
-      "sha256": "895ae40d82b2b17fcf16bc7857b00a8401e7ae9e754dcd44ef4ff2c180e10e7e"
+      "sha256": "b23909c6d0f9854c1108ee3de8f5d185bbe7f50830860defcb32f4688eea7dff"
     },
     {
       "bytes": 18326,
@@ -5380,6 +5518,18 @@
       "sha256": "07d66b02848073a2cf036da6d5dbbb96bff951a2924b429440bc607906732083"
     },
     {
+      "bytes": 8983,
+      "executable": false,
+      "path": "tools/deterministic_operations.py",
+      "sha256": "fbdd5f9f110f9974199d682def8aa570c006e995b3d6934e0070979bde4cb4f1"
+    },
+    {
+      "bytes": 3259,
+      "executable": false,
+      "path": "tools/diagnostics.py",
+      "sha256": "62b024533ff619b21c393cea7cf0c1d8ea5b7f7b1b84acb17216a1c08cc46b52"
+    },
+    {
       "bytes": 9083,
       "executable": false,
       "path": "tools/evidence_replay.py",
@@ -5434,10 +5584,16 @@
       "sha256": "71c42f0232674d4c7deacb24afe59442cc1387ac3a4a5667702705e8aa0b944d"
     },
     {
-      "bytes": 125138,
+      "bytes": 21218,
+      "executable": false,
+      "path": "tools/identity_graph.py",
+      "sha256": "2e74122c3c06247cb7d0d6074551fab50c65fa9532b4aa07fc6f2afc9391ab08"
+    },
+    {
+      "bytes": 125549,
       "executable": false,
       "path": "tools/install.py",
-      "sha256": "a5a02de9529123a99676f10fde2399d5f4697edbd8e44f1fcc8b7a2dae6cd240"
+      "sha256": "282837005031bafe4726f3ee8b949aab301948d06028aabe6bcbdf718f98d7bc"
     },
     {
       "bytes": 18332,
@@ -5878,10 +6034,16 @@
       "sha256": "dfba31d6cdb59295ec57aaa4bc94e5084629273ffe2c0365ab52be9636991e5a"
     },
     {
-      "bytes": 75526,
+      "bytes": 76583,
       "executable": false,
       "path": "tools/release_qualification.py",
-      "sha256": "9fdb6cbd4313ce6e63760ba4af21ffb8f2ea3d225a31ae32d2d75cca4c05c2c7"
+      "sha256": "c37b8f71f7db71bb6f2330383d044c0ca16be99a94e9e3872312dad82a7c349c"
+    },
+    {
+      "bytes": 6684,
+      "executable": false,
+      "path": "tools/replay_oracle.py",
+      "sha256": "d0f6374970eda279edc3cd7b20f1aee516b1591d5b7d3640fa36deea7e671fd3"
     },
     {
       "bytes": 35073,
@@ -5932,10 +6094,10 @@
       "sha256": "29551a0607a5e9efdf848d787c82bd6fd1ed9e143a51e3d38b3da4a48e81e084"
     },
     {
-      "bytes": 4638,
+      "bytes": 4931,
       "executable": false,
       "path": "tools/source_sanity.py",
-      "sha256": "6c4278e967b377c1e357b5c16cb3d03fadeca0467e022266408f5d6e2ab224c5"
+      "sha256": "8a5872f6555f21a9cdc8d36c37c375f05ecb959e5f6f51ab9e0c04354d8ee432"
     },
     {
       "bytes": 52610,
@@ -5956,10 +6118,10 @@
       "sha256": "9391cd1d37a9390d658139928a63134b547e59f3ea190d40ee3e156007e338c0"
     },
     {
-      "bytes": 33072,
+      "bytes": 36123,
       "executable": false,
       "path": "tools/substrate/beads_adapter.py",
-      "sha256": "555efa4f0bfa078eb373576cc06bbf078b6580a0691c000845c45193294e3110"
+      "sha256": "869f14e137eab9dd54234293801c17553284ff491ac487059332f906c36090ad"
     },
     {
       "bytes": 21531,
@@ -5992,16 +6154,16 @@
       "sha256": "875de7ea9989a9e7922af00a1c2edebfa7062038fcc4135d211e54e57654b551"
     },
     {
-      "bytes": 34171,
+      "bytes": 37858,
       "executable": false,
       "path": "tools/update_codex.py",
-      "sha256": "7c6d77f2d253d532adefd97db282875f819b7d3d2b94731fd77787edd27dc68b"
+      "sha256": "cf87e7e2876dc7e0c843ba6dd3ead910a5992557c80818c717d5388361e20052"
     },
     {
-      "bytes": 44493,
+      "bytes": 44541,
       "executable": false,
       "path": "tools/update_omp.py",
-      "sha256": "05a139c6f947fb851462f39464d4e26e6e2da5f7135ccd9453ca85e76e916e06"
+      "sha256": "e20242ac9bcb428c965e004758e21475627a826c5c052e5be404052186bdf961"
     },
     {
       "bytes": 12873,
@@ -6022,10 +6184,10 @@
       "sha256": "584d1c39e8967a1acd11509f63f831f1622201b9140ae31808fa1198441bfc34"
     },
     {
-      "bytes": 22043,
+      "bytes": 35091,
       "executable": false,
       "path": "tools/verification_economy.py",
-      "sha256": "ad10219072e4c1d00085b754e5693b0416f2e80e6bd4eca6d93772ac7db965df"
+      "sha256": "2b7414881029f77fbc85c63bdb7b29dd3d2ae06ec5612a3319d648f06b37b22a"
     },
     {
       "bytes": 13145,
@@ -6040,10 +6202,10 @@
       "sha256": "e6e0d5f99644a75bf6119d17bddd55ed135a8585d2cb0509b2effb39fd60028d"
     },
     {
-      "bytes": 5306,
+      "bytes": 5323,
       "executable": false,
       "path": "tools/verify_package.py",
-      "sha256": "05e0b68b23e48342ffecf463aaffc76433cfb16caeea42ab812020160635854c"
+      "sha256": "1b6680d006b5510240384e091df3c604ad1844660cf9502bebcbd0f8c0af7399"
     },
     {
       "bytes": 8420,
@@ -6061,12 +6223,12 @@
   "model_route_count": 19,
   "model_routing_mode": "per-role",
   "model_routing_schema": "bbk.model-routing.v2",
-  "model_routing_source_sha256": "fa1d9e38e50346f18561c76a0f1e64bec10f0f76e7e78b0f1f7f58f7d4fb6b2b",
+  "model_routing_source_sha256": "cb728f4bfe77c1746e3b8b8b0ab201aa4793a6a17bfc9e8935f8de9dfc9d84e8",
   "name": "Blueprint Bootstrap Kit",
   "projection_count": 100,
-  "projection_source_sha256": "f189a418c878327fccb0df9f0a4402850ffcdae6087a17dca68f06b2657f7948",
+  "projection_source_sha256": "6c0b9579dca2e19c6c24b8938f6f334df85c1e64aaf392a14a0e913c05bcae99",
   "role_count": 19,
-  "root_sha256": "8d4d3e33252b848cc5685477dbf87da1f41a6d729b15d20cdd9b6922afd5f42a",
+  "root_sha256": "1b7de3e36f6acfcae76e5082879b02fb4a7ebd3be88ab1ac82bf385214dba11c",
   "schema": "bbk.package-manifest.v1",
   "targets": [
     "claude",

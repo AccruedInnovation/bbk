@@ -216,6 +216,8 @@ def validated_routes(
 
 
 def prepared_bundled_profiles(installed_ids: list[str], temp_root: Path) -> tuple[list[PreparedProfile], list[str]]:
+    if not installed_ids:
+        return [], []
     try:
         all_profiles = prepare_profile_sources(
             [str(install_tool.BUNDLED_PROFILES_PATH)], temp_root=temp_root, selected_ids=None

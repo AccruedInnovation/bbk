@@ -4,10 +4,11 @@
 This command is intended for an existing BBK installation. It updates BBK's
 installed Codex custom-agent definitions, the effective optional external-skill
 catalog (excluding compiled primary procedures), and the unified installation
-manifest. It
-deliberately preserves the installed package copy, current pointer, launcher,
-effective model-routing file, OMP agent/extension state, Claude Code, generic
-agent files, language-profile packages, and OMP runtime model-routing state.
+manifest. It deliberately preserves the installed package copy, current pointer,
+launcher, OMP agent/extension state, Claude Code, generic agent files,
+language-profile packages, and OMP runtime model-routing state. The owned
+effective model-routing copy is refreshed with the candidate managed policy for
+Codex projections.
 """
 from __future__ import annotations
 
@@ -35,10 +36,17 @@ import dependencies as dependency_tool
 import install as install_tool
 from path_compat import path_key
 from generate_agents import rendered_projections
-from model_routing import ModelRoutingError
+from model_routing import ModelRoutingError, as_v2
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
+CODEX_MANAGED_ROUTE_ROLES = frozenset(
+    {
+        "bbk_prototyper",
+        "bbk_territory_orchestrator",
+        "bbk_worker_orchestrator",
+    }
+)
 
 
 class CodexUpdateError(RuntimeError):
@@ -167,19 +175,39 @@ def render_preserved_codex(
     old_manifest: Mapping[str, Any],
     old_records: Mapping[str, Mapping[str, Any]],
     temp_root: Path,
-) -> tuple[dict[str, bytes], dict[str, Any], Path]:
-    """Render current Codex agents with the installed model assignments.
+) -> tuple[dict[str, bytes], dict[str, Any], Path, bytes, dict[str, Any]]:
+    """Render Codex agents from the candidate managed routing contract.
 
-    The installed effective policy is treated as immutable shared state because
-    OMP and other installed surfaces may still be bound to its package version.
-    A temporary version-rebound copy is used only as generator input.
+    Explicit custom policy remains authoritative for unrelated routes.  The
+    three child-spawning Codex roles are managed by the accepted Terra policy,
+    so only those host routes are refreshed when a custom policy is present.
+    The effective copy is updated atomically with the projections.
     """
     metadata = old_manifest.get("model_routing")
     if not isinstance(metadata, Mapping) or not isinstance(metadata.get("effective_copy"), str):
         raise CodexUpdateError("Existing installation has no effective model-routing policy")
     effective_path = Path(str(metadata["effective_copy"]))
-    policy = owned_json(effective_path, old_records, "effective model-routing policy")
-    policy["package_version"] = VERSION
+    installed_bytes = effective_path.read_bytes()
+    installed_policy = owned_json(effective_path, old_records, "effective model-routing policy")
+    try:
+        candidate_bytes = install_tool.MODEL_ROUTING_PATH.read_bytes()
+        candidate_policy = json.loads(candidate_bytes)
+        candidate_policy = as_v2(candidate_policy)
+        installed_policy = as_v2(installed_policy)
+        installed_policy_bytes = install_tool.json_bytes(installed_policy)
+        custom = bool(metadata.get("custom"))
+        if custom:
+            policy = installed_policy
+            for role_name in CODEX_MANAGED_ROUTE_ROLES:
+                if role_name not in candidate_policy["roles"] or role_name not in policy["roles"]:
+                    raise CodexUpdateError(
+                        f"managed Codex routing role is missing from candidate or installed policy: {role_name}"
+                    )
+                policy["roles"][role_name]["codex"] = dict(candidate_policy["roles"][role_name]["codex"])
+        else:
+            policy = candidate_policy
+    except (OSError, json.JSONDecodeError, ModelRoutingError, TypeError, KeyError) as exc:
+        raise CodexUpdateError(f"Cannot resolve candidate model-routing policy: {exc}") from exc
     candidate = temp_root / "effective-model-routing.json"
     candidate.write_bytes(install_tool.json_bytes(policy))
     try:
@@ -189,7 +217,17 @@ def render_preserved_codex(
     codex = projections.get("codex")
     if not isinstance(codex, dict) or not codex:
         raise CodexUpdateError("Current role catalogue produced no Codex agents")
-    return codex, projection_meta, effective_path
+    source = Path(str(metadata.get("source"))) if custom and metadata.get("source") else install_tool.MODEL_ROUTING_PATH
+    model_routing = install_tool.model_routing_manifest_metadata(
+        custom=custom,
+        source=source,
+        effective_copy=effective_path,
+        routing_meta=projection_meta,
+    )
+    effective_bytes = candidate_bytes if not custom else (
+        installed_bytes if installed_policy_bytes == install_tool.json_bytes(policy) else candidate.read_bytes()
+    )
+    return codex, projection_meta, effective_path, effective_bytes, model_routing
 
 
 def make_desired_files(
@@ -199,15 +237,21 @@ def make_desired_files(
     old_manifest: Mapping[str, Any],
     old_records: Mapping[str, Mapping[str, Any]],
     temp_root: Path,
-) -> tuple[dict[str, DesiredFile], dict[str, Any], Path]:
+) -> tuple[dict[str, DesiredFile], dict[str, Any], Path, dict[str, Any]]:
     desired: dict[str, DesiredFile] = {}
     targets = install_tool.installation_targets(scope=scope, project=project)
     codex_agents = targets["codex_agents"]
     if codex_agents is None:
         raise CodexUpdateError("Cannot resolve Codex installation target")
 
-    codex, projection_meta, effective_path = render_preserved_codex(
+    codex, projection_meta, effective_path, effective_bytes, model_routing = render_preserved_codex(
         old_manifest, old_records, temp_root
+    )
+    add_desired(
+        desired,
+        effective_path,
+        effective_bytes,
+        source="generated:effective-model-routing:update",
     )
     for filename, data in sorted(codex.items()):
         # Controller projections are package-owned runtime inputs, not Codex
@@ -248,7 +292,7 @@ def make_desired_files(
         install_tool.rendered_controller_skill(controller_spec, host="codex").encode("utf-8"),
         source="generated:codex-controller-skill:update",
     )
-    return desired, projection_meta, effective_path
+    return desired, projection_meta, effective_path, model_routing
 
 
 def plan_project_activation(
@@ -533,6 +577,8 @@ def merge_manifest(
     removed_stale: Sequence[StaleFile] = (),
     clean: bool = False,
     codex_project_activation: Mapping[str, Any] | None = None,
+    model_routing: Mapping[str, Any] | None = None,
+    effective_model_routing_updated: bool = False,
 ) -> dict[str, Any]:
     """Update Codex ownership records without rebinding shared package state."""
     merged_records = record_map(old)
@@ -597,6 +643,8 @@ def merge_manifest(
         "adapter_digest": hashlib.sha256(b"codex").hexdigest(),
     }
     result["harness_prompt_compilation"] = prompt_compilation
+    if model_routing is not None:
+        result["model_routing"] = dict(model_routing)
     if codex_project_activation is not None:
         result["codex_project_activation"] = dict(codex_project_activation)
     history = [item for item in old.get("update_history", []) if isinstance(item, Mapping)]
@@ -608,7 +656,7 @@ def merge_manifest(
             "at": result["updated_at"],
             "shared_installation_version": installation_version,
             "shared_package_updated": False,
-            "effective_model_routing_updated": False,
+            "effective_model_routing_updated": bool(effective_model_routing_updated),
             "effective_model_routing_path": install_tool.json_path(effective_path),
             "projection_source_sha256": projection_meta.get("source_sha256"),
             "model_routing_source_sha256": projection_meta.get("model_routing_source_sha256"),
@@ -670,7 +718,7 @@ def update_codex(args: argparse.Namespace) -> dict[str, Any]:
     backup_root = root / "backups" / f"codex-update-{install_tool.stamp()}"
 
     with tempfile.TemporaryDirectory(prefix="bbk-codex-update-") as raw_temp:
-        desired, projection_meta, effective_path = make_desired_files(
+        desired, projection_meta, effective_path, model_routing = make_desired_files(
             scope=args.scope,
             project=project,
             old_manifest=old_manifest,
@@ -713,6 +761,11 @@ def update_codex(args: argparse.Namespace) -> dict[str, Any]:
             item for item in update_records
             if item.get("source") != install_tool.CODEX_ACTIVATION_SOURCE
         ]
+        effective_model_routing_updated = any(
+            normalized(Path(str(item["path"]))) == normalized(effective_path)
+            and item.get("action") != "unchanged"
+            for item in owned_update_records
+        )
         merged = merge_manifest(
             old_manifest,
             owned_update_records,
@@ -723,10 +776,32 @@ def update_codex(args: argparse.Namespace) -> dict[str, Any]:
             removed_stale=stale_plan,
             clean=bool(getattr(args, "clean", False)),
             codex_project_activation=activation_metadata,
+            model_routing=model_routing,
+            effective_model_routing_updated=effective_model_routing_updated,
         )
         merged["dependency_preflight"] = dependency_report
         if not args.dry_run:
-            install_tool.atomic_write(mpath, install_tool.json_bytes(merged), 0o600)
+            try:
+                install_tool.atomic_write(mpath, install_tool.json_bytes(merged), 0o600)
+            except Exception as exc:
+                for item in reversed(plan):
+                    if item.action == "unchanged":
+                        continue
+                    try:
+                        if item.original is None:
+                            item.desired.path.unlink(missing_ok=True)
+                        else:
+                            install_tool.atomic_write(
+                                item.desired.path,
+                                item.original,
+                                (item.original_mode or 0o644) & 0o777,
+                            )
+                    except Exception:
+                        pass
+                restore_stale_files(stale_plan)
+                raise CodexUpdateError(
+                    f"Codex-only update manifest write failed and rollback was attempted: {exc}"
+                ) from exc
 
     actions: dict[str, int] = {}
     for item in owned_update_records:
@@ -749,7 +824,7 @@ def update_codex(args: argparse.Namespace) -> dict[str, Any]:
         "manifest_path": install_tool.json_path(mpath),
         "package_root": old_manifest.get("package_root"),
         "shared_package_updated": False,
-        "effective_model_routing_updated": False,
+        "effective_model_routing_updated": effective_model_routing_updated,
         "source_release_root": install_tool.json_path(ROOT),
         "dependency_preflight": dependency_report,
         "files": owned_update_records,

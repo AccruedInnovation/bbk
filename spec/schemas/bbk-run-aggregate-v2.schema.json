@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-run-aggregate-v2.schema.json",
+  "title": "BBK non-averaging run aggregate v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "run_id", "stage_receipt_ids", "stage_statuses", "inner_results", "overall_status", "non_averaging", "integrity"],
+  "properties": {
+    "schema": {"const": "bbk.run-aggregate.v2"},
+    "run_id": {"type": "string", "minLength": 1},
+    "stage_receipt_ids": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "stage_statuses": {"type": "array", "minItems": 1, "items": {"enum": ["PASS", "FAIL", "INCONCLUSIVE", "BLOCKED", "BLOCKED_TECHNICAL"]}},
+    "inner_results": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["status"], "properties": {"status": {"enum": ["PASS", "FAIL", "INCONCLUSIVE", "BLOCKED", "NOT_RUN"]}}}},
+    "overall_status": {"enum": ["PASS", "FAIL", "INCONCLUSIVE", "BLOCKED", "BLOCKED_TECHNICAL"]},
+    "non_averaging": {"const": true},
+    "integrity": {"type": "object", "additionalProperties": false, "required": ["aggregate_digest"], "properties": {"aggregate_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}}}
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-stage-receipt-v1.schema.json",
+  "title": "BBK layered stage receipt v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "receipt_id", "stage_id", "subject", "operation", "inner_result", "inner_result_digest", "envelope", "aggregate", "observed_at", "reuse", "integrity"],
+  "properties": {
+    "schema": {"const": "bbk.stage-receipt.v1"},
+    "receipt_id": {"$ref": "#/$defs/digest"},
+    "stage_id": {"type": "string", "minLength": 1},
+    "subject": {"type": "object", "minProperties": 1},
+    "operation": {"type": "object", "minProperties": 1},
+    "inner_result": {"$ref": "#/$defs/result"},
+    "inner_result_digest": {"$ref": "#/$defs/digest"},
+    "envelope": {"$ref": "#/$defs/envelope"},
+    "aggregate": {"type": "object", "additionalProperties": false, "required": ["status"], "properties": {"status": {"enum": ["PASS", "FAIL", "INCONCLUSIVE", "BLOCKED", "BLOCKED_TECHNICAL"]}}},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "reuse": {"type": "object", "additionalProperties": false, "required": ["status", "execution_count", "launch_invoked"], "properties": {"status": {"enum": ["NOT_REUSED", "REUSED_RECEIPT"]}, "execution_count": {"type": "integer", "minimum": 0}, "launch_invoked": {"type": "boolean"}}},
+    "integrity": {"type": "object", "additionalProperties": false, "required": ["receipt_digest"], "properties": {"receipt_digest": {"$ref": "#/$defs/digest"}}}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "result": {"type": "object", "additionalProperties": true, "required": ["status"], "properties": {"status": {"enum": ["PASS", "FAIL", "INCONCLUSIVE", "BLOCKED", "NOT_RUN"]}}},
+    "state": {"type": "object", "additionalProperties": false, "required": ["status"], "properties": {"status": {"enum": ["PASS", "FAIL", "INCONCLUSIVE", "BLOCKED", "NOT_RUN", "REUSED"]}}},
+    "envelope": {"type": "object", "additionalProperties": false, "required": ["launch", "runner", "serialization", "finalization"], "properties": {"launch": {"$ref": "#/$defs/state"}, "runner": {"$ref": "#/$defs/state"}, "serialization": {"$ref": "#/$defs/state"}, "finalization": {"$ref": "#/$defs/state"}}}
+  }
+}

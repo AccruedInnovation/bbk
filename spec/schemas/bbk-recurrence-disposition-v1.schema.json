@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-recurrence-disposition-v1.schema.json",
+  "title": "BBK deterministic recurrence disposition v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "fingerprint", "failure_class", "occurrence_count", "transition", "controller_disposition", "execution_authorized", "third_execution_admitted", "reviewer_required", "replanning_required", "immediate_stop", "mechanical"],
+  "properties": {
+    "schema": {"const": "bbk.recurrence-disposition.v1"},
+    "fingerprint": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "failure_class": {"type": "string", "minLength": 1},
+    "occurrence_count": {"type": "integer", "minimum": 0},
+    "transition": {"enum": ["SAME_WORK_UNIT_REPAIR", "SECOND_RECURRENCE_STOP", "REUSE_PRIOR_CLASSIFICATION", "IMMEDIATE_STOP", "CONTROLLER_DISPOSITION"]},
+    "controller_disposition": {"type": "string", "minLength": 1},
+    "execution_authorized": {"type": "boolean"},
+    "third_execution_admitted": {"type": "boolean"},
+    "reviewer_required": {"const": false},
+    "replanning_required": {"const": false},
+    "immediate_stop": {"type": "boolean"},
+    "mechanical": {"type": "boolean"}
+  }
+}

@@ -163,7 +163,7 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
             self.assertEqual(updated['codex_agent_count'], 19)
             self.assertEqual(updated['codex_skill_file_count'], 7)
             self.assertEqual(updated['codex_controller_skill_count'], 1)
-            self.assertEqual(updated['actions'], {'create': 8, 'replace': 19, 'unchanged': 17})
+            self.assertEqual(updated['actions'], {'create': 8, 'replace': 19, 'unchanged': 18})
             self.assertFalse(updated['shared_package_updated'])
             self.assertFalse(updated['effective_model_routing_updated'])
             self.assertEqual(updated['omp_files_touched'], 0)
@@ -212,6 +212,102 @@ class Alpha116CodexWorkspaceTests(unittest.TestCase):
             self.assertIn(controller_skill_key, current_records)
             status, _ = m7_run_json([sys.executable, m7_INSTALL, '--json', 'status', '--scope', 'user'], env=env)
             self.assertEqual(status['summary'], {'current': len(status['files'])})
+
+    def _routing_install_env(self, base: Path) -> dict[str, str]:
+        home = base / 'home'
+        home.mkdir()
+        env = os.environ.copy()
+        env.update({
+            'BBK_HOME': str(home),
+            'HOME': str(home),
+            'BBK_INSTALL_ROOT': str(base / 'data'),
+            'BBK_BIN_DIR': str(base / 'bin'),
+            'BBK_TEST_ALLOW_MISSING_DEPENDENCIES': '1',
+        })
+        return env
+
+    def _old_luna_policy(self, path: Path, *, custom_role: str | None = None) -> None:
+        policy = json.loads((m7_ROOT / 'spec' / 'model-routing.json').read_text(encoding='utf-8'))
+        for role_name in ('bbk_prototyper', 'bbk_territory_orchestrator', 'bbk_worker_orchestrator'):
+            policy['roles'][role_name]['codex']['model'] = 'gpt-5.6-luna'
+        if custom_role:
+            policy['roles'][custom_role]['codex'] = {
+                'model': 'gpt-5.6-custom',
+                'model_reasoning_effort': 'low',
+            }
+        path.write_text(json.dumps(policy, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+
+    def test_codex_update_applies_candidate_terra_routes_and_preserves_edges(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            env = self._routing_install_env(base)
+            old_policy = base / 'old-routing.json'
+            self._old_luna_policy(old_policy)
+            installed, _ = m7_run_json([
+                sys.executable, m7_INSTALL, '--json', 'install', '--scope', 'user', '--codex',
+                '--no-language-profiles', '--model-routing', old_policy,
+            ], env=env)
+            # Model the prior managed effective copy that exposed the official
+            # updater defect; the route file is old, but ownership is managed.
+            manifest_path = Path(installed['manifest_path'])
+            prior_manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+            prior_manifest['model_routing']['custom'] = False
+            manifest_path.write_text(
+                json.dumps(prior_manifest, indent=2, ensure_ascii=False, sort_keys=True) + '\n',
+                encoding='utf-8',
+            )
+            agents = Path(env['HOME']) / '.codex' / 'agents'
+            before = {
+                name: tomllib.loads((agents / f'{name}.toml').read_text(encoding='utf-8'))
+                for name in ('bbk_prototyper', 'bbk_territory_orchestrator', 'bbk_worker_orchestrator', 'bbk_worker')
+            }
+            updated, _ = m7_run_json([sys.executable, m7_UPDATE_CODEX, '--json', '--scope', 'user'], env=env)
+            self.assertEqual(updated['status'], 'PASS')
+            self.assertTrue(updated['effective_model_routing_updated'])
+            effective_record = next(item for item in updated['files'] if item['source'] == 'generated:effective-model-routing:update')
+            self.assertEqual(effective_record['action'], 'replace')
+            for role_name in ('bbk_prototyper', 'bbk_territory_orchestrator', 'bbk_worker_orchestrator'):
+                after = tomllib.loads((agents / f'{role_name}.toml').read_text(encoding='utf-8'))
+                self.assertEqual(after['model'], 'gpt-5.6-terra')
+                self.assertEqual(after['model_reasoning_effort'], before[role_name]['model_reasoning_effort'])
+                self.assertEqual(after['developer_instructions'], before[role_name]['developer_instructions'])
+            self.assertEqual(
+                tomllib.loads((agents / 'bbk_worker.toml').read_text(encoding='utf-8'))['model'],
+                'gpt-5.6-luna',
+            )
+            manifest = json.loads(Path(installed['manifest_path']).read_text(encoding='utf-8'))
+            effective = Path(manifest['model_routing']['effective_copy'])
+            effective_policy = json.loads(effective.read_text(encoding='utf-8'))
+            for role_name in ('bbk_prototyper', 'bbk_territory_orchestrator', 'bbk_worker_orchestrator'):
+                self.assertEqual(effective_policy['roles'][role_name]['codex']['model'], 'gpt-5.6-terra')
+
+    def test_codex_update_preserves_unrelated_custom_routes_and_dry_run(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            env = self._routing_install_env(base)
+            old_policy = base / 'old-custom-routing.json'
+            self._old_luna_policy(old_policy, custom_role='bbk_worker')
+            installed, _ = m7_run_json([
+                sys.executable, m7_INSTALL, '--json', 'install', '--scope', 'user', '--codex',
+                '--no-language-profiles', '--model-routing', old_policy,
+            ], env=env)
+            manifest_path = Path(installed['manifest_path'])
+            manifest_before = manifest_path.read_bytes()
+            effective = Path(installed['model_routing']['effective_copy'])
+            effective_before = effective.read_bytes()
+            dry, _ = m7_run_json([
+                sys.executable, m7_UPDATE_CODEX, '--json', '--scope', 'user', '--dry-run',
+            ], env=env)
+            self.assertEqual(dry['status'], 'DRY-RUN')
+            self.assertTrue(dry['effective_model_routing_updated'])
+            self.assertEqual(manifest_before, manifest_path.read_bytes())
+            self.assertEqual(effective_before, effective.read_bytes())
+            updated, _ = m7_run_json([sys.executable, m7_UPDATE_CODEX, '--json', '--scope', 'user'], env=env)
+            self.assertTrue(updated['effective_model_routing_updated'])
+            final = json.loads(effective.read_text(encoding='utf-8'))
+            self.assertEqual(final['roles']['bbk_worker']['codex']['model'], 'gpt-5.6-custom')
+            for role_name in ('bbk_prototyper', 'bbk_territory_orchestrator', 'bbk_worker_orchestrator'):
+                self.assertEqual(final['roles'][role_name]['codex']['model'], 'gpt-5.6-terra')
 
     def test_controller_skill_delivery_respects_harness_discovery_roots(self) -> None:
         selections = {

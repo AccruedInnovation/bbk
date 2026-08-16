@@ -1,0 +1,18 @@
+{
+  "schema": "bbk.execution-readiness-synthetic-matrix.v1",
+  "campaign": "BBK-EXECUTION-READINESS-001",
+  "work_unit": "WU-ER-06-STREAMLINED",
+  "cases": [
+    {"id": "WRONG_SUBJECT", "expected": "WRONG_SUBJECT"},
+    {"id": "CONTRADICTORY_EVIDENCE", "expected": "CONTRADICTORY_EVIDENCE"},
+    {"id": "INTEGRITY_FAILURE", "expected": "INTEGRITY_FAILURE"},
+    {"id": "UNOWNED_WRITE", "expected": "UNOWNED_WRITE"},
+    {"id": "AMBIGUOUS_IRREVERSIBLE_EFFECT", "expected": "AMBIGUOUS_IRREVERSIBLE_EFFECT"},
+    {"id": "CROSS_BOUNDARY_EFFECT", "expected": "CROSS_BOUNDARY_EFFECT"},
+    {"id": "ZERO_PAYLOAD_SUCCESSOR", "expected": "ZERO_PAYLOAD_SUCCESSOR"},
+    {"id": "INNER_PASS_OUTER_FAIL", "expected": "BLOCKED_TECHNICAL"},
+    {"id": "STATIC_DYNAMIC", "expected": "DYNAMIC_EXECUTION_NOT_ESTABLISHED"},
+    {"id": "RECURRENCE_2", "expected": "SECOND_RECURRENCE_STOP"},
+    {"id": "PRESEAL_CUTOFF", "expected": "PRESEAL_CUTOFF"}
+  ]
+}

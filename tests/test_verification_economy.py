@@ -199,6 +199,43 @@ class VerificationEconomyTests(unittest.TestCase):
         schema = json.loads((ROOT / "spec" / "schemas" / "bbk-verification-receipt-v1.schema.json").read_text(encoding="utf-8"))
         jsonschema.Draft202012Validator(schema, format_checker=jsonschema.FormatChecker()).validate(receipt)
 
+    def test_reuse_has_zero_execution_and_integrity_tampering_is_not_current(self):
+        request = self.verification_request()
+        receipt = economy.create_receipt(request, {"status": "PASS", "evidence_refs": []})
+        reused = economy.pre_check(request, [receipt])
+        self.assertEqual(0, reused["execution_count"])
+        self.assertFalse(reused["underlying_method_invoked"])
+        tampered = copy.deepcopy(receipt)
+        tampered["method"]["method_version"] = "changed"
+        self.assertEqual("AUTHORIZED_CHECK", economy.pre_check(request, [tampered])["status"])
+
+    def test_recurrence_fingerprint_ignores_volatile_carriers(self):
+        base = {"logical_subject": {"id": "subject-1"}, "assertion": "A-1", "failure_code": "SCHEMA_SHAPE", "failure_class": "SCHEMA", "method_revision": "m5", "environment": {"python": "3.13"}}
+        noisy = {**base, "observed_at": "2026-01-01T00:00:00Z", "physical_attempt_id": "a2", "carrier_id": "c9", "absolute_path": "C:\\temp\\x", "message": "different formatting"}
+        self.assertEqual(economy.recurrence_fingerprint(base), economy.recurrence_fingerprint(noisy))
+
+    def test_recurrence_first_second_and_immediate_stop(self):
+        event = {"logical_subject": "s", "operation": "verify", "failure_code": "SCHEMA_SHAPE", "failure_class": "SCHEMA", "method_revision": "m5", "environment": {"python": "3.13"}}
+        first = economy.classify_recurrence(event)
+        second = economy.classify_recurrence(event, [event])
+        stop = economy.classify_recurrence({**event, "failure_class": "UNOWNED_WRITE"})
+        self.assertEqual("SAME_WORK_UNIT_REPAIR", first["transition"])
+        self.assertTrue(first["execution_authorized"])
+        self.assertEqual("SECOND_RECURRENCE_STOP", second["transition"])
+        self.assertFalse(second["third_execution_admitted"])
+        self.assertEqual("IMMEDIATE_STOP", stop["transition"])
+
+    def test_layered_stage_receipt_preserves_inner_pass_on_outer_failure(self):
+        request = {"stage_id": "stage-1", "subject": {"id": "s"}, "operation": {"id": "op"}}
+        receipt = economy.create_stage_receipt(request, {"status": "PASS", "value": {"count": 1}}, finalization="FAIL")
+        self.assertEqual("PASS", receipt["inner_result"]["status"])
+        self.assertEqual("BLOCKED_TECHNICAL", receipt["aggregate"]["status"])
+        aggregate = economy.aggregate_stage_receipts([receipt])
+        self.assertEqual("BLOCKED_TECHNICAL", aggregate["overall_status"])
+        reused = economy.reuse_stage_receipt(receipt)
+        self.assertEqual(0, reused["execution_count"])
+        self.assertFalse(reused["launch_invoked"])
+
 
 if __name__ == "__main__":
     unittest.main()

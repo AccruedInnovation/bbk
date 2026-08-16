@@ -4601,6 +4601,86 @@ def _smallest_schema_example(node: Any) -> Any:
     return None
 
 
+def _operation_environment(values: Sequence[str] | None) -> dict[str, str]:
+    result: dict[str, str] = {}
+    for value in values or ():
+        if "=" not in value:
+            raise BbkError(f"operation environment must be KEY=VALUE: {value}")
+        key, raw = value.split("=", 1)
+        result[key] = raw
+    return result
+
+
+def cmd_operation_list(args: argparse.Namespace) -> dict[str, Any]:
+    from deterministic_operations import load_registry
+    registry = load_registry(Path(args.registry) if args.registry else None)
+    return {
+        "schema": "bbk.deterministic-operation-registry.v1",
+        "registry_id": registry["registry_id"],
+        "revision": registry["revision"],
+        "operations": registry["operations"],
+    }
+
+
+def cmd_operation_qualify(args: argparse.Namespace) -> dict[str, Any]:
+    from deterministic_operations import OperationAdmissionError, qualify_operation
+    try:
+        return qualify_operation(
+            args.operation_id,
+            subject=args.subject,
+            argv=args.argv or (),
+            environment=_operation_environment(args.environment),
+            registry_path=Path(args.registry) if args.registry else None,
+        )
+    except OperationAdmissionError as exc:
+        raise BbkError(str(exc), diagnostic={"schema": "bbk.operation-qualification.v1", "status": "REJECTED", "code": exc.code, "message": str(exc)}) from exc
+
+
+def cmd_operation_run(args: argparse.Namespace) -> dict[str, Any]:
+    from deterministic_operations import OperationAdmissionError, run_registered_operation
+    try:
+        return run_registered_operation(
+            args.operation_id,
+            subject=args.subject,
+            argv=args.argv or (),
+            environment=_operation_environment(args.environment),
+            registry_path=Path(args.registry) if args.registry else None,
+        )
+    except OperationAdmissionError as exc:
+        # Qualification happens before the callable is entered.  Preserve that
+        # boundary in the CLI error instead of executing an ad-hoc fallback.
+        raise BbkError(str(exc), diagnostic={"schema": "bbk.operation-qualification.v1", "status": "REJECTED", "code": exc.code, "message": str(exc), "effects_observed": "NONE"}) from exc
+
+
+def cmd_identity_validate(args: argparse.Namespace) -> dict[str, Any]:
+    from identity_graph import IdentityGraphError, validate_file
+    try:
+        return validate_file(Path(args.path).expanduser().resolve())
+    except IdentityGraphError as exc:
+        raise BbkError(str(exc), diagnostic={"schema": "bbk.identity-graph-validation.v1", "status": "REJECTED", "code": exc.code, "message": str(exc)}) from exc
+
+
+def cmd_identity_derive(args: argparse.Namespace) -> dict[str, Any]:
+    from identity_graph import IdentityGraphError, derive_identity
+    try:
+        payload = json.loads(Path(args.payload).read_text(encoding="utf-8")) if args.payload else None
+        node = derive_identity(
+            args.kind,
+            subject={"kind": args.subject_kind, "id": args.subject_id, "revision": args.subject_revision, "digest": args.subject_digest},
+            revision=args.revision,
+            payload=payload,
+            node_id=args.node_id,
+        )
+        if args.output:
+            output = Path(args.output).expanduser().resolve()
+            if output.exists() and not args.force:
+                raise BbkError(f"output already exists: {output}")
+            write_json(output, node)
+        return {"schema": "bbk.identity-node.v1", "status": "PASS", "node": node, "output": args.output}
+    except IdentityGraphError as exc:
+        raise BbkError(str(exc), diagnostic={"schema": "bbk.identity-node.v1", "status": "REJECTED", "code": exc.code, "message": str(exc)}) from exc
+
+
 def _schema_registry_paths(schema_root: Path, extra_paths: Sequence[Path] = ()) -> list[Path]:
     """Return every schema resource path in stable physical-path order.
 
@@ -6216,6 +6296,7 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument("--version", action="version", version=f"bbk {VERSION}")
     p.add_argument("--json", action="store_true")
     sub = p.add_subparsers(parser_class=BbkArgumentParser, dest="command", required=True)
+    from identity_graph import IDENTITY_KINDS
 
     result = sub.add_parser(
         "result", help="atomically finalize durable role results and emit identity receipts",
@@ -6446,6 +6527,34 @@ def parser() -> argparse.ArgumentParser:
     x = schema.add_parser("explain"); x.add_argument("--schema", required=True); x.add_argument("--instance", required=True); x.add_argument("--pointer"); x.set_defaults(func=cmd_schema_explain)
     x = schema.add_parser("validate"); x.add_argument("--schema", required=True); x.add_argument("--instance", action="append", required=True); x.add_argument("--root"); x.add_argument("--tool-dir"); x.add_argument("--ensure", action="store_true"); x.add_argument("--wheelhouse"); x.add_argument("--timeout", type=float, default=120.0); x.set_defaults(func=cmd_schema_validate)
     x = schema.add_parser("status"); x.add_argument("--root"); x.add_argument("--tool-dir"); x.set_defaults(func=cmd_schema_status)
+
+    operation = sub.add_parser("operation", help="run only a qualified checked-in deterministic operation").add_subparsers(parser_class=BbkArgumentParser, dest="operation_command", required=True)
+    x = operation.add_parser("list"); x.add_argument("--registry"); x.set_defaults(func=cmd_operation_list)
+    for name, handler in (("qualify", cmd_operation_qualify), ("run", cmd_operation_run)):
+        x = operation.add_parser(name)
+        x.add_argument("--id", dest="operation_id", required=True)
+        x.add_argument("--subject", required=True)
+        x.add_argument("--arg", dest="argv", action="append", default=[])
+        x.add_argument("--environment", action="append", default=[])
+        x.add_argument("--registry")
+        x.set_defaults(func=handler)
+
+    identity = sub.add_parser("identity", help="validate or derive typed identity graph nodes").add_subparsers(parser_class=BbkArgumentParser, dest="identity_command", required=True)
+    x = identity.add_parser("validate")
+    x.add_argument("path")
+    x.set_defaults(func=cmd_identity_validate)
+    x = identity.add_parser("derive")
+    x.add_argument("--kind", required=True, choices=sorted(IDENTITY_KINDS))
+    x.add_argument("--subject-kind", required=True)
+    x.add_argument("--subject-id", required=True)
+    x.add_argument("--subject-revision", required=True)
+    x.add_argument("--subject-digest", required=True)
+    x.add_argument("--revision", required=True)
+    x.add_argument("--payload")
+    x.add_argument("--node-id")
+    x.add_argument("--output")
+    x.add_argument("--force", action="store_true")
+    x.set_defaults(func=cmd_identity_derive)
 
     b = sub.add_parser("beads").add_subparsers(parser_class=BbkArgumentParser, dest="beads_command", required=True)
     x = b.add_parser("plan"); x.add_argument("--root"); x.add_argument("--work-unit"); x.add_argument("--kind", action="append", choices=sorted(BEADS_OBJECT_KINDS)); x.add_argument("--id", action="append"); x.add_argument("--output"); x.add_argument("--apply", action="store_true"); x.add_argument("--initialize", action="store_true"); x.add_argument("--timeout", type=float, default=60.0); x.set_defaults(func=cmd_beads_plan)

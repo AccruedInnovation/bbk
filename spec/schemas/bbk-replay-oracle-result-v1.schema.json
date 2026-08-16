@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-replay-oracle-result-v1.schema.json",
+  "title": "BBK replay oracle result v1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schema", "status", "subject", "history_cases", "synthetic_cases", "protected_history", "write_inventory"],
+  "properties": {
+    "schema": {"const": "bbk.replay-oracle-result.v1"},
+    "status": {"enum": ["PASS", "FAIL"]},
+    "subject": {"type": "string", "minLength": 1},
+    "history_cases": {"type": "array", "minItems": 9},
+    "synthetic_cases": {"type": "array", "minItems": 11},
+    "protected_history": {"type": "object", "required": ["before", "after", "byte_identical"], "properties": {"before": {"type": "array"}, "after": {"type": "array"}, "byte_identical": {"type": "boolean"}}},
+    "write_inventory": {"type": "object", "required": ["history_writes", "s24_writes", "product_writes", "external_effects"]}
+  }
+}

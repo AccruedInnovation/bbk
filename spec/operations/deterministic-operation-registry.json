@@ -1,0 +1,86 @@
+{
+  "schema": "bbk.deterministic-operation-registry.v1",
+  "registry_id": "bbk-m3-m6-deterministic-operations",
+  "revision": "m6",
+  "operations": [
+    {
+      "operation_id": "bbk.replay-oracle",
+      "version": "1.0.0",
+      "implementation_sha256": "d0f6374970eda279edc3cd7b20f1aee516b1591d5b7d3640fa36deea7e671fd3",
+      "entrypoint": "replay_oracle:run_replay_oracle",
+      "subject_kind": "json",
+      "argv": ["--json"],
+      "environment_policy": {"mode": "NONE", "allowed_variables": []},
+      "allowed_effects": ["READ_ONLY"],
+      "output_schema": "bbk.replay-oracle-result.v1",
+      "invalidation_keys": ["history-corpus", "synthetic-matrix", "replay-oracle-implementation", "python-runtime"],
+      "qualification": {"status": "QUALIFIED", "qualified_by": "WU-ER-06-STREAMLINED", "qualification_revision": "M6"}
+    },
+    {
+      "operation_id": "bbk.source-sanity",
+      "version": "1.0.0",
+      "implementation_sha256": "fbdd5f9f110f9974199d682def8aa570c006e995b3d6934e0070979bde4cb4f1",
+      "entrypoint": "deterministic_operations:run_source_sanity",
+      "subject_kind": "repository",
+      "argv": ["--json"],
+      "environment_policy": {"mode": "NONE", "allowed_variables": []},
+      "allowed_effects": ["READ_ONLY"],
+      "output_schema": "bbk.source-sanity.v1",
+      "invalidation_keys": ["source-tree", "operation-implementation", "python-runtime"],
+      "qualification": {"status": "QUALIFIED", "qualified_by": "WU-ER-03-STREAMLINED", "qualification_revision": "M3"}
+    },
+    {
+      "operation_id": "bbk.identity-graph",
+      "version": "1.0.0",
+      "implementation_sha256": "fbdd5f9f110f9974199d682def8aa570c006e995b3d6934e0070979bde4cb4f1",
+      "entrypoint": "deterministic_operations:run_identity_graph",
+      "subject_kind": "json",
+      "argv": ["--validate"],
+      "environment_policy": {"mode": "NONE", "allowed_variables": []},
+      "allowed_effects": ["READ_ONLY"],
+      "output_schema": "bbk.identity-graph-validation.v1",
+      "invalidation_keys": ["identity-graph-schema", "identity-graph-implementation", "python-runtime"],
+      "qualification": {"status": "QUALIFIED", "qualified_by": "WU-ER-04-STREAMLINED", "qualification_revision": "M4"}
+    },
+    {
+      "operation_id": "bbk.verification-receipt-precheck",
+      "version": "1.0.0",
+      "implementation_sha256": "2b7414881029f77fbc85c63bdb7b29dd3d2ae06ec5612a3319d648f06b37b22a",
+      "entrypoint": "verification_economy:run_receipt_precheck",
+      "subject_kind": "json",
+      "argv": ["--json"],
+      "environment_policy": {"mode": "NONE", "allowed_variables": []},
+      "allowed_effects": ["READ_ONLY"],
+      "output_schema": "bbk.verification-precheck-result.v1",
+      "invalidation_keys": ["receipt-schema", "receipt-subject", "receipt-method", "receipt-environment", "receipt-invalidation-keys", "python-runtime"],
+      "qualification": {"status": "QUALIFIED", "qualified_by": "WU-ER-05-STREAMLINED", "qualification_revision": "M5"}
+    },
+    {
+      "operation_id": "bbk.recurrence-guard",
+      "version": "1.0.0",
+      "implementation_sha256": "2b7414881029f77fbc85c63bdb7b29dd3d2ae06ec5612a3319d648f06b37b22a",
+      "entrypoint": "verification_economy:run_recurrence_guard",
+      "subject_kind": "json",
+      "argv": ["--json"],
+      "environment_policy": {"mode": "NONE", "allowed_variables": []},
+      "allowed_effects": ["READ_ONLY"],
+      "output_schema": "bbk.recurrence-disposition.v1",
+      "invalidation_keys": ["recurrence-schema", "recurrence-method", "recurrence-environment", "python-runtime"],
+      "qualification": {"status": "QUALIFIED", "qualified_by": "WU-ER-05-STREAMLINED", "qualification_revision": "M5"}
+    },
+    {
+      "operation_id": "bbk.stage-aggregate",
+      "version": "1.0.0",
+      "implementation_sha256": "2b7414881029f77fbc85c63bdb7b29dd3d2ae06ec5612a3319d648f06b37b22a",
+      "entrypoint": "verification_economy:run_stage_aggregate",
+      "subject_kind": "json",
+      "argv": ["--json"],
+      "environment_policy": {"mode": "NONE", "allowed_variables": []},
+      "allowed_effects": ["READ_ONLY"],
+      "output_schema": "bbk.run-aggregate.v2",
+      "invalidation_keys": ["stage-schema", "aggregate-schema", "stage-method", "python-runtime"],
+      "qualification": {"status": "QUALIFIED", "qualified_by": "WU-ER-05-STREAMLINED", "qualification_revision": "M5"}
+    }
+  ]
+}
+

@@ -1,0 +1,19 @@
+{
+  "schema": "bbk.schema-registry.v1",
+  "registry_id": "bbk-canonical-schemas",
+  "revision": "m6",
+  "schemas": [
+    {"id": "https://bbk.local/schemas/bbk-diagnostic-v1.schema.json", "path": "spec/schemas/bbk-diagnostic-v1.schema.json", "compatibility": "NEW"},
+    {"id": "https://bbk.local/schemas/bbk-verification-receipt-v1.schema.json", "path": "spec/schemas/bbk-verification-receipt-v1.schema.json", "compatibility": "ADDITIVE"},
+    {"id": "https://bbk.local/schemas/bbk-identity-graph-v1.schema.json", "path": "spec/schemas/bbk-identity-graph-v1.schema.json", "compatibility": "ADDITIVE"},
+    {"id": "https://bbk.local/schemas/bbk-deterministic-operation-registry-v1.schema.json", "path": "spec/schemas/bbk-deterministic-operation-registry-v1.schema.json", "compatibility": "NEW"},
+    {"id": "https://bbk.local/schemas/bbk-operation-qualification-v1.schema.json", "path": "spec/schemas/bbk-operation-qualification-v1.schema.json", "compatibility": "NEW"},
+    {"id": "https://bbk.local/schemas/bbk-source-sanity-v1.schema.json", "path": "spec/schemas/bbk-source-sanity-v1.schema.json", "compatibility": "NEW"},
+    {"id": "https://bbk.local/schemas/bbk-command-attempt-v2.schema.json", "path": "spec/schemas/bbk-command-attempt-v2.schema.json", "compatibility": "ADDITIVE"},
+    {"id": "https://bbk.local/schemas/bbk-stage-receipt-v1.schema.json", "path": "spec/schemas/bbk-stage-receipt-v1.schema.json", "compatibility": "NEW"},
+    {"id": "https://bbk.local/schemas/bbk-run-aggregate-v2.schema.json", "path": "spec/schemas/bbk-run-aggregate-v2.schema.json", "compatibility": "NEW"},
+    {"id": "https://bbk.local/schemas/bbk-recurrence-disposition-v1.schema.json", "path": "spec/schemas/bbk-recurrence-disposition-v1.schema.json", "compatibility": "NEW"},
+    {"id": "https://bbk.local/schemas/bbk-verification-precheck-result-v1.schema.json", "path": "spec/schemas/bbk-verification-precheck-result-v1.schema.json", "compatibility": "NEW"}
+    ,{"id": "https://bbk.local/schemas/bbk-replay-oracle-result-v1.schema.json", "path": "spec/schemas/bbk-replay-oracle-result-v1.schema.json", "compatibility": "NEW"}
+  ]
+}

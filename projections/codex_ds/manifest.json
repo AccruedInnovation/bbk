@@ -3,7 +3,7 @@
   "canonical_sources": {
     "model_routing": "spec/model-routing.json",
     "roles": "spec/roles.json",
-    "source_sha256": "81a7bbb77507bbeae7e173a6e8fa2e2a4af9a659dad70aee0dbafc68e24ee634"
+    "source_sha256": "7526c3709683993b87fd92651929bf1250139835e0a4478c1a4857dc8f8cc3f3"
   },
   "invariants": {
     "credential_value_persisted": false,
@@ -42,24 +42,24 @@
           "sha256": "73f1cf1752558351df20cf719a7945459da740a63d37193fd8d71ca182922fcc"
         },
         {
-          "bytes": 86935,
+          "bytes": 86980,
           "fallback": "NONE",
           "model": "deepseek-v4-flash",
           "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_phase_wayfinder.toml",
           "provider": "deepseek",
           "role": "bbk_phase_wayfinder",
           "selection": "EXPLICIT_ONLY",
-          "sha256": "d177381f08d8adcb76b31aefe81d830727745fc537c4d707f3ac7e1162d258cf"
+          "sha256": "c173b6ce9e60e641b04af22c4c13d6046de55e2dd3891586420425944f533a69"
         },
         {
-          "bytes": 80303,
+          "bytes": 80353,
           "fallback": "NONE",
           "model": "deepseek-v4-flash",
           "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_planning_wayfinder.toml",
           "provider": "deepseek",
           "role": "bbk_planning_wayfinder",
           "selection": "EXPLICIT_ONLY",
-          "sha256": "433b89803815adcd3e3fb958f39d4fea34ffbe605729666a6a42b9d8a59c7486"
+          "sha256": "c1460af01b3e2b4c3e0d1f1b2d91c793eeb2258cb1b4a201d9baab92bf8be3f2"
         },
         {
           "bytes": 87989,
@@ -82,14 +82,14 @@
           "sha256": "9d4be6a48f7af4841f1fbf071f1e555b4560cd24e05d7d243db61c0197247cfd"
         },
         {
-          "bytes": 61160,
+          "bytes": 61210,
           "fallback": "NONE",
           "model": "deepseek-v4-flash",
           "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_questioning_wayfinder.toml",
           "provider": "deepseek",
           "role": "bbk_questioning_wayfinder",
           "selection": "EXPLICIT_ONLY",
-          "sha256": "7ebfa3fc33aae181488fcd783df326007e19dd1c882a1f3463a16ee687cbfe4b"
+          "sha256": "2480e01b7e4f3341faf5c55b62301bd9ef557a130fb3dad5f3e47fa16f6bacae"
         },
         {
           "bytes": 56595,
@@ -112,24 +112,24 @@
           "sha256": "79cae6bf114dbded9213796a5be137308437a6ebd57155dc68b50a170de6e196"
         },
         {
-          "bytes": 106142,
+          "bytes": 106206,
           "fallback": "NONE",
           "model": "deepseek-v4-flash",
           "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_root_orchestrator.toml",
           "provider": "deepseek",
           "role": "bbk_root_orchestrator",
           "selection": "EXPLICIT_ONLY",
-          "sha256": "1008a71600143c7977fa1c7b408c7e54b6952ecac4fdcc3a0e142cc6e1ca4775"
+          "sha256": "171da9c093c72788e0d1f2efadb447ecbe08da53e075ee99a92447712c826825"
         },
         {
-          "bytes": 78170,
+          "bytes": 78214,
           "fallback": "NONE",
           "model": "deepseek-v4-flash",
           "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_root_wayfinder.toml",
           "provider": "deepseek",
           "role": "bbk_root_wayfinder",
           "selection": "EXPLICIT_ONLY",
-          "sha256": "606443df47f171d8f2b979217173809f89462817190af906c07be52a71df6859"
+          "sha256": "fc6dc98fc0d0174b4db9ecae076a8beab6dee147bc15a2f8d31d8414ec731c66"
         },
         {
           "bytes": 62211,
@@ -142,24 +142,24 @@
           "sha256": "9fea07df383d0e11b8b099489df0992bb5d48adfd1153245478e3a42fa47af86"
         },
         {
-          "bytes": 110333,
+          "bytes": 110392,
           "fallback": "NONE",
           "model": "deepseek-v4-flash",
           "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_territory_orchestrator.toml",
           "provider": "deepseek",
           "role": "bbk_territory_orchestrator",
           "selection": "EXPLICIT_ONLY",
-          "sha256": "c888be1e864ab82e5b2bb87ff28f202c9c7ecfb2e975b7b6b533d7d77da53af3"
+          "sha256": "7d4f433e46a818987b1fdc9c27da3081c62194f22907beb9adb1fbc613ba101f"
         },
         {
-          "bytes": 77441,
+          "bytes": 77491,
           "fallback": "NONE",
           "model": "deepseek-v4-flash",
           "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_territory_wayfinder.toml",
           "provider": "deepseek",
           "role": "bbk_territory_wayfinder",
           "selection": "EXPLICIT_ONLY",
-          "sha256": "58716fc911dbbe406291d3c18531bb45a1ead107ac979efa8f71e7bed58169a2"
+          "sha256": "39a69c7b789d661d50e8d214fa56f68ad85e58855ad194db184113b0abe91788"
         },
         {
           "bytes": 84864,
@@ -212,14 +212,14 @@
           "sha256": "3d7859e98e74791049fbeeb24131f987c310546c96fdb5853d56670a933740c0"
         },
         {
-          "bytes": 103607,
+          "bytes": 103666,
           "fallback": "NONE",
           "model": "deepseek-v4-flash",
           "path": "projections/codex_ds/deepseek-v4-flash/agents/bbk_worker_orchestrator.toml",
           "provider": "deepseek",
           "role": "bbk_worker_orchestrator",
           "selection": "EXPLICIT_ONLY",
-          "sha256": "9d002974bec2aef8f7462ee01e8d8da195311db3b888ced6013392d9636a7012"
+          "sha256": "5990e5cf59aa6ff4e5eabf2d95adb8f56bc7316025cd0ff15990d94885886fb3"
         }
       ],
       "model": "deepseek-v4-flash",
@@ -241,24 +241,24 @@
           "sha256": "941913ea69a4420ef057c2881db6b8d9afd247cba016a1cdb648b6eb2e36422c"
         },
         {
-          "bytes": 86933,
+          "bytes": 86978,
           "fallback": "NONE",
           "model": "deepseek-v4-pro",
           "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_phase_wayfinder.toml",
           "provider": "deepseek",
           "role": "bbk_phase_wayfinder",
           "selection": "EXPLICIT_ONLY",
-          "sha256": "c6c5a220d61a09a317560efab7b6c5b242d0a493f161ab587de1f0e468f8dce7"
+          "sha256": "da33ad4364613a992835d8f9d7217712f8e761abed4be94a8eea26e2c58f420f"
         },
         {
-          "bytes": 80301,
+          "bytes": 80351,
           "fallback": "NONE",
           "model": "deepseek-v4-pro",
           "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_planning_wayfinder.toml",
           "provider": "deepseek",
           "role": "bbk_planning_wayfinder",
           "selection": "EXPLICIT_ONLY",
-          "sha256": "04fc4c6f9d2be03be8226f0c1881636d174a3ecd8960a0759421f34da972ca07"
+          "sha256": "660310d9435bdbdd62744c3e3868f16ecdc79dc3143d65960c1dd3d2c005f185"
         },
         {
           "bytes": 87987,
@@ -281,14 +281,14 @@
           "sha256": "da824d4d1132a0d61e004c2ae4847659cc3de8ba2aedf91aa3b3221bab174b04"
         },
         {
-          "bytes": 61158,
+          "bytes": 61208,
           "fallback": "NONE",
           "model": "deepseek-v4-pro",
           "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_questioning_wayfinder.toml",
           "provider": "deepseek",
           "role": "bbk_questioning_wayfinder",
           "selection": "EXPLICIT_ONLY",
-          "sha256": "ddd8b7d60bb862385cac8fdeb4785d312a0774269a97597258b728b1014f8c43"
+          "sha256": "b81005dfa1d6238009b8a6f53305af8ca22d5c60d75c31fac5b5c6227a13296c"
         },
         {
           "bytes": 56593,
@@ -311,24 +311,24 @@
           "sha256": "25a366e04e5be5632af16b293bc1b574c0c9b76a1977c86b34cccb477af532f9"
         },
         {
-          "bytes": 106140,
+          "bytes": 106204,
           "fallback": "NONE",
           "model": "deepseek-v4-pro",
           "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_root_orchestrator.toml",
           "provider": "deepseek",
           "role": "bbk_root_orchestrator",
           "selection": "EXPLICIT_ONLY",
-          "sha256": "22c1061eeffe9ec5bad690af975f3d04811807c08a0311547fdc0b385b3dc7ef"
+          "sha256": "8ee59cb33d31e33814cd3a260f52124b1b29f0b09739f1c5acbccf8c8a9f8607"
         },
         {
-          "bytes": 78168,
+          "bytes": 78212,
           "fallback": "NONE",
           "model": "deepseek-v4-pro",
           "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_root_wayfinder.toml",
           "provider": "deepseek",
           "role": "bbk_root_wayfinder",
           "selection": "EXPLICIT_ONLY",
-          "sha256": "05d6f41436f6de785b2e820939cab7dd185490f62b333e5ea7acdff91fb78f5e"
+          "sha256": "5e9e5e725a3cc82185be90ea9c65bca3362a4a10909032053a5a1af13ce3ff12"
         },
         {
           "bytes": 62209,
@@ -341,24 +341,24 @@
           "sha256": "2583d1fe5e66c770f7e4fd4d05448ee875d53e2dacc4c09c3223f31d5d37a186"
         },
         {
-          "bytes": 110331,
+          "bytes": 110390,
           "fallback": "NONE",
           "model": "deepseek-v4-pro",
           "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_territory_orchestrator.toml",
           "provider": "deepseek",
           "role": "bbk_territory_orchestrator",
           "selection": "EXPLICIT_ONLY",
-          "sha256": "a8cd5e973ad39089a5a37b3d53f1a937844365e7f7cb988ea6c5a331fd28dd71"
+          "sha256": "fe82b0f4acd487ffcf1682d906247f51ac183984bb71f3fdc6ee7f8bae86edb7"
         },
         {
-          "bytes": 77439,
+          "bytes": 77489,
           "fallback": "NONE",
           "model": "deepseek-v4-pro",
           "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_territory_wayfinder.toml",
           "provider": "deepseek",
           "role": "bbk_territory_wayfinder",
           "selection": "EXPLICIT_ONLY",
-          "sha256": "ded380dc9276227f66d04e559aeb7aaa9cc589912f9f43aed673635e0f57f149"
+          "sha256": "8f051404e0912bc78ef91055276315f044513f6d8a3b1ffd0535a16792b537b4"
         },
         {
           "bytes": 84862,
@@ -411,14 +411,14 @@
           "sha256": "e36226c5084048778680c073d4afcb453798171a4af7e3373ddc8add91e65fd5"
         },
         {
-          "bytes": 103605,
+          "bytes": 103664,
           "fallback": "NONE",
           "model": "deepseek-v4-pro",
           "path": "projections/codex_ds/deepseek-v4-pro/agents/bbk_worker_orchestrator.toml",
           "provider": "deepseek",
           "role": "bbk_worker_orchestrator",
           "selection": "EXPLICIT_ONLY",
-          "sha256": "01366a5c3e31a190efe74f0950a8205f64756a8c5acaabe1a85d729199291933"
+          "sha256": "5452478d20b76d53c02b30de93c40d6ac5775c26588b9f0e390eae3dbed266ef"
         }
       ],
       "model": "deepseek-v4-pro",

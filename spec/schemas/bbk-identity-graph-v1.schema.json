@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-identity-graph-v1.schema.json",
+  "title": "BBK Typed Identity Graph v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "graph_id", "revision", "subject", "nodes", "relations", "policy"],
+  "properties": {
+    "schema": {"const": "bbk.identity-graph.v1"},
+    "graph_id": {"$ref": "#/$defs/id"},
+    "revision": {"$ref": "#/$defs/non_empty"},
+    "subject": {"$ref": "#/$defs/subject"},
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/node"}
+    },
+    "relations": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/relation"}
+    },
+    "policy": {"$ref": "#/$defs/policy"}
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "non_empty": {"type": "string", "minLength": 1},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "kind": {"enum": ["PRODUCT_PAYLOAD", "COMPLETE_PACKAGE", "CARRIER", "METHOD", "ENVIRONMENT_OR_MIRROR", "ASSURANCE_ATTEMPT", "EVIDENCE_BUNDLE", "PUBLICATION", "HANDOFF"]},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "revision", "digest"],
+      "properties": {
+        "kind": {"$ref": "#/$defs/non_empty"},
+        "id": {"$ref": "#/$defs/non_empty"},
+        "revision": {"$ref": "#/$defs/non_empty"},
+        "digest": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_id", "kind", "revision", "digest"],
+      "properties": {
+        "node_id": {"$ref": "#/$defs/id"},
+        "kind": {"$ref": "#/$defs/kind"},
+        "revision": {"$ref": "#/$defs/non_empty"},
+        "digest": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_id", "kind", "subject", "revision", "digest", "derivation_inputs", "dependency_edges", "metadata"],
+      "properties": {
+        "node_id": {"$ref": "#/$defs/id"},
+        "kind": {"$ref": "#/$defs/kind"},
+        "subject": {"$ref": "#/$defs/subject"},
+        "revision": {"$ref": "#/$defs/non_empty"},
+        "digest": {"$ref": "#/$defs/sha256"},
+        "contentSha256": {"$ref": "#/$defs/sha256"},
+        "derivation_inputs": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/ref"}},
+        "dependency_edges": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/ref"}},
+        "metadata": {"type": "object", "additionalProperties": true}
+      },
+      "allOf": [
+        {"if": {"properties": {"kind": {"const": "COMPLETE_PACKAGE"}}}, "then": {"required": ["contentSha256"]}},
+        {"if": {"properties": {"kind": {"const": "HANDOFF"}}}, "then": {"properties": {"metadata": {"required": ["evidence_cutoff", "sealed_after_cutoff", "verification_external"]}}}},
+        {"if": {"properties": {"kind": {"const": "EVIDENCE_BUNDLE"}}}, "then": {"properties": {"metadata": {"required": ["verification_external", "self_attesting"]}}}}
+      ]
+    },
+    "relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["relation_id", "kind", "from_node", "to_node", "dependency_scope"],
+      "properties": {
+        "relation_id": {"$ref": "#/$defs/id"},
+        "kind": {"enum": ["DERIVED_FROM", "DEPENDS_ON", "INVALIDATES", "EVIDENCE_FOR", "SEALED_BY", "VERIFIED_BY"]},
+        "from_node": {"$ref": "#/$defs/id"},
+        "to_node": {"$ref": "#/$defs/id"},
+        "dependency_scope": {"enum": ["PRODUCT", "SUPPORTING", "EXTERNAL"]}
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["canonicalization", "product_successor_rule", "zero_payload_rule", "external_verification_rule"],
+      "properties": {
+        "canonicalization": {"const": "JCS_SORTED_UTF8"},
+        "product_successor_rule": {"const": "PRODUCT_PAYLOAD_OR_DECLARED_PRODUCT_DEPENDENCY"},
+        "zero_payload_rule": {"const": "FAIL_CLOSED"},
+        "external_verification_rule": {"const": "VERIFICATION_AND_FRESHNESS_REMAIN_EXTERNAL"}
+      }
+    }
+  }
+}

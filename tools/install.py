@@ -68,19 +68,24 @@ CODEX_ACTIVATION_SOURCE = "generated:codex-project-activation"
 # deleting a transitive runtime dependency that the full installer provided.
 OMP_EXTENSION_RUNTIME_FILES: tuple[str, ...] = (
     "bbk.py",
+    "build_release.py",
     "contracts.py",
+    "deterministic_operations.py",
+    "diagnostics.py",
     "state_effect.py",
     "review_assurance.py",
     "verify_package.py",
     "path_compat.py",
     "dependencies.py",
     "runtime_requirements.py",
+    "source_sanity.py",
     "strict_json.py",
     "artifact_packages.py",
     "artifact_platform.py",
     "bbk_artifact.py",
     "context_packages.py",
     "host_preflight.py",
+    "identity_graph.py",
     "handoff_packages.py",
     "artifact_classification.py",
     "omp_model_routing.py",
@@ -384,15 +389,17 @@ def bin_dir() -> Path:
     return user_home() / ".local" / "bin"
 
 
-def source_files(root: Path) -> Iterable[Path]:
+def source_files(root: Path, *, excluded_parts: set[str] | None = None) -> Iterable[Path]:
     excluded = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
-    for path in sorted(root.rglob("*"), key=lambda value: value.relative_to(root).as_posix()):
-        if not path.is_file():
-            continue
-        rel = path.relative_to(root)
-        if any(part in excluded for part in rel.parts) or path.suffix in {".pyc", ".pyo"}:
-            continue
-        yield path
+    excluded.update(excluded_parts or set())
+    for directory, dirnames, filenames in os.walk(root):
+        dirnames[:] = sorted(name for name in dirnames if name not in excluded)
+        for name in sorted(filenames):
+            path = Path(directory) / name
+            rel = path.relative_to(root)
+            if path.suffix in {".pyc", ".pyo"}:
+                continue
+            yield path
 
 
 def backup_layout(destination: PurePath) -> tuple[str, tuple[str, ...]]:
@@ -613,10 +620,11 @@ def copy_tree(
     *,
     source_prefix: str | None = None,
     exclude: set[str] | None = None,
+    excluded_parts: set[str] | None = None,
     **kwargs: Any,
 ) -> None:
     excluded = exclude or set()
-    for path in source_files(source):
+    for path in source_files(source, excluded_parts=excluded_parts):
         rel = path.relative_to(source)
         if rel.as_posix() in excluded:
             continue
@@ -741,7 +749,7 @@ def omp_runtime_routing_state_bytes(metadata: Mapping[str, Any]) -> bytes:
 
 def install_package_copy(root: Path, **kwargs: Any) -> Path:
     version_root = root / "versions" / VERSION
-    copy_tree(ROOT, version_root, **kwargs)
+    copy_tree(ROOT, version_root, excluded_parts={".bbk", ".beads", ".jj"}, **kwargs)
     install_bytes(
         json_bytes(
             {
@@ -1482,6 +1490,7 @@ def run_verification_gate(
             str(jobs),
             "--test-mode",
             test_mode,
+            "--launch-child-scope",
         )
         if timing_report:
             command.extend(["--timing-report", timing_report])

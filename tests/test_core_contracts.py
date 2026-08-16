@@ -413,7 +413,7 @@ class Alpha7CongruenceTests(unittest.TestCase):
         self.assertEqual(len(skills), 40)
         for name in ('bbk-artifact', 'bbk-state-decision-effect-design', 'bbk-review-plan', 'bbk-review-context', 'bbk-review-run', 'bbk-review-findings', 'bbk-review-intent', 'bbk-review-learn', 'bbk-context-routing', 'bbk-procedure-design'):
             self.assertIn(name, skills)
-        self.assertEqual(len(list((m2_ROOT / 'shared' / 'references').glob('*.md'))), 23)
+        self.assertEqual(len(list((m2_ROOT / 'shared' / 'references').glob('*.md'))), 24)
         self.assertTrue((m2_ROOT / 'shared' / 'references' / 'omp.md').is_file())
 
     def test_role_catalogue_is_extended_not_replaced(self):
@@ -536,6 +536,8 @@ class Alpha7CongruenceTests(unittest.TestCase):
             'OMP-CHILD-LIFETIME.md', 'CRITICAL-PATH-EXECUTION-ALPHA17.md',
             'PROMPT-COMPILATION-ALPHA17.0.1.md',
             'BBK-MINIMUM-CEREMONY-OPERATING-MODE.md',
+            'BBK-EXECUTION-READINESS-001-PLAN.md',
+            'BBK-EXECUTION-READINESS-001-EXECUTION-AMENDMENT-001.md',
         }
         actual = {path.name for path in (m2_ROOT / 'docs').iterdir() if path.is_file()}
         self.assertEqual(actual, expected)

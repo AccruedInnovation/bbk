@@ -569,6 +569,20 @@ def _receipt_counts(project: Path) -> dict[str, int]:
     return dict(sorted(result.items()))
 
 
+def _validated_qualification_temp_root(value: str) -> Path:
+    """Resolve an explicit Windows campaign root without following a symlink root."""
+    raw = Path(value)
+    if raw.is_symlink():
+        raise QualificationError("QUALIFICATION_TEMP_ROOT_INVALID", f"temporary root is a symlink: {raw}")
+    try:
+        resolved = raw.resolve(strict=True)
+    except OSError as exc:
+        raise QualificationError("QUALIFICATION_TEMP_ROOT_INVALID", f"temporary root is unavailable: {raw}") from exc
+    if resolved.is_symlink() or not resolved.is_dir():
+        raise QualificationError("QUALIFICATION_TEMP_ROOT_INVALID", f"temporary root is not a real directory: {raw}")
+    return resolved
+
+
 def _isolated_qualified_task_environment(campaign_parent: Path, workspace: Path) -> dict[str, str]:
     """Return a host-neutral environment that cannot leak user mise state."""
     home = campaign_parent / "mise-home"
@@ -656,9 +670,20 @@ def _run_alpha17_automated_bound(
 
     checks: list[dict[str, Any]] = []
     fixture_digest = _tree_digest(fixture)
-    parent_dir = Path(temporary_parent).resolve() if temporary_parent else None
-    with tempfile.TemporaryDirectory(prefix="bbk-alpha17-qualification-", dir=parent_dir) as temporary_name:
-        campaign_parent = Path(temporary_name).resolve()
+    override_root = os.environ.get("BBK_QUALIFICATION_TEMP_ROOT") if os.name == "nt" else None
+    if override_root:
+        parent_dir = _validated_qualification_temp_root(override_root)
+    elif temporary_parent:
+        parent_dir = Path(temporary_parent).resolve()
+    elif os.name == "nt":
+        parent_dir = Path(tempfile.gettempdir()).resolve()
+    else:
+        parent_dir = None
+    with tempfile.TemporaryDirectory(
+        prefix="bbk-alpha17-qualification-",
+        dir=str(parent_dir) if parent_dir is not None else None,
+    ) as temporary_name:
+        campaign_parent = Path(temporary_name)
         project = campaign_parent / "project"
         workspaces = campaign_parent / "workspaces"
         workspaces.mkdir()

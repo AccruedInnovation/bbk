@@ -364,6 +364,46 @@ def _coordination_receipts(project_root: str | Path) -> list[dict[str, Any]]:
     return [item for item in all_receipts(project_root) if item.get("receipt_kind") == "COORDINATION_COMMAND"]
 
 
+def _failure_receipts(project_root: str | Path, receipt_kind: str) -> list[dict[str, Any]]:
+    return [item for item in all_receipts(project_root) if item.get("receipt_kind") == receipt_kind]
+
+
+def _find_failed(
+    project_root: str | Path,
+    receipt_kind: str,
+    idempotency_key: str,
+) -> dict[str, Any] | None:
+    matches = [
+        item for item in _failure_receipts(project_root, receipt_kind)
+        if item.get("content", {}).get("command", {}).get("idempotency_key") == idempotency_key
+    ]
+    if len(matches) > 1:
+        raise BeadsAdapterError(
+            "BEADS_FAILURE_STATE_CORRUPT",
+            f"duplicate failed Beads command idempotency key {idempotency_key}",
+        )
+    return matches[0] if matches else None
+
+
+def _append_failure(
+    project_root: str | Path,
+    receipt_kind: str,
+    command: Mapping[str, Any],
+    error: BeadsAdapterError,
+) -> dict[str, Any]:
+    stable = _stable_command(command)
+    content = {
+        "schema": "bbk.beads-failure.v1",
+        "command": stable,
+        "error": {"code": error.code, "message": error.message},
+        "effect_state": "UNKNOWN_OR_NOT_APPLIED",
+        "correction": "Reconcile backend state, then retry only with a corrected idempotency key.",
+    }
+    receipt_id = f"sha256:{canonical_digest({'receipt_kind': receipt_kind, 'content': content})}"
+    receipt, _ = append_receipt(project_root, receipt_kind, content, receipt_id=receipt_id)
+    return receipt
+
+
 def _stable_command(command: Mapping[str, Any]) -> dict[str, Any]:
     return json.loads(canonical_json_bytes(dict(command)).decode("utf-8"))
 
@@ -522,6 +562,18 @@ def execute(
     """Validate, serialize, execute, and receipt one typed projection command."""
     _validate(command)
     stable = _stable_command(command)
+    failed = _find_failed(project_root, "BEADS_COMMAND_FAILURE", command["idempotency_key"])
+    if failed:
+        prior_command = failed.get("content", {}).get("command")
+        if prior_command != stable:
+            raise BeadsAdapterError(
+                "BEADS_IDEMPOTENCY_COLLISION",
+                f"idempotency key {command['idempotency_key']} was used for different failed command content",
+            )
+        raise BeadsAdapterError(
+            "BEADS_FAILED_ATTEMPT_REQUIRES_CORRECTION",
+            f"failed Beads command {command['idempotency_key']} requires backend reconciliation before retry",
+        )
     prior = find_idempotent(project_root, command["idempotency_key"])
     if prior:
         prior_command = prior.get("content", {}).get("command")
@@ -547,8 +599,12 @@ def execute(
         # Recheck after acquiring the lock to close the race window.
         if current_revision(project_root, command["work_unit_id"]) != revision:
             raise BeadsAdapterError("BEADS_EXPECTED_REVISION_MISMATCH", "revision changed while waiting for writer lock")
-        ensure_backend_initialized(beads_workspace, bd_path=bd_path)
-        result = _apply_backend(beads_workspace, stable, bd_path=bd_path)
+        try:
+            ensure_backend_initialized(beads_workspace, bd_path=bd_path)
+            result = _apply_backend(beads_workspace, stable, bd_path=bd_path)
+        except BeadsAdapterError as exc:
+            _append_failure(project_root, "BEADS_COMMAND_FAILURE", stable, exc)
+            raise
         result.update({
             "schema": "bbk.beads-command-result.v1",
             "status": "PASS",
@@ -584,6 +640,18 @@ def execute_coordination(
     """
     _validate_coordination(command)
     stable = _stable_command(command)
+    failed = _find_failed(project_root, "COORDINATION_COMMAND_FAILURE", stable["idempotency_key"])
+    if failed:
+        prior_command = failed.get("content", {}).get("command")
+        if prior_command != stable:
+            raise BeadsAdapterError(
+                "COORDINATION_IDEMPOTENCY_COLLISION",
+                f"idempotency key {stable['idempotency_key']} was used for different failed coordination content",
+            )
+        raise BeadsAdapterError(
+            "COORDINATION_FAILED_ATTEMPT_REQUIRES_CORRECTION",
+            f"failed coordination command {stable['idempotency_key']} requires backend reconciliation before retry",
+        )
     prior = find_coordination_idempotent(project_root, stable["idempotency_key"])
     if prior:
         prior_command = prior.get("content", {}).get("command")
@@ -621,7 +689,11 @@ def execute_coordination(
             **({"integration": stable["integration"]} if "integration" in stable else {}),
         },
     }
-    backend_result = execute(project_root, beads_workspace, backend_command, bd_path=bd_path)
+    try:
+        backend_result = execute(project_root, beads_workspace, backend_command, bd_path=bd_path)
+    except BeadsAdapterError as exc:
+        _append_failure(project_root, "COORDINATION_COMMAND_FAILURE", stable, exc)
+        raise
     result_core = {
         "schema": "bbk.beads-projection-receipt.v1",
         "status": "PASS",

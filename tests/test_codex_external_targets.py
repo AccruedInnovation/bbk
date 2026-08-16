@@ -78,6 +78,14 @@ class CodexExternalTargetsTests(unittest.TestCase):
         self.assertEqual(transformation["local_sha256"], "77ec4c343866918f91815ef7ca031901601d041a1cb44bdb1e4c9418c239da85")
 
     def test_protected_routing_matches_repository_baseline(self):
+        git_root = subprocess.run(
+            ["git", "-C", str(ROOT), "rev-parse", "--show-toplevel"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if git_root.returncode != 0 or Path(git_root.stdout.strip()).resolve() != ROOT.resolve():
+            self.skipTest("repository-baseline comparison requires the exact Git checkout context")
         protected = ["spec/model-routing.json", "spec/omp-model-routing-profiles.json"]
         for relative in protected:
             current = (ROOT / relative).read_bytes()

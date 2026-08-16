@@ -106,7 +106,7 @@
         "thinkingLevel": "high"
       },
       "codex": {
-        "model": "gpt-5.6-luna",
+        "model": "gpt-5.6-terra",
         "model_reasoning_effort": "xhigh"
       },
       "claude": {
@@ -190,7 +190,7 @@
         "thinkingLevel": "high"
       },
       "codex": {
-        "model": "gpt-5.6-luna",
+        "model": "gpt-5.6-terra",
         "model_reasoning_effort": "medium"
       },
       "claude": {
@@ -204,7 +204,7 @@
         "thinkingLevel": "high"
       },
       "codex": {
-        "model": "gpt-5.6-luna",
+        "model": "gpt-5.6-terra",
         "model_reasoning_effort": "medium"
       },
       "claude": {

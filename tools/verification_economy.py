@@ -25,6 +25,8 @@ except ImportError:  # pragma: no cover
 
 DIGEST_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 PASS_STATUSES = {"PASS"}
+STAGE_PASS_STATUSES = {"PASS", "REUSED"}
+STAGE_NONPASS_STATUSES = {"FAIL", "INCONCLUSIVE", "BLOCKED", "NOT_RUN"}
 MECHANICAL_CLASSES = {
     "ENCODING", "BOM", "LINE_ENDING", "TERMINAL_NEWLINE", "CANONICALIZATION",
     "SERIALIZATION", "SCHEMA_SHAPE", "CONTROLLED_VOCABULARY", "GENERATED_METADATA",
@@ -39,6 +41,26 @@ SEMANTIC_CHANGE_KEYS = {
 METADATA_PREFIXES = (
     ".bbk/", "docs/planning/", "evidence/", "handoffs/", "logs/", "coordination/",
 )
+
+IMMEDIATE_STOP_CLASSES = {
+    "WRONG_SUBJECT", "CONTRADICTORY_ACCEPTANCE_EVIDENCE", "CONTRADICTORY_EVIDENCE",
+    "INTEGRITY_FAILURE", "UNOWNED_WRITE", "AMBIGUOUS_IRREVERSIBLE_EFFECT",
+    "CROSS_BOUNDARY_AUTHORITY_IMPACT", "CROSS_BOUNDARY_EFFECT",
+}
+MECHANICAL_FAILURE_CLASSES = {
+    "METHOD", "ENVIRONMENT", "PATH", "NAMESPACE", "SCHEMA", "SERIALIZATION",
+    "FINALIZATION", "CARRIER", "LOCATOR", "PROJECTION", "LAUNCH", "TOOL",
+    "ENCODING", "DIGEST", "BYTE_COUNT", "MANIFEST", "PACKAGE",
+}
+_VOLATILE_RECURRENCE_KEYS = {
+    "timestamp", "timestamps", "observed_at", "started_at", "finished_at",
+    "completed_at", "created_at", "updated_at", "attempt", "attempt_id",
+    "physical_attempt", "physical_attempt_id", "carrier", "carrier_id",
+    "receipt_id", "execution_id", "run_id", "temp_path", "temporary_path",
+    "absolute_path", "path", "paths", "message", "detail", "details",
+    "prose", "formatted_message",
+}
+_PATH_RE = re.compile(r"(?:[A-Za-z]:[\\/]|/)(?:[^\\/\s]+[\\/]?)+")
 
 
 class VerificationEconomyError(RuntimeError):
@@ -90,6 +112,7 @@ def verification_identity(request: Mapping[str, Any]) -> dict[str, Any]:
     claim_id = _text(request.get("claim_id"), "claim_id")
     subject = _object(request.get("subject"), "subject")
     method = _object(request.get("method"), "method")
+    environment = _object(request.get("environment", {}), "environment")
     invalidation = request.get("invalidation_keys")
     if not isinstance(invalidation, list) or not invalidation:
         raise VerificationEconomyError("VERIFICATION_REQUEST_INVALID", "invalidation_keys must be a non-empty list")
@@ -108,6 +131,7 @@ def verification_identity(request: Mapping[str, Any]) -> dict[str, Any]:
         "claim_id": claim_id,
         "subject": subject,
         "method": method,
+        "environment": environment,
         "invalidation_keys": normalized_keys,
     }
     return {**core, "verification_key": _digest(core)}
@@ -115,12 +139,13 @@ def verification_identity(request: Mapping[str, Any]) -> dict[str, Any]:
 
 def current_receipt(request: Mapping[str, Any], receipts: Sequence[Mapping[str, Any]]) -> dict[str, Any] | None:
     identity = verification_identity(request)
-    matches = [
-        dict(receipt) for receipt in receipts
-        if receipt.get("schema") == "bbk.verification-receipt.v1"
-        and receipt.get("verification_key") == identity["verification_key"]
-        and receipt.get("result", {}).get("status") in PASS_STATUSES
-    ]
+    matches = []
+    for raw in receipts:
+        receipt = dict(raw)
+        if not _receipt_is_current(receipt, identity):
+            continue
+        if receipt.get("result", {}).get("status") in PASS_STATUSES:
+            matches.append(receipt)
     if len(matches) > 1:
         digests = {item.get("integrity", {}).get("receipt_digest") for item in matches}
         if len(digests) > 1:
@@ -129,6 +154,31 @@ def current_receipt(request: Mapping[str, Any], receipts: Sequence[Mapping[str, 
                 f"multiple different PASS receipts exist for {identity['verification_key']}",
             )
     return matches[-1] if matches else None
+
+
+def _receipt_is_current(receipt: Mapping[str, Any], identity: Mapping[str, Any]) -> bool:
+    """Validate the complete receipt binding before allowing reuse."""
+    if receipt.get("schema") != "bbk.verification-receipt.v1":
+        return False
+    if receipt.get("verification_key") != identity.get("verification_key"):
+        return False
+    if receipt.get("claim_id") != identity.get("claim_id"):
+        return False
+    if receipt.get("subject") != identity.get("subject") or receipt.get("method") != identity.get("method"):
+        return False
+    if receipt.get("environment", {}) != identity.get("environment", {}):
+        return False
+    if receipt.get("invalidation_keys") != identity.get("invalidation_keys"):
+        return False
+    integrity = receipt.get("integrity")
+    if not isinstance(integrity, Mapping) or not isinstance(integrity.get("receipt_digest"), str):
+        return False
+    core = {key: value for key, value in receipt.items() if key != "integrity"}
+    if integrity.get("receipt_digest") != _digest(core):
+        return False
+    receipt_id = receipt.get("receipt_id")
+    expected_id = _digest({key: value for key, value in core.items() if key != "receipt_id"})
+    return receipt_id == expected_id
 
 
 def pre_check(request: Mapping[str, Any], receipts: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
@@ -144,6 +194,8 @@ def pre_check(request: Mapping[str, Any], receipts: Sequence[Mapping[str, Any]])
             "execution_authorized": False,
             "verification_key": identity["verification_key"],
             "receipt_id": existing["receipt_id"],
+            "execution_count": 0,
+            "underlying_method_invoked": False,
             "reason_code": "CURRENT_PASS_RECEIPT",
             "smallest_next_action": "Consume the current receipt; do not rerun the unchanged check.",
         }
@@ -153,6 +205,8 @@ def pre_check(request: Mapping[str, Any], receipts: Sequence[Mapping[str, Any]])
         "execution_authorized": True,
         "verification_key": identity["verification_key"],
         "receipt_id": None,
+        "execution_count": 1,
+        "underlying_method_invoked": True,
         "reason_code": "INDEPENDENT_METHOD_REQUIRED" if independent and existing else "NO_CURRENT_PASS_RECEIPT",
         "smallest_next_action": "Execute the smallest declared method once and register its result.",
     }
@@ -164,6 +218,9 @@ def create_receipt(request: Mapping[str, Any], result: Mapping[str, Any], *, obs
     status = result_value.get("status")
     if status not in {"PASS", "FAIL", "INCONCLUSIVE", "BLOCKED"}:
         raise VerificationEconomyError("VERIFICATION_RESULT_INVALID", "result.status is invalid")
+    execution_count = result_value.get("execution_count", 1)
+    if isinstance(execution_count, bool) or not isinstance(execution_count, int) or execution_count < 1:
+        raise VerificationEconomyError("VERIFICATION_RESULT_INVALID", "result.execution_count must be a positive integer")
     producer = _object(request.get("producer"), "producer")
     context = _object(request.get("context", {}), "context")
     evidence_refs = _string_list(result_value.get("evidence_refs", []), "result.evidence_refs")
@@ -174,11 +231,13 @@ def create_receipt(request: Mapping[str, Any], result: Mapping[str, Any], *, obs
         "claim_id": identity["claim_id"],
         "subject": identity["subject"],
         "method": identity["method"],
+        "environment": identity["environment"],
         "context": context,
         "result": {
             "status": status,
             "observed_at": observed_at or utc_now(),
             "evidence_refs": evidence_refs,
+            "execution_count": execution_count,
             **({"reason_code": result_value["reason_code"]} if isinstance(result_value.get("reason_code"), str) else {}),
         },
         "invalidation_keys": identity["invalidation_keys"],
@@ -188,6 +247,219 @@ def create_receipt(request: Mapping[str, Any], result: Mapping[str, Any], *, obs
     receipt_core["receipt_id"] = receipt_id
     digest = _digest(receipt_core)
     return {**receipt_core, "integrity": {"receipt_digest": digest}}
+
+
+def _stable_recurrence_value(value: Any, key: str = "") -> Any:
+    key_name = key.casefold().replace("-", "_")
+    if key_name in _VOLATILE_RECURRENCE_KEYS or key_name.endswith("_timestamp"):
+        return None
+    if isinstance(value, Mapping):
+        result = {}
+        for raw_key in sorted(value):
+            normalized_key = str(raw_key)
+            child = _stable_recurrence_value(value[raw_key], normalized_key)
+            if child is not None:
+                result[normalized_key] = child
+        return result
+    if isinstance(value, list):
+        return [_stable_recurrence_value(item, key) for item in value]
+    if isinstance(value, str):
+        if key_name in {"physical_attempt", "physical_attempt_ref", "carrier", "carrier_ref"}:
+            return None
+        # Keep relative logical paths, but remove host/temp path spelling and
+        # formatting-only whitespace from recurrence identity.
+        cleaned = _PATH_RE.sub("<path>", value)
+        return " ".join(cleaned.split())
+    return value
+
+
+def recurrence_identity(event: Mapping[str, Any]) -> dict[str, Any]:
+    """Return the stable, inspectable basis for a recurrence fingerprint."""
+    source = dict(event)
+    selected = {
+        "logical_subject": source.get("logical_subject", source.get("subject")),
+        "assertion_or_operation": source.get(
+            "assertion_or_operation", source.get("assertion", source.get("operation"))
+        ),
+        "failure": source.get("failure", {
+            "code": source.get("failure_code", source.get("code")),
+            "class": source.get("failure_class", source.get("class")),
+        }),
+        "method_revision": source.get("method_revision", source.get("method", {})),
+        "material_environment": source.get(
+            "material_environment", source.get("environment", source.get("context", {}))
+        ),
+    }
+    normalized = _stable_recurrence_value(selected)
+    return normalized if isinstance(normalized, dict) else {"value": normalized}
+
+
+def recurrence_fingerprint(event: Mapping[str, Any]) -> str:
+    """Compute a stable recurrence identity excluding volatile carrier fields."""
+    return _digest(recurrence_identity(event))
+
+
+def classify_recurrence(
+    event: Mapping[str, Any], occurrences: Sequence[Mapping[str, Any] | str] = (),
+) -> dict[str, Any]:
+    """Classify one failure without admitting a third equivalent execution."""
+    fingerprint = recurrence_fingerprint(event)
+    prior = []
+    for item in occurrences:
+        prior.append(item if isinstance(item, str) else recurrence_fingerprint(item))
+    matching = sum(item == fingerprint for item in prior)
+    raw_class = event.get("failure_class", event.get("class", "METHOD"))
+    failure_class = str(raw_class).upper().replace(" ", "_")
+    immediate = failure_class in IMMEDIATE_STOP_CLASSES
+    mechanical = failure_class in MECHANICAL_FAILURE_CLASSES or bool(event.get("mechanical", False))
+    if immediate:
+        transition = "IMMEDIATE_STOP"
+        route = "IMMEDIATE_STOP_CONTROLLER_DISPOSITION"
+        authorized = False
+    elif matching == 0 and mechanical:
+        transition = "SAME_WORK_UNIT_REPAIR"
+        route = "LOCAL_MECHANICAL_REPAIR"
+        authorized = True
+    elif matching == 1 and mechanical:
+        transition = "SECOND_RECURRENCE_STOP"
+        route = "REUSE_PRIOR_CLASSIFICATION"
+        authorized = False
+    elif matching >= 2 and mechanical:
+        transition = "REUSE_PRIOR_CLASSIFICATION"
+        route = "REUSE_PRIOR_CLASSIFICATION"
+        authorized = False
+    else:
+        transition = "CONTROLLER_DISPOSITION"
+        route = "CONTROLLER_DISPOSITION"
+        authorized = False
+    return {
+        "schema": "bbk.recurrence-disposition.v1",
+        "fingerprint": fingerprint,
+        "failure_class": failure_class,
+        "occurrence_count": matching,
+        "transition": transition,
+        "controller_disposition": route,
+        "execution_authorized": authorized,
+        "third_execution_admitted": False if matching >= 1 or immediate else True,
+        "reviewer_required": False,
+        "replanning_required": False,
+        "immediate_stop": immediate,
+        "mechanical": mechanical,
+    }
+
+
+recurrence_transition = classify_recurrence
+
+
+def _stage_state(value: Any, default: str = "NOT_RUN") -> dict[str, str]:
+    if isinstance(value, Mapping):
+        status = str(value.get("status", default)).upper()
+    elif value is None:
+        status = default
+    else:
+        status = str(value).upper()
+    if status not in {"PASS", "FAIL", "INCONCLUSIVE", "BLOCKED", "NOT_RUN", "REUSED"}:
+        raise VerificationEconomyError("STAGE_RECEIPT_INVALID", f"invalid stage state {status}")
+    return {"status": status}
+
+
+def create_stage_receipt(
+    request: Mapping[str, Any],
+    inner_result: Mapping[str, Any],
+    *,
+    launch: Any = "PASS", runner: Any = "PASS", serialization: Any = "PASS",
+    finalization: Any = "PASS", observed_at: str | None = None,
+) -> dict[str, Any]:
+    """Build a stage receipt whose inner result is immutable and independently hashed."""
+    inner = _object(inner_result, "inner_result")
+    status = inner.get("status")
+    if status not in {"PASS", "FAIL", "INCONCLUSIVE", "BLOCKED", "NOT_RUN"}:
+        raise VerificationEconomyError("STAGE_INNER_RESULT_INVALID", "inner_result.status is invalid")
+    envelope = {
+        "launch": _stage_state(launch, "PASS"),
+        "runner": _stage_state(runner, "PASS"),
+        "serialization": _stage_state(serialization, "PASS"),
+        "finalization": _stage_state(finalization, "PASS"),
+    }
+    outer_pass = all(state["status"] in STAGE_PASS_STATUSES for state in envelope.values())
+    aggregate = "PASS" if status == "PASS" and outer_pass else ("BLOCKED_TECHNICAL" if not outer_pass else status)
+    core = {
+        "schema": "bbk.stage-receipt.v1",
+        "receipt_id": "",
+        "stage_id": _text(request.get("stage_id", request.get("claim_id", "stage")), "stage_id"),
+        "subject": _object(request.get("subject", {"id": "unknown"}), "subject"),
+        "operation": _object(request.get("operation", request.get("method", {"id": "unknown"})), "operation"),
+        "inner_result": inner,
+        "inner_result_digest": _digest(inner),
+        "envelope": envelope,
+        "aggregate": {"status": aggregate},
+        "observed_at": observed_at or utc_now(),
+        "reuse": {"status": "NOT_REUSED", "execution_count": 1, "launch_invoked": True},
+    }
+    core["receipt_id"] = _digest({key: value for key, value in core.items() if key != "receipt_id"})
+    return {**core, "integrity": {"receipt_digest": _digest(core)}}
+
+
+def reuse_stage_receipt(receipt: Mapping[str, Any]) -> dict[str, Any]:
+    """Return a reuse result without launching the underlying stage method."""
+    inner = _object(receipt.get("inner_result"), "receipt.inner_result")
+    return {
+        "schema": "bbk.stage-receipt-reuse.v1",
+        "status": "REUSED_RECEIPT",
+        "receipt_id": _text(receipt.get("receipt_id"), "receipt_id"),
+        "inner_result": inner,
+        "inner_result_digest": receipt.get("inner_result_digest", _digest(inner)),
+        "execution_count": 0,
+        "launch_invoked": False,
+        "smallest_next_action": "Consume the current stage receipt; do not launch the underlying method.",
+    }
+
+
+def aggregate_stage_receipts(stages: Sequence[Mapping[str, Any]], *, run_id: str = "run") -> dict[str, Any]:
+    """Aggregate stage truth without averaging or promoting outer failures."""
+    if not stages:
+        raise VerificationEconomyError("RUN_AGGREGATE_INVALID", "at least one stage receipt is required")
+    inner_results = [dict(_object(stage.get("inner_result"), "stage.inner_result")) for stage in stages]
+    stage_statuses = [str(stage.get("aggregate", {}).get("status", "BLOCKED")).upper() for stage in stages]
+    overall = "PASS" if all(item.get("status") == "PASS" for item in inner_results) and all(
+        status == "PASS" for status in stage_statuses
+    ) else "BLOCKED_TECHNICAL"
+    core = {
+        "schema": "bbk.run-aggregate.v2",
+        "run_id": run_id,
+        "stage_receipt_ids": [stage.get("receipt_id") for stage in stages],
+        "stage_statuses": stage_statuses,
+        "inner_results": inner_results,
+        "overall_status": overall,
+        "non_averaging": True,
+    }
+    return {**core, "integrity": {"aggregate_digest": _digest(core)}}
+
+
+stage_receipt = create_stage_receipt
+run_aggregate = aggregate_stage_receipts
+
+
+def _operation_subject(path: Path) -> dict[str, Any]:
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(value, Mapping):
+        raise VerificationEconomyError("OPERATION_SUBJECT_INVALID", "operation subject must contain a JSON object")
+    return dict(value)
+
+
+def run_receipt_precheck(subject: Path) -> dict[str, Any]:
+    value = _operation_subject(subject)
+    return pre_check(value, value.get("receipts", []))
+
+
+def run_recurrence_guard(subject: Path) -> dict[str, Any]:
+    value = _operation_subject(subject)
+    return classify_recurrence(value, value.get("occurrences", []))
+
+
+def run_stage_aggregate(subject: Path) -> dict[str, Any]:
+    value = _operation_subject(subject)
+    return aggregate_stage_receipts(value.get("stages", []), run_id=str(value.get("run_id", "run")))
 
 
 def _fact_present(value: Any) -> bool:
@@ -437,7 +709,7 @@ def _load_request(path: str | None) -> dict[str, Any]:
 
 def main(argv: Iterable[str] | None=None) -> int:
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action",choices=("dispatch","pre-check","post-check","mechanical","validator-scope","assurance","planning-stop"))
+    parser.add_argument("action",choices=("dispatch","pre-check","post-check","mechanical","validator-scope","assurance","planning-stop","fingerprint","recurrence","stage","aggregate"))
     parser.add_argument("--request")
     parser.add_argument("--receipts")
     parser.add_argument("--receipt-dir")
@@ -452,7 +724,11 @@ def main(argv: Iterable[str] | None=None) -> int:
         elif args.action=="mechanical": result=mechanical_transition(request)
         elif args.action=="validator-scope": result=validator_scope(request)
         elif args.action=="assurance": result=assurance_dispatch(request)
-        else: result=planning_stop(request)
+        elif args.action=="planning-stop": result=planning_stop(request)
+        elif args.action=="fingerprint": result={"schema": "bbk.recurrence-fingerprint.v1", "fingerprint": recurrence_fingerprint(request), "basis": recurrence_identity(request)}
+        elif args.action=="recurrence": result=classify_recurrence(request, load_receipts(args.receipts))
+        elif args.action=="stage": result=create_stage_receipt(request, _object(request.get("inner_result"), "inner_result"), launch=request.get("launch", "PASS"), runner=request.get("runner", "PASS"), serialization=request.get("serialization", "PASS"), finalization=request.get("finalization", "PASS"))
+        else: result=aggregate_stage_receipts(request.get("stages", []), run_id=str(request.get("run_id", "run")))
         print(json.dumps(result,indent=2,sort_keys=True))
         return 0
     except (VerificationEconomyError, OSError, json.JSONDecodeError) as exc:

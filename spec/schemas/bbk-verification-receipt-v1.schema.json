@@ -4,7 +4,7 @@
   "title": "BBK verification receipt v1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "receipt_id", "verification_key", "claim_id", "subject", "method", "context", "result", "invalidation_keys", "producer", "integrity"],
+  "required": ["schema", "receipt_id", "verification_key", "claim_id", "subject", "method", "context", "environment", "result", "invalidation_keys", "producer", "integrity"],
   "properties": {
     "schema": {"const": "bbk.verification-receipt.v1"},
     "receipt_id": {"$ref": "#/$defs/digest"},
@@ -13,13 +13,15 @@
     "subject": {"type": "object", "minProperties": 1, "additionalProperties": true},
     "method": {"type": "object", "minProperties": 1, "additionalProperties": true},
     "context": {"type": "object", "additionalProperties": true},
+    "environment": {"type": "object", "additionalProperties": true},
     "result": {
       "type": "object", "additionalProperties": false,
-      "required": ["status", "observed_at", "evidence_refs"],
+      "required": ["status", "observed_at", "evidence_refs", "execution_count"],
       "properties": {
         "status": {"enum": ["PASS", "FAIL", "INCONCLUSIVE", "BLOCKED"]},
         "observed_at": {"type": "string", "format": "date-time"},
         "evidence_refs": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "execution_count": {"type": "integer", "minimum": 1},
         "reason_code": {"type": "string", "minLength": 1}
       }
     },

@@ -13,7 +13,7 @@
     "UNQUALIFIED_SHELL"
   ],
   "generated_by": "tools/generate_role_capabilities.py",
-  "manifest_digest": "sha256:0ade8c002c11dfd6b762482b62edfe9258e34a28dc52bf191c930b4f3b26e620",
+  "manifest_digest": "sha256:ab1e2d13af0b2fa75f19bb7a6d76af1fce90d9b57e86875e4ad51176a552733f",
   "policy_version": "1.0.0-alpha.17",
   "profile": "governed-software",
   "required_bindings": [],
@@ -25,5 +25,5 @@
     "semantic_scope": "READ_ONLY",
     "workspace_source": "NONE"
   },
-  "source_role_digest": "sha256:dd4a40e9c0cb8dd04242fc4f6baeb593af2ff636fd8770af50af5202fc6e30bb"
+  "source_role_digest": "sha256:33b43ab61c5dd9270ef0e4f1542f2c57537986f169f0d220f387f625e3902c0d"
 }

@@ -206,6 +206,38 @@ class ReleaseQualificationVerticalSliceTests(unittest.TestCase):
         self.assertFalse(report["security"]["credentials_used"])
         self.assertEqual([], report["security"]["waivers"])
 
+    def test_alpha17_real_local_vertical_slice_handles_deep_windows_temp(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            deep_parent = Path(raw)
+            for name in ("deep-temp-" + "x" * 20,):
+                deep_parent /= name
+            deep_parent.mkdir(parents=True)
+            with mock.patch.dict(
+                os.environ,
+                {
+                    "BBK_BD": "",
+                    "BBK_QUALIFICATION_TEMP_ROOT": r"D:\q10",
+                    "TEMP": str(deep_parent),
+                    "TMP": str(deep_parent),
+                    "TMPDIR": str(deep_parent),
+                },
+                clear=False,
+            ):
+                report = release_qualification.run_alpha17_automated(
+                    jj_path=JJ,
+                    bd_path=BD,
+                    mise_path=MISE,
+                    temporary_parent=deep_parent,
+                )
+
+        validator().validate(report)
+        assert_report_digest(self, report)
+        self.assertEqual("PASS", report["status"])
+        self.assertEqual("AUTOMATED_PASS", report["qualification"])
+        self.assertEqual("PASS", report["assertions"]["VER-036"])
+        self.assertNotIn(str(deep_parent), json.dumps(report, sort_keys=True))
+        self.assertFalse(any(Path(r"D:\q10").glob("bbk-alpha17-qualification-*")))
+
 
 if __name__ == "__main__":
     unittest.main()

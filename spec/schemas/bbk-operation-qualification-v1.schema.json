@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-operation-qualification-v1.schema.json",
+  "title": "BBK Deterministic Operation Qualification v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "status", "operation_id", "version", "implementation_sha256", "subject", "argv", "allowed_effects", "environment_policy"],
+  "properties": {
+    "schema": {"const": "bbk.operation-qualification.v1"},
+    "status": {"enum": ["QUALIFIED", "REJECTED"]},
+    "code": {"type": "string"},
+    "operation_id": {"type": "string", "minLength": 1},
+    "version": {"type": "string", "minLength": 1},
+    "implementation_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "subject": {"type": "string", "minLength": 1},
+    "argv": {"type": "array", "items": {"type": "string"}},
+    "allowed_effects": {"type": "array", "items": {"type": "string"}},
+    "environment_policy": {"type": "object"},
+    "reason": {"type": "string"}
+  }
+}

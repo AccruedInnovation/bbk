@@ -826,7 +826,7 @@ class PromptModulePackageV1Tests(unittest.TestCase):
     def test_alpha132_beads_skill_is_the_normal_role_owned_coordination_projection(self) -> None:
         text = self.method["skills"]["bbk-beads"]
         for required in (
-            "Beads is BBK's default coordination projection for newly initialized projects.",
+            "Beads is mandatory coordination state for every substantive BBK record and governed invocation.",
             "Root and Territory Wayfinders: project, territory, and decision records.",
             "Planning and Phase Wayfinders: capability increments, phases, and WorkUnits.",
             "Root, Territory, and Worker Orchestrators: execution-state records and durable-handoff pointers.",

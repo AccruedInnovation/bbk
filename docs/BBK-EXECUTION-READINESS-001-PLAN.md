@@ -1,7 +1,7 @@
 # BBK Execution Readiness M1–M6 Operating Plan
 
 Plan ID: `BBK-EXECUTION-READINESS-001-PLAN-r1`  
-Status: accepted operating direction, execution-admission package  
+Status: accepted operating direction, execution-admission package; execution process amended by `BBK-EXECUTION-READINESS-001-EXECUTION-AMENDMENT-001`  
 Planning mode: `FAST_CONTINUATION`; architecture mode: `ADOPT_AND_GAP`  
 Prepared: 2026-08-16  
 Execution stop: after Milestone 6; Milestones 7 and 8 are excluded
@@ -32,14 +32,16 @@ The `.bbk/execution/ARTIFACT-HARDENING-001` tree is ignored and mutable ambient 
 
 The controlling user accepted this direction and authorized `WORKSPACE_IMPLEMENTATION` in this repository plus `EXTERNAL_EXECUTION` only for its user-scoped Codex BBK installation, routine reversible decisions, local packaging, and deterministic validation. No remote publication, deployment, service, account, credential, network, or release effect is authorized. Repository work, user installation, and canonical Beads mutation are serialized at their respective mutation boundaries.
 
-Routine schema layout, helper boundaries, compatible naming, test fixture structure, and sequencing within a milestone are delegated. Any change to actor-visible outcome, canonical interfaces, protected floors, authority, ownership, identity meaning, or completion criteria is an architectural branch and stops only the affected frontier. Milestone order is fixed. Milestone notifications do not pause execution.
+Routine schema layout, helper boundaries, compatible naming, test fixture structure, sequencing within a milestone, and recovery within the accepted local effect envelope are delegated. Only a change to actor-visible outcome, protected floors, external effect class, or identity meaning requires a new architectural branch. Compatible interface refinement, local tooling repair, carrier repair, evidence completion, and deterministic recovery stay in the current semantic WorkUnit. Milestone order is fixed. Milestone notifications do not pause execution.
 
 ### Durable deviations and overrides
 
 1. Beads is mandatory for every substantive semantic object and invocation, despite installed skill text that calls it optional. Beads stays non-authoritative; projection failure blocks at the next safe coordination boundary.
 2. Direct Python initially failed `bbk doctor` because the qualified `PYTHONPATH` was absent. Preserve the failed bootstrap observation. The deterministic correction is the ordered path `D:\Projects\BBK\repos\bbk;D:\Projects\BBK\repos\bbk\tools;C:\Users\Tombstone\.cache\bbk\tooling\jsonschema-4.25.1\Lib\site-packages`, with `BBK_QUALIFIED_PYTHONPATH` and `PYTHONPATH` equal, `PYTHONNOUSERSITE=1`, `PYTHONDONTWRITEBYTECODE=1`, and `C:\Python313\python.exe -B -X utf8`. Do not improvise a wrapper.
 3. The campaign implements through M6 only. Campaign-bound readiness cutover and CODESYS adaptation remain deferred even if technically reachable.
-4. The architecture specialist requested a separate pre-acceptance Reviewer. That request is rejected for this already user-accepted direction: deterministic matrices, one grouped independent Validator per milestone, and one final integrated Validator are sufficient. A diagnostic Reviewer is still mandatory when an actual recurrence or immediate-stop trigger occurs; it may diagnose but never repair, rerun, accept, or release.
+4. The architecture specialist requested a separate pre-acceptance Reviewer. That request is rejected for this already user-accepted direction. Amendment 001 also supersedes mandatory review of every recurrence: deterministic method, environment, carrier, path, schema, serialization, finalization, projection, or launch failure is recorded and recovered in the same semantic WorkUnit when effects are reconciled. Review is reserved for semantic product ambiguity, contradictory acceptance evidence, an unresolved external-effect ambiguity, or a genuine cross-boundary authority conflict.
+5. The user-scoped Codex update formerly required by M2 is moved to M6. M2 establishes repository candidate correctness and installability; M6 performs the one final official updater after all M3-M5 product changes and final candidate assurance.
+6. The campaign operates under one accepted M1-M6 local execution envelope. New Root Wayfinder baselines or Territory boundaries are not created for same-scope mechanical recovery, new physical attempts, carrier publication, or evidence completion. The controller records those as attempt-local incidents and continues under the current semantic WorkUnit.
 
 ## Stable interfaces and ownership
 
@@ -67,9 +69,9 @@ The execution baseline uses `C:\Python313\python.exe -B -X utf8`, the released r
 
 The typed identity graph has nine non-substitutable kinds: `PRODUCT_PAYLOAD`, `COMPLETE_PACKAGE`, `CARRIER`, `METHOD`, `ENVIRONMENT_OR_MIRROR`, `ASSURANCE_ATTEMPT`, `EVIDENCE_BUNDLE`, `PUBLICATION`, and `HANDOFF`. Product payload is derived only from selected outcome-bearing bytes and selection policy. Existing `contentSha256` retains its existing complete-package meaning and is not reinterpreted. Every relation records source kind, target kind, relation, exact digest/revision, and invalidation behavior.
 
-The stage lifecycle is `PLANNED → RUNNING → INNER_RECORDED → FINALIZING → COMPLETE`. Failure substates are `LOCAL_MECHANICAL_FAILED`, `OUTER_FAILED_WITH_INNER`, `REPAIR_ADMITTED`, `DIAGNOSTIC_REVIEW_REQUIRED`, and `BLOCKED`. `INNER_RECORDED` is immutable. Overall PASS requires inner PASS and every required outer stage PASS.
+The stage lifecycle is `PLANNED → RUNNING → INNER_RECORDED → FINALIZING → COMPLETE`. Failure substates are `LOCAL_MECHANICAL_FAILED`, `OUTER_FAILED_WITH_INNER`, `REPAIR_ADMITTED`, `DIAGNOSTIC_REVIEW_REQUIRED`, and `BLOCKED`. `INNER_RECORDED` is immutable. Overall PASS requires inner PASS and every required outer stage PASS. A physical-attempt or carrier failure does not create a new planning baseline or semantic WorkUnit.
 
-Every evidenced non-success is durably recorded. A first clear, local, reversible mechanical failure is repaired in the same semantic run and assurance attempt with a new physical stage ordinal. If the receipt key is unchanged, the inner result is reused. The normalized recurrence fingerprint includes logical subject scope, assertion/operation, deterministic failure class and stable code, method revision, and material environment class; it excludes timestamps, absolute/temp paths, free-form formatting, physical attempt IDs, and carrier IDs. Before a second matching unresolved recurrence—or immediately for wrong subject, contradictory evidence, integrity or unowned write, ambiguous irreversible effect, cross-boundary impact, or proposed zero-payload successor—broad work stops and one bounded diagnostic Reviewer receives the immutable attempts and effects. No third equivalent execution is admitted without disposition.
+Every evidenced non-success is durably recorded. Clear local reversible failures are repaired within the same semantic WorkUnit, with a new physical ordinal only when the method actually executes again. If the receipt key is unchanged, the inner result is reused. The normalized recurrence fingerprint includes logical subject scope, assertion/operation, deterministic failure class and stable code, method revision, and material environment class; it excludes timestamps, absolute/temp paths, free-form formatting, physical attempt IDs, and carrier IDs. A deterministic classifier may disposition method, environment, carrier, path, schema, serialization, finalization, projection, and launch failures without a Reviewer after effect reconciliation. Broad work stops immediately only for wrong subject with possible effect, contradictory acceptance evidence, integrity or unowned write, ambiguous irreversible effect, or cross-boundary authority impact. Recurrence alone does not force replanning or review.
 
 ## Receipt reuse and handoff semantics
 
@@ -79,7 +81,7 @@ Stage receipts contain the immutable inner assertion result and separate launch,
 
 ## Work graph
 
-All routine Worker contracts are generated mechanically from the exact WorkUnit, authority, owned paths, qualified Python profile, output carrier, checks, checkpoint, cleanup, and `bbk.worker-return.v2`. Each milestone ends with one grouped independent candidate-bound Validator. All Beads mutations and artifact/handoff writers are serialized.
+Routine Worker contracts are generated mechanically from the exact WorkUnit, authority, owned paths, qualified Python profile, output carrier, checks, checkpoint, cleanup, and `bbk.worker-return.v2`. One Worker may own the complete coherent milestone slice when its mutation surface is serialized. Independent candidate-bound validation is required for the integrated M5 candidate and final M6 candidate; M3 and M4 close on deterministic focused gates and are revalidated together at M5. All Beads mutations and artifact/handoff writers are serialized.
 
 ### M1 — adopt predecessor and freeze replay inputs
 
@@ -93,7 +95,7 @@ Definition of done: product and coordination baselines are separately bound; S24
 
 ### M2 — Terra routing, mandatory Beads, repo and installed projections
 
-Definition of done: exactly the three currently Luna-routed Codex roles with spawn authority route to Terra, reasoning and spawn graph are unchanged, all mandatory-Beads source text and projections agree, single-writer/mise behavior is proven, repo projections pass, and the user-scoped Codex installation is updated and verified from the M2 passing candidate.
+Definition of done: exactly the three currently Luna-routed Codex roles with spawn authority route to Terra, reasoning and spawn graph are unchanged, all mandatory-Beads source text and projections agree, single-writer/mise behavior is proven, repo projections pass, and the M2 repository candidate passes grouped assurance. User-scoped installation is deferred to the single final M6 updater.
 
 | WorkUnit | Purpose and canonical ownership | Depends on | Completion evidence |
 |---|---|---|---|
@@ -101,7 +103,7 @@ Definition of done: exactly the three currently Luna-routed Codex roles with spa
 | `WU-ER-02-02-BEADS-POLICY` | canonical mandatory-Beads/single-writer directives, method content, checked-in adapter policy | M1 | direct-write negative tests; mise path/version receipt; failure containment |
 | `WU-ER-02-03-PROJECTIONS-TESTS` | regenerate repo/Codex projections and focused routing/Beads/bootstrap tests | 02-01, 02-02 | projection congruence, direct-Python fail/correct/pass lineage |
 | `WU-ER-02-04-M2-VALIDATE` | freeze M2 candidate; grouped independent Validator | 02-03 | `ER-M2-001..003` PASS; exact candidate identity |
-| `WU-ER-02-05-USER-INSTALL` | run official user updater and verify installed agents/skills/current projections | 02-04 | updater receipt; installed consumer route/Beads checks; rollback package/ref |
+| `WU-ER-02-05-USER-INSTALL` | superseded by Amendment 001; retain all attempts as diagnostic evidence and defer the official updater to M6 | 02-04 | `DEFERRED_TO_M6`; no M2 installation effect required |
 
 ### M3 — canonical diagnostics and deterministic operations
 
@@ -197,13 +199,13 @@ Synthetic cases are `WRONG_SUBJECT`, `CONTRADICTORY_EVIDENCE`, `INTEGRITY_FAILUR
 | `ER-M6-002` | every history oracle row matches expected classification | structured comparison | 06-02 |
 | `ER-M6-003` | synthetic matrix and integrated candidate pass | one final grouped independent Validator and broad gates | 06-03 |
 
-One independent logical Validator evaluates each implementation change exactly once, grouped by milestone candidate and method/environment. The final integrated Validator may reuse unchanged milestone receipts. Reviewer work is not a standing gate; it is dispatched only for a material qualitative risk or the accepted diagnostic trigger. No Validator or Reviewer accepts or releases the candidate.
+Independent validation is proportional and non-duplicative. M2's current grouped candidate assurance is reused. M3 and M4 use deterministic focused gates; one grouped independent Validator evaluates their integrated result with M5. M6 receives the final grouped independent candidate validation and broad gates. Reviewer work is not a standing gate and is not required for deterministic mechanical failures with reconciled effects. No Validator or Reviewer accepts or releases the candidate.
 
 ## Failure, rollback, recovery, and checkpoint protocol
 
-Before freeze, mechanical schema/canonicalization/path/digest/projection defects are repaired in the same attempt and rerun only their gate. After freeze, product bytes require a product successor; carrier-only bytes require only a carrier successor. Preserve all failed receipts and findings. User installation changes require an updater-produced rollback reference to the previous verified installation. Delete only attempt-owned disposable temp/cache after evidence capture; never delete historical or sealed records.
+Before freeze, mechanical schema/canonicalization/path/digest/projection defects are repaired in the same semantic WorkUnit and rerun only their gate. After freeze, product bytes require a product successor; carrier-only bytes require only a carrier successor and never a new planning baseline. Preserve compact failed receipts and findings; do not snapshot the whole repository when an exact path manifest or selected package already proves the subject. User installation changes require an updater-produced rollback reference to the previous verified installation. Delete only attempt-owned disposable temp/cache after evidence capture; never delete historical or sealed records.
 
-After every WorkUnit and milestone, the deterministic checkpoint records: exact completed/current/pending IDs; immutable refs and receipts; owned workspaces/processes; effects; failures/findings and recurrence fingerprints; Beads pointers; cleanup status; and one exact resume command. The checkpoint is small and directly readable; no synthesis agent is required. A WorkUnit checkpoint permits continuation at its next dependency. A milestone checkpoint also emits a concise controller notification and immediately continues. M6 uses resume command `STOP_M6_COMPLETE` and admits no M7/M8 work.
+Checkpoint at coherent WorkUnit completion, before or after a real external effect, and at milestone completion—not after every mechanical attempt. The deterministic checkpoint records exact completed/current/pending IDs, immutable refs and reusable receipts, owned workspaces/processes, effects, unresolved findings, Beads pointers, cleanup status, and one exact resume command. It is small and directly readable; no synthesis agent is required. Attempt-local incidents append to one ledger instead of creating a new baseline, handoff, or root report. A milestone checkpoint emits a concise controller notification and immediately continues. M6 uses resume command `STOP_M6_COMPLETE` and admits no M7/M8 work.
 
 ## Deferred work and final claim limits
 

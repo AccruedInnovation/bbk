@@ -18,7 +18,7 @@ from runtime_requirements import enforce_supported_python
 
 enforce_supported_python(program='BBK package verifier')
 
-EXCLUDED_PARTS = {".git", ".bbk", "evidence", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
+EXCLUDED_PARTS = {".git", ".bbk", ".beads", ".jj", "evidence", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
 EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
 INCLUDED_EVIDENCE_FILES = frozenset({
     "evidence/alpha17-rc6-work-unit-dispositions.json",

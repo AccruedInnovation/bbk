@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-verification-precheck-result-v1.schema.json",
+  "title": "BBK exact verification precheck result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "status", "execution_authorized", "verification_key", "receipt_id", "execution_count", "underlying_method_invoked", "reason_code", "smallest_next_action"],
+  "properties": {
+    "schema": {"const": "bbk.verification-precheck-result.v1"},
+    "status": {"enum": ["REUSED_RECEIPT", "AUTHORIZED_CHECK"]},
+    "execution_authorized": {"type": "boolean"},
+    "verification_key": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "receipt_id": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
+    "execution_count": {"type": "integer", "minimum": 0},
+    "underlying_method_invoked": {"type": "boolean"},
+    "reason_code": {"type": "string", "minLength": 1},
+    "smallest_next_action": {"type": "string", "minLength": 1}
+  }
+}

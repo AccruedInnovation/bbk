@@ -740,6 +740,7 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
         self.assertEqual(observed['env']['PYTHONIOENCODING'], 'utf-8:backslashreplace')
         self.assertEqual(observed['command'][observed['command'].index('--profile') + 1], 'omp')
         self.assertEqual(observed['command'][observed['command'].index('--jobs') + 1], '1')
+        self.assertIn('--launch-child-scope', observed['command'])
         self.assertIn('Résumé', output)
         self.assertIn('\\u2192', output)
         self.assertIn('\\U0001f680', output)

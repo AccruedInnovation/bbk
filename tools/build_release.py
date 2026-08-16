@@ -32,7 +32,7 @@ PROFILE_GENERATED_AT = "2026-08-07T00:00:00-06:00"
 # Governance, execution, and interpreter state are never release subjects.
 # Keep this identical to the package verifier so a direct source-root build
 # and its strict readback select the same files.
-EXCLUDED_PARTS = {".git", ".bbk", "evidence", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
+EXCLUDED_PARTS = {".git", ".bbk", ".beads", ".jj", "evidence", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
 EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
 INCLUDED_EVIDENCE_FILES = frozenset({
     "evidence/alpha17-rc6-work-unit-dispositions.json",

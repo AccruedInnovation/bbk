@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-source-sanity-v1.schema.json",
+  "title": "BBK Source Sanity Result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "status", "root", "python_files", "json_files", "explicit_text_encoding_calls_checked", "implicit_text_encoding_calls", "errors"],
+  "properties": {
+    "schema": {"const": "bbk.source-sanity.v1"},
+    "status": {"enum": ["PASS", "FAIL"]},
+    "root": {"type": "string", "minLength": 1},
+    "python_files": {"type": "integer", "minimum": 0},
+    "json_files": {"type": "integer", "minimum": 0},
+    "explicit_text_encoding_calls_checked": {"type": "integer", "minimum": 0},
+    "implicit_text_encoding_calls": {"type": "integer", "minimum": 0},
+    "errors": {"type": "array", "items": {"type": "string"}}
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-diagnostic-v1.schema.json",
+  "title": "BBK Typed Diagnostic v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "code", "class", "subject", "semantic_result", "mechanical_envelope", "claims"],
+  "properties": {
+    "schema": {"const": "bbk.diagnostic.v1"},
+    "code": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,63}$"},
+    "class": {"enum": ["SEMANTIC", "MECHANICAL", "IMMEDIATE_STOP"]},
+    "subject": {"type": "string", "minLength": 1},
+    "message": {"type": "string"},
+    "semantic_result": {"$ref": "#/$defs/result"},
+    "mechanical_envelope": {"$ref": "#/$defs/envelope"},
+    "claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["established", "not_established"],
+      "properties": {
+        "established": {"type": "array", "items": {"type": "string"}},
+        "not_established": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "immediate_stop": {"type": "boolean"},
+    "prohibited_claims": {"type": "array", "items": {"type": "string"}},
+    "details": {"type": "object"}
+  },
+  "$defs": {
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {"enum": ["PASS", "FAIL", "NOT_RUN", "UNKNOWN"]},
+        "value": {},
+        "code": {"type": ["string", "null"]},
+        "message": {"type": ["string", "null"]}
+      }
+    },
+    "envelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "effects_observed", "cleanup"],
+      "properties": {
+        "status": {"enum": ["PASS", "FAIL", "BLOCKED", "UNKNOWN"]},
+        "effects_observed": {"enum": ["NONE", "PRESENT", "UNKNOWN"]},
+        "cleanup": {"enum": ["COMPLETE", "INCOMPLETE", "UNKNOWN"]},
+        "code": {"type": ["string", "null"]},
+        "message": {"type": ["string", "null"]}
+      }
+    }
+  }
+}

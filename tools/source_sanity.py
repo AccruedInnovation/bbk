@@ -20,8 +20,14 @@ from runtime_requirements import enforce_supported_python
 
 enforce_supported_python(program="BBK source sanity check")
 
-EXCLUDED_PARTS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
-EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
+# Reuse the release selector so source sanity and package construction cannot
+# silently diverge.  Only the exact evidence allowlist is product-selected.
+from build_release import (  # noqa: E402
+    EXCLUDED_PARTS,
+    EXCLUDED_ROOT_FILES,
+    EXCLUDED_SUFFIXES,
+    INCLUDED_EVIDENCE_FILES,
+)
 
 
 def package_files() -> list[Path]:
@@ -30,7 +36,9 @@ def package_files() -> list[Path]:
         if not path.is_file():
             continue
         rel = path.relative_to(ROOT)
-        if any(part in EXCLUDED_PARTS for part in rel.parts) or path.suffix in EXCLUDED_SUFFIXES:
+        if (any(part in EXCLUDED_PARTS for part in rel.parts) and rel.as_posix() not in INCLUDED_EVIDENCE_FILES) or path.suffix in EXCLUDED_SUFFIXES:
+            continue
+        if rel.as_posix() in EXCLUDED_ROOT_FILES:
             continue
         values.append(path)
     return sorted(values, key=lambda value: value.relative_to(ROOT).as_posix())
