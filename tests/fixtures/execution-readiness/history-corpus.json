@@ -1,0 +1,16 @@
+{
+  "schema": "bbk.execution-readiness-history-corpus.v1",
+  "campaign": "BBK-EXECUTION-READINESS-001",
+  "milestone": "M1",
+  "work_unit": "WU-ER-01-02-CORPUS-FREEZE",
+  "selection_policy": "path-and-hash-bound references; selected history is read-only and not copied",
+  "entries": [
+    {"id":"POSTMORTEM","path":".bbk/execution/ARTIFACT-HARDENING-001/POSTMORTEM.md","bytes":13598,"sha256":"e95a60f7b8d49bd32e01dd77d3fcf6980311778c052529587d8c081565f63f13"},
+    {"id":"S24_PACKAGE_DESCRIPTOR","path":".bbk/execution/ARTIFACT-HARDENING-001/p4/r13/release-qualification/WU-AH-P4-R13-S24-02-S23-BOUND-S24-FREEZE/sealed/CAND-AH-R13-RELEASE-S24/bbk-package.json","bytes":123891,"sha256":"01ce80dc1c6400e19ce97d3d12a2b958f5c48b64f6e65a732dafed8a74e8e0c0"},
+    {"id":"S24_CANDIDATE","path":".bbk/execution/ARTIFACT-HARDENING-001/p4/r13/release-qualification/WU-AH-P4-R13-S24-02-S23-BOUND-S24-FREEZE/sealed/CAND-AH-R13-RELEASE-S24/candidate.json","bytes":22522,"sha256":"18ee094b081f62b18a5700fa57ff1d13535bb4b02b3c38522e75e367bff58ab4"},
+    {"id":"S24_PACKAGE_MANIFEST","path":".bbk/execution/ARTIFACT-HARDENING-001/p4/r13/release-qualification/WU-AH-P4-R13-S24-02-S23-BOUND-S24-FREEZE/sealed/CAND-AH-R13-RELEASE-S24/PACKAGE-MANIFEST.json","bytes":212697,"sha256":"e17181c6f298648844a33e3c7729ef53dbdbed03488814dcefd7bbd5a4886312"},
+    {"id":"S24_PUBLICATION","path":".bbk/artifacts/publications/bbk-artifact-hardening-candidate-24.json","bytes":1346,"sha256":"50fbd8210861f0d3669d2a543772cfe1071ea79cf3e0675e72a6453e439fff51"}
+  ],
+  "a3": {"status":"SOURCE_REPORT_ONLY","carrier":"EXACT_CARRIER_NOT_ESTABLISHED"},
+  "historical_mutation": "NONE"
+}
