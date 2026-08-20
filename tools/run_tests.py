@@ -55,6 +55,10 @@ enforce_supported_python(program='BBK test runner')
 
 ROOT = Path(__file__).resolve().parents[1]
 TESTS = ROOT / "tests"
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from tests import _test_profiles as test_profiles
+
 RUN_COUNT_RE = re.compile(r"^Ran (\d+) tests? in ", re.MULTILINE)
 DEFAULT_SUITE_TIMEOUT = 420.0
 DEFAULT_HEARTBEAT_SECONDS = 15.0
@@ -65,37 +69,6 @@ TEST_PROFILES = ("fast", "standard", "release")
 DEFAULT_TEST_PROFILE = "standard"
 DURATION_SEED_PATH = TESTS / "test-durations.json"
 LAST_RUN_REPORT: dict[str, Any] | None = None
-FAST_TEST_FILES = frozenset({
-    # ART-HARD-A13 is the bounded native artifact-control subject.  Keep its
-    # applicability-aware skips in the fast inventory so the gate cannot omit
-    # the subject merely because this host is not Windows.
-    "test_artifact_windows_native.py",
-    "test_assurance_state.py",
-    "test_dependencies.py",
-    "test_contract_package_v1.py",
-    "test_prompt_module_package_v1.py",
-    "test_role_package_v4.py",
-    "test_schema_registry.py",
-    "test_role_capabilities.py",
-    "test_substrate_beads.py",
-    "test_governed_filesystem.py",
-    "test_worker_spawn.py",
-    "test_read_only_spawn.py",
-    "test_qualified_task.py",
-    "test_governance_status.py",
-    "test_omp_governed_profile.py",
-    "test_role_return_runtime.py",
-    "test_control_plane.py",
-    "test_release_qualification.py",
-    "test_session_oracle.py",
-    "test_model_routing_optional_package_version.py",
-    "test_manual_qualification_kit.py",
-    "test_verification_economy.py",
-    "test_verification_metrics.py",
-    "test_substrate_doctor.py",
-    "test_substrate_jj.py",
-})
-
 
 @contextlib.contextmanager
 def test_profile_environment(profile: str):
@@ -2091,7 +2064,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             parser.error("--require-node and --skip-package-manifest require --all")
         files = matching_test_files(args.pattern)
         if args.profile == "fast" and args.pattern == "test*.py":
-            files = [path for path in files if path.name in FAST_TEST_FILES]
+            files = [
+                path
+                for path in files
+                if path.name in test_profiles.fast_test_filenames()
+            ]
         if not files:
             issue = TestIssue(
                 "CONFIGURATION ERROR",

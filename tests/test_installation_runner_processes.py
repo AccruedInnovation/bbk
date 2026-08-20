@@ -340,44 +340,108 @@ class Alpha101EntrySetupTests(unittest.TestCase):
             )
 
     def test_profile_selection_is_total_and_standard_keeps_product_tests(self):
-        with mock.patch.dict(
-            os.environ,
-            {'BBK_TEST_PROFILE': 'release', 'BBK_EXTERNAL_SCHEMA': '1'},
-            clear=False,
-        ):
-            # Use a fresh loader: the process-wide default loader may retain
-            # outer-discovery state while this release-only inventory test runs.
-            suite = unittest.TestLoader().discover(
-                str(m4_ROOT / 'tests'),
-                pattern='test*.py',
+        def _ids(suite):
+            return tuple(
+                test_profiles.normalize_test_id(test.id())
+                for test in test_profiles.iter_tests(suite)
             )
-        ids = {
-            test_profiles.normalize_test_id(test.id())
-            for test in test_profiles.iter_tests(suite)
-        }
-        self.assertTrue(test_profiles.RELEASE_ONLY <= ids)
-        self.assertGreater(len(ids), len(test_profiles.RELEASE_ONLY))
-        standard = {
-            test_id for test_id in ids
-            if test_profiles.selected(test_id, 'standard')
-        }
-        release = {
-            test_id for test_id in ids
-            if test_profiles.selected(test_id, 'release')
-        }
-        fast = {
-            test_id for test_id in ids
-            if test_profiles.selected(test_id, 'fast')
-        }
-        self.assertEqual(release, ids)
-        self.assertEqual(ids - standard, set(test_profiles.RELEASE_ONLY))
-        self.assertTrue(fast < standard)
-        self.assertEqual(
-            {test_id.split('.', 1)[0] for test_id in fast},
-            set(test_profiles.FAST_MODULES),
+
+        def _discover(pattern, profile):
+            with mock.patch.dict(
+                os.environ,
+                {
+                    'BBK_TEST_PROFILE': profile,
+                    'BBK_EXTERNAL_SCHEMA': '1' if profile == 'release' else '0',
+                },
+                clear=False,
+            ):
+                return _ids(
+                    unittest.TestLoader().discover(
+                        str(m4_ROOT / 'tests'),
+                        pattern=pattern,
+                    )
+                )
+
+        def _validate_identities(values):
+            normalized = tuple(test_profiles.normalize_test_id(value) for value in values)
+            if any(not isinstance(value, str) or not value or '.' not in value for value in normalized):
+                raise ValueError('invalid test identity')
+            if len(normalized) != len(set(normalized)):
+                raise ValueError('duplicate test identity')
+            return normalized
+
+        predecessor_filenames = (
+            'test_artifact_windows_native.py',
+            'test_assurance_state.py',
+            'test_contract_package_v1.py',
+            'test_control_plane.py',
+            'test_dependencies.py',
+            'test_governance_status.py',
+            'test_governed_filesystem.py',
+            'test_manual_qualification_kit.py',
+            'test_model_routing_optional_package_version.py',
+            'test_omp_governed_profile.py',
+            'test_prompt_module_package_v1.py',
+            'test_qualified_task.py',
+            'test_read_only_spawn.py',
+            'test_release_qualification.py',
+            'test_role_capabilities.py',
+            'test_role_package_v4.py',
+            'test_role_return_runtime.py',
+            'test_schema_registry.py',
+            'test_session_oracle.py',
+            'test_substrate_beads.py',
+            'test_substrate_doctor.py',
+            'test_substrate_jj.py',
+            'test_verification_economy.py',
+            'test_verification_metrics.py',
+            'test_worker_spawn.py',
         )
-        # Product-facing schema command behavior remains standard; only the
-        # optional whole-package external-engine repetitions are release-only.
+        successor_filenames = test_profiles.fast_test_filenames()
+        with self.subTest('predecessor-successor-filenames'):
+            self.assertEqual(successor_filenames, predecessor_filenames)
+        with self.subTest('predecessor-successor-identities'):
+            predecessor_ids = tuple(
+                identity
+                for filename in predecessor_filenames
+                for identity in _discover(filename, 'fast')
+            )
+            successor_ids = tuple(
+                identity
+                for filename in successor_filenames
+                for identity in _discover(filename, 'fast')
+            )
+            self.assertEqual(successor_ids, predecessor_ids)
+            self.assertEqual(len(successor_ids), len(set(successor_ids)))
+
+        ids = _discover('test*.py', 'release')
+        self.assertTrue(test_profiles.RELEASE_ONLY <= set(ids))
+        standard = {test_id for test_id in ids if test_profiles.selected(test_id, 'standard')}
+        release = {test_id for test_id in ids if test_profiles.selected(test_id, 'release')}
+        fast = {test_id for test_id in ids if test_profiles.selected(test_id, 'fast')}
+        with self.subTest('profile-algebra'):
+            self.assertEqual(release, set(ids))
+            self.assertEqual(release - standard, set(test_profiles.RELEASE_ONLY))
+            self.assertTrue(fast < standard < release)
+            self.assertEqual({test_id.split('.', 1)[0] for test_id in fast}, set(test_profiles.FAST_MODULES))
+        with self.subTest('invalid-duplicate-identities'):
+            with self.assertRaises(ValueError):
+                _validate_identities(('',))
+            with self.assertRaises(ValueError):
+                _validate_identities((next(iter(fast)), next(iter(fast))))
+        with self.subTest('resource-metadata-does-not-select'):
+            identity = next(iter(fast))
+            selected = test_profiles.selected(identity, 'fast')
+            for metadata in ({}, {'resource_class': 'cpu'}, {'resource_class': 'io', 'slots': 4}):
+                self.assertEqual(test_profiles.selected(identity, 'fast'), selected, metadata)
+        with self.subTest('public-names-aliases-defaults'):
+            self.assertEqual(test_profiles.PROFILE_ENV, 'BBK_TEST_PROFILE')
+            self.assertEqual(test_profiles.PROFILES, ('fast', 'standard', 'release'))
+            self.assertEqual(test_profiles.DEFAULT_PROFILE, 'release')
+            self.assertEqual(run_tests.TEST_PROFILES, ('fast', 'standard', 'release'))
+            self.assertEqual(run_tests.DEFAULT_TEST_PROFILE, 'standard')
+            self.assertFalse(hasattr(run_tests, 'FAST_TEST_FILES'))
+            self.assertEqual(test_profiles.normalize_test_id('tests.example.Case.test_name'), 'example.Case.test_name')
         self.assertIn(
             'test_system.Alpha118WayfindingExecutionTests.'
             'test_schema_validator_is_discoverable_and_uses_draft_2020_12',

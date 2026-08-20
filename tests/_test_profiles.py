@@ -45,19 +45,44 @@ RELEASE_ONLY = frozenset(
     }
 )
 
-# Fast verification intentionally covers canonical contracts, prompt/role
-# compilation, assurance logic, and deterministic transformations. Real
+# Fast verification owns the canonical predecessor module inventory. Real
 # installer/Node/Git/platform boundaries remain in standard/release profiles.
 FAST_MODULES = frozenset(
     {
+        "test_artifact_windows_native",
         "test_assurance_state",
-        "test_dependencies",
         "test_contract_package_v1",
+        "test_control_plane",
+        "test_dependencies",
+        "test_governance_status",
+        "test_governed_filesystem",
+        "test_manual_qualification_kit",
+        "test_model_routing_optional_package_version",
+        "test_omp_governed_profile",
         "test_prompt_module_package_v1",
+        "test_qualified_task",
+        "test_read_only_spawn",
+        "test_release_qualification",
+        "test_role_capabilities",
         "test_role_package_v4",
         "test_role_return_runtime",
+        "test_schema_registry",
+        "test_session_oracle",
+        "test_substrate_beads",
+        "test_substrate_doctor",
+        "test_substrate_jj",
+        "test_verification_economy",
+        "test_verification_metrics",
+        "test_worker_spawn",
     }
 )
+
+FAST_TEST_FILENAMES = tuple(f"{module}.py" for module in sorted(FAST_MODULES))
+
+
+def fast_test_filenames() -> tuple[str, ...]:
+    """Return the canonical ordered FAST module filename projection."""
+    return FAST_TEST_FILENAMES
 
 
 def normalize_test_id(test_id: str) -> str:
