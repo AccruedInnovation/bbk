@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import hashlib
 import importlib.util
 import inspect
 import io
@@ -30,7 +31,7 @@ import tempfile
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Sequence, TextIO
+from typing import Callable, Mapping, Sequence, TextIO
 
 TOOLS_DIR = Path(__file__).resolve().parent
 if str(TOOLS_DIR) not in sys.path:
@@ -47,6 +48,7 @@ import dependencies
 ROOT = Path(__file__).resolve().parents[1]
 SUBPROCESS_OUTPUT_ENCODING = "utf-8"
 SUBPROCESS_OUTPUT_ERRORS = "backslashreplace"
+STANDARD_RELEASE_DELTA_SCHEMA = "bbk.standard-release-delta.v1"
 
 
 @dataclass(frozen=True)
@@ -593,6 +595,177 @@ def run_all_report(
 def run_all(**kwargs: object) -> int:
     exit_code, _ = run_all_report(**kwargs)  # type: ignore[arg-type]
     return exit_code
+
+
+RECEIPT_EQUAL_FIELDS = (
+    "candidate_content_root",
+    "profile_policy_sha256",
+    "inventory_sha256",
+    "runner_sha256",
+    "toolchain_runtime_identity",
+    "platform_identity",
+    "mode_jobs_resource_policy",
+    "tool_versions",
+    "environment_qualification",
+    "command_semantics",
+)
+
+
+def _required_binding_equal(key: str, left: object, right: object) -> bool:
+    """Compare required-equal fields while ignoring only accepted profile deltas."""
+    if key == "environment_qualification" and isinstance(left, Mapping) and isinstance(right, Mapping):
+        left = {name: value for name, value in left.items() if name != "BBK_EXTERNAL_SCHEMA"}
+        right = {name: value for name, value in right.items() if name != "BBK_EXTERNAL_SCHEMA"}
+    if key == "command_semantics" and isinstance(left, Mapping) and isinstance(right, Mapping):
+        ignored = {"profile", "attempt", "attempt_id", "output", "output_path", "body_path", "sidecar_path"}
+        left = {name: value for name, value in left.items() if name not in ignored}
+        right = {name: value for name, value in right.items() if name not in ignored}
+    return left == right
+
+
+def _receipt_value(value: Mapping[str, object] | str | Path) -> tuple[dict[str, object] | None, dict[str, object]]:
+    """Read a receipt through the Worker-side body/sidecar verifier."""
+    import run_tests
+
+    if isinstance(value, (str, Path)):
+        result = run_tests.verify_test_run_receipt(Path(value))
+        body = result.get("body") if result.get("status") == "PASS" else None
+        return (body if isinstance(body, dict) else None), result
+    body = dict(value)
+    status = "PASS" if body.get("schema") == "bbk.test-run.v2" and body.get("status") == "PASS" else "REJECTED"
+    return body if status == "PASS" else None, {"status": status, "body": body}
+
+
+def standard_receipt_reuse_decision(
+    standard_receipt: Mapping[str, object] | str | Path,
+    *,
+    expected_bindings: Mapping[str, object] | None = None,
+) -> dict[str, object]:
+    """Return a typed, fail-closed decision for mandatory STANDARD reuse."""
+    body, result = _receipt_value(standard_receipt)
+    if body is None:
+        return {"status": "REJECTED", "cause": result.get("cause", "MISSING_OR_INVALID_STANDARD"), "fallback": "FULL_RELEASE"}
+    mismatches = [key for key in RECEIPT_EQUAL_FIELDS if expected_bindings and key in expected_bindings and not _required_binding_equal(key, body.get(key), expected_bindings[key])]
+    if mismatches:
+        return {"status": "REJECTED", "cause": "REQUIRED_EQUAL_MISMATCH", "keys": mismatches, "fallback": "FULL_RELEASE"}
+    selected = body.get("selected")
+    if not isinstance(selected, list) or len(selected) != len(set(selected)):
+        return {"status": "REJECTED", "cause": "INVALID_SELECTED_IDENTITIES", "fallback": "FULL_RELEASE"}
+    return {"status": "ELIGIBLE", "source": body, "fallback": None}
+
+
+def derive_standard_release_delta(
+    standard_receipt: Mapping[str, object] | str | Path,
+    release_receipt: Mapping[str, object] | str | Path,
+    *,
+    expected_bindings: Mapping[str, object] | None = None,
+) -> dict[str, object]:
+    """Derive the exact ordered RELEASE_ONLY delta, or preserve rejection."""
+    standard, standard_result = _receipt_value(standard_receipt)
+    release, release_result = _receipt_value(release_receipt)
+    if standard is None or release is None:
+        return {"schema": STANDARD_RELEASE_DELTA_SCHEMA, "status": "REJECTED", "cause": "SOURCE_RECEIPT_INVALID", "fallback": "FULL_RELEASE", "sources": {"standard": standard_result, "release": release_result}}
+    mismatches = [key for key in RECEIPT_EQUAL_FIELDS if not _required_binding_equal(key, standard.get(key), release.get(key))]
+    if expected_bindings:
+        mismatches.extend(key for key in RECEIPT_EQUAL_FIELDS if key in expected_bindings and not _required_binding_equal(key, standard.get(key), expected_bindings[key]))
+    if mismatches:
+        return {"schema": STANDARD_RELEASE_DELTA_SCHEMA, "status": "REJECTED", "cause": "REQUIRED_EQUAL_MISMATCH", "keys": sorted(set(mismatches)), "fallback": "FULL_RELEASE"}
+    standard_ids = standard.get("selected")
+    release_ids = release.get("selected")
+    if not isinstance(standard_ids, list) or not isinstance(release_ids, list):
+        return {"schema": STANDARD_RELEASE_DELTA_SCHEMA, "status": "REJECTED", "cause": "MALFORMED_SELECTED_IDENTITIES", "fallback": "FULL_RELEASE"}
+    if len(standard_ids) != len(set(standard_ids)) or len(release_ids) != len(set(release_ids)):
+        return {"schema": STANDARD_RELEASE_DELTA_SCHEMA, "status": "REJECTED", "cause": "DUPLICATE_SELECTED_IDENTITIES", "fallback": "FULL_RELEASE"}
+    standard_set = set(standard_ids)
+    delta_ids = [identity for identity in release_ids if identity not in standard_set]
+    import run_tests
+    canonical_only = set(run_tests.test_profiles.RELEASE_ONLY)
+    if set(standard_ids) & canonical_only != set():
+        return {"schema": STANDARD_RELEASE_DELTA_SCHEMA, "status": "REJECTED", "cause": "STANDARD_OVERLAPS_RELEASE_ONLY", "fallback": "FULL_RELEASE"}
+    if set(delta_ids) != canonical_only or set(release_ids) != standard_set | canonical_only:
+        return {"schema": STANDARD_RELEASE_DELTA_SCHEMA, "status": "REJECTED", "cause": "PROFILE_SET_INVARIANT", "fallback": "FULL_RELEASE"}
+    body = {
+        "schema": STANDARD_RELEASE_DELTA_SCHEMA,
+        "status": "PASS",
+        "standard_source": {"body": str(standard_receipt), "sha256": standard.get("selected_identity_sha256")},
+        "release_source": {"body": str(release_receipt), "sha256": release.get("selected_identity_sha256")},
+        "release_only_policy": {"identities": sorted(canonical_only), "sha256": run_tests.profile_policy_identity()["sha256"]},
+        "standard_selected": standard_ids,
+        "release_selected": release_ids,
+        "delta_selected": delta_ids,
+        "standard_selected_sha256": standard.get("selected_identity_sha256"),
+        "release_selected_sha256": release.get("selected_identity_sha256"),
+        "delta_selected_sha256": hashlib.sha256(run_tests.canonical_json_bytes(delta_ids)).hexdigest(),
+        "binding_comparison": {"status": "PASS", "required_equal": list(RECEIPT_EQUAL_FIELDS), "mismatches": []},
+        "derivation": "RELEASE = STANDARD disjoint-union RELEASE_ONLY; delta = ordered RELEASE_ONLY",
+    }
+    return body
+
+
+def execute_release_with_reuse(
+    standard_receipt: Mapping[str, object] | str | Path,
+    *,
+    expected_bindings: Mapping[str, object] | None = None,
+    release_only: Callable[[], object],
+    full_release: Callable[[], object],
+) -> dict[str, object]:
+    """Use STANDARD exactly once when current; otherwise run full RELEASE."""
+    decision = standard_receipt_reuse_decision(standard_receipt, expected_bindings=expected_bindings)
+    if decision.get("status") != "ELIGIBLE":
+        result = full_release()
+        return {"status": "FULL_RELEASE_FALLBACK", "reuse": decision, "result": result, "delta_claim": None}
+    result = release_only()
+    return {"status": "REUSED_STANDARD_RELEASE_ONLY", "reuse": decision, "result": result, "delta_claim": "PENDING_FINALIZATION"}
+
+
+def finalize_standard_release_delta(delta: Mapping[str, object], output: Path, *, replace: bool = False) -> dict[str, object]:
+    """Publish an immutable delta body and identity sidecar via the shared finalizer."""
+    import atomic_finalizer
+    import run_tests
+
+    output = output.expanduser().resolve()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    draft = output.with_name(f".{output.name}.{os.getpid()}.draft")
+    run_tests.write_json_atomic(draft, delta)
+    try:
+        return atomic_finalizer.finalize_json(
+            draft,
+            output,
+            subject_kind="OTHER",
+            schema=ROOT / "spec" / "schemas" / "bbk-standard-release-delta-v1.schema.json",
+            replace=replace,
+        )
+    finally:
+        draft.unlink(missing_ok=True)
+
+
+def verify_standard_release_delta(path: Path) -> dict[str, object]:
+    """Verify a finalized delta body and its current identity sidecar."""
+    import run_tests
+
+    value = run_tests.verify_test_run_receipt(path)
+    if value.get("status") == "PASS":
+        return {"status": "REJECTED", "cause": "WRONG_SCHEMA"}
+    path = path.expanduser().resolve()
+    sidecar = path.with_name(path.name + ".identity.json")
+    try:
+        body = json.loads(path.read_text(encoding="utf-8"))
+        receipt = json.loads(sidecar.read_text(encoding="utf-8"))
+        import atomic_finalizer
+        atomic_finalizer.validate_schema(body, ROOT / "spec" / "schemas" / "bbk-standard-release-delta-v1.schema.json")
+        raw = path.read_bytes()
+        digest = hashlib.sha256(raw).hexdigest()
+        if (
+            receipt.get("schema") != "bbk.identity-receipt.v1"
+            or receipt.get("schema_id") != "https://bbk.local/schemas/bbk-standard-release-delta-v1.schema.json"
+            or receipt.get("subject_ref") != path.as_posix()
+            or receipt.get("byte_count") != len(raw)
+            or receipt.get("sha256") != digest
+        ):
+            return {"status": "REJECTED", "cause": "IDENTITY_MISMATCH"}
+        return {"status": "PASS", "body": body, "sidecar": receipt}
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError, TypeError) as exc:
+        return {"status": "REJECTED", "cause": "MALFORMED_OR_MISSING", "detail": str(exc)}
 
 
 def _qualification_candidate_binding(

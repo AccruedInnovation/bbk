@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 # Historical source: test_alpha10_1_entry_setup.py
-# ---------------------------------------------------------------------------
 import hashlib
 import ast
 import io
@@ -1266,4 +1265,57 @@ class Alpha101EntrySetupTests(unittest.TestCase):
             self.assertIn(command, combined)
 
 # ---------------------------------------------------------------------------
+
+
+class WUTr04ReceiptDeltaTests(unittest.TestCase):
+    def _report(self, selected, *, status='PASS'):
+        return {
+            'schema': 'bbk.test-run.v1', 'status': status, 'profile': 'standard',
+            'mode': 'isolated', 'requested_jobs': 1, 'execution_processes': 1,
+            'selected': list(selected), 'executed': list(selected), 'skipped_ids': [],
+            'not_run': [], 'groups': [], 'tests_reported': len(selected), 'exit_code': 0,
+        }
+
+    def test_v2_receipt_finalizer_publishes_body_and_sidecar_without_self_identity(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            candidate = {'schema': 'bbk.test-candidate-content-root.v1', 'root_sha256': 'a' * 64, 'status': 'PASS'}
+            output = root / 'standard.json'
+            result = run_tests.finalize_test_run_receipt(
+                self._report(['alpha.test_one']), output, attempt_id='attempt-1',
+                candidate_root=candidate,
+            )
+            body = json.loads(output.read_text(encoding='utf-8'))
+            sidecar = json.loads(Path(result['identity_receipt']).read_text(encoding='utf-8'))
+            self.assertEqual(body['schema'], 'bbk.test-run.v2')
+            self.assertNotIn('sha256', body)
+            self.assertEqual(sidecar['byte_count'], output.stat().st_size)
+            self.assertEqual(sidecar['sha256'], hashlib.sha256(output.read_bytes()).hexdigest())
+            self.assertEqual(run_tests.verify_test_run_receipt(output)['status'], 'PASS')
+            output.write_bytes(output.read_bytes().replace(b'alpha.test_one', b'alpha.test_two'))
+            self.assertEqual(run_tests.verify_test_run_receipt(output)['cause'], 'IDENTITY_MISMATCH')
+
+    def test_standard_release_delta_requires_exact_release_only_set(self):
+        release_only = sorted(test_profiles.RELEASE_ONLY)
+        standard = run_tests.build_test_run_receipt(
+            self._report(['alpha.test_one']), candidate_root={'root_sha256': 'a' * 64, 'status': 'PASS'}, attempt_id='standard',
+        )
+        release_report = self._report(['alpha.test_one', *release_only], status='PASS')
+        release = run_tests.build_test_run_receipt(
+            release_report, candidate_root={'root_sha256': 'a' * 64, 'status': 'PASS'}, attempt_id='release',
+        )
+        delta = verify_all.derive_standard_release_delta(standard, release)
+        self.assertEqual(delta['status'], 'PASS')
+        self.assertEqual(delta['delta_selected'], release_only)
+
+    def test_ineligible_standard_receipt_runs_full_release_fallback(self):
+        calls = []
+        result = verify_all.execute_release_with_reuse(
+            {'schema': 'bbk.test-run.v2', 'status': 'FAIL'},
+            release_only=lambda: calls.append('release-only'),
+            full_release=lambda: calls.append('full-release') or {'status': 'PASS'},
+        )
+        self.assertEqual(calls, ['full-release'])
+        self.assertEqual(result['status'], 'FULL_RELEASE_FALLBACK')
+        self.assertIsNone(result['delta_claim'])
 

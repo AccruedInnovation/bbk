@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-test-run-v2.schema.json",
+  "title": "BBK immutable test-run receipt v2",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema", "subject", "status", "profile", "candidate_content_root",
+    "profile_policy_sha256", "inventory_sha256", "runner_sha256",
+    "toolchain_runtime_identity", "platform_identity",
+    "mode_jobs_resource_policy", "tool_versions", "environment_qualification",
+    "command_semantics", "selected_identity_sha256", "selected", "executed",
+    "skipped", "not_run", "groups", "invalidation_keys"
+  ],
+  "properties": {
+    "schema": {"const": "bbk.test-run.v2"},
+    "subject": {"type": "object", "required": ["kind", "ref", "attempt"], "properties": {"kind": {"type": "string"}, "ref": {"type": "string", "minLength": 1}, "attempt": {"type": "string", "minLength": 1}}},
+    "status": {"enum": ["PASS", "FAIL", "INCONCLUSIVE", "PARTIAL"]},
+    "exit_code": {"type": ["integer", "null"]},
+    "profile": {"enum": ["fast", "standard", "release"]},
+    "candidate_content_root": {"type": "object", "required": ["root_sha256", "status"], "properties": {"root_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "status": {"enum": ["PASS", "INCONCLUSIVE"]}}},
+    "profile_policy_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "inventory_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "runner_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "toolchain_runtime_identity": {"type": "object"},
+    "platform_identity": {"type": "object"},
+    "mode_jobs_resource_policy": {"type": "object"},
+    "tool_versions": {"type": "object"},
+    "environment_qualification": {"type": "object"},
+    "command_semantics": {"type": "object"},
+    "selected_identity_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "selected": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "executed": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "skipped": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "not_run": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "groups": {"type": "array"},
+    "invalidation_keys": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+  },
+  "allOf": [
+    {"not": {"required": ["sha256"]}},
+    {"not": {"required": ["byte_count"]}},
+    {"not": {"required": ["raw_byte_digest"]}},
+    {"not": {"required": ["self_sha256"]}}
+  ]
+}

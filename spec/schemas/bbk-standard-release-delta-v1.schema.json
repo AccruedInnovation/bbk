@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bbk.local/schemas/bbk-standard-release-delta-v1.schema.json",
+  "title": "BBK STANDARD to RELEASE delta v1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schema", "status"],
+  "properties": {
+    "schema": {"const": "bbk.standard-release-delta.v1"},
+    "status": {"enum": ["PASS", "REJECTED", "INCONCLUSIVE"]},
+    "cause": {"type": "string"},
+    "fallback": {"enum": ["FULL_RELEASE", null]},
+    "standard_selected": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "release_selected": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "delta_selected": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "binding_comparison": {"type": "object"},
+    "invalidation_keys": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+  },
+  "allOf": [
+    {"not": {"required": ["sha256"]}},
+    {"not": {"required": ["byte_count"]}},
+    {"not": {"required": ["raw_byte_digest"]}},
+    {"not": {"required": ["self_sha256"]}}
+  ]
+}

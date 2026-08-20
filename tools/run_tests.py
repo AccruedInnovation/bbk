@@ -70,6 +70,9 @@ TEST_PROFILES = ("fast", "standard", "release")
 DEFAULT_TEST_PROFILE = "standard"
 DURATION_SEED_PATH = TESTS / "test-durations.json"
 LAST_RUN_REPORT: dict[str, Any] | None = None
+TEST_RUN_RECEIPT_SCHEMA = "bbk.test-run.v2"
+STANDARD_RELEASE_DELTA_SCHEMA = "bbk.standard-release-delta.v1"
+IDENTITY_RECEIPT_SCHEMA = "bbk.identity-receipt.v1"
 RESOURCE_DEFAULT = "DEFAULT"
 RESOURCE_EXCLUSIVE_PROCESS_TREE = "EXCLUSIVE_PROCESS_TREE"
 PRODUCTION_RESOURCE_OVERRIDES: dict[str, str] = {}
@@ -567,6 +570,222 @@ def _expected_child_subject(
 def _subject_digest(subject: Mapping[str, object]) -> str:
     encoded = json.dumps(subject, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
+
+
+def canonical_json_bytes(value: Mapping[str, Any] | Sequence[Any]) -> bytes:
+    """Return the one canonical byte representation used by receipt identities."""
+    return (json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode("utf-8")
+
+
+def canonical_digest(value: Mapping[str, Any] | Sequence[Any]) -> str:
+    return hashlib.sha256(canonical_json_bytes(value)).hexdigest()
+
+
+def _receipt_file_identity(path: Path) -> dict[str, Any]:
+    data = path.read_bytes()
+    return {"path": path.resolve().as_posix(), "byte_count": len(data), "sha256": hashlib.sha256(data).hexdigest()}
+
+
+def candidate_content_root(root: Path | None = None, *, manifest: Path | None = None) -> dict[str, Any]:
+    """Compute a profile-independent root from a verified package manifest.
+
+    A manifest is used only when every declared byte identity is current.  The
+    deterministic repository closure is the safe fallback for source trees
+    without a current package manifest; it deliberately excludes execution
+    carriers and profile-selected output.
+    """
+    base = (root or ROOT).resolve()
+    manifest_path = (manifest or base / "PACKAGE-MANIFEST.json").resolve()
+    records: list[dict[str, Any]] = []
+    if manifest_path.is_file():
+        try:
+            value = json.loads(manifest_path.read_text(encoding="utf-8"))
+            declared = value.get("files")
+            if isinstance(declared, list) and declared:
+                for item in declared:
+                    if not isinstance(item, Mapping) or not isinstance(item.get("path"), str):
+                        raise ValueError("malformed package manifest entry")
+                    rel = Path(str(item["path"]))
+                    if rel.is_absolute() or ".." in rel.parts:
+                        raise ValueError("unsafe package manifest path")
+                    path = base / rel
+                    raw = path.read_bytes()
+                    if item.get("bytes") != len(raw) or item.get("sha256") != hashlib.sha256(raw).hexdigest():
+                        raise ValueError(f"stale package manifest path: {rel.as_posix()}")
+                    records.append({"path": rel.as_posix(), "byte_count": len(raw), "sha256": item["sha256"]})
+                records.sort(key=lambda item: item["path"])
+                closure = {"schema": "bbk.test-candidate-content-root.v1", "source": "PACKAGE-MANIFEST.json", "files": records}
+                declared_root = value.get("root_sha256")
+                root_sha = declared_root if isinstance(declared_root, str) and re.fullmatch(r"[0-9a-f]{64}", declared_root) else canonical_digest(closure)
+                return {
+                    **closure,
+                    "root_sha256": root_sha,
+                    "manifest": _receipt_file_identity(manifest_path),
+                    "status": "PASS",
+                }
+        except (OSError, UnicodeError, json.JSONDecodeError, TypeError, ValueError):
+            records = []
+
+    excluded = {".git", ".bbk", "__pycache__", ".pytest_cache"}
+    for path in sorted(base.rglob("*"), key=lambda item: item.as_posix()):
+        if not path.is_file() or any(part in excluded for part in path.relative_to(base).parts):
+            continue
+        rel = path.relative_to(base).as_posix()
+        if rel.endswith((".pyc", ".pyo")) or "/." in rel:
+            continue
+        raw = path.read_bytes()
+        records.append({"path": rel, "byte_count": len(raw), "sha256": hashlib.sha256(raw).hexdigest()})
+    closure = {"schema": "bbk.test-candidate-content-root.v1", "source": "repository-closure", "files": records}
+    return {**closure, "root_sha256": canonical_digest(closure), "status": "PASS" if records else "INCONCLUSIVE"}
+
+
+def profile_policy_identity() -> dict[str, Any]:
+    policy = {
+        "schema": "bbk.test-profile-policy.v1",
+        "profiles": list(TEST_PROFILES),
+        "default": DEFAULT_TEST_PROFILE,
+        "fast_modules": list(test_profiles.FAST_TEST_FILENAMES),
+        "release_only": sorted(test_profiles.RELEASE_ONLY),
+        "resource_overrides": dict(sorted(PRODUCTION_RESOURCE_OVERRIDES.items())),
+    }
+    return {"policy": policy, "sha256": canonical_digest(policy)}
+
+
+def inventory_identity(root: Path | None = None) -> dict[str, Any]:
+    base = (root or ROOT).resolve()
+    files = matching_test_files("test*.py")
+    records = []
+    for path in files:
+        raw = path.read_bytes()
+        records.append({"path": path.resolve().relative_to(base).as_posix(), "byte_count": len(raw), "sha256": hashlib.sha256(raw).hexdigest()})
+    inventory = {"schema": "bbk.test-inventory.v1", "files": records}
+    return {"inventory": inventory, "sha256": canonical_digest(inventory)}
+
+
+def runner_identity() -> dict[str, Any]:
+    components = [ROOT / "tools" / "run_tests.py", ROOT / "tools" / "test_module_runner.py"]
+    supervisor = ROOT / "tools" / "_process_supervisor.py"
+    if supervisor.is_file():
+        components.append(supervisor)
+    records = [_receipt_file_identity(path) for path in components if path.is_file()]
+    value = {"schema": "bbk.test-runner-closure.v1", "components": records}
+    return {"closure": value, "sha256": canonical_digest(value)}
+
+
+def runtime_identity() -> dict[str, Any]:
+    return {
+        "executable": str(Path(sys.executable).resolve()),
+        "implementation": sys.implementation.name,
+        "version": platform.python_version(),
+        "cache_tag": sys.implementation.cache_tag,
+        "platform": platform.platform(aliased=True),
+    }
+
+
+def build_test_run_receipt(
+    report: Mapping[str, Any],
+    *,
+    profile: str | None = None,
+    attempt_id: str | None = None,
+    candidate_root: Mapping[str, Any] | None = None,
+    command_semantics: Mapping[str, Any] | None = None,
+    environment_qualification: Mapping[str, Any] | None = None,
+    tool_versions: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Build a v2 body; raw identity is intentionally sidecar-only."""
+    selected = report.get("selected", report.get("test_ids", {}).get("selected", []))
+    selected_ids = [str(item) for item in selected] if isinstance(selected, list) else []
+    policy = profile_policy_identity()
+    inventory = inventory_identity()
+    root_identity = dict(candidate_root or candidate_content_root())
+    runtime = runtime_identity()
+    mode = report.get("mode", "unknown")
+    jobs = report.get("requested_jobs", 0)
+    resource = {"schema": "bbk.test-resource-policy.v1", "sha256": canonical_digest(PRODUCTION_RESOURCE_OVERRIDES), "overrides": {}}
+    selected_identity = hashlib.sha256(canonical_json_bytes(selected_ids)).hexdigest()
+    return {
+        "schema": TEST_RUN_RECEIPT_SCHEMA,
+        "subject": {"kind": "TEST_RUN", "ref": str(report.get("subject", "BBK")), "attempt": attempt_id or uuid.uuid4().hex},
+        "status": str(report.get("status", "INCONCLUSIVE")),
+        "exit_code": report.get("exit_code"),
+        "profile": profile or report.get("profile", DEFAULT_TEST_PROFILE),
+        "candidate_content_root": root_identity,
+        "profile_policy_sha256": policy["sha256"],
+        "inventory_sha256": inventory["sha256"],
+        "runner_sha256": runner_identity()["sha256"],
+        "toolchain_runtime_identity": runtime,
+        "platform_identity": {"system": platform.system(), "release": platform.release(), "machine": platform.machine()},
+        "mode_jobs_resource_policy": {"mode": mode, "requested_jobs": jobs, "resolved_jobs": report.get("execution_processes", jobs), "resource_policy": resource},
+        "tool_versions": dict(tool_versions or {}),
+        "environment_qualification": dict(environment_qualification or {"status": "PASS", "BBK_EXTERNAL_SCHEMA": os.environ.get("BBK_EXTERNAL_SCHEMA", "0")}),
+        "command_semantics": dict(command_semantics or {"operation": "run-tests", "mode": mode, "requested_jobs": jobs}),
+        "selected_identity_sha256": selected_identity,
+        "selected": selected_ids,
+        "executed": list(report.get("executed", report.get("test_ids", {}).get("executed", [])) or []),
+        "skipped": list(report.get("skipped_ids", report.get("test_ids", {}).get("skipped", [])) or []),
+        "not_run": list(report.get("not_run", report.get("test_ids", {}).get("not_run", [])) or []),
+        "groups": list(report.get("groups", []) or []),
+        "tests_reported": report.get("tests_reported", 0),
+        "invalidation_keys": [
+            f"candidate_content_root:{root_identity.get('root_sha256', '')}",
+            f"profile_policy_sha256:{policy['sha256']}",
+            f"inventory_sha256:{inventory['sha256']}",
+            f"runner_sha256:{runner_identity()['sha256']}",
+        ],
+    }
+
+
+def finalize_test_run_receipt(
+    report: Mapping[str, Any],
+    output: Path,
+    *,
+    profile: str | None = None,
+    attempt_id: str | None = None,
+    candidate_root: Mapping[str, Any] | None = None,
+    replace: bool = False,
+) -> dict[str, Any]:
+    """Finalize a v2 body and its identity sidecar with the qualified engine."""
+    import atomic_finalizer
+
+    output = output.expanduser().resolve()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    draft = output.with_name(f".{output.name}.{os.getpid()}.draft")
+    body = build_test_run_receipt(report, profile=profile, attempt_id=attempt_id, candidate_root=candidate_root)
+    write_json_atomic(draft, body)
+    try:
+        return atomic_finalizer.finalize_json(draft, output, subject_kind="OTHER", schema=ROOT / "spec" / "schemas" / "bbk-test-run-v2.schema.json", replace=replace)
+    finally:
+        draft.unlink(missing_ok=True)
+
+
+def verify_test_run_receipt(body_path: Path, *, expected: Mapping[str, Any] | None = None) -> dict[str, Any]:
+    """Verify body/sidecar raw bytes and required currentness bindings."""
+    import atomic_finalizer
+
+    body_path = body_path.expanduser().resolve()
+    sidecar = body_path.with_name(body_path.name + ".identity.json")
+    try:
+        body = json.loads(body_path.read_text(encoding="utf-8"))
+        receipt = json.loads(sidecar.read_text(encoding="utf-8"))
+        atomic_finalizer.validate_schema(body, ROOT / "spec" / "schemas" / "bbk-test-run-v2.schema.json")
+        raw = body_path.read_bytes()
+        actual = hashlib.sha256(raw).hexdigest()
+        if (
+            receipt.get("schema") != IDENTITY_RECEIPT_SCHEMA
+            or receipt.get("schema_id") != "https://bbk.local/schemas/bbk-test-run-v2.schema.json"
+            or receipt.get("subject_ref") != body_path.as_posix()
+            or receipt.get("byte_count") != len(raw)
+            or receipt.get("sha256") != actual
+        ):
+            return {"status": "REJECTED", "cause": "IDENTITY_MISMATCH"}
+        if body.get("status") != "PASS":
+            return {"status": "REJECTED", "cause": "NON_PASS"}
+        mismatches = [key for key, value in (expected or {}).items() if body.get(key) != value]
+        if mismatches:
+            return {"status": "REJECTED", "cause": "REQUIRED_EQUAL_MISMATCH", "keys": mismatches}
+        return {"status": "PASS", "body": body, "sidecar": receipt}
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError, TypeError) as exc:
+        return {"status": "REJECTED", "cause": "MALFORMED_OR_MISSING", "detail": str(exc)}
 
 
 def _invalid_report(code: str, detail: str = "") -> None:
