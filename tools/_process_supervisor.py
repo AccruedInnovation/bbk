@@ -140,6 +140,8 @@ if os.name == "nt":
     STARTF_USESTDHANDLES = 0x00000100
     JOB_OBJECT_EXTENDED_LIMIT_INFORMATION = 9
     JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE = 0x00002000
+    JOB_OBJECT_LIMIT_BREAKAWAY_OK = 0x00000800
+    JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK = 0x00001000
     JOB_OBJECT_BASIC_PROCESS_ID_LIST = 3
     WAIT_OBJECT_0 = 0
     WAIT_TIMEOUT = 258
@@ -192,6 +194,34 @@ def _windows_process_dead(pid: int) -> bool | None:
         kernel32.CloseHandle(handle)
 
 
+def _windows_breakaway_allowed() -> bool:
+    """Return true only when the immediate ambient Job explicitly permits it."""
+    in_job = wintypes.BOOL()
+    if not kernel32.IsProcessInJob(
+        kernel32.GetCurrentProcess(), None, ctypes.byref(in_job)
+    ):
+        raise _win_error("IsProcessInJob(ambient)")
+    if not in_job.value:
+        return False
+
+    limits = _ExtendedLimit()
+    returned = wintypes.DWORD()
+    # A NULL job handle means the caller's immediate Job, including the
+    # immediate member of a nested Job hierarchy.
+    if not kernel32.QueryInformationJobObject(
+        None,
+        JOB_OBJECT_EXTENDED_LIMIT_INFORMATION,
+        ctypes.byref(limits),
+        ctypes.sizeof(limits),
+        ctypes.byref(returned),
+    ):
+        raise _win_error("QueryInformationJobObject(ambient)")
+    flags = int(limits.BasicLimitInformation.LimitFlags)
+    return bool(flags & JOB_OBJECT_LIMIT_BREAKAWAY_OK) and not bool(
+        flags & JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK
+    )
+
+
 def _run_windows(
     command: Sequence[str], *, capture: Path, timeout: float, cwd: Path | None,
     environment: Mapping[str, str] | None,
@@ -223,11 +253,8 @@ def _run_windows(
         startup.hStdError = msvcrt.get_osfhandle(output_fd)
         pi = _ProcessInformation()
         command_line = ctypes.create_unicode_buffer(subprocess.list2cmdline(list(command)))
-        host_job = wintypes.BOOL()
-        if not kernel32.IsProcessInJob(kernel32.GetCurrentProcess(), None, ctypes.byref(host_job)):
-            raise _win_error("IsProcessInJob")
         flags = CREATE_SUSPENDED | CREATE_NEW_PROCESS_GROUP | CREATE_UNICODE_ENVIRONMENT
-        if host_job.value:
+        if _windows_breakaway_allowed():
             flags |= CREATE_BREAKAWAY_FROM_JOB
         env_block = _environment_block(environment)
         if not kernel32.CreateProcessW(None, command_line, None, None, True, flags, env_block, str(cwd) if cwd else None, ctypes.byref(startup), ctypes.byref(pi)):
@@ -236,14 +263,16 @@ def _run_windows(
         os.close(output_fd); output_fd = None
         os.close(input_fd); input_fd = None
         before = wintypes.BOOL()
-        if not kernel32.IsProcessInJob(process, None, ctypes.byref(before)):
-            raise _win_error("IsProcessInJob(root)")
+        if not kernel32.IsProcessInJob(process, job, ctypes.byref(before)):
+            raise _win_error("IsProcessInJob(supervisor-before)")
         if before.value:
-            raise SupervisionError("root process remained in ambient Job before supervisor assignment")
+            raise SupervisionError("root process was already in supervisor Job before assignment")
         if not kernel32.AssignProcessToJobObject(job, process):
             raise _win_error("AssignProcessToJobObject")
         after = wintypes.BOOL()
-        if not kernel32.IsProcessInJob(process, None, ctypes.byref(after)) or not after.value:
+        if not kernel32.IsProcessInJob(process, job, ctypes.byref(after)):
+            raise _win_error("IsProcessInJob(supervisor)")
+        if not after.value:
             raise SupervisionError("root process was not observed in supervisor Job")
         if kernel32.ResumeThread(thread) == 0xFFFFFFFF:
             raise _win_error("ResumeThread")

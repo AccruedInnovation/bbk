@@ -38,6 +38,7 @@ import windows_compat
 import install as install_tool
 import verify_all
 import verify_package
+import _process_supervisor as process_supervisor
 from tests import _test_profiles as test_profiles
 from tests._path_support import assert_different_path, assert_same_path, assert_same_path_sequence
 m8_build_release = m1_load_module('bbk_build_release_alpha13', 'tools/build_release.py')
@@ -46,6 +47,143 @@ m8_RELEASE = json.loads((m8_BUNDLE / 'RELEASE-MANIFEST.json').read_text(encoding
 m5_EXPECTED_PROFILES = sorted((m8_RELEASE.get('profileVersions') or {}).keys())
 
 class Alpha117GitRepositoryTests(unittest.TestCase):
+
+    def test_windows_supervisor_breakaway_flags_are_explicit_and_membership_is_private(self):
+        if os.name != 'nt':
+            self.skipTest('Windows Job API probe requires native Windows')
+
+        def branch(flags, *, in_job=True):
+            fake = mock.Mock()
+            fake.GetCurrentProcess.return_value = 1
+
+            def is_in_job(_process, _job, result):
+                result._obj.value = in_job
+                return True
+
+            def query(_job, _kind, result, _size, _returned):
+                result._obj.BasicLimitInformation.LimitFlags = flags
+                return True
+
+            fake.IsProcessInJob.side_effect = is_in_job
+            fake.QueryInformationJobObject.side_effect = query
+            with mock.patch.object(process_supervisor, 'kernel32', fake):
+                return process_supervisor._windows_breakaway_allowed()
+
+        self.assertFalse(branch(0, in_job=False))
+        self.assertTrue(branch(process_supervisor.JOB_OBJECT_LIMIT_BREAKAWAY_OK))
+        self.assertFalse(branch(process_supervisor.JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK))
+        self.assertFalse(branch(0))
+
+    def test_windows_supervisor_assignment_failure_terminates_unresumed_root(self):
+        if os.name != 'nt':
+            self.skipTest('Windows Job API probe requires native Windows')
+        fake = mock.Mock()
+        fake.CreateJobObjectW.return_value = 1
+        fake.SetInformationJobObject.return_value = True
+        fake.AssignProcessToJobObject.return_value = False
+        fake.TerminateProcess.return_value = True
+        fake.CloseHandle.return_value = True
+
+        def create_process(_application, _command, _process_attrs, _thread_attrs, _inherit,
+                           _flags, _environment, _cwd, _startup, info):
+            info._obj.hProcess = 101
+            info._obj.hThread = 102
+            info._obj.dwProcessId = 103
+            info._obj.dwThreadId = 104
+            return True
+
+        fake.CreateProcessW.side_effect = create_process
+        with tempfile.TemporaryDirectory() as raw_root, mock.patch.object(
+            process_supervisor, 'kernel32', fake
+        ), mock.patch.object(
+            process_supervisor, '_windows_breakaway_allowed', return_value=False
+        ), mock.patch.object(
+            process_supervisor.os, 'open', side_effect=[11, 12]
+        ), mock.patch.object(
+            process_supervisor.os, 'close'
+        ), mock.patch.object(
+            process_supervisor.os, 'set_handle_inheritable'
+        ), mock.patch.object(
+            process_supervisor.msvcrt, 'get_osfhandle', side_effect=[21, 22, 21, 21, 21]
+        ):
+            with self.assertRaises(process_supervisor.SupervisionError):
+                process_supervisor._run_windows(
+                    (sys.executable, '-c', 'pass'),
+                    capture=Path(raw_root) / 'capture.log',
+                    timeout=5,
+                    cwd=None,
+                    environment=None,
+                )
+        self.assertEqual(fake.ResumeThread.call_count, 0)
+        fake.TerminateProcess.assert_called_once_with(101, 2)
+
+    def test_windows_supervisor_nested_outer_job_normal_and_timeout_containment(self):
+        if os.name != 'nt':
+            self.skipTest('Windows Job API probe requires native Windows')
+        helper = textwrap.dedent(r'''
+            import ctypes, json, os, sys, tempfile
+            from pathlib import Path
+            from ctypes import wintypes
+            sys.path.insert(0, sys.argv[1])
+            import _process_supervisor as supervisor
+            kernel = ctypes.WinDLL('kernel32', use_last_error=True)
+            kernel.CreateJobObjectW.argtypes = [wintypes.LPVOID, wintypes.LPCWSTR]
+            kernel.CreateJobObjectW.restype = wintypes.HANDLE
+            kernel.SetInformationJobObject.argtypes = [wintypes.HANDLE, wintypes.INT, wintypes.LPVOID, wintypes.DWORD]
+            kernel.SetInformationJobObject.restype = wintypes.BOOL
+            kernel.AssignProcessToJobObject.argtypes = [wintypes.HANDLE, wintypes.HANDLE]
+            kernel.AssignProcessToJobObject.restype = wintypes.BOOL
+            kernel.GetCurrentProcess.restype = wintypes.HANDLE
+            class Basic(ctypes.Structure):
+                _fields_ = [('UserTime', ctypes.c_longlong), ('KernelTime', ctypes.c_longlong), ('LimitFlags', wintypes.DWORD), ('MinWS', ctypes.c_size_t), ('MaxWS', ctypes.c_size_t), ('Active', wintypes.DWORD), ('Affinity', ctypes.c_size_t), ('Priority', wintypes.DWORD), ('Scheduling', wintypes.DWORD)]
+            class Io(ctypes.Structure):
+                _fields_ = [(n, ctypes.c_ulonglong) for n in ('ReadOperationCount','WriteOperationCount','OtherOperationCount','ReadTransferCount','WriteTransferCount','OtherTransferCount')]
+            class Extended(ctypes.Structure):
+                _fields_ = [('Basic', Basic), ('Io', Io), ('ProcessMemoryLimit', ctypes.c_size_t), ('JobMemoryLimit', ctypes.c_size_t), ('PeakProcessMemoryUsed', ctypes.c_size_t), ('PeakJobMemoryUsed', ctypes.c_size_t)]
+            outer = kernel.CreateJobObjectW(None, None)
+            limits = Extended(); limits.Basic.LimitFlags = 0x00002000
+            if not kernel.SetInformationJobObject(outer, 9, ctypes.byref(limits), ctypes.sizeof(limits)):
+                raise ctypes.WinError(ctypes.get_last_error())
+            if not kernel.AssignProcessToJobObject(outer, kernel.GetCurrentProcess()):
+                raise ctypes.WinError(ctypes.get_last_error())
+            mode = sys.argv[2]
+            if mode == 'normal':
+                code = 'import subprocess,sys; subprocess.run([sys.executable,"-c","print(\\"grandchild-ok\\",flush=True)"]); print("child-ok",flush=True)'
+                timeout = 20
+            else:
+                code = 'import subprocess,sys,time; p=subprocess.Popen([sys.executable,"-c","import time; time.sleep(30)"]); print("child-started",flush=True); time.sleep(30)'
+                timeout = 1
+            capture_fd, capture_name = tempfile.mkstemp(prefix='bbk-job-probe-', suffix='.log')
+            os.close(capture_fd)
+            capture = Path(capture_name)
+            try:
+                result = supervisor.run_bounded([sys.executable, '-c', code], capture_path=capture, timeout=timeout)
+                print(json.dumps({'returncode': result.returncode, 'output': result.output, 'timed_out': result.timed_out, 'quiescent': result.quiescent, 'cleanup': result.cleanup, 'pids': result.pids}), flush=True)
+            finally:
+                capture.unlink(missing_ok=True)
+        ''')
+        with tempfile.TemporaryDirectory() as raw_root:
+            script = Path(raw_root) / 'nested_job_probe.py'
+            script.write_text(helper, encoding='utf-8')
+            for mode in ('normal', 'timeout'):
+                completed = subprocess.run(
+                    [sys.executable, str(script), str(m8_TOOLS), mode],
+                    capture_output=True,
+                    text=True,
+                    timeout=35,
+                    check=False,
+                )
+                self.assertEqual(completed.returncode, 0, completed.stderr)
+                result = json.loads(completed.stdout.strip().splitlines()[-1])
+                self.assertTrue(result['quiescent'], result)
+                self.assertEqual(result['cleanup'], 'CLEAN')
+                self.assertTrue(result['pids'])
+                if mode == 'normal':
+                    self.assertFalse(result['timed_out'])
+                    self.assertIn('grandchild-ok', result['output'])
+                else:
+                    self.assertTrue(result['timed_out'])
+                    self.assertNotEqual(result['returncode'], 0)
 
     def test_release_package_uses_an_explicit_cross_extractor_mode_policy(self):
         self.assertEqual(m8_build_release.PACKAGE_EXECUTABLES, frozenset())
