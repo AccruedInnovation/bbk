@@ -31,6 +31,7 @@ import datetime as dt
 import hashlib
 import json
 import os
+import platform
 import re
 import signal
 import subprocess
@@ -121,8 +122,12 @@ ISSUE_HEADING_RE = re.compile(r"^(ERROR|FAIL): (.+)$")
 SKIP_COUNT_RE = re.compile(r"(?:OK|FAILED) \([^\n]*?skipped=(\d+)")
 STRUCTURED_REPORT_RE = re.compile(r"^BBK_TEST_REPORT_JSON:(\{.*\})$", re.MULTILINE)
 STRUCTURED_REPORT_ENV = "BBK_TEST_REPORT_JSON"
+STRUCTURED_REPORT_NONCE_ENV = "BBK_TEST_REPORT_NONCE"
 SUBPROCESS_OUTPUT_ENCODING = "utf-8"
 SUBPROCESS_OUTPUT_ERRORS = "backslashreplace"
+STRUCTURED_REPORT_SCHEMA = "bbk.test-child-report.v2"
+STRUCTURED_SUBJECT_SCHEMA = "bbk.test-child-actual-subject.v1"
+STRUCTURED_REPORT_MAX_BYTES = 4 * 1024 * 1024
 
 
 class TestIssue(NamedTuple):
@@ -131,6 +136,16 @@ class TestIssue(NamedTuple):
     kind: str
     label: str
     cause: str
+
+
+class StructuredReportError(ValueError):
+    """Typed rejection for a managed child report that cannot establish PASS."""
+
+    def __init__(self, code: str, detail: str = "") -> None:
+        self.code = code
+        self.detail = detail
+        message = code if not detail else f"{code}: {detail}"
+        super().__init__(message)
 
 
 class SuiteResult(NamedTuple):
@@ -233,7 +248,9 @@ def _configure_standard_stream(stream: TextIO) -> None:
         pass
 
 
-def _subprocess_environment(*, report_path: Path | None = None) -> dict[str, str]:
+def _subprocess_environment(
+    *, report_path: Path | None = None, report_nonce: str | None = None
+) -> dict[str, str]:
     """Return an environment that makes Python child output deterministic."""
     environment = os.environ.copy()
     environment["PYTHONIOENCODING"] = (
@@ -262,8 +279,13 @@ def _subprocess_environment(*, report_path: Path | None = None) -> dict[str, str
         # inherited value prevents nested BBK runners from writing into an
         # outer pool/batch/isolated ledger.
         environment[STRUCTURED_REPORT_ENV] = str(report_path)
+        if report_nonce is not None:
+            environment[STRUCTURED_REPORT_NONCE_ENV] = report_nonce
+        else:
+            environment.pop(STRUCTURED_REPORT_NONCE_ENV, None)
     else:
         environment.pop(STRUCTURED_REPORT_ENV, None)
+        environment.pop(STRUCTURED_REPORT_NONCE_ENV, None)
     return environment
 
 
@@ -427,29 +449,194 @@ def _empty_structured_test_report() -> dict[str, tuple[str, ...]]:
     return {key: () for key in ("selected", "executed", "skipped", "not_run")}
 
 
-def read_structured_test_report(path: Path) -> dict[str, tuple[str, ...]]:
-    """Read and minimally validate a parent-owned child report sidecar."""
+def _physical_identity(path: Path) -> dict[str, int]:
+    stat = path.stat()
+    return {"st_dev": int(stat.st_dev), "st_ino": int(stat.st_ino)}
+
+
+def _raw_identity(path: Path) -> dict[str, object]:
+    raw = path.read_bytes()
+    return {"byte_count": len(raw), "sha256": hashlib.sha256(raw).hexdigest()}
+
+
+def _expected_child_subject(
+    command: Sequence[str],
+    environment: Mapping[str, str],
+) -> dict[str, object] | None:
+    """Derive the parent view without consuming any child report values."""
+    profile = environment.get("BBK_TEST_PROFILE")
+    if not profile:
+        return None
+    root = ROOT.resolve()
+    cwd = root
     try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeError, json.JSONDecodeError):
-        return _empty_structured_test_report()
+        runner_index = next(index for index, value in enumerate(command) if Path(value).name == "test_module_runner.py")
+        runner = Path(command[runner_index]).resolve()
+    except (StopIteration, OSError):
+        return None
+    args = list(command[runner_index + 1:])
+    profile_arg: str | None = None
+    filtered: list[str] = []
+    index = 0
+    while index < len(args):
+        value = args[index]
+        if value in {"--bbk-profile", "--profile"}:
+            profile_arg = args[index + 1] if index + 1 < len(args) else None
+            index += 2
+            continue
+        filtered.append(value)
+        index += 1
+    if profile_arg and profile_arg != profile:
+        return None
+    args = filtered
+    modules: list[Path] = []
+    if "--discover" in args:
+        discover_index = args.index("--discover")
+        pattern = args[discover_index + 1] if discover_index + 1 < len(args) else "test*.py"
+        modules = sorted(path.resolve() for path in (root / "tests").glob(pattern) if path.is_file())
+    else:
+        modules = [Path(value).resolve() for value in args if value.endswith(".py") and Path(value).is_file()]
+    assigned: list[dict[str, object]] = []
+    for path in modules:
+        try:
+            relative = path.relative_to(root).as_posix()
+            physical = _physical_identity(path)
+            identity = _raw_identity(path)
+        except (OSError, ValueError):
+            return None
+        assigned.append({"relative_path": relative, "path": str(path), "physical": physical, **identity})
+    subject: dict[str, object] = {
+        "schema": STRUCTURED_SUBJECT_SCHEMA,
+        "cwd": {"path": str(cwd), "physical": _physical_identity(cwd)},
+        "root": {"path": str(root), "physical": _physical_identity(root)},
+        "child_runner": {"path": str(runner), "physical": _physical_identity(runner), **_raw_identity(runner)},
+        "assigned_modules": assigned,
+        "interpreter": {
+            "path": str(Path(sys.executable).resolve()),
+            "implementation": sys.implementation.name,
+            "version": platform.python_version(),
+            "cache_tag": sys.implementation.cache_tag,
+        },
+        "profile": profile,
+    }
+    return subject
+
+
+def _subject_digest(subject: Mapping[str, object]) -> str:
+    encoded = json.dumps(subject, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _invalid_report(code: str, detail: str = "") -> None:
+    raise StructuredReportError(code, detail)
+
+
+def _validate_structured_report(
+    value: object,
+    *,
+    expected_subject: Mapping[str, object] | None = None,
+    expected_nonce: str | None = None,
+    expected_profile: str | None = None,
+    expected_modules: Sequence[Mapping[str, object]] | None = None,
+    raw_count: int | None = None,
+) -> dict[str, object]:
     if not isinstance(value, dict):
-        return _empty_structured_test_report()
-    result: dict[str, tuple[str, ...]] = {}
+        _invalid_report("MALFORMED_REPORT", "root must be an object")
+    if value.get("schema") != STRUCTURED_REPORT_SCHEMA:
+        _invalid_report("SCHEMA_MISMATCH", "expected bbk.test-child-report.v2")
+    required = ("nonce", "actual_subject", "actual_subject_sha256", "selected", "executed", "skipped", "not_run", "tests_run", "state")
+    if any(key not in value for key in required):
+        _invalid_report("MALFORMED_REPORT", "required field missing")
+    if not isinstance(value.get("nonce"), (str, type(None))):
+        _invalid_report("MALFORMED_REPORT", "nonce must be a string or null")
+    if value.get("state") not in {"completed", "subject-invalid"}:
+        _invalid_report("MALFORMED_REPORT", "unknown state")
+    if expected_nonce is not None and value.get("nonce") != expected_nonce:
+        _invalid_report("NONCE_MISMATCH")
+    if value.get("subject_error"):
+        _invalid_report("SUBJECT_INVALID", str(value["subject_error"]))
+    subject = value.get("actual_subject")
+    digest = value.get("actual_subject_sha256")
+    if not isinstance(subject, dict) or subject.get("schema") != STRUCTURED_SUBJECT_SCHEMA:
+        _invalid_report("SUBJECT_MISSING")
+    if not isinstance(digest, str) or digest != _subject_digest(subject):
+        _invalid_report("SUBJECT_DIGEST_MISMATCH")
+    if expected_subject is not None:
+        if subject != dict(expected_subject):
+            _invalid_report("SUBJECT_MISMATCH")
+        if digest != _subject_digest(expected_subject):
+            _invalid_report("SUBJECT_DIGEST_MISMATCH")
+    if expected_profile is not None and subject.get("profile") != expected_profile:
+        _invalid_report("PROFILE_MISMATCH")
+    if expected_modules is not None and subject.get("assigned_modules") != list(expected_modules):
+        _invalid_report("MODULE_ASSIGNMENT_MISMATCH")
+    result: dict[str, object] = {"schema": value["schema"], "nonce": value["nonce"], "actual_subject": subject, "actual_subject_sha256": digest}
     for key in ("selected", "executed", "skipped", "not_run"):
         raw = value.get(key)
-        if not isinstance(raw, list) or not all(isinstance(item, str) for item in raw):
-            return _empty_structured_test_report()
-        result[key] = tuple(dict.fromkeys(raw))
+        if not isinstance(raw, list) or not all(isinstance(item, str) and item for item in raw):
+            _invalid_report("MALFORMED_REPORT", f"{key} must be a string list")
+        if len(raw) != len(set(raw)):
+            _invalid_report("DUPLICATE_IDENTITY", key)
+        result[key] = tuple(raw)
     selected = set(result["selected"])
     executed = set(result["executed"])
     skipped = set(result["skipped"])
     not_run = set(result["not_run"])
     if (executed & skipped) or (executed & not_run) or (skipped & not_run):
-        return _empty_structured_test_report()
+        _invalid_report("IDENTITY_OVERLAP")
     if (executed | skipped | not_run) != selected:
-        return _empty_structured_test_report()
+        _invalid_report("IDENTITY_CLOSURE")
+    tests_run = value.get("tests_run")
+    if not isinstance(tests_run, int) or isinstance(tests_run, bool):
+        _invalid_report("MALFORMED_REPORT", "tests_run must be an integer")
+    expected_count = len(result["executed"]) + len(result["skipped"])
+    if tests_run != expected_count or (raw_count is not None and raw_count != tests_run):
+        _invalid_report("COUNT_MISMATCH", f"tests_run={tests_run}, raw={raw_count}")
+    if value.get("state") == "completed" and not selected:
+        _invalid_report("ZERO_SELECTED")
+    if value.get("state") == "completed" and not_run:
+        _invalid_report("NOT_RUN_ON_SUCCESS")
+    result["tests_run"] = tests_run
+    result["state"] = value["state"]
     return result
+
+
+def read_structured_test_report(
+    path: Path,
+    *,
+    strict: bool = False,
+    expected_subject: Mapping[str, object] | None = None,
+    expected_nonce: str | None = None,
+    expected_profile: str | None = None,
+    expected_modules: Sequence[Mapping[str, object]] | None = None,
+    raw_count: int | None = None,
+) -> dict[str, object]:
+    """Read a child sidecar; strict mode is the managed PASS boundary."""
+    try:
+        if not path.is_file():
+            _invalid_report("MISSING_REPORT")
+        size = path.stat().st_size
+        if size == 0:
+            _invalid_report("MISSING_REPORT")
+        if size > STRUCTURED_REPORT_MAX_BYTES:
+            _invalid_report("REPORT_TOO_LARGE")
+        value = json.loads(path.read_text(encoding="utf-8"))
+        return _validate_structured_report(
+            value,
+            expected_subject=expected_subject,
+            expected_nonce=expected_nonce,
+            expected_profile=expected_profile,
+            expected_modules=expected_modules,
+            raw_count=raw_count,
+        )
+    except StructuredReportError:
+        if strict:
+            raise
+        return _empty_structured_test_report()
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        if strict:
+            raise StructuredReportError("MALFORMED_REPORT", f"{type(exc).__name__}: {exc}") from exc
+        return _empty_structured_test_report()
 
 
 
@@ -889,6 +1076,9 @@ def _execute_unittest_command(
     launch_failure: launch_recorder.LaunchRecordError | None = None
     timed_out = False
     returncode = 2
+    expected_subject: dict[str, object] | None = None
+    report_nonce: str | None = None
+    launch_command = list(command)
     try:
         capture_dir = None
         if raw_cache := os.environ.get("BBK_TEST_CACHE_DIR"):
@@ -909,16 +1099,26 @@ def _execute_unittest_command(
         )
         os.close(report_fd)
         with capture_path.open("wb") as writer:
-            child_environment = _subprocess_environment(report_path=report_path)
+            managed_profile = os.environ.get("BBK_TEST_PROFILE")
+            if managed_profile and "--bbk-profile" not in launch_command and "--profile" not in launch_command:
+                try:
+                    runner_index = next(index for index, value in enumerate(launch_command) if Path(value).name == "test_module_runner.py")
+                except StopIteration:
+                    runner_index = -1
+                if runner_index >= 0:
+                    launch_command[runner_index + 1:runner_index + 1] = ["--bbk-profile", managed_profile]
+            report_nonce = uuid.uuid4().hex if managed_profile else None
+            child_environment = _subprocess_environment(report_path=report_path, report_nonce=report_nonce)
+            expected_subject = _expected_child_subject(launch_command, child_environment)
             launch = launch_recorder.prepare(
-                command,
+                launch_command,
                 cwd=ROOT,
                 environment=child_environment,
                 kind="unittest-suite",
                 require_evidence_root=True,
             )
             process = subprocess.Popen(
-                list(command),
+                launch_command,
                 cwd=ROOT,
                 stdin=subprocess.DEVNULL,
                 stdout=writer,
@@ -987,7 +1187,6 @@ def _execute_unittest_command(
         # A supplied sidecar is authoritative.  Do not fall back to stdout
         # when it is missing or malformed: nested child markers are precisely
         # the contamination boundary this carrier prevents.
-        structured = read_structured_test_report(report_path)
         if timed_out:
             diagnostic = (
                 f"\nBBK test runner: suite {label} exceeded "
@@ -1000,6 +1199,19 @@ def _execute_unittest_command(
             return SuiteResult(
                 label, 2, output, parse_test_count(output), (issue,), parse_skip_count(output)
             )
+        try:
+            structured = read_structured_test_report(
+                report_path,
+                strict=True,
+                expected_subject=expected_subject,
+                expected_nonce=report_nonce,
+                expected_profile=os.environ.get("BBK_TEST_PROFILE") or None,
+                expected_modules=(expected_subject or {}).get("assigned_modules") if expected_subject else None,
+                raw_count=parse_test_count(output),
+            )
+        except StructuredReportError as exc:
+            issue = TestIssue("REPORT REJECTED", label, str(exc))
+            return SuiteResult(label, 2, output, parse_test_count(output), (issue,), parse_skip_count(output))
     except (launch_recorder.LaunchRecordError, PythonLaunchInvariantError) as exc:
         if isinstance(exc, launch_recorder.LaunchRecordError):
             launch_failure = exc
@@ -1046,8 +1258,8 @@ def _execute_unittest_command(
         if report_path is not None:
             _remove_capture_file(report_path)
 
-    # Prefer the private sidecar.  Stdout marker parsing remains a compatibility
-    # fallback for older/standalone child runners and synthetic callers.
+    # The private sidecar is authoritative for every managed child.  Stdout
+    # marker parsing remains a standalone compatibility helper only.
     return SuiteResult(
         name=label,
         returncode=returncode,
