@@ -1,7 +1,7 @@
 {
   "authority_disclaimer": "BBK is a temporary method harness and is not an official Blueprint release or authority-bearing package.",
   "created_at": "2026-08-07T00:00:00Z",
-  "file_count": 1036,
+  "file_count": 1039,
   "files": [
     {
       "bytes": 139,
@@ -208,10 +208,10 @@
       "sha256": "03d5085ab7242eb66b18952ffc75b6fc04e004e63cb464472cdfe8f4924b2a59"
     },
     {
-      "bytes": 17512,
+      "bytes": 17889,
       "executable": false,
       "path": "docs/DEVELOPMENT.md",
-      "sha256": "33053547e03a283494b11cc4b439f86b89e5f3ae8a931bceea03de59ec2a6c18"
+      "sha256": "e3085832459256a09a284ec76490c256f692a36a53574eea978b4386dde05eb2"
     },
     {
       "bytes": 3182,
@@ -3718,6 +3718,12 @@
       "sha256": "1f1255d78de3cb2c8fbc7ee58034051a9266e3e8b89be76847a317979ac77060"
     },
     {
+      "bytes": 1113,
+      "executable": false,
+      "path": "spec/schemas/bbk-standard-release-delta-v1.schema.json",
+      "sha256": "ebe1afeada8ed1f29dad7a902e8cca534a9ac695c9e2b77b0b5af5dd218a0083"
+    },
+    {
       "bytes": 20973,
       "executable": false,
       "path": "spec/schemas/bbk-state-decision-effect-design-v1.schema.json",
@@ -3770,6 +3776,12 @@
       "executable": false,
       "path": "spec/schemas/bbk-territory-execution-boundary-v1.schema.json",
       "sha256": "82852323f741034a73d03202b0bfddbc12cf2be60d179d3e7037c8797c4a9568"
+    },
+    {
+      "bytes": 2570,
+      "executable": false,
+      "path": "spec/schemas/bbk-test-run-v2.schema.json",
+      "sha256": "f77df733df9b1c268580bf405c803e8c8c50adad2161002bb067c75e159e00c6"
     },
     {
       "bytes": 2396,
@@ -4576,10 +4588,10 @@
       "sha256": "7de67d9daf1b0c25aff29009d463c197989254d0a7b341c49845a586f071a92e"
     },
     {
-      "bytes": 6161,
+      "bytes": 7722,
       "executable": false,
       "path": "tests/_test_profiles.py",
-      "sha256": "02325f25c6f42ff452a0dbeb3515b1c39694f8a5e5b7d3ba3a47dbf571f32ca3"
+      "sha256": "07ece96dcb98b11e794fd881957936b74c86510899cee7f336300402796a806a"
     },
     {
       "bytes": 5854,
@@ -4948,10 +4960,10 @@
       "sha256": "e89f1880e3aa53b98ba65a1899d925b15e06fe1f802a070206d7018cddaa028c"
     },
     {
-      "bytes": 69998,
+      "bytes": 76494,
       "executable": false,
       "path": "tests/test_installation_runner_processes.py",
-      "sha256": "bce5adcf6df31031a66e1511a5e4626ba35b8c6f51fe2db812de2bb6e7be2248"
+      "sha256": "b28091c4faa2bc9803bdb3edc9c9caca07feb392f4572e11200d65b7450bd899"
     },
     {
       "bytes": 3320,
@@ -5402,6 +5414,12 @@
       "executable": false,
       "path": "third_party/codex-deepseek-subagent/tests/test_plaintext_handoff.py",
       "sha256": "77ec4c343866918f91815ef7ca031901601d041a1cb44bdb1e4c9418c239da85"
+    },
+    {
+      "bytes": 14304,
+      "executable": false,
+      "path": "tools/_process_supervisor.py",
+      "sha256": "5405ebb1316c0c58ef6c85d2316b32040b49b2115347300476cbed406ab31301"
     },
     {
       "bytes": 589,
@@ -6064,10 +6082,10 @@
       "sha256": "5516324abed8cddf6c2dda6e8ccc02f3e9b07ab20daf2d3cb00f94e81df787d1"
     },
     {
-      "bytes": 76339,
+      "bytes": 103850,
       "executable": false,
       "path": "tools/run_tests.py",
-      "sha256": "fa98a2aecec05646ffb3d6c9ff5e18c4f78881e078c639b98dbbf86158e5e504"
+      "sha256": "8d3d6447ec13be23ea7a5e217c8966b5ae6282bd0e87c37e5cc0910016d1f19a"
     },
     {
       "bytes": 4076,
@@ -6148,10 +6166,10 @@
       "sha256": "2a28a9c99ba145114922f23d18f478abc127b5e4246d4aa7c0af2ebad0ad4f9c"
     },
     {
-      "bytes": 5039,
+      "bytes": 9537,
       "executable": false,
       "path": "tools/test_module_runner.py",
-      "sha256": "875de7ea9989a9e7922af00a1c2edebfa7062038fcc4135d211e54e57654b551"
+      "sha256": "86ad8a51a55fa7ddf7f16245b9d2dbdfabe7ad10cefebecf0a916ca1186a04db"
     },
     {
       "bytes": 37858,
@@ -6196,10 +6214,10 @@
       "sha256": "fce8cb318c92913b3bd015617c171fbc2efcb83448863b31667d0204ea15b58a"
     },
     {
-      "bytes": 39318,
+      "bytes": 49236,
       "executable": false,
       "path": "tools/verify_all.py",
-      "sha256": "e6e0d5f99644a75bf6119d17bddd55ed135a8585d2cb0509b2effb39fd60028d"
+      "sha256": "5d94b4faa97499babbe95a35404378304dbeb7f1d2c6f8608d9a699ca062e375"
     },
     {
       "bytes": 5323,
@@ -6228,7 +6246,7 @@
   "projection_count": 100,
   "projection_source_sha256": "6c0b9579dca2e19c6c24b8938f6f334df85c1e64aaf392a14a0e913c05bcae99",
   "role_count": 19,
-  "root_sha256": "1b7de3e36f6acfcae76e5082879b02fb4a7ebd3be88ab1ac82bf385214dba11c",
+  "root_sha256": "eccafb802abcd9b503078fe294c088a04865d0f83c21a8b8054c9484ec10abcb",
   "schema": "bbk.package-manifest.v1",
   "targets": [
     "claude",

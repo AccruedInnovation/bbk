@@ -144,7 +144,11 @@ Current regression coverage includes:
 - installation, selective OMP/Codex updates, profile verification and reuse, manifest ownership, Windows paths, console behavior, and UTF-8 handling;
 - governed filesystem effects, WorkUnit ownership, durable handoffs, Beads projection, assurance state, findings, and schema commands.
 
-Add a focused regression whenever a defect exposes a new contract boundary. Keep release history in [`../CHANGELOG.md`](../CHANGELOG.md) and candidate-specific host evidence in `qualification/`.
+Add a focused regression whenever a defect exposes a new contract boundary.
+
+Expected results must not be derived solely from the implementation under test. For material regression closure, use a proportionate known-bad fixture, mutation, fault injection, or negative control to demonstrate sensitivity. A qualification result may pass only when requested, selected, executed, skipped, not-run, and authoritative evidence identities reconcile exactly.
+
+Keep release history in [`../CHANGELOG.md`](../CHANGELOG.md) and candidate-specific host evidence in `qualification/`.
 
 ### Native filesystem path assertions
 
