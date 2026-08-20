@@ -764,7 +764,7 @@ def verify_standard_release_delta(path: Path) -> dict[str, object]:
         ):
             return {"status": "REJECTED", "cause": "IDENTITY_MISMATCH"}
         return {"status": "PASS", "body": body, "sidecar": receipt}
-    except (OSError, UnicodeError, json.JSONDecodeError, ValueError, TypeError) as exc:
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError, TypeError, atomic_finalizer.FinalizationError) as exc:
         return {"status": "REJECTED", "cause": "MALFORMED_OR_MISSING", "detail": str(exc)}
 
 

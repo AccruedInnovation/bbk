@@ -784,7 +784,7 @@ def verify_test_run_receipt(body_path: Path, *, expected: Mapping[str, Any] | No
         if mismatches:
             return {"status": "REJECTED", "cause": "REQUIRED_EQUAL_MISMATCH", "keys": mismatches}
         return {"status": "PASS", "body": body, "sidecar": receipt}
-    except (OSError, UnicodeError, json.JSONDecodeError, ValueError, TypeError) as exc:
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError, TypeError, atomic_finalizer.FinalizationError) as exc:
         return {"status": "REJECTED", "cause": "MALFORMED_OR_MISSING", "detail": str(exc)}
 
 
