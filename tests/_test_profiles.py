@@ -78,6 +78,21 @@ FAST_MODULES = frozenset(
 )
 
 FAST_TEST_FILENAMES = tuple(f"{module}.py" for module in sorted(FAST_MODULES))
+RESOURCE_DEFAULT = "DEFAULT"
+RESOURCE_EXCLUSIVE_PROCESS_TREE = "EXCLUSIVE_PROCESS_TREE"
+# Sparse policy is intentionally empty in production until a measured
+# assignment is admitted; metadata never changes profile membership.
+PRODUCTION_RESOURCE_OVERRIDES: dict[str, str] = {}
+
+
+def resource_policy(test_id: str, metadata: dict[str, object] | None = None) -> str:
+    """Return a scheduling marker independently of profile selection."""
+    module = normalize_test_id(test_id).split(".", 1)[0]
+    value = PRODUCTION_RESOURCE_OVERRIDES.get(module, RESOURCE_DEFAULT)
+    marker = (metadata or {}).get("resource_class")
+    if marker in {RESOURCE_DEFAULT, RESOURCE_EXCLUSIVE_PROCESS_TREE}:
+        value = str(marker)
+    return value
 
 
 def fast_test_filenames() -> tuple[str, ...]:

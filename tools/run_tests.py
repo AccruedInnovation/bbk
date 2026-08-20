@@ -50,6 +50,7 @@ if str(TOOLS_DIR) not in sys.path:
 
 from runtime_requirements import PythonLaunchInvariantError, enforce_supported_python, python_command, python_environment
 import launch_recorder
+import _process_supervisor as process_supervisor
 
 enforce_supported_python(program='BBK test runner')
 
@@ -69,6 +70,74 @@ TEST_PROFILES = ("fast", "standard", "release")
 DEFAULT_TEST_PROFILE = "standard"
 DURATION_SEED_PATH = TESTS / "test-durations.json"
 LAST_RUN_REPORT: dict[str, Any] | None = None
+RESOURCE_DEFAULT = "DEFAULT"
+RESOURCE_EXCLUSIVE_PROCESS_TREE = "EXCLUSIVE_PROCESS_TREE"
+PRODUCTION_RESOURCE_OVERRIDES: dict[str, str] = {}
+
+
+def resolve_resource_policy(
+    module: str, metadata: Mapping[str, object] | None = None,
+    *, overrides: Mapping[str, str] | None = None,
+) -> str:
+    """Resolve sparse scheduling metadata without changing test membership."""
+    selected = (overrides or PRODUCTION_RESOURCE_OVERRIDES).get(module, RESOURCE_DEFAULT)
+    if selected not in {RESOURCE_DEFAULT, RESOURCE_EXCLUSIVE_PROCESS_TREE}:
+        selected = RESOURCE_DEFAULT
+    if metadata and metadata.get("resource_class") in {RESOURCE_DEFAULT, RESOURCE_EXCLUSIVE_PROCESS_TREE}:
+        selected = str(metadata["resource_class"])
+    return selected
+
+
+def group_resource_policy(
+    modules: Sequence[Path | str], metadata: Mapping[str, Mapping[str, object]] | None = None,
+    *, overrides: Mapping[str, str] | None = None,
+) -> str:
+    """A group is exclusive when any member carries the exclusive marker."""
+    return RESOURCE_EXCLUSIVE_PROCESS_TREE if any(
+        resolve_resource_policy(Path(module).name, (metadata or {}).get(Path(module).name), overrides=overrides)
+        == RESOURCE_EXCLUSIVE_PROCESS_TREE for module in modules
+    ) else RESOURCE_DEFAULT
+
+
+class SparseResourceScheduler:
+    """Deterministic capacity admission for DEFAULT and sparse exclusive groups."""
+
+    def __init__(self, capacity: int, *, overrides: Mapping[str, str] | None = None) -> None:
+        self.capacity = max(1, int(capacity))
+        self.overrides = dict(overrides or PRODUCTION_RESOURCE_OVERRIDES)
+        self.active_slots = 0
+        self.active_exclusive = False
+        self.admission_order: list[int] = []
+
+    def can_admit(self, policy: str) -> bool:
+        if policy == RESOURCE_EXCLUSIVE_PROCESS_TREE:
+            return self.active_slots == 0
+        return not self.active_exclusive and self.active_slots < self.capacity
+
+    def admit(self, group_index: int, policy: str = RESOURCE_DEFAULT) -> int:
+        if policy not in {RESOURCE_DEFAULT, RESOURCE_EXCLUSIVE_PROCESS_TREE}:
+            policy = RESOURCE_DEFAULT
+        if not self.can_admit(policy):
+            raise RuntimeError("resource capacity or exclusive process-tree conflict")
+        self.active_slots = self.capacity if policy == RESOURCE_EXCLUSIVE_PROCESS_TREE else self.active_slots + 1
+        self.active_exclusive = policy == RESOURCE_EXCLUSIVE_PROCESS_TREE
+        self.admission_order.append(int(group_index))
+        return self.active_slots
+
+    def release(self, policy: str = RESOURCE_DEFAULT) -> None:
+        if policy == RESOURCE_EXCLUSIVE_PROCESS_TREE:
+            self.active_slots = 0
+            self.active_exclusive = False
+        else:
+            self.active_slots = max(0, self.active_slots - 1)
+
+
+def resolve_jobs(jobs: int, *, group_count: int, platform_name: str | None = None) -> int:
+    """Preserve jobs=1 serial, jobs=0 automatic capacity, and positive bounds."""
+    if group_count <= 0:
+        return 0
+    requested = automatic_parallel_jobs(platform_name=platform_name) if jobs == 0 else max(1, int(jobs))
+    return min(group_count, requested)
 
 @contextlib.contextmanager
 def test_profile_environment(profile: str):
@@ -1034,6 +1103,9 @@ def _execute_unittest_command(
     an inherited pipe handle after the suite process exits. When *stream* is
     supplied, new bytes are decoded and mirrored while the suite is running.
     """
+    return _execute_unittest_command_supervised(
+        command, label=label, stream=stream, timeout=timeout,
+    )
     creation: dict[str, object] = {}
     if os.name == "nt":
         creation["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP
@@ -1245,6 +1317,78 @@ def _execute_unittest_command(
         skipped_ids=structured["skipped"],
         not_run_ids=structured["not_run"],
     )
+
+
+def _execute_unittest_command_supervised(
+    command: Sequence[str], *, label: str, stream: TextIO | None,
+    timeout: float,
+) -> SuiteResult:
+    """Execute a suite through the file-backed supervisor boundary."""
+    capture_dir = None
+    if raw_cache := os.environ.get("BBK_TEST_CACHE_DIR"):
+        capture_dir = Path(raw_cache).expanduser() / "runtime" / "captures"
+        capture_dir.mkdir(parents=True, exist_ok=True)
+    mkstemp_kwargs = {"prefix": "bbk-test-suite-", "suffix": ".log"}
+    if capture_dir is not None:
+        mkstemp_kwargs["dir"] = str(capture_dir)
+    fd, raw_capture = tempfile.mkstemp(**mkstemp_kwargs)
+    os.close(fd)
+    capture_path = Path(raw_capture)
+    report_path = capture_path.with_suffix(".json")
+    report_path.touch()
+    launch_command = list(command)
+    managed_profile = os.environ.get("BBK_TEST_PROFILE")
+    if managed_profile and "--bbk-profile" not in launch_command and "--profile" not in launch_command:
+        try:
+            runner_index = next(index for index, value in enumerate(launch_command) if Path(value).name == "test_module_runner.py")
+        except StopIteration:
+            runner_index = -1
+        if runner_index >= 0:
+            launch_command[runner_index + 1:runner_index + 1] = ["--bbk-profile", managed_profile]
+    report_nonce = uuid.uuid4().hex if managed_profile else None
+    child_environment = _subprocess_environment(report_path=report_path, report_nonce=report_nonce)
+    expected_subject = _expected_child_subject(launch_command, child_environment)
+    launch = None
+    structured = _empty_structured_test_report()
+    try:
+        launch = launch_recorder.prepare(
+            launch_command, cwd=ROOT, environment=child_environment,
+            kind="unittest-suite", require_evidence_root=True,
+        )
+        result = process_supervisor.run_bounded(
+            launch_command, capture_path=capture_path, timeout=timeout,
+            cwd=ROOT, environment=child_environment,
+        )
+        if result.pids:
+            launch.started(result.pids[0])
+        output = result.output
+        if stream is not None:
+            _write_text(stream, output, flush=True)
+        launch.completed(returncode=result.returncode, state="timed-out" if result.timed_out else "completed")
+        if result.timed_out:
+            output += f"\nBBK test runner: suite {label} exceeded {timeout:g} seconds and its process tree was terminated.\n"
+            return SuiteResult(label, 2, output, parse_test_count(output), (TestIssue("PROCESS ERROR", label, output.strip()),), parse_skip_count(output))
+        try:
+            structured = read_structured_test_report(
+                report_path, strict=True, expected_subject=expected_subject,
+                expected_nonce=report_nonce, expected_profile=os.environ.get("BBK_TEST_PROFILE") or None,
+                expected_modules=(expected_subject or {}).get("assigned_modules") if expected_subject else None,
+                raw_count=parse_test_count(output),
+            )
+        except StructuredReportError as exc:
+            return SuiteResult(label, 2, output, parse_test_count(output), (TestIssue("REPORT REJECTED", label, str(exc)),), parse_skip_count(output))
+        if not result.quiescent:
+            return SuiteResult(label, 2, output, parse_test_count(output), (TestIssue("PROCESS ERROR", label, "supervisor cleanup state is unknown"),), parse_skip_count(output))
+        return SuiteResult(
+            label, result.returncode, output, parse_test_count(output), parse_issues(output),
+            parse_skip_count(output), structured["selected"], structured["executed"],
+            structured["skipped"], structured["not_run"],
+        )
+    except (OSError, RuntimeError, launch_recorder.LaunchRecordError, PythonLaunchInvariantError) as exc:
+        return SuiteResult(label, 2, "", None, (TestIssue("PROCESS ERROR", label, f"{type(exc).__name__}: {exc}"),), 0)
+    finally:
+        _remove_capture_file(capture_path)
+        _remove_capture_file(report_path)
 
 
 def execute_discovered(
@@ -1498,10 +1642,7 @@ def run_test_pool(
 ) -> int:
     """Run modules in a small parallel pool of multi-module processes."""
     target = stream if stream is not None else sys.stdout
-    process_count = min(
-        len(files),
-        max(1, (automatic_parallel_jobs() if jobs == 0 else jobs)),
-    )
+    process_count = resolve_jobs(jobs, group_count=len(files), platform_name=os.name)
     if failfast:
         process_count = 1
     groups = partition_test_files(files, process_count, platform_name=os.name)

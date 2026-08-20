@@ -38,6 +38,7 @@ if str(TOOLS_DIR) not in sys.path:
 
 from runtime_requirements import PythonLaunchInvariantError, enforce_supported_python, direct_python_executable, python_command, python_environment
 import launch_recorder
+import _process_supervisor as process_supervisor
 
 enforce_supported_python(program="BBK verification")
 
@@ -392,17 +393,15 @@ def execute_step(spec: CheckSpec, *, stream: TextIO) -> CheckResult:
             kind="verification-gate",
             require_evidence_root=True,
         )
-        process = subprocess.Popen(
-            list(spec.command),
-            cwd=spec.cwd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            encoding=SUBPROCESS_OUTPUT_ENCODING,
-            errors=SUBPROCESS_OUTPUT_ERRORS,
-            env=environment,
+        capture_root = Path(os.environ.get("BBK_TEST_CACHE_DIR", tempfile.gettempdir())) / "runtime" / "verification-captures"
+        capture_root.mkdir(parents=True, exist_ok=True)
+        fd, raw_capture = tempfile.mkstemp(prefix="bbk-verification-", suffix=".log", dir=str(capture_root))
+        os.close(fd)
+        supervised = process_supervisor.run_bounded(
+            spec.command, capture_path=Path(raw_capture), timeout=600.0,
+            cwd=spec.cwd, environment=environment,
         )
-    except OSError as exc:
+    except (OSError, RuntimeError) as exc:
         if "launch" in locals():
             launch.spawn_failed(exc)
         cause = f"{type(exc).__name__}: {exc}"
@@ -418,17 +417,16 @@ def execute_step(spec: CheckSpec, *, stream: TextIO) -> CheckResult:
         _write_text(stream, cause + "\n", flush=True)
         return CheckResult(spec.name, spec.command, "FAIL", 2, "", cause)
 
-    launch.started(process.pid)
-
-    chunks: list[str] = []
-    assert process.stdout is not None
-    with process.stdout:
-        for line in process.stdout:
-            chunks.append(line)
-            _write_text(stream, line, flush=True)
-    returncode = process.wait()
-    launch.completed(returncode=returncode)
-    output = "".join(chunks)
+    if supervised.pids:
+        launch.started(supervised.pids[0])
+    returncode = supervised.returncode
+    output = supervised.output
+    _write_text(stream, output, flush=True)
+    Path(supervised.capture_path).unlink(missing_ok=True)
+    launch.completed(returncode=returncode, state="timed-out" if supervised.timed_out else "completed")
+    if not supervised.quiescent:
+        returncode = 2
+        output += "\nverification supervisor cleanup state is unknown\n"
     return CheckResult(
         spec.name,
         spec.command,
