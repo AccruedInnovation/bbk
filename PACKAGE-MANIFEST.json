@@ -1,7 +1,7 @@
 {
   "authority_disclaimer": "BBK is a temporary method harness and is not an official Blueprint release or authority-bearing package.",
   "created_at": "2026-08-07T00:00:00Z",
-  "file_count": 1040,
+  "file_count": 1035,
   "files": [
     {
       "bytes": 139,
@@ -32,12 +32,6 @@
       "executable": false,
       "path": ".github/workflows/windows-verification.yml",
       "sha256": "b6acb578c54a33b2387a9c49dc661ec98faa662e5b53898c11c3dc882a9aa8ae"
-    },
-    {
-      "bytes": 304,
-      "executable": false,
-      "path": ".gitignore",
-      "sha256": "105713e3eb4f9ca95461c7aff93493b29e57915830618a1560fde118fff21628"
     },
     {
       "bytes": 74818,
@@ -94,28 +88,16 @@
       "sha256": "808d40e45f4df0615e30dd0340166899de43970cd19cac2046620822d3ddfb10"
     },
     {
-      "bytes": 2738,
+      "bytes": 2325,
       "executable": false,
       "path": "bundled-language-profiles/RELEASE-MANIFEST.json",
-      "sha256": "c64ced4530d484d421b4978d0d34fc5e494bfcd8daaf47857346aa326e496944"
+      "sha256": "ad4013a79ec3a49e843cd1b676cfc0f85bbaac40129cf4590ebd5952888cbe1a"
     },
     {
-      "bytes": 575,
+      "bytes": 461,
       "executable": false,
       "path": "bundled-language-profiles/SHA256SUMS.txt",
-      "sha256": "2173907dab7c39836b671dd7a68e6dd668567976ac5d8332f017c9c2531b4b40"
-    },
-    {
-      "bytes": 588803,
-      "executable": false,
-      "path": "bundled-language-profiles/packages/bbk-profile-codesys-0.1.0-alpha.5.zip",
-      "sha256": "9cfa5f2f356dfee75e7e387f8e44b5d895b7b8df6c718bc7ffbe4e48a0ba2e42"
-    },
-    {
-      "bytes": 105,
-      "executable": false,
-      "path": "bundled-language-profiles/packages/bbk-profile-codesys-0.1.0-alpha.5.zip.sha256",
-      "sha256": "d01b53622f443d91320788a9afd08f4447426ab11d38bf42a8d8c53225cf09da"
+      "sha256": "4f629187455d3bad0093159da9f2460f4a0545c1dbd11ed55ae99ee293847f8b"
     },
     {
       "bytes": 249138,
@@ -4588,10 +4570,10 @@
       "sha256": "7de67d9daf1b0c25aff29009d463c197989254d0a7b341c49845a586f071a92e"
     },
     {
-      "bytes": 7722,
+      "bytes": 7721,
       "executable": false,
       "path": "tests/_test_profiles.py",
-      "sha256": "07ece96dcb98b11e794fd881957936b74c86510899cee7f336300402796a806a"
+      "sha256": "7d0a4775ffaf5c8159973cf4dcbf159ce797d9f9fae673e89c547b0cd7a03010"
     },
     {
       "bytes": 6297,
@@ -4960,10 +4942,10 @@
       "sha256": "e89f1880e3aa53b98ba65a1899d925b15e06fe1f802a070206d7018cddaa028c"
     },
     {
-      "bytes": 76494,
+      "bytes": 75248,
       "executable": false,
       "path": "tests/test_installation_runner_processes.py",
-      "sha256": "b28091c4faa2bc9803bdb3edc9c9caca07feb392f4572e11200d65b7450bd899"
+      "sha256": "3538c15c060bab32594acbd95502ec667ff82a0302d8f31dd8fd4e91da982407"
     },
     {
       "bytes": 3320,
@@ -5242,12 +5224,6 @@
       "sha256": "26f39e8fc53f2f51c79d8630d016a8595d182e20a14f529e3739beb7e7bee6b4"
     },
     {
-      "bytes": 68,
-      "executable": false,
-      "path": "third_party/codex-deepseek-subagent/.gitignore",
-      "sha256": "074ae324538888a810740a030683c34eb9fb290d3dc62bf76c8e917510c9de20"
-    },
-    {
       "bytes": 1547,
       "executable": false,
       "path": "third_party/codex-deepseek-subagent/BBK-DELTA.md",
@@ -5414,12 +5390,6 @@
       "executable": false,
       "path": "third_party/codex-deepseek-subagent/tests/test_plaintext_handoff.py",
       "sha256": "77ec4c343866918f91815ef7ca031901601d041a1cb44bdb1e4c9418c239da85"
-    },
-    {
-      "bytes": 7,
-      "executable": false,
-      "path": "tmp-super.log",
-      "sha256": "cd2eca3535741f27a8ae40c31b0c41d4057a7a7b912b33b9aed86485d1c84676"
     },
     {
       "bytes": 20416,
@@ -6220,10 +6190,10 @@
       "sha256": "fce8cb318c92913b3bd015617c171fbc2efcb83448863b31667d0204ea15b58a"
     },
     {
-      "bytes": 49236,
+      "bytes": 49235,
       "executable": false,
       "path": "tools/verify_all.py",
-      "sha256": "5d94b4faa97499babbe95a35404378304dbeb7f1d2c6f8608d9a699ca062e375"
+      "sha256": "dd9aea404406c75a5cc0919caf4d4270a97d04f227237a44303a11cb60340ae5"
     },
     {
       "bytes": 5323,
@@ -6252,7 +6222,7 @@
   "projection_count": 100,
   "projection_source_sha256": "6c0b9579dca2e19c6c24b8938f6f334df85c1e64aaf392a14a0e913c05bcae99",
   "role_count": 19,
-  "root_sha256": "ec55c0a5de7bc7d2d7b9754114d18d868440626333a0fae77244f0d2911787f4",
+  "root_sha256": "41126ab11e308a9219f46f217d4b986a93be3f0b412098cdbfd31a2df613ae6b",
   "schema": "bbk.package-manifest.v1",
   "targets": [
     "claude",
