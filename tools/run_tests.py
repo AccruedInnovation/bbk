@@ -58,7 +58,74 @@ ROOT = Path(__file__).resolve().parents[1]
 TESTS = ROOT / "tests"
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-from tests import _test_profiles as test_profiles
+
+
+class _TestProfileContract:
+    """Production-owned profile projection used by the test runner."""
+
+    FAST_TEST_FILENAMES = tuple(
+        f"{module}.py"
+        for module in (
+            "test_artifact_windows_native",
+            "test_assurance_state",
+            "test_contract_package_v1",
+            "test_control_plane",
+            "test_dependencies",
+            "test_governance_status",
+            "test_governed_filesystem",
+            "test_manual_qualification_kit",
+            "test_model_routing_optional_package_version",
+            "test_omp_governed_profile",
+            "test_prompt_module_package_v1",
+            "test_qualified_task",
+            "test_read_only_spawn",
+            "test_release_qualification",
+            "test_role_capabilities",
+            "test_role_package_v4",
+            "test_role_return_runtime",
+            "test_schema_registry",
+            "test_session_oracle",
+            "test_substrate_beads",
+            "test_substrate_doctor",
+            "test_substrate_jj",
+            "test_verification_economy",
+            "test_verification_metrics",
+            "test_worker_spawn",
+        )
+    )
+    RELEASE_ONLY = frozenset(
+        {
+            "test_installation_portability_contracts.Alpha93VerificationReportingTests.test_runner_end_to_end_repeats_failure_and_error_at_the_end",
+            "test_installation_portability_contracts.Alpha93VerificationReportingTests.test_runner_end_to_end_prints_clean_final_summary",
+            "test_installation_profile_packages.Alpha117GitRepositoryTests.test_pooled_runner_uses_bounded_multi_module_processes",
+            "test_installation_profile_packages.Alpha117GitRepositoryTests.test_batch_runner_uses_one_python_process_for_all_discovered_modules",
+            "test_installation_profile_packages.Alpha117GitRepositoryTests.test_test_runner_emits_suite_progress_and_quiet_heartbeat",
+            "test_installation_profile_packages.Alpha117GitRepositoryTests.test_parallel_runner_heartbeat_names_the_current_test",
+            "test_installation_profile_packages.Alpha117GitRepositoryTests.test_suite_children_cannot_read_the_developer_console",
+            "test_installation_profile_packages.Alpha117GitRepositoryTests.test_test_runner_survives_cp1252_console_and_non_utf8_child_bytes",
+            "test_installation_profile_packages.Alpha117GitRepositoryTests.test_output_stream_failure_terminates_child_before_capture_cleanup",
+            "test_installation_profile_packages.Alpha117GitRepositoryTests.test_windows_process_tree_cleanup_bounds_taskkill",
+            "test_installation_profile_packages.Alpha117GitRepositoryTests.test_capture_cleanup_retries_and_suppresses_windows_sharing_violation",
+            "test_installation_profile_packages.Alpha117GitRepositoryTests.test_ordered_verifier_survives_cp1252_console_with_unicode_child_output",
+            "test_installation_profile_packages.Alpha117GitRepositoryTests.test_install_verification_gate_survives_cp1252_console_mirroring",
+            "test_contract_package_v1.ContractPackageV1Tests.test_declared_nullability_matches_role_contract_prose_and_schema",
+            "test_contract_package_v1.ContractPackageV1Tests.test_representative_return_for_every_role_validates",
+            "test_contract_package_v1.ContractPackageV1Tests.test_exact_role_contract_discriminators_reject_drift_for_every_role",
+            "test_contract_package_v1.ContractPackageV1Tests.test_result_payload_is_closed_and_every_declared_field_is_required",
+            "test_contract_package_v1.ContractPackageV1Tests.test_supplemental_enum_fields_are_exact_machine_discriminators",
+            "test_contract_package_v1.ContractPackageV1Tests.test_all_supported_field_kinds_have_schema_valid_examples",
+            "test_contract_package_v1.ContractPackageV1Tests.test_execution_contract_examples_validate_against_published_schemas",
+            "test_prompt_module_package_v1.PromptModulePackageV1Tests.test_catalog_and_module_schemas_are_valid_draft_2020_12",
+            "test_role_package_v4.SplitRolePackageV4Tests.test_published_draft_2020_12_schemas_validate_all_instances",
+        }
+    )
+
+    @classmethod
+    def fast_test_filenames(cls) -> tuple[str, ...]:
+        return cls.FAST_TEST_FILENAMES
+
+
+test_profiles = _TestProfileContract()
 
 RUN_COUNT_RE = re.compile(r"^Ran (\d+) tests? in ", re.MULTILINE)
 DEFAULT_SUITE_TIMEOUT = 420.0
