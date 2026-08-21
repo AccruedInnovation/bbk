@@ -1,13 +1,13 @@
 {
   "authority_disclaimer": "BBK is a temporary method harness and is not an official Blueprint release or authority-bearing package.",
   "created_at": "2026-08-07T00:00:00Z",
-  "file_count": 1039,
+  "file_count": 1035,
   "files": [
     {
-      "bytes": 139,
+      "bytes": 147,
       "executable": false,
       "path": ".gitattributes",
-      "sha256": "68621095cc05ceaaf0c7568ca0d7ad42b24dff6299d87426254ea5eac9ca25fe"
+      "sha256": "402e3432dc8e298eefab8f5fc778cd6c0fe25a907d06f794fb885ae32ff49d1c"
     },
     {
       "bytes": 1004,
@@ -28,16 +28,10 @@
       "sha256": "663da8cc54984605efe78a7b145ae20f1719c80855fcb4381258bbaf72a07c59"
     },
     {
-      "bytes": 2131,
+      "bytes": 2198,
       "executable": false,
       "path": ".github/workflows/windows-verification.yml",
-      "sha256": "b6acb578c54a33b2387a9c49dc661ec98faa662e5b53898c11c3dc882a9aa8ae"
-    },
-    {
-      "bytes": 304,
-      "executable": false,
-      "path": ".gitignore",
-      "sha256": "105713e3eb4f9ca95461c7aff93493b29e57915830618a1560fde118fff21628"
+      "sha256": "574e9af06ec750e5ae5236ce37c97d064ca4013a40ae19547a2755110f5b05cc"
     },
     {
       "bytes": 74818,
@@ -46,10 +40,10 @@
       "sha256": "2068568361891dbf6553e840ddac6e4e5acb64a5f25bc362834a58e0fd2aae2e"
     },
     {
-      "bytes": 1093,
+      "bytes": 1114,
       "executable": false,
       "path": "LICENSE",
-      "sha256": "d1278607a64065a2485edb5700a36a7050e57e450df28be8f703f62a87c92355"
+      "sha256": "a3f941f9cfcf3dd3bf49360d3dc373b39d8127cf588bd47a346d5c51c5e517c2"
     },
     {
       "bytes": 3488,
@@ -94,28 +88,16 @@
       "sha256": "808d40e45f4df0615e30dd0340166899de43970cd19cac2046620822d3ddfb10"
     },
     {
-      "bytes": 2738,
+      "bytes": 2325,
       "executable": false,
       "path": "bundled-language-profiles/RELEASE-MANIFEST.json",
-      "sha256": "c64ced4530d484d421b4978d0d34fc5e494bfcd8daaf47857346aa326e496944"
+      "sha256": "ad4013a79ec3a49e843cd1b676cfc0f85bbaac40129cf4590ebd5952888cbe1a"
     },
     {
-      "bytes": 575,
+      "bytes": 461,
       "executable": false,
       "path": "bundled-language-profiles/SHA256SUMS.txt",
-      "sha256": "2173907dab7c39836b671dd7a68e6dd668567976ac5d8332f017c9c2531b4b40"
-    },
-    {
-      "bytes": 588803,
-      "executable": false,
-      "path": "bundled-language-profiles/packages/bbk-profile-codesys-0.1.0-alpha.5.zip",
-      "sha256": "9cfa5f2f356dfee75e7e387f8e44b5d895b7b8df6c718bc7ffbe4e48a0ba2e42"
-    },
-    {
-      "bytes": 105,
-      "executable": false,
-      "path": "bundled-language-profiles/packages/bbk-profile-codesys-0.1.0-alpha.5.zip.sha256",
-      "sha256": "d01b53622f443d91320788a9afd08f4447426ab11d38bf42a8d8c53225cf09da"
+      "sha256": "4f629187455d3bad0093159da9f2460f4a0545c1dbd11ed55ae99ee293847f8b"
     },
     {
       "bytes": 249138,
@@ -448,10 +430,10 @@
       "sha256": "9679da91dd28cfbced5829f0b96157626fdba5e8b4376f948f47a1d1b00c33df"
     },
     {
-      "bytes": 38,
+      "bytes": 43,
       "executable": false,
       "path": "fixtures/alpha17-governed-vertical-slice/.gitignore",
-      "sha256": "60dd053510a3375fbe87b7a0700f3c3707ee9f59bd1dd6db457248df96d61092"
+      "sha256": "eab946ecc56e4e7163bbbf322d8e3b03d87bea8a7d6e1b414e9ea47729645c7f"
     },
     {
       "bytes": 508,
@@ -868,10 +850,10 @@
       "sha256": "e719a83669829b855ddde59314f65c519d20007ebab7ff2078284ae5832ef7ad"
     },
     {
-      "bytes": 289978,
+      "bytes": 289950,
       "executable": false,
       "path": "omp/extension/index.js",
-      "sha256": "fb163fc64f28992f80bd34682e8495fec897643e46867305b9ff5b2ffb987645"
+      "sha256": "a320b1236057980c31671d20c5c86e8bfb676f1b3a2df81fb705be07b58e04ca"
     },
     {
       "bytes": 242,
@@ -1876,10 +1858,10 @@
       "sha256": "27204b7d710ef7a7c5da8a2312004ef57f80a2044dedbb324021253be0f05da2"
     },
     {
-      "bytes": 406,
+      "bytes": 412,
       "executable": false,
       "path": "shared/skills/bbk-artifact/agents/openai.yaml",
-      "sha256": "1eb17f345de0f6ad59e925085ac2301107c0b6bc2a6659bd097422ac9e9aaaec"
+      "sha256": "05c1edbbdfc538b5760c2e1ab697e8f8604d140b41c94d0c96a1bdc651a38e8f"
     },
     {
       "bytes": 502,
@@ -1894,16 +1876,16 @@
       "sha256": "25faca3edaac497d2d0df92ac7181642eefc0364d0cf5883bc3e4703a9e0486e"
     },
     {
-      "bytes": 845,
+      "bytes": 872,
       "executable": false,
       "path": "shared/skills/bbk-artifact/scripts/bbk-artifact.cmd",
-      "sha256": "38491b12298b52c41998121cc7d7e2f5f937093beef41aecc5146c8b5a961fe0"
+      "sha256": "22bec06c630064ce9e37a4a73f1a186ff3661cb8e38dd31bc0d5d282a5cda723"
     },
     {
-      "bytes": 704,
+      "bytes": 717,
       "executable": false,
       "path": "shared/skills/bbk-artifact/scripts/bbk-artifact.sh",
-      "sha256": "8702d2ee006b4ffb28b02a0d9e5a042a78435b583977f03d104b7d6adce1b287"
+      "sha256": "61c77825ce71e78d2742bfa62e116c5122a16e804be32689c4833ca126745c9d"
     },
     {
       "bytes": 7242,
@@ -4588,16 +4570,16 @@
       "sha256": "7de67d9daf1b0c25aff29009d463c197989254d0a7b341c49845a586f071a92e"
     },
     {
-      "bytes": 7722,
+      "bytes": 7721,
       "executable": false,
       "path": "tests/_test_profiles.py",
-      "sha256": "07ece96dcb98b11e794fd881957936b74c86510899cee7f336300402796a806a"
+      "sha256": "7d0a4775ffaf5c8159973cf4dcbf159ce797d9f9fae673e89c547b0cd7a03010"
     },
     {
-      "bytes": 5854,
+      "bytes": 6297,
       "executable": false,
       "path": "tests/_vcs_fixture.py",
-      "sha256": "af9c5828819bebf98de43715e334e3272557a26aae4e3226111117d7dc7e0cb5"
+      "sha256": "282810d1d9a771ad92af65bae5e0ff8e09de5fdaa1217de44e8a3cbf6206a357"
     },
     {
       "bytes": 140831,
@@ -4690,10 +4672,10 @@
       "sha256": "ae0249d6f6340e9666b90a60b61e614cf7134fff756432c577921fbd5cac70e9"
     },
     {
-      "bytes": 1574,
+      "bytes": 1590,
       "executable": false,
       "path": "tests/fixtures/deepseek-codex-probe/run_probe.ps1",
-      "sha256": "3619e13c53cd95e2dce32e805422b81d42bb821c880c22d3e93e8fd1c9399db0"
+      "sha256": "b92099b5f240488d09873e9e79fd340d14db92205c652f21166d961894d70111"
     },
     {
       "bytes": 2537,
@@ -4726,10 +4708,10 @@
       "sha256": "ee2e95d3b5208ddc8b0d3f8879336b97ffaa77033e02839725413460cdf6109f"
     },
     {
-      "bytes": 7506,
+      "bytes": 7690,
       "executable": false,
       "path": "tests/fixtures/omp-host-contract/fixture-extension.mjs",
-      "sha256": "ade6c4c54ba96ce1e3a16fc996bf1601f109b9dfe648da6ea72e6922f9b9b342"
+      "sha256": "2c4236048d2672c32884f79a25b09f6ec0dc64146520b98b842819c8c7220858"
     },
     {
       "bytes": 295,
@@ -4948,10 +4930,10 @@
       "sha256": "ec4a5eca9dd467416fd2470186d9da5b7df3f8e7e62dab64dad2d723943f484b"
     },
     {
-      "bytes": 37731,
+      "bytes": 44778,
       "executable": false,
       "path": "tests/test_installation_profile_packages.py",
-      "sha256": "547d73a4c3808ca4d82787e3303558f50281e095d538a144440265c2b309b1c4"
+      "sha256": "35d199c91d1b0f11a0a6932058b09c3af118cbec1facf4d15dc2002bd35bc884"
     },
     {
       "bytes": 3004,
@@ -4960,10 +4942,10 @@
       "sha256": "e89f1880e3aa53b98ba65a1899d925b15e06fe1f802a070206d7018cddaa028c"
     },
     {
-      "bytes": 76494,
+      "bytes": 75248,
       "executable": false,
       "path": "tests/test_installation_runner_processes.py",
-      "sha256": "b28091c4faa2bc9803bdb3edc9c9caca07feb392f4572e11200d65b7450bd899"
+      "sha256": "3538c15c060bab32594acbd95502ec667ff82a0302d8f31dd8fd4e91da982407"
     },
     {
       "bytes": 3320,
@@ -5020,10 +5002,10 @@
       "sha256": "88b818341b06a06e30c12a349234728d03d666f3bb2e4ebff702dbad5d655370"
     },
     {
-      "bytes": 64183,
+      "bytes": 64691,
       "executable": false,
       "path": "tests/test_omp_governed_profile.py",
-      "sha256": "08227c71a988a20d19da14c5d635c8d2a15e70402a7cf65f712edede5f5218c3"
+      "sha256": "54721baa522bb9a89972519cf5e01c49cbb87c75d1c7c9ad77bb6ee9e230ebf4"
     },
     {
       "bytes": 4805,
@@ -5242,12 +5224,6 @@
       "sha256": "26f39e8fc53f2f51c79d8630d016a8595d182e20a14f529e3739beb7e7bee6b4"
     },
     {
-      "bytes": 68,
-      "executable": false,
-      "path": "third_party/codex-deepseek-subagent/.gitignore",
-      "sha256": "074ae324538888a810740a030683c34eb9fb290d3dc62bf76c8e917510c9de20"
-    },
-    {
       "bytes": 1547,
       "executable": false,
       "path": "third_party/codex-deepseek-subagent/BBK-DELTA.md",
@@ -5416,10 +5392,10 @@
       "sha256": "77ec4c343866918f91815ef7ca031901601d041a1cb44bdb1e4c9418c239da85"
     },
     {
-      "bytes": 14304,
+      "bytes": 15312,
       "executable": false,
       "path": "tools/_process_supervisor.py",
-      "sha256": "5405ebb1316c0c58ef6c85d2316b32040b49b2115347300476cbed406ab31301"
+      "sha256": "fcaf6dfbee57b389aa2db3abf4bdfd2a8f8fd7fdf06325957780a30238ba7591"
     },
     {
       "bytes": 589,
@@ -5578,10 +5554,10 @@
       "sha256": "1b957455fd5eae2dc6c6fc469a765de9ce59b3d23f0f0d450c459f65ca75079c"
     },
     {
-      "bytes": 44956,
+      "bytes": 45396,
       "executable": false,
       "path": "tools/governed_filesystem.py",
-      "sha256": "83e14a9905641e59869752b9ef948a1659cfd776a97dd44c5342428d7f47ee96"
+      "sha256": "0c092b938d510204f2d6443b3124775bd4e5853d5225ae99a1118a79773c3b37"
     },
     {
       "bytes": 19427,
@@ -5632,10 +5608,10 @@
       "sha256": "d20cba827c36895ac2b5eea177b9bf8371680d804c5e4f19c8305b37306d486a"
     },
     {
-      "bytes": 1081,
+      "bytes": 1102,
       "executable": false,
       "path": "tools/jsonl_analyzer/LICENSE",
-      "sha256": "e18243672c4a4b5615c8390819c07346e6ca1fba35e94ef99f2b60468d6f4c1c"
+      "sha256": "8d1c03a50c3139925b3d274b4f4dec9be3f8a9b55144be72fcf8fb54880f3e36"
     },
     {
       "bytes": 7276,
@@ -5650,16 +5626,16 @@
       "sha256": "7c6b93cdc1bc379918d3be79a97d38d6341635a6fbc87f2e95ee63c00ecd9ba0"
     },
     {
-      "bytes": 509,
+      "bytes": 526,
       "executable": false,
       "path": "tools/jsonl_analyzer/analyze.ps1",
-      "sha256": "274a6cf76f4744770288edf0a149ca7f3f2d3a464498531a390eacf55af74eae"
+      "sha256": "bcc0b8b47d2538537e6e271c34fcac180e6212ac41b34cf9c398064c57909658"
     },
     {
-      "bytes": 136,
+      "bytes": 140,
       "executable": false,
       "path": "tools/jsonl_analyzer/analyze.sh",
-      "sha256": "503ab8bcb9962091d5e46755ee73e605288b0c93d420fcf6e19a0a8dc355e951"
+      "sha256": "087d1f529a38220df1936d117a0a20aa3f4ff55190612da3c8b1797901e7fee0"
     },
     {
       "bytes": 81413,
@@ -5680,10 +5656,10 @@
       "sha256": "af88811e6f0edccc77c13db5b2ff6dfe9ee50d86d6e2dd7ada9920e268c43536"
     },
     {
-      "bytes": 1876,
+      "bytes": 1884,
       "executable": false,
       "path": "tools/jsonl_analyzer/fixtures/alpha17-acceptance-synthetic.jsonl",
-      "sha256": "4b285c028da3b3a07469c1b651349a2d42f63d8a30efb034bdfd087ab3498d56"
+      "sha256": "8ccc84f6aa851363a1332f07218df87b649edbbc67fce1a3c0eaa449c03a0f3a"
     },
     {
       "bytes": 420,
@@ -5812,10 +5788,10 @@
       "sha256": "2be326b64ab75560766c053fe557f2e9ddffd5a8709e25362957adeec83f533a"
     },
     {
-      "bytes": 1591,
+      "bytes": 1615,
       "executable": false,
       "path": "tools/qualification/codex-manual-kit-template/analyze-codex-run.ps1",
-      "sha256": "944b9cbfd607bd74b06ff20a5dbdac139fa3ff22890eca339c4868fb6214fe66"
+      "sha256": "5f27588f7ce5e9013be48ccf6db3faf7489696caad4c9896f56e343b2b9b4d82"
     },
     {
       "bytes": 129,
@@ -5872,10 +5848,10 @@
       "sha256": "38f0c5ed232c106cfa9df6475f97ed59b0bbc16ddcb470f19db1d7bf41c7d220"
     },
     {
-      "bytes": 5545,
+      "bytes": 5641,
       "executable": false,
       "path": "tools/qualification/codex-manual-kit-template/prepare-codex-fixtures.ps1",
-      "sha256": "58796bf43e8636c9d3fd89df4d6468c511131e840decab8bf947b0cf5a27e219"
+      "sha256": "759990e806fdda230274315ca55704bc384798a0c9e64792b600201c28cd6c0b"
     },
     {
       "bytes": 1314,
@@ -5914,10 +5890,10 @@
       "sha256": "7f97378a9b29b5c5574f742b0ea98b6e6be4ab866063a5e6795bedf809f708fb"
     },
     {
-      "bytes": 857,
+      "bytes": 868,
       "executable": false,
       "path": "tools/qualification/codex-manual-kit-template/rollback-codex-fixtures.ps1",
-      "sha256": "aae585d7d6b25bc059b9d47864eb05c532104541d33e07fca793ccf6b393aa7c"
+      "sha256": "d1fce7f922b6e102bce1caef5dfc568b076fbd5d93c8e9dde53390728e3ccca1"
     },
     {
       "bytes": 13933,
@@ -5962,10 +5938,10 @@
       "sha256": "c986f31e35da2c22184a6fe0584c0cba4512ae82c233ce25d640af46fb7069dc"
     },
     {
-      "bytes": 10455,
+      "bytes": 10589,
       "executable": false,
       "path": "tools/qualification/manual-kit-template/collect-evidence.ps1",
-      "sha256": "3a5ba63a587870afc9f777d3c4b28abce5431ccead73578a4b37672c94111693"
+      "sha256": "a235c426e1cfa90525cb0b57389a0cb1730aae7b73c22a0c10742cf9650cdd69"
     },
     {
       "bytes": 9949,
@@ -5974,16 +5950,16 @@
       "sha256": "2770de8398fb733f0d5117912b3999cf47911ed9ffa1cd58fb03ff9b2fca4d5c"
     },
     {
-      "bytes": 26450,
+      "bytes": 26943,
       "executable": false,
       "path": "tools/qualification/manual-kit-template/install-isolated-rc.ps1",
-      "sha256": "dc66afe0c4ca585a3eca77e26c481303d02ed3e82240d97fbe6eafb152370914"
+      "sha256": "010dab407e9903b13acf1efeb9cd2dda4320913619f259784a2d35765eeb6837"
     },
     {
-      "bytes": 12308,
+      "bytes": 12577,
       "executable": false,
       "path": "tools/qualification/manual-kit-template/manual-bootstrap-extension.mjs",
-      "sha256": "108bc2218699472a2c8466de6c477cf9b8a488c6baae1fcb10c1c25e635dd220"
+      "sha256": "515a44259e764cff276491b7234c05382ef8d578921aaf8a48b4233b57aea3ae"
     },
     {
       "bytes": 14492,
@@ -5992,10 +5968,10 @@
       "sha256": "f3d6032ace8fa2417630378acce3a3a99ea0ad842852861ebf94e6f13884fc17"
     },
     {
-      "bytes": 294,
+      "bytes": 298,
       "executable": false,
       "path": "tools/qualification/manual-kit-template/omp-qualification-overlay.yml",
-      "sha256": "81869ade01b2ff9a50fd02d1514a2418026989bcb37063167d1e968f06802921"
+      "sha256": "7479392bad0aa1c822031c78a19ad05fceca332976ada9b1771e424741f392bb"
     },
     {
       "bytes": 211,
@@ -6010,10 +5986,10 @@
       "sha256": "c314bdbf55cfbd049a84be2ef42c398da635c37c3c2401d66d37673898614f04"
     },
     {
-      "bytes": 1594,
+      "bytes": 1619,
       "executable": false,
       "path": "tools/qualification/manual-kit-template/redact-and-package.ps1",
-      "sha256": "aed5d47a2186900341df378f8451d8bfb1d83a85ca5a10b883d0bcc0fbca4d4e"
+      "sha256": "a6e812a5aec212fc3e1f8341195309060771cd6fac5ad2798005d2406cba1c2e"
     },
     {
       "bytes": 5208,
@@ -6022,16 +5998,16 @@
       "sha256": "b2de3ff37662f0f14cbee2793d4ebd471340f6751f411dd460d66d33bd23f08a"
     },
     {
-      "bytes": 1550,
+      "bytes": 1575,
       "executable": false,
       "path": "tools/qualification/manual-kit-template/rollback-isolated-rc.ps1",
-      "sha256": "c44cdd47d0b6a25ec1a8e7ca974f41f7853fb868ad992d45ba7d80b1cfb2539d"
+      "sha256": "a4342c911fa45c4d890b3bc9aa827638c23fca97537dade29a4fc67e3356eea1"
     },
     {
-      "bytes": 4065,
+      "bytes": 4151,
       "executable": false,
       "path": "tools/qualification/manual-kit-template/start-alpha17-qualification.ps1",
-      "sha256": "9ad344e32af9629bde127cf13b35875c92781fcce689d4f5b522d02333cd3fc8"
+      "sha256": "818fa26fdeddc771fea548b47c9b353e4bf59a8117005d04cca9e484d6d2ff53"
     },
     {
       "bytes": 39605,
@@ -6082,10 +6058,10 @@
       "sha256": "5516324abed8cddf6c2dda6e8ccc02f3e9b07ab20daf2d3cb00f94e81df787d1"
     },
     {
-      "bytes": 103850,
+      "bytes": 109355,
       "executable": false,
       "path": "tools/run_tests.py",
-      "sha256": "8d3d6447ec13be23ea7a5e217c8966b5ae6282bd0e87c37e5cc0910016d1f19a"
+      "sha256": "b6907846b9a336f58c24348a4504697c65210ed041c2f10f273ce21a04704c8b"
     },
     {
       "bytes": 4076,
@@ -6214,10 +6190,10 @@
       "sha256": "fce8cb318c92913b3bd015617c171fbc2efcb83448863b31667d0204ea15b58a"
     },
     {
-      "bytes": 49236,
+      "bytes": 49235,
       "executable": false,
       "path": "tools/verify_all.py",
-      "sha256": "5d94b4faa97499babbe95a35404378304dbeb7f1d2c6f8608d9a699ca062e375"
+      "sha256": "dd9aea404406c75a5cc0919caf4d4270a97d04f227237a44303a11cb60340ae5"
     },
     {
       "bytes": 5323,
@@ -6246,7 +6222,7 @@
   "projection_count": 100,
   "projection_source_sha256": "6c0b9579dca2e19c6c24b8938f6f334df85c1e64aaf392a14a0e913c05bcae99",
   "role_count": 19,
-  "root_sha256": "eccafb802abcd9b503078fe294c088a04865d0f83c21a8b8054c9484ec10abcb",
+  "root_sha256": "4a5191a1e493c8aca38d6b4b912b3d0dc426b7f228893376c5c4eb27e6b1d0bf",
   "schema": "bbk.package-manifest.v1",
   "targets": [
     "claude",
