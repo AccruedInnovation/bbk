@@ -94,6 +94,7 @@ OMP_EXTENSION_RUNTIME_FILES: tuple[str, ...] = (
     "omp_binding_registry.py",
     "governed_filesystem.py",
     "worker_spawn.py",
+    "_process_supervisor.py",
     "read_only_spawn.py",
     "control_plane.py",
     "qualified_task.py",

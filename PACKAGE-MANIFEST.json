@@ -5584,10 +5584,10 @@
       "sha256": "2e74122c3c06247cb7d0d6074551fab50c65fa9532b4aa07fc6f2afc9391ab08"
     },
     {
-      "bytes": 125549,
+      "bytes": 125579,
       "executable": false,
       "path": "tools/install.py",
-      "sha256": "282837005031bafe4726f3ee8b949aab301948d06028aabe6bcbdf718f98d7bc"
+      "sha256": "38aaf91b2f8dfea1fc2464be0a6fcd8f529cbc10bf90e53e6ae01c9405054e36"
     },
     {
       "bytes": 18332,
@@ -6222,7 +6222,7 @@
   "projection_count": 100,
   "projection_source_sha256": "6c0b9579dca2e19c6c24b8938f6f334df85c1e64aaf392a14a0e913c05bcae99",
   "role_count": 19,
-  "root_sha256": "4a4a9ef176fa8b9bae1cd200b2ca1ac5d2aac1648294ea3bc1af01d16baad383",
+  "root_sha256": "7e13920fe4d8b0208989583931393104779389737a4e89051bedbd9a29d9e60c",
   "schema": "bbk.package-manifest.v1",
   "targets": [
     "claude",
