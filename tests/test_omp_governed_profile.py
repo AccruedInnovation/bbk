@@ -1198,13 +1198,20 @@ class OmpGovernedProfileTests(unittest.TestCase):
                   const systemBlock = {native_agent_system_block('bbk_worker', json.dumps(marker))};
                   await before({{prompt:"assignment", systemPrompt:[systemBlock]}}, childCtx);
                 }} catch (caught) {{ error = {{code:caught.code || null, message:String(caught.message || caught)}}; }}
-                console.log(JSON.stringify({{error}}));
+                const {{ readdirSync }} = await import("node:fs");
+                const activationRoot = `${{process.env.BBK_PROJECT_ROOT}}/.bbk/governance/receipts/SPAWN_SESSION_ACTIVATION`;
+                const activationReceiptCount = (() => {{
+                  try {{ return readdirSync(activationRoot).filter(name => name.endsWith(".json")).length; }}
+                  catch {{ return 0; }}
+                }})();
+                console.log(JSON.stringify({{error, activationReceiptCount}}));
                 """
             ),
             environment=environment,
         )
         self.assertIsNotNone(value["error"])
         self.assertIn("OMP_SPAWN", value["error"]["code"])
+        self.assertEqual(0, value["activationReceiptCount"])
 
     def test_governed_filesystem_tool_is_blocked_outside_explicit_profile(self):
         binding, workspace = self.create_mutation_binding()

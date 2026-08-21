@@ -520,7 +520,7 @@ function canonicalJsonValue(value) {
   return value;
 }
 function governedPayloadDigest(value) {
-  const normalized = canonicalJsonValue(JSON.parse(JSON.stringify(value ?? {})));
+  const normalized = canonicalJsonValue(value ?? {});
   return `sha256:${createHash("sha256").update(JSON.stringify(normalized), "utf8").digest("hex")}`;
 }
 function canonicalDispatchEnvelope(input) {
