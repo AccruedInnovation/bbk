@@ -11,9 +11,16 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Mapping
+
+TOOLS = Path(__file__).resolve().parents[1] / "tools"
+if str(TOOLS) not in sys.path:
+    sys.path.insert(0, str(TOOLS))
+
+from substrate import jj_adapter
 
 
 def _tool(name: str, override: str | None = None) -> Path | None:
@@ -92,9 +99,19 @@ def prepare_git_seed(
 def init_jj(seed_or_root: GitSeed | Path, *, jj_path: str | Path | None = None) -> Path:
     """Create a fresh colocated JJ store for one seed and return its path."""
     root = seed_or_root.root if isinstance(seed_or_root, GitSeed) else Path(seed_or_root).resolve()
-    executable = Path(jj_path or JJ or "jj").resolve()
-    subprocess.run([str(executable), "--no-pager", "--color=never", "git", "init", "--colocate", "."],
-                   cwd=root, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # A fixture may live below the repository's own ``.jj`` store (the bounded
+    # Windows test roots do), so initialize from the nearest directory outside
+    # that store.  The checked-in adapter remains the sole JJ command surface.
+    init_cwd = root.parent
+    for ancestor in (root, *root.parents):
+        if (ancestor / ".jj").is_dir():
+            init_cwd = ancestor.parent
+            break
+    jj_adapter._run(
+        init_cwd,
+        ("git", "init", "--colocate", str(root)),
+        jj_path=jj_path,
+    )
     metadata = root / ".jj"
     if not metadata.is_dir() or metadata.is_symlink():
         raise AssertionError(f"JJ metadata is not a fresh local directory: {metadata}")

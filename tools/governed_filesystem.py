@@ -546,6 +546,14 @@ def _git_backing_root(workspace: Path, *, jj_path: str | Path | None) -> Path:
     Git roots and bounded unit-test adapters may not expose a runnable jj
     binary, so they fall back only to the exact Git repository boundary.
     """
+    # A plain Git fixture can be nested below the main JJ checkout.  Resolve
+    # its explicit ``.git`` boundary first; otherwise ``jj git root`` would
+    # walk to the parent checkout and falsely report an unbound workspace.
+    if (workspace / ".git").is_dir() and not (workspace / ".git").is_symlink():
+        try:
+            return git_adapter.repository_root(workspace)
+        except git_adapter.GitAdapterError:
+            pass
     try:
         return jj_adapter.git_repository_root(workspace, jj_path=jj_path)
     except jj_adapter.JjAdapterError as jj_exc:
