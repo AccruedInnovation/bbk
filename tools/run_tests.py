@@ -1635,6 +1635,10 @@ def _execute_unittest_command_supervised(
     child_environment = _subprocess_environment(report_path=report_path, report_nonce=report_nonce)
     expected_subject = _expected_child_subject(launch_command, child_environment)
     launch = None
+    launch_started = False
+    launch_completed = False
+    launch_failure: launch_recorder.LaunchRecordError | None = None
+    result = None
     structured = _empty_structured_test_report()
     try:
         launch = launch_recorder.prepare(
@@ -1647,10 +1651,17 @@ def _execute_unittest_command_supervised(
         )
         if result.pids:
             launch.started(result.pids[0])
+            launch_started = True
         output = result.output
         if stream is not None:
             _write_text(stream, output, flush=True)
-        launch.completed(returncode=result.returncode, state="timed-out" if result.timed_out else "completed")
+        try:
+            launch.completed(returncode=result.returncode, state="timed-out" if result.timed_out else "completed")
+            launch_completed = True
+        except launch_recorder.LaunchRecordError as exc:
+            # Preserve the producer result and retry finalization in the
+            # bounded cleanup path; the terminal record retains this failure.
+            launch_failure = exc
         if result.timed_out:
             output += f"\nBBK test runner: suite {label} exceeded {timeout:g} seconds and its process tree was terminated.\n"
             return SuiteResult(label, 2, output, parse_test_count(output), (TestIssue("PROCESS ERROR", label, output.strip()),), parse_skip_count(output))
@@ -1673,6 +1684,22 @@ def _execute_unittest_command_supervised(
     except (OSError, RuntimeError, launch_recorder.LaunchRecordError, PythonLaunchInvariantError) as exc:
         return SuiteResult(label, 2, "", None, (TestIssue("PROCESS ERROR", label, f"{type(exc).__name__}: {exc}"),), 0)
     finally:
+        if launch is not None and launch_started and not launch_completed and result is not None:
+            try:
+                launch.completed(
+                    returncode=result.returncode,
+                    state="timed-out" if result.timed_out else "completed",
+                    error=(
+                        f"{type(launch_failure).__name__}: {launch_failure}"
+                        if launch_failure is not None
+                        else None
+                    ),
+                )
+                launch_completed = True
+            except launch_recorder.LaunchRecordError:
+                # The underlying test/process result remains authoritative if
+                # a second persistence attempt also fails.
+                pass
         _remove_capture_file(capture_path)
         _remove_capture_file(report_path)
 
