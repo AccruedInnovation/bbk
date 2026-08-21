@@ -6,6 +6,7 @@ from __future__ import annotations
 import importlib.util
 import importlib
 import contextlib
+import concurrent.futures
 import io
 import json
 import os
@@ -932,6 +933,92 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
             self.assertIn(phrase, combined)
         self.assertNotIn('tools/extract_git_repositories.py', combined)
         self.assertFalse((m8_ROOT / 'tools' / 'extract_git_repositories.py').exists())
+
+    def test_a_a4i_tr_01_child_temp_namespaces_are_distinct_and_identical(self):
+        with tempfile.TemporaryDirectory() as raw_root:
+            root = Path(raw_root)
+            first = run_tests._subprocess_environment(temp_root=root / 'first')
+            second = run_tests._subprocess_environment(temp_root=root / 'second')
+        self.assertEqual(first['TEMP'], first['TMP'])
+        self.assertEqual(first['TEMP'], first['TMPDIR'])
+        self.assertEqual(second['TEMP'], second['TMP'])
+        self.assertEqual(second['TEMP'], second['TMPDIR'])
+        self.assertNotEqual(first['TEMP'], second['TEMP'])
+
+    def test_a_a4i_tr_02_predecessor_collision_fails_and_successor_passes(self):
+        code = (
+            'import os, pathlib, time; '
+            'p=pathlib.Path(os.environ["TEMP"]) / "collision.lock"; '
+            'fd=os.open(p, os.O_CREAT|os.O_EXCL|os.O_WRONLY); '
+            'time.sleep(0.05); os.close(fd)'
+        )
+        with tempfile.TemporaryDirectory() as raw_root:
+            root = Path(raw_root)
+
+            def launch(environment, capture):
+                return process_supervisor.run_bounded(
+                    [sys.executable, '-c', code],
+                    capture_path=capture,
+                    timeout=5,
+                    environment=environment,
+                )
+
+            common = root / 'predecessor'
+            common.mkdir()
+            predecessor = dict(os.environ, TEMP=str(common), TMP=str(common), TMPDIR=str(common))
+            with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+                old = list(pool.map(
+                    lambda index: launch(predecessor, root / f'old-{index}.log'),
+                    range(2),
+                ))
+            successors = []
+            for index in range(2):
+                private = root / f'successor-{index}'
+                private.mkdir()
+                successors.append(dict(os.environ, TEMP=str(private), TMP=str(private), TMPDIR=str(private)))
+            with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+                new = list(pool.map(
+                    lambda item: launch(item[1], root / f'new-{item[0]}.log'),
+                    enumerate(successors),
+                ))
+        self.assertEqual(sorted(result.returncode for result in old), [0, 1])
+        self.assertEqual([result.returncode for result in new], [0, 0])
+
+    def test_a_a4i_tr_03_quiescent_cleanup_removes_private_roots_without_outcome_rewrite(self):
+        with tempfile.TemporaryDirectory() as raw_root:
+            root = Path(raw_root)
+            tests = root / 'tests'
+            tests.mkdir()
+            test_file = tests / 'test_temp_probe.py'
+            test_file.write_text(textwrap.dedent('''
+                import os
+                import pathlib
+                import unittest
+
+                class TempProbe(unittest.TestCase):
+                    def test_private_temp_is_writable(self):
+                        pathlib.Path(os.environ['TEMP'], 'probe.txt').write_text('ok')
+            '''), encoding='utf-8')
+            attempt = root / 'attempt'
+            attempt.mkdir()
+            with mock.patch.object(run_tests, 'ROOT', root), mock.patch.object(run_tests, 'TESTS', tests):
+                result = run_tests.execute_discovered(
+                    test_file.name, stream=io.StringIO(), timeout=10, temp_root=attempt,
+                )
+            self.assertTrue(result.passed, result.output)
+            self.assertFalse(any(attempt.iterdir()))
+
+    def test_a_a4i_tr_04_controlled_surface_and_trust_tools_are_present(self):
+        controlled = {
+            'tools/run_tests.py',
+            'tests/test_installation_profile_packages.py',
+            'PACKAGE-MANIFEST.json',
+            'bundled-language-profiles/RELEASE-MANIFEST.json',
+            'bundled-language-profiles/SHA256SUMS.txt',
+        }
+        self.assertEqual(len(controlled), 5)
+        self.assertTrue((m8_ROOT / 'tools' / 'verify_package.py').is_file())
+        self.assertTrue((m8_ROOT / 'tools' / 'build_release.py').is_file())
 
 # Deterministic fast/standard/release selection used by tools/run_tests.py.
 from tests._test_profiles import load_profiled_tests as load_tests

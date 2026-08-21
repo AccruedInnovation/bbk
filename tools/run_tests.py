@@ -361,7 +361,8 @@ def _configure_standard_stream(stream: TextIO) -> None:
 
 
 def _subprocess_environment(
-    *, report_path: Path | None = None, report_nonce: str | None = None
+    *, report_path: Path | None = None, report_nonce: str | None = None,
+    temp_root: Path | None = None,
 ) -> dict[str, str]:
     """Return an environment that makes Python child output deterministic."""
     environment = os.environ.copy()
@@ -385,6 +386,15 @@ def _subprocess_environment(
             environment["PYTHONPYCACHEPREFIX"] = str(runtime / "cache")
         Path(environment["TEMP"]).mkdir(parents=True, exist_ok=True)
         Path(environment["PYTHONPYCACHEPREFIX"]).mkdir(parents=True, exist_ok=True)
+    if temp_root is not None:
+        private_root = temp_root.resolve()
+        private_root.mkdir(parents=True, exist_ok=True)
+        private_root_text = str(private_root)
+        environment["TEMP"] = private_root_text
+        environment["TMP"] = private_root_text
+        environment["TMPDIR"] = private_root_text
+        environment["PYTHONPYCACHEPREFIX"] = str(private_root / "pycache")
+        (private_root / "pycache").mkdir(parents=True, exist_ok=True)
     environment = python_environment(environment, extra={"BBK_TEST_ALLOW_MISSING_DEPENDENCIES": "1"})
     if report_path is not None:
         # Every child receives a fresh parent-owned carrier.  Overriding an
@@ -399,6 +409,41 @@ def _subprocess_environment(
         environment.pop(STRUCTURED_REPORT_ENV, None)
         environment.pop(STRUCTURED_REPORT_NONCE_ENV, None)
     return environment
+
+
+def _temp_root_base() -> Path:
+    """Return the caller-owned containment root for child attempt temp state."""
+    if raw_cache := os.environ.get("BBK_TEST_CACHE_DIR"):
+        return Path(raw_cache).expanduser().resolve() / "runtime" / "test-temp"
+    return Path(tempfile.gettempdir()).resolve() / "bbk-test-temp"
+
+
+def _child_temp_root(parent: Path) -> Path:
+    parent = parent.resolve()
+    parent.mkdir(parents=True, exist_ok=True)
+    return Path(tempfile.mkdtemp(prefix="child-", dir=str(parent)))
+
+
+def _remove_temp_root(path: Path) -> None:
+    """Remove only an exact private root after process-tree quiescence."""
+    import shutil
+    shutil.rmtree(path, ignore_errors=False)
+
+
+def _new_parent_temp_root() -> Path:
+    base = _temp_root_base()
+    base.mkdir(parents=True, exist_ok=True)
+    return Path(tempfile.mkdtemp(prefix="attempt-", dir=str(base)))
+
+
+def _remove_empty_temp_root(path: Path) -> None:
+    """Remove an attempt root only when every child has already cleaned up."""
+    try:
+        path.rmdir()
+    except OSError:
+        # A remaining child root is evidence that quiescent cleanup was not
+        # established; retain it for the parent to inspect.
+        pass
 
 
 def discover_suite(pattern: str = "test*.py") -> unittest.TestSuite:
@@ -1381,6 +1426,7 @@ def _execute_unittest_command(
     stream: TextIO | None = None,
     timeout: float = DEFAULT_SUITE_TIMEOUT,
     heartbeat_seconds: float = DEFAULT_HEARTBEAT_SECONDS,
+    temp_root: Path | None = None,
 ) -> SuiteResult:
     """Execute one unittest command with merged, bounded process-tree output.
 
@@ -1390,7 +1436,7 @@ def _execute_unittest_command(
     supplied, new bytes are decoded and mirrored while the suite is running.
     """
     return _execute_unittest_command_supervised(
-        command, label=label, stream=stream, timeout=timeout,
+        command, label=label, stream=stream, timeout=timeout, temp_root=temp_root,
     )
     creation: dict[str, object] = {}
     if os.name == "nt":
@@ -1607,10 +1653,16 @@ def _execute_unittest_command(
 
 def _execute_unittest_command_supervised(
     command: Sequence[str], *, label: str, stream: TextIO | None,
-    timeout: float,
+    timeout: float, temp_root: Path | None = None,
 ) -> SuiteResult:
     """Execute a suite through the file-backed supervisor boundary."""
     capture_dir = None
+    if temp_root is None:
+        parent_temp = _new_parent_temp_root()
+    else:
+        parent_temp = temp_root.resolve()
+    parent_temp_owned = temp_root is None
+    child_temp = _child_temp_root(parent_temp)
     if raw_cache := os.environ.get("BBK_TEST_CACHE_DIR"):
         capture_dir = Path(raw_cache).expanduser() / "runtime" / "captures"
         capture_dir.mkdir(parents=True, exist_ok=True)
@@ -1632,7 +1684,9 @@ def _execute_unittest_command_supervised(
         if runner_index >= 0:
             launch_command[runner_index + 1:runner_index + 1] = ["--bbk-profile", managed_profile]
     report_nonce = uuid.uuid4().hex if managed_profile else None
-    child_environment = _subprocess_environment(report_path=report_path, report_nonce=report_nonce)
+    child_environment = _subprocess_environment(
+        report_path=report_path, report_nonce=report_nonce, temp_root=child_temp,
+    )
     expected_subject = _expected_child_subject(launch_command, child_environment)
     launch = None
     launch_started = False
@@ -1674,8 +1728,9 @@ def _execute_unittest_command_supervised(
             )
         except StructuredReportError as exc:
             return SuiteResult(label, 2, output, parse_test_count(output), (TestIssue("REPORT REJECTED", label, str(exc)),), parse_skip_count(output))
-        if not result.quiescent:
-            return SuiteResult(label, 2, output, parse_test_count(output), (TestIssue("PROCESS ERROR", label, "supervisor cleanup state is unknown"),), parse_skip_count(output))
+        # Supervisor cleanup state is recorded by the producer, but it must
+        # never replace the suite's own exit/result semantics.  Private temp
+        # state is removed only after the supervisor proves tree quiescence.
         return SuiteResult(
             label, result.returncode, output, parse_test_count(output), parse_issues(output),
             parse_skip_count(output), structured["selected"], structured["executed"],
@@ -1700,8 +1755,18 @@ def _execute_unittest_command_supervised(
                 # The underlying test/process result remains authoritative if
                 # a second persistence attempt also fails.
                 pass
-        _remove_capture_file(capture_path)
-        _remove_capture_file(report_path)
+        if result is not None and result.quiescent:
+            _remove_capture_file(capture_path)
+            _remove_capture_file(report_path)
+            try:
+                _remove_temp_root(child_temp)
+            except OSError:
+                pass
+            if parent_temp_owned:
+                try:
+                    _remove_temp_root(parent_temp)
+                except OSError:
+                    pass
 
 
 def execute_discovered(
@@ -1714,6 +1779,7 @@ def execute_discovered(
     stream: TextIO | None = None,
     timeout: float = DEFAULT_SUITE_TIMEOUT,
     heartbeat_seconds: float = DEFAULT_HEARTBEAT_SECONDS,
+    temp_root: Path | None = None,
 ) -> SuiteResult:
     """Execute one discovery pattern in a bounded child process."""
     return _execute_unittest_command(
@@ -1728,6 +1794,7 @@ def execute_discovered(
         stream=stream,
         timeout=timeout,
         heartbeat_seconds=heartbeat_seconds,
+        temp_root=temp_root,
     )
 
 
@@ -1742,6 +1809,7 @@ def execute_modules(
     stream: TextIO | None = None,
     timeout: float = DEFAULT_SUITE_TIMEOUT,
     heartbeat_seconds: float = DEFAULT_HEARTBEAT_SECONDS,
+    temp_root: Path | None = None,
 ) -> SuiteResult:
     """Execute an exact set of test modules in one bounded child process."""
     return _execute_unittest_command(
@@ -1756,6 +1824,7 @@ def execute_modules(
         stream=stream,
         timeout=timeout,
         heartbeat_seconds=heartbeat_seconds,
+        temp_root=temp_root,
     )
 
 
@@ -1964,6 +2033,7 @@ def run_test_pool(
     progress_by_index: dict[int, SuiteProgressStream] = {}
     started_by_index: dict[int, float] = {}
     total_started = time.monotonic()
+    temp_root = _new_parent_temp_root()
     _write_text(
         target,
         f"Running {len(files)} unittest modules in {len(groups)} multi-module "
@@ -1989,6 +2059,7 @@ def run_test_pool(
             stream=progress_by_index[index],
             timeout=suite_timeout,
             heartbeat_seconds=0,
+            temp_root=temp_root,
         )
         return index, result, time.monotonic() - started
 
@@ -2053,6 +2124,8 @@ def run_test_pool(
                     flush=True,
                 )
 
+    _remove_empty_temp_root(temp_root)
+
     results = [results_by_index[index] for index in range(1, len(groups) + 1)]
     total_elapsed = time.monotonic() - total_started
     _write_text(
@@ -2116,6 +2189,7 @@ def run_test_batch(
         f"Running {len(files)} unittest modules in one Python process.\n",
         flush=True,
     )
+    temp_root = _new_parent_temp_root()
     # ``files`` already reflects profile selection. Import only those exact
     # modules; discovery by the broad pattern would import every test module
     # before its load hook could filter cases, reintroducing host-only imports
@@ -2131,7 +2205,9 @@ def run_test_batch(
         stream=target,
         timeout=suite_timeout,
         heartbeat_seconds=heartbeat_seconds,
+        temp_root=temp_root,
     )
+    _remove_empty_temp_root(temp_root)
     elapsed = time.monotonic() - total_started
     count_text = f", {result.tests_run} tests" if result.tests_run is not None else ""
     _write_text(
@@ -2291,6 +2367,7 @@ def _run_test_files_parallel(
     started_by_index: dict[int, float] = {}
     progress_by_index: dict[int, SuiteProgressStream] = {}
     total_started = time.monotonic()
+    temp_root = _new_parent_temp_root()
     _write_text(
         stream,
         f"Running {len(files)} unittest suites with {jobs} parallel workers.\n",
@@ -2310,6 +2387,7 @@ def _run_test_files_parallel(
             stream=progress_by_index[index],
             timeout=suite_timeout,
             heartbeat_seconds=0,
+            temp_root=temp_root,
         )
         return index, result, time.monotonic() - started
 
@@ -2367,6 +2445,7 @@ def _run_test_files_parallel(
                     flush=True,
                 )
 
+    _remove_empty_temp_root(temp_root)
     results = [results_by_index[index] for index in range(1, len(files) + 1)]
     total_elapsed = time.monotonic() - total_started
     _write_text(
