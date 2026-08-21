@@ -15,6 +15,10 @@ try:
     from .mise_adapter import MiseAdapterError, managed_tool_command, managed_tool_environment
 except ImportError:  # pragma: no cover - direct script compatibility
     from mise_adapter import MiseAdapterError, managed_tool_command, managed_tool_environment
+try:
+    from .._process_supervisor import run_text
+except ImportError:  # pragma: no cover - direct script compatibility
+    from _process_supervisor import run_text
 
 
 class JjAdapterError(RuntimeError):
@@ -82,16 +86,10 @@ def _run(
     environment: Mapping[str, str] | None = None,
 ) -> subprocess.CompletedProcess[str]:
     command_prefix, _binding = _jj_command(cwd, jj_path=jj_path, environment=environment)
-    completed = subprocess.run(
+    completed = run_text(
         [*command_prefix, "--no-pager", "--color=never", *arguments],
         cwd=Path(cwd).resolve(),
-        env=managed_tool_environment({**os.environ, **dict(environment or {})}),
-        check=False,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        encoding="utf-8",
-        errors="backslashreplace",
+        environment=managed_tool_environment({**os.environ, **dict(environment or {})}),
         timeout=300,
     )
     if check and completed.returncode != 0:

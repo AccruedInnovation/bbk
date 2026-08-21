@@ -39,6 +39,12 @@ class BoundedResult:
     pids: tuple[int, ...]
     elapsed_seconds: float
     capture_path: str
+    stdout: str = ""
+    stderr: str = ""
+    stdout_capture_path: str = ""
+    stderr_capture_path: str = ""
+    stdout_bytes: bytes = b""
+    stderr_bytes: bytes = b""
 
 
 class SupervisionError(RuntimeError):
@@ -225,12 +231,14 @@ def _windows_breakaway_allowed() -> bool:
 def _run_windows(
     command: Sequence[str], *, capture: Path, timeout: float, cwd: Path | None,
     environment: Mapping[str, str] | None,
+    stdout_capture: Path | None = None, stderr_capture: Path | None = None,
 ) -> BoundedResult:
     job = kernel32.CreateJobObjectW(None, None)
     if not job:
         raise _win_error("CreateJobObjectW")
     process = thread = None
-    output_fd = input_fd = None
+    output_fd = error_fd = input_fd = None
+    shared_error = False
     started = time.monotonic()
     timed_out = False
     resumed = False
@@ -240,27 +248,46 @@ def _run_windows(
         info.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
         if not kernel32.SetInformationJobObject(job, JOB_OBJECT_EXTENDED_LIMIT_INFORMATION, ctypes.byref(info), ctypes.sizeof(info)):
             raise _win_error("SetInformationJobObject")
-        capture.parent.mkdir(parents=True, exist_ok=True)
-        output_fd = os.open(str(capture), os.O_CREAT | os.O_TRUNC | os.O_WRONLY, 0o600)
+        stdout_path = stdout_capture or capture
+        stderr_path = stderr_capture or capture
+        stdout_path.parent.mkdir(parents=True, exist_ok=True)
+        if stderr_path != stdout_path:
+            stderr_path.parent.mkdir(parents=True, exist_ok=True)
+        output_fd = os.open(str(stdout_path), os.O_CREAT | os.O_TRUNC | os.O_WRONLY, 0o600)
+        error_fd = output_fd if stderr_path == stdout_path else os.open(str(stderr_path), os.O_CREAT | os.O_TRUNC | os.O_WRONLY, 0o600)
+        shared_error = error_fd == output_fd
         input_fd = os.open(os.devnull, os.O_RDONLY)
         os.set_handle_inheritable(msvcrt.get_osfhandle(output_fd), True)
+        if error_fd != output_fd:
+            os.set_handle_inheritable(msvcrt.get_osfhandle(error_fd), True)
         os.set_handle_inheritable(msvcrt.get_osfhandle(input_fd), True)
         startup = _StartupInfo()
         startup.cb = ctypes.sizeof(startup)
         startup.dwFlags = STARTF_USESTDHANDLES
         startup.hStdInput = msvcrt.get_osfhandle(input_fd)
         startup.hStdOutput = msvcrt.get_osfhandle(output_fd)
-        startup.hStdError = msvcrt.get_osfhandle(output_fd)
+        startup.hStdError = msvcrt.get_osfhandle(error_fd)
         pi = _ProcessInformation()
-        command_line = ctypes.create_unicode_buffer(subprocess.list2cmdline(list(command)))
+        application_name = ctypes.create_unicode_buffer(str(command[0]))
+        if len(command) >= 5 and Path(command[0]).name.casefold() in {"cmd.exe", "cmd"} and command[3].casefold() == "/c":
+            # CreateProcess receives one command line, while cmd's /c
+            # grammar requires the child command to remain one quoted token.
+            child_line = subprocess.list2cmdline(list(command[4:]))
+            command_line = ctypes.create_unicode_buffer(
+                f'/d /s /c "{child_line}"'
+            )
+        else:
+            command_line = ctypes.create_unicode_buffer(subprocess.list2cmdline(list(command)))
         flags = CREATE_SUSPENDED | CREATE_NEW_PROCESS_GROUP | CREATE_UNICODE_ENVIRONMENT
         if _windows_breakaway_allowed():
             flags |= CREATE_BREAKAWAY_FROM_JOB
         env_block = _environment_block(environment)
-        if not kernel32.CreateProcessW(None, command_line, None, None, True, flags, env_block, str(cwd) if cwd else None, ctypes.byref(startup), ctypes.byref(pi)):
+        if not kernel32.CreateProcessW(application_name, command_line, None, None, True, flags, env_block, str(cwd) if cwd else None, ctypes.byref(startup), ctypes.byref(pi)):
             raise _win_error("CreateProcessW")
         process, thread = int(pi.hProcess), int(pi.hThread)
         os.close(output_fd); output_fd = None
+        if not shared_error:
+            os.close(error_fd); error_fd = None
         os.close(input_fd); input_fd = None
         before = wintypes.BOOL()
         if not kernel32.IsProcessInJob(process, job, ctypes.byref(before)):
@@ -293,13 +320,24 @@ def _run_windows(
             job = None
         if output_fd is not None:
             os.close(output_fd)
+        if error_fd is not None and not shared_error:
+            os.close(error_fd)
         if input_fd is not None:
             os.close(input_fd)
     # The Job close is the only tree-wide cleanup effect.  Wait on the known
-    # root handle, then independently inspect every PID captured from the Job.
-    quiescent = bool(process) and kernel32.WaitForSingleObject(process, 5000) == WAIT_OBJECT_0
-    states = tuple(_windows_process_dead(pid) for pid in pids)
-    quiescent = quiescent and all(value is True for value in states)
+    # root handle, then independently inspect every PID captured from the Job
+    # until all handles report termination.  This barrier is what makes cwd
+    # release observable before the caller receives the result.
+    deadline = time.monotonic() + 5.0
+    states: tuple[bool | None, ...] = ()
+    quiescent = False
+    while time.monotonic() <= deadline:
+        root_done = bool(process) and kernel32.WaitForSingleObject(process, 0) == WAIT_OBJECT_0
+        states = tuple(_windows_process_dead(pid) for pid in pids)
+        if root_done and all(value is True for value in states):
+            quiescent = True
+            break
+        time.sleep(0.01)
     code = wintypes.DWORD()
     returncode = int(code.value) if process and kernel32.GetExitCodeProcess(process, ctypes.byref(code)) else 2
     if timed_out:
@@ -308,17 +346,30 @@ def _run_windows(
         kernel32.CloseHandle(process)
     if thread:
         kernel32.CloseHandle(thread)
-    return BoundedResult(returncode, _read_capture(capture), timed_out, quiescent, "CLEAN" if quiescent else "CLEANUP_UNKNOWN", pids, time.monotonic() - started, str(capture))
+    stdout_path = stdout_capture or capture
+    stderr_path = stderr_capture or capture
+    stdout_raw = stdout_path.read_bytes()
+    stderr_raw = stderr_path.read_bytes() if stderr_path != stdout_path else stdout_raw
+    stdout = stdout_raw.decode("utf-8", errors="backslashreplace")
+    stderr = stderr_raw.decode("utf-8", errors="backslashreplace")
+    return BoundedResult(returncode, stdout, timed_out, quiescent, "CLEAN" if quiescent else "CLEANUP_UNKNOWN", pids, time.monotonic() - started, str(capture), stdout, stderr, str(stdout_path), str(stderr_path), stdout_raw, stderr_raw)
 
 
 def _run_posix(
     command: Sequence[str], *, capture: Path, timeout: float, cwd: Path | None,
     environment: Mapping[str, str] | None,
+    stdout_capture: Path | None = None, stderr_capture: Path | None = None,
 ) -> BoundedResult:
-    capture.parent.mkdir(parents=True, exist_ok=True)
+    stdout_path = stdout_capture or capture
+    stderr_path = stderr_capture or capture
+    stdout_path.parent.mkdir(parents=True, exist_ok=True)
+    if stderr_path != stdout_path:
+        stderr_path.parent.mkdir(parents=True, exist_ok=True)
     started = time.monotonic()
-    with capture.open("wb") as output:
-        process = subprocess.Popen(list(command), cwd=cwd, env=environment, stdin=subprocess.DEVNULL, stdout=output, stderr=subprocess.STDOUT, start_new_session=True)
+    output = stdout_path.open("wb")
+    error = output if stderr_path == stdout_path else stderr_path.open("wb")
+    try:
+        process = subprocess.Popen(list(command), cwd=cwd, env=environment, stdin=subprocess.DEVNULL, stdout=output, stderr=error, start_new_session=True)
         try:
             process.wait(timeout=timeout if timeout > 0 else None)
             timed_out = False
@@ -330,20 +381,34 @@ def _run_posix(
             except subprocess.TimeoutExpired:
                 os.killpg(process.pid, signal.SIGKILL)
                 process.wait(timeout=5)
-    return BoundedResult(process.returncode if not timed_out else 2, _read_capture(capture), timed_out, process.poll() is not None, "CLEAN" if process.poll() is not None else "CLEANUP_UNKNOWN", (process.pid,), time.monotonic() - started, str(capture))
+    finally:
+        if error is not output:
+            error.close()
+        output.close()
+    stdout_raw = stdout_path.read_bytes()
+    stderr_raw = stderr_path.read_bytes() if stderr_path != stdout_path else stdout_raw
+    stdout = stdout_raw.decode("utf-8", errors="backslashreplace")
+    stderr = stderr_raw.decode("utf-8", errors="backslashreplace")
+    return BoundedResult(process.returncode if not timed_out else 2, stdout, timed_out, process.poll() is not None, "CLEAN" if process.poll() is not None else "CLEANUP_UNKNOWN", (process.pid,), time.monotonic() - started, str(capture), stdout, stderr, str(stdout_path), str(stderr_path), stdout_raw, stderr_raw)
 
 
 def run_bounded(
     command: Sequence[str], *, capture_path: Path | None = None, timeout: float = DEFAULT_TIMEOUT,
     cwd: Path | None = None, environment: Mapping[str, str] | None = None,
+    stdout_capture_path: Path | None = None, stderr_capture_path: Path | None = None,
 ) -> BoundedResult:
     """Run one owned command without a stdout pipe or unbound cleanup target."""
     temporary = capture_path is None
-    capture = capture_path or Path(tempfile.mkstemp(prefix="bbk-supervisor-", suffix=".log")[1])
+    if capture_path is None:
+        capture_fd, capture_name = tempfile.mkstemp(prefix="bbk-supervisor-", suffix=".log")
+        os.close(capture_fd)
+        capture = Path(capture_name)
+    else:
+        capture = capture_path
     try:
         if os.name == "nt":
-            return _run_windows(command, capture=capture, timeout=timeout, cwd=cwd, environment=environment)
-        return _run_posix(command, capture=capture, timeout=timeout, cwd=cwd, environment=environment)
+            return _run_windows(command, capture=capture, timeout=timeout, cwd=cwd, environment=environment, stdout_capture=stdout_capture_path, stderr_capture=stderr_capture_path)
+        return _run_posix(command, capture=capture, timeout=timeout, cwd=cwd, environment=environment, stdout_capture=stdout_capture_path, stderr_capture=stderr_capture_path)
     finally:
         if temporary:
             capture.unlink(missing_ok=True)
@@ -351,6 +416,43 @@ def run_bounded(
 
 supervise = run_bounded
 execute = run_bounded
+
+
+def run_text(
+    command: Sequence[str], *, cwd: Path | None = None,
+    environment: Mapping[str, str] | None = None, timeout: float = DEFAULT_TIMEOUT,
+) -> subprocess.CompletedProcess[str]:
+    """Run an owned command with distinct streams and a quiescent return barrier."""
+    result = run_bytes(command, cwd=cwd, environment=environment, timeout=timeout)
+    if result.returncode is None:
+        raise SupervisionError(f"owned command returned no exit status: {list(command)!r}")
+    return subprocess.CompletedProcess(
+        list(command), result.returncode,
+        result.stdout.decode("utf-8", errors="backslashreplace"),
+        result.stderr.decode("utf-8", errors="backslashreplace"),
+    )
+
+
+def run_bytes(
+    command: Sequence[str], *, cwd: Path | None = None,
+    environment: Mapping[str, str] | None = None, timeout: float = DEFAULT_TIMEOUT,
+) -> subprocess.CompletedProcess[bytes]:
+    """Run an owned command while retaining raw, distinct stream bytes."""
+    with tempfile.TemporaryDirectory(prefix="bbk-supervised-") as raw:
+        root = Path(raw)
+        result = run_bounded(
+            command,
+            timeout=timeout,
+            cwd=cwd,
+            environment=environment,
+            stdout_capture_path=root / "stdout.log",
+            stderr_capture_path=root / "stderr.log",
+        )
+        if result.timed_out:
+            raise subprocess.TimeoutExpired(list(command), timeout, output=result.stdout_bytes, stderr=result.stderr_bytes)
+        if not result.quiescent:
+            raise SupervisionError(f"owned command cleanup unknown: {list(command)!r}")
+        return subprocess.CompletedProcess(list(command), result.returncode, result.stdout_bytes, result.stderr_bytes)
 
 
 if os.name == "nt":

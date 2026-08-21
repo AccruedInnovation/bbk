@@ -10,6 +10,7 @@ import io
 import json
 import os
 import subprocess
+import shutil
 import sys
 import tempfile
 import textwrap
@@ -184,6 +185,33 @@ class Alpha117GitRepositoryTests(unittest.TestCase):
                 else:
                     self.assertTrue(result['timed_out'])
                     self.assertNotEqual(result['returncode'], 0)
+
+    def test_supervisor_returns_distinct_streams_and_releases_nested_cwd(self):
+        if os.name != 'nt':
+            self.skipTest('Windows Job API probe requires native Windows')
+        with tempfile.TemporaryDirectory() as raw_root:
+            root = Path(raw_root) / 'project'
+            root.mkdir()
+            code = (
+                'import subprocess,sys,time; '
+                'subprocess.Popen([sys.executable,"-c","import time; time.sleep(30)"], '
+                'stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL); '
+                'print("stdout-value", flush=True); print("stderr-value", file=sys.stderr, flush=True)'
+            )
+            result = process_supervisor.run_bounded(
+                [sys.executable, '-c', code],
+                capture_path=root / 'merged.log',
+                stdout_capture_path=root / 'stdout.log',
+                stderr_capture_path=root / 'stderr.log',
+                cwd=root,
+                timeout=10,
+            )
+            self.assertTrue(result.quiescent, result)
+            self.assertEqual('stdout-value', result.stdout.strip())
+            self.assertEqual('stderr-value', result.stderr.strip())
+            self.assertEqual(0, result.returncode)
+            shutil.rmtree(root)
+            self.assertFalse(root.exists())
 
     def test_release_package_uses_an_explicit_cross_extractor_mode_policy(self):
         self.assertEqual(m8_build_release.PACKAGE_EXECUTABLES, frozenset())

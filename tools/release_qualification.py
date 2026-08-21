@@ -22,6 +22,11 @@ import tempfile
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
+try:
+    from ._process_supervisor import run_text
+except ImportError:  # pragma: no cover - direct script compatibility
+    from _process_supervisor import run_text
+
 TOOLS_DIR = Path(__file__).resolve().parent
 if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
@@ -209,16 +214,10 @@ def _run(
     environment: Mapping[str, str] | None = None,
     timeout: int = 120,
 ) -> subprocess.CompletedProcess[str]:
-    completed = subprocess.run(
+    completed = run_text(
         [str(item) for item in command],
         cwd=cwd,
-        env={**os.environ, **dict(environment or {}), "NO_COLOR": "1"},
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        encoding="utf-8",
-        errors="backslashreplace",
-        check=False,
+        environment={**os.environ, **dict(environment or {}), "NO_COLOR": "1"},
         timeout=timeout,
     )
     if completed.returncode != 0:

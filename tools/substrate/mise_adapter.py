@@ -17,6 +17,11 @@ from governed_state import all_receipts, append_receipt
 from dependencies import command_argv, discover_executable
 import shutil
 
+try:
+    from .._process_supervisor import run_text
+except ImportError:
+    from _process_supervisor import run_text
+
 
 class MiseAdapterError(RuntimeError):
     def __init__(self, code: str, message: str):
@@ -301,16 +306,11 @@ def _mise_path(
 
 
 def mise_version(path: Path, *, environment: Mapping[str, str] | None = None) -> str:
-    completed = subprocess.run(
+    completed = run_text(
         command_argv(path, ["--version"], environment=environment),
-        check=False,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        encoding="utf-8",
-        errors="backslashreplace",
+        environment={**(os.environ if environment is None else dict(environment)), "NO_COLOR": "1"},
+        cwd=Path.cwd(),
         timeout=10,
-        env={**(os.environ if environment is None else dict(environment)), "NO_COLOR": "1"},
     )
     output = " ".join(completed.stdout.split())
     if completed.returncode != 0 or not output:
@@ -436,21 +436,18 @@ def execute(
         arguments.extend(["--", *request["arguments"]])
     command = command_argv(executable, arguments, environment=execution_environment)
     started = utc_now()
-    completed = subprocess.run(
+    completed = run_text(
         command,
         cwd=execution,
-        env=execution_environment,
-        check=False,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        environment=execution_environment,
         timeout=1800,
     )
     finished = utc_now()
     output_evidence = {
-        "stdout_sha256": sha256_bytes(completed.stdout),
-        "stderr_sha256": sha256_bytes(completed.stderr),
-        "stdout_bytes": len(completed.stdout),
-        "stderr_bytes": len(completed.stderr),
+        "stdout_sha256": sha256_bytes(completed.stdout.encode("utf-8")),
+        "stderr_sha256": sha256_bytes(completed.stderr.encode("utf-8")),
+        "stdout_bytes": len(completed.stdout.encode("utf-8")),
+        "stderr_bytes": len(completed.stderr.encode("utf-8")),
     }
     output_digest = f"sha256:{canonical_digest(output_evidence)}"
     result_core = {

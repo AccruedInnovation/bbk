@@ -12,6 +12,11 @@ import time
 from pathlib import Path
 from typing import Any, Iterator, Mapping, Sequence
 
+try:
+    from .._process_supervisor import run_text
+except ImportError:  # pragma: no cover - direct script compatibility
+    from _process_supervisor import run_text
+
 from gate_kernel import canonical_digest, canonical_json_bytes
 try:
     from .mise_adapter import MiseAdapterError, managed_tool_command, managed_tool_environment
@@ -107,20 +112,14 @@ def _run(
     check: bool = True,
 ) -> subprocess.CompletedProcess[str]:
     command_prefix, _binding = _bd_command(workspace, bd_path=bd_path)
-    completed = subprocess.run(
+    completed = run_text(
         [*command_prefix, "--sandbox", "--json", "-C", str(Path(workspace).resolve()), *arguments],
         cwd=Path(workspace).resolve(),
-        env={
+        environment={
             **managed_tool_environment(os.environ),
             "BD_NON_INTERACTIVE": "1",
             "BEADS_DISABLE_METRICS": "1",
         },
-        check=False,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        encoding="utf-8",
-        errors="backslashreplace",
         timeout=300,
     )
     if check and completed.returncode != 0:
@@ -164,24 +163,18 @@ def ensure_backend_initialized(
     gitignore_bytes = gitignore.read_bytes() if gitignore_existed else b""
     gitignore_mode = gitignore.stat().st_mode if gitignore_existed else None
     try:
-        completed = subprocess.run(
+        completed = run_text(
             [
                 *command_prefix, "--sandbox", "--json", "init", "--init-if-missing",
                 "--non-interactive", "--skip-agents", "--skip-hooks", "--setup-exclude",
                 "--prefix", "BBK",
             ],
             cwd=root,
-            env={
+            environment={
                 **managed_tool_environment(os.environ),
                 "BD_NON_INTERACTIVE": "1",
                 "BEADS_DISABLE_METRICS": "1",
             },
-            check=False,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            encoding="utf-8",
-            errors="backslashreplace",
             timeout=300,
         )
     finally:
