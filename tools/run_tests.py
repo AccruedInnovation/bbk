@@ -51,6 +51,7 @@ if str(TOOLS_DIR) not in sys.path:
 from runtime_requirements import PythonLaunchInvariantError, enforce_supported_python, python_command, python_environment
 import launch_recorder
 import _process_supervisor as process_supervisor
+from tests import _test_profiles as test_profiles
 
 enforce_supported_python(program='BBK test runner')
 
@@ -63,73 +64,20 @@ if str(ROOT) not in sys.path:
 class _TestProfileContract:
     """Production-owned profile projection used by the test runner."""
 
-    FAST_TEST_FILENAMES = tuple(
-        f"{module}.py"
-        for module in (
-            "test_artifact_windows_native",
-            "test_assurance_state",
-            "test_contract_package_v1",
-            "test_control_plane",
-            "test_dependencies",
-            "test_governance_status",
-            "test_governed_filesystem",
-            "test_manual_qualification_kit",
-            "test_model_routing_optional_package_version",
-            "test_omp_governed_profile",
-            "test_prompt_module_package_v1",
-            "test_qualified_task",
-            "test_read_only_spawn",
-            "test_release_qualification",
-            "test_role_capabilities",
-            "test_role_package_v4",
-            "test_role_return_runtime",
-            "test_schema_registry",
-            "test_session_oracle",
-            "test_substrate_beads",
-            "test_substrate_doctor",
-            "test_substrate_jj",
-            "test_verification_economy",
-            "test_verification_metrics",
-            "test_worker_spawn",
-        )
-    )
-    RELEASE_ONLY = frozenset(
-        {
-            "test_installation_portability_contracts.Alpha93VerificationReportingTests.test_runner_end_to_end_repeats_failure_and_error_at_the_end",
-            "test_installation_portability_contracts.Alpha93VerificationReportingTests.test_runner_end_to_end_prints_clean_final_summary",
-            "test_installation_profile_packages.Alpha117GitRepositoryTests.test_pooled_runner_uses_bounded_multi_module_processes",
-            "test_installation_profile_packages.Alpha117GitRepositoryTests.test_batch_runner_uses_one_python_process_for_all_discovered_modules",
-            "test_installation_profile_packages.Alpha117GitRepositoryTests.test_test_runner_emits_suite_progress_and_quiet_heartbeat",
-            "test_installation_profile_packages.Alpha117GitRepositoryTests.test_parallel_runner_heartbeat_names_the_current_test",
-            "test_installation_profile_packages.Alpha117GitRepositoryTests.test_suite_children_cannot_read_the_developer_console",
-            "test_installation_profile_packages.Alpha117GitRepositoryTests.test_test_runner_survives_cp1252_console_and_non_utf8_child_bytes",
-            "test_installation_profile_packages.Alpha117GitRepositoryTests.test_output_stream_failure_terminates_child_before_capture_cleanup",
-            "test_installation_profile_packages.Alpha117GitRepositoryTests.test_windows_process_tree_cleanup_bounds_taskkill",
-            "test_installation_profile_packages.Alpha117GitRepositoryTests.test_capture_cleanup_retries_and_suppresses_windows_sharing_violation",
-            "test_installation_profile_packages.Alpha117GitRepositoryTests.test_ordered_verifier_survives_cp1252_console_with_unicode_child_output",
-            "test_installation_profile_packages.Alpha117GitRepositoryTests.test_install_verification_gate_survives_cp1252_console_mirroring",
-            "test_contract_package_v1.ContractPackageV1Tests.test_declared_nullability_matches_role_contract_prose_and_schema",
-            "test_contract_package_v1.ContractPackageV1Tests.test_representative_return_for_every_role_validates",
-            "test_contract_package_v1.ContractPackageV1Tests.test_exact_role_contract_discriminators_reject_drift_for_every_role",
-            "test_contract_package_v1.ContractPackageV1Tests.test_result_payload_is_closed_and_every_declared_field_is_required",
-            "test_contract_package_v1.ContractPackageV1Tests.test_supplemental_enum_fields_are_exact_machine_discriminators",
-            "test_contract_package_v1.ContractPackageV1Tests.test_all_supported_field_kinds_have_schema_valid_examples",
-            "test_contract_package_v1.ContractPackageV1Tests.test_execution_contract_examples_validate_against_published_schemas",
-            "test_prompt_module_package_v1.PromptModulePackageV1Tests.test_catalog_and_module_schemas_are_valid_draft_2020_12",
-            "test_role_package_v4.SplitRolePackageV4Tests.test_published_draft_2020_12_schemas_validate_all_instances",
-        }
-    )
+    FAST_TEST_FILENAMES = test_profiles.FAST_TEST_FILENAMES
+    RELEASE_ONLY = test_profiles.RELEASE_ONLY
 
     @classmethod
     def fast_test_filenames(cls) -> tuple[str, ...]:
         return cls.FAST_TEST_FILENAMES
 
 
-test_profiles = _TestProfileContract()
+test_profile_contract = _TestProfileContract()
 
 RUN_COUNT_RE = re.compile(r"^Ran (\d+) tests? in ", re.MULTILINE)
 DEFAULT_SUITE_TIMEOUT = 420.0
 DEFAULT_HEARTBEAT_SECONDS = 15.0
+WINDOWS_ATTEMPT_PATH_BUDGET = 240
 DEFAULT_PARALLEL_JOBS = 0
 DEFAULT_EXECUTION_MODE = "auto"
 EXECUTION_MODES = ("auto", "pooled", "batch", "isolated")
@@ -142,7 +90,18 @@ STANDARD_RELEASE_DELTA_SCHEMA = "bbk.standard-release-delta.v1"
 IDENTITY_RECEIPT_SCHEMA = "bbk.identity-receipt.v1"
 RESOURCE_DEFAULT = "DEFAULT"
 RESOURCE_EXCLUSIVE_PROCESS_TREE = "EXCLUSIVE_PROCESS_TREE"
-PRODUCTION_RESOURCE_OVERRIDES: dict[str, str] = {}
+PRODUCTION_RESOURCE_OVERRIDES: dict[str, str] = {
+    module: RESOURCE_EXCLUSIVE_PROCESS_TREE
+    for module in (
+        "test_worker_spawn",
+        "test_read_only_spawn",
+        "test_omp_governed_profile",
+        "test_qualified_task",
+        "test_substrate_jj",
+        "test_release_qualification",
+        "test_substrate_beads",
+    )
+}
 
 
 def resolve_resource_policy(
@@ -150,10 +109,16 @@ def resolve_resource_policy(
     *, overrides: Mapping[str, str] | None = None,
 ) -> str:
     """Resolve sparse scheduling metadata without changing test membership."""
-    selected = (overrides or PRODUCTION_RESOURCE_OVERRIDES).get(module, RESOURCE_DEFAULT)
+    selected = (overrides or PRODUCTION_RESOURCE_OVERRIDES).get(
+        test_profiles.module_key(module), RESOURCE_DEFAULT
+    )
     if selected not in {RESOURCE_DEFAULT, RESOURCE_EXCLUSIVE_PROCESS_TREE}:
         selected = RESOURCE_DEFAULT
-    if metadata and metadata.get("resource_class") in {RESOURCE_DEFAULT, RESOURCE_EXCLUSIVE_PROCESS_TREE}:
+    if (
+        test_profiles.module_key(module) not in PRODUCTION_RESOURCE_OVERRIDES
+        and metadata
+        and metadata.get("resource_class") in {RESOURCE_DEFAULT, RESOURCE_EXCLUSIVE_PROCESS_TREE}
+    ):
         selected = str(metadata["resource_class"])
     return selected
 
@@ -164,7 +129,11 @@ def group_resource_policy(
 ) -> str:
     """A group is exclusive when any member carries the exclusive marker."""
     return RESOURCE_EXCLUSIVE_PROCESS_TREE if any(
-        resolve_resource_policy(Path(module).name, (metadata or {}).get(Path(module).name), overrides=overrides)
+        resolve_resource_policy(
+            test_profiles.module_key(module),
+            (metadata or {}).get(Path(module).name),
+            overrides=overrides,
+        )
         == RESOURCE_EXCLUSIVE_PROCESS_TREE for module in modules
     ) else RESOURCE_DEFAULT
 
@@ -178,6 +147,8 @@ class SparseResourceScheduler:
         self.active_slots = 0
         self.active_exclusive = False
         self.admission_order: list[int] = []
+        self.release_order: list[int] = []
+        self.effective_assignments: dict[int, str] = {}
 
     def can_admit(self, policy: str) -> bool:
         if policy == RESOURCE_EXCLUSIVE_PROCESS_TREE:
@@ -191,15 +162,28 @@ class SparseResourceScheduler:
             raise RuntimeError("resource capacity or exclusive process-tree conflict")
         self.active_slots = self.capacity if policy == RESOURCE_EXCLUSIVE_PROCESS_TREE else self.active_slots + 1
         self.active_exclusive = policy == RESOURCE_EXCLUSIVE_PROCESS_TREE
+        self.effective_assignments[int(group_index)] = policy
         self.admission_order.append(int(group_index))
         return self.active_slots
 
-    def release(self, policy: str = RESOURCE_DEFAULT) -> None:
+    def release(self, policy: str = RESOURCE_DEFAULT, group_index: int | None = None) -> None:
         if policy == RESOURCE_EXCLUSIVE_PROCESS_TREE:
             self.active_slots = 0
             self.active_exclusive = False
         else:
             self.active_slots = max(0, self.active_slots - 1)
+        if group_index is not None:
+            self.release_order.append(int(group_index))
+
+    def receipt(self, *, requested_jobs: int, resolved_capacity: int) -> dict[str, object]:
+        """Return the actual scheduler trace for a run-owned receipt."""
+        return {
+            "requested_jobs": int(requested_jobs),
+            "resolved_capacity": int(resolved_capacity),
+            "admission_order": list(self.admission_order),
+            "release_order": list(self.release_order),
+            "effective_assignments": dict(sorted(self.effective_assignments.items())),
+        }
 
 
 def resolve_jobs(jobs: int, *, group_count: int, platform_name: str | None = None) -> int:
@@ -208,6 +192,44 @@ def resolve_jobs(jobs: int, *, group_count: int, platform_name: str | None = Non
         return 0
     requested = automatic_parallel_jobs(platform_name=platform_name) if jobs == 0 else max(1, int(jobs))
     return min(group_count, requested)
+
+
+def resource_assignments(
+    groups: Sequence[Sequence[Path]],
+    *,
+    overrides: Mapping[str, str] | None = None,
+) -> list[dict[str, object]]:
+    """Project normalized module/group resource policy before admission."""
+    values: list[dict[str, object]] = []
+    for group_index, group in enumerate(groups, start=1):
+        group_policy = group_resource_policy(group, overrides=overrides)
+        for path in group:
+            module = test_profiles.module_key(path.name)
+            values.append({
+                "group_index": group_index,
+                "module": module,
+                "requested_policy": resolve_resource_policy(module, overrides=overrides),
+                "effective_policy": resolve_resource_policy(module, overrides=overrides),
+                "group_policy": group_policy,
+            })
+    return values
+
+
+def _resource_report(
+    groups: Sequence[Sequence[Path]],
+    scheduler: SparseResourceScheduler,
+    *,
+    requested_jobs: int,
+    resolved_capacity: int,
+    child_process_count: int,
+) -> dict[str, object]:
+    receipt = scheduler.receipt(
+        requested_jobs=requested_jobs,
+        resolved_capacity=resolved_capacity,
+    )
+    receipt["assignments"] = resource_assignments(groups)
+    receipt["total_child_process_count"] = int(child_process_count)
+    return receipt
 
 @contextlib.contextmanager
 def test_profile_environment(profile: str):
@@ -418,6 +440,43 @@ def _temp_root_base() -> Path:
     return Path(tempfile.gettempdir()).resolve() / "bbk-test-temp"
 
 
+def validate_attempt_root(
+    root: Path,
+    *,
+    descendants: Sequence[str | Path] = (),
+    budget: int = WINDOWS_ATTEMPT_PATH_BUDGET,
+) -> dict[str, object]:
+    """Fail closed on symlink/junction escapes and over-budget child paths."""
+    raw = Path(root).expanduser()
+    if raw.is_symlink():
+        raise ValueError("attempt root must not be a symlink or junction")
+    resolved = raw.resolve(strict=False)
+    if not resolved.is_absolute():
+        raise ValueError("attempt root must be absolute")
+    paths = [resolved / Path(value) for value in descendants]
+    for candidate in paths:
+        if candidate.is_symlink():
+            raise ValueError(f"attempt descendant must not be a symlink: {candidate}")
+        candidate_resolved = candidate.resolve(strict=False)
+        try:
+            candidate_resolved.relative_to(resolved)
+        except ValueError as exc:
+            raise ValueError(f"attempt descendant escapes root: {candidate}") from exc
+    longest = max((len(str(path)) for path in [resolved, *paths]), default=len(str(resolved)))
+    if os.name == "nt" and longest > budget:
+        raise ValueError(f"attempt path budget exceeded: {longest}>{budget}")
+    return {
+        "root": str(resolved),
+        "declared_paths": [str(path) for path in paths],
+        "max_path_length": longest,
+        "budget": budget,
+        "status": "PASS",
+    }
+
+
+preflight_attempt_root = validate_attempt_root
+
+
 def _child_temp_root(parent: Path) -> Path:
     parent = parent.resolve()
     parent.mkdir(parents=True, exist_ok=True)
@@ -433,17 +492,27 @@ def _remove_temp_root(path: Path) -> None:
 def _new_parent_temp_root() -> Path:
     base = _temp_root_base()
     base.mkdir(parents=True, exist_ok=True)
-    return Path(tempfile.mkdtemp(prefix="attempt-", dir=str(base)))
+    root = Path(tempfile.mkdtemp(prefix="attempt-", dir=str(base)))
+    try:
+        validate_attempt_root(root, descendants=("child-probe", "pycache", "capture.log"))
+    except ValueError:
+        shutil = __import__("shutil")
+        shutil.rmtree(root, ignore_errors=True)
+        raise
+    return root
 
 
-def _remove_empty_temp_root(path: Path) -> None:
+def _remove_empty_temp_root(path: Path) -> bool:
     """Remove an attempt root only when every child has already cleaned up."""
     try:
         path.rmdir()
+        return True
+    except FileNotFoundError:
+        return True
     except OSError:
         # A remaining child root is evidence that quiescent cleanup was not
         # established; retain it for the parent to inspect.
-        pass
+        return False
 
 
 def discover_suite(pattern: str = "test*.py") -> unittest.TestSuite:
@@ -813,7 +882,12 @@ def build_test_run_receipt(
     runtime = runtime_identity()
     mode = report.get("mode", "unknown")
     jobs = report.get("requested_jobs", 0)
-    resource = {"schema": "bbk.test-resource-policy.v1", "sha256": canonical_digest(PRODUCTION_RESOURCE_OVERRIDES), "overrides": {}}
+    resource = {
+        "schema": "bbk.test-resource-policy.v1",
+        "sha256": canonical_digest(PRODUCTION_RESOURCE_OVERRIDES),
+        "overrides": dict(sorted(PRODUCTION_RESOURCE_OVERRIDES.items())),
+        "actual": dict(report.get("resource", {})) if isinstance(report.get("resource"), Mapping) else {},
+    }
     selected_identity = hashlib.sha256(canonical_json_bytes(selected_ids)).hexdigest()
     return {
         "schema": TEST_RUN_RECEIPT_SCHEMA,
@@ -1663,6 +1737,20 @@ def _execute_unittest_command_supervised(
         parent_temp = temp_root.resolve()
     parent_temp_owned = temp_root is None
     child_temp = _child_temp_root(parent_temp)
+    try:
+        validate_attempt_root(
+            parent_temp,
+            descendants=(child_temp.relative_to(parent_temp), "pycache", "capture.log"),
+        )
+    except (ValueError, OSError) as exc:
+        try:
+            _remove_temp_root(child_temp)
+        except OSError:
+            pass
+        return SuiteResult(
+            label, 2, "", None,
+            (TestIssue("PROCESS ERROR", label, f"attempt-root preflight: {exc}"),),
+        )
     if raw_cache := os.environ.get("BBK_TEST_CACHE_DIR"):
         capture_dir = Path(raw_cache).expanduser() / "runtime" / "captures"
         capture_dir.mkdir(parents=True, exist_ok=True)
@@ -1716,6 +1804,16 @@ def _execute_unittest_command_supervised(
             # Preserve the producer result and retry finalization in the
             # bounded cleanup path; the terminal record retains this failure.
             launch_failure = exc
+        if not result.quiescent or result.cleanup != "CLEAN":
+            output += (
+                f"\nBBK test runner: suite {label} process-tree cleanup was "
+                f"{result.cleanup}; PASS is not allowed without quiescence.\n"
+            )
+            return SuiteResult(
+                label, 2, output, parse_test_count(output),
+                (TestIssue("PROCESS ERROR", label, output.strip()),),
+                parse_skip_count(output),
+            )
         if result.timed_out:
             output += f"\nBBK test runner: suite {label} exceeded {timeout:g} seconds and its process tree was terminated.\n"
             return SuiteResult(label, 2, output, parse_test_count(output), (TestIssue("PROCESS ERROR", label, output.strip()),), parse_skip_count(output))
@@ -2028,6 +2126,7 @@ def run_test_pool(
     if failfast:
         process_count = 1
     groups = partition_test_files(files, process_count, platform_name=os.name)
+    scheduler = SparseResourceScheduler(process_count)
     results_by_index: dict[int, SuiteResult] = {}
     elapsed_by_index: dict[int, float] = {}
     progress_by_index: dict[int, SuiteProgressStream] = {}
@@ -2069,12 +2168,30 @@ def run_test_pool(
     ) as pool:
         pending: dict[
             concurrent.futures.Future[tuple[int, SuiteResult, float]],
-            tuple[int, Sequence[Path]],
+            tuple[int, Sequence[Path], str],
         ] = {}
-        for index, group in enumerate(groups, start=1):
-            started_by_index[index] = time.monotonic()
-            progress_by_index[index] = SuiteProgressStream()
-            pending[pool.submit(execute, index, group)] = (index, group)
+        queued = list(enumerate(groups, start=1))
+
+        def admit_queued() -> None:
+            while queued:
+                choice = next(
+                    (
+                        (offset, index, group, group_resource_policy(group))
+                        for offset, (index, group) in enumerate(queued)
+                        if scheduler.can_admit(group_resource_policy(group))
+                    ),
+                    None,
+                )
+                if choice is None:
+                    return
+                offset, index, group, policy = choice
+                queued.pop(offset)
+                scheduler.admit(index, policy)
+                started_by_index[index] = time.monotonic()
+                progress_by_index[index] = SuiteProgressStream()
+                pending[pool.submit(execute, index, group)] = (index, group, policy)
+
+        admit_queued()
 
         while pending:
             wait_timeout = heartbeat_seconds if heartbeat_seconds > 0 else None
@@ -2095,7 +2212,7 @@ def run_test_pool(
                 if suite_timeout > 0:
                     _write_text(target, f" (hard timeout {suite_timeout:g}s per process)")
                 _write_text(target, ":\n")
-                for index, group in running:
+                for index, group, _policy in running:
                     current = progress_by_index[index].snapshot()
                     detail = f" — {current}" if current else ""
                     names = ", ".join(path.name for path in group)
@@ -2104,7 +2221,7 @@ def run_test_pool(
                 continue
 
             for future in sorted(done, key=lambda item: pending[item][0]):
-                index, group = pending.pop(future)
+                index, group, policy = pending.pop(future)
                 label = _shard_label(index, group)
                 try:
                     _, result, elapsed = future.result()
@@ -2114,6 +2231,7 @@ def run_test_pool(
                     elapsed = time.monotonic() - started_by_index[index]
                 results_by_index[index] = result
                 elapsed_by_index[index] = elapsed
+                scheduler.release(policy, index)
                 _write_text(target, f"\n==> [{index}/{len(groups)}] {label} output\n", flush=True)
                 _write_output(result.output, target)
                 count_text = f", {result.tests_run} tests" if result.tests_run is not None else ""
@@ -2123,8 +2241,9 @@ def run_test_pool(
                     f"{'PASS' if result.passed else 'FAIL'} ({elapsed:.1f}s{count_text})\n",
                     flush=True,
                 )
+                admit_queued()
 
-    _remove_empty_temp_root(temp_root)
+    root_removed = _remove_empty_temp_root(temp_root)
 
     results = [results_by_index[index] for index in range(1, len(groups) + 1)]
     total_elapsed = time.monotonic() - total_started
@@ -2149,6 +2268,10 @@ def run_test_pool(
         "tests_reported": sum(result.tests_run or 0 for result in results),
         "skipped": sum(result.skipped for result in results),
         **_identity_report(results),
+        "resource": _resource_report(
+            groups, scheduler, requested_jobs=jobs,
+            resolved_capacity=process_count, child_process_count=len(groups),
+        ),
         "groups": [
             {
                 "label": _shard_label(index, groups[index - 1]),
@@ -2160,6 +2283,9 @@ def run_test_pool(
             for index in range(1, len(groups) + 1)
         ],
     }
+    if not root_removed:
+        LAST_RUN_REPORT["resource"]["cleanup"] = "RESIDUE"
+        exit_code = 1
     if not _attach_launch_ledger(LAST_RUN_REPORT, child_scope=True):
         exit_code = 1
     return exit_code
@@ -2190,6 +2316,8 @@ def run_test_batch(
         flush=True,
     )
     temp_root = _new_parent_temp_root()
+    scheduler = SparseResourceScheduler(1)
+    scheduler.admit(1, group_resource_policy(files))
     # ``files`` already reflects profile selection. Import only those exact
     # modules; discovery by the broad pattern would import every test module
     # before its load hook could filter cases, reintroducing host-only imports
@@ -2207,7 +2335,8 @@ def run_test_batch(
         heartbeat_seconds=heartbeat_seconds,
         temp_root=temp_root,
     )
-    _remove_empty_temp_root(temp_root)
+    scheduler.release(group_resource_policy(files), 1)
+    root_removed = _remove_empty_temp_root(temp_root)
     elapsed = time.monotonic() - total_started
     count_text = f", {result.tests_run} tests" if result.tests_run is not None else ""
     _write_text(
@@ -2231,6 +2360,10 @@ def run_test_batch(
         "tests_reported": result.tests_run or 0,
         "skipped": result.skipped,
         **_identity_report([result]),
+        "resource": _resource_report(
+            [files], scheduler, requested_jobs=1,
+            resolved_capacity=1, child_process_count=1,
+        ),
         "groups": [{
             "label": result.name,
             "modules": [path.name for path in files],
@@ -2239,6 +2372,9 @@ def run_test_batch(
             "status": "PASS" if result.passed else "FAIL",
         }],
     }
+    if not root_removed:
+        LAST_RUN_REPORT["resource"]["cleanup"] = "RESIDUE"
+        exit_code = 1
     if not _attach_launch_ledger(LAST_RUN_REPORT, child_scope=True):
         exit_code = 1
     return exit_code
@@ -2283,7 +2419,10 @@ def run_test_files(
     results: list[SuiteResult] = []
     elapsed_by_index: dict[int, float] = {}
     total_started = time.monotonic()
+    scheduler = SparseResourceScheduler(1)
     for index, path in enumerate(files, start=1):
+        policy = resolve_resource_policy(path.name)
+        scheduler.admit(index, policy)
         suite_started = time.monotonic()
         _write_text(target, f"==> [{index}/{len(files)}] {path.name}\n", flush=True)
         result = execute_discovered(
@@ -2297,6 +2436,7 @@ def run_test_files(
             heartbeat_seconds=heartbeat_seconds,
         )
         results.append(result)
+        scheduler.release(policy, index)
         elapsed = time.monotonic() - suite_started
         elapsed_by_index[index] = elapsed
         count_text = f", {result.tests_run} tests" if result.tests_run is not None else ""
@@ -2328,6 +2468,11 @@ def run_test_files(
         "tests_reported": sum(result.tests_run or 0 for result in results),
         "skipped": sum(result.skipped for result in results),
         **_identity_report(results),
+        "resource": _resource_report(
+            [[path] for path in files], scheduler,
+            requested_jobs=jobs, resolved_capacity=1,
+            child_process_count=len(results),
+        ),
         "groups": [
             {
                 "label": path.name,
@@ -2368,6 +2513,7 @@ def _run_test_files_parallel(
     progress_by_index: dict[int, SuiteProgressStream] = {}
     total_started = time.monotonic()
     temp_root = _new_parent_temp_root()
+    scheduler = SparseResourceScheduler(jobs)
     _write_text(
         stream,
         f"Running {len(files)} unittest suites with {jobs} parallel workers.\n",
@@ -2392,11 +2538,29 @@ def _run_test_files_parallel(
         return index, result, time.monotonic() - started
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=jobs, thread_name_prefix="bbk-tests") as pool:
-        pending: dict[concurrent.futures.Future[tuple[int, SuiteResult, float]], tuple[int, Path]] = {}
-        for index, path in enumerate(files, start=1):
-            started_by_index[index] = time.monotonic()
-            progress_by_index[index] = SuiteProgressStream()
-            pending[pool.submit(execute, index, path)] = (index, path)
+        pending: dict[concurrent.futures.Future[tuple[int, SuiteResult, float]], tuple[int, Path, str]] = {}
+        queued = list(enumerate(files, start=1))
+
+        def admit_queued() -> None:
+            while queued:
+                choice = next(
+                    (
+                        (offset, index, path, resolve_resource_policy(path.name))
+                        for offset, (index, path) in enumerate(queued)
+                        if scheduler.can_admit(resolve_resource_policy(path.name))
+                    ),
+                    None,
+                )
+                if choice is None:
+                    return
+                offset, index, path, policy = choice
+                queued.pop(offset)
+                scheduler.admit(index, policy)
+                started_by_index[index] = time.monotonic()
+                progress_by_index[index] = SuiteProgressStream()
+                pending[pool.submit(execute, index, path)] = (index, path, policy)
+
+        admit_queued()
 
         while pending:
             timeout = heartbeat_seconds if heartbeat_seconds > 0 else None
@@ -2416,7 +2580,7 @@ def _run_test_files_parallel(
                 if suite_timeout > 0:
                     _write_text(stream, f" (hard timeout {suite_timeout:g}s)")
                 _write_text(stream, ":\n")
-                for index, path in running[:4]:
+                for index, path, _policy in running[:4]:
                     current = progress_by_index[index].snapshot()
                     detail = f" — {current}" if current else ""
                     _write_text(stream, f"        {path.name}{detail}\n")
@@ -2426,7 +2590,7 @@ def _run_test_files_parallel(
                 continue
 
             for future in sorted(done, key=lambda item: pending[item][0]):
-                index, path = pending.pop(future)
+                index, path, policy = pending.pop(future)
                 try:
                     _, result, elapsed = future.result()
                 except BaseException as exc:  # pragma: no cover - defensive scheduler path
@@ -2435,6 +2599,7 @@ def _run_test_files_parallel(
                     elapsed = time.monotonic() - started_by_index[index]
                 results_by_index[index] = result
                 elapsed_by_index[index] = elapsed
+                scheduler.release(policy, index)
                 _write_text(stream, f"\n==> [{index}/{len(files)}] {path.name} output\n", flush=True)
                 _write_output(result.output, stream)
                 count_text = f", {result.tests_run} tests" if result.tests_run is not None else ""
@@ -2444,8 +2609,9 @@ def _run_test_files_parallel(
                     f"{'PASS' if result.passed else 'FAIL'} ({elapsed:.1f}s{count_text})\n",
                     flush=True,
                 )
+                admit_queued()
 
-    _remove_empty_temp_root(temp_root)
+    root_removed = _remove_empty_temp_root(temp_root)
     results = [results_by_index[index] for index in range(1, len(files) + 1)]
     total_elapsed = time.monotonic() - total_started
     _write_text(
@@ -2466,6 +2632,11 @@ def _run_test_files_parallel(
         "tests_reported": sum(result.tests_run or 0 for result in results),
         "skipped": sum(result.skipped for result in results),
         **_identity_report(results),
+        "resource": _resource_report(
+            [[path] for path in files], scheduler,
+            requested_jobs=jobs, resolved_capacity=jobs,
+            child_process_count=len(files),
+        ),
         "groups": [
             {
                 "label": files[index - 1].name,
@@ -2477,6 +2648,9 @@ def _run_test_files_parallel(
             for index in range(1, len(files) + 1)
         ],
     }
+    if not root_removed:
+        LAST_RUN_REPORT["resource"]["cleanup"] = "RESIDUE"
+        exit_code = 1
     if not _attach_launch_ledger(LAST_RUN_REPORT, child_scope=True):
         exit_code = 1
     return exit_code
@@ -2600,7 +2774,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             files = [
                 path
                 for path in files
-                if path.name in test_profiles.fast_test_filenames()
+                if path.name in test_profile_contract.fast_test_filenames()
             ]
         if not files:
             issue = TestIssue(

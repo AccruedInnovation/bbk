@@ -8,6 +8,7 @@ individual test modules remain readable and can still be invoked directly.
 from __future__ import annotations
 
 import os
+import re
 import unittest
 from collections.abc import Iterable, Iterator
 
@@ -42,6 +43,8 @@ RELEASE_ONLY = frozenset(
         "test_contract_package_v1.ContractPackageV1Tests.test_execution_contract_examples_validate_against_published_schemas",
         "test_prompt_module_package_v1.PromptModulePackageV1Tests.test_catalog_and_module_schemas_are_valid_draft_2020_12",
         "test_role_package_v4.SplitRolePackageV4Tests.test_published_draft_2020_12_schemas_validate_all_instances",
+        "test_release_qualification.ReleaseQualificationVerticalSliceTests.test_alpha17_real_local_vertical_slice_passes_all_required_invariants",
+        "test_release_qualification.ReleaseQualificationVerticalSliceTests.test_alpha17_real_local_vertical_slice_handles_deep_windows_temp",
     }
 )
 
@@ -77,20 +80,54 @@ FAST_MODULES = frozenset(
     }
 )
 
+# The four modules below are retained in the release inventory but no longer
+# belong to FAST.  The remaining three affected modules contain a small pure
+# contract floor that stays FAST; their integration/vertical-slice classes
+# move to STANDARD or RELEASE_ONLY as declared here.
+FAST_MODULES = frozenset(FAST_MODULES - {
+    "test_omp_governed_profile",
+    "test_qualified_task",
+    "test_read_only_spawn",
+    "test_worker_spawn",
+})
+FAST_EXCLUDED_CLASSES = frozenset({
+    "test_omp_governed_profile.OmpGovernedProfileTests",
+    "test_qualified_task.QualifiedTaskTests",
+    "test_read_only_spawn.ReadOnlySpawnTests",
+    "test_worker_spawn.WorkerSpawnTests",
+    "test_substrate_jj.JjAdapterIntegrationTests",
+    "test_substrate_jj.JjMiseOwnershipTests",
+    "test_substrate_beads.BeadsAdapterIntegrationTests",
+    "test_substrate_beads.BeadsMiseOwnershipTests",
+    "test_release_qualification.ReleaseQualificationVerticalSliceTests",
+})
+
 FAST_TEST_FILENAMES = tuple(f"{module}.py" for module in sorted(FAST_MODULES))
 RESOURCE_DEFAULT = "DEFAULT"
 RESOURCE_EXCLUSIVE_PROCESS_TREE = "EXCLUSIVE_PROCESS_TREE"
-# Sparse policy is intentionally empty in production until a measured
-# assignment is admitted; metadata never changes profile membership.
-PRODUCTION_RESOURCE_OVERRIDES: dict[str, str] = {}
+PRODUCTION_RESOURCE_OVERRIDES: dict[str, str] = {
+    module: RESOURCE_EXCLUSIVE_PROCESS_TREE
+    for module in (
+        "test_worker_spawn",
+        "test_read_only_spawn",
+        "test_omp_governed_profile",
+        "test_qualified_task",
+        "test_substrate_jj",
+        "test_release_qualification",
+        "test_substrate_beads",
+    )
+}
 
 
 def resource_policy(test_id: str, metadata: dict[str, object] | None = None) -> str:
     """Return a scheduling marker independently of profile selection."""
-    module = normalize_test_id(test_id).split(".", 1)[0]
+    module = module_key(test_id)
     value = PRODUCTION_RESOURCE_OVERRIDES.get(module, RESOURCE_DEFAULT)
     marker = (metadata or {}).get("resource_class")
-    if marker in {RESOURCE_DEFAULT, RESOURCE_EXCLUSIVE_PROCESS_TREE}:
+    if module not in PRODUCTION_RESOURCE_OVERRIDES and marker in {
+        RESOURCE_DEFAULT,
+        RESOURCE_EXCLUSIVE_PROCESS_TREE,
+    }:
         value = str(marker)
     return value
 
@@ -101,9 +138,29 @@ def fast_test_filenames() -> tuple[str, ...]:
 
 
 def normalize_test_id(test_id: str) -> str:
-    """Return a stable ID independent of ``tests.`` package loading style."""
-    value = str(test_id)
-    return value[6:] if value.startswith("tests.") else value
+    """Return a stable unittest ID for package, path, and suffix spellings."""
+    value = str(test_id).strip().replace("\\", "/")
+    value = re.sub(r"\s+\(unittest\.[^)]+\)$", "", value)
+    while value.startswith("./"):
+        value = value[2:]
+    value = re.sub(r"\.py(?=\.|$)", "", value)
+    if "/" in value:
+        parts = [part for part in value.split("/") if part and part != "."]
+        if "tests" in parts:
+            parts = parts[parts.index("tests") + 1:]
+        if parts:
+            parts[-1] = re.sub(r"\.py$", "", parts[-1])
+            value = ".".join(parts)
+    else:
+        value = re.sub(r"\.py$", "", value)
+    if value.startswith("tests."):
+        value = value[6:]
+    return value
+
+
+def module_key(test_id: str) -> str:
+    """Return the canonical module stem from any accepted test-key spelling."""
+    return normalize_test_id(test_id).split(".", 1)[0]
 
 
 def iter_tests(suite: unittest.TestSuite) -> Iterator[unittest.TestCase]:
@@ -125,8 +182,13 @@ def selected(test_id: str, profile: str) -> bool:
         return False
     if profile == "standard":
         return True
-    module = normalized.split(".", 1)[0]
-    return module in FAST_MODULES
+    module = module_key(normalized)
+    if module not in FAST_MODULES:
+        return False
+    return not any(
+        normalized == prefix or normalized.startswith(prefix + ".")
+        for prefix in FAST_EXCLUDED_CLASSES
+    )
 
 
 def filter_suite(
