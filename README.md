@@ -1,3 +1,9 @@
+# BBK has served its purpose
+
+BBK was intended as a test bench and a stepping stone on the way to the tools that I really need - Blueprint, Tenex, and others.
+
+It has served it's purpose, and will not be updated further. This repo will remain archived so links and referenced to it don't go stale, but I can't recommend using it in the current state - the shape is useful to learn from, but many of the present elements are not well suited to production use.
+
 # BBK — Blueprint Bootstrap Kit
 
 ### Structured planning, delegation, execution, and review for coding agents
